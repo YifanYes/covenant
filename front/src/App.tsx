@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import './App.css'
 import reactLogo from './assets/react.svg'
 import { trpc } from './utils/trpc'
 import viteLogo from '/vite.svg'
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const { t, i18n } = useTranslation()
   const { data, isLoading } = useQuery(trpc.greet.queryOptions({ name: 'world' }))
 
   if (isLoading || !data) {
@@ -26,10 +25,12 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
+        <button onClick={() => i18n.changeLanguage('en')}>English</button>
+        <button onClick={() => i18n.changeLanguage('es')}>Español</button>
       </div>
       <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
       <p>{data.greeting}</p>
+      <p>{t('hello')}</p>
     </>
   )
 }
