@@ -28,9 +28,8 @@ function App() {
         <button onClick={() => i18n.changeLanguage('en')}>English</button>
         <button onClick={() => i18n.changeLanguage('es')}>Español</button>
       </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-      <p>{data.greeting}</p>
-      <p>{t('hello')}</p>
+      <p>Data from server: {data.greeting}</p>
+      <p>Translation key: {t('hello')}</p>
     </>
   )
 }
