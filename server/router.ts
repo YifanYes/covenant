@@ -1,4 +1,5 @@
 import { authRouter } from './routers/auth.router'
+import { objectivesRouter } from './routers/objectives.router'
 import { publicProcedure, t } from './trpc'
 
 export const appRouter = t.router({
@@ -7,7 +8,8 @@ export const appRouter = t.router({
       message: 'Server online'
     }
   }),
-  auth: authRouter
+  auth: authRouter,
+  objectives: objectivesRouter
 })
 
 export type AppRouter = typeof appRouter

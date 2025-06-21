@@ -1,4 +1,5 @@
 import type { FastifyRequest } from 'fastify'
+import { prisma } from './lib/prisma'
 import { supabase } from './lib/supabase'
 
 export async function createContext({ req }: { req: FastifyRequest }) {
@@ -11,7 +12,7 @@ export async function createContext({ req }: { req: FastifyRequest }) {
     if (!error) user = data.user
   }
 
-  return { user }
+  return { user, supabase, prisma }
 }
 
 export type Context = Awaited<ReturnType<typeof createContext>>
