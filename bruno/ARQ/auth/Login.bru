@@ -1,0 +1,33 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/auth.login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{email}}",
+    "password": "{{password}}"
+  }
+}
+
+script:post-response {
+  const data = res.body?.result?.data
+  
+  if (data) {
+    const userId = data.user?.id
+    const accessToken = data.session?.accessToken
+    const refreshToken = data.session?.refreshToken
+  
+    if (userId) bru.setEnvVar('user_id', userId)
+    if (accessToken) bru.setEnvVar('access_token', accessToken)
+    if (refreshToken) bru.setEnvVar('refresh_token', refreshToken)
+  }
+  
+}

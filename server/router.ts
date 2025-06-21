@@ -1,14 +1,13 @@
-import { initTRPC } from '@trpc/server'
-import { z } from 'zod'
-
-const t = initTRPC.create()
+import { authRouter } from './routers/auth.router'
+import { publicProcedure, t } from './trpc'
 
 export const appRouter = t.router({
-  greet: t.procedure.input(z.object({ name: z.string() })).query(({ input }) => {
+  health: publicProcedure.query(() => {
     return {
-      greeting: `Hello, ${input.name}!`
+      message: 'Server online'
     }
-  })
+  }),
+  auth: authRouter
 })
 
 export type AppRouter = typeof appRouter
