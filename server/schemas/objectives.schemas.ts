@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 export const createObjectiveSchema = z.object({
   name: z.string(),
@@ -6,11 +6,11 @@ export const createObjectiveSchema = z.object({
 })
 
 export const updateObjectiveSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string(),
   description: z.string().optional()
 })
 
 export const deleteObjectiveSchema = z.object({
-  id: z.string().uuid()
+  id: z.uuid()
 })

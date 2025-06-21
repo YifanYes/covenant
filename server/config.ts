@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['dev', 'prod', 'test']).default('dev'),
@@ -10,7 +10,7 @@ const envSchema = z.object({
     }),
   DATABASE_URL: z.string().min(1),
   DIRECT_URL: z.string().min(1),
-  SUPABASE_URL: z.string().url(),
+  SUPABASE_URL: z.url(),
   SUPABASE_SERVICE_KEY: z.string().min(1)
 })
 
