@@ -1,0 +1,22 @@
+meta {
+  name: Update
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/objectives.update
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "id": "{{objective_id}}",
+    "name": "Train 4 times a week"
+  }
+}

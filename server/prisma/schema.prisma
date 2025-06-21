@@ -8,3 +8,14 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+model Objective {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar(255)
+  description String?
+  userId      String   @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamp
+  updatedAt   DateTime @updatedAt @db.Timestamp
+
+  @@map("objectives")
+}

@@ -1,14 +1,10 @@
 import { TRPCError } from '@trpc/server'
-import { supabase } from '../lib/supabase'
 import { loginSchema, signUpSchema } from '../schemas/auth.schemas'
 import { protectedProcedure, publicProcedure, t } from '../trpc'
 
 export const authRouter = t.router({
-  getSecretMessage: protectedProcedure.query(({ ctx }) => {
-    return `This is a secret message for ${ctx.user.email}`
-  }),
-  signUp: publicProcedure.input(signUpSchema).mutation(async ({ input }) => {
-    const { data, error } = await supabase.auth.signUp({
+  signUp: publicProcedure.input(signUpSchema).mutation(async ({ ctx, input }) => {
+    const { data, error } = await ctx.supabase.auth.signUp({
       email: input.email,
       password: input.password
     })
@@ -26,8 +22,8 @@ export const authRouter = t.router({
       }
     }
   }),
-  login: publicProcedure.input(loginSchema).mutation(async ({ input }) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+  login: publicProcedure.input(loginSchema).mutation(async ({ ctx, input }) => {
+    const { data, error } = await ctx.supabase.auth.signInWithPassword({
       email: input.email,
       password: input.password
     })
@@ -49,8 +45,8 @@ export const authRouter = t.router({
       }
     }
   }),
-  logout: protectedProcedure.mutation(async () => {
-    const { error } = await supabase.auth.signOut()
+  logout: protectedProcedure.mutation(async ({ ctx }) => {
+    const { error } = await ctx.supabase.auth.signOut()
 
     if (error) {
       throw new TRPCError({

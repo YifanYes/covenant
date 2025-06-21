@@ -1,0 +1,29 @@
+meta {
+  name: Delete
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/objectives.delete
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "id": "{{objective_id}}"
+  }
+}
+
+script:post-response {
+  const data = res.body?.result?.data
+  
+  if (data) {
+    bru.setEnvVar('objective_id', '')
+  }
+}

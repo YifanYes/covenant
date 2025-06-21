@@ -7,11 +7,11 @@ meta {
 post {
   url: {{host}}/auth.logout
   body: json
-  auth: none
+  auth: bearer
 }
 
-headers {
-  Authorization: Bearer {{access_token}}
+auth:bearer {
+  token: {{access_token}}
 }
 
 body:json {
@@ -22,7 +22,11 @@ body:json {
 }
 
 script:post-response {
-  bru.setEnvVar('user_id', '')
-  bru.setEnvVar('access_token', '')
-  bru.setEnvVar('refresh_token', '')
+  const data = res.body?.result?.data
+
+  if (data) {
+    bru.setEnvVar('user_id', '')
+    bru.setEnvVar('access_token', '')
+    bru.setEnvVar('refresh_token', '')
+  }
 }

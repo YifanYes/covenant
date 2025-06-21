@@ -1,0 +1,31 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/objectives.create
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "name": "Save $100"
+  }
+}
+
+script:post-response {
+  const data = res.body?.result?.data
+  
+  if (data) {
+    const objectiveId = data.objective?.id
+    if (objectiveId) bru.setEnvVar('objective_id', objectiveId)
+  }
+  
+}
