@@ -1,3 +1,9 @@
 {
-  "hello": "Hello world"
+  "hello": "Hello world",
+  "login": {
+    "button": "Login",
+    "email": "Email",
+    "password": "Password",
+    "title": "Login to ARQ"
+  }
 }
