@@ -1,3 +1,9 @@
 {
-  "hello": "Hola mundo"
+  "hello": "Hola mundo",
+  "login": {
+    "button": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "title": "Inicia sesión en ARQ"
+  }
 }
