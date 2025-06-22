@@ -28,7 +28,7 @@ export const authRouter = t.router({
       password: input.password
     })
 
-    if (error) {
+    if (error || !data.user || !data.session) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR'
       })
@@ -36,12 +36,12 @@ export const authRouter = t.router({
 
     return {
       user: {
-        id: data.user?.id,
-        email: data.user?.email
+        id: data.user.id,
+        email: data.user.email
       },
       session: {
-        accessToken: data.session?.access_token,
-        refreshToken: data.session?.refresh_token
+        accessToken: data.session.access_token,
+        refreshToken: data.session.refresh_token
       }
     }
   }),
