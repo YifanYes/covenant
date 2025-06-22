@@ -5,5 +5,15 @@
     "email": "Correo electrónico",
     "password": "Contraseña",
     "title": "Inicia sesión en ARQ"
+  },
+  "sidebar": {
+    "calendar": "Calendario",
+    "dashboard": "Panel de control",
+    "habits": "Hábitos",
+    "objectives": "Objetivos",
+    "profile": "Perfil",
+    "review": "Revisión",
+    "settings": "Configuración",
+    "tasks": "Tareas"
   }
 }
