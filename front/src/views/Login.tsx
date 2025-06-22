@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import { loginSchema, type LoginSchema } from '../../../server/schemas/auth.schemas'
-import { useAuthStore } from '../hooks/useStore'
+import { useAuthStore } from '../hooks/useAuthStore'
 
 export default function Login() {
   const { t } = useTranslation()

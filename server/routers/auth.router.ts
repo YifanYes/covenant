@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { loginSchema, signUpSchema } from '../schemas/auth.schemas'
+import { loginSchema, refreshTokenSchema, signUpSchema } from '../schemas/auth.schemas'
 import { protectedProcedure, publicProcedure, t } from '../trpc'
 
 export const authRouter = t.router({
@@ -56,6 +56,21 @@ export const authRouter = t.router({
 
     return {
       message: 'Logout successfully'
+    }
+  }),
+  refreshToken: publicProcedure.input(refreshTokenSchema).mutation(async ({ ctx, input }) => {
+    const { data, error } = await ctx.supabase.auth.setSession({
+      access_token: input.accessToken,
+      refresh_token: input.refreshToken
+    })
+
+    if (error || !data.session) {
+      throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Token refresh failed' })
+    }
+
+    return {
+      accessToken: data.session.access_token,
+      refreshToken: data.session.refresh_token
     }
   })
 })
