@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/hooks/useStore'
+import { useAuthStore } from '@/hooks/useAuthStore'
 import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router'
 
