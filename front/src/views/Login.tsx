@@ -18,7 +18,6 @@ export default function Login() {
   const loginMutation = useMutation(
     trpc.auth.login.mutationOptions({
       onSuccess: (data) => {
-        console.log(data)
         updateUserInfo({
           // TODO: fix type inference
           email: data.user.email as string,
@@ -54,9 +53,9 @@ export default function Login() {
   const password = watch('password')
 
   return (
-    <div className="w-xs flex flex-col gap-2.5">
+    <div className='w-xs flex flex-col gap-2.5'>
       <h2>{t('login.title')}</h2>
-      <Input type="email" placeholder={t('login.email')} {...register('email')} />
+      <Input type='email' placeholder={t('login.email')} {...register('email')} />
       <PasswordInput placeholder={t('login.password')} {...register('password')} />
       <LoaderButtton
         disabled={!email || !password}

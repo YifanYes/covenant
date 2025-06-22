@@ -15,8 +15,8 @@ export default function LoaderButton({
   className?: string
 }) {
   return (
-    <Button size="sm" disabled={disabled} onClick={onClick} {...(className && { className })}>
-      {isLoading && <Loader2Icon className="animate-spin" />}
+    <Button size='sm' disabled={disabled} onClick={onClick} {...(className && { className })}>
+      {isLoading && <Loader2Icon className='animate-spin' />}
       {label}
     </Button>
   )

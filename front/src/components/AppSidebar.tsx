@@ -1,0 +1,102 @@
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem
+} from '@/components/ui/sidebar'
+import { BookCheck, Calendar, LayoutDashboard, List, Settings, Trophy, User } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { Separator } from './ui/separator'
+
+export function AppSidebar() {
+  const { t } = useTranslation()
+
+  const sidebarItems = {
+    content: [
+      {
+        title: t('sidebar.dashboard'),
+        url: '/dashboard',
+        icon: LayoutDashboard
+      },
+      {
+        title: t('sidebar.objectives'),
+        url: '/objectives',
+        icon: Trophy
+      },
+      {
+        title: t('sidebar.calendar'),
+        url: '/calendar',
+        icon: Calendar
+      },
+      {
+        title: t('sidebar.tasks'),
+        url: '/tasks',
+        icon: List
+      },
+      {
+        title: t('sidebar.habits'),
+        url: '/habits',
+        icon: BookCheck
+      }
+    ],
+    settings: [
+      {
+        title: t('sidebar.profile'),
+        url: '/profile',
+        icon: User
+      },
+      {
+        title: t('sidebar.settings'),
+        url: '/settings',
+        icon: Settings
+      }
+    ]
+  }
+
+  return (
+    <Sidebar>
+      <SidebarHeader>
+        <h2 className='text-lg font-semibold'>ARQ</h2>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {sidebarItems.content.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <a href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <Separator />
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {sidebarItems.settings.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <a href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  )
+}
