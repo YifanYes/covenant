@@ -1,0 +1,9 @@
+{
+  "name": "arq",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "install": "cd front && bun install && cd ../server && bun install"
+  }
+}

@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/hooks/useStore'
 import { QueryClient } from '@tanstack/react-query'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
@@ -10,9 +11,12 @@ const trpcClient = createTRPCClient<AppRouter>({
     httpBatchLink({
       url: 'http://localhost:2022/trpc',
       fetch(url, options) {
+        const { accessToken } = useAuthStore.getState()
+
         return fetch(url, {
           ...options,
-          credentials: 'include'
+          credentials: 'include',
+          ...(accessToken && { headers: { Authorization: `Bearer ${accessToken}` } })
         })
       }
     })
