@@ -2,8 +2,15 @@
   "hello": "Hello world",
   "login": {
     "button": "Login",
+    "create_account": "Create account",
+    "dont_have_account": "Don't have an account?",
     "email": "Email",
+    "error": {
+      "title": "An error ocurred while logging in"
+    },
+    "forgot_password": "Forgot password?",
     "password": "Password",
+    "recover_password": "Recover password",
     "title": "Login to ARQ"
   },
   "sidebar": {

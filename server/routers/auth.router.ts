@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server'
+import { env } from '../config'
 import { loginSchema, refreshTokenSchema, signUpSchema } from '../schemas/auth.schemas'
 import { protectedProcedure, publicProcedure, t } from '../trpc'
 
@@ -6,7 +7,10 @@ export const authRouter = t.router({
   signUp: publicProcedure.input(signUpSchema).mutation(async ({ ctx, input }) => {
     const { data, error } = await ctx.supabase.auth.signUp({
       email: input.email,
-      password: input.password
+      password: input.password,
+      options: {
+        emailRedirectTo: `${env.FRONT_URL}/login`
+      }
     })
 
     if (error) {
