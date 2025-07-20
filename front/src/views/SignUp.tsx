@@ -1,6 +1,7 @@
 import LoaderButton from '@/components/LoaderButton'
 import PasswordInput from '@/components/PasswordInput'
 import { Input } from '@/components/ui/input'
+import { useSnackbar } from '@/hooks/useSnackbar'
 import { trpc } from '@/utils/trpc'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
@@ -11,13 +12,20 @@ import { signUpSchema } from '../../../server/schemas/auth.schemas'
 
 export const SignUp: FC = () => {
   const { t } = useTranslation()
+  const { show } = useSnackbar()
 
   const [isSigned, setIsSigned] = useState(false)
 
   const signUpMutation = useMutation(
     trpc.auth.signUp.mutationOptions({
       onSuccess: () => setIsSigned(true),
-      onError: (error) => console.log(error)
+      onError: (error) => {
+        console.log(error)
+        show({
+          variant: 'destructive',
+          title: t('signup.error.title')
+        })
+      }
     })
   )
 
