@@ -33,7 +33,7 @@ export default function Login() {
       onError: (error) => {
         console.log(error)
         show({
-          variant: 'default',
+          variant: 'destructive',
           title: t('login.error.title')
         })
       }
