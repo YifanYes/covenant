@@ -2,8 +2,15 @@
   "hello": "Hola mundo",
   "login": {
     "button": "Iniciar sesión",
+    "create_account": "Crear cuenta",
+    "dont_have_account": "¿No tienes cuenta?",
     "email": "Correo electrónico",
+    "error": {
+      "title": "Ocurrió un error al iniciar sesión"
+    },
+    "forgot_password": "¿Olvidaste tu contraseña?",
     "password": "Contraseña",
+    "recover_password": "Recuperar contraseña",
     "title": "Inicia sesión en ARQ"
   },
   "sidebar": {
