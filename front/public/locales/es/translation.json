@@ -25,6 +25,18 @@
     "recover_password": "Recuperar contraseña",
     "title": "Inicia sesión en ARQ"
   },
+  "recover_password": {
+    "button": "Restablecer contraseña",
+    "confirm_password": "Confirmar contraseña",
+    "error": {
+      "title": "Ocurrió un error al cambiar la contraseña de tu cuenta"
+    },
+    "password": "Contraseña",
+    "success": {
+      "title": "Contraseña restablecida con éxito"
+    },
+    "title": "Crea una nueva contraseña para tu cuenta"
+  },
   "sidebar": {
     "calendar": "Calendario",
     "dashboard": "Panel de control",

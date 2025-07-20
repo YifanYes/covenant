@@ -25,6 +25,18 @@
     "recover_password": "Recover password",
     "title": "Login to ARQ"
   },
+  "recover_password": {
+    "button": "Reset password",
+    "confirm_password": "Confirm password",
+    "error": {
+      "title": "An error occurred while changing the password for your account"
+    },
+    "password": "Password",
+    "success": {
+      "title": "Password successfully reset"
+    },
+    "title": "Create a new password for your account"
+  },
   "sidebar": {
     "calendar": "Calendar",
     "dashboard": "Dashboard",
