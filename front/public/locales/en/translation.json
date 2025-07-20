@@ -22,5 +22,17 @@
     "review": "Review",
     "settings": "Settings",
     "tasks": "Tasks"
+  },
+  "signup": {
+    "button": "Create account",
+    "confirm_password": "Confirm password",
+    "email": "Email",
+    "error": {
+      "title": "An error ocurred while signing up"
+    },
+    "password": "Password",
+    "success_message": "Check your email inbox to enable your account",
+    "success_title": "Account created successfully",
+    "title": "Create an ARQ account"
   }
 }
