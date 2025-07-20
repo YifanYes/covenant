@@ -15,5 +15,14 @@
     "review": "Revisión",
     "settings": "Configuración",
     "tasks": "Tareas"
+  },
+  "signup": {
+    "button": "Crear cuenta",
+    "confirmPassword": "Confirmar contraseña",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "successMessage": "Comprueba el correo para activar tu cuenta",
+    "successTitle": "Cuenta creada con exito",
+    "title": "Crear una cuenta en ARQ"
   }
 }
