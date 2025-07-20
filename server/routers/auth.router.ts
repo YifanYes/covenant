@@ -1,6 +1,12 @@
 import { TRPCError } from '@trpc/server'
 import { env } from '../config'
-import { loginSchema, refreshTokenSchema, signUpSchema } from '../schemas/auth.schemas'
+import {
+  emailSchema,
+  loginSchema,
+  refreshTokenSchema,
+  signUpSchema,
+  updatePasswordSchema
+} from '../schemas/auth.schemas'
 import { protectedProcedure, publicProcedure, t } from '../trpc'
 
 export const authRouter = t.router({
@@ -31,6 +37,13 @@ export const authRouter = t.router({
       email: input.email,
       password: input.password
     })
+
+    if (error?.code === 'invalid_credentials') {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Invalid credentials'
+      })
+    }
 
     if (error || !data.user || !data.session) {
       throw new TRPCError({
@@ -75,6 +88,57 @@ export const authRouter = t.router({
     return {
       accessToken: data.session.access_token,
       refreshToken: data.session.refresh_token
+    }
+  }),
+  resetPassword: publicProcedure.input(emailSchema).mutation(async ({ ctx, input }) => {
+    const { error } = await ctx.supabase.auth.resetPasswordForEmail(input.email, {
+      redirectTo: `${env.FRONT_URL}/recover-password`
+    })
+
+    if (error) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR'
+      })
+    }
+
+    return {
+      message: 'Password reset successfully'
+    }
+  }),
+  updatePassword: publicProcedure.input(updatePasswordSchema).mutation(async ({ ctx, input }) => {
+    await ctx.supabase.auth.setSession({
+      access_token: input.accessToken,
+      refresh_token: input.refreshToken
+    })
+
+    const { error } = await ctx.supabase.auth.updateUser({
+      password: input.password
+    })
+
+    if (error?.code === 'same_password') {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'New password is the same as the current password'
+      })
+    }
+
+    if (error?.name === 'AuthSessionMissingError') {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Session expired'
+      })
+    }
+
+    if (error) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR'
+      })
+    }
+
+    await ctx.supabase.auth.signOut()
+
+    return {
+      message: 'Password updated successfully'
     }
   })
 })
