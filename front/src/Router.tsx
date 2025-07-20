@@ -4,6 +4,7 @@ import AppLayout from './layouts/AppLayout'
 import CenteredLayout from './layouts/CenteredLayout'
 import WorkspaceLayout from './layouts/WorkspaceLayout'
 import Dashboard from './views/Dashboard'
+import ForgotPassword from './views/ForgotPassword'
 import Login from './views/Login'
 import RecoverPassword from './views/RecoverPassword'
 import SignUp from './views/SignUp'
@@ -16,6 +17,7 @@ export const Router = () => {
           <Route element={<CenteredLayout />}>
             <Route path='/login' element={<Login />} />
             <Route path='/sign-up' element={<SignUp />} />
+            <Route path='/forgot-password' element={<ForgotPassword />} />
             <Route path='/recover-password' element={<RecoverPassword />} />
           </Route>
           <Route element={<PrivateRoute />}>
