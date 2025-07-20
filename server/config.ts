@@ -11,7 +11,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   DIRECT_URL: z.string().min(1),
   SUPABASE_URL: z.url(),
-  SUPABASE_SERVICE_KEY: z.string().min(1)
+  SUPABASE_SERVICE_KEY: z.string().min(1),
+  FRONT_URL: z.url().min(1)
 })
 
 const _env = envSchema.safeParse(process.env)
