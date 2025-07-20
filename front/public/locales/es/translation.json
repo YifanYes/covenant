@@ -27,6 +27,9 @@
     "button": "Crear cuenta",
     "confirm_password": "Confirmar contraseña",
     "email": "Correo electrónico",
+    "error": {
+      "title": "Ocurrió un error al crear la cuenta"
+    },
     "password": "Contraseña",
     "success_message": "Comprueba el correo para activar tu cuenta",
     "success_title": "Cuenta creada con exito",
