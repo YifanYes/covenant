@@ -1,6 +1,8 @@
+import Link from '@/components/Link'
 import LoaderButtton from '@/components/LoaderButton'
 import PasswordInput from '@/components/PasswordInput'
 import { Input } from '@/components/ui/input'
+import { useSnackbar } from '@/hooks/useSnackbar'
 import { trpc } from '@/utils/trpc'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
@@ -14,12 +16,12 @@ export default function Login() {
   const { t } = useTranslation()
   const { updateUserInfo } = useAuthStore()
   const navigate = useNavigate()
+  const { show } = useSnackbar()
 
   const loginMutation = useMutation(
     trpc.auth.login.mutationOptions({
       onSuccess: (data) => {
         updateUserInfo({
-          // TODO: fix type inference
           email: data.user.email as string,
           userId: data.user.id,
           accessToken: data.session.accessToken,
@@ -28,7 +30,13 @@ export default function Login() {
 
         navigate('/dashboard')
       },
-      onError: (error) => console.log(error)
+      onError: (error) => {
+        console.log(error)
+        show({
+          variant: 'default',
+          title: t('login.error.title')
+        })
+      }
     })
   )
 
@@ -36,12 +44,7 @@ export default function Login() {
     loginMutation.mutate(data)
   }
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors }
-  } = useForm({
+  const { register, handleSubmit, watch } = useForm({
     defaultValues: {
       email: '',
       password: ''
@@ -53,7 +56,7 @@ export default function Login() {
   const password = watch('password')
 
   return (
-    <div className='w-xs flex flex-col gap-2.5'>
+    <div className='w-md flex flex-col gap-2.5'>
       <h2>{t('login.title')}</h2>
       <Input type='email' placeholder={t('login.email')} {...register('email')} />
       <PasswordInput placeholder={t('login.password')} {...register('password')} />
@@ -63,6 +66,14 @@ export default function Login() {
         label={t('login.button')}
         onClick={handleSubmit(onSubmit)}
       />
+      <div className='flex flex-row gap-0.5'>
+        <p>{t('login.dont_have_account')}</p>
+        <Link href='/sign-up'>{t('login.create_account')}</Link>
+      </div>
+      <div className='flex flex-row gap-0.5'>
+        <p>{t('login.forgot_password')}</p>
+        <Link href='/recover-password'>{t('login.recover_password')}</Link>
+      </div>
     </div>
   )
 }
