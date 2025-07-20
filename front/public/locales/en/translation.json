@@ -18,11 +18,11 @@
   },
   "signup": {
     "button": "Crear cuenta",
-    "confirmPassword": "Confirmar contraseña",
+    "confirm_password": "Confirmar contraseña",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "successMessage": "Comprueba el correo para activar tu cuenta",
-    "successTitle": "Cuenta creada con exito",
+    "success_message": "Comprueba el correo para activar tu cuenta",
+    "success_title": "Cuenta creada con exito",
     "title": "Crear una cuenta en ARQ"
   }
 }
