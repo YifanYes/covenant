@@ -44,12 +44,7 @@ export default function Login() {
     loginMutation.mutate(data)
   }
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors }
-  } = useForm({
+  const { register, handleSubmit, watch } = useForm({
     defaultValues: {
       email: '',
       password: ''

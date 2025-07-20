@@ -14,7 +14,7 @@ export const Router = () => {
       <Routes>
         <Route element={<AppLayout />}>
           <Route element={<CenteredLayout />}>
-            <Route path='/' element={<Login />} />
+            <Route path='/login' element={<Login />} />
             <Route path='/sign-up' element={<SignUp />} />
             <Route path='/recover-password' element={<RecoverPassword />} />
           </Route>
