@@ -16,7 +16,7 @@ export const ForgotPassword: FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false)
 
   const forgotPasswordMutation = useMutation(
-    trpc.auth.forgotPassword.mutationOptions({
+    trpc.auth.resetPassword.mutationOptions({
       onSuccess: () => setIsSubmitted(true),
       onError: (error) => {
         console.log(error)
@@ -38,7 +38,7 @@ export const ForgotPassword: FC = () => {
     <div className='w-xs flex flex-col gap-2.5'>
       <h2>{t(isSubmitted ? 'forgot_password.success.title' : 'forgot_password.title')}</h2>
       {isSubmitted ? (
-        <p>{t('forgot_password.success_message')}</p>
+        <p>{t('forgot_password.success.message')}</p>
       ) : (
         <>
           <Input type='email' placeholder={t('forgot_password.email')} {...register('email')} />

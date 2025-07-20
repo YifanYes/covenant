@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useLocation, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 import { loginSchema, type LoginSchema } from '../../../server/schemas/auth.schemas'
 import { useAuthStore } from '../hooks/useAuthStore'
 
@@ -17,7 +17,6 @@ export default function Login() {
   const { updateUserInfo } = useAuthStore()
   const navigate = useNavigate()
   const { show } = useSnackbar()
-  const { state } = useLocation()
 
   const loginMutation = useMutation(
     trpc.auth.login.mutationOptions({
@@ -46,7 +45,7 @@ export default function Login() {
   }
 
   const { register, handleSubmit, watch } = useForm({
-    defaultValues: { email: state?.email ?? '', password: '' },
+    defaultValues: { email: '', password: '' },
     resolver: zodResolver(loginSchema)
   })
 
@@ -70,7 +69,7 @@ export default function Login() {
       </div>
       <div className='flex flex-row gap-0.5'>
         <p>{t('login.forgot_password')}</p>
-        <Link href='/recover-password'>{t('login.recover_password')}</Link>
+        <Link href='/forgot-password'>{t('login.recover_password')}</Link>
       </div>
     </div>
   )
