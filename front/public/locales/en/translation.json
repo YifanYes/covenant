@@ -1,4 +1,16 @@
 {
+  "forgot_password": {
+    "button": "Send mail",
+    "email": "Email",
+    "error": {
+      "title": "An error occurred while sending the recovery mail"
+    },
+    "success": {
+      "message": "Recovery mail sent",
+      "title": "Check the inbox of the provided mail"
+    },
+    "title": "Password recovery"
+  },
   "hello": "Hello world",
   "login": {
     "button": "Login",
