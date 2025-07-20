@@ -6,8 +6,8 @@
       "title": "An error occurred while sending the recovery mail"
     },
     "success": {
-      "message": "Recovery mail sent",
-      "title": "Check the inbox of the provided mail"
+      "message": "Check the inbox of the provided mail",
+      "title": "Recovery mail sent"
     },
     "title": "Password recovery"
   },
