@@ -31,14 +31,14 @@ export const SignUp: FC = () => {
 
   return (
     <div className='w-xs flex flex-col gap-2.5'>
-      <h2>{t(isSigned ? 'signup.successTitle' : 'signup.title')}</h2>
+      <h2>{t(isSigned ? 'signup.success_title' : 'signup.title')}</h2>
       {isSigned ? (
-        <p>{t('signup.successMessage')}</p>
+        <p>{t('signup.success_message')}</p>
       ) : (
         <>
           <Input type='email' placeholder={t('signup.email')} {...register('email')} />
           <PasswordInput placeholder={t('signup.password')} {...register('password')} />
-          <PasswordInput placeholder={t('signup.confirmPassword')} {...register('confirmPassword')} />
+          <PasswordInput placeholder={t('signup.confirm_password')} {...register('confirmPassword')} />
           <LoaderButton
             disabled={!email || !password || !confirmPassword || password !== confirmPassword}
             isLoading={signUpMutation.isPending}
