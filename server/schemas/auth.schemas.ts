@@ -1,5 +1,16 @@
 import { z } from 'zod/v4'
 
+export const forgotPasswordSchema = z.object({
+  email: z.email()
+})
+export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>
+
+export const recoverPasswordSchema = z.object({
+  password: z.string(),
+  confirmPassword: z.string()
+})
+export type RecoverPasswordSchema = z.infer<typeof recoverPasswordSchema>
+
 export const signUpSchema = z.object({
   email: z.email(),
   password: z.string(),

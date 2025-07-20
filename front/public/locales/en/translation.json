@@ -1,4 +1,16 @@
 {
+  "forgot_password": {
+    "button": "Send mail",
+    "email": "Email",
+    "error": {
+      "title": "An error occurred while sending the recovery mail"
+    },
+    "success": {
+      "message": "Check the inbox of the provided mail",
+      "title": "Recovery mail sent"
+    },
+    "title": "Password recovery"
+  },
   "hello": "Hello world",
   "login": {
     "button": "Login",
@@ -12,6 +24,18 @@
     "password": "Password",
     "recover_password": "Recover password",
     "title": "Login to ARQ"
+  },
+  "recover_password": {
+    "button": "Reset password",
+    "confirm_password": "Confirm password",
+    "error": {
+      "title": "An error occurred while changing the password for your account"
+    },
+    "password": "Password",
+    "success": {
+      "title": "Password successfully reset"
+    },
+    "title": "Create a new password for your account"
   },
   "sidebar": {
     "calendar": "Calendar",
