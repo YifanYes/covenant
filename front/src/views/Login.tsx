@@ -1,4 +1,4 @@
-import LoaderButtton from '@/components/LoaderButton'
+import LoaderButton from '@/components/LoaderButton'
 import PasswordInput from '@/components/PasswordInput'
 import { Input } from '@/components/ui/input'
 import { trpc } from '@/utils/trpc'
@@ -57,7 +57,7 @@ export default function Login() {
       <h2>{t('login.title')}</h2>
       <Input type='email' placeholder={t('login.email')} {...register('email')} />
       <PasswordInput placeholder={t('login.password')} {...register('password')} />
-      <LoaderButtton
+      <LoaderButton
         disabled={!email || !password}
         isLoading={loginMutation.isPending}
         label={t('login.button')}
