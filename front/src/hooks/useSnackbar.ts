@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export type SnackbarVariant = 'default' | 'destructive'
+export type SnackbarVariant = 'default' | 'destructive' | 'success'
 
 type SnackbarInput = {
   variant: SnackbarVariant
