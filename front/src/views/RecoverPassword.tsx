@@ -51,7 +51,7 @@ export const RecoverPassword: FC = () => {
 
   useEffect(() => {
     if (errorCode) navigate('/login')
-  }, [errorCode])
+  }, [errorCode, navigate])
 
   return (
     <div className='w-xs flex flex-col gap-2.5'>
