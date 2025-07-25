@@ -1,4 +1,9 @@
 {
+  "errors": {
+    "invalid_email": "Correo electrónico no valido",
+    "invalid_password_length": "La contraseña debe tener al menos 6 caracteres",
+    "password_mismatch": "Las contraseñas no coinciden"
+  },
   "forgot_password": {
     "button": "Enviar correo",
     "email": "Correo electrónico",
@@ -6,8 +11,8 @@
       "title": "Ocurrió un error al enviar el correo de recuperación"
     },
     "success": {
-      "message": "Revisa la bandeja de entrada del correo proporcionado",
-      "title": "Correo de recuperación enviado"
+      "message": "Revisa tu bandeja de entrada.",
+      "title": "¡Correo de recuperación enviado!"
     },
     "title": "Recuperación de contraseña"
   },
@@ -18,7 +23,8 @@
     "dont_have_account": "¿No tienes cuenta?",
     "email": "Correo electrónico",
     "error": {
-      "title": "Ocurrió un error al iniciar sesión"
+      "internal_error": "Ocurrió un error al iniciar sesión",
+      "invalid_credentials": "Credenciales inválidas. Por favor, verifica tu correo y contraseña."
     },
     "forgot_password": "¿Olvidaste tu contraseña?",
     "password": "Contraseña",
@@ -47,16 +53,18 @@
     "settings": "Configuración",
     "tasks": "Tareas"
   },
-  "signup": {
+  "sign_up": {
+    "already_have_account": "¿Ya tienes cuenta?",
     "button": "Crear cuenta",
     "confirm_password": "Confirmar contraseña",
     "email": "Correo electrónico",
     "error": {
       "title": "Ocurrió un error al crear la cuenta"
     },
+    "login": "Inicia sesión",
     "password": "Contraseña",
-    "success_message": "Comprueba el correo para activar tu cuenta",
-    "success_title": "Cuenta creada con exito",
+    "success_message": "Te hemos enviado un correo de vertificación. Comprueba tu bandeja de entrada.",
+    "success_title": "¡Cuenta creada!",
     "title": "Crear una cuenta en ARQ"
   }
 }
