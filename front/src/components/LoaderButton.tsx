@@ -15,7 +15,13 @@ export default function LoaderButton({
   className?: string
 }) {
   return (
-    <Button size='sm' disabled={disabled} onClick={onClick} className={`cursor-pointer ${className || ''}`}>
+    <Button
+      size='sm'
+      disabled={disabled || isLoading}
+      onClick={onClick}
+      className={`cursor-pointer ${className || ''}`}
+      aria-busy={isLoading}
+    >
       {isLoading && <Loader2Icon className='animate-spin' />}
       {label}
     </Button>
