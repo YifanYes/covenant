@@ -1,7 +1,7 @@
 import Link from '@/components/Link'
 import LoaderButton from '@/components/LoaderButton'
-import PasswordInput from '@/components/PasswordInput'
-import { Input } from '@/components/ui/input'
+import PasswordInput from '@/components/forms/PasswordInput'
+import TextInput from '@/components/forms/TextInput'
 import { useSnackbar } from '@/hooks/useSnackbar'
 import { trpc } from '@/utils/trpc'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -32,6 +32,15 @@ export default function Login() {
       },
       onError: (error) => {
         console.log(error)
+
+        if (error?.message === 'Invalid credentials') {
+          show({
+            variant: 'destructive',
+            title: t('login.error.invalid_credentials')
+          })
+          return
+        }
+
         show({
           variant: 'destructive',
           title: t('login.error.title')
@@ -44,21 +53,32 @@ export default function Login() {
     loginMutation.mutate(data)
   }
 
-  const { register, handleSubmit, watch } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isDirty }
+  } = useForm({
     defaultValues: { email: '', password: '' },
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(loginSchema),
+    mode: 'onTouched'
   })
-
-  const email = watch('email')
-  const password = watch('password')
 
   return (
     <div className='w-md flex flex-col gap-2.5'>
       <h2>{t('login.title')}</h2>
-      <Input type='email' placeholder={t('login.email')} {...register('email')} />
-      <PasswordInput placeholder={t('login.password')} {...register('password')} />
+      <TextInput
+        type='email'
+        placeholder={t('login.email')}
+        {...register('email')}
+        {...(errors.email?.message && { errorMessage: t(errors.email.message) })}
+      />
+      <PasswordInput
+        placeholder={t('login.password')}
+        {...register('password')}
+        {...(errors.password?.message && { errorMessage: t(errors.password.message) })}
+      />
       <LoaderButton
-        disabled={!email || !password}
+        disabled={!isValid || !isDirty}
         isLoading={loginMutation.isPending}
         label={t('login.button')}
         onClick={handleSubmit(onSubmit)}

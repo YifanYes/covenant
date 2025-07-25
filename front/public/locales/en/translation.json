@@ -1,4 +1,9 @@
 {
+  "errors": {
+    "invalid_email": "Invalid email",
+    "invalid_password_length": "Password must have at least 6 characters",
+    "password_mismatch": "Passwords do not match"
+  },
   "forgot_password": {
     "button": "Send mail",
     "email": "Email",
@@ -6,8 +11,8 @@
       "title": "An error occurred while sending the recovery mail"
     },
     "success": {
-      "message": "Check the inbox of the provided mail",
-      "title": "Recovery mail sent"
+      "message": "Check your inbox.",
+      "title": "Recovery mail sent!"
     },
     "title": "Password recovery"
   },
@@ -18,7 +23,8 @@
     "dont_have_account": "Don't have an account?",
     "email": "Email",
     "error": {
-      "title": "An error ocurred while logging in"
+      "internal_error": "An error ocurred while logging in",
+      "invalid_credentials": "Invalid credentials. Please check your email and password."
     },
     "forgot_password": "Forgot password?",
     "password": "Password",
@@ -47,16 +53,18 @@
     "settings": "Settings",
     "tasks": "Tasks"
   },
-  "signup": {
+  "sign_up": {
+    "already_have_account": "Already have an account?",
     "button": "Create account",
     "confirm_password": "Confirm password",
     "email": "Email",
     "error": {
       "title": "An error ocurred while signing up"
     },
+    "login": "Log in",
     "password": "Password",
-    "success_message": "Check your email inbox to enable your account",
-    "success_title": "Account created successfully",
+    "success_message": "We have sent you a verification email. Please check your inbox.",
+    "success_title": "Account created!",
     "title": "Create an ARQ account"
   }
 }

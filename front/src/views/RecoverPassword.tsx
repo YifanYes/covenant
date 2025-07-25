@@ -1,5 +1,5 @@
 import LoaderButton from '@/components/LoaderButton'
-import PasswordInput from '@/components/PasswordInput'
+import PasswordInput from '@/components/forms/PasswordInput'
 import useHashParams from '@/hooks/use-hash-params'
 import { useSnackbar } from '@/hooks/useSnackbar'
 import { trpc } from '@/utils/trpc'
@@ -25,7 +25,7 @@ export const RecoverPassword: FC = () => {
     trpc.auth.updatePassword.mutationOptions({
       onSuccess: () => {
         show({
-          variant: 'default',
+          variant: 'success',
           title: t('recover_password.success.title')
         })
         navigate('/login')
@@ -40,10 +40,11 @@ export const RecoverPassword: FC = () => {
     })
   )
 
-  const { register, handleSubmit, watch } = useForm({ resolver: zodResolver(recoverPasswordSchema) })
-
-  const password = watch('password')
-  const confirmPassword = watch('confirmPassword')
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isDirty }
+  } = useForm({ resolver: zodResolver(recoverPasswordSchema), mode: 'onTouched' })
 
   const onSubmit = handleSubmit(({ password }) =>
     recoverPasswordMutation.mutate({ password, accessToken, refreshToken })
@@ -54,12 +55,20 @@ export const RecoverPassword: FC = () => {
   }, [errorCode, navigate])
 
   return (
-    <div className='w-xs flex flex-col gap-2.5'>
+    <div className='w-md flex flex-col gap-2.5'>
       <h2>{t('recover_password.title')}</h2>
-      <PasswordInput placeholder={t('recover_password.password')} {...register('password')} />
-      <PasswordInput placeholder={t('recover_password.confirm_password')} {...register('confirmPassword')} />
+      <PasswordInput
+        placeholder={t('recover_password.password')}
+        {...register('password')}
+        {...(errors.password?.message && { errorMessage: t(errors.password.message) })}
+      />
+      <PasswordInput
+        placeholder={t('recover_password.confirm_password')}
+        {...register('confirmPassword')}
+        {...(errors.confirmPassword?.message && { errorMessage: t(errors.confirmPassword.message) })}
+      />
       <LoaderButton
-        disabled={!password || !confirmPassword || password !== confirmPassword || !accessToken || !refreshToken}
+        disabled={!isValid || !isDirty}
         isLoading={recoverPasswordMutation.isPending}
         label={t('recover_password.button')}
         onClick={onSubmit}
