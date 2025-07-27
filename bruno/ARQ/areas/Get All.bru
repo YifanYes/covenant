@@ -1,0 +1,25 @@
+meta {
+  name: Get All
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{host}}/areas.getAll
+  body: none
+  auth: bearer
+}
+
+headers {
+  x-refresh-token: {{refresh_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "name": "Save $100"
+  }
+}

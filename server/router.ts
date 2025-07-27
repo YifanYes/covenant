@@ -1,3 +1,4 @@
+import { areasRouter } from './routers/areas.router'
 import { authRouter } from './routers/auth.router'
 import { objectivesRouter } from './routers/objectives.router'
 import { publicProcedure, t } from './trpc'
@@ -9,7 +10,8 @@ export const appRouter = t.router({
     }
   }),
   auth: authRouter,
-  objectives: objectivesRouter
+  objectives: objectivesRouter,
+  areas: areasRouter
 })
 
 export type AppRouter = typeof appRouter

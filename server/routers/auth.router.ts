@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { env } from '../config'
+import { defaultAreas } from '../schemas/areas.schemas'
 import {
   emailSchema,
   loginSchema,
@@ -22,6 +23,19 @@ export const authRouter = t.router({
     if (error) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR'
+      })
+    }
+
+    if (data.user) {
+      const { user } = data
+
+      await ctx.prisma.area.createMany({
+        data: defaultAreas.map((defaultArea) => ({
+          name: defaultArea.name,
+          color: defaultArea.color,
+          icon: defaultArea.icon,
+          userId: user.id
+        }))
       })
     }
 

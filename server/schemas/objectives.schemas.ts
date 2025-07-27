@@ -2,13 +2,15 @@ import { z } from 'zod/v4'
 
 export const createObjectiveSchema = z.object({
   name: z.string(),
-  description: z.string().optional()
+  description: z.string().optional(),
+  areas: z.array(z.uuid()).optional()
 })
 
 export const updateObjectiveSchema = z.object({
   id: z.uuid(),
-  name: z.string(),
-  description: z.string().optional()
+  name: z.string().optional(),
+  description: z.string().optional(),
+  areas: z.array(z.uuid()).optional()
 })
 
 export const deleteObjectiveSchema = z.object({

@@ -1,0 +1,35 @@
+meta {
+  name: Delete
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/areas.delete
+  body: json
+  auth: bearer
+}
+
+headers {
+  x-refresh-token: {{refresh_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "id": "{{area_id}}"
+  }
+}
+
+script:post-response {
+  const data = res.body?.result?.data
+  
+  if (data) {
+    const areaId = data.area?.id
+    if (areaId) bru.setEnvVar('area_id', areaId)
+  }
+  
+}

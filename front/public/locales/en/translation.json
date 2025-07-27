@@ -1,4 +1,12 @@
 {
+  "areas": {
+    "career": "Professional career",
+    "family_and_friends": "Family and friends",
+    "finances": "Finances",
+    "love": "Love",
+    "mental_health": "Mental health",
+    "physical_health": "Physical health"
+  },
   "errors": {
     "invalid_email": "Invalid email",
     "invalid_password_length": "Password must have at least 6 characters",
