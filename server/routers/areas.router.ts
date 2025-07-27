@@ -1,4 +1,5 @@
 import { createAreaSchema, deleteAreaSchema, updateAreaSchema } from '../schemas/areas.schemas'
+import { getUserArea } from '../services/areas.services'
 import { protectedProcedure, t } from '../trpc'
 
 export const areasRouter = t.router({
@@ -28,7 +29,9 @@ export const areasRouter = t.router({
     }
   }),
   update: protectedProcedure.input(updateAreaSchema).mutation(async ({ ctx, input }) => {
-    const objective = await ctx.prisma.area.update({
+    await getUserArea(ctx.prisma, input.id, ctx.user.id)
+
+    const area = await ctx.prisma.area.update({
       where: {
         id: input.id
       },
@@ -41,10 +44,12 @@ export const areasRouter = t.router({
     })
 
     return {
-      objective
+      area
     }
   }),
   delete: protectedProcedure.input(deleteAreaSchema).mutation(async ({ ctx, input }) => {
+    await getUserArea(ctx.prisma, input.id, ctx.user.id)
+
     await ctx.prisma.area.delete({
       where: {
         id: input.id
