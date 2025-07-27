@@ -1,0 +1,36 @@
+meta {
+  name: Update
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/areas.update
+  body: json
+  auth: bearer
+}
+
+headers {
+  x-refresh-token: {{refresh_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "id": "{{area_id}}",
+    "color": "#1f24o"
+  }
+}
+
+script:post-response {
+  const data = res.body?.result?.data
+  
+  if (data) {
+    const areaId = data.area?.id
+    if (areaId) bru.setEnvVar('area_id', areaId)
+  }
+  
+}

@@ -7,7 +7,13 @@ export const objectivesRouter = t.router({
       data: {
         name: input.name,
         ...(input.description && { description: input.description }),
-        userId: ctx.user.id
+        userId: ctx.user.id,
+        areas: {
+          connect: input.areas?.map((areaId) => ({ id: areaId })) || []
+        }
+      },
+      include: {
+        areas: true
       }
     })
 
@@ -19,6 +25,9 @@ export const objectivesRouter = t.router({
     const objectives = await ctx.prisma.objective.findMany({
       where: {
         userId: ctx.user.id
+      },
+      include: {
+        areas: true
       }
     })
 
@@ -33,7 +42,14 @@ export const objectivesRouter = t.router({
       },
       data: {
         name: input.name,
-        ...(input.description && { description: input.description })
+        updatedAt: new Date(),
+        ...(input.description && { description: input.description }),
+        areas: {
+          set: input.areas?.map((areaId) => ({ id: areaId })) || []
+        }
+      },
+      include: {
+        areas: true
       }
     })
 

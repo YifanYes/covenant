@@ -14,8 +14,22 @@ model Objective {
   name        String   @db.VarChar(255)
   description String?
   userId      String   @db.Uuid
-  createdAt   DateTime @default(now()) @db.Timestamp
-  updatedAt   DateTime @updatedAt @db.Timestamp
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @updatedAt @db.Timestamp(6)
+  areas       Area[]
 
   @@map("objectives")
+}
+
+model Area {
+  id         String      @id @default(uuid()) @db.Uuid
+  name       String      @db.VarChar(255)
+  color      String?     @db.VarChar(255)
+  icon       String?     @db.VarChar(255)
+  userId     String      @db.Uuid
+  createdAt  DateTime    @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime    @updatedAt @db.Timestamp(6)
+  objectives Objective[]
+
+  @@map("areas")
 }
