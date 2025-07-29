@@ -2,7 +2,7 @@ import Link from '@/components/Link'
 import LoaderButton from '@/components/LoaderButton'
 import PasswordInput from '@/components/forms/PasswordInput'
 import TextInput from '@/components/forms/TextInput'
-import { useSnackbar } from '@/hooks/useSnackbar'
+import { useSnackbar } from '@/hooks/use-snackbar'
 import { trpc } from '@/utils/trpc'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import { loginSchema, type LoginSchema } from '../../../server/schemas/auth.schemas'
-import { useAuthStore } from '../hooks/useAuthStore'
+import { useAuthStore } from '../hooks/use-auth-store'
 
 export default function Login() {
   const { t } = useTranslation()

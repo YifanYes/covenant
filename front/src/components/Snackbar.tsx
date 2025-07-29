@@ -1,5 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { useSnackbar } from '@/hooks/useSnackbar'
+import { useSnackbar } from '@/hooks/use-snackbar'
 
 export default function Snackbar() {
   const { open, variant, title, description } = useSnackbar()

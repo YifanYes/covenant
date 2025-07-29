@@ -1,11 +1,14 @@
 {
   "areas": {
+    "add": "Add Area",
     "career": "Professional career",
     "family_and_friends": "Family and friends",
     "finances": "Finances",
+    "leisure": "Leisure",
     "love": "Love",
     "mental_health": "Mental health",
-    "physical_health": "Physical health"
+    "physical_health": "Physical health",
+    "title": "Areas"
   },
   "errors": {
     "invalid_email": "Invalid email",
@@ -24,7 +27,6 @@
     },
     "title": "Password recovery"
   },
-  "hello": "Hello world",
   "login": {
     "button": "Login",
     "create_account": "Create account",
@@ -38,6 +40,9 @@
     "password": "Password",
     "recover_password": "Recover password",
     "title": "Login to ARQ"
+  },
+  "objectives": {
+    "title": "Objetives"
   },
   "recover_password": {
     "button": "Reset password",

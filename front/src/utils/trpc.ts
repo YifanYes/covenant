@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/hooks/useAuthStore'
+import { useAuthStore } from '@/hooks/use-auth-store'
 import { env } from '@/lib/config'
 import { QueryClient } from '@tanstack/react-query'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'

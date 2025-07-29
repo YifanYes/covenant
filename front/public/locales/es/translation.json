@@ -1,11 +1,14 @@
 {
   "areas": {
+    "add": "Añadir área",
     "career": "Carrera profesional",
     "family_and_friends": "Familia y amigos",
     "finances": "Finanzas",
+    "leisure": "Ocio",
     "love": "Amor",
     "mental_health": "Salud mental",
-    "physical_health": "Salud física"
+    "physical_health": "Salud física",
+    "title": "Áreas"
   },
   "errors": {
     "invalid_email": "Correo electrónico no valido",
@@ -24,7 +27,6 @@
     },
     "title": "Recuperación de contraseña"
   },
-  "hello": "Hola mundo",
   "login": {
     "button": "Iniciar sesión",
     "create_account": "Crear cuenta",
@@ -38,6 +40,9 @@
     "password": "Contraseña",
     "recover_password": "Recuperar contraseña",
     "title": "Inicia sesión en ARQ"
+  },
+  "objectives": {
+    "title": "Objetivos"
   },
   "recover_password": {
     "button": "Restablecer contraseña",
