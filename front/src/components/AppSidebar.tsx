@@ -60,7 +60,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <h2 className='text-lg font-semibold'>ARQ</h2>
+        <img src='/logo.png' alt='logo' width={120} className='p-2 pt-4' />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
