@@ -10,10 +10,37 @@
     "physical_health": "Physical health",
     "title": "Areas"
   },
+  "cancel": "Cancel",
+  "colors": {
+    "amber": "Amber",
+    "blue": "Blue",
+    "cyan": "Cyan",
+    "green": "Green",
+    "indigo": "Indigo",
+    "lime": "Lime",
+    "orange": "Orange",
+    "pink": "Pink",
+    "placeholder": "Pick a color",
+    "purple": "Purple",
+    "red": "Red",
+    "rose": "Rose",
+    "sky": "Sky",
+    "slate": "Slate",
+    "teal": "Teal",
+    "yellow": "Yellow"
+  },
+  "create_area_dialog": {
+    "color": "Color",
+    "description": "Dialog to create new area",
+    "icon": "Icon",
+    "name": "Name",
+    "title": "Create new area"
+  },
   "errors": {
     "invalid_email": "Invalid email",
     "invalid_password_length": "Password must have at least 6 characters",
-    "password_mismatch": "Passwords do not match"
+    "password_mismatch": "Passwords do not match",
+    "required_field": "Required field"
   },
   "forgot_password": {
     "button": "Send mail",
@@ -56,6 +83,7 @@
     },
     "title": "Create a new password for your account"
   },
+  "save_changes": "Save changes",
   "sidebar": {
     "calendar": "Calendar",
     "dashboard": "Dashboard",

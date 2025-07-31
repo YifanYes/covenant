@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 
 export const createAreaSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, 'errors.required_field'),
   color: z.string().optional(),
   icon: z.string().optional()
 })

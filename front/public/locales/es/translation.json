@@ -10,10 +10,37 @@
     "physical_health": "Salud física",
     "title": "Áreas"
   },
+  "cancel": "Cancelar",
+  "colors": {
+    "amber": "Ámbar",
+    "blue": "Azul",
+    "cyan": "Cian",
+    "green": "Verde",
+    "indigo": "Índigo",
+    "lime": "Lima",
+    "orange": "Naranja",
+    "pink": "Rosa",
+    "placeholder": "Elige un color",
+    "purple": "Morado",
+    "red": "Rojo",
+    "rose": "Rosado",
+    "sky": "Celeste",
+    "slate": "Gris pizarra",
+    "teal": "Verde azulado",
+    "yellow": "Amarillo"
+  },
+  "create_area_dialog": {
+    "color": "Color",
+    "description": "Modal para crear una nueva área",
+    "icon": "Icono",
+    "name": "Nombre",
+    "title": "Crear nueva área"
+  },
   "errors": {
     "invalid_email": "Correo electrónico no valido",
     "invalid_password_length": "La contraseña debe tener al menos 6 caracteres",
-    "password_mismatch": "Las contraseñas no coinciden"
+    "password_mismatch": "Las contraseñas no coinciden",
+    "required_field": "Campo requerido"
   },
   "forgot_password": {
     "button": "Enviar correo",
@@ -56,6 +83,7 @@
     },
     "title": "Crea una nueva contraseña para tu cuenta"
   },
+  "save_changes": "Guardar cambios",
   "sidebar": {
     "calendar": "Calendario",
     "dashboard": "Panel de control",

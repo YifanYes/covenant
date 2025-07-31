@@ -1,0 +1,111 @@
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { useSnackbar } from '@/hooks/use-snackbar'
+import { trpc } from '@/utils/trpc'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
+import { Plus } from 'lucide-react'
+import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { createAreaSchema } from '../../../../server/schemas/areas.schemas'
+import LoaderButton from '../LoaderButton'
+import ColorSelector from '../forms/ColorSelector'
+import TextInput from '../forms/TextInput'
+
+export function CreateAreaDialog() {
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
+  const { show } = useSnackbar()
+
+  const mutation = useMutation(
+    trpc.areas.create.mutationOptions({
+      onSuccess: () => {
+        show({ variant: 'success', title: t('areas.success') })
+        setOpen(false)
+      },
+      onError: (error) => {
+        console.log(error)
+        show({
+          variant: 'destructive',
+          title: t('areas.error.internal')
+        })
+      }
+    })
+  )
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid, isDirty }
+  } = useForm({ resolver: zodResolver(createAreaSchema), mode: 'onTouched' })
+
+  // const onSubmit = handleSubmit((data) => mutation.mutate(data))
+  const onSubmit = handleSubmit((data) => console.log(data))
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen)
+        if (!isOpen) {
+          reset()
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button className='cursor-pointer'>
+          <Plus />
+          <span>{t('areas.add')}</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className='sm:max-w-[425px]' aria-describedby='create-area-dialog-desc'>
+        <DialogHeader>
+          <DialogTitle>{t('create_area_dialog.title')}</DialogTitle>
+          <DialogDescription className='sr-only'>
+            {t('create_area_dialog.description') || 'Dialog to create a new area'}
+          </DialogDescription>
+        </DialogHeader>
+        <div className='grid gap-4'>
+          <div className='grid gap-3'>
+            <TextInput
+              type='text'
+              placeholder={t('create_area_dialog.name')}
+              {...register('name')}
+              {...(errors.name?.message && { errorMessage: t(errors.name.message) })}
+            />
+          </div>
+          <div className='grid gap-3'>
+            <Controller
+              name='color'
+              control={control}
+              render={({ field }) => <ColorSelector className='w-full' value={field.value} onChange={field.onChange} />}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant='outline'>{t('cancel')}</Button>
+          </DialogClose>
+          <LoaderButton
+            disabled={!isValid || !isDirty}
+            isLoading={mutation.isPending}
+            onClick={onSubmit}
+            label={t('save_changes')}
+          />
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}

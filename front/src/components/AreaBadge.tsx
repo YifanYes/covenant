@@ -34,6 +34,41 @@ const areaStyles = [
   {
     color: 'teal',
     styles: 'text-teal-600 border-teal-600 bg-teal-100 hover:text-teal-700 hover:border-teal-700 hover:bg-teal-200'
+  },
+  {
+    color: 'pink',
+    styles: 'text-pink-600 border-pink-600 bg-pink-100 hover:text-pink-700 hover:border-pink-700 hover:bg-pink-200'
+  },
+  {
+    color: 'cyan',
+    styles: 'text-cyan-600 border-cyan-600 bg-cyan-100 hover:text-cyan-700 hover:border-cyan-700 hover:bg-cyan-200'
+  },
+  {
+    color: 'indigo',
+    styles:
+      'text-indigo-600 border-indigo-600 bg-indigo-100 hover:text-indigo-700 hover:border-indigo-700 hover:bg-indigo-200'
+  },
+  {
+    color: 'lime',
+    styles: 'text-lime-600 border-lime-600 bg-lime-100 hover:text-lime-700 hover:border-lime-700 hover:bg-lime-200'
+  },
+  {
+    color: 'rose',
+    styles: 'text-rose-600 border-rose-600 bg-rose-100 hover:text-rose-700 hover:border-rose-700 hover:bg-rose-200'
+  },
+  {
+    color: 'amber',
+    styles:
+      'text-amber-600 border-amber-600 bg-amber-100 hover:text-amber-700 hover:border-amber-700 hover:bg-amber-200'
+  },
+  {
+    color: 'sky',
+    styles: 'text-sky-600 border-sky-600 bg-sky-100 hover:text-sky-700 hover:border-sky-700 hover:bg-sky-200'
+  },
+  {
+    color: 'slate',
+    styles:
+      'text-slate-600 border-slate-600 bg-slate-100 hover:text-slate-700 hover:border-slate-700 hover:bg-slate-200'
   }
 ]
 
