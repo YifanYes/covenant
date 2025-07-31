@@ -45,9 +45,7 @@ export default function IconPicker({
   }, [selectedCategory, searchTerm])
 
   const currentIcon = useMemo(() => {
-    return Object.values(iconCollection)
-      .flat()
-      .find((icon) => icon.name === value)
+    return allIcons.find((icon) => icon.name === value)
   }, [value])
 
   const handleSelect = (icon: Icon) => {
