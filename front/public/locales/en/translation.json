@@ -2,12 +2,16 @@
   "areas": {
     "add": "Add Area",
     "career": "Professional career",
+    "error": {
+      "interal": "An error ocurred while creating the area"
+    },
     "family_and_friends": "Family and friends",
     "finances": "Finances",
     "leisure": "Leisure",
     "love": "Love",
     "mental_health": "Mental health",
     "physical_health": "Physical health",
+    "success_snackbar": "Area created successfully",
     "title": "Areas"
   },
   "cancel": "Cancel",
@@ -53,6 +57,10 @@
       "title": "Recovery mail sent!"
     },
     "title": "Password recovery"
+  },
+  "icons": {
+    "not_found": "No icons found",
+    "placeholder": "Choose an icon"
   },
   "login": {
     "button": "Login",

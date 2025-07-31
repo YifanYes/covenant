@@ -10,7 +10,7 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { useSnackbar } from '@/hooks/use-snackbar'
-import { trpc } from '@/utils/trpc'
+import { queryClient, trpc } from '@/utils/trpc'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { createAreaSchema } from '../../../../server/schemas/areas.schemas'
 import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
+import IconPicker from '../forms/IconPicker'
 import TextInput from '../forms/TextInput'
 
 export function CreateAreaDialog() {
@@ -30,7 +31,8 @@ export function CreateAreaDialog() {
   const mutation = useMutation(
     trpc.areas.create.mutationOptions({
       onSuccess: () => {
-        show({ variant: 'success', title: t('areas.success') })
+        show({ variant: 'success', title: t('areas.success_snackbar') })
+        queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })
         setOpen(false)
       },
       onError: (error) => {
@@ -51,8 +53,7 @@ export function CreateAreaDialog() {
     formState: { errors, isValid, isDirty }
   } = useForm({ resolver: zodResolver(createAreaSchema), mode: 'onTouched' })
 
-  // const onSubmit = handleSubmit((data) => mutation.mutate(data))
-  const onSubmit = handleSubmit((data) => console.log(data))
+  const onSubmit = handleSubmit((data) => mutation.mutate(data))
 
   return (
     <Dialog
@@ -82,6 +83,7 @@ export function CreateAreaDialog() {
             <TextInput
               type='text'
               placeholder={t('create_area_dialog.name')}
+              className='h-9'
               {...register('name')}
               {...(errors.name?.message && { errorMessage: t(errors.name.message) })}
             />
@@ -91,6 +93,13 @@ export function CreateAreaDialog() {
               name='color'
               control={control}
               render={({ field }) => <ColorSelector className='w-full' value={field.value} onChange={field.onChange} />}
+            />
+          </div>
+          <div className='grid gap-3'>
+            <Controller
+              name='icon'
+              control={control}
+              render={({ field }) => <IconPicker className='w-full' value={field.value} onChange={field.onChange} />}
             />
           </div>
         </div>

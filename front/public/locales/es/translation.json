@@ -2,12 +2,16 @@
   "areas": {
     "add": "Añadir área",
     "career": "Carrera profesional",
+    "error": {
+      "interal": "Ocurrió un error al crear el área"
+    },
     "family_and_friends": "Familia y amigos",
     "finances": "Finanzas",
     "leisure": "Ocio",
     "love": "Amor",
     "mental_health": "Salud mental",
     "physical_health": "Salud física",
+    "success_snackbar": "Área creada exitosamente",
     "title": "Áreas"
   },
   "cancel": "Cancelar",
@@ -53,6 +57,10 @@
       "title": "¡Correo de recuperación enviado!"
     },
     "title": "Recuperación de contraseña"
+  },
+  "icons": {
+    "not_found": "No se han encontrado iconos",
+    "placeholder": "Elige un icono"
   },
   "login": {
     "button": "Iniciar sesión",

@@ -1,5 +1,5 @@
-import { Banknote, Brain, BriefcaseBusiness, Dumbbell, Gamepad2, Heart, Users } from 'lucide-react'
-import type { JSX } from 'react'
+import { allIcons } from '@/types/constants.types'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const areaStyles = [
@@ -72,16 +72,6 @@ const areaStyles = [
   }
 ]
 
-const areaIcons: { [key: string]: JSX.Element } = {
-  Banknote: <Banknote />,
-  Brain: <Brain />,
-  Users: <Users />,
-  Heart: <Heart />,
-  BriefcaseBusiness: <BriefcaseBusiness />,
-  Dumbbell: <Dumbbell />,
-  Gamepad2: <Gamepad2 />
-}
-
 export default function AreaBadge({
   area
 }: {
@@ -97,6 +87,9 @@ export default function AreaBadge({
 }) {
   const { t } = useTranslation()
   const areaStyle = areaStyles.find((defaultArea) => defaultArea.color === area.color)
+  const currentIcon = useMemo(() => {
+    return allIcons.find((icon) => icon.name === area.icon)
+  }, [area.icon])
 
   if (!areaStyle) {
     return null
@@ -106,7 +99,7 @@ export default function AreaBadge({
     <div
       className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors duration-200 ${areaStyle.styles}`}
     >
-      {areaIcons[area.icon || 'Banknote']}
+      {currentIcon && <currentIcon.component className='size-4' />}
       <span>{t(area.name)}</span>
     </div>
   )
