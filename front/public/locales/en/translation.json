@@ -1,16 +1,64 @@
 {
   "areas": {
+    "add": "Add Area",
     "career": "Professional career",
+    "delete_confirmation": "Are you sure you want to delete the area?",
+    "error": {
+      "internal": {
+        "create": "An error ocurred while creating the area",
+        "delete": "An error ocurred while deleting the area",
+        "update": "An error ocurred while updating the area"
+      }
+    },
     "family_and_friends": "Family and friends",
     "finances": "Finances",
+    "leisure": "Leisure",
     "love": "Love",
     "mental_health": "Mental health",
-    "physical_health": "Physical health"
+    "physical_health": "Physical health",
+    "success": {
+      "create": "Area created successfully",
+      "delete": "Area deleted successfully",
+      "update": "Area updated successfully"
+    },
+    "title": "Areas"
   },
+  "cancel": "Cancel",
+  "colors": {
+    "amber": "Amber",
+    "blue": "Blue",
+    "cyan": "Cyan",
+    "green": "Green",
+    "indigo": "Indigo",
+    "lime": "Lime",
+    "orange": "Orange",
+    "pink": "Pink",
+    "placeholder": "Pick a color",
+    "purple": "Purple",
+    "red": "Red",
+    "rose": "Rose",
+    "sky": "Sky",
+    "slate": "Slate",
+    "teal": "Teal",
+    "yellow": "Yellow"
+  },
+  "confirm_delete_area_dialog": {
+    "description": "This action is irreversible. This will permanently delete the area.",
+    "title": "Are you sure you want to delete the area?"
+  },
+  "create_area_dialog": {
+    "color": "Color",
+    "description": "Dialog to create new area",
+    "icon": "Icon",
+    "name": "Name",
+    "title": "Create new area"
+  },
+  "delete": "Delete",
   "errors": {
     "invalid_email": "Invalid email",
     "invalid_password_length": "Password must have at least 6 characters",
-    "password_mismatch": "Passwords do not match"
+    "password_mismatch": "Passwords do not match",
+    "required_field": "Required field"
   },
   "forgot_password": {
     "button": "Send mail",
@@ -24,7 +72,10 @@
     },
     "title": "Password recovery"
   },
-  "hello": "Hello world",
+  "icons": {
+    "not_found": "No icons found",
+    "placeholder": "Choose an icon"
+  },
   "login": {
     "button": "Login",
     "create_account": "Create account",
@@ -39,6 +90,9 @@
     "recover_password": "Recover password",
     "title": "Login to ARQ"
   },
+  "objectives": {
+    "title": "Objetives"
+  },
   "recover_password": {
     "button": "Reset password",
     "confirm_password": "Confirm password",
@@ -51,6 +105,7 @@
     },
     "title": "Create a new password for your account"
   },
+  "save_changes": "Save changes",
   "sidebar": {
     "calendar": "Calendar",
     "dashboard": "Dashboard",
@@ -74,5 +129,9 @@
     "success_message": "We have sent you a verification email. Please check your inbox.",
     "success_title": "Account created!",
     "title": "Create an ARQ account"
+  },
+  "update_area_dialog": {
+    "description": "Modal to update an area",
+    "title": "Update area"
   }
 }

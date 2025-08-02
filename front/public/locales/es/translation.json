@@ -1,16 +1,64 @@
 {
   "areas": {
+    "add": "Añadir área",
     "career": "Carrera profesional",
+    "delete_confirmation": "¿Estás seguro de querer eliminar el área?",
+    "error": {
+      "internal": {
+        "create": "Ocurrió un error al crear el área",
+        "delete": "Ocurrió un error al eliminar el área",
+        "update": "Ocurrió un error al actualizar el área"
+      }
+    },
     "family_and_friends": "Familia y amigos",
     "finances": "Finanzas",
+    "leisure": "Ocio",
     "love": "Amor",
     "mental_health": "Salud mental",
-    "physical_health": "Salud física"
+    "physical_health": "Salud física",
+    "success": {
+      "create": "Área creada exitosamente",
+      "delete": "Área eliminada exitosamente",
+      "update": "Área actualizada exitosamente"
+    },
+    "title": "Áreas"
   },
+  "cancel": "Cancelar",
+  "colors": {
+    "amber": "Ámbar",
+    "blue": "Azul",
+    "cyan": "Cian",
+    "green": "Verde",
+    "indigo": "Índigo",
+    "lime": "Lima",
+    "orange": "Naranja",
+    "pink": "Rosa",
+    "placeholder": "Elige un color",
+    "purple": "Morado",
+    "red": "Rojo",
+    "rose": "Rosado",
+    "sky": "Celeste",
+    "slate": "Gris pizarra",
+    "teal": "Verde azulado",
+    "yellow": "Amarillo"
+  },
+  "confirm_delete_area_dialog": {
+    "description": "Esta acción es irreversible. Esto eliminará permanentemente el área.",
+    "title": "¿Estás seguro que quieres eliminar el área?"
+  },
+  "create_area_dialog": {
+    "color": "Color",
+    "description": "Modal para crear una nueva área",
+    "icon": "Icono",
+    "name": "Nombre",
+    "title": "Crear nueva área"
+  },
+  "delete": "Eliminar",
   "errors": {
     "invalid_email": "Correo electrónico no valido",
     "invalid_password_length": "La contraseña debe tener al menos 6 caracteres",
-    "password_mismatch": "Las contraseñas no coinciden"
+    "password_mismatch": "Las contraseñas no coinciden",
+    "required_field": "Campo requerido"
   },
   "forgot_password": {
     "button": "Enviar correo",
@@ -24,7 +72,10 @@
     },
     "title": "Recuperación de contraseña"
   },
-  "hello": "Hola mundo",
+  "icons": {
+    "not_found": "No se han encontrado iconos",
+    "placeholder": "Elige un icono"
+  },
   "login": {
     "button": "Iniciar sesión",
     "create_account": "Crear cuenta",
@@ -39,6 +90,9 @@
     "recover_password": "Recuperar contraseña",
     "title": "Inicia sesión en ARQ"
   },
+  "objectives": {
+    "title": "Objetivos"
+  },
   "recover_password": {
     "button": "Restablecer contraseña",
     "confirm_password": "Confirmar contraseña",
@@ -51,6 +105,7 @@
     },
     "title": "Crea una nueva contraseña para tu cuenta"
   },
+  "save_changes": "Guardar cambios",
   "sidebar": {
     "calendar": "Calendario",
     "dashboard": "Panel de control",
@@ -74,5 +129,9 @@
     "success_message": "Te hemos enviado un correo de vertificación. Comprueba tu bandeja de entrada.",
     "success_title": "¡Cuenta creada!",
     "title": "Crear una cuenta en ARQ"
+  },
+  "update_area_dialog": {
+    "description": "Modal para actualizar una área",
+    "title": "Actualizar área"
   }
 }

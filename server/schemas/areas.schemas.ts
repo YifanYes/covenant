@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 
 export const createAreaSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, 'errors.required_field'),
   color: z.string().optional(),
   icon: z.string().optional()
 })
@@ -20,32 +20,37 @@ export const deleteAreaSchema = z.object({
 export const defaultAreas = [
   {
     name: 'areas.finances',
-    color: '#A8D5BA',
+    color: 'green',
     icon: 'Banknote'
   },
   {
     name: 'areas.mental_health',
-    color: '#D7BDE2',
+    color: 'purple',
     icon: 'Brain'
   },
   {
     name: 'areas.family_and_friends',
-    color: '#FAD7A0',
+    color: 'orange',
     icon: 'Users'
   },
   {
     name: 'areas.love',
-    color: '#F5B7B1',
+    color: 'red',
     icon: 'Heart'
   },
   {
     name: 'areas.career',
-    color: '#AED6F1',
+    color: 'blue',
     icon: 'BriefcaseBusiness'
   },
   {
     name: 'areas.physical_health',
-    color: '#F9E79F',
+    color: 'yellow',
     icon: 'Dumbbell'
+  },
+  {
+    name: 'areas.leisure',
+    color: 'teal',
+    icon: 'Gamepad2'
   }
 ]

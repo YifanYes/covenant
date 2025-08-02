@@ -1,7 +1,7 @@
 import LoaderButton from '@/components/LoaderButton'
 import PasswordInput from '@/components/forms/PasswordInput'
 import useHashParams from '@/hooks/use-hash-params'
-import { useSnackbar } from '@/hooks/useSnackbar'
+import { useSnackbar } from '@/hooks/use-snackbar'
 import { trpc } from '@/utils/trpc'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
