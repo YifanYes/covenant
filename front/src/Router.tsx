@@ -3,11 +3,17 @@ import PrivateRoute from './components/PrivateRoute'
 import AppLayout from './layouts/AppLayout'
 import CenteredLayout from './layouts/CenteredLayout'
 import WorkspaceLayout from './layouts/WorkspaceLayout'
+import Calendar from './views/Calendar'
 import Dashboard from './views/Dashboard'
 import ForgotPassword from './views/ForgotPassword'
+import Habits from './views/Habits'
 import Login from './views/Login'
+import Objectives from './views/Objectives'
+import Profile from './views/Profile'
 import RecoverPassword from './views/RecoverPassword'
+import Settings from './views/Settings'
 import SignUp from './views/SignUp'
+import Tasks from './views/Tasks'
 
 export const Router = () => {
   return (
@@ -23,6 +29,12 @@ export const Router = () => {
           <Route element={<PrivateRoute />}>
             <Route element={<WorkspaceLayout />}>
               <Route path='/dashboard' element={<Dashboard />} />
+              <Route path='/objectives' element={<Objectives />} />
+              <Route path='/calendar' element={<Calendar />} />
+              <Route path='/tasks' element={<Tasks />} />
+              <Route path='/habits' element={<Habits />} />
+              <Route path='/profile' element={<Profile />} />
+              <Route path='/settings' element={<Settings />} />
             </Route>
           </Route>
         </Route>

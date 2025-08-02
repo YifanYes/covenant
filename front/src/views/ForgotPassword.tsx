@@ -1,6 +1,6 @@
 import TextInput from '@/components/forms/TextInput'
 import LoaderButton from '@/components/LoaderButton'
-import { useSnackbar } from '@/hooks/useSnackbar'
+import { useSnackbar } from '@/hooks/use-snackbar'
 import { trpc } from '@/utils/trpc'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
