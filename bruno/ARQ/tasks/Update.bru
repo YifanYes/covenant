@@ -31,11 +31,6 @@ body:json {
 }
 
 script:post-response {
-  const data = res.body?.result?.data
   
-  if (data) {
-    const taskId = data.task?.id
-    if (taskId) bru.setEnvVar('task_id', taskId)
-  }
   
 }

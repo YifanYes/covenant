@@ -28,13 +28,3 @@ body:json {
     "objectives": ["{{objective_id}}"]
   }
 }
-
-script:post-response {
-  const data = res.body?.result?.data
-  
-  if (data) {
-    const objectiveId = data.objective?.id
-    if (objectiveId) bru.setEnvVar('objective_id', objectiveId)
-  }
-  
-}
