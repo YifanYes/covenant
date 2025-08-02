@@ -10,13 +10,15 @@ datasource db {
 }
 
 model Objective {
-  id          String   @id @default(uuid()) @db.Uuid
-  name        String   @db.VarChar(255)
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @db.VarChar(255)
   description String?
-  userId      String   @db.Uuid
-  createdAt   DateTime @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime @updatedAt @db.Timestamp(6)
+  userId      String    @db.Uuid
+  dueDate     DateTime? @db.Timestamp(6)
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @db.Timestamp(6)
   areas       Area[]
+  tasks       Task[]
 
   @@map("objectives")
 }
@@ -32,4 +34,19 @@ model Area {
   objectives Objective[]
 
   @@map("areas")
+}
+
+model Task {
+  id          String      @id @default(uuid()) @db.Uuid
+  title       String      @db.VarChar(255)
+  description String?
+  status      String      @db.VarChar(255)
+  order       Int         @default(0)
+  dueDate     DateTime?   @db.Timestamp(6)
+  userId      String      @db.Uuid
+  createdAt   DateTime    @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime    @updatedAt @db.Timestamp(6)
+  objectives  Objective[]
+
+  @@map("tasks")
 }

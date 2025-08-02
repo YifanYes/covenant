@@ -1,11 +1,11 @@
 meta {
-  name: Create
+  name: Get All
   type: http
-  seq: 1
+  seq: 2
 }
 
-post {
-  url: {{host}}/objectives.create
+get {
+  url: {{host}}/tasks.getAll
   body: json
   auth: bearer
 }
@@ -20,8 +20,12 @@ auth:bearer {
 
 body:json {
   {
-    "name": "Improve digestive health",
-    "dueDate": "2025-08-02T13:54:21Z"
+    "title": "Eat a kiwi",
+    "description": "A kiwi a day keeps the doctor away",
+    "status": "TO DO",
+    "order": 0,
+    "dueDate": "2025-08-10T00:00:00Z",
+    "objectives": ["{{objective_id}}"]
   }
 }
 
