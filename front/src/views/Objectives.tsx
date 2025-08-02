@@ -1,5 +1,5 @@
-import AreaBadge from '@/components/AreaBadge'
 import { CreateAreaDialog } from '@/components/dialogs/CreateAreaDialog'
+import { UpdateAreaDialog } from '@/components/dialogs/UpdateAreaDialog'
 import { trpc } from '@/utils/trpc'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -26,7 +26,7 @@ export default function Objectives() {
         </div>
         <div className='flex flex-wrap gap-2'>
           {areasData?.areas?.map((area) => (
-            <AreaBadge key={area.id} area={area} />
+            <UpdateAreaDialog key={area.id} area={area} />
           ))}
         </div>
       </section>

@@ -31,7 +31,7 @@ export function CreateAreaDialog() {
   const mutation = useMutation(
     trpc.areas.create.mutationOptions({
       onSuccess: () => {
-        show({ variant: 'success', title: t('areas.success_snackbar') })
+        show({ variant: 'success', title: t('areas.success.create') })
         queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })
         setOpen(false)
       },
@@ -39,7 +39,7 @@ export function CreateAreaDialog() {
         console.log(error)
         show({
           variant: 'destructive',
-          title: t('areas.error.internal')
+          title: t('areas.error.internal.create')
         })
       }
     })

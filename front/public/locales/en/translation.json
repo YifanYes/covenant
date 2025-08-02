@@ -2,8 +2,13 @@
   "areas": {
     "add": "Add Area",
     "career": "Professional career",
+    "delete_confirmation": "Are you sure you want to delete the area?",
     "error": {
-      "interal": "An error ocurred while creating the area"
+      "internal": {
+        "create": "An error ocurred while creating the area",
+        "delete": "An error ocurred while deleting the area",
+        "update": "An error ocurred while updating the area"
+      }
     },
     "family_and_friends": "Family and friends",
     "finances": "Finances",
@@ -11,7 +16,11 @@
     "love": "Love",
     "mental_health": "Mental health",
     "physical_health": "Physical health",
-    "success_snackbar": "Area created successfully",
+    "success": {
+      "create": "Area created successfully",
+      "delete": "Area deleted successfully",
+      "update": "Area updated successfully"
+    },
     "title": "Areas"
   },
   "cancel": "Cancel",
@@ -33,6 +42,10 @@
     "teal": "Teal",
     "yellow": "Yellow"
   },
+  "confirm_delete_area_dialog": {
+    "description": "This action is irreversible. This will permanently delete the area.",
+    "title": "Are you sure you want to delete the area?"
+  },
   "create_area_dialog": {
     "color": "Color",
     "description": "Dialog to create new area",
@@ -40,6 +53,7 @@
     "name": "Name",
     "title": "Create new area"
   },
+  "delete": "Delete",
   "errors": {
     "invalid_email": "Invalid email",
     "invalid_password_length": "Password must have at least 6 characters",
@@ -115,5 +129,9 @@
     "success_message": "We have sent you a verification email. Please check your inbox.",
     "success_title": "Account created!",
     "title": "Create an ARQ account"
+  },
+  "update_area_dialog": {
+    "description": "Modal to update an area",
+    "title": "Update area"
   }
 }

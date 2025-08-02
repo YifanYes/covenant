@@ -2,8 +2,13 @@
   "areas": {
     "add": "Añadir área",
     "career": "Carrera profesional",
+    "delete_confirmation": "¿Estás seguro de querer eliminar el área?",
     "error": {
-      "interal": "Ocurrió un error al crear el área"
+      "internal": {
+        "create": "Ocurrió un error al crear el área",
+        "delete": "Ocurrió un error al eliminar el área",
+        "update": "Ocurrió un error al actualizar el área"
+      }
     },
     "family_and_friends": "Familia y amigos",
     "finances": "Finanzas",
@@ -11,7 +16,11 @@
     "love": "Amor",
     "mental_health": "Salud mental",
     "physical_health": "Salud física",
-    "success_snackbar": "Área creada exitosamente",
+    "success": {
+      "create": "Área creada exitosamente",
+      "delete": "Área eliminada exitosamente",
+      "update": "Área actualizada exitosamente"
+    },
     "title": "Áreas"
   },
   "cancel": "Cancelar",
@@ -33,6 +42,10 @@
     "teal": "Verde azulado",
     "yellow": "Amarillo"
   },
+  "confirm_delete_area_dialog": {
+    "description": "Esta acción es irreversible. Esto eliminará permanentemente el área.",
+    "title": "¿Estás seguro que quieres eliminar el área?"
+  },
   "create_area_dialog": {
     "color": "Color",
     "description": "Modal para crear una nueva área",
@@ -40,6 +53,7 @@
     "name": "Nombre",
     "title": "Crear nueva área"
   },
+  "delete": "Eliminar",
   "errors": {
     "invalid_email": "Correo electrónico no valido",
     "invalid_password_length": "La contraseña debe tener al menos 6 caracteres",
@@ -115,5 +129,9 @@
     "success_message": "Te hemos enviado un correo de vertificación. Comprueba tu bandeja de entrada.",
     "success_title": "¡Cuenta creada!",
     "title": "Crear una cuenta en ARQ"
+  },
+  "update_area_dialog": {
+    "description": "Modal para actualizar una área",
+    "title": "Actualizar área"
   }
 }
