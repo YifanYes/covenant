@@ -43,9 +43,9 @@ export const SignUp: FC = () => {
     <div className='flex w-md flex-col gap-2.5'>
       {isSigned ? (
         <>
-          <div className='dark:bg-card rounded-lg border border-green-200 bg-green-50 p-6 text-center'>
+          <div className='dark:bg-card rounded-lg border-2 border-green-300 bg-green-50 p-6 text-center'>
             <div className='flex flex-col items-center gap-4'>
-              <div className='rounded-full bg-green-100 p-3 dark:border-2 dark:border-green-400 dark:bg-green-200/10'>
+              <div className='rounded-full border-2 border-green-500 p-3 dark:border-green-400 dark:bg-green-200/10'>
                 <MailCheck className='h-8 w-8 text-green-600 dark:text-green-400' />
               </div>
               <div className='space-y-2'>
