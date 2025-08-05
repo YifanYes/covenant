@@ -16,7 +16,7 @@ model Objective {
   userId      String   @db.Uuid
   createdAt   DateTime @default(now()) @db.Timestamp(6)
   updatedAt   DateTime @updatedAt @db.Timestamp(6)
-  areas       Area[]   @relation("AreaToObjective")
+  areas       Area[]   
 
   @@map("objectives")
 }
@@ -29,7 +29,7 @@ model Area {
   createdAt  DateTime    @default(now()) @db.Timestamp(6)
   updatedAt  DateTime    @updatedAt @db.Timestamp(6)
   userId     String      @db.Uuid
-  objectives Objective[] @relation("AreaToObjective")
+  objectives Objective[] 
 
   @@map("areas")
 }
