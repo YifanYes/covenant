@@ -78,32 +78,17 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
     }
   }, [open, area, reset])
 
-  const onSubmit = handleSubmit((data) => {
-    updateMutation.mutate(data)
-  })
+  const onSubmit = handleSubmit((data) => updateMutation.mutate(data))
 
-  const handleDeleteSuccess = () => {
-    setOpen(false)
+  const handleDeleteSuccess = () => setOpen(false)
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen)
+    !isOpen && reset()
   }
 
-  if (!areaStyle) {
-    return null
-  }
-
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => {
-        setOpen(isOpen)
-        if (!isOpen) {
-          reset({
-            name: area.name,
-            color: area.color || '',
-            icon: area.icon || ''
-          })
-        }
-      }}
-    >
+  return !areaStyle ? null : (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <div
           className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors duration-200 ${areaStyle.styles}`}
@@ -152,13 +137,14 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
             />
           </div>
         </div>
-        <DialogFooter className='mt-6 flex justify-between'>
+        <DialogFooter className='flex h-auto justify-end'>
           <ConfirmDeleteAreaDialog area={area} onDeleteSuccess={handleDeleteSuccess} />
           <div className='flex gap-2'>
-            <DialogClose asChild>
+            <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
               <Button variant='outline'>{t('cancel')}</Button>
             </DialogClose>
             <LoaderButton
+              className='h-auto cursor-pointer'
               disabled={!isValid || !isDirty}
               isLoading={updateMutation.isPending}
               onClick={onSubmit}

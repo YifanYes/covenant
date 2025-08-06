@@ -10,11 +10,12 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { useSnackbar } from '@/hooks/use-snackbar'
+import type { Area } from '@/types/areas.types'
 import { queryClient, trpc } from '@/utils/trpc'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type FC } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { createAreaSchema } from '../../../../server/schemas/areas.schemas'
@@ -23,7 +24,11 @@ import ColorSelector from '../forms/ColorSelector'
 import IconPicker from '../forms/IconPicker'
 import TextInput from '../forms/TextInput'
 
-export function CreateAreaDialog() {
+interface Props {
+  area?: Area
+}
+
+export const CreateAreaDialog: FC<Props> = ({ area }) => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { show } = useSnackbar()
@@ -55,16 +60,13 @@ export function CreateAreaDialog() {
 
   const onSubmit = handleSubmit((data) => mutation.mutate(data))
 
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen)
+    !isOpen && reset()
+  }
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => {
-        setOpen(isOpen)
-        if (!isOpen) {
-          reset()
-        }
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className='cursor-pointer'>
           <Plus />
@@ -103,11 +105,12 @@ export function CreateAreaDialog() {
             />
           </div>
         </div>
-        <DialogFooter>
-          <DialogClose asChild>
+        <DialogFooter className='flex h-auto justify-end'>
+          <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
             <Button variant='outline'>{t('cancel')}</Button>
           </DialogClose>
           <LoaderButton
+            className='h-auto cursor-pointer'
             disabled={!isValid || !isDirty}
             isLoading={mutation.isPending}
             onClick={onSubmit}
