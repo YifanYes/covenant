@@ -8,6 +8,7 @@ export const objectivesRouter = t.router({
       data: {
         name: input.name,
         ...(input.description && { description: input.description }),
+        ...(input.dueDate && { dueDate: input.dueDate }),
         userId: ctx.user.id,
         areas: {
           connect: input.areas?.map((areaId) => ({ id: areaId })) || []
@@ -45,8 +46,8 @@ export const objectivesRouter = t.router({
       },
       data: {
         name: input.name,
-        updatedAt: new Date(),
         ...(input.description && { description: input.description }),
+        ...(input.dueDate && { dueDate: input.dueDate }),
         areas: {
           set: input.areas?.map((areaId) => ({ id: areaId })) || []
         }
