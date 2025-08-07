@@ -16,7 +16,7 @@ import type { Area } from '@/types/areas.types'
 import { queryClient, trpc } from '@/utils/trpc'
 import { useMutation } from '@tanstack/react-query'
 import { Trash2 } from 'lucide-react'
-import { useState, type FC } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 interface Props {
@@ -24,7 +24,7 @@ interface Props {
   onDeleteSuccess: () => void
 }
 
-export const ConfirmDeleteAreaDialog: FC<Props> = ({ area, onDeleteSuccess }) => {
+export const ConfirmDeleteAreaDialog = ({ area, onDeleteSuccess }: Props) => {
   const { t } = useTranslation()
   const { show } = useSnackbar()
   const [open, setOpen] = useState(false)

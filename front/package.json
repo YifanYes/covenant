@@ -26,8 +26,6 @@
     "@tanstack/react-query": "^5.76.1",
     "@trpc/client": "^11.1.2",
     "@trpc/tanstack-react-query": "^11.1.2",
-    "@typescript-eslint/eslint-plugin": "^8.39.0",
-    "@typescript-eslint/parser": "^8.39.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "i18next": "^25.2.1",
@@ -45,6 +43,8 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
     "@eslint/js": "^9.25.0",
     "@types/node": "^24.0.3",
     "@types/react": "^19.1.2",

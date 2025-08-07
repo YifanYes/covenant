@@ -10,12 +10,11 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { useSnackbar } from '@/hooks/use-snackbar'
-import type { Area } from '@/types/areas.types'
 import { queryClient, trpc } from '@/utils/trpc'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
-import { useState, type FC } from 'react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { createAreaSchema } from '../../../../server/schemas/areas.schemas'
@@ -24,11 +23,7 @@ import ColorSelector from '../forms/ColorSelector'
 import IconPicker from '../forms/IconPicker'
 import TextInput from '../forms/TextInput'
 
-interface Props {
-  area?: Area
-}
-
-export const CreateAreaDialog: FC<Props> = ({ area }) => {
+export const CreateAreaDialog = () => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { show } = useSnackbar()
