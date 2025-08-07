@@ -1,0 +1,36 @@
+meta {
+  name: Bulk Update
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/tasks.bulkUpdate
+  body: json
+  auth: bearer
+}
+
+headers {
+  x-refresh-token: {{refresh_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "tasks": [
+      {
+        "id": "{{task_id}}",
+        "status": "DOING",
+        "order": 1
+      },
+      {
+        "id": "f39642f0-a742-43e8-b9d5-3e0db0597f16",
+        "status": "DOING",
+        "order": 0
+      }
+    ]
+  }
+}

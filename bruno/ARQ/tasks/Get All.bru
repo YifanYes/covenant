@@ -1,0 +1,30 @@
+meta {
+  name: Get All
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{host}}/tasks.getAll
+  body: json
+  auth: bearer
+}
+
+headers {
+  x-refresh-token: {{refresh_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Eat a kiwi",
+    "description": "A kiwi a day keeps the doctor away",
+    "status": "TO DO",
+    "order": 0,
+    "dueDate": "2025-08-10T00:00:00Z",
+    "objectives": ["{{objective_id}}"]
+  }
+}
