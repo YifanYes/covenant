@@ -1,0 +1,40 @@
+meta {
+  name: Create
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/tasks.create
+  body: json
+  auth: bearer
+}
+
+headers {
+  x-refresh-token: {{refresh_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Eat a kiwi",
+    "description": "A kiwi a day keeps the doctor away",
+    "status": "TO DO",
+    "order": 0,
+    "dueDate": "2025-08-10T00:00:00Z",
+    "objectives": ["{{objective_id}}"]
+  }
+}
+
+script:post-response {
+  const data = res.body?.result?.data
+  
+  if (data) {
+    const taskId = data.task?.id
+    if (taskId) bru.setEnvVar('task_id', taskId)
+  }
+  
+}

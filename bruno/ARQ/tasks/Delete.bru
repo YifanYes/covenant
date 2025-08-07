@@ -1,11 +1,11 @@
 meta {
-  name: Create
+  name: Delete
   type: http
-  seq: 1
+  seq: 5
 }
 
 post {
-  url: {{host}}/objectives.create
+  url: {{host}}/tasks.delete
   body: json
   auth: bearer
 }
@@ -20,8 +20,7 @@ auth:bearer {
 
 body:json {
   {
-    "name": "Improve digestive health",
-    "dueDate": "2025-08-02T13:54:21Z"
+    "id": "{{task_id}}"
   }
 }
 
@@ -29,8 +28,6 @@ script:post-response {
   const data = res.body?.result?.data
   
   if (data) {
-    const objectiveId = data.objective?.id
-    if (objectiveId) bru.setEnvVar('objective_id', objectiveId)
+    bru.setEnvVar('task_id', '')
   }
-  
 }

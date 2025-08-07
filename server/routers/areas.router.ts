@@ -38,8 +38,7 @@ export const areasRouter = t.router({
       data: {
         ...(input.name && { name: input.name }),
         ...(input.color && { color: input.color }),
-        ...(input.icon && { icon: input.icon }),
-        updatedAt: new Date()
+        ...(input.icon && { icon: input.icon })
       }
     })
 
