@@ -83,11 +83,11 @@ export default function Login() {
         label={t('login.button')}
         onClick={handleSubmit(onSubmit)}
       />
-      <div className='flex flex-row gap-0.5'>
+      <div className='flex flex-row gap-1'>
         <p>{t('login.dont_have_account')}</p>
         <Link href='/sign-up'>{t('login.create_account')}</Link>
       </div>
-      <div className='flex flex-row gap-0.5'>
+      <div className='flex flex-row gap-1'>
         <p>{t('login.forgot_password')}</p>
         <Link href='/forgot-password'>{t('login.recover_password')}</Link>
       </div>

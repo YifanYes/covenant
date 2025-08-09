@@ -40,17 +40,19 @@ export const SignUp: FC = () => {
   const onSubmit = handleSubmit((data) => signUpMutation.mutate(data))
 
   return (
-    <div className='w-md flex flex-col gap-2.5'>
+    <div className='flex w-md flex-col gap-2.5'>
       {isSigned ? (
         <>
-          <div className='bg-green-50 border border-green-200 rounded-lg p-6 text-center'>
+          <div className='dark:bg-card rounded-lg border-2 border-green-300 bg-green-50 p-6 text-center'>
             <div className='flex flex-col items-center gap-4'>
-              <div className='bg-green-100 rounded-full p-3'>
-                <MailCheck className='w-8 h-8 text-green-600' />
+              <div className='rounded-full border-2 border-green-500 p-3 dark:border-green-400 dark:bg-green-200/10'>
+                <MailCheck className='h-8 w-8 text-green-600 dark:text-green-400' />
               </div>
               <div className='space-y-2'>
-                <h2 className='text-xl font-semibold text-green-800'>{t('sign_up.success_title')}</h2>
-                <p className='text-green-700 leading-relaxed'>{t('sign_up.success_message')}</p>
+                <h2 className='text-xl font-semibold text-green-800 dark:text-green-400'>
+                  {t('sign_up.success_title')}
+                </h2>
+                <p className='leading-relaxed text-green-700 dark:text-green-200'>{t('sign_up.success_message')}</p>
               </div>
             </div>
           </div>
@@ -80,7 +82,7 @@ export const SignUp: FC = () => {
             label={t('sign_up.button')}
             onClick={onSubmit}
           />
-          <div className='flex flex-row gap-0.5'>
+          <div className='flex flex-row gap-1'>
             <p>{t('sign_up.already_have_account')}</p>
             <Link href='/login'>{t('sign_up.login')}</Link>
           </div>

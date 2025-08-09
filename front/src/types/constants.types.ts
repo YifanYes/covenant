@@ -346,68 +346,76 @@ export const areaStyles = [
   {
     color: 'green',
     styles:
-      'text-green-600 border-green-600 bg-green-100 hover:text-green-700 hover:border-green-700 hover:bg-green-200'
+      'dark:text-green-700 dark:border-green-700 dark:bg-green-200 dark:hover:text-green-600 dark:hover:border-green-600 dark:hover:bg-green-100 text-green-600 border-green-600 bg-green-100 hover:text-green-700 hover:border-green-700 hover:bg-green-200'
   },
   {
     color: 'purple',
     styles:
-      'text-purple-600 border-purple-600 bg-purple-100 hover:text-purple-700 hover:border-purple-700 hover:bg-purple-200'
+      'dark:text-purple-700 dark:border-purple-700 dark:bg-purple-200 dark:hover:text-purple-600 dark:hover:border-purple-600 dark:hover:bg-purple-100 text-purple-600 border-purple-600 bg-purple-100 hover:text-purple-700 hover:border-purple-700 hover:bg-purple-200'
   },
   {
     color: 'orange',
     styles:
-      'text-orange-600 border-orange-600 bg-orange-100 hover:text-orange-700 hover:border-orange-700 hover:bg-orange-200'
+      'dark:text-orange-700 dark:border-orange-700 dark:bg-orange-200 dark:hover:text-orange-600 dark:hover:border-orange-600 dark:hover:bg-orange-100 text-orange-600 border-orange-600 bg-orange-100 hover:text-orange-700 hover:border-orange-700 hover:bg-orange-200'
   },
   {
     color: 'red',
-    styles: 'text-red-600 border-red-600 bg-red-100 hover:text-red-700 hover:border-red-700 hover:bg-red-200'
+    styles:
+      'dark:text-red-700 dark:border-red-700 dark:bg-red-200 dark:hover:text-red-600 dark:hover:border-red-600 dark:hover:bg-red-100 text-red-600 border-red-600 bg-red-100 hover:text-red-700 hover:border-red-700 hover:bg-red-200'
   },
   {
     color: 'blue',
-    styles: 'text-blue-600 border-blue-600 bg-blue-100 hover:text-blue-700 hover:border-blue-700 hover:bg-blue-200'
+    styles:
+      'dark:text-blue-700 dark:border-blue-700 dark:bg-blue-200 dark:hover:text-blue-600 dark:hover:border-blue-600 dark:hover:bg-blue-100 text-blue-600 border-blue-600 bg-blue-100 hover:text-blue-700 hover:border-blue-700 hover:bg-blue-200'
   },
   {
     color: 'yellow',
     styles:
-      'text-yellow-600 border-yellow-600 bg-yellow-100 hover:text-yellow-700 hover:border-yellow-700 hover:bg-yellow-200'
+      'dark:text-yellow-700 dark:border-yellow-700 dark:bg-yellow-200 dark:hover:text-yellow-600 dark:hover:border-yellow-600 dark:hover:bg-yellow-100 text-yellow-600 border-yellow-600 bg-yellow-100 hover:text-yellow-700 hover:border-yellow-700 hover:bg-yellow-200'
   },
   {
     color: 'teal',
-    styles: 'text-teal-600 border-teal-600 bg-teal-100 hover:text-teal-700 hover:border-teal-700 hover:bg-teal-200'
+    styles:
+      'dark:text-teal-700 dark:border-teal-700 dark:bg-teal-200 dark:hover:text-teal-600 dark:hover:border-teal-600 dark:hover:bg-teal-100 text-teal-600 border-teal-600 bg-teal-100 hover:text-teal-700 hover:border-teal-700 hover:bg-teal-200'
   },
   {
     color: 'pink',
-    styles: 'text-pink-600 border-pink-600 bg-pink-100 hover:text-pink-700 hover:border-pink-700 hover:bg-pink-200'
+    styles:
+      'dark:text-pink-700 dark:border-pink-700 dark:bg-pink-200 dark:hover:text-pink-600 dark:hover:border-pink-600 dark:hover:bg-pink-100 text-pink-600 border-pink-600 bg-pink-100 hover:text-pink-700 hover:border-pink-700 hover:bg-pink-200'
   },
   {
     color: 'cyan',
-    styles: 'text-cyan-600 border-cyan-600 bg-cyan-100 hover:text-cyan-700 hover:border-cyan-700 hover:bg-cyan-200'
+    styles:
+      'dark:text-cyan-700 dark:border-cyan-700 dark:bg-cyan-200 dark:hover:text-cyan-600 dark:hover:border-cyan-600 dark:hover:bg-cyan-100 text-cyan-600 border-cyan-600 bg-cyan-100 hover:text-cyan-700 hover:border-cyan-700 hover:bg-cyan-200'
   },
   {
     color: 'indigo',
     styles:
-      'text-indigo-600 border-indigo-600 bg-indigo-100 hover:text-indigo-700 hover:border-indigo-700 hover:bg-indigo-200'
+      'dark:text-indigo-700 dark:border-indigo-700 dark:bg-indigo-200 dark:hover:text-indigo-600 dark:hover:border-indigo-600 dark:hover:bg-indigo-100 text-indigo-600 border-indigo-600 bg-indigo-100 hover:text-indigo-700 hover:border-indigo-700 hover:bg-indigo-200'
   },
   {
     color: 'lime',
-    styles: 'text-lime-600 border-lime-600 bg-lime-100 hover:text-lime-700 hover:border-lime-700 hover:bg-lime-200'
+    styles:
+      'dark:text-lime-700 dark:border-lime-700 dark:bg-lime-200 dark:hover:text-lime-600 dark:hover:border-lime-600 dark:hover:bg-lime-100 text-lime-600 border-lime-600 bg-lime-100 hover:text-lime-700 hover:border-lime-700 hover:bg-lime-200'
   },
   {
     color: 'rose',
-    styles: 'text-rose-600 border-rose-600 bg-rose-100 hover:text-rose-700 hover:border-rose-700 hover:bg-rose-200'
+    styles:
+      'dark:text-rose-700 dark:border-rose-700 dark:bg-rose-200 dark:hover:text-rose-600 dark:hover:border-rose-600 dark:hover:bg-rose-100 text-rose-600 border-rose-600 bg-rose-100 hover:text-rose-700 hover:border-rose-700 hover:bg-rose-200'
   },
   {
     color: 'amber',
     styles:
-      'text-amber-600 border-amber-600 bg-amber-100 hover:text-amber-700 hover:border-amber-700 hover:bg-amber-200'
+      'dark:text-amber-700 dark:border-amber-700 dark:bg-amber-200 dark:hover:text-amber-600 dark:hover:border-amber-600 dark:hover:bg-amber-100 text-amber-600 border-amber-600 bg-amber-100 hover:text-amber-700 hover:border-amber-700 hover:bg-amber-200'
   },
   {
     color: 'sky',
-    styles: 'text-sky-600 border-sky-600 bg-sky-100 hover:text-sky-700 hover:border-sky-700 hover:bg-sky-200'
+    styles:
+      'dark:text-sky-700 dark:border-sky-700 dark:bg-sky-200 dark:hover:text-sky-600 dark:hover:border-sky-600 dark:hover:bg-sky-100 text-sky-600 border-sky-600 bg-sky-100 hover:text-sky-700 hover:border-sky-700 hover:bg-sky-200'
   },
   {
     color: 'slate',
     styles:
-      'text-slate-600 border-slate-600 bg-slate-100 hover:text-slate-700 hover:border-slate-700 hover:bg-slate-200'
+      'dark:text-slate-700 dark:border-slate-700 dark:bg-slate-200 dark:hover:text-slate-600 dark:hover:border-slate-600 dark:hover:bg-slate-100 text-slate-600 border-slate-600 bg-slate-100 hover:text-slate-700 hover:border-slate-700 hover:bg-slate-200'
   }
 ]

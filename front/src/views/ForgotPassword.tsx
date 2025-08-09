@@ -38,17 +38,21 @@ export const ForgotPassword: FC = () => {
   const onSubmit = handleSubmit((data) => forgotPasswordMutation.mutate(data))
 
   return (
-    <div className='w-md flex flex-col gap-2.5'>
+    <div className='flex w-md flex-col gap-2.5'>
       {isSubmitted ? (
         <>
-          <div className='bg-green-50 border border-green-200 rounded-lg p-6 text-center'>
+          <div className='dark:bg-card rounded-lg border-2 border-green-500 bg-green-50 p-6 text-center'>
             <div className='flex flex-col items-center gap-4'>
-              <div className='bg-green-100 rounded-full p-3'>
-                <MailCheck className='w-8 h-8 text-green-600' />
+              <div className='rounded-full border-2 border-green-500 p-3 dark:border-green-400 dark:bg-green-200/10'>
+                <MailCheck className='h-8 w-8 text-green-600 dark:text-green-400' />
               </div>
               <div className='space-y-2'>
-                <h2 className='text-xl font-semibold text-green-800'>{t('forgot_password.success.title')}</h2>
-                <p className='text-green-700 leading-relaxed'>{t('forgot_password.success.message')}</p>
+                <h2 className='text-xl font-semibold text-green-800 dark:text-green-400'>
+                  {t('forgot_password.success.title')}
+                </h2>
+                <p className='leading-relaxed text-green-700 dark:text-green-200'>
+                  {t('forgot_password.success.message')}
+                </p>
               </div>
             </div>
           </div>

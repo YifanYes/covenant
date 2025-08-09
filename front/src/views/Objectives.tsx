@@ -4,24 +4,21 @@ import { trpc } from '@/utils/trpc'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
-export default function Objectives() {
+export const Objectives = () => {
   const { t } = useTranslation()
   const { data: areasData, isLoading: isAreasLoading } = useQuery(trpc.areas.getAll.queryOptions())
 
-  if (isAreasLoading) {
-    return <div>Loading...</div>
-  }
-
-  return (
-    <div className='mx-auto max-w-3xl space-y-6 p-6'>
-      <section className='space-y-2 p-5'>
-        <h2 className='text-xl font-semibold text-gray-800'>{t('objectives.title')}</h2>
-        <p className='text-gray-600'>TO DO: add objectives</p>
+  return isAreasLoading ? (
+    <div>Loading...</div>
+  ) : (
+    <div className='mx-auto flex max-w-3xl flex-col gap-y-12 p-6'>
+      <section className='flex flex-col gap-y-6'>
+        <h2 className='text-foreground text-xl font-semibold'>{t('objectives.title')}</h2>
+        <p className='text-foreground'>TO DO: add objectives</p>
       </section>
-
-      <section className='space-y-3 p-5'>
-        <div className='mb-8 flex items-center justify-between'>
-          <h2 className='text-xl font-semibold text-gray-800'>{t('areas.title')}</h2>
+      <section className='flex flex-col gap-y-6'>
+        <div className='flex items-center justify-between'>
+          <h2 className='text-foreground text-xl font-semibold'>{t('areas.title')}</h2>
           <CreateAreaDialog />
         </div>
         <div className='flex flex-wrap gap-2'>
@@ -33,3 +30,5 @@ export default function Objectives() {
     </div>
   )
 }
+
+export default Objectives

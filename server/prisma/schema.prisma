@@ -28,9 +28,9 @@ model Area {
   name       String      @db.VarChar(255)
   color      String?     @db.VarChar(255)
   icon       String?     @db.VarChar(255)
-  userId     String      @db.Uuid
   createdAt  DateTime    @default(now()) @db.Timestamp(6)
   updatedAt  DateTime    @updatedAt @db.Timestamp(6)
+  userId     String      @db.Uuid
   objectives Objective[]
 
   @@map("areas")
