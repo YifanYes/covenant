@@ -9,6 +9,20 @@ import tseslint from 'typescript-eslint'
 export default tseslint.config(
   { ignores: ['dist'] },
   {
+    parser: '@typescript-eslint/parser',
+    plugins: ['@typescript-eslint'],
+    extends: [
+      'plugin:@typescript-eslint/recommended',
+    ],
+    rules: {
+      '@typescript-eslint/no-unused-expressions': ['error', {
+        allowShortCircuit: true,
+        allowTernary: true,
+        allowTaggedTemplates: true,
+      }],
+    }
+  },
+  {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {

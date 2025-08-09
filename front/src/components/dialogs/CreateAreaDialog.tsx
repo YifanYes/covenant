@@ -23,7 +23,7 @@ import ColorSelector from '../forms/ColorSelector'
 import IconPicker from '../forms/IconPicker'
 import TextInput from '../forms/TextInput'
 
-export function CreateAreaDialog() {
+export const CreateAreaDialog = () => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { show } = useSnackbar()
@@ -55,16 +55,13 @@ export function CreateAreaDialog() {
 
   const onSubmit = handleSubmit((data) => mutation.mutate(data))
 
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen)
+    !isOpen && reset()
+  }
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => {
-        setOpen(isOpen)
-        if (!isOpen) {
-          reset()
-        }
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className='cursor-pointer'>
           <Plus />
@@ -103,11 +100,12 @@ export function CreateAreaDialog() {
             />
           </div>
         </div>
-        <DialogFooter>
-          <DialogClose asChild>
+        <DialogFooter className='flex h-auto justify-end'>
+          <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
             <Button variant='outline'>{t('cancel')}</Button>
           </DialogClose>
           <LoaderButton
+            className='h-auto cursor-pointer'
             disabled={!isValid || !isDirty}
             isLoading={mutation.isPending}
             onClick={onSubmit}

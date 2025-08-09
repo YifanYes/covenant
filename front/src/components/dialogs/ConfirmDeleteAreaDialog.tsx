@@ -9,8 +9,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { useSnackbar } from '@/hooks/use-snackbar'
+import { cn } from '@/lib/utils'
 import type { Area } from '@/types/areas.types'
 import { queryClient, trpc } from '@/utils/trpc'
 import { useMutation } from '@tanstack/react-query'
@@ -18,7 +19,12 @@ import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export function ConfirmDeleteAreaDialog({ area, onDeleteSuccess }: { area: Area; onDeleteSuccess: () => void }) {
+interface Props {
+  area: Area
+  onDeleteSuccess: () => void
+}
+
+export const ConfirmDeleteAreaDialog = ({ area, onDeleteSuccess }: Props) => {
   const { t } = useTranslation()
   const { show } = useSnackbar()
   const [open, setOpen] = useState(false)
@@ -41,9 +47,7 @@ export function ConfirmDeleteAreaDialog({ area, onDeleteSuccess }: { area: Area;
     })
   )
 
-  const handleDelete = () => {
-    deleteMutation.mutate({ id: area.id })
-  }
+  const handleDelete = () => deleteMutation.mutate({ id: area.id })
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -52,7 +56,7 @@ export function ConfirmDeleteAreaDialog({ area, onDeleteSuccess }: { area: Area;
           variant='outline'
           size='sm'
           disabled={deleteMutation.isPending}
-          className='mr-auto cursor-pointer border-red-500 text-red-500 hover:bg-red-500 hover:text-white'
+          className='text-destructive hover:text-foreground hover:bg-foreground/10 mr-auto h-auto cursor-pointer'
         >
           <Trash2 className='mr-2 h-4 w-4' />
           {t('delete')}
@@ -64,9 +68,12 @@ export function ConfirmDeleteAreaDialog({ area, onDeleteSuccess }: { area: Area;
           <AlertDialogDescription>{t('confirm_delete_area_dialog.description')}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className='cursor-pointer'>{t('cancel')}</AlertDialogCancel>
+          <AlertDialogCancel className='hover:bg-foreground/10 cursor-pointer'>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction
-            className='cursor-pointer bg-red-500 hover:bg-red-600'
+            className={cn(
+              buttonVariants({ variant: 'outline' }),
+              'text-destructive hover:text-foreground hover:bg-foreground/10 cursor-pointer bg-transparent'
+            )}
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
           >
