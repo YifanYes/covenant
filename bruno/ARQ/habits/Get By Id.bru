@@ -1,0 +1,29 @@
+meta {
+  name: Get By Id
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{host}}/habits.getById?input={"id":"{{habit_id}}"}
+  body: none
+  auth: bearer
+}
+
+params:query {
+  input: {"id":"{{habit_id}}"}
+}
+
+headers {
+  x-refresh-token: {{refresh_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "id": "{{habit_id}}"
+  }
+}
