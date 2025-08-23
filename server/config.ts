@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['dev', 'prod', 'test']).default('dev'),
