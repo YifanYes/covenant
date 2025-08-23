@@ -1,0 +1,25 @@
+meta {
+  name: Get Deleted
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{host}}/habits.getDeleted
+  body: none
+  auth: bearer
+}
+
+headers {
+  x-refresh-token: {{refresh_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "name": "Save $100"
+  }
+}
