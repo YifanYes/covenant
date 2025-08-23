@@ -130,6 +130,22 @@
     "success_title": "Account created!",
     "title": "Create an ARQ account"
   },
+  "tasks": {
+    "add": "Add Task",
+    "error": {
+      "internal": {
+        "create": "An error ocurred while creating the task",
+        "delete": "An error ocurred while deleting the task",
+        "update": "An error ocurred while updating the task"
+      }
+    },
+    "success": {
+      "create": "Task created successfully",
+      "delete": "Task deleted successfully",
+      "update": "Task updated successfully"
+    },
+    "title": "Tasks"
+  },
   "update_area_dialog": {
     "description": "Modal to update an area",
     "title": "Update area"
