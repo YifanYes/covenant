@@ -6,7 +6,7 @@ export default function WorkspaceLayout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className='p-2'>
+      <main className='w-full p-2'>
         <SidebarTrigger className='dark:hover:bg-accent' />
         <Outlet />
       </main>
