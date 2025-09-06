@@ -12,7 +12,7 @@ import {
 import { useSnackbar } from '@/hooks/use-snackbar'
 import type { Area } from '@/types/areas.types'
 import { allIcons, areaStyles } from '@/types/constants.types'
-import { queryClient, trpc } from '@/utils/trpc'
+import { queryClient, trpc } from '@/utils/trpc.utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'

@@ -2,7 +2,7 @@ import LoaderButton from '@/components/LoaderButton'
 import PasswordInput from '@/components/forms/PasswordInput'
 import useHashParams from '@/hooks/use-hash-params'
 import { useSnackbar } from '@/hooks/use-snackbar'
-import { trpc } from '@/utils/trpc'
+import { trpc } from '@/utils/trpc.utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, type FC } from 'react'
@@ -55,7 +55,7 @@ export const RecoverPassword: FC = () => {
   }, [errorCode, navigate])
 
   return (
-    <div className='w-md flex flex-col gap-2.5'>
+    <div className='flex w-md flex-col gap-2.5'>
       <h2>{t('recover_password.title')}</h2>
       <PasswordInput
         placeholder={t('recover_password.password')}

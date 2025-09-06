@@ -1,6 +1,6 @@
 import { CreateAreaDialog } from '@/components/dialogs/CreateAreaDialog'
 import { UpdateAreaDialog } from '@/components/dialogs/UpdateAreaDialog'
-import { trpc } from '@/utils/trpc'
+import { trpc } from '@/utils/trpc.utils'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 

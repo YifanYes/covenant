@@ -3,7 +3,7 @@ import LoaderButton from '@/components/LoaderButton'
 import PasswordInput from '@/components/forms/PasswordInput'
 import TextInput from '@/components/forms/TextInput'
 import { useSnackbar } from '@/hooks/use-snackbar'
-import { trpc } from '@/utils/trpc'
+import { trpc } from '@/utils/trpc.utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
@@ -64,7 +64,7 @@ export default function Login() {
   })
 
   return (
-    <div className='w-md flex flex-col gap-2.5'>
+    <div className='flex w-md flex-col gap-2.5'>
       <h2>{t('login.title')}</h2>
       <TextInput
         type='email'
