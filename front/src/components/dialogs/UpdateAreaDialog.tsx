@@ -13,12 +13,12 @@ import { useSnackbar } from '@/hooks/use-snackbar'
 import type { Area } from '@/types/areas.types'
 import { allIcons, areaStyles } from '@/types/constants.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { updateAreaSchema } from '../../../../server/schemas/areas.schemas'
+import { updateAreaSchema, type UpdateAreaBody } from '../../../../server/schemas/areas.schemas'
 import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
 import IconPicker from '../forms/IconPicker'
@@ -55,8 +55,8 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm({
-    resolver: zodResolver(updateAreaSchema),
+  } = useForm<UpdateAreaBody>({
+    resolver: standardSchemaResolver(updateAreaSchema),
     mode: 'onTouched',
     defaultValues: {
       id: area.id,
@@ -78,7 +78,7 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
     }
   }, [open, area, reset])
 
-  const onSubmit = handleSubmit((data) => updateMutation.mutate(data))
+  const onSubmit = (data: UpdateAreaBody) => updateMutation.mutate(data)
 
   const handleDeleteSuccess = () => setOpen(false)
 
@@ -147,7 +147,7 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
               className='h-auto cursor-pointer'
               disabled={!isValid || !isDirty}
               isLoading={updateMutation.isPending}
-              onClick={onSubmit}
+              onClick={handleSubmit(onSubmit)}
               label={t('save_changes')}
             />
           </div>

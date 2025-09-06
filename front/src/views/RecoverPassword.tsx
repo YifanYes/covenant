@@ -3,13 +3,13 @@ import PasswordInput from '@/components/forms/PasswordInput'
 import useHashParams from '@/hooks/use-hash-params'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { trpc } from '@/utils/trpc.utils'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
-import { recoverPasswordSchema } from '../../../server/schemas/auth.schemas'
+import { recoverPasswordSchema, type RecoverPasswordSchema } from '../../../server/schemas/auth.schemas'
 
 export const RecoverPassword: FC = () => {
   const { t } = useTranslation()
@@ -44,11 +44,10 @@ export const RecoverPassword: FC = () => {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty }
-  } = useForm({ resolver: zodResolver(recoverPasswordSchema), mode: 'onTouched' })
+  } = useForm<RecoverPasswordSchema>({ resolver: standardSchemaResolver(recoverPasswordSchema), mode: 'onTouched' })
 
-  const onSubmit = handleSubmit(({ password }) =>
-    recoverPasswordMutation.mutate({ password, accessToken, refreshToken })
-  )
+  const onSubmit = (data: RecoverPasswordSchema) =>
+    recoverPasswordMutation.mutate({ password: data.password, accessToken, refreshToken })
 
   useEffect(() => {
     if (errorCode) navigate('/login')
@@ -71,7 +70,7 @@ export const RecoverPassword: FC = () => {
         disabled={!isValid || !isDirty}
         isLoading={recoverPasswordMutation.isPending}
         label={t('recover_password.button')}
-        onClick={onSubmit}
+        onClick={handleSubmit(onSubmit)}
       />
     </div>
   )

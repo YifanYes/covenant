@@ -7,7 +7,7 @@ export default function CalendarSidebar() {
   return (
     <div className='p-1'>
       <p>Calendar Sidebar</p>
-      <Button variant='ghost'>{t('calendar.today')}</Button>
+      <Button variant='outline'>{t('calendar.today')}</Button>
     </div>
   )
 }

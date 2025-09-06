@@ -56,7 +56,7 @@ export const ConfirmDeleteAreaDialog = ({ area, onDeleteSuccess }: Props) => {
           variant='outline'
           size='sm'
           disabled={deleteMutation.isPending}
-          className='text-destructive hover:text-foreground hover:bg-foreground/10 mr-auto h-auto cursor-pointer'
+          className='text-destructive hover:text-foreground hover:bg-foreground/10 mr-auto h-auto'
         >
           <Trash2 className='mr-2 h-4 w-4' />
           {t('delete')}

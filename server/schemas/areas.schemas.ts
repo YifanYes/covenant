@@ -5,6 +5,7 @@ export const createAreaSchema = z.object({
   color: z.string().optional(),
   icon: z.string().optional()
 })
+export type CreateAreaBody = z.infer<typeof createAreaSchema>
 
 export const updateAreaSchema = z.object({
   id: z.uuid(),
@@ -12,6 +13,7 @@ export const updateAreaSchema = z.object({
   color: z.string().optional(),
   icon: z.string().optional()
 })
+export type UpdateAreaBody = z.infer<typeof updateAreaSchema>
 
 export const deleteAreaSchema = z.object({
   id: z.uuid()

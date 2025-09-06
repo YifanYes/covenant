@@ -4,7 +4,7 @@ import PasswordInput from '@/components/forms/PasswordInput'
 import TextInput from '@/components/forms/TextInput'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { trpc } from '@/utils/trpc.utils'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -57,9 +57,9 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty }
-  } = useForm({
+  } = useForm<LoginSchema>({
     defaultValues: { email: '', password: '' },
-    resolver: zodResolver(loginSchema),
+    resolver: standardSchemaResolver(loginSchema),
     mode: 'onTouched'
   })
 
