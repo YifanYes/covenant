@@ -17,7 +17,7 @@ import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { createAreaSchema, type CreateAreaBody } from '../../../../server/schemas/areas.schemas'
+import { createAreaSchema, type CreateAreaBodyType } from '../../../../server/schemas/areas.schemas'
 import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
 import IconPicker from '../forms/IconPicker'
@@ -51,9 +51,9 @@ export const CreateAreaDialog = () => {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<CreateAreaBody>({ resolver: standardSchemaResolver(createAreaSchema), mode: 'onTouched' })
+  } = useForm<CreateAreaBodyType>({ resolver: standardSchemaResolver(createAreaSchema), mode: 'onTouched' })
 
-  const onSubmit = (data: CreateAreaBody) => mutation.mutate(data)
+  const onSubmit = (data: CreateAreaBodyType) => mutation.mutate(data)
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)

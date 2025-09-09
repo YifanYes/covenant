@@ -9,7 +9,7 @@ import { useEffect, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
-import { recoverPasswordSchema, type RecoverPasswordSchema } from '../../../server/schemas/auth.schemas'
+import { recoverPasswordSchema, type RecoverPasswordType } from '../../../server/schemas/auth.schemas'
 
 export const RecoverPassword: FC = () => {
   const { t } = useTranslation()
@@ -44,9 +44,9 @@ export const RecoverPassword: FC = () => {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty }
-  } = useForm<RecoverPasswordSchema>({ resolver: standardSchemaResolver(recoverPasswordSchema), mode: 'onTouched' })
+  } = useForm<RecoverPasswordType>({ resolver: standardSchemaResolver(recoverPasswordSchema), mode: 'onTouched' })
 
-  const onSubmit = (data: RecoverPasswordSchema) =>
+  const onSubmit = (data: RecoverPasswordType) =>
     recoverPasswordMutation.mutate({ password: data.password, accessToken, refreshToken })
 
   useEffect(() => {

@@ -2,11 +2,8 @@ import { cn } from '@/lib/utils'
 import dayjs from 'dayjs'
 
 export default function CalendarDay({ day, weekIndex }: { day: dayjs.Dayjs; weekIndex: number }) {
-  const getCurrentDayClass = () => {
-    return day.format('DD-MM-YYYY') === dayjs().format('DD-MM-YYYY')
-      ? 'bg-primary text-primary-foreground rounded-full w-7'
-      : ''
-  }
+  const getCurrentDayClass = () =>
+    day.isSame(dayjs(), 'day') ? 'bg-primary text-primary-foreground rounded-full w-7' : ''
 
   return (
     <div className='flex flex-col border border-gray-100'>

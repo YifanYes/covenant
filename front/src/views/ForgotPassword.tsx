@@ -8,7 +8,7 @@ import { MailCheck } from 'lucide-react'
 import { useState, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { forgotPasswordSchema, type ForgotPasswordSchema } from '../../../server/schemas/auth.schemas'
+import { forgotPasswordSchema, type ForgotPasswordType } from '../../../server/schemas/auth.schemas'
 
 export const ForgotPassword: FC = () => {
   const { t } = useTranslation()
@@ -33,9 +33,9 @@ export const ForgotPassword: FC = () => {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty }
-  } = useForm<ForgotPasswordSchema>({ resolver: standardSchemaResolver(forgotPasswordSchema), mode: 'onTouched' })
+  } = useForm<ForgotPasswordType>({ resolver: standardSchemaResolver(forgotPasswordSchema), mode: 'onTouched' })
 
-  const onSubmit = (data: ForgotPasswordSchema) => forgotPasswordMutation.mutate(data)
+  const onSubmit = (data: ForgotPasswordType) => forgotPasswordMutation.mutate(data)
 
   return (
     <div className='flex w-md flex-col gap-2.5'>

@@ -18,7 +18,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { updateAreaSchema, type UpdateAreaBody } from '../../../../server/schemas/areas.schemas'
+import { updateAreaSchema, type UpdateAreaBodyType } from '../../../../server/schemas/areas.schemas'
 import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
 import IconPicker from '../forms/IconPicker'
@@ -55,7 +55,7 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<UpdateAreaBody>({
+  } = useForm<UpdateAreaBodyType>({
     resolver: standardSchemaResolver(updateAreaSchema),
     mode: 'onTouched',
     defaultValues: {
@@ -78,7 +78,7 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
     }
   }, [open, area, reset])
 
-  const onSubmit = (data: UpdateAreaBody) => updateMutation.mutate(data)
+  const onSubmit = (data: UpdateAreaBodyType) => updateMutation.mutate(data)
 
   const handleDeleteSuccess = () => setOpen(false)
 

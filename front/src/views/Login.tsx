@@ -9,7 +9,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
-import { loginSchema, type LoginSchema } from '../../../server/schemas/auth.schemas'
+import { loginSchema, type LoginType } from '../../../server/schemas/auth.schemas'
 import { useAuthStore } from '../hooks/use-auth-store'
 
 export default function Login() {
@@ -49,7 +49,7 @@ export default function Login() {
     })
   )
 
-  const onSubmit = (data: LoginSchema) => {
+  const onSubmit = (data: LoginType) => {
     loginMutation.mutate(data)
   }
 
@@ -57,7 +57,7 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty }
-  } = useForm<LoginSchema>({
+  } = useForm<LoginType>({
     defaultValues: { email: '', password: '' },
     resolver: standardSchemaResolver(loginSchema),
     mode: 'onTouched'

@@ -10,7 +10,7 @@ import { MailCheck } from 'lucide-react'
 import { useState, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { signUpSchema, type SignUpSchema } from '../../../server/schemas/auth.schemas'
+import { signUpSchema, type SignUpType } from '../../../server/schemas/auth.schemas'
 
 export const SignUp: FC = () => {
   const { t } = useTranslation()
@@ -35,9 +35,9 @@ export const SignUp: FC = () => {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty }
-  } = useForm<SignUpSchema>({ resolver: standardSchemaResolver(signUpSchema), mode: 'onTouched' })
+  } = useForm<SignUpType>({ resolver: standardSchemaResolver(signUpSchema), mode: 'onTouched' })
 
-  const onSubmit = (data: SignUpSchema) => signUpMutation.mutate(data)
+  const onSubmit = (data: SignUpType) => signUpMutation.mutate(data)
 
   return (
     <div className='flex w-md flex-col gap-2.5'>
