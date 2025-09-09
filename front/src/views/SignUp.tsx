@@ -3,14 +3,14 @@ import LoaderButton from '@/components/LoaderButton'
 import PasswordInput from '@/components/forms/PasswordInput'
 import TextInput from '@/components/forms/TextInput'
 import { useSnackbar } from '@/hooks/use-snackbar'
-import { trpc } from '@/utils/trpc'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { trpc } from '@/utils/trpc.utils'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation } from '@tanstack/react-query'
 import { MailCheck } from 'lucide-react'
 import { useState, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { signUpSchema } from '../../../server/schemas/auth.schemas'
+import { signUpSchema, type SignUpType } from '../../../server/schemas/auth.schemas'
 
 export const SignUp: FC = () => {
   const { t } = useTranslation()
@@ -35,9 +35,9 @@ export const SignUp: FC = () => {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty }
-  } = useForm({ resolver: zodResolver(signUpSchema), mode: 'onTouched' })
+  } = useForm<SignUpType>({ resolver: standardSchemaResolver(signUpSchema), mode: 'onTouched' })
 
-  const onSubmit = handleSubmit((data) => signUpMutation.mutate(data))
+  const onSubmit = (data: SignUpType) => signUpMutation.mutate(data)
 
   return (
     <div className='flex w-md flex-col gap-2.5'>
@@ -80,7 +80,7 @@ export const SignUp: FC = () => {
             disabled={!isValid || !isDirty}
             isLoading={signUpMutation.isPending}
             label={t('sign_up.button')}
-            onClick={onSubmit}
+            onClick={handleSubmit(onSubmit)}
           />
           <div className='flex flex-row gap-1'>
             <p>{t('sign_up.already_have_account')}</p>

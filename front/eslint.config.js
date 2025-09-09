@@ -6,45 +6,54 @@ import globals from 'globals'
 import path from 'path'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+export default [
   { ignores: ['dist'] },
+
+  // Base JavaScript configuration
+  js.configs.recommended,
+
+  // TypeScript configurations
+  ...tseslint.configs.recommended,
+
+  // Main configuration for TypeScript files
   {
-    parser: '@typescript-eslint/parser',
-    plugins: ['@typescript-eslint'],
-    extends: [
-      'plugin:@typescript-eslint/recommended',
-    ],
-    rules: {
-      '@typescript-eslint/no-unused-expressions': ['error', {
-        allowShortCircuit: true,
-        allowTernary: true,
-        allowTaggedTemplates: true,
-      }],
-    }
-  },
-  {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser
+      globals: globals.browser,
+      parser: tseslint.parser,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
+      }
     },
     plugins: {
+      '@typescript-eslint': tseslint.plugin,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }]
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      '@typescript-eslint/no-unused-expressions': [
+        'error',
+        {
+          allowShortCircuit: true,
+          allowTernary: true,
+          allowTaggedTemplates: true
+        }
+      ]
     }
   },
+
+  // i18n JSON configuration
   {
     files: ['public/locales/**/*.json'],
-    plugins: { 'i18n-json': i18nJsonPlugin },
-    processor: {
-      meta: { name: '.json' },
-      ...i18nJsonPlugin.processors['.json']
+    plugins: {
+      'i18n-json': i18nJsonPlugin
     },
+    processor: i18nJsonPlugin.processors['.json'],
     rules: {
       ...i18nJsonPlugin.configs.recommended.rules,
       'i18n-json/valid-message-syntax': 'off',
@@ -52,12 +61,12 @@ export default tseslint.config(
         2,
         {
           filePath: {
-            'translation.json': path.resolve('public/locales/en/translation.json'),
-            'translation.json': path.resolve('public/locales/es/translation.json')
+            'public/locales/en/translation.json': path.resolve('public/locales/en/translation.json'),
+            'public/locales/es/translation.json': path.resolve('public/locales/es/translation.json')
           }
         }
       ],
       'i18n-json/sorted-keys': [2]
     }
   }
-)
+]

@@ -3,13 +3,13 @@ import LoaderButton from '@/components/LoaderButton'
 import PasswordInput from '@/components/forms/PasswordInput'
 import TextInput from '@/components/forms/TextInput'
 import { useSnackbar } from '@/hooks/use-snackbar'
-import { trpc } from '@/utils/trpc'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { trpc } from '@/utils/trpc.utils'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
-import { loginSchema, type LoginSchema } from '../../../server/schemas/auth.schemas'
+import { loginSchema, type LoginType } from '../../../server/schemas/auth.schemas'
 import { useAuthStore } from '../hooks/use-auth-store'
 
 export default function Login() {
@@ -49,7 +49,7 @@ export default function Login() {
     })
   )
 
-  const onSubmit = (data: LoginSchema) => {
+  const onSubmit = (data: LoginType) => {
     loginMutation.mutate(data)
   }
 
@@ -57,14 +57,14 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty }
-  } = useForm({
+  } = useForm<LoginType>({
     defaultValues: { email: '', password: '' },
-    resolver: zodResolver(loginSchema),
+    resolver: standardSchemaResolver(loginSchema),
     mode: 'onTouched'
   })
 
   return (
-    <div className='w-md flex flex-col gap-2.5'>
+    <div className='flex w-md flex-col gap-2.5'>
       <h2>{t('login.title')}</h2>
       <TextInput
         type='email'
