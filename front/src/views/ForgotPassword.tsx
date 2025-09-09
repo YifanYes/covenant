@@ -1,14 +1,14 @@
 import TextInput from '@/components/forms/TextInput'
 import LoaderButton from '@/components/LoaderButton'
 import { useSnackbar } from '@/hooks/use-snackbar'
-import { trpc } from '@/utils/trpc'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { trpc } from '@/utils/trpc.utils'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation } from '@tanstack/react-query'
 import { MailCheck } from 'lucide-react'
 import { useState, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { forgotPasswordSchema } from '../../../server/schemas/auth.schemas'
+import { forgotPasswordSchema, type ForgotPasswordType } from '../../../server/schemas/auth.schemas'
 
 export const ForgotPassword: FC = () => {
   const { t } = useTranslation()
@@ -33,9 +33,9 @@ export const ForgotPassword: FC = () => {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty }
-  } = useForm({ resolver: zodResolver(forgotPasswordSchema), mode: 'onTouched' })
+  } = useForm<ForgotPasswordType>({ resolver: standardSchemaResolver(forgotPasswordSchema), mode: 'onTouched' })
 
-  const onSubmit = handleSubmit((data) => forgotPasswordMutation.mutate(data))
+  const onSubmit = (data: ForgotPasswordType) => forgotPasswordMutation.mutate(data)
 
   return (
     <div className='flex w-md flex-col gap-2.5'>
@@ -70,7 +70,7 @@ export const ForgotPassword: FC = () => {
             disabled={!isValid || !isDirty}
             isLoading={forgotPasswordMutation.isPending}
             label={t('recover_password.button')}
-            onClick={onSubmit}
+            onClick={handleSubmit(onSubmit)}
           />
         </>
       )}

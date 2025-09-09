@@ -1,5 +1,5 @@
 import ObjectiveCard from '@/components/ObjectiveCard'
-import { trpc } from '@/utils/trpc'
+import { trpc } from '@/utils/trpc.utils'
 import { useQuery } from '@tanstack/react-query'
 
 export default function Dashboard() {
