@@ -12,7 +12,7 @@ import {
 import { Button, buttonVariants } from '@/components/ui/button'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { cn } from '@/lib/utils'
-import type { Area } from '@/types/areas.types'
+import type { Area } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { useMutation } from '@tanstack/react-query'
 import { Trash2 } from 'lucide-react'

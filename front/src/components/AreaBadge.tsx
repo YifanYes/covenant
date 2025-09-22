@@ -1,5 +1,5 @@
-import type { Area } from '@/types/areas.types'
 import { allIcons, areaStyles } from '@/types/constants.types'
+import type { Area } from '@/types/models.types'
 import { useTranslation } from 'react-i18next'
 
 export default function AreaBadge({ area }: { area: Area }) {
