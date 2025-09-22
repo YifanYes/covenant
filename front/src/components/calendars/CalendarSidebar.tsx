@@ -2,7 +2,8 @@ import { useCalendarStore } from '@/hooks/use-calendar-store'
 import dayjs from 'dayjs'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Button } from './ui/button'
+import { CreateTaskDialog } from '../dialogs/CreateTaskDialog'
+import { Button } from '../ui/button'
 
 export default function CalendarSidebar() {
   const { t } = useTranslation()
@@ -16,7 +17,7 @@ export default function CalendarSidebar() {
   const formattedMonthYear = currentMonth.format('MMMM YYYY')
 
   return (
-    <div className='flex flex-col gap-4 p-3'>
+    <aside className='flex flex-col gap-4 p-3'>
       <div className='flex items-center justify-between'>
         <p className='text-xl font-semibold'>{formattedMonthYear}</p>
         <div className='flex gap-1'>
@@ -32,6 +33,8 @@ export default function CalendarSidebar() {
       <Button variant='outline' className='w-full' onClick={handleReset}>
         {t('calendar.today')}
       </Button>
-    </div>
+
+      <CreateTaskDialog />
+    </aside>
   )
 }

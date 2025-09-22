@@ -10,8 +10,8 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { useSnackbar } from '@/hooks/use-snackbar'
-import type { Area } from '@/types/areas.types'
 import { allIcons, areaStyles } from '@/types/constants.types'
+import type { Area } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation } from '@tanstack/react-query'

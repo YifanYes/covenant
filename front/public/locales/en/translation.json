@@ -49,12 +49,20 @@
     "description": "This action is irreversible. This will permanently delete the area.",
     "title": "Are you sure you want to delete the area?"
   },
+  "create": "Create",
   "create_area_dialog": {
     "color": "Color",
     "description": "Dialog to create new area",
     "icon": "Icon",
     "name": "Name",
     "title": "Create new area"
+  },
+  "create_task_dialog": {
+    "description": "Modal to create a new task",
+    "description_placeholder": "Task description",
+    "due_date_placeholder": "Due date (optional)",
+    "title": "Create new task",
+    "title_placeholder": "Task title"
   },
   "delete": "Delete",
   "errors": {
@@ -132,6 +140,14 @@
     "success_message": "We have sent you a verification email. Please check your inbox.",
     "success_title": "Account created!",
     "title": "Create an ARQ account"
+  },
+  "tasks": {
+    "add": "Create task",
+    "error": {
+      "internal": {
+        "create": "An error ocurred while creating the task"
+      }
+    }
   },
   "update_area_dialog": {
     "description": "Modal to update an area",
