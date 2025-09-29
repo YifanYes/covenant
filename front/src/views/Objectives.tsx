@@ -1,16 +1,14 @@
 import { CreateAreaDialog } from '@/components/dialogs/CreateAreaDialog'
 import { UpdateAreaDialog } from '@/components/dialogs/UpdateAreaDialog'
 import { trpc } from '@/utils/trpc.utils'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 export const Objectives = () => {
   const { t } = useTranslation()
-  const { data: areasData, isLoading: isAreasLoading } = useQuery(trpc.areas.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
 
-  return isAreasLoading ? (
-    <div>Loading...</div>
-  ) : (
+  return (
     <div className='mx-auto flex max-w-3xl flex-col gap-y-12 p-6'>
       <section className='flex flex-col gap-y-6'>
         <h2 className='text-foreground text-xl font-semibold'>{t('objectives.title')}</h2>
@@ -22,7 +20,7 @@ export const Objectives = () => {
           <CreateAreaDialog />
         </div>
         <div className='flex flex-wrap gap-2'>
-          {areasData?.areas?.map((area) => (
+          {areasData.areas.map((area) => (
             <UpdateAreaDialog key={area.id} area={area} />
           ))}
         </div>
