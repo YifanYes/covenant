@@ -57,6 +57,18 @@
     "name": "Name",
     "title": "Create new area"
   },
+  "create_objective_dialog": {
+    "description": "Modal to create a new objective",
+    "description_placeholder": "Description (optional)",
+    "due_date_placeholder": "Due date (optional)",
+    "error": {
+      "internal": "An error occurred while creating the objective"
+    },
+    "name_placeholder": "Title",
+    "select_areas_placeholder": "Select areas",
+    "success": "Objective created successfully",
+    "title": "Create new objective"
+  },
   "create_task_dialog": {
     "description": "Modal to create a new task",
     "description_placeholder": "Task description",
@@ -102,6 +114,7 @@
     "title": "Login to ARQ"
   },
   "objectives": {
+    "add": "Add objective",
     "title": "Objetives"
   },
   "recover_password": {
