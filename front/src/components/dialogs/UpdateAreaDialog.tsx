@@ -84,7 +84,7 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
-    !isOpen && reset()
+    reset()
   }
 
   return !areaStyle ? null : (

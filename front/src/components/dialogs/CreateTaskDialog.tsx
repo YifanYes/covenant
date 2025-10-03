@@ -74,22 +74,7 @@ export const CreateTaskDialog = () => {
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
-    if (!isOpen) {
-      reset(
-        {
-          title: '',
-          description: '',
-          status: TaskStatus.TODO,
-          dueDate: undefined
-        },
-        {
-          keepErrors: false,
-          keepDirty: false,
-          keepTouched: false,
-          keepIsSubmitted: false
-        }
-      )
-    }
+    reset()
   }
 
   return (

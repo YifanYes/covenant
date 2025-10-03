@@ -57,7 +57,7 @@ export const CreateAreaDialog = () => {
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
-    !isOpen && reset()
+    reset()
   }
 
   return (

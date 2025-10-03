@@ -17,6 +17,8 @@ export type Objective = {
   updatedAt: string
   dueDate?: string | null
   areas?: Area[]
+  habits?: Habit[]
+  tasks?: Task[]
 }
 
 export type Task = {
@@ -30,4 +32,26 @@ export type Task = {
   createdAt: string
   updatedAt: string
   objectives: Objective[]
+}
+
+export type HabitCompletion = {
+  id: string
+  habitId: string
+  userId: string
+  completedAt: string
+  habit?: Habit
+}
+
+export type Habit = {
+  id: string
+  name: string
+  description?: string | null
+  recurrence: number
+  timespan: string
+  userId: string
+  createdAt: string
+  updatedAt: string
+  deletedAt?: string | null
+  completions?: HabitCompletion[]
+  objectives?: Objective[]
 }

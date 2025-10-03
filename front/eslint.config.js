@@ -43,7 +43,8 @@ export default [
           allowTernary: true,
           allowTaggedTemplates: true
         }
-      ]
+      ],
+      '@typescript-eslint/no-explicit-any': 'off'
     }
   },
 
