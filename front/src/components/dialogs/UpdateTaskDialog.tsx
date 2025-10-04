@@ -10,13 +10,13 @@ import {
 } from '@/components/ui/dialog'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { useSnackbar } from '@/hooks/use-snackbar'
-import type { Task } from '@/types/models.types'
+import { useTasksStore } from '@/hooks/use-tasks-store'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { isNil, isUndefined, map } from 'es-toolkit/compat'
-import { useEffect, type Dispatch, type SetStateAction } from 'react'
+import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { TaskStatus, updateTaskSchema, type UpdateTaskType } from '../../../../server/schemas/tasks.schemas'
@@ -26,31 +26,25 @@ import SingleSelect from '../forms/SingleSelect'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
 
-export const UpdateTaskDialog = ({
-  task,
-  setTask,
-  callback
-}: {
-  task?: Task
-  setTask: Dispatch<SetStateAction<Task | undefined>>
-  callback?: () => Promise<unknown>
-}) => {
+export const UpdateTaskDialog = ({ callback }: { callback?: () => Promise<unknown> }) => {
   const { t } = useTranslation()
   const { show } = useSnackbar()
   const { monthIndex } = useCalendarStore()
+  const { selectedTask, setSelectedTask } = useTasksStore()
 
   const updateMutation = useMutation(
     trpc.tasks.update.mutationOptions({
       onSuccess: async () => {
         show({ variant: 'success', title: t('tasks.success.update') })
-        queryClient.invalidateQueries({
-          queryKey: trpc.tasks.getByDate.queryKey({
-            monthIndex: monthIndex.toString(),
-            year: dayjs().year().toString()
+        queryClient
+          .invalidateQueries({
+            queryKey: trpc.tasks.getByDate.queryKey({
+              monthIndex: monthIndex.toString(),
+              year: dayjs().year().toString()
+            })
           })
-        })
-        callback && (await callback?.())
-        setTask(undefined)
+          .then(() => callback && callback?.())
+          .then(() => setSelectedTask(undefined))
       },
       onError: (error) => {
         console.log(error)
@@ -66,14 +60,15 @@ export const UpdateTaskDialog = ({
     trpc.tasks.delete.mutationOptions({
       onSuccess: async () => {
         show({ variant: 'success', title: t('tasks.success.delete') })
-        queryClient.invalidateQueries({
-          queryKey: trpc.tasks.getByDate.queryKey({
-            monthIndex: monthIndex.toString(),
-            year: dayjs().year().toString()
+        queryClient
+          .invalidateQueries({
+            queryKey: trpc.tasks.getByDate.queryKey({
+              monthIndex: monthIndex.toString(),
+              year: dayjs().year().toString()
+            })
           })
-        })
-        callback && (await callback?.())
-        setTask(undefined)
+          .then(() => callback && callback?.())
+          .then(() => setSelectedTask(undefined))
       },
       onError: (error) => {
         console.log(error)
@@ -96,25 +91,25 @@ export const UpdateTaskDialog = ({
     mode: 'onSubmit'
   })
 
-  const onDelete = () => !isUndefined(task) && deleteMutation.mutate({ id: task.id })
+  const onDelete = () => !isUndefined(selectedTask) && deleteMutation.mutate({ id: selectedTask.id })
   const onUpdate = (data: UpdateTaskType) => updateMutation.mutate(data)
 
   const handleOpenChange = () => {
-    setTask(undefined)
+    setSelectedTask(undefined)
     reset()
   }
 
   useEffect(() => {
-    task &&
+    selectedTask &&
       reset({
-        ...task,
-        objectives: map(task?.objectives, (objective) => objective.id),
-        dueDate: !isNil(task?.dueDate) ? new Date(task.dueDate) : undefined
+        ...selectedTask,
+        objectives: map(selectedTask?.objectives, (objective) => objective.id),
+        dueDate: !isNil(selectedTask?.dueDate) ? new Date(selectedTask.dueDate) : undefined
       })
-  }, [task, reset])
+  }, [selectedTask, reset])
 
   return (
-    <Dialog open={!isUndefined(task)} onOpenChange={handleOpenChange}>
+    <Dialog open={!isUndefined(selectedTask)} onOpenChange={handleOpenChange}>
       <DialogContent className='sm:max-w-[425px]' aria-describedby='update-task-dialog-desc'>
         <DialogHeader>
           <DialogTitle>{t('update_task_dialog.title')}</DialogTitle>
@@ -171,7 +166,7 @@ export const UpdateTaskDialog = ({
           <LoaderButton
             className='text-destructive border-destructive hover:text-background hover:bg-destructive h-auto cursor-pointer border-2 bg-transparent'
             isLoading={deleteMutation.isPending}
-            disabled={isUndefined(task)}
+            disabled={isUndefined(selectedTask)}
             onClick={onDelete}
             label={t('tasks.delete')}
           />

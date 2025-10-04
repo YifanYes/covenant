@@ -1,7 +1,10 @@
+import { useTasksStore } from '@/hooks/use-tasks-store'
 import { type Task } from '@/types/models.types'
 import { useDragAndDrop } from '@formkit/drag-and-drop/react'
+import { map } from 'es-toolkit/compat'
 import { GripVertical, PlusIcon } from 'lucide-react'
-import { useEffect, type Dispatch, type SetStateAction } from 'react'
+import { useEffect } from 'react'
+import type { TaskStatus } from '../../../server/schemas/tasks.schemas'
 import { Button } from './ui/button'
 
 export type TaskRow = {
@@ -37,13 +40,7 @@ export const TaskListSkeleton = () => {
   )
 }
 
-const TaskItem = ({
-  task,
-  setSelectedTask
-}: {
-  task: Task
-  setSelectedTask: Dispatch<SetStateAction<Task | undefined>>
-}) => (
+const TaskItem = ({ task, setSelectedTask }: { task: Task; setSelectedTask: (task?: Task) => void }) => (
   <li
     onClick={() => setSelectedTask(task)}
     className='group border-input flex cursor-pointer items-center gap-3 border-b-2 py-4 transition-all hover:bg-gray-50/10'
@@ -55,36 +52,30 @@ const TaskItem = ({
   </li>
 )
 
-const TaskList = ({
-  row,
-  group,
-  collection,
-  setSelectedTask
-}: {
-  row: TaskRow
-  group: string
-  collection?: Record<string, Task[]>
-  setSelectedTask: Dispatch<SetStateAction<Task | undefined>>
-}) => {
-  const [parent, values, setValues] = useDragAndDrop<HTMLUListElement, Task>(row.items, {
+const TaskList = ({ id, group, mutation }: { id: string; group: string; mutation: any }) => {
+  const { tasks, setSelectedTask } = useTasksStore()
+  const [parent, values, setValues] = useDragAndDrop<HTMLUListElement, Task>(tasks?.[id] ?? [], {
     group,
-    multiDrag: true,
-    selectedClass: 'bg-gray-50/10 text-gray-50',
     dragHandle: '.drag-handle',
-    handleDragend: (value) => console.log(value, collection)
+    handleNodeDrop: (event, state) =>
+      mutation.mutate({
+        ...event.targetData.node.data.value,
+        status: state.currentParent.el.dataset.listId as TaskStatus,
+        order: state.targetIndex
+      })
   })
 
   useEffect(() => {
-    setValues(row.items)
-  }, [row.items, setValues])
+    setValues(tasks?.[id])
+  }, [tasks, id, setValues])
 
   return (
     <section className='w-full py-6'>
       <header className='mb-2 flex items-center justify-between'>
-        <h2 className='text-md font-medium'>{row.name}</h2>
+        <h2 className='text-md font-medium'>{id}</h2>
       </header>
-      <ul ref={parent} className='flex flex-col' data-list-id={row.id}>
-        {values.map((task: Task) => (
+      <ul ref={parent} className='flex flex-col' data-list-id={id}>
+        {map(values, (task: Task) => (
           <TaskItem key={task.id} task={task} setSelectedTask={setSelectedTask} />
         ))}
       </ul>
