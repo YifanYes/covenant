@@ -155,15 +155,33 @@
     "title": "Create an ARQ account"
   },
   "tasks": {
-    "add": "Create task",
+    "add": "Add Task",
+    "delete": "Delete Task",
     "error": {
       "internal": {
-        "create": "An error ocurred while creating the task"
+        "create": "An error ocurred while creating the task",
+        "delete": "An error ocurred while deleting the task",
+        "update": "An error ocurred while updating the task"
       }
-    }
+    },
+    "success": {
+      "create": "Task created successfully",
+      "delete": "Task deleted successfully",
+      "update": "Task updated successfully"
+    },
+    "title": "Tasks"
   },
+  "update": "Update",
   "update_area_dialog": {
     "description": "Modal to update an area",
     "title": "Update area"
+  },
+  "update_task_dialog": {
+    "description": "Modal to update a task",
+    "description_placeholder": "Task description",
+    "due_date_placeholder": "Due date (optional)",
+    "status_placeholder": "Task status",
+    "title": "Update task",
+    "title_placeholder": "Task title"
   }
 }
