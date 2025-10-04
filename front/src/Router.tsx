@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import PrivateRoute from './components/PrivateRoute'
 import AppLayout from './layouts/AppLayout'
@@ -29,30 +28,9 @@ export const Router = () => {
           </Route>
           <Route element={<PrivateRoute />}>
             <Route element={<WorkspaceLayout />}>
-              <Route
-                path='/dashboard'
-                element={
-                  <Suspense fallback={<div>Loading dashboard…</div>}>
-                    <Dashboard />
-                  </Suspense>
-                }
-              />
-              <Route
-                path='/objectives'
-                element={
-                  <Suspense fallback={<div>Loading objectives…</div>}>
-                    <Objectives />
-                  </Suspense>
-                }
-              />
-              <Route
-                path='/calendar'
-                element={
-                  <Suspense fallback={<div>Loading calendar…</div>}>
-                    <Calendar />
-                  </Suspense>
-                }
-              />
+              <Route path='/dashboard' element={<Dashboard />} />
+              <Route path='/objectives' element={<Objectives />} />
+              <Route path='/calendar' element={<Calendar />} />
               <Route path='/tasks' element={<Tasks />} />
               <Route path='/habits' element={<Habits />} />
               <Route path='/profile' element={<Profile />} />

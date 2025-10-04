@@ -14,12 +14,11 @@ model Objective {
   name        String    @db.VarChar(255)
   description String?
   userId      String    @db.Uuid
+  dueDate     DateTime? @db.Timestamp(6)
   createdAt   DateTime  @default(now()) @db.Timestamp(6)
   updatedAt   DateTime  @updatedAt @db.Timestamp(6)
-  dueDate     DateTime? @db.Timestamp(6)
-  areas       Area[]    @relation("AreaToObjective")
-  habits      Habit[]   @relation("HabitToObjective")
-  tasks       Task[]    @relation("ObjectiveToTask")
+  areas       Area[]
+  tasks       Task[]
 
   @@map("objectives")
 }
@@ -32,7 +31,7 @@ model Area {
   createdAt  DateTime    @default(now()) @db.Timestamp(6)
   updatedAt  DateTime    @updatedAt @db.Timestamp(6)
   userId     String      @db.Uuid
-  objectives Objective[] @relation("AreaToObjective")
+  objectives Objective[]
 
   @@map("areas")
 }
@@ -47,33 +46,7 @@ model Task {
   userId      String      @db.Uuid
   createdAt   DateTime    @default(now()) @db.Timestamp(6)
   updatedAt   DateTime    @updatedAt @db.Timestamp(6)
-  objectives  Objective[] @relation("ObjectiveToTask")
+  objectives  Objective[]
 
   @@map("tasks")
-}
-
-model Habit {
-  id          String            @id @default(uuid()) @db.Uuid
-  name        String            @db.VarChar(255)
-  description String?
-  recurrence  Int               @default(1)
-  timespan    String            @db.VarChar(255)
-  userId      String            @db.Uuid
-  createdAt   DateTime          @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime          @updatedAt @db.Timestamp(6)
-  deletedAt   DateTime?         @db.Timestamp(6)
-  completions HabitCompletion[]
-  objectives  Objective[]       @relation("HabitToObjective")
-
-  @@map("habits")
-}
-
-model HabitCompletion {
-  id          String   @id @default(uuid()) @db.Uuid
-  habitId     String   @db.Uuid
-  userId      String   @db.Uuid
-  completedAt DateTime @default(now()) @db.Timestamp(6)
-  habit       Habit    @relation(fields: [habitId], references: [id])
-
-  @@map("habit_completions")
 }

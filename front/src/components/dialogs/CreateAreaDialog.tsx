@@ -10,14 +10,14 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { useSnackbar } from '@/hooks/use-snackbar'
-import { queryClient, trpc } from '@/utils/trpc.utils'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { queryClient, trpc } from '@/utils/trpc'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { createAreaSchema, type CreateAreaBodyType } from '../../../../server/schemas/areas.schemas'
+import { createAreaSchema } from '../../../../server/schemas/areas.schemas'
 import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
 import IconPicker from '../forms/IconPicker'
@@ -51,19 +51,19 @@ export const CreateAreaDialog = () => {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<CreateAreaBodyType>({ resolver: standardSchemaResolver(createAreaSchema), mode: 'onTouched' })
+  } = useForm({ resolver: zodResolver(createAreaSchema), mode: 'onTouched' })
 
-  const onSubmit = (data: CreateAreaBodyType) => mutation.mutate(data)
+  const onSubmit = handleSubmit((data) => mutation.mutate(data))
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
-    reset()
+    !isOpen && reset()
   }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>
+        <Button className='cursor-pointer'>
           <Plus />
           <span>{t('areas.add')}</span>
         </Button>
@@ -82,7 +82,7 @@ export const CreateAreaDialog = () => {
               placeholder={t('create_area_dialog.name')}
               className='h-9'
               {...register('name')}
-              {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
+              {...(errors.name?.message && { errorMessage: t(errors.name.message) })}
             />
           </div>
           <div className='grid gap-3'>
@@ -108,7 +108,7 @@ export const CreateAreaDialog = () => {
             className='h-auto cursor-pointer'
             disabled={!isValid || !isDirty}
             isLoading={mutation.isPending}
-            onClick={handleSubmit(onSubmit)}
+            onClick={onSubmit}
             label={t('save_changes')}
           />
         </DialogFooter>
