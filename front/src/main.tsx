@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import './i18n.ts'
 import './index.css'
 import { Router } from './Router.tsx'
-import { queryClient } from './utils/trpc.utils.ts'
+import { queryClient } from './utils/trpc.ts'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

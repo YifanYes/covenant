@@ -1,11 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import {
-  bulkUpdateTasksSchema,
-  createTaskSchema,
-  getByDateInputSchema,
-  taskIdSchema,
-  updateTaskSchema
-} from '../schemas/tasks.schemas'
+import { bulkUpdateTasksSchema, createTaskSchema, taskIdSchema, updateTaskSchema } from '../schemas/tasks.schemas'
 import { getUserTask } from '../services/tasks.services'
 import { protectedProcedure, t } from '../trpc'
 
@@ -38,47 +32,38 @@ export const tasksRouter = t.router({
   }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const tasks = await ctx.prisma.task.findMany({
-      where: { userId: ctx.user.id },
+      where: {
+        userId: ctx.user.id
+      },
       include: {
         objectives: {
-          include: { areas: true }
+          include: {
+            areas: true
+          }
         }
       },
-      orderBy: [{ status: 'asc' }, { order: 'asc' }]
+      orderBy: [
+        {
+          status: 'asc'
+        },
+        {
+          order: 'asc'
+        }
+      ]
     })
 
+    // Group tasks by status
     const groupedTasks = tasks.reduce((acc, task) => {
-      if (!acc[task.status]) acc[task.status] = []
+      if (!acc[task.status]) {
+        acc[task.status] = []
+      }
       acc[task.status].push(task)
       return acc
     }, {} as Record<string, typeof tasks>)
 
-    return { tasks: groupedTasks }
-  }),
-  getByDate: protectedProcedure.input(getByDateInputSchema).query(async ({ ctx, input }) => {
-    const year = Number(input.year ?? new Date().getFullYear())
-    const monthIndex = Number(input.monthIndex ?? new Date().getMonth())
-
-    const startDate = new Date(year, monthIndex, 1, 0, 0, 0, 0)
-    const endDate = new Date(year, monthIndex + 1, 0, 23, 59, 59, 999)
-
-    const tasks = await ctx.prisma.task.findMany({
-      where: {
-        userId: ctx.user.id,
-        dueDate: {
-          gte: startDate,
-          lte: endDate
-        }
-      },
-      include: {
-        objectives: {
-          include: { areas: true }
-        }
-      },
-      orderBy: [{ dueDate: 'asc' }]
-    })
-
-    return { tasks }
+    return {
+      tasks: groupedTasks
+    }
   }),
   update: protectedProcedure.input(updateTaskSchema).mutation(async ({ ctx, input }) => {
     await getUserTask(ctx.prisma, input.id, ctx.user.id)

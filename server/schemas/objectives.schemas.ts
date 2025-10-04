@@ -1,16 +1,11 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 export const createObjectiveSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
-  dueDate: z
-    .date()
-    .nullable()
-    .optional()
-    .or(z.string().transform((str) => (str ? new Date(str) : null))),
+  dueDate: z.iso.datetime().optional(),
   areas: z.array(z.uuid()).optional()
 })
-export type CreateObjectiveBodyType = z.infer<typeof createObjectiveSchema>
 
 export const updateObjectiveSchema = z.object({
   id: z.uuid(),

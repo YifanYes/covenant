@@ -1,9 +1,9 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 export const forgotPasswordSchema = z.object({
   email: z.email('errors.invalid_email')
 })
-export type ForgotPasswordType = z.infer<typeof forgotPasswordSchema>
+export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>
 
 export const recoverPasswordSchema = z
   .object({
@@ -14,7 +14,7 @@ export const recoverPasswordSchema = z
     path: ['confirmPassword'],
     message: 'errors.password_mismatch'
   })
-export type RecoverPasswordType = z.infer<typeof recoverPasswordSchema>
+export type RecoverPasswordSchema = z.infer<typeof recoverPasswordSchema>
 
 export const signUpSchema = z
   .object({
@@ -26,13 +26,13 @@ export const signUpSchema = z
     path: ['confirmPassword'],
     message: 'errors.password_mismatch'
   })
-export type SignUpType = z.infer<typeof signUpSchema>
+export type SignUpSchema = z.infer<typeof signUpSchema>
 
 export const loginSchema = z.object({
   email: z.email('errors.invalid_email'),
   password: z.string()
 })
-export type LoginType = z.infer<typeof loginSchema>
+export type LoginSchema = z.infer<typeof loginSchema>
 
 export const refreshTokenSchema = z.object({
   accessToken: z.string(),
