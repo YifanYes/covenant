@@ -1,0 +1,37 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/habits.create
+  body: json
+  auth: bearer
+}
+
+headers {
+  x-refresh-token: {{refresh_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "name": "Read every day",
+    "recurrence": 1,
+    "timespan": "DAILY"
+  }
+}
+
+script:post-response {
+  const data = res.body?.result?.data
+  
+  if (data) {
+    const habitId = data.habit?.id
+    if (habitId) bru.setEnvVar('habit_id', habitId)
+  }
+  
+}

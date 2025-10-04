@@ -23,6 +23,9 @@
     },
     "title": "Áreas"
   },
+  "calendar": {
+    "today": "Hoy"
+  },
   "cancel": "Cancelar",
   "colors": {
     "amber": "Ámbar",
@@ -46,12 +49,32 @@
     "description": "Esta acción es irreversible. Esto eliminará permanentemente el área.",
     "title": "¿Estás seguro que quieres eliminar el área?"
   },
+  "create": "Crear",
   "create_area_dialog": {
     "color": "Color",
     "description": "Modal para crear una nueva área",
     "icon": "Icono",
     "name": "Nombre",
     "title": "Crear nueva área"
+  },
+  "create_objective_dialog": {
+    "description": "Modal para crear un nuevo objetivo",
+    "description_placeholder": "Descripción (opcional)",
+    "due_date_placeholder": "Fecha de entrega (opcional)",
+    "error": {
+      "internal": "Ocurrió un error al crear el objetivo"
+    },
+    "name_placeholder": "Título",
+    "select_areas_placeholder": "Seleccionar áreas",
+    "success": "Objetivo creado exitosamente",
+    "title": "Crear nuevo objetivo"
+  },
+  "create_task_dialog": {
+    "description": "Modal para crear una nueva tarea",
+    "description_placeholder": "Descripción de la tarea",
+    "due_date_placeholder": "Fecha de entrega (opcional)",
+    "title": "Create nueva tarea",
+    "title_placeholder": "Título de la tarea"
   },
   "delete": "Eliminar",
   "errors": {
@@ -91,6 +114,7 @@
     "title": "Inicia sesión en ARQ"
   },
   "objectives": {
+    "add": "Añadir objetivo",
     "title": "Objetivos"
   },
   "recover_password": {

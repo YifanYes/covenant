@@ -1,0 +1,25 @@
+meta {
+  name: Delete
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/habits.delete
+  body: json
+  auth: bearer
+}
+
+headers {
+  x-refresh-token: {{refresh_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "id": "{{habit_id}}"
+  }
+}

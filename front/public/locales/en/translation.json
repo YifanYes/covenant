@@ -23,6 +23,9 @@
     },
     "title": "Areas"
   },
+  "calendar": {
+    "today": "Today"
+  },
   "cancel": "Cancel",
   "colors": {
     "amber": "Amber",
@@ -46,12 +49,32 @@
     "description": "This action is irreversible. This will permanently delete the area.",
     "title": "Are you sure you want to delete the area?"
   },
+  "create": "Create",
   "create_area_dialog": {
     "color": "Color",
     "description": "Dialog to create new area",
     "icon": "Icon",
     "name": "Name",
     "title": "Create new area"
+  },
+  "create_objective_dialog": {
+    "description": "Modal to create a new objective",
+    "description_placeholder": "Description (optional)",
+    "due_date_placeholder": "Due date (optional)",
+    "error": {
+      "internal": "An error occurred while creating the objective"
+    },
+    "name_placeholder": "Title",
+    "select_areas_placeholder": "Select areas",
+    "success": "Objective created successfully",
+    "title": "Create new objective"
+  },
+  "create_task_dialog": {
+    "description": "Modal to create a new task",
+    "description_placeholder": "Task description",
+    "due_date_placeholder": "Due date (optional)",
+    "title": "Create new task",
+    "title_placeholder": "Task title"
   },
   "delete": "Delete",
   "errors": {
@@ -91,6 +114,7 @@
     "title": "Login to ARQ"
   },
   "objectives": {
+    "add": "Add objective",
     "title": "Objetives"
   },
   "recover_password": {

@@ -1,10 +1,11 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 export const createAreaSchema = z.object({
   name: z.string().min(1, 'errors.required_field'),
   color: z.string().optional(),
   icon: z.string().optional()
 })
+export type CreateAreaBodyType = z.infer<typeof createAreaSchema>
 
 export const updateAreaSchema = z.object({
   id: z.uuid(),
@@ -12,6 +13,7 @@ export const updateAreaSchema = z.object({
   color: z.string().optional(),
   icon: z.string().optional()
 })
+export type UpdateAreaBodyType = z.infer<typeof updateAreaSchema>
 
 export const deleteAreaSchema = z.object({
   id: z.uuid()

@@ -9,37 +9,45 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
+import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { createAreaSchema, type CreateAreaBodyType } from '../../../../server/schemas/areas.schemas'
+import { createTaskSchema, TaskStatus, type CreateTaskType } from '../../../../server/schemas/tasks.schemas'
 import LoaderButton from '../LoaderButton'
-import ColorSelector from '../forms/ColorSelector'
-import IconPicker from '../forms/IconPicker'
+import { DatePicker } from '../forms/DatePicker'
 import TextInput from '../forms/TextInput'
+import { Textarea } from '../ui/textarea'
 
-export const CreateAreaDialog = () => {
+export const CreateTaskDialog = () => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { show } = useSnackbar()
+  const { monthIndex } = useCalendarStore()
 
   const mutation = useMutation(
-    trpc.areas.create.mutationOptions({
+    trpc.tasks.create.mutationOptions({
       onSuccess: () => {
-        show({ variant: 'success', title: t('areas.success.create') })
-        queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })
+        show({ variant: 'success', title: t('tasks.success.create') })
+        queryClient.invalidateQueries({
+          queryKey: trpc.tasks.getByDate.queryKey({
+            monthIndex: monthIndex.toString(),
+            year: dayjs().year().toString()
+          })
+        })
         setOpen(false)
       },
       onError: (error) => {
         console.log(error)
         show({
           variant: 'destructive',
-          title: t('areas.error.internal.create')
+          title: t('tasks.error.internal.create')
         })
       }
     })
@@ -51,9 +59,18 @@ export const CreateAreaDialog = () => {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<CreateAreaBodyType>({ resolver: standardSchemaResolver(createAreaSchema), mode: 'onTouched' })
+  } = useForm<CreateTaskType>({
+    resolver: standardSchemaResolver(createTaskSchema),
+    mode: 'onSubmit',
+    defaultValues: {
+      title: '',
+      description: '',
+      status: TaskStatus.TODO,
+      dueDate: undefined
+    }
+  })
 
-  const onSubmit = (data: CreateAreaBodyType) => mutation.mutate(data)
+  const onSubmit = (data: CreateTaskType) => mutation.mutate(data)
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
@@ -65,38 +82,46 @@ export const CreateAreaDialog = () => {
       <DialogTrigger asChild>
         <Button>
           <Plus />
-          <span>{t('areas.add')}</span>
+          <span>{t('tasks.add')}</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[425px]' aria-describedby='create-area-dialog-desc'>
+      <DialogContent className='sm:max-w-[425px]' aria-describedby='create-task-dialog-desc'>
         <DialogHeader>
-          <DialogTitle>{t('create_area_dialog.title')}</DialogTitle>
+          <DialogTitle>{t('create_task_dialog.title')}</DialogTitle>
           <DialogDescription className='sr-only'>
-            {t('create_area_dialog.description') || 'Dialog to create a new area'}
+            {t('create_task_dialog.description') || 'Dialog to create a new task'}
           </DialogDescription>
         </DialogHeader>
-        <div className='grid gap-4'>
+        <div className='grid gap-4' key={`create-task-form-${open}`}>
           <div className='grid gap-3'>
             <TextInput
               type='text'
-              placeholder={t('create_area_dialog.name')}
+              placeholder={t('create_task_dialog.title_placeholder')}
               className='h-9'
-              {...register('name')}
-              {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
+              {...register('title')}
+              {...(errors.title?.message && { errorMessage: t(errors.title.message.toString()) })}
+            />
+          </div>
+          <div className='grid gap-3'>
+            <Textarea
+              placeholder={t('create_task_dialog.description_placeholder')}
+              className='min-h-[80px] resize-none'
+              {...register('description')}
+              {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
             />
           </div>
           <div className='grid gap-3'>
             <Controller
-              name='color'
+              name='dueDate'
               control={control}
-              render={({ field }) => <ColorSelector className='w-full' value={field.value} onChange={field.onChange} />}
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Controller
-              name='icon'
-              control={control}
-              render={({ field }) => <IconPicker className='w-full' value={field.value} onChange={field.onChange} />}
+              render={({ field }) => (
+                <DatePicker
+                  className='w-full'
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={t('create_task_dialog.due_date_placeholder')}
+                />
+              )}
             />
           </div>
         </div>
@@ -109,7 +134,7 @@ export const CreateAreaDialog = () => {
             disabled={!isValid || !isDirty}
             isLoading={mutation.isPending}
             onClick={handleSubmit(onSubmit)}
-            label={t('save_changes')}
+            label={t('create')}
           />
         </DialogFooter>
       </DialogContent>
