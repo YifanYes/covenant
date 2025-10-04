@@ -25,7 +25,7 @@ import { DatePicker } from '../forms/DatePicker'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
 
-export const CreateTaskDialog = () => {
+export const CreateTaskDialog = ({ callback }: { callback?: () => Promise<unknown> }) => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { show } = useSnackbar()
@@ -33,7 +33,7 @@ export const CreateTaskDialog = () => {
 
   const mutation = useMutation(
     trpc.tasks.create.mutationOptions({
-      onSuccess: () => {
+      onSuccess: async () => {
         show({ variant: 'success', title: t('tasks.success.create') })
         queryClient.invalidateQueries({
           queryKey: trpc.tasks.getByDate.queryKey({
@@ -41,6 +41,7 @@ export const CreateTaskDialog = () => {
             year: dayjs().year().toString()
           })
         })
+        callback && (await callback?.())
         setOpen(false)
       },
       onError: (error) => {
