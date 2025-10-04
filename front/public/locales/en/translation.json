@@ -161,6 +161,7 @@
       "internal": {
         "create": "An error ocurred while creating the task",
         "delete": "An error ocurred while deleting the task",
+        "reorder": "An error ocurred while reordering the tasks",
         "update": "An error ocurred while updating the task"
       }
     },

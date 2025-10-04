@@ -161,6 +161,7 @@
       "internal": {
         "create": "Ha ocurrido un error al crear la tarea.",
         "delete": "Ha ocurrido un error al eliminar la tarea.",
+        "reorder": "Ha ocurrido un error al reordenar las tareas.",
         "update": "Ha ocurrido un error al actualizar la tarea."
       }
     },
