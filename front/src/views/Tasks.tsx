@@ -2,10 +2,11 @@ import { CreateTaskDialog } from '@/components/dialogs/CreateTaskDialog'
 import { UpdateTaskDialog } from '@/components/dialogs/UpdateTaskDialog'
 import TaskList, { TaskListSkeleton } from '@/components/Task'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
+import { useDebouncedMutation } from '@/hooks/use-debounced-mutation'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import { queryClient, trpc } from '@/utils/trpc.utils'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { isUndefined, keys, map } from 'es-toolkit/compat'
 import { useEffect } from 'react'
@@ -17,8 +18,7 @@ const TasksView = () => {
   const { show } = useSnackbar()
   const { tasks, setTasks } = useTasksStore()
   const { monthIndex } = useCalendarStore()
-
-  const reorderMutation = useMutation(
+  const reorderMutation = useDebouncedMutation(
     trpc.tasks.update.mutationOptions({
       onSuccess: async () =>
         queryClient.invalidateQueries({
@@ -29,12 +29,10 @@ const TasksView = () => {
         }),
       onError: (error) => {
         console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('tasks.error.internal.reorder')
-        })
+        show({ variant: 'destructive', title: t('tasks.error.internal.reorder') })
       }
-    })
+    }),
+    1000
   )
 
   useEffect(() => {

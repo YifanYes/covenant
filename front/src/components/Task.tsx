@@ -58,7 +58,7 @@ const TaskList = ({ id, group, mutation }: { id: string; group: string; mutation
     group,
     dragHandle: '.drag-handle',
     handleNodeDrop: (event, state) =>
-      mutation.mutate({
+      mutation.debouncedMutate({
         ...event.targetData.node.data.value,
         status: state.currentParent.el.dataset.listId as TaskStatus,
         order: state.targetIndex
