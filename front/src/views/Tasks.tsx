@@ -19,7 +19,7 @@ const TasksView = () => {
   const { tasks, setTasks } = useTasksStore()
   const { monthIndex } = useCalendarStore()
   const reorderMutation = useDebouncedMutation(
-    trpc.tasks.update.mutationOptions({
+    trpc.tasks.bulkUpdate.mutationOptions({
       onSuccess: async () =>
         queryClient.invalidateQueries({
           queryKey: trpc.tasks.getByDate.queryKey({
