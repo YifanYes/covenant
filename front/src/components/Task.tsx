@@ -1,10 +1,10 @@
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import { type Task } from '@/types/models.types'
 import { useDragAndDrop } from '@formkit/drag-and-drop/react'
-import { map } from 'es-toolkit/compat'
+import { clone, filter, flatten, map, values } from 'es-toolkit/compat'
 import { GripVertical, PlusIcon } from 'lucide-react'
 import { useEffect } from 'react'
-import type { TaskStatus } from '../../../server/schemas/tasks.schemas'
+import { TaskStatus } from '../../../server/schemas/tasks.schemas'
 import { Button } from './ui/button'
 
 export type TaskRow = {
@@ -52,16 +52,51 @@ const TaskItem = ({ task, setSelectedTask }: { task: Task; setSelectedTask: (tas
   </li>
 )
 
+const handleDrop = ({
+  tasks,
+  currentParentId = TaskStatus.TODO,
+  formerParentId = TaskStatus.TODO,
+  task,
+  currentIndex,
+  setTasks
+}: {
+  tasks: Record<string, Task[]>
+  currentParentId: string
+  formerParentId: string
+  task: Task
+  currentIndex: number
+  setTasks: (tasks: Record<string, Task[]>) => void
+}) => {
+  const reIndex = (tasks: Task[]) => map(tasks, (t, i) => ({ ...t, order: i }))
+
+  const from = filter(clone(tasks[formerParentId]), (item) => item.id !== task.id)
+  const to = currentParentId === formerParentId ? from : clone(tasks[currentParentId])
+  to.splice(currentIndex, 0, {
+    ...task,
+    order: currentIndex,
+    ...(currentParentId !== formerParentId && { status: currentParentId })
+  })
+  const result = { ...tasks, [formerParentId]: reIndex(from), [currentParentId]: reIndex(to) }
+
+  setTasks(result)
+  return flatten(values(result))
+}
+
 const TaskList = ({ id, group, mutation }: { id: string; group: string; mutation: any }) => {
-  const { tasks, setSelectedTask } = useTasksStore()
+  const { tasks, setSelectedTask, setTasks } = useTasksStore()
   const [parent, values, setValues] = useDragAndDrop<HTMLUListElement, Task>(tasks?.[id] ?? [], {
     group,
     dragHandle: '.drag-handle',
     handleNodeDrop: (event, state) =>
       mutation.debouncedMutate({
-        ...event.targetData.node.data.value,
-        status: state.currentParent.el.dataset.listId as TaskStatus,
-        order: state.targetIndex
+        tasks: handleDrop({
+          tasks,
+          currentParentId: state.currentParent.el.dataset.listId as TaskStatus,
+          formerParentId: state.initialParent.el.dataset.listId as TaskStatus,
+          task: event.targetData.node.data.value,
+          currentIndex: state.targetIndex,
+          setTasks
+        })
       })
   })
 
