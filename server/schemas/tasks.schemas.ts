@@ -26,9 +26,13 @@ export const updateTaskSchema = z.object({
   description: z.string().optional().nullable(),
   status: z.string().optional(),
   order: z.number().int().min(0).optional(),
-  dueDate: z.date().optional().nullable(),
+  dueDate: z
+    .date()
+    .nullish()
+    .or(z.string().transform((str) => (str ? new Date(str) : null))),
   objectives: z.array(z.uuid()).optional()
 })
+export type UpdateTaskType = z.infer<typeof updateTaskSchema>
 
 export const taskIdSchema = z.object({
   id: z.uuid()
