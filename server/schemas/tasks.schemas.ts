@@ -28,8 +28,7 @@ export const updateTaskSchema = z.object({
   order: z.number().int().min(0).optional(),
   dueDate: z
     .date()
-    .nullable()
-    .optional()
+    .nullish()
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
   objectives: z.array(z.uuid()).optional()
 })
