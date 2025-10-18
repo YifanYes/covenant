@@ -1,6 +1,7 @@
 import { CreateTaskDialog } from '@/components/dialogs/CreateTaskDialog'
 import { UpdateTaskDialog } from '@/components/dialogs/UpdateTaskDialog'
-import TaskList, { TaskListSkeleton } from '@/components/Task'
+import { TaskListSkeleton } from '@/components/skeletons/TaskListSkeleton'
+import TaskList from '@/components/tasks/TaskList'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { useDebouncedMutation } from '@/hooks/use-debounced-mutation'
 import { useSnackbar } from '@/hooks/use-snackbar'
@@ -12,7 +13,7 @@ import { isUndefined, keys, map } from 'es-toolkit/compat'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const TasksView = () => {
+const Tasks = () => {
   const { t } = useTranslation()
   const { data, isLoading, isRefetching, refetch } = useQuery(trpc.tasks.getAll.queryOptions())
   const { show } = useSnackbar()
@@ -58,4 +59,4 @@ const TasksView = () => {
   )
 }
 
-export default TasksView
+export default Tasks
