@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import PrivateRoute from './components/PrivateRoute'
+import TasksSuspenseFallback from './components/suspense-fallbacks/TasksSuspenseFallback'
 import AppLayout from './layouts/AppLayout'
 import CenteredLayout from './layouts/CenteredLayout'
 import WorkspaceLayout from './layouts/WorkspaceLayout'
@@ -53,7 +54,14 @@ export const Router = () => {
                   </Suspense>
                 }
               />
-              <Route path='/tasks' element={<Tasks />} />
+              <Route
+                path='/tasks'
+                element={
+                  <Suspense fallback={<TasksSuspenseFallback />}>
+                    <Tasks />
+                  </Suspense>
+                }
+              />
               <Route path='/habits' element={<Habits />} />
               <Route path='/profile' element={<Profile />} />
               <Route path='/settings' element={<Settings />} />

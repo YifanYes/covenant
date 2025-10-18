@@ -33,7 +33,7 @@ export const CreateTaskDialog = () => {
 
   const mutation = useMutation(
     trpc.tasks.create.mutationOptions({
-      onSuccess: () => {
+      onSuccess: async () => {
         show({ variant: 'success', title: t('tasks.success.create') })
         queryClient.invalidateQueries({
           queryKey: trpc.tasks.getByDate.queryKey({
@@ -41,6 +41,7 @@ export const CreateTaskDialog = () => {
             year: dayjs().year().toString()
           })
         })
+        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
         setOpen(false)
       },
       onError: (error) => {

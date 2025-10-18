@@ -28,10 +28,10 @@ export type Task = {
   status: string
   order: number
   dueDate?: string | null
-  userId: string
-  createdAt: string
-  updatedAt: string
-  objectives: Objective[]
+  userId?: string
+  createdAt?: string
+  updatedAt?: string
+  objectives?: Objective[]
 }
 
 export type HabitCompletion = {

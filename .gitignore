@@ -1,3 +1,4 @@
 **/node_modules/
 **/bun.lock
+**/bruno/ARQ/environments
 .DS_Store
