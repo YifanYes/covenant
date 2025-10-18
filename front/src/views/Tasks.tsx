@@ -32,7 +32,7 @@ const Tasks = () => {
         show({ variant: 'destructive', title: t('tasks.error.internal.reorder') })
       }
     }),
-    2000
+    1000
   )
 
   useEffect(() => {
