@@ -60,15 +60,14 @@ export const UpdateTaskDialog = ({ callback }: { callback?: () => Promise<unknow
     trpc.tasks.delete.mutationOptions({
       onSuccess: async () => {
         show({ variant: 'success', title: t('tasks.success.delete') })
-        queryClient
-          .invalidateQueries({
-            queryKey: trpc.tasks.getByDate.queryKey({
-              monthIndex: monthIndex.toString(),
-              year: dayjs().year().toString()
-            })
+        await queryClient.invalidateQueries({
+          queryKey: trpc.tasks.getByDate.queryKey({
+            monthIndex: monthIndex.toString(),
+            year: dayjs().year().toString()
           })
-          .then(() => callback && callback?.())
-          .then(() => setSelectedTask(undefined))
+        })
+        await callback?.()
+        setSelectedTask(undefined)
       },
       onError: (error) => {
         console.log(error)
