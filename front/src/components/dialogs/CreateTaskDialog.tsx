@@ -25,7 +25,7 @@ import { DatePicker } from '../forms/DatePicker'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
 
-export const CreateTaskDialog = ({ callback }: { callback?: () => Promise<unknown> }) => {
+export const CreateTaskDialog = () => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { show } = useSnackbar()
@@ -41,7 +41,7 @@ export const CreateTaskDialog = ({ callback }: { callback?: () => Promise<unknow
             year: dayjs().year().toString()
           })
         })
-        callback && (await callback?.())
+        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
         setOpen(false)
       },
       onError: (error) => {

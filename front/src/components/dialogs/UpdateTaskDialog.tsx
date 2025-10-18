@@ -26,7 +26,7 @@ import SingleSelect from '../forms/SingleSelect'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
 
-export const UpdateTaskDialog = ({ callback }: { callback?: () => Promise<unknown> }) => {
+export const UpdateTaskDialog = () => {
   const { t } = useTranslation()
   const { show } = useSnackbar()
   const { monthIndex } = useCalendarStore()
@@ -36,15 +36,14 @@ export const UpdateTaskDialog = ({ callback }: { callback?: () => Promise<unknow
     trpc.tasks.update.mutationOptions({
       onSuccess: async () => {
         show({ variant: 'success', title: t('tasks.success.update') })
-        queryClient
-          .invalidateQueries({
-            queryKey: trpc.tasks.getByDate.queryKey({
-              monthIndex: monthIndex.toString(),
-              year: dayjs().year().toString()
-            })
+        await queryClient.invalidateQueries({
+          queryKey: trpc.tasks.getByDate.queryKey({
+            monthIndex: monthIndex.toString(),
+            year: dayjs().year().toString()
           })
-          .then(() => callback && callback?.())
-          .then(() => setSelectedTask(undefined))
+        })
+        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
+        setSelectedTask(undefined)
       },
       onError: (error) => {
         console.log(error)
@@ -66,7 +65,7 @@ export const UpdateTaskDialog = ({ callback }: { callback?: () => Promise<unknow
             year: dayjs().year().toString()
           })
         })
-        await callback?.()
+        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
         setSelectedTask(undefined)
       },
       onError: (error) => {
@@ -87,7 +86,7 @@ export const UpdateTaskDialog = ({ callback }: { callback?: () => Promise<unknow
     formState: { errors, isValid, isDirty }
   } = useForm<UpdateTaskType>({
     resolver: standardSchemaResolver(updateTaskSchema),
-    mode: 'onSubmit'
+    mode: 'onTouched'
   })
 
   const onDelete = () => !isUndefined(selectedTask) && deleteMutation.mutate({ id: selectedTask.id })
@@ -176,7 +175,7 @@ export const UpdateTaskDialog = ({ callback }: { callback?: () => Promise<unknow
             <LoaderButton
               className='h-auto cursor-pointer'
               isLoading={updateMutation.isPending}
-              disabled={!isValid || !isDirty}
+              disabled={!isValid || !isDirty || updateMutation.isPending}
               onClick={handleSubmit(onUpdate)}
               label={t('update')}
             />
