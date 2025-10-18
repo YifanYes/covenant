@@ -1,13 +1,12 @@
 import { CreateTaskDialog } from '@/components/dialogs/CreateTaskDialog'
 import { UpdateTaskDialog } from '@/components/dialogs/UpdateTaskDialog'
-import { TaskListSkeleton } from '@/components/skeletons/TaskListSkeleton'
 import TaskList from '@/components/tasks/TaskList'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { useDebouncedMutation } from '@/hooks/use-debounced-mutation'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import { queryClient, trpc } from '@/utils/trpc.utils'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { isUndefined, keys, map } from 'es-toolkit/compat'
 import { useEffect } from 'react'
@@ -15,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 
 const Tasks = () => {
   const { t } = useTranslation()
-  const { data, isLoading, isRefetching, refetch } = useQuery(trpc.tasks.getAll.queryOptions())
+  const { data } = useSuspenseQuery(trpc.tasks.getAll.queryOptions())
   const { show } = useSnackbar()
   const { tasks, setTasks } = useTasksStore()
   const { monthIndex } = useCalendarStore()
@@ -37,24 +36,21 @@ const Tasks = () => {
   )
 
   useEffect(() => {
-    if (isLoading || isRefetching || isUndefined(data)) return
-    setTasks(data?.tasks)
-  }, [data, isLoading, isRefetching, setTasks])
+    !isUndefined(data?.tasks) && setTasks(data?.tasks)
+  }, [data, setTasks])
 
   return (
     <div className='min-h-screen w-full p-6'>
       <div className='flex flex-row justify-between gap-4'>
         <h1 className='text-2xl font-semibold'>{t('tasks.title')}</h1>
-        <CreateTaskDialog callback={refetch} />
+        <CreateTaskDialog />
       </div>
       <div className='flex flex-col gap-4'>
-        {isLoading ? (
-          <TaskListSkeleton />
-        ) : (
-          map(keys(tasks), (id) => <TaskList key={id} id={id} group='tasks' mutation={reorderMutation} />)
-        )}
+        {map(keys(tasks), (id) => (
+          <TaskList key={id} id={id} group='tasks' mutation={reorderMutation} />
+        ))}
       </div>
-      <UpdateTaskDialog callback={refetch} />
+      <UpdateTaskDialog />
     </div>
   )
 }
