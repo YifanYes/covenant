@@ -115,7 +115,18 @@
   },
   "objectives": {
     "add": "Add objective",
-    "title": "Objetives"
+    "delete": {
+      "description": "This action is irreversible. This will permanently delete the objective.",
+      "error": "An error occurred while deleting the objective",
+      "success": "Objective successfully deleted",
+      "title": "Delete objective"
+    },
+    "title": "Objectives",
+    "update": {
+      "error": "An error occurred while updating the objective",
+      "success": "Objective successfully updated",
+      "title": "Update objective"
+    }
   },
   "recover_password": {
     "button": "Reset password",

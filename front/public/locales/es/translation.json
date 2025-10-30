@@ -115,7 +115,18 @@
   },
   "objectives": {
     "add": "Añadir objetivo",
-    "title": "Objetivos"
+    "delete": {
+      "description": "Esta acción es irreversible. Esto eliminará permanentemente el objetivo.",
+      "error": "Ha ocurrido un error al eliminar el objetivo",
+      "success": "Objetivo eliminado exitosamente",
+      "title": "Eliminar objetivo"
+    },
+    "title": "Objetivos",
+    "update": {
+      "error": "Ha ocurrido un error al actualizar el objetivo",
+      "success": "Objetivo actualizado exitosamente",
+      "title": "Actualizar objetivo"
+    }
   },
   "recover_password": {
     "button": "Restablecer contraseña",
