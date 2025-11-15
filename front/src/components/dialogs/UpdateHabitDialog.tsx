@@ -101,7 +101,7 @@ export function UpdateHabitDialog({ habit }: { habit: Habit }) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <HabitCard habit={habit} key={habit.id} />
+        <HabitCard habit={habit} />
       </DialogTrigger>
 
       <DialogContent className='sm:max-w-[425px]' aria-describedby='update-habit-dialog-desc'>
