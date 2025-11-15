@@ -9,7 +9,7 @@ import type { AppRouter } from '../../../server/router'
 export const queryClient = new QueryClient()
 
 const fetchWithRefreshToken: FetchEsque = async (input, init) => {
-  const { accessToken, refreshToken, setTokens } = useAuthStore.getState()
+  const { accessToken, refreshToken, setTokens, resetUserInfo } = useAuthStore.getState()
 
   const injectAuth = (token?: string): RequestInit => ({
     ...(init as RequestInit),
@@ -39,6 +39,7 @@ const fetchWithRefreshToken: FetchEsque = async (input, init) => {
     const newRefreshToken = json.result?.data?.refreshToken
 
     if (!newAccessToken || !newRefreshToken) {
+      resetUserInfo()
       throw new Error('Token refresh failed')
     }
 

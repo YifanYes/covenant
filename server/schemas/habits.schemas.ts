@@ -13,6 +13,7 @@ export const createHabitSchema = z.object({
   timespan: z.enum(HabitTimespan),
   objectives: z.array(z.uuid()).optional()
 })
+export type CreateHabitType = z.infer<typeof createHabitSchema>
 
 export const updateHabitSchema = z.object({
   id: z.uuid(),
@@ -22,6 +23,7 @@ export const updateHabitSchema = z.object({
   timespan: z.enum(HabitTimespan).optional(),
   objectives: z.array(z.uuid()).optional()
 })
+export type UpdateHabitType = z.infer<typeof updateHabitSchema>
 
 export const habitIdSchema = z.object({
   id: z.uuid()
