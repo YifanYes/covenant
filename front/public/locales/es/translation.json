@@ -49,6 +49,10 @@
     "description": "Esta acción es irreversible. Esto eliminará permanentemente el área.",
     "title": "¿Estás seguro que quieres eliminar el área?"
   },
+  "confirm_delete_habit_dialog": {
+    "description": "Esta acción es irreversible. Esto eliminará permanentemente el hábito.",
+    "title": "¿Estás seguro de que quieres eliminar el hábito?"
+  },
   "create": "Crear",
   "create_area_dialog": {
     "color": "Color",
@@ -56,6 +60,15 @@
     "icon": "Icono",
     "name": "Nombre",
     "title": "Crear nueva área"
+  },
+  "create_habit_dialog": {
+    "description": "Modal para crear un nuevo hábito",
+    "description_placeholder": "Descripción (opcional)",
+    "name_placeholder": "Nombre del hábito",
+    "objectives_placeholder": "Seleccionar objetivos",
+    "recurrence_placeholder": "Recurrencia",
+    "timespan_placeholder": "Período",
+    "title": "Crear nuevo hábito"
   },
   "create_objective_dialog": {
     "description": "Modal para crear un nuevo objetivo",
@@ -94,6 +107,27 @@
       "title": "¡Correo de recuperación enviado!"
     },
     "title": "Recuperación de contraseña"
+  },
+  "habits": {
+    "add": "Añadir hábito",
+    "error": {
+      "internal": {
+        "create": "Ocurrió un error al crear el hábito",
+        "delete": "Ocurrió un error al eliminar el hábito",
+        "update": "Ocurrió un error al actualizar el hábito"
+      }
+    },
+    "success": {
+      "create": "Hábito creado exitosamente",
+      "delete": "Hábito eliminado exitosamente",
+      "update": "Hábito actualizado exitosamente"
+    },
+    "timespan": {
+      "daily": "Diario",
+      "monthly": "Mensual",
+      "weekly": "Semanal"
+    },
+    "title": "Hábitos"
   },
   "icons": {
     "not_found": "No se han encontrado iconos",
@@ -187,6 +221,10 @@
   "update_area_dialog": {
     "description": "Modal para actualizar una área",
     "title": "Actualizar área"
+  },
+  "update_habit_dialog": {
+    "description": "Modal para actualizar un hábito existente",
+    "title": "Actualizar hábito"
   },
   "update_task_dialog": {
     "description": "Modal para actualizar una tarea",

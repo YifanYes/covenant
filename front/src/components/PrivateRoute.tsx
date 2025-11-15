@@ -8,7 +8,7 @@ export default function PrivateRoute() {
 
   useEffect(() => {
     if (!accessToken || !refreshToken) {
-      navigate('/')
+      navigate('/login')
     }
   }, [accessToken, refreshToken, navigate])
 
