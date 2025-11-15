@@ -1,14 +1,27 @@
 import { cn } from '@/lib/utils'
-import type { ComponentProps } from 'react'
+import { useId, type ComponentProps } from 'react'
 
 interface TextInputProps extends ComponentProps<'input'> {
   errorMessage?: string
+  label?: string
 }
 
-export default function TextInput({ className, type, errorMessage, ...props }: TextInputProps) {
+export default function TextInput({ className, type, errorMessage, label, id, ...props }: TextInputProps) {
+  const generatedId = useId()
+  const inputId = id || generatedId
+
   return (
     <div className='w-full space-y-1'>
+      {label && (
+        <label
+          htmlFor={inputId}
+          className='text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+        >
+          {label}
+        </label>
+      )}
       <input
+        id={inputId}
         type={type}
         data-slot='input'
         className={cn(
@@ -21,7 +34,7 @@ export default function TextInput({ className, type, errorMessage, ...props }: T
         {...props}
       />
       {errorMessage && (
-        <p className='text-sm text-destructive' role='alert'>
+        <p className='text-destructive text-sm' role='alert'>
           {errorMessage}
         </p>
       )}
