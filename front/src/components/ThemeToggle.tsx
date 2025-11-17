@@ -5,7 +5,7 @@ import { Moon, Sun } from 'lucide-react'
 export const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme()
   return (
-    <div className='fixed top-6 right-6'>
+    <div className='relative'>
       <Switch
         className='peer bg-input data-[state=checked]:bg-primary h-6 w-11 [&>span]:hidden'
         checked={theme === 'dark'}

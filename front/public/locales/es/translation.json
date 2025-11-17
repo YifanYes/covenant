@@ -45,6 +45,13 @@
     "teal": "Verde azulado",
     "yellow": "Amarillo"
   },
+  "confirm_delete_account_dialog": {
+    "button": "Eliminar cuenta",
+    "description": "Esta acción es irreversible. Esto eliminará permanentemente tu cuenta y todos los datos asociados a ella.",
+    "error": "Ocurrió un error al eliminar tu cuenta",
+    "success": "Cuenta eliminada exitosamente",
+    "title": "¿Estás seguro de que quieres eliminar tu cuenta?"
+  },
   "confirm_delete_area_dialog": {
     "description": "Esta acción es irreversible. Esto eliminará permanentemente el área.",
     "title": "¿Estás seguro que quieres eliminar el área?"
@@ -134,6 +141,10 @@
     "placeholder": "Elige un icono"
   },
   "login": {
+    "account_verified": {
+      "description": "Ahora puedes iniciar sesión con tus credenciales.",
+      "title": "¡Cuenta verificada exitosamente!"
+    },
     "button": "Iniciar sesión",
     "create_account": "Crear cuenta",
     "dont_have_account": "¿No tienes cuenta?",
@@ -175,6 +186,13 @@
     "title": "Crea una nueva contraseña para tu cuenta"
   },
   "save_changes": "Guardar cambios",
+  "settings": {
+    "email_label": "Correo electrónico",
+    "theme_dark": "Oscuro",
+    "theme_label": "Tema",
+    "theme_light": "Claro",
+    "title": "Configuración"
+  },
   "sidebar": {
     "calendar": "Calendario",
     "dashboard": "Panel de control",

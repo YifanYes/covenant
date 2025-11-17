@@ -9,11 +9,11 @@ const alertVariants = cva(
     variants: {
       variant: {
         default:
-          'text-gray-800 border border-gray-800 bg-gray-800/10 [&>svg]:text-gray-800 *:data-[slot=alert-description]:text-gray-800/90',
+          'text-foreground border-border bg-card [&>svg]:text-foreground *:data-[slot=alert-description]:text-muted-foreground dark:bg-card dark:border-border',
         destructive:
-          'text-red-800 border border-red-800 bg-red-800/10 [&>svg]:text-red-800 *:data-[slot=alert-description]:text-red-800/90',
+          'text-red-900 border-red-800 bg-red-50 [&>svg]:text-red-800 *:data-[slot=alert-description]:text-red-800/90 dark:text-red-100 dark:border-red-400 dark:bg-red-900/95 dark:[&>svg]:text-red-300 dark:*:data-[slot=alert-description]:text-red-300/90',
         success:
-          'text-green-800 border border-green-800 bg-green-800/10 [&>svg]:text-green-800 *:data-[slot=alert-description]:text-green-800/90'
+          'text-green-900 border-green-800 bg-green-50 [&>svg]:text-green-800 *:data-[slot=alert-description]:text-green-800/90 dark:text-green-100 dark:border-green-400 dark:bg-green-900/95 dark:[&>svg]:text-green-300 dark:*:data-[slot=alert-description]:text-green-300/90'
       }
     },
     defaultVariants: {
