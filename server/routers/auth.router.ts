@@ -16,7 +16,7 @@ export const authRouter = t.router({
       email: input.email,
       password: input.password,
       options: {
-        emailRedirectTo: `${env.FRONT_URL}/login`
+        emailRedirectTo: `${env.FRONT_URL}/login?verified=true`
       }
     })
 
@@ -153,6 +153,29 @@ export const authRouter = t.router({
 
     return {
       message: 'Password updated successfully'
+    }
+  }),
+  deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {
+    const userId = ctx.user.id
+
+    const { error: supabaseError } = await ctx.supabase.auth.admin.deleteUser(userId)
+
+    if (supabaseError) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to delete account'
+      })
+    }
+
+    await ctx.prisma.$transaction([
+      ctx.prisma.task.deleteMany({ where: { userId } }),
+      ctx.prisma.habit.deleteMany({ where: { userId } }),
+      ctx.prisma.objective.deleteMany({ where: { userId } }),
+      ctx.prisma.area.deleteMany({ where: { userId } })
+    ])
+
+    return {
+      message: 'Account deleted successfully'
     }
   })
 })
