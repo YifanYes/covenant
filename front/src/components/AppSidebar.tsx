@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar'
-import { BookCheck, Calendar, LayoutDashboard, List, Settings, Trophy, User } from 'lucide-react'
+import { BookCheck, Calendar, LayoutDashboard, List, Settings, Trophy } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Separator } from './ui/separator'
 
@@ -44,11 +44,6 @@ export function AppSidebar() {
       }
     ],
     settings: [
-      {
-        title: t('sidebar.profile'),
-        url: '/profile',
-        icon: User
-      },
       {
         title: t('sidebar.settings'),
         url: '/settings',
