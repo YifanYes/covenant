@@ -45,6 +45,13 @@
     "teal": "Teal",
     "yellow": "Yellow"
   },
+  "confirm_delete_account_dialog": {
+    "button": "Delete Account",
+    "description": "This action is irreversible. This will permanently delete your account and all associated data.",
+    "error": "An error occurred while deleting your account",
+    "success": "Account deleted successfully",
+    "title": "Are you sure you want to delete your account?"
+  },
   "confirm_delete_area_dialog": {
     "description": "This action is irreversible. This will permanently delete the area.",
     "title": "Are you sure you want to delete the area?"
@@ -134,6 +141,10 @@
     "placeholder": "Choose an icon"
   },
   "login": {
+    "account_verified": {
+      "description": "You can now log in with your credentials.",
+      "title": "Account verified successfully!"
+    },
     "button": "Login",
     "create_account": "Create account",
     "dont_have_account": "Don't have an account?",
@@ -175,6 +186,13 @@
     "title": "Create a new password for your account"
   },
   "save_changes": "Save changes",
+  "settings": {
+    "email_label": "Email",
+    "theme_dark": "Dark",
+    "theme_label": "Theme",
+    "theme_light": "Light",
+    "title": "Settings"
+  },
   "sidebar": {
     "calendar": "Calendar",
     "dashboard": "Dashboard",
