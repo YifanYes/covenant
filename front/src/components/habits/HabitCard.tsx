@@ -16,9 +16,7 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
     const createCompletion = useMutation(
       trpc.habits.createCompletion.mutationOptions({
         onSuccess: async () => {
-          // Show success snackbar
           show({ variant: 'success', title: t('habits.success.complete') })
-          // Invalidate and refetch habits to show the new completion
           await queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })
         },
         onError: () => {
@@ -63,7 +61,6 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
       createCompletion.mutate({ id: habit.id })
     }
 
-    // Check if today is already completed
     const isTodayCompleted = useMemo(() => {
       const today = new Date().toDateString()
       return (habit.completions || []).some((c) => {
@@ -74,7 +71,6 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
 
     return (
       <div ref={ref} {...props} className='cursor-pointer rounded-lg border p-4'>
-        {/* Header with icon, title, and button */}
         <div className='flex items-start justify-between gap-3'>
           <div className='flex flex-1 items-start gap-2'>
             <div className='bg-primary/10 text-primary rounded-md p-1.5'>
@@ -96,7 +92,6 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
           </Button>
         </div>
 
-        {/* Calendar grid */}
         <div className='mt-4'>
           <div className='grid grid-cols-28 gap-[2px]'>
             {calendarDays.map((day, index) => {
@@ -131,5 +126,7 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
     )
   }
 )
+
+HabitCard.displayName = 'HabitCard'
 
 export default HabitCard
