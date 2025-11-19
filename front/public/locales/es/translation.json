@@ -119,12 +119,14 @@
     "add": "Añadir hábito",
     "error": {
       "internal": {
+        "complete": "Ocurrió un error al completar el hábito",
         "create": "Ocurrió un error al crear el hábito",
         "delete": "Ocurrió un error al eliminar el hábito",
         "update": "Ocurrió un error al actualizar el hábito"
       }
     },
     "success": {
+      "complete": "Hábito completado exitosamente",
       "create": "Hábito creado exitosamente",
       "delete": "Hábito eliminado exitosamente",
       "update": "Hábito actualizado exitosamente"
