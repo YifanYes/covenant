@@ -14,7 +14,7 @@ export default function HabitsSuspenseFallback() {
         </Button>
       </div>
       <div className='flex flex-col gap-4 py-2'>
-        {[1, 2, 3].map((i) => (
+        {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className='bg-muted w-full animate-pulse rounded-lg border p-4'>
             <div className='bg-muted-foreground/20 mb-2 h-6 w-1/3 animate-pulse rounded' />
             <div className='bg-muted-foreground/20 mb-2 h-4 w-1/2 animate-pulse rounded' />

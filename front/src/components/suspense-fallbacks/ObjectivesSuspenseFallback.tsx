@@ -1,4 +1,3 @@
-import { Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../ui/button'
 
@@ -13,7 +12,7 @@ export default function ObjectivesSuspenseFallback() {
           <Button disabled className='bg-muted h-9 w-30 animate-pulse cursor-not-allowed px-3 py-1'></Button>
         </div>
         <div className='flex flex-col gap-4'>
-          {[1, 2, 3].map((i) => (
+          {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className='bg-muted w-full animate-pulse rounded-xl p-4'>
               <div className='bg-muted-foreground/20 mb-2 h-5 w-3/4 animate-pulse rounded' />
               <div className='bg-muted-foreground/20 mb-2 h-4 w-1/2 animate-pulse rounded' />
@@ -28,12 +27,10 @@ export default function ObjectivesSuspenseFallback() {
       <section className='flex flex-col gap-y-6'>
         <div className='flex items-center justify-between'>
           <div className='bg-muted h-6 w-24 animate-pulse rounded' />
-          <Button disabled className='bg-muted h-9 w-30 animate-pulse cursor-not-allowed px-3 py-1'>
-            <Plus />
-          </Button>
+          <Button disabled className='bg-muted h-9 w-30 animate-pulse cursor-not-allowed px-3 py-1'></Button>
         </div>
         <div className='flex flex-wrap gap-2'>
-          {[1, 2, 3, 4].map((i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className='bg-muted h-8 w-20 animate-pulse rounded' />
           ))}
         </div>
