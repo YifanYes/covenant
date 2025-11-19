@@ -1,6 +1,15 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import PrivateRoute from './components/PrivateRoute'
+import CalendarSuspenseFallback from './components/suspense-fallbacks/CalendarSuspenseFallback'
+import DashboardSuspenseFallback from './components/suspense-fallbacks/DashboardSuspenseFallback'
+import ForgotPasswordSuspenseFallback from './components/suspense-fallbacks/ForgotPasswordSuspenseFallback'
+import HabitsSuspenseFallback from './components/suspense-fallbacks/HabitsSuspenseFallback'
+import LoginSuspenseFallback from './components/suspense-fallbacks/LoginSuspenseFallback'
+import ObjectivesSuspenseFallback from './components/suspense-fallbacks/ObjectivesSuspenseFallback'
+import RecoverPasswordSuspenseFallback from './components/suspense-fallbacks/RecoverPasswordSuspenseFallback'
+import SettingsSuspenseFallback from './components/suspense-fallbacks/SettingsSuspenseFallback'
+import SignUpSuspenseFallback from './components/suspense-fallbacks/SignUpSuspenseFallback'
 import TasksSuspenseFallback from './components/suspense-fallbacks/TasksSuspenseFallback'
 import AppLayout from './layouts/AppLayout'
 import CenteredLayout from './layouts/CenteredLayout'
@@ -13,7 +22,6 @@ const ForgotPassword = lazy(() => import('./views/ForgotPassword'))
 const Habits = lazy(() => import('./views/Habits'))
 const Login = lazy(() => import('./views/Login'))
 const Objectives = lazy(() => import('./views/Objectives'))
-const Profile = lazy(() => import('./views/Profile'))
 const RecoverPassword = lazy(() => import('./views/RecoverPassword'))
 const Settings = lazy(() => import('./views/Settings'))
 const SignUp = lazy(() => import('./views/SignUp'))
@@ -28,7 +36,7 @@ export const Router = () => {
             <Route
               path='/login'
               element={
-                <Suspense fallback={<div>Loading…</div>}>
+                <Suspense fallback={<LoginSuspenseFallback />}>
                   <Login />
                 </Suspense>
               }
@@ -36,7 +44,7 @@ export const Router = () => {
             <Route
               path='/sign-up'
               element={
-                <Suspense fallback={<div>Loading…</div>}>
+                <Suspense fallback={<SignUpSuspenseFallback />}>
                   <SignUp />
                 </Suspense>
               }
@@ -44,7 +52,7 @@ export const Router = () => {
             <Route
               path='/forgot-password'
               element={
-                <Suspense fallback={<div>Loading…</div>}>
+                <Suspense fallback={<ForgotPasswordSuspenseFallback />}>
                   <ForgotPassword />
                 </Suspense>
               }
@@ -52,7 +60,7 @@ export const Router = () => {
             <Route
               path='/recover-password'
               element={
-                <Suspense fallback={<div>Loading…</div>}>
+                <Suspense fallback={<RecoverPasswordSuspenseFallback />}>
                   <RecoverPassword />
                 </Suspense>
               }
@@ -63,7 +71,7 @@ export const Router = () => {
               <Route
                 path='/dashboard'
                 element={
-                  <Suspense fallback={<div>Loading dashboard…</div>}>
+                  <Suspense fallback={<DashboardSuspenseFallback />}>
                     <Dashboard />
                   </Suspense>
                 }
@@ -71,7 +79,7 @@ export const Router = () => {
               <Route
                 path='/objectives'
                 element={
-                  <Suspense fallback={<div>Loading objectives…</div>}>
+                  <Suspense fallback={<ObjectivesSuspenseFallback />}>
                     <Objectives />
                   </Suspense>
                 }
@@ -79,7 +87,7 @@ export const Router = () => {
               <Route
                 path='/calendar'
                 element={
-                  <Suspense fallback={<div>Loading calendar…</div>}>
+                  <Suspense fallback={<CalendarSuspenseFallback />}>
                     <Calendar />
                   </Suspense>
                 }
@@ -95,23 +103,15 @@ export const Router = () => {
               <Route
                 path='/habits'
                 element={
-                  <Suspense fallback={<div>Loading habits…</div>}>
+                  <Suspense fallback={<HabitsSuspenseFallback />}>
                     <Habits />
-                  </Suspense>
-                }
-              />
-              <Route
-                path='/profile'
-                element={
-                  <Suspense fallback={<div>Loading profile…</div>}>
-                    <Profile />
                   </Suspense>
                 }
               />
               <Route
                 path='/settings'
                 element={
-                  <Suspense fallback={<div>Loading settings…</div>}>
+                  <Suspense fallback={<SettingsSuspenseFallback />}>
                     <Settings />
                   </Suspense>
                 }

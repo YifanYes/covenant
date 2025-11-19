@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import TaskSkeleton from '../skeletons/TaskSkeleton'
 import { Button } from '../ui/button'
 
-export const TasksSuspenseFallback = () => {
+export default function TasksSuspenseFallback() {
   const { t } = useTranslation()
   return (
     <div className='min-h-screen w-full p-6'>
@@ -28,5 +28,3 @@ export const TasksSuspenseFallback = () => {
     </div>
   )
 }
-
-export default TasksSuspenseFallback
