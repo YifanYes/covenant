@@ -33,7 +33,12 @@ export const habitsRouter = t.router({
         deletedAt: null
       },
       include: {
-        objectives: true
+        objectives: true,
+        completions: {
+          orderBy: {
+            completedAt: 'desc'
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc'
