@@ -1,6 +1,5 @@
 import Link from '@/components/Link'
 import LoaderButton from '@/components/LoaderButton'
-import PasswordInput from '@/components/forms/PasswordInput'
 import TextInput from '@/components/forms/TextInput'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { trpc } from '@/utils/trpc.utils'
@@ -20,12 +19,13 @@ export const SignUp: FC = () => {
 
   const signUpMutation = useMutation(
     trpc.auth.signUp.mutationOptions({
-      onSuccess: () => setIsSigned(true),
+      onSuccess: () => {setIsSigned(true)},
       onError: (error) => {
         console.log(error)
         show({
           variant: 'destructive',
-          title: t('sign_up.error.title')
+          title: t('sign_up.error.title'),
+          description: error.message
         })
       }
     })
@@ -65,16 +65,6 @@ export const SignUp: FC = () => {
             placeholder={t('sign_up.email')}
             {...register('email')}
             {...(errors.email?.message && { errorMessage: t(errors.email.message) })}
-          />
-          <PasswordInput
-            placeholder={t('sign_up.password')}
-            {...register('password')}
-            {...(errors.password?.message && { errorMessage: t(errors.password.message) })}
-          />
-          <PasswordInput
-            placeholder={t('sign_up.confirm_password')}
-            {...register('confirmPassword')}
-            {...(errors.confirmPassword?.message && { errorMessage: t(errors.confirmPassword.message) })}
           />
           <LoaderButton
             disabled={!isValid || !isDirty}
