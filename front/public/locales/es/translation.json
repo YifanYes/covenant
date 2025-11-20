@@ -148,17 +148,26 @@
       "title": "¡Cuenta verificada exitosamente!"
     },
     "button": "Iniciar sesión",
+    "check_email_title": "Revisa tu correo",
     "create_account": "Crear cuenta",
     "dont_have_account": "¿No tienes cuenta?",
     "email": "Correo electrónico",
     "error": {
       "internal_error": "Ocurrió un error al iniciar sesión",
-      "invalid_credentials": "Credenciales inválidas. Por favor, verifica tu correo y contraseña."
+      "invalid_credentials": "Credenciales inválidas. Por favor, verifica tu correo y contraseña.",
+      "invalid_magic_link": "Enlace mágico inválido o expirado",
+      "magic_link_error": "Error del enlace mágico"
     },
     "forgot_password": "¿Olvidaste tu contraseña?",
+    "magic_link_sent_description": "Haz clic en el enlace del correo para iniciar sesión en tu cuenta.",
+    "magic_link_sent_title": "¡Enlace mágico enviado!",
     "password": "Contraseña",
     "recover_password": "Recuperar contraseña",
-    "title": "Inicia sesión en ARQ"
+    "success": "Se ha enviado un enlace de inicio de sesión a tu correo.",
+    "title": "Inicia sesión en ARQ",
+    "verifying_description": "Por favor espera mientras verificamos tu enlace...",
+    "verifying_magic_link": "Verificando enlace mágico...",
+    "verifying_title": "Verificando..."
   },
   "objectives": {
     "add": "Añadir objetivo",

@@ -148,17 +148,26 @@
       "title": "Account verified successfully!"
     },
     "button": "Login",
+    "check_email_title": "Check your email",
     "create_account": "Create account",
     "dont_have_account": "Don't have an account?",
     "email": "Email",
     "error": {
       "internal_error": "An error ocurred while logging in",
-      "invalid_credentials": "Invalid credentials. Please check your email and password."
+      "invalid_credentials": "Invalid credentials. Please check your email and password.",
+      "invalid_magic_link": "Invalid or expired magic link",
+      "magic_link_error": "Magic Link Error"
     },
     "forgot_password": "Forgot password?",
+    "magic_link_sent_description": "Click the link in the email to log in to your account.",
+    "magic_link_sent_title": "Magic link sent!",
     "password": "Password",
     "recover_password": "Recover password",
-    "title": "Login to ARQ"
+    "success": "A login link has been sent to your email.",
+    "title": "Login to ARQ",
+    "verifying_description": "Please wait while we verify your email link...",
+    "verifying_magic_link": "Verifying magic link...",
+    "verifying_title": "Verifying..."
   },
   "objectives": {
     "add": "Add objective",
