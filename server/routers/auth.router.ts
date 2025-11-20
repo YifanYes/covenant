@@ -6,29 +6,73 @@ import {
   loginSchema,
   refreshTokenSchema,
   signUpSchema,
-  updatePasswordSchema
+  updatePasswordSchema,
+  verifyOTPSchema
 } from '../schemas/auth.schemas'
 import { protectedProcedure, publicProcedure, t } from '../trpc'
 
 export const authRouter = t.router({
   signUp: publicProcedure.input(signUpSchema).mutation(async ({ ctx, input }) => {
-    const { data, error } = await ctx.supabase.auth.signUp({
+    const { data, error } = await ctx.supabase.auth.signInWithOtp({
       email: input.email,
-      password: input.password,
       options: {
-        emailRedirectTo: `${env.FRONT_URL}/login?verified=true`
+        emailRedirectTo: `${env.FRONT_URL}/login`,
+        shouldCreateUser: true
       }
     })
 
     if (error) {
       throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR'
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message
       })
     }
 
-    if (data.user) {
-      const { user } = data
+    return {
+      message: 'Magic link sent to your email'
+    }
+  }),
+  login: publicProcedure.input(loginSchema).mutation(async ({ ctx, input }) => {
+    const { data, error } = await ctx.supabase.auth.signInWithOtp({
+      email: input.email,
+      options: {
+        emailRedirectTo: `${env.FRONT_URL}/login`,
+        shouldCreateUser: false
+      }
+    })
 
+    if (error) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message
+      })
+    }
+
+    return {
+      message: 'Magic link sent to your email'
+    }
+  }),
+  verifyOTP: publicProcedure.input(verifyOTPSchema).mutation(async ({ ctx, input }) => {
+    const { data, error } = await ctx.supabase.auth.verifyOtp({
+      email: input.email,
+      token: input.token,
+      type: 'email'
+    })
+
+    if (error || !data.user || !data.session) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Invalid or expired magic link'
+      })
+    }
+
+    // Check if this is a new user (first time login) and create default areas
+    const { user } = data
+    const existingAreas = await ctx.prisma.area.findMany({
+      where: { userId: user.id }
+    })
+
+    if (existingAreas.length === 0) {
       await ctx.prisma.area.createMany({
         data: defaultAreas.map((defaultArea) => ({
           name: defaultArea.name,
@@ -41,34 +85,8 @@ export const authRouter = t.router({
 
     return {
       user: {
-        id: data.user?.id,
-        email: data.user?.email
-      }
-    }
-  }),
-  login: publicProcedure.input(loginSchema).mutation(async ({ ctx, input }) => {
-    const { data, error } = await ctx.supabase.auth.signInWithPassword({
-      email: input.email,
-      password: input.password
-    })
-
-    if (error?.code === 'invalid_credentials') {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'Invalid credentials'
-      })
-    }
-
-    if (error || !data.user || !data.session) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR'
-      })
-    }
-
-    return {
-      user: {
-        id: data.user.id,
-        email: data.user.email
+        id: user.id,
+        email: user.email
       },
       session: {
         accessToken: data.session.access_token,
@@ -158,6 +176,13 @@ export const authRouter = t.router({
   deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {
     const userId = ctx.user.id
 
+    await ctx.prisma.$transaction([
+      ctx.prisma.task.deleteMany({ where: { userId } }),
+      ctx.prisma.habit.deleteMany({ where: { userId } }),
+      ctx.prisma.objective.deleteMany({ where: { userId } }),
+      ctx.prisma.area.deleteMany({ where: { userId } })
+    ])
+
     const { error: supabaseError } = await ctx.supabase.auth.admin.deleteUser(userId)
 
     if (supabaseError) {
@@ -166,13 +191,6 @@ export const authRouter = t.router({
         message: 'Failed to delete account'
       })
     }
-
-    await ctx.prisma.$transaction([
-      ctx.prisma.task.deleteMany({ where: { userId } }),
-      ctx.prisma.habit.deleteMany({ where: { userId } }),
-      ctx.prisma.objective.deleteMany({ where: { userId } }),
-      ctx.prisma.area.deleteMany({ where: { userId } })
-    ])
 
     return {
       message: 'Account deleted successfully'

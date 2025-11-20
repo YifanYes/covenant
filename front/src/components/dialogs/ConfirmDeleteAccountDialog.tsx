@@ -47,7 +47,7 @@ export const ConfirmDeleteAccountDialog = () => {
     })
   )
 
-  const handleDelete = () => deleteAccountMutation.mutate(undefined)
+  const handleDelete = () => deleteAccountMutation.mutate()
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
