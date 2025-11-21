@@ -139,8 +139,9 @@
     "title": "Hábitos"
   },
   "icons": {
-    "not_found": "No se han encontrado iconos",
-    "placeholder": "Elige un icono"
+    "placeholder": "Seleccionar un icono",
+    "search_placeholder": "Buscar iconos...",
+    "not_found": "No se encontraron iconos"
   },
   "login": {
     "account_verified": {
