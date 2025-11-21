@@ -17,7 +17,7 @@ export type CreateHabitType = z.infer<typeof createHabitSchema>
 
 export const updateHabitSchema = z.object({
   id: z.uuid(),
-  name: z.string().min(1).max(255).optional(),
+  name: z.string().min(1, 'errors.required_field').max(255),
   description: z.string().optional(),
   recurrence: z.number().int().min(1).optional(),
   timespan: z.enum(HabitTimespan).optional(),

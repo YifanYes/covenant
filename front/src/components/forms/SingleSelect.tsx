@@ -1,28 +1,48 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useFormField } from '@/hooks/use-form-field'
+import FormField from './FormField'
 
-export const SingleSelect = ({
+export default function SingleSelect({
   placeholder,
   options,
   onChange,
-  value
+  value,
+  label,
+  required,
+  errorMessage
 }: {
   placeholder?: string
   options: { value: string; label: string }[]
-  onChange: (date: string | null) => void
+  onChange: (value: string | null) => void
   value?: string
-}) => (
-  <Select onValueChange={onChange} value={value}>
-    <SelectTrigger className='w-full'>
-      <SelectValue placeholder={placeholder} />
-    </SelectTrigger>
-    <SelectContent>
-      {options.map((option) => (
-        <SelectItem key={option.value} value={option.value}>
-          {option.label}
-        </SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
-)
+  label?: string
+  required?: boolean
+  errorMessage?: string
+}) {
+  const { fieldId, effectivePlaceholder } = useFormField({
+    placeholder,
+    required,
+    componentPrefix: 'singleselect'
+  })
 
-export default SingleSelect
+  return (
+    <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
+      <Select onValueChange={onChange} value={value}>
+        <SelectTrigger
+          className='hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 w-full transition-all duration-200'
+          id={fieldId}
+          aria-invalid={!!errorMessage}
+        >
+          <SelectValue placeholder={effectivePlaceholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </FormField>
+  )
+}

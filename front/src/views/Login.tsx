@@ -218,6 +218,7 @@ export default function Login() {
         placeholder={t('login.email')}
         {...register('email')}
         {...(errors.email?.message && { errorMessage: t(errors.email.message) })}
+        required
       />
       <LoaderButton
         disabled={!isValid || !isDirty}

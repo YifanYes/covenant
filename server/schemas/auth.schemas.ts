@@ -5,17 +5,6 @@ export const forgotPasswordSchema = z.object({
 })
 export type ForgotPasswordType = z.infer<typeof forgotPasswordSchema>
 
-export const recoverPasswordSchema = z
-  .object({
-    password: z.string().min(6, 'errors.invalid_password_length'),
-    confirmPassword: z.string()
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'errors.password_mismatch'
-  })
-export type RecoverPasswordType = z.infer<typeof recoverPasswordSchema>
-
 export const signUpSchema = z.object({
   email: z.email('errors.invalid_email')
 })

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const createObjectiveSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, 'errors.required_field'),
   description: z.string().optional(),
   dueDate: z
     .date()
@@ -14,7 +14,7 @@ export type CreateObjectiveBodyType = z.infer<typeof createObjectiveSchema>
 
 export const updateObjectiveSchema = z.object({
   id: z.uuid(),
-  name: z.string().optional(),
+  name: z.string().min(1, 'errors.required_field'),
   description: z.string().optional(),
   dueDate: z
     .date()

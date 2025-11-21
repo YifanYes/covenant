@@ -19,7 +19,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { createObjectiveSchema, type CreateObjectiveBodyType } from '../../../../server/schemas/objectives.schemas'
 import LoaderButton from '../LoaderButton'
-import { DatePicker } from '../forms/DatePicker'
+import DatePicker from '../forms/DatePicker'
 import MultiSelect from '../forms/MultiSelect'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
@@ -61,7 +61,7 @@ export const CreateObjectiveDialog = () => {
       name: '',
       description: '',
       dueDate: undefined,
-      areas: [] // add default empty array for areas
+      areas: []
     }
   })
 
@@ -94,6 +94,7 @@ export const CreateObjectiveDialog = () => {
             className='h-9'
             {...register('name')}
             {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
+            required
           />
           <Controller
             name='description'
