@@ -1,5 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useFormField } from '@/hooks/use-form-field'
+import { cn } from '@/lib/utils'
 import { colorOptions } from '@/types/constants.types'
 import { useTranslation } from 'react-i18next'
 import FormField from './FormField'
@@ -30,7 +31,14 @@ export default function ColorSelector({
   return (
     <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
       <Select value={value ?? ''} onValueChange={onChange}>
-        <SelectTrigger className={className} id={fieldId} aria-invalid={!!errorMessage}>
+        <SelectTrigger
+          className={cn(
+            'hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 transition-all duration-200',
+            className
+          )}
+          id={fieldId}
+          aria-invalid={!!errorMessage}
+        >
           <SelectValue placeholder={effectivePlaceholder} />
         </SelectTrigger>
         <SelectContent>

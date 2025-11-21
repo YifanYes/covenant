@@ -28,7 +28,11 @@ export default function SingleSelect({
   return (
     <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
       <Select onValueChange={onChange} value={value}>
-        <SelectTrigger className='w-full' id={fieldId} aria-invalid={!!errorMessage}>
+        <SelectTrigger
+          className='hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 w-full transition-all duration-200'
+          id={fieldId}
+          aria-invalid={!!errorMessage}
+        >
           <SelectValue placeholder={effectivePlaceholder} />
         </SelectTrigger>
         <SelectContent>
