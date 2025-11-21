@@ -1,5 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useId } from 'react'
+import FormLabel from './FormLabel'
 
 export const SingleSelect = ({
   placeholder,
@@ -24,15 +25,7 @@ export const SingleSelect = ({
 
   return (
     <div className='w-full space-y-1'>
-      {label && (
-        <label
-          htmlFor={selectId}
-          className='mb-1 inline-flex items-center gap-1 pl-0.5 text-sm font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-        >
-          <span>{label}</span>
-          {required && <span className='text-destructive leading-none'>*</span>}
-        </label>
-      )}
+      {label && <FormLabel htmlFor={selectId} label={label} required={required} />}
       <Select onValueChange={onChange} value={value}>
         <SelectTrigger className='w-full' id={selectId} aria-invalid={!!errorMessage}>
           <SelectValue placeholder={effectivePlaceholder} />

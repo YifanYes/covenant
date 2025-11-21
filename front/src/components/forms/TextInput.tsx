@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import { useId, type ComponentProps } from 'react'
+import FormLabel from './FormLabel'
 
 interface TextInputProps extends ComponentProps<'input'> {
   errorMessage?: string
@@ -7,22 +8,20 @@ interface TextInputProps extends ComponentProps<'input'> {
   required?: boolean
 }
 
-export default function TextInput({ className, type, errorMessage, label, id, required, ...props }: TextInputProps) {
+export default function TextInput({
+  label,
+  errorMessage,
+  type,
+  required = false,
+  className,
+  ...props
+}: TextInputProps) {
   const generatedId = useId()
-  const inputId = id || generatedId
-  const placeholder = props.placeholder && required ? `${props.placeholder} *` : props.placeholder
+  const inputId = props.id || `textinput-${generatedId}`
 
   return (
     <div className='w-full space-y-1'>
-      {label && (
-        <label
-          htmlFor={inputId}
-          className='mb-1 flex items-center gap-1 pl-0.5 text-sm font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-        >
-          <span>{label}</span>
-          {required && <span className='text-destructive leading-none'>*</span>}
-        </label>
-      )}
+      {label && <FormLabel htmlFor={inputId} label={label} required={required} />}
       <input
         id={inputId}
         type={type}
@@ -36,7 +35,7 @@ export default function TextInput({ className, type, errorMessage, label, id, re
         )}
         aria-invalid={!!errorMessage}
         {...props}
-        placeholder={placeholder}
+        placeholder={props.placeholder && required ? `${props.placeholder} *` : props.placeholder}
         required={required}
       />
       {errorMessage && (

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { enUS } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
 import React, { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import FormLabel from './FormLabel'
 
 function formatDate(date: Date | undefined) {
   if (!date) return ''
@@ -88,15 +89,7 @@ export function DatePicker({
 
   return (
     <div className={cn('w-full space-y-1', className)}>
-      {label && (
-        <label
-          htmlFor={inputId}
-          className='mb-1 inline-flex items-center gap-1 pl-0.5 text-sm font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-        >
-          <span>{label}</span>
-          {required && <span className='text-destructive leading-none'>*</span>}
-        </label>
-      )}
+      {label && <FormLabel htmlFor={inputId} label={label} required={required} />}
       <div className='relative flex gap-2'>
         <Input
           id={inputId}

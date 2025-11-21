@@ -2,6 +2,7 @@ import { cn, truncateText } from '@/lib/utils'
 import { Check, ChevronDown } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { type Control, Controller } from 'react-hook-form'
+import FormLabel from './FormLabel'
 
 type MultiSelectItem = {
   id: string
@@ -72,15 +73,7 @@ export default function MultiSelect({
 
         return (
           <div className='w-full space-y-1'>
-            {label && (
-              <label
-                htmlFor={selectId}
-                className='mb-1 inline-flex items-center gap-1 pl-0.5 text-sm font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-              >
-                <span>{label}</span>
-                {required && <span className='text-destructive leading-none'>*</span>}
-              </label>
-            )}
+            {label && <FormLabel htmlFor={selectId} label={label} required={required} />}
             <div className='relative w-full' ref={containerRef}>
               <button
                 id={selectId}

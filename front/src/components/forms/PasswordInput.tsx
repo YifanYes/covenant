@@ -1,7 +1,8 @@
 import { cn } from '@/lib/utils'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useId, useState, type ComponentProps } from 'react'
 import { Button } from '../ui/button'
+import FormLabel from './FormLabel'
 
 type PasswordInputProps = ComponentProps<'input'> & {
   errorMessage?: string
@@ -9,23 +10,20 @@ type PasswordInputProps = ComponentProps<'input'> & {
   required?: boolean
 }
 
-export default function PasswordInput({ className, errorMessage, label, id, required, ...props }: PasswordInputProps) {
+export default function PasswordInput({
+  label,
+  errorMessage,
+  required = false,
+  className,
+  ...props
+}: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false)
   const generatedId = useId()
-  const inputId = id || generatedId
-  const placeholder = props.placeholder && required ? `${props.placeholder} *` : props.placeholder
+  const inputId = props.id || `passwordinput-${generatedId}`
 
   return (
     <div className='w-full space-y-1'>
-      {label && (
-        <label
-          htmlFor={inputId}
-          className='mb-1 inline-flex items-center gap-1 pl-0.5 text-sm font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-        >
-          <span>{label}</span>
-          {required && <span className='text-destructive leading-none'>*</span>}
-        </label>
-      )}
+      {label && <FormLabel htmlFor={inputId} label={label} required={required} />}
       <div className='relative'>
         <input
           id={inputId}
@@ -40,7 +38,7 @@ export default function PasswordInput({ className, errorMessage, label, id, requ
             className
           )}
           {...props}
-          placeholder={placeholder}
+          placeholder={props.placeholder && required ? `${props.placeholder} *` : props.placeholder}
           required={required}
         />
         <Button
@@ -51,9 +49,9 @@ export default function PasswordInput({ className, errorMessage, label, id, requ
           onClick={() => setShowPassword((prev) => !prev)}
         >
           {showPassword ? (
-            <EyeIcon className='h-4 w-4' aria-hidden='true' />
+            <Eye className='h-4 w-4' aria-hidden='true' />
           ) : (
-            <EyeOffIcon className='h-4 w-4' aria-hidden='true' />
+            <EyeOff className='h-4 w-4' aria-hidden='true' />
           )}
         </Button>
       </div>

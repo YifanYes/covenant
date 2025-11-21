@@ -2,6 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { colorOptions } from '@/types/constants.types'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
+import FormLabel from './FormLabel'
 
 export default function ColorSelector({
   className,
@@ -26,15 +27,7 @@ export default function ColorSelector({
 
   return (
     <div className='w-full space-y-1'>
-      {label && (
-        <label
-          htmlFor={selectId}
-          className='mb-1 inline-flex items-center gap-1 pl-0.5 text-sm font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-        >
-          <span>{label}</span>
-          {required && <span className='text-destructive leading-none'>*</span>}
-        </label>
-      )}
+      {label && <FormLabel htmlFor={selectId} label={label} required={required} />}
       <Select value={value ?? ''} onValueChange={onChange}>
         <SelectTrigger className={className} id={selectId} aria-invalid={!!errorMessage}>
           <SelectValue placeholder={effectivePlaceholder} />
