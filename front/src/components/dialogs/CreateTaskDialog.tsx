@@ -62,7 +62,7 @@ export const CreateTaskDialog = () => {
     formState: { errors, isValid, isDirty }
   } = useForm<CreateTaskType>({
     resolver: standardSchemaResolver(createTaskSchema),
-    mode: 'onSubmit',
+    mode: 'onTouched',
     defaultValues: {
       title: '',
       description: '',
@@ -101,6 +101,7 @@ export const CreateTaskDialog = () => {
               className='h-9'
               {...register('title')}
               {...(errors.title?.message && { errorMessage: t(errors.title.message.toString()) })}
+              required
             />
           </div>
           <div className='grid gap-3'>

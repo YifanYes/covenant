@@ -122,6 +122,7 @@ export function UpdateHabitDialog({ habit }: { habit: Habit }) {
               {...register('name')}
               {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
               tabIndex={-1}
+              required
             />
           </div>
           <div className='grid gap-3'>
@@ -141,40 +142,32 @@ export function UpdateHabitDialog({ habit }: { habit: Habit }) {
               min={1}
               {...register('recurrence', { valueAsNumber: true })}
               {...(errors.recurrence?.message && { errorMessage: t(errors.recurrence.message.toString()) })}
+              required
             />
           </div>
           <div className='grid gap-3'>
-            <label
-              htmlFor='timespan'
-              className='text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-            >
-              {t('create_habit_dialog.timespan_placeholder')}
-            </label>
             <Controller
               name='timespan'
               control={control}
               render={({ field }) => (
                 <SingleSelect
+                  label={t('create_habit_dialog.timespan_placeholder')}
                   placeholder={t('create_habit_dialog.timespan_placeholder')}
                   options={timespanOptions}
                   value={field.value}
                   onChange={(value) => field.onChange(value || HabitTimespan.DAILY)}
+                  required
                 />
               )}
             />
           </div>
           <div className='grid gap-3'>
-            <label
-              htmlFor='timespan'
-              className='text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-            >
-              {t('create_habit_dialog.objectives_placeholder')}
-            </label>
             <MultiSelect
               name='objectives'
               control={control}
               items={objectivesData?.objectives.map((o) => ({ id: o.id, label: o.name })) || []}
               placeholder={t('create_habit_dialog.objectives_placeholder')}
+              label={t('create_habit_dialog.objectives_placeholder')}
             />
           </div>
         </div>

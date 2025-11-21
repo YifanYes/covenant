@@ -56,7 +56,7 @@ export const CreateHabitDialog = () => {
     formState: { errors, isValid, isDirty }
   } = useForm<CreateHabitType>({
     resolver: standardSchemaResolver(createHabitSchema),
-    mode: 'onSubmit',
+    mode: 'onTouched',
     defaultValues: {
       name: '',
       description: '',
@@ -99,10 +99,12 @@ export const CreateHabitDialog = () => {
           <div className='grid gap-3'>
             <TextInput
               type='text'
+              label={t('create_habit_dialog.name_placeholder')}
               placeholder={t('create_habit_dialog.name_placeholder')}
               className='h-9'
               {...register('name')}
               {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
+              required
             />
           </div>
           <div className='grid gap-3'>
@@ -122,24 +124,21 @@ export const CreateHabitDialog = () => {
               min={1}
               {...register('recurrence', { valueAsNumber: true })}
               {...(errors.recurrence?.message && { errorMessage: t(errors.recurrence.message.toString()) })}
+              required
             />
           </div>
           <div className='grid gap-3'>
-            <label
-              htmlFor='timespan'
-              className='text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-            >
-              {t('create_habit_dialog.timespan_placeholder')}
-            </label>
             <Controller
               name='timespan'
               control={control}
               render={({ field }) => (
                 <SingleSelect
+                  label={t('create_habit_dialog.timespan_placeholder')}
                   placeholder={t('create_habit_dialog.timespan_placeholder')}
                   options={timespanOptions}
                   value={field.value}
                   onChange={(value) => field.onChange(value || HabitTimespan.DAILY)}
+                  required
                 />
               )}
             />

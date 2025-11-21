@@ -118,6 +118,7 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
                   {...field}
                   value={t(field.value || '')}
                   {...(errors.name?.message && { errorMessage: t(errors.name.message) })}
+                  required
                 />
               )}
             />

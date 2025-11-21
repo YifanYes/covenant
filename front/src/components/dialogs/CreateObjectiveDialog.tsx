@@ -61,7 +61,7 @@ export const CreateObjectiveDialog = () => {
       name: '',
       description: '',
       dueDate: undefined,
-      areas: [] // add default empty array for areas
+      areas: []
     }
   })
 
@@ -94,6 +94,7 @@ export const CreateObjectiveDialog = () => {
             className='h-9'
             {...register('name')}
             {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
+            required
           />
           <Controller
             name='description'

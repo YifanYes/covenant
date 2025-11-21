@@ -60,11 +60,13 @@ export const RecoverPassword: FC = () => {
         placeholder={t('recover_password.password')}
         {...register('password')}
         {...(errors.password?.message && { errorMessage: t(errors.password.message) })}
+        required
       />
       <PasswordInput
         placeholder={t('recover_password.confirm_password')}
         {...register('confirmPassword')}
         {...(errors.confirmPassword?.message && { errorMessage: t(errors.confirmPassword.message) })}
+        required
       />
       <LoaderButton
         disabled={!isValid || !isDirty}

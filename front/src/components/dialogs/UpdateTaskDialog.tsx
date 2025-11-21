@@ -121,6 +121,7 @@ export const UpdateTaskDialog = () => {
               className='h-9'
               {...register('title')}
               {...(errors.title?.message && { errorMessage: t(errors.title.message.toString()) })}
+              required
             />
           </div>
           <div className='grid gap-3'>
