@@ -79,42 +79,44 @@ export default function MultiSelect({
                 type='button'
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
-                  'border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm',
-                  'dark:bg-input/30',
-                  'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                  'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                  'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
+                  'border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex h-9 w-full items-center justify-between rounded-md border px-3 py-2 text-sm whitespace-nowrap shadow-xs focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
+                  value.length === 0 && required && 'text-destructive',
+                  errorMessage && 'border-destructive'
                 )}
                 aria-invalid={!!errorMessage}
               >
-                <span className='min-w-0 flex-1 truncate overflow-hidden text-left'>{displayText}</span>
-                <span className='flex-shrink-0'>
-                  <ChevronDown className={cn('h-4 w-4 transition-transform', isOpen && 'rotate-180')} />
+                <span className={cn('block truncate', value.length === 0 && 'text-muted-foreground')}>
+                  {displayText}
                 </span>
+                <ChevronDown className='h-4 w-4 opacity-50' />
               </button>
 
               {isOpen && (
-                <div className='border-border bg-popover absolute z-50 mt-1 w-full rounded-md border shadow-md'>
-                  <div className='max-h-60 overflow-y-auto p-1'>
-                    {items.map((item) => {
-                      const isSelected = value.includes(item.id)
-                      return (
-                        <label
-                          key={item.id}
-                          className='hover:bg-accent hover:text-accent-foreground flex cursor-pointer items-center gap-2 rounded px-2 py-2'
-                        >
-                          <input
-                            type='checkbox'
-                            className='border-input accent-primary focus:ring-ring h-4 w-4 rounded'
-                            checked={isSelected}
-                            onChange={() => toggleItem(item.id)}
-                          />
-                          <span className='flex-1 text-sm'>{item.label}</span>
-                          {isSelected && <Check className='text-primary h-4 w-4' />}
-                        </label>
-                      )
-                    })}
-                  </div>
+                <div className='border-input bg-popover text-popover-foreground absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border shadow-md'>
+                  {items.map((item) => {
+                    const isSelected = value.includes(item.id)
+                    return (
+                      <div
+                        key={item.id}
+                        className={cn(
+                          'relative flex cursor-pointer items-center px-2 py-1.5 text-sm transition-all duration-200 outline-none select-none',
+                          isSelected
+                            ? 'bg-primary/10 text-primary'
+                            : 'text-foreground hover:bg-primary/10 hover:text-primary'
+                        )}
+                        onClick={() => toggleItem(item.id)}
+                      >
+                        <span className={cn('absolute left-2 flex h-3.5 w-3.5 items-center justify-center')}>
+                          {isSelected ? (
+                            <Check className='h-4 w-4' />
+                          ) : (
+                            <div className='bg-muted-foreground h-1 w-1 rounded-full' />
+                          )}
+                        </span>
+                        <span className='ml-6'>{item.label}</span>
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </div>
