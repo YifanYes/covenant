@@ -1,6 +1,6 @@
 import { cn, truncateText } from '@/lib/utils'
 import { Check, ChevronDown } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { type Control, Controller } from 'react-hook-form'
 
 type MultiSelectItem = {
@@ -13,11 +13,25 @@ type MultiSelectProps = {
   control: Control<any>
   items: MultiSelectItem[]
   placeholder?: string
+  label?: string
+  required?: boolean
+  errorMessage?: string
 }
 
-export default function MultiSelect({ name, control, items, placeholder = 'Select...' }: MultiSelectProps) {
+export default function MultiSelect({
+  name,
+  control,
+  items,
+  placeholder = 'Select...',
+  label,
+  required,
+  errorMessage
+}: MultiSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const generatedId = useId()
+  const selectId = `multiselect-${generatedId}`
+  const effectivePlaceholder = required ? `${placeholder} *` : placeholder
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,49 +68,68 @@ export default function MultiSelect({ name, control, items, placeholder = 'Selec
                   .join(', '),
                 60
               )
-            : placeholder
+            : effectivePlaceholder
 
         return (
-          <div className='relative w-full' ref={containerRef}>
-            <button
-              type='button'
-              onClick={() => setIsOpen(!isOpen)}
-              className={cn(
-                'border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm',
-                'dark:bg-input/30',
-                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
-              )}
-            >
-              <span className='min-w-0 flex-1 truncate overflow-hidden text-left'>{displayText}</span>
-              <span className='flex-shrink-0'>
-                <ChevronDown className={cn('h-4 w-4 transition-transform', isOpen && 'rotate-180')} />
-              </span>
-            </button>
+          <div className='w-full space-y-1'>
+            {label && (
+              <label
+                htmlFor={selectId}
+                className='text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+              >
+                {label}
+                {required && <span className='text-destructive ml-1'>*</span>}
+              </label>
+            )}
+            <div className='relative w-full' ref={containerRef}>
+              <button
+                id={selectId}
+                type='button'
+                onClick={() => setIsOpen(!isOpen)}
+                className={cn(
+                  'border-input flex h-9 w-full items-center gap-2 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm',
+                  'dark:bg-input/30',
+                  'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                  'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                  'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
+                )}
+                aria-invalid={!!errorMessage}
+              >
+                <span className='min-w-0 flex-1 truncate overflow-hidden text-left'>{displayText}</span>
+                <span className='flex-shrink-0'>
+                  <ChevronDown className={cn('h-4 w-4 transition-transform', isOpen && 'rotate-180')} />
+                </span>
+              </button>
 
-            {isOpen && (
-              <div className='border-border bg-popover absolute z-50 mt-1 w-full rounded-md border shadow-md'>
-                <div className='max-h-60 overflow-y-auto p-1'>
-                  {items.map((item) => {
-                    const isSelected = value.includes(item.id)
-                    return (
-                      <label
-                        key={item.id}
-                        className='hover:bg-accent hover:text-accent-foreground flex cursor-pointer items-center gap-2 rounded px-2 py-2'
-                      >
-                        <input
-                          type='checkbox'
-                          className='border-input accent-primary focus:ring-ring h-4 w-4 rounded'
-                          checked={isSelected}
-                          onChange={() => toggleItem(item.id)}
-                        />
-                        <span className='flex-1 text-sm'>{item.label}</span>
-                        {isSelected && <Check className='text-primary h-4 w-4' />}
-                      </label>
-                    )
-                  })}
+              {isOpen && (
+                <div className='border-border bg-popover absolute z-50 mt-1 w-full rounded-md border shadow-md'>
+                  <div className='max-h-60 overflow-y-auto p-1'>
+                    {items.map((item) => {
+                      const isSelected = value.includes(item.id)
+                      return (
+                        <label
+                          key={item.id}
+                          className='hover:bg-accent hover:text-accent-foreground flex cursor-pointer items-center gap-2 rounded px-2 py-2'
+                        >
+                          <input
+                            type='checkbox'
+                            className='border-input accent-primary focus:ring-ring h-4 w-4 rounded'
+                            checked={isSelected}
+                            onChange={() => toggleItem(item.id)}
+                          />
+                          <span className='flex-1 text-sm'>{item.label}</span>
+                          {isSelected && <Check className='text-primary h-4 w-4' />}
+                        </label>
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
+            </div>
+            {errorMessage && (
+              <p className='text-destructive text-sm' role='alert'>
+                {errorMessage}
+              </p>
             )}
           </div>
         )
