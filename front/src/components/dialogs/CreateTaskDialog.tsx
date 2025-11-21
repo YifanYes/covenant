@@ -21,7 +21,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { createTaskSchema, TaskStatus, type CreateTaskType } from '../../../../server/schemas/tasks.schemas'
 import LoaderButton from '../LoaderButton'
-import { DatePicker } from '../forms/DatePicker'
+import DatePicker from '../forms/DatePicker'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
 
@@ -62,7 +62,7 @@ export const CreateTaskDialog = () => {
     formState: { errors, isValid, isDirty }
   } = useForm<CreateTaskType>({
     resolver: standardSchemaResolver(createTaskSchema),
-    mode: 'onSubmit',
+    mode: 'onTouched',
     defaultValues: {
       title: '',
       description: '',
@@ -101,6 +101,7 @@ export const CreateTaskDialog = () => {
               className='h-9'
               {...register('title')}
               {...(errors.title?.message && { errorMessage: t(errors.title.message.toString()) })}
+              required
             />
           </div>
           <div className='grid gap-3'>

@@ -22,7 +22,7 @@ export type CreateTaskType = z.infer<typeof createTaskSchema>
 
 export const updateTaskSchema = z.object({
   id: z.uuid(),
-  title: z.string().optional().nullable(),
+  title: z.string().min(1, 'errors.required_field'),
   description: z.string().optional().nullable(),
   status: z.string().optional(),
   order: z.number().int().min(0).optional(),

@@ -65,6 +65,7 @@ export const SignUp: FC = () => {
             placeholder={t('sign_up.email')}
             {...register('email')}
             {...(errors.email?.message && { errorMessage: t(errors.email.message) })}
+            required
           />
           <LoaderButton
             disabled={!isValid || !isDirty}

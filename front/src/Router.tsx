@@ -7,7 +7,6 @@ import ForgotPasswordSuspenseFallback from './components/suspense-fallbacks/Forg
 import HabitsSuspenseFallback from './components/suspense-fallbacks/HabitsSuspenseFallback'
 import LoginSuspenseFallback from './components/suspense-fallbacks/LoginSuspenseFallback'
 import ObjectivesSuspenseFallback from './components/suspense-fallbacks/ObjectivesSuspenseFallback'
-import RecoverPasswordSuspenseFallback from './components/suspense-fallbacks/RecoverPasswordSuspenseFallback'
 import SettingsSuspenseFallback from './components/suspense-fallbacks/SettingsSuspenseFallback'
 import SignUpSuspenseFallback from './components/suspense-fallbacks/SignUpSuspenseFallback'
 import TasksSuspenseFallback from './components/suspense-fallbacks/TasksSuspenseFallback'
@@ -22,7 +21,6 @@ const ForgotPassword = lazy(() => import('./views/ForgotPassword'))
 const Habits = lazy(() => import('./views/Habits'))
 const Login = lazy(() => import('./views/Login'))
 const Objectives = lazy(() => import('./views/Objectives'))
-const RecoverPassword = lazy(() => import('./views/RecoverPassword'))
 const Settings = lazy(() => import('./views/Settings'))
 const SignUp = lazy(() => import('./views/SignUp'))
 const Tasks = lazy(() => import('./views/Tasks'))
@@ -54,14 +52,6 @@ export const Router = () => {
               element={
                 <Suspense fallback={<ForgotPasswordSuspenseFallback />}>
                   <ForgotPassword />
-                </Suspense>
-              }
-            />
-            <Route
-              path='/recover-password'
-              element={
-                <Suspense fallback={<RecoverPasswordSuspenseFallback />}>
-                  <RecoverPassword />
                 </Suspense>
               }
             />

@@ -83,6 +83,7 @@ export const CreateAreaDialog = () => {
               className='h-9'
               {...register('name')}
               {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
+              required
             />
           </div>
           <div className='grid gap-3'>

@@ -65,6 +65,7 @@ export const ForgotPassword: FC = () => {
             placeholder={t('forgot_password.email')}
             {...register('email')}
             {...(errors.email?.message && { errorMessage: t(errors.email.message) })}
+            required
           />
           <LoaderButton
             disabled={!isValid || !isDirty}

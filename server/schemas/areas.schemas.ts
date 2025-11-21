@@ -9,7 +9,7 @@ export type CreateAreaBodyType = z.infer<typeof createAreaSchema>
 
 export const updateAreaSchema = z.object({
   id: z.uuid(),
-  name: z.string().optional(),
+  name: z.string().min(1, 'errors.required_field'),
   color: z.string().optional(),
   icon: z.string().optional()
 })
