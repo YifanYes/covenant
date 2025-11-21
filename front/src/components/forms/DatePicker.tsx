@@ -2,37 +2,14 @@ import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/utils'
 import { enUS } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
-import React, { useEffect, useRef, useState, type ChangeEvent } from 'react'
-import FormLabel from './FormLabel'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import FormField from './FormField'
 
-function formatDate(date: Date | undefined) {
-  if (!date) return ''
-  return date.toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  })
-}
-
-function isValidDate(date: Date | undefined) {
-  return !!date && !isNaN(date.getTime())
-}
-
-interface DatePickerProps {
-  value?: Date | null
-  onChange: (date: Date | null) => void
-  className?: string
-  placeholder?: string
-  label?: string
-  required?: boolean
-  errorMessage?: string
-  id?: string
-}
-
-export function DatePicker({
+export default function DatePicker({
   value,
   onChange,
   className,
@@ -41,14 +18,38 @@ export function DatePicker({
   required,
   errorMessage,
   id
-}: DatePickerProps) {
+}: {
+  value?: Date | null
+  onChange: (date: Date | null) => void
+  className?: string
+  placeholder?: string
+  label?: string
+  required?: boolean
+  errorMessage?: string
+  id?: string
+}) {
+  const { fieldId, effectivePlaceholder } = useFormField({
+    id,
+    placeholder: placeholder || 'Select date',
+    required,
+    componentPrefix: 'datepicker'
+  })
+
+  const formatDate = (date: Date | undefined) => {
+    if (!date) {
+      return ''
+    }
+    return date.toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    })
+  }
+
   const [open, setOpen] = useState(false)
   const [month, setMonth] = useState<Date>(value || new Date())
   const [inputValue, setInputValue] = useState(formatDate(value || undefined))
   const inputRef = useRef<HTMLInputElement>(null)
-  const generatedId = React.useId()
-  const inputId = id || generatedId
-  const effectivePlaceholder = placeholder && required ? `${placeholder} *` : placeholder || 'Select date'
 
   useEffect(() => {
     setInputValue(formatDate(value || undefined))
@@ -77,7 +78,7 @@ export function DatePicker({
     }
 
     const parsedDate = new Date(val)
-    if (isValidDate(parsedDate)) {
+    if (!!parsedDate && !isNaN(parsedDate.getTime())) {
       onChange(parsedDate)
       setMonth(parsedDate)
     }
@@ -88,11 +89,10 @@ export function DatePicker({
   }
 
   return (
-    <div className={cn('w-full space-y-1', className)}>
-      {label && <FormLabel htmlFor={inputId} label={label} required={required} />}
-      <div className='relative flex gap-2'>
+    <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
+      <div className={cn('relative flex gap-2', className)}>
         <Input
-          id={inputId}
+          id={fieldId}
           ref={inputRef}
           value={inputValue}
           placeholder={effectivePlaceholder}
@@ -110,8 +110,7 @@ export function DatePicker({
           aria-invalid={!!errorMessage}
           required={required}
         />
-
-        <Popover open={open} onOpenChange={(state) => setOpen(state)} modal>
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               type='button'
@@ -155,11 +154,6 @@ export function DatePicker({
           </PopoverContent>
         </Popover>
       </div>
-      {errorMessage && (
-        <p className='text-destructive text-sm' role='alert'>
-          {errorMessage}
-        </p>
-      )}
-    </div>
+    </FormField>
   )
 }

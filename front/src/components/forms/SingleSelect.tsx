@@ -1,8 +1,8 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useId } from 'react'
-import FormLabel from './FormLabel'
+import { useFormField } from '@/hooks/use-form-field'
+import FormField from './FormField'
 
-export const SingleSelect = ({
+export default function SingleSelect({
   placeholder,
   options,
   onChange,
@@ -13,21 +13,22 @@ export const SingleSelect = ({
 }: {
   placeholder?: string
   options: { value: string; label: string }[]
-  onChange: (date: string | null) => void
+  onChange: (value: string | null) => void
   value?: string
   label?: string
   required?: boolean
   errorMessage?: string
-}) => {
-  const generatedId = useId()
-  const selectId = `singleselect-${generatedId}`
-  const effectivePlaceholder = placeholder && required ? `${placeholder} *` : placeholder
+}) {
+  const { fieldId, effectivePlaceholder } = useFormField({
+    placeholder,
+    required,
+    componentPrefix: 'singleselect'
+  })
 
   return (
-    <div className='w-full space-y-1'>
-      {label && <FormLabel htmlFor={selectId} label={label} required={required} />}
+    <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
       <Select onValueChange={onChange} value={value}>
-        <SelectTrigger className='w-full' id={selectId} aria-invalid={!!errorMessage}>
+        <SelectTrigger className='w-full' id={fieldId} aria-invalid={!!errorMessage}>
           <SelectValue placeholder={effectivePlaceholder} />
         </SelectTrigger>
         <SelectContent>
@@ -38,13 +39,6 @@ export const SingleSelect = ({
           ))}
         </SelectContent>
       </Select>
-      {errorMessage && (
-        <p className='text-destructive text-sm' role='alert'>
-          {errorMessage}
-        </p>
-      )}
-    </div>
+    </FormField>
   )
 }
-
-export default SingleSelect

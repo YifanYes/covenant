@@ -1,8 +1,8 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useFormField } from '@/hooks/use-form-field'
 import { colorOptions } from '@/types/constants.types'
-import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
-import FormLabel from './FormLabel'
+import FormField from './FormField'
 
 export default function ColorSelector({
   className,
@@ -20,16 +20,17 @@ export default function ColorSelector({
   errorMessage?: string
 }) {
   const { t } = useTranslation()
-  const generatedId = useId()
-  const selectId = `colorselector-${generatedId}`
   const placeholderText = t('colors.placeholder')
-  const effectivePlaceholder = required ? `${placeholderText} *` : placeholderText
+  const { fieldId, effectivePlaceholder } = useFormField({
+    placeholder: placeholderText,
+    required,
+    componentPrefix: 'colorselector'
+  })
 
   return (
-    <div className='w-full space-y-1'>
-      {label && <FormLabel htmlFor={selectId} label={label} required={required} />}
+    <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
       <Select value={value ?? ''} onValueChange={onChange}>
-        <SelectTrigger className={className} id={selectId} aria-invalid={!!errorMessage}>
+        <SelectTrigger className={className} id={fieldId} aria-invalid={!!errorMessage}>
           <SelectValue placeholder={effectivePlaceholder} />
         </SelectTrigger>
         <SelectContent>
@@ -43,11 +44,6 @@ export default function ColorSelector({
           ))}
         </SelectContent>
       </Select>
-      {errorMessage && (
-        <p className='text-destructive text-sm' role='alert'>
-          {errorMessage}
-        </p>
-      )}
-    </div>
+    </FormField>
   )
 }

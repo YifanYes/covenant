@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { createHabitSchema, HabitTimespan, type CreateHabitType } from '../../../../server/schemas/habits.schemas'
 import LoaderButton from '../LoaderButton'
 import MultiSelect from '../forms/MultiSelect'
-import { SingleSelect } from '../forms/SingleSelect'
+import SingleSelect from '../forms/SingleSelect'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
 

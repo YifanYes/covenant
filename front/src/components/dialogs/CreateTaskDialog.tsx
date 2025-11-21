@@ -21,7 +21,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { createTaskSchema, TaskStatus, type CreateTaskType } from '../../../../server/schemas/tasks.schemas'
 import LoaderButton from '../LoaderButton'
-import { DatePicker } from '../forms/DatePicker'
+import DatePicker from '../forms/DatePicker'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
 

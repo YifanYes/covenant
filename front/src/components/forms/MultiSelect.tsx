@@ -1,23 +1,9 @@
+import { useFormField } from '@/hooks/use-form-field'
 import { cn, truncateText } from '@/lib/utils'
 import { Check, ChevronDown } from 'lucide-react'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { type Control, Controller } from 'react-hook-form'
-import FormLabel from './FormLabel'
-
-type MultiSelectItem = {
-  id: string
-  label: string
-}
-
-type MultiSelectProps = {
-  name: string
-  control: Control<any>
-  items: MultiSelectItem[]
-  placeholder?: string
-  label?: string
-  required?: boolean
-  errorMessage?: string
-}
+import FormField from './FormField'
 
 export default function MultiSelect({
   name,
@@ -27,12 +13,26 @@ export default function MultiSelect({
   label,
   required,
   errorMessage
-}: MultiSelectProps) {
+}: {
+  name: string
+  control: Control<any>
+  items: {
+    id: string
+    label: string
+  }[]
+  placeholder?: string
+  label?: string
+  required?: boolean
+  errorMessage?: string
+}) {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-  const generatedId = useId()
-  const selectId = `multiselect-${generatedId}`
-  const effectivePlaceholder = required ? `${placeholder} *` : placeholder
+
+  const { fieldId, effectivePlaceholder } = useFormField({
+    placeholder,
+    required,
+    componentPrefix: 'multiselect'
+  })
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -72,11 +72,10 @@ export default function MultiSelect({
             : effectivePlaceholder
 
         return (
-          <div className='w-full space-y-1'>
-            {label && <FormLabel htmlFor={selectId} label={label} required={required} />}
+          <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
             <div className='relative w-full' ref={containerRef}>
               <button
-                id={selectId}
+                id={fieldId}
                 type='button'
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
@@ -119,12 +118,7 @@ export default function MultiSelect({
                 </div>
               )}
             </div>
-            {errorMessage && (
-              <p className='text-destructive text-sm' role='alert'>
-                {errorMessage}
-              </p>
-            )}
-          </div>
+          </FormField>
         )
       }}
     />

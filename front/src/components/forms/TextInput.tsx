@@ -1,12 +1,7 @@
+import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/utils'
-import { useId, type ComponentProps } from 'react'
-import FormLabel from './FormLabel'
-
-interface TextInputProps extends ComponentProps<'input'> {
-  errorMessage?: string
-  label?: string
-  required?: boolean
-}
+import type { ComponentProps } from 'react'
+import FormField from './FormField'
 
 export default function TextInput({
   label,
@@ -15,15 +10,22 @@ export default function TextInput({
   required = false,
   className,
   ...props
-}: TextInputProps) {
-  const generatedId = useId()
-  const inputId = props.id || `textinput-${generatedId}`
+}: ComponentProps<'input'> & {
+  errorMessage?: string
+  label?: string
+  required?: boolean
+}) {
+  const { fieldId, effectivePlaceholder } = useFormField({
+    id: props.id,
+    placeholder: props.placeholder,
+    required,
+    componentPrefix: 'textinput'
+  })
 
   return (
-    <div className='w-full space-y-1'>
-      {label && <FormLabel htmlFor={inputId} label={label} required={required} />}
+    <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
       <input
-        id={inputId}
+        id={fieldId}
         type={type}
         data-slot='input'
         className={cn(
@@ -35,14 +37,9 @@ export default function TextInput({
         )}
         aria-invalid={!!errorMessage}
         {...props}
-        placeholder={props.placeholder && required ? `${props.placeholder} *` : props.placeholder}
+        placeholder={effectivePlaceholder}
         required={required}
       />
-      {errorMessage && (
-        <p className='text-destructive text-sm' role='alert'>
-          {errorMessage}
-        </p>
-      )}
-    </div>
+    </FormField>
   )
 }

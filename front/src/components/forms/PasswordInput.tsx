@@ -1,14 +1,9 @@
+import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/utils'
 import { Eye, EyeOff } from 'lucide-react'
-import { useId, useState, type ComponentProps } from 'react'
+import { useState, type ComponentProps } from 'react'
 import { Button } from '../ui/button'
-import FormLabel from './FormLabel'
-
-type PasswordInputProps = ComponentProps<'input'> & {
-  errorMessage?: string
-  label?: string
-  required?: boolean
-}
+import FormField from './FormField'
 
 export default function PasswordInput({
   label,
@@ -16,17 +11,24 @@ export default function PasswordInput({
   required = false,
   className,
   ...props
-}: PasswordInputProps) {
+}: ComponentProps<'input'> & {
+  errorMessage?: string
+  label?: string
+  required?: boolean
+}) {
   const [showPassword, setShowPassword] = useState(false)
-  const generatedId = useId()
-  const inputId = props.id || `passwordinput-${generatedId}`
+  const { fieldId, effectivePlaceholder } = useFormField({
+    id: props.id,
+    placeholder: props.placeholder,
+    required,
+    componentPrefix: 'passwordinput'
+  })
 
   return (
-    <div className='w-full space-y-1'>
-      {label && <FormLabel htmlFor={inputId} label={label} required={required} />}
+    <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
       <div className='relative'>
         <input
-          id={inputId}
+          id={fieldId}
           type={showPassword ? 'text' : 'password'}
           data-slot='input'
           aria-invalid={!!errorMessage}
@@ -38,7 +40,7 @@ export default function PasswordInput({
             className
           )}
           {...props}
-          placeholder={props.placeholder && required ? `${props.placeholder} *` : props.placeholder}
+          placeholder={effectivePlaceholder}
           required={required}
         />
         <Button
@@ -55,7 +57,6 @@ export default function PasswordInput({
           )}
         </Button>
       </div>
-      {errorMessage && <p className='text-destructive text-sm'>{errorMessage}</p>}
-    </div>
+    </FormField>
   )
 }

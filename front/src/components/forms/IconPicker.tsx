@@ -1,25 +1,14 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/utils'
 import { allIcons, iconCategories, iconCollection, type Icon, type IconCategoryKey } from '@/types/constants.types'
 import { ChevronDown, Search, X } from 'lucide-react'
-import { useId, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../ui/button'
-import FormLabel from './FormLabel'
-
-interface IconPickerProps {
-  value?: string
-  onChange?: (iconName: string) => void
-  placeholder?: string
-  label?: string
-  name?: string
-  disabled?: boolean
-  required?: boolean
-  className?: string
-  errorMessage?: string
-}
+import FormField from './FormField'
 
 export default function IconPicker({
   value = '',
@@ -31,15 +20,28 @@ export default function IconPicker({
   required = false,
   className = '',
   errorMessage
-}: IconPickerProps) {
+}: {
+  value?: string
+  onChange?: (iconName: string) => void
+  placeholder?: string
+  label?: string
+  name?: string
+  disabled?: boolean
+  required?: boolean
+  className?: string
+  errorMessage?: string
+}) {
   const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<IconCategoryKey>('all')
-  const generatedId = useId()
-  const selectId = `iconpicker-${generatedId}`
 
   const defaultPlaceholder = t('icons.placeholder')
+  const { fieldId, effectivePlaceholder } = useFormField({
+    placeholder: placeholder || defaultPlaceholder,
+    required,
+    componentPrefix: 'iconpicker'
+  })
 
   const filteredIcons = useMemo(() => {
     let icons: Icon[] = selectedCategory === 'all' ? allIcons : iconCollection[selectedCategory] || []
@@ -51,9 +53,7 @@ export default function IconPicker({
     return icons
   }, [selectedCategory, searchTerm])
 
-  const currentIcon = useMemo(() => {
-    return allIcons.find((icon) => icon.name === value)
-  }, [value])
+  const currentIcon = useMemo(() => allIcons.find((icon) => icon.name === value), [value])
 
   const handleSelect = (icon: Icon) => {
     onChange?.(icon.name)
@@ -66,16 +66,13 @@ export default function IconPicker({
     onChange?.('')
   }
 
-  const effectivePlaceholder = required ? `${placeholder || defaultPlaceholder} *` : placeholder || defaultPlaceholder
-
   return (
-    <div className={cn('w-full space-y-1', className)}>
-      {label && <FormLabel htmlFor={selectId} label={label} required={required} />}
-      <div className='relative'>
+    <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
+      <div className={cn('relative', className)}>
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <Button
-              id={selectId}
+              id={fieldId}
               variant='outline'
               className={cn(
                 'flex h-9 w-full items-center justify-between gap-2 font-normal',
@@ -174,11 +171,6 @@ export default function IconPicker({
           </button>
         )}
       </div>
-      {errorMessage && (
-        <p className='text-destructive text-sm' role='alert'>
-          {errorMessage}
-        </p>
-      )}
-    </div>
+    </FormField>
   )
 }
