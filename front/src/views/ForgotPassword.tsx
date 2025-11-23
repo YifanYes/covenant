@@ -19,7 +19,7 @@ export const ForgotPassword: FC = () => {
   const forgotPasswordMutation = useMutation(
     trpc.auth.resetPassword.mutationOptions({
       onSuccess: () => setIsSubmitted(true),
-      onError: (error) => {
+      onError: (error: any) => {
         console.log(error)
         show({
           variant: 'destructive',

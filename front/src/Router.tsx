@@ -21,6 +21,7 @@ const ForgotPassword = lazy(() => import('./views/ForgotPassword'))
 const Habits = lazy(() => import('./views/Habits'))
 const Login = lazy(() => import('./views/Login'))
 const Objectives = lazy(() => import('./views/Objectives'))
+const Onboarding = lazy(() => import('./views/Onboarding'))
 const Settings = lazy(() => import('./views/Settings'))
 const SignUp = lazy(() => import('./views/SignUp'))
 const Tasks = lazy(() => import('./views/Tasks'))
@@ -55,8 +56,18 @@ export const Router = () => {
                 </Suspense>
               }
             />
+         
           </Route>
           <Route element={<PrivateRoute />}>
+             <Route
+              path='/onboarding'
+              element={
+                <Suspense fallback={<LoginSuspenseFallback />}>
+                  <Onboarding />
+                </Suspense>
+              }
+            />
+            
             <Route element={<WorkspaceLayout />}>
               <Route
                 path='/dashboard'

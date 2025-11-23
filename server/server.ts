@@ -6,7 +6,9 @@ import { createContext } from './context'
 import { appRouter, type AppRouter } from './router'
 
 const server = fastify({
-  maxParamLength: 5000
+  routerOptions: {
+    maxParamLength: 5000
+  }
 })
 
 async function startServer() {
