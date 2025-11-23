@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { PrismaClient, Task } from '../generated/prisma/client'
+import { type PrismaClient, type Task } from '../generated/prisma/client'
 
 export const getUserTask = async (prisma: PrismaClient, taskId: string, userId: string): Promise<Task> => {
   const task = await prisma.task.findFirst({

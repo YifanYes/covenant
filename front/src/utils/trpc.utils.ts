@@ -3,10 +3,11 @@ import { env } from '@/lib/config'
 import { QueryClient } from '@tanstack/react-query'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
-import type { FetchEsque } from 'node_modules/@trpc/client/dist/types.d-POgEdUB1.d.mts'
 import type { AppRouter } from '../../../server/router'
 
 export const queryClient = new QueryClient()
+
+type FetchEsque = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 
 const fetchWithRefreshToken: FetchEsque = async (input, init) => {
   const { accessToken, refreshToken, setTokens, resetUserInfo } = useAuthStore.getState()

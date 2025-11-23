@@ -12,12 +12,12 @@ import {
 import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, type Resolver } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { createTaskSchema, TaskStatus, type CreateTaskType } from '../../../../server/schemas/tasks.schemas'
 import LoaderButton from '../LoaderButton'
@@ -61,7 +61,8 @@ export const CreateTaskDialog = () => {
     reset,
     formState: { errors, isValid, isDirty }
   } = useForm<CreateTaskType>({
-    resolver: standardSchemaResolver(createTaskSchema),
+    // cast resolver to match date transform
+    resolver: zodResolver(createTaskSchema) as Resolver<CreateTaskType>,
     mode: 'onTouched',
     defaultValues: {
       title: '',

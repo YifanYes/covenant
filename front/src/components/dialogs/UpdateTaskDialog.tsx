@@ -19,6 +19,7 @@ import { isNil, isUndefined, map } from 'es-toolkit/compat'
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { z } from 'zod'
 import { TaskStatus, updateTaskSchema, type UpdateTaskType } from '../../../../server/schemas/tasks.schemas'
 import LoaderButton from '../LoaderButton'
 import DatePicker from '../forms/DatePicker'
@@ -84,7 +85,7 @@ export const UpdateTaskDialog = () => {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<UpdateTaskType>({
+  } = useForm<z.input<typeof updateTaskSchema>>({
     resolver: standardSchemaResolver(updateTaskSchema),
     mode: 'onTouched'
   })
@@ -153,7 +154,7 @@ export const UpdateTaskDialog = () => {
               render={({ field }) => (
                 <DatePicker
                   className='w-full'
-                  value={field.value}
+                  value={typeof field.value === 'string' ? new Date(field.value) : field.value}
                   onChange={field.onChange}
                   placeholder={t('update_task_dialog.due_date_placeholder')}
                 />
@@ -177,7 +178,7 @@ export const UpdateTaskDialog = () => {
               className='h-auto cursor-pointer'
               isLoading={updateMutation.isPending}
               disabled={!isValid || !isDirty || updateMutation.isPending}
-              onClick={handleSubmit(onUpdate)}
+              onClick={handleSubmit((data) => onUpdate(data as UpdateTaskType))}
               label={t('update')}
             />
           </div>

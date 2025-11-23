@@ -262,5 +262,29 @@
     "status_placeholder": "Task status",
     "title": "Update task",
     "title_placeholder": "Task title"
+  },
+  "onboarding": {
+    "title": "Create Your Character",
+    "subtitle": "Choose your path and begin your journey",
+    "name_label": "Character Name",
+    "name_placeholder": "Enter your character's name",
+    "class_label": "Choose Your Class",
+    "button": "Begin Your Journey",
+    "loading": "Creating your character...",
+    "error": {
+      "title": "Failed to create character",
+      "already_exists": "You already have a character",
+      "description": "An error occurred while creating your character"
+    }
+  },
+  "classes": {
+    "knight": {
+      "name": "Knight",
+      "description": "I will seek the strength to crush evil."
+    },
+    "sorcerer": {
+      "name": "Sorcerer",
+      "description": "I will seek wisdom to find the light."
+    }
   }
 }

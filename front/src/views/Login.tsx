@@ -45,30 +45,6 @@ export default function Login() {
     })
   )
 
-  const verifyOTPMutation = useMutation(
-    trpc.auth.verifyOTP.mutationOptions({
-      onSuccess: (data) => {
-        updateUserInfo({
-          email: data.user.email as string,
-          userId: data.user.id,
-          accessToken: data.session.accessToken,
-          refreshToken: data.session.refreshToken
-        })
-
-        navigate('/dashboard')
-      },
-      onError: (error) => {
-        console.log(error)
-        setIsVerifyingOTP(false)
-        show({
-          variant: 'destructive',
-          title: t('login.error.invalid_magic_link'),
-          description: error.message
-        })
-      }
-    })
-  )
-
   const onSubmit = (data: LoginType) => {
     loginMutation.mutate(data)
   }
@@ -99,8 +75,8 @@ export default function Login() {
     // Check search params for other scenarios
     const verified = searchParams.get('verified')
     const type = searchParams.get('type')
-    const token = searchParams.get('token_hash') || searchParams.get('token')
-    const email = searchParams.get('email')
+    const redirectTo = searchParams.get('redirect_to')
+
 
     if (error && errorDescription) {
       setMagicLinkError(errorDescription.replace(/\+/g, ' '))
@@ -125,9 +101,12 @@ export default function Login() {
           refreshToken: refreshToken
         })
         
+        // Clear the hash from the URL
         window.history.replaceState(null, '', window.location.pathname)
-        
-        navigate('/dashboard')
+
+        // Navigate to the desired location after successful login
+        const destination = redirectTo ? new URL(redirectTo).pathname : '/dashboard'
+        navigate(destination)
       } catch (error) {
         console.error('Error parsing access token:', error)
         setIsVerifyingOTP(false)
@@ -148,27 +127,19 @@ export default function Login() {
       const newSearchParams = new URLSearchParams(searchParams)
       newSearchParams.delete('verified')
       newSearchParams.delete('type')
+      newSearchParams.delete('redirect_to')
       setSearchParams(newSearchParams, { replace: true })
       
       if (window.location.hash) {
         window.history.replaceState(null, '', window.location.pathname + window.location.search)
       }
+
+      // After verification, redirect to the provided destination (default to onboarding)
+      const destination = redirectTo ? new URL(redirectTo).pathname : '/onboarding'
+      navigate(destination)
     }
 
-    // Handle legacy magic link callback (tokens in search params)
-    if (token && email && (type === 'email' || type === 'magiclink')) {
-      setIsVerifyingOTP(true)
-      verifyOTPMutation.mutate({ email, token })
-
-      // Clean up the URL parameters
-      const newSearchParams = new URLSearchParams(searchParams)
-      newSearchParams.delete('token')
-      newSearchParams.delete('token_hash')
-      newSearchParams.delete('type')
-      newSearchParams.delete('email')
-      setSearchParams(newSearchParams, { replace: true })
-    }
-  }, [searchParams, setSearchParams, verifyOTPMutation, updateUserInfo, navigate, show, t])
+  }, [searchParams, setSearchParams, updateUserInfo, navigate, show, t])
 
   if (isVerifyingOTP) {
     return (
