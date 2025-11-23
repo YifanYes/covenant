@@ -11,11 +11,11 @@ import {
 } from '@/components/ui/dialog'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, type Resolver } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { createObjectiveSchema, type CreateObjectiveBodyType } from '../../../../server/schemas/objectives.schemas'
 import LoaderButton from '../LoaderButton'
@@ -55,7 +55,8 @@ export const CreateObjectiveDialog = () => {
     reset,
     formState: { errors, isValid, isDirty }
   } = useForm<CreateObjectiveBodyType>({
-    resolver: standardSchemaResolver(createObjectiveSchema),
+    // cast resolver to match date transform
+    resolver: zodResolver(createObjectiveSchema) as Resolver<CreateObjectiveBodyType>,
     mode: 'onTouched',
     defaultValues: {
       name: '',

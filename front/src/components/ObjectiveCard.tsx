@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
 } from '@/components/ui/dialog'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import type { Objective } from '@/types/models.types'
@@ -17,6 +17,7 @@ import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { z } from 'zod'
 import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '../../../server/schemas/objectives.schemas'
 import AreaBadge from './AreaBadge'
 import { ConfirmDeleteObjectiveDialog } from './dialogs/ConfirmDeleteObjectiveDialog'
@@ -55,7 +56,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<UpdateObjectiveBodyType>({
+  } = useForm<z.input<typeof updateObjectiveSchema>>({
     resolver: standardSchemaResolver(updateObjectiveSchema),
     mode: 'onTouched',
     defaultValues: {
@@ -150,7 +151,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
             render={({ field }) => (
               <DatePicker
                 placeholder={t('create_objective_dialog.due_date_placeholder')}
-                value={field.value}
+                value={typeof field.value === 'string' ? new Date(field.value) : field.value}
                 onChange={field.onChange}
               />
             )}
@@ -173,7 +174,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
               className='h-auto cursor-pointer'
               disabled={!isValid || !isDirty}
               isLoading={updateMutation.isPending}
-              onClick={handleSubmit(onSubmit)}
+              onClick={handleSubmit((data) => onSubmit(data as UpdateObjectiveBodyType))}
               label={t('save_changes')}
             />
           </div>

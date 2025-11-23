@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { Habit, HabitCompletion, PrismaClient } from '../generated/prisma/client'
+import { type Habit, type HabitCompletion, type PrismaClient } from '../generated/prisma/client'
 
 export const getUserHabit = async (prisma: PrismaClient, habitId: string, userId: string): Promise<Habit> => {
   const habit = await prisma.habit.findFirst({
