@@ -1,7 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { env } from '../config'
 import {
-  forgotPasswordSchema,
   loginSchema,
   refreshTokenSchema,
   signUpSchema
@@ -47,22 +46,6 @@ export const authRouter = t.router({
 
     return {
       message: 'Magic link sent to your email'
-    }
-  }),
-  resetPassword: publicProcedure.input(forgotPasswordSchema).mutation(async ({ ctx, input }) => {
-    const { error } = await ctx.supabase.auth.resetPasswordForEmail(input.email, {
-      redirectTo: `${env.FRONT_URL}/update-password`
-    })
-
-    if (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message
-      })
-    }
-
-    return {
-      message: 'Password reset link sent'
     }
   }),
   logout: protectedProcedure.mutation(async ({ ctx }) => {

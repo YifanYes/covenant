@@ -27,6 +27,16 @@
     "today": "Today"
   },
   "cancel": "Cancel",
+  "classes": {
+    "knight": {
+      "description": "I will seek the strength to crush evil.",
+      "name": "Knight"
+    },
+    "sorcerer": {
+      "description": "I will seek wisdom to find the light.",
+      "name": "Sorcerer"
+    }
+  },
   "colors": {
     "amber": "Amber",
     "blue": "Blue",
@@ -139,9 +149,9 @@
     "title": "Habits"
   },
   "icons": {
+    "not_found": "No icons found",
     "placeholder": "Select an icon",
-    "search_placeholder": "Search icons...",
-    "not_found": "No icons found"
+    "search_placeholder": "Search icons..."
   },
   "login": {
     "account_verified": {
@@ -184,6 +194,20 @@
       "success": "Objective successfully updated",
       "title": "Update objective"
     }
+  },
+  "onboarding": {
+    "button": "Begin Your Journey",
+    "class_label": "Choose Your Class",
+    "error": {
+      "already_exists": "You already have a character",
+      "description": "An error occurred while creating your character",
+      "title": "Failed to create character"
+    },
+    "loading": "Creating your character...",
+    "name_label": "Character Name",
+    "name_placeholder": "Enter your character's name",
+    "subtitle": "Choose your path and begin your journey",
+    "title": "Create Your Character"
   },
   "recover_password": {
     "button": "Reset password",
@@ -262,29 +286,5 @@
     "status_placeholder": "Task status",
     "title": "Update task",
     "title_placeholder": "Task title"
-  },
-  "onboarding": {
-    "title": "Create Your Character",
-    "subtitle": "Choose your path and begin your journey",
-    "name_label": "Character Name",
-    "name_placeholder": "Enter your character's name",
-    "class_label": "Choose Your Class",
-    "button": "Begin Your Journey",
-    "loading": "Creating your character...",
-    "error": {
-      "title": "Failed to create character",
-      "already_exists": "You already have a character",
-      "description": "An error occurred while creating your character"
-    }
-  },
-  "classes": {
-    "knight": {
-      "name": "Knight",
-      "description": "I will seek the strength to crush evil."
-    },
-    "sorcerer": {
-      "name": "Sorcerer",
-      "description": "I will seek wisdom to find the light."
-    }
   }
 }

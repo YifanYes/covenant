@@ -139,9 +139,9 @@
     "title": "Hábitos"
   },
   "icons": {
+    "not_found": "No se encontraron iconos",
     "placeholder": "Seleccionar un icono",
-    "search_placeholder": "Buscar iconos...",
-    "not_found": "No se encontraron iconos"
+    "search_placeholder": "Buscar iconos..."
   },
   "login": {
     "account_verified": {
@@ -256,9 +256,33 @@
     "title": "Actualizar hábito"
   },
   "update_task_dialog": {
+    "classes": {
+      "knight": {
+        "description": "Buscaré la fuerza para aplastar el mal.",
+        "name": "Caballero"
+      },
+      "sorcerer": {
+        "description": "Buscaré la sabiduría para encontrar la luz.",
+        "name": "Hechicero"
+      }
+    },
     "description": "Modal para actualizar una tarea",
     "description_placeholder": "Descripción de la tarea",
     "due_date_placeholder": "Fecha de entrega (opcional)",
+    "onboarding": {
+      "button": "Comenzar tu viaje",
+      "class_label": "Elige tu clase",
+      "error": {
+        "already_exists": "Ya tienes un personaje",
+        "description": "Ocurrió un error al crear tu personaje",
+        "title": "Error al crear el personaje"
+      },
+      "loading": "Creando tu personaje...",
+      "name_label": "Nombre del personaje",
+      "name_placeholder": "Introduce el nombre de tu personaje",
+      "subtitle": "Elige tu camino y comienza tu viaje",
+      "title": "Crear tu personaje"
+    },
     "status_placeholder": "Estado de la tarea",
     "title": "Actualizar tarea",
     "title_placeholder": "Título de la tarea"
