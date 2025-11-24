@@ -9,7 +9,7 @@ export enum HabitTimespan {
 export const createHabitSchema = z.object({
   name: z.string().min(1, "errors.required_field").max(255),
   description: z.string().optional(),
-  recurrence: z.number().int().min(1).default(1),
+  recurrence: z.number().int().min(1),
   timespan: z.enum(HabitTimespan),
   objectives: z.array(z.uuid()).optional()
 })
