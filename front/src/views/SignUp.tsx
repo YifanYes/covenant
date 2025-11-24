@@ -4,12 +4,12 @@ import TextInput from '@/components/forms/TextInput'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { signUpSchema, type SignUpType } from '@schemas/auth.schemas'
 import { useMutation } from '@tanstack/react-query'
 import { MailCheck } from 'lucide-react'
 import { useState, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { signUpSchema, type SignUpType } from '../../../server/schemas/auth.schemas'
 
 export const SignUp: FC = () => {
   const { t } = useTranslation()

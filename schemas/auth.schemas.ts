@@ -1,10 +1,5 @@
 import { z } from 'zod'
 
-export const forgotPasswordSchema = z.object({
-  email: z.email('errors.invalid_email')
-})
-export type ForgotPasswordType = z.infer<typeof forgotPasswordSchema>
-
 export const signUpSchema = z.object({
   email: z.email('errors.invalid_email')
 })

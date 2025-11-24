@@ -113,18 +113,6 @@
     "password_mismatch": "Passwords do not match",
     "required_field": "Required field"
   },
-  "forgot_password": {
-    "button": "Send mail",
-    "email": "Email",
-    "error": {
-      "title": "An error occurred while sending the recovery mail"
-    },
-    "success": {
-      "message": "Check your inbox.",
-      "title": "Recovery mail sent!"
-    },
-    "title": "Password recovery"
-  },
   "habits": {
     "add": "Add Habit",
     "error": {
@@ -169,7 +157,6 @@
       "invalid_magic_link": "Invalid or expired magic link",
       "magic_link_error": "Magic Link Error"
     },
-    "forgot_password": "Forgot password?",
     "magic_link_sent_description": "Click the link in the email to log in to your account.",
     "magic_link_sent_title": "Magic link sent!",
     "password": "Password",

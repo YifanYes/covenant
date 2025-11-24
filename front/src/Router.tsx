@@ -3,7 +3,6 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import PrivateRoute from './components/PrivateRoute'
 import CalendarSuspenseFallback from './components/suspense-fallbacks/CalendarSuspenseFallback'
 import DashboardSuspenseFallback from './components/suspense-fallbacks/DashboardSuspenseFallback'
-import ForgotPasswordSuspenseFallback from './components/suspense-fallbacks/ForgotPasswordSuspenseFallback'
 import HabitsSuspenseFallback from './components/suspense-fallbacks/HabitsSuspenseFallback'
 import LoginSuspenseFallback from './components/suspense-fallbacks/LoginSuspenseFallback'
 import ObjectivesSuspenseFallback from './components/suspense-fallbacks/ObjectivesSuspenseFallback'
@@ -17,7 +16,6 @@ import WorkspaceLayout from './layouts/WorkspaceLayout'
 // Lazy load views
 const Calendar = lazy(() => import('./views/Calendar'))
 const Dashboard = lazy(() => import('./views/Dashboard'))
-const ForgotPassword = lazy(() => import('./views/ForgotPassword'))
 const Habits = lazy(() => import('./views/Habits'))
 const Login = lazy(() => import('./views/Login'))
 const Objectives = lazy(() => import('./views/Objectives'))
@@ -48,18 +46,9 @@ export const Router = () => {
                 </Suspense>
               }
             />
-            <Route
-              path='/forgot-password'
-              element={
-                <Suspense fallback={<ForgotPasswordSuspenseFallback />}>
-                  <ForgotPassword />
-                </Suspense>
-              }
-            />
-         
           </Route>
           <Route element={<PrivateRoute />}>
-             <Route
+            <Route
               path='/onboarding'
               element={
                 <Suspense fallback={<LoginSuspenseFallback />}>
@@ -67,7 +56,6 @@ export const Router = () => {
                 </Suspense>
               }
             />
-            
             <Route element={<WorkspaceLayout />}>
               <Route
                 path='/dashboard'

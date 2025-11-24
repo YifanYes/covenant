@@ -1,11 +1,11 @@
-import { TRPCError } from '@trpc/server'
 import {
   bulkUpdateTasksSchema,
   createTaskSchema,
   getByDateInputSchema,
   taskIdSchema,
   updateTaskSchema
-} from '../schemas/tasks.schemas'
+} from '@schemas/tasks.schemas'
+import { TRPCError } from '@trpc/server'
 import { getUserTask } from '../services/tasks.services'
 import { protectedProcedure, t } from '../trpc'
 
