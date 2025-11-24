@@ -103,18 +103,6 @@
     "password_mismatch": "Las contraseñas no coinciden",
     "required_field": "Campo requerido"
   },
-  "forgot_password": {
-    "button": "Enviar correo",
-    "email": "Correo electrónico",
-    "error": {
-      "title": "Ocurrió un error al enviar el correo de recuperación"
-    },
-    "success": {
-      "message": "Revisa tu bandeja de entrada.",
-      "title": "¡Correo de recuperación enviado!"
-    },
-    "title": "Recuperación de contraseña"
-  },
   "habits": {
     "add": "Añadir hábito",
     "error": {
@@ -159,7 +147,6 @@
       "invalid_magic_link": "Enlace mágico inválido o expirado",
       "magic_link_error": "Error del enlace mágico"
     },
-    "forgot_password": "¿Olvidaste tu contraseña?",
     "magic_link_sent_description": "Haz clic en el enlace del correo para iniciar sesión en tu cuenta.",
     "magic_link_sent_title": "¡Enlace mágico enviado!",
     "password": "Contraseña",

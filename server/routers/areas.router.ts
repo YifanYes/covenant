@@ -1,4 +1,4 @@
-import { createAreaSchema, deleteAreaSchema, updateAreaSchema } from '../schemas/areas.schemas'
+import { createAreaSchema, deleteAreaSchema, updateAreaSchema } from '@schemas/areas.schemas'
 import { getUserArea } from '../services/areas.services'
 import { protectedProcedure, t } from '../trpc'
 

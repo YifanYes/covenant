@@ -4,15 +4,15 @@ import { Label } from '@/components/ui/label'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import {
+  createCharacterSchema,
+  type CreateCharacterType
+} from '@schemas/character.schemas'
 import { useMutation } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import { CharacterClassName } from '../../../server/constants/classes'
-import {
-  createCharacterSchema,
-  type CreateCharacterType
-} from '../../../server/schemas/character.schemas'
 import { useHandleMagicLink } from '../hooks/use-handle-magic-link'
 
 

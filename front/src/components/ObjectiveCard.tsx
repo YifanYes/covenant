@@ -1,24 +1,24 @@
 import { Button } from '@/components/ui/button'
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from '@/components/ui/dialog'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import type { Objective } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '@schemas/objectives.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
-import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '../../../server/schemas/objectives.schemas'
 import AreaBadge from './AreaBadge'
 import { ConfirmDeleteObjectiveDialog } from './dialogs/ConfirmDeleteObjectiveDialog'
 import DatePicker from './forms/DatePicker'

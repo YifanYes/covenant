@@ -1,10 +1,6 @@
+import { loginSchema, refreshTokenSchema, signUpSchema } from '@schemas/auth.schemas'
 import { TRPCError } from '@trpc/server'
 import { env } from '../config'
-import {
-  loginSchema,
-  refreshTokenSchema,
-  signUpSchema
-} from '../schemas/auth.schemas'
 import { protectedProcedure, publicProcedure, t } from '../trpc'
 
 export const authRouter = t.router({

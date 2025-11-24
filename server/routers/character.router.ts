@@ -1,6 +1,6 @@
+import { defaultAreas } from '@schemas/areas.schemas'
+import { createCharacterSchema, switchClassSchema } from '@schemas/character.schemas'
 import { TRPCError } from '@trpc/server'
-import { defaultAreas } from '../schemas/areas.schemas'
-import { createCharacterSchema, switchClassSchema } from '../schemas/character.schemas'
 import { protectedProcedure, t } from '../trpc'
 
 export const characterRouter = t.router({
