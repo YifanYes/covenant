@@ -1,15 +1,15 @@
-import { z } from 'zod'
+import { z } from "zod"
 
 export enum TaskStatus {
-  TODO = 'TODO',
-  DOING = 'DOING',
-  DONE = 'DONE'
+  TODO = "TODO",
+  DOING = "DOING",
+  DONE = "DONE"
 }
 
 export const createTaskSchema = z.object({
-  title: z.string().min(1, 'errors.required_field'),
+  title: z.string().min(1, "errors.required_field"),
   description: z.string().optional(),
-  status: z.string().min(1, 'errors.required_field'),
+  status: z.string().min(1, "errors.required_field"),
   order: z.number().int().min(0).optional(),
   dueDate: z
     .date()
@@ -22,7 +22,7 @@ export type CreateTaskType = z.infer<typeof createTaskSchema>
 
 export const updateTaskSchema = z.object({
   id: z.uuid(),
-  title: z.string().min(1, 'errors.required_field'),
+  title: z.string().min(1, "errors.required_field"),
   description: z.string().optional().nullable(),
   status: z.string().optional(),
   order: z.number().int().min(0).optional(),
@@ -42,7 +42,7 @@ export const bulkUpdateTasksSchema = z.object({
   tasks: z.array(
     z.object({
       id: z.uuid(),
-      status: z.string().min(1, 'errors.required_field'),
+      status: z.string().min(1, "errors.required_field"),
       order: z.number().int().min(0)
     })
   )
