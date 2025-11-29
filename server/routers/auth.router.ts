@@ -1,4 +1,4 @@
-import { loginSchema, refreshTokenSchema, signUpSchema } from '@schemas/auth.schemas'
+import { loginSchema, refreshTokenSchema, signUpSchema } from '@shared/schemas/auth.schemas'
 import { TRPCError } from '@trpc/server'
 import { env } from '../config'
 import { protectedProcedure, publicProcedure, t } from '../trpc'

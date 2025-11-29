@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { loginSchema, type LoginType } from '@schemas/auth.schemas'
+import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
 import { useMutation } from '@tanstack/react-query'
 import { AlertCircle, CheckCircle, Mail } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -63,24 +63,23 @@ export default function Login() {
     // Parse hash fragment for Supabase magic link callback
     const hash = window.location.hash.substring(1) // Remove the '#'
     const hashParams = new URLSearchParams(hash)
-    
+
     const accessToken = hashParams.get('access_token')
     const refreshToken = hashParams.get('refresh_token')
     const hashType = hashParams.get('type')
-    
+
     // Check for errors in hash (e.g., expired magic link)
     const error = hashParams.get('error')
     const errorDescription = hashParams.get('error_description')
-    
+
     // Check search params for other scenarios
     const verified = searchParams.get('verified')
     const type = searchParams.get('type')
     const redirectTo = searchParams.get('redirect_to')
 
-
     if (error && errorDescription) {
       setMagicLinkError(errorDescription.replace(/\+/g, ' '))
-      
+
       window.history.replaceState(null, '', window.location.pathname)
       return
     }
@@ -88,19 +87,19 @@ export default function Login() {
     // Handle Supabase magic link callback (tokens in URL hash)
     if (accessToken && refreshToken) {
       setIsVerifyingOTP(true)
-      
+
       try {
         const payload = JSON.parse(atob(accessToken.split('.')[1]))
         const userEmail = payload.email
         const userId = payload.sub
-        
+
         updateUserInfo({
           email: userEmail,
           userId: userId,
           accessToken: accessToken,
           refreshToken: refreshToken
         })
-        
+
         // Clear the hash from the URL
         window.history.replaceState(null, '', window.location.pathname)
 
@@ -129,7 +128,7 @@ export default function Login() {
       newSearchParams.delete('type')
       newSearchParams.delete('redirect_to')
       setSearchParams(newSearchParams, { replace: true })
-      
+
       if (window.location.hash) {
         window.history.replaceState(null, '', window.location.pathname + window.location.search)
       }
@@ -138,7 +137,6 @@ export default function Login() {
       const destination = redirectTo ? new URL(redirectTo).pathname : '/onboarding'
       navigate(destination)
     }
-
   }, [searchParams, setSearchParams, updateUserInfo, navigate, show, t])
 
   if (isVerifyingOTP) {

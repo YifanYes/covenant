@@ -9,7 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@schemas': path.resolve(__dirname, '../schemas')
+      '@shared': path.resolve(__dirname, '../shared')
     }
   }
 })

@@ -1,7 +1,7 @@
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import { type Task as TaskType } from '@/types/models.types'
 import { useDragAndDrop } from '@formkit/drag-and-drop/react'
-import { TaskStatus } from '@schemas/tasks.schemas'
+import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { clone, filter, flatten, values as getValues, map } from 'es-toolkit/compat'
 import { useEffect } from 'react'
 import Task from './Task'

@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar'
-import { BookCheck, Calendar, LayoutDashboard, List, Settings, Trophy } from 'lucide-react'
+import { BookCheck, LayoutDashboard, List, Settings, Trophy } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Separator } from './ui/separator'
 
@@ -26,11 +26,6 @@ export function AppSidebar() {
         title: t('sidebar.objectives'),
         url: '/objectives',
         icon: Trophy
-      },
-      {
-        title: t('sidebar.calendar'),
-        url: '/calendar',
-        icon: Calendar
       },
       {
         title: t('sidebar.tasks'),

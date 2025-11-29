@@ -215,6 +215,11 @@
     "success_title": "¡Cuenta creada!",
     "title": "Crear una cuenta en ARQ"
   },
+  "task_status": {
+    "DOING": "En progreso",
+    "DONE": "Completado",
+    "TODO": "Por hacer"
+  },
   "tasks": {
     "add": "Crear tarea",
     "delete": "Eliminar tarea",
@@ -226,10 +231,29 @@
         "update": "Ha ocurrido un error al actualizar la tarea."
       }
     },
+    "filters": {
+      "all_statuses": "Todos los estados",
+      "clear": "Limpiar filtros",
+      "date_placeholder": "Filtrar por fecha",
+      "search_placeholder": "Buscar",
+      "status_placeholder": "Filtrar por estado"
+    },
     "success": {
       "create": "Tarea creada exitosamente",
       "delete": "Tarea eliminada exitosamente",
       "update": "Tarea actualizada exitosamente"
+    },
+    "table": {
+      "dueDate": "Fecha de entrega",
+      "no_tasks": "No se encontraron tareas",
+      "objectives": "Objetivos",
+      "status": "Estado",
+      "title": "Título"
+    },
+    "tabs": {
+      "calendar": "Calendario",
+      "list": "Lista",
+      "table": "Tabla"
     },
     "title": "Tareas"
   },

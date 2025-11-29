@@ -71,19 +71,28 @@ export default function DatePicker({
   const [month, setMonth] = useState<Date>(value || new Date())
   const [inputValue, setInputValue] = useState(formatDate(value || undefined))
   const [cursorPosition, setCursorPosition] = useState<number | null>(null)
+  const [isUserEditing, setIsUserEditing] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    setInputValue(formatDate(value || undefined))
-    value && setMonth(value)
-  }, [value])
+  const handleInputBlur = () => {
+    if (isUserEditing) {
+      setInputValue(formatDate(value || undefined))
+      setIsUserEditing(false)
+    }
+  }
+
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen)
+    if (newOpen && value) {
+      setMonth(value)
+    }
+  }
 
   useEffect(() => {
     if (cursorPosition !== null && inputRef.current) {
       inputRef.current.setSelectionRange(cursorPosition, cursorPosition)
-      setCursorPosition(null)
     }
-  }, [inputValue, cursorPosition])
+  }, [cursorPosition])
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
@@ -172,15 +181,16 @@ export default function DatePicker({
             errorMessage && 'border-destructive'
           )}
           onChange={handleInputChange}
+          onBlur={handleInputBlur}
           aria-invalid={!!errorMessage}
           required={required}
         />
-        <Popover open={open} onOpenChange={setOpen} modal={true}>
+        <Popover open={open} onOpenChange={handleOpenChange} modal={true}>
           <PopoverTrigger asChild>
             <button
               className={cn(
                 'border-input hover:bg-primary/10 hover:text-primary hover:border-primary',
-                'dark:bg-input/30 h-auto rounded-md border-1 bg-transparent px-3 transition-all duration-200'
+                'dark:bg-input/30 h-auto rounded-md border bg-transparent px-3 transition-all duration-200'
               )}
             >
               <CalendarIcon className='h-4 w-4' />

@@ -1,4 +1,9 @@
-import { createHabitSchema, habitCompletionIdSchema, habitIdSchema, updateHabitSchema } from '@schemas/habits.schemas'
+import {
+  createHabitSchema,
+  habitCompletionIdSchema,
+  habitIdSchema,
+  updateHabitSchema
+} from '@shared/schemas/habits.schemas'
 import { TRPCError } from '@trpc/server'
 import { getUserHabit, getUserHabitCompletion } from '../services/habits.services'
 import { protectedProcedure, t } from '../trpc'
