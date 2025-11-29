@@ -12,7 +12,7 @@ import {
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { createAreaSchema, type CreateAreaBodyType } from '@schemas/areas.schemas'
+import { createAreaSchema, type CreateAreaBodyType } from '@shared/schemas/areas.schemas'
 import { useMutation } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'

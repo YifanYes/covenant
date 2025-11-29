@@ -1,6 +1,9 @@
 import { CreateTaskDialog } from '@/components/dialogs/CreateTaskDialog'
 import { UpdateTaskDialog } from '@/components/dialogs/UpdateTaskDialog'
+import TaskCalendar from '@/components/tasks/TaskCalendar'
 import TaskList from '@/components/tasks/TaskList'
+import TasksTable from '@/components/tasks/TaskTable'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { useDebouncedMutation } from '@/hooks/use-debounced-mutation'
 import { useSnackbar } from '@/hooks/use-snackbar'
@@ -18,6 +21,7 @@ const Tasks = () => {
   const { show } = useSnackbar()
   const { tasks, setTasks } = useTasksStore()
   const { monthIndex } = useCalendarStore()
+
   const reorderMutation = useDebouncedMutation(
     trpc.tasks.bulkUpdate.mutationOptions({
       onSuccess: async () =>
@@ -41,15 +45,36 @@ const Tasks = () => {
 
   return (
     <div className='min-h-screen w-full p-6'>
-      <div className='flex flex-row justify-between gap-4'>
-        <h1 className='text-2xl font-semibold'>{t('tasks.title')}</h1>
-        <CreateTaskDialog />
-      </div>
-      <div className='flex flex-col gap-4'>
-        {map(keys(tasks), (id) => (
-          <TaskList key={id} id={id} group='tasks' mutation={reorderMutation} />
-        ))}
-      </div>
+      <Tabs defaultValue='list' className='w-full'>
+        <div className='mb-6 flex flex-row items-center justify-between gap-4'>
+          <h1 className='text-2xl font-semibold'>{t('tasks.title')}</h1>
+          <div className='flex items-center gap-4'>
+            <TabsList>
+              <TabsTrigger value='list'>{t('tasks.tabs.list')}</TabsTrigger>
+              <TabsTrigger value='calendar'>{t('tasks.tabs.calendar')}</TabsTrigger>
+              <TabsTrigger value='table'>{t('tasks.tabs.table')}</TabsTrigger>
+            </TabsList>
+            <CreateTaskDialog />
+          </div>
+        </div>
+
+        <TabsContent value='list' className='mt-4'>
+          <div className='flex flex-col gap-4'>
+            {map(keys(tasks), (id) => (
+              <TaskList key={id} id={id} group='tasks' mutation={reorderMutation} />
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value='calendar' className='mt-4'>
+          <TaskCalendar />
+        </TabsContent>
+
+        <TabsContent value='table' className='mt-4'>
+          <TasksTable />
+        </TabsContent>
+      </Tabs>
+
       <UpdateTaskDialog />
     </div>
   )

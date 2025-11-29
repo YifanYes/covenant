@@ -4,7 +4,7 @@ import {
   getByDateInputSchema,
   taskIdSchema,
   updateTaskSchema
-} from '@schemas/tasks.schemas'
+} from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
 import { getUserTask } from '../services/tasks.services'
 import { protectedProcedure, t } from '../trpc'
@@ -47,11 +47,14 @@ export const tasksRouter = t.router({
       orderBy: [{ status: 'asc' }, { order: 'asc' }]
     })
 
-    const groupedTasks = tasks.reduce((acc, task) => {
-      if (!acc[task.status]) acc[task.status] = []
-      acc[task.status].push(task)
-      return acc
-    }, {} as Record<string, typeof tasks>)
+    const groupedTasks = tasks.reduce(
+      (acc, task) => {
+        if (!acc[task.status]) acc[task.status] = []
+        acc[task.status].push(task)
+        return acc
+      },
+      {} as Record<string, typeof tasks>
+    )
 
     return { tasks: groupedTasks }
   }),

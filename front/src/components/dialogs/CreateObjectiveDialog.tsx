@@ -12,7 +12,7 @@ import {
 import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createObjectiveSchema, type CreateObjectiveBodyType } from '@schemas/objectives.schemas'
+import { createObjectiveSchema, type CreateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'

@@ -1,5 +1,5 @@
-import { defaultAreas } from '@schemas/areas.schemas'
-import { createCharacterSchema, switchClassSchema } from '@schemas/character.schemas'
+import { defaultAreas } from '@shared/schemas/areas.schemas'
+import { createCharacterSchema, switchClassSchema } from '@shared/schemas/character.schemas'
 import { TRPCError } from '@trpc/server'
 import { protectedProcedure, t } from '../trpc'
 
@@ -59,7 +59,7 @@ export const characterRouter = t.router({
       characterClass = await ctx.prisma.characterClass.create({
         data: {
           characterId: character.id,
-          className: input.className,
+          className: input.className
         }
       })
     }

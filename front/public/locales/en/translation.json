@@ -239,6 +239,11 @@
     "success_title": "Account created!",
     "title": "Create an ARQ account"
   },
+  "task_status": {
+    "DOING": "In Progress",
+    "DONE": "Done",
+    "TODO": "To Do"
+  },
   "tasks": {
     "add": "Add Task",
     "delete": "Delete Task",
@@ -250,10 +255,29 @@
         "update": "An error ocurred while updating the task"
       }
     },
+    "filters": {
+      "all_statuses": "All statuses",
+      "clear": "Clear filters",
+      "date_placeholder": "Filter by date",
+      "search_placeholder": "Search",
+      "status_placeholder": "Filter by status"
+    },
     "success": {
       "create": "Task created successfully",
       "delete": "Task deleted successfully",
       "update": "Task updated successfully"
+    },
+    "table": {
+      "dueDate": "Due Date",
+      "no_tasks": "No tasks found",
+      "objectives": "Objectives",
+      "status": "Status",
+      "title": "Title"
+    },
+    "tabs": {
+      "calendar": "Calendar",
+      "list": "List",
+      "table": "Table"
     },
     "title": "Tasks"
   },

@@ -1,4 +1,4 @@
-import { createObjectiveSchema, deleteObjectiveSchema, updateObjectiveSchema } from '@schemas/objectives.schemas'
+import { createObjectiveSchema, deleteObjectiveSchema, updateObjectiveSchema } from '@shared/schemas/objectives.schemas'
 import { getUserObjective } from '../services/objectives.services'
 import { protectedProcedure, t } from '../trpc'
 
