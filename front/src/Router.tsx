@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import PrivateRoute from './components/PrivateRoute'
-import CalendarSuspenseFallback from './components/suspense-fallbacks/CalendarSuspenseFallback'
 import DashboardSuspenseFallback from './components/suspense-fallbacks/DashboardSuspenseFallback'
 import HabitsSuspenseFallback from './components/suspense-fallbacks/HabitsSuspenseFallback'
 import LoginSuspenseFallback from './components/suspense-fallbacks/LoginSuspenseFallback'
@@ -14,7 +13,6 @@ import CenteredLayout from './layouts/CenteredLayout'
 import WorkspaceLayout from './layouts/WorkspaceLayout'
 
 // Lazy load views
-const Calendar = lazy(() => import('./views/Calendar'))
 const Dashboard = lazy(() => import('./views/Dashboard'))
 const Habits = lazy(() => import('./views/Habits'))
 const Login = lazy(() => import('./views/Login'))
@@ -70,14 +68,6 @@ export const Router = () => {
                 element={
                   <Suspense fallback={<ObjectivesSuspenseFallback />}>
                     <Objectives />
-                  </Suspense>
-                }
-              />
-              <Route
-                path='/calendar'
-                element={
-                  <Suspense fallback={<CalendarSuspenseFallback />}>
-                    <Calendar />
                   </Suspense>
                 }
               />

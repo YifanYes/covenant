@@ -6,7 +6,7 @@ import { trpc } from '@/utils/trpc.utils'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
-export default function Calendar() {
+export default function TaskCalendar() {
   const [currentMonth, setCurrentMonth] = useState(getMonth())
   const { monthIndex } = useCalendarStore()
 
@@ -22,7 +22,7 @@ export default function Calendar() {
   }, [monthIndex])
 
   return (
-    <div className='flex h-screen'>
+    <div className='flex h-[calc(100vh-200px)]'>
       <div className='h-full flex-1'>
         <MonthlyCalendar month={currentMonth} tasks={tasksData?.tasks || []} />
       </div>
