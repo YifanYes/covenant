@@ -5,7 +5,8 @@
   "type": "module",
   "workspaces": [
     "front",
-    "server"
+    "server",
+    "shared"
   ],
   "dependencies": {
     "@trpc/server": "^11.7.1",

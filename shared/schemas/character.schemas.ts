@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { CharacterClassName } from '../server/constants/classes'
+import { CharacterClassName } from '../constants/classes'
 
 export const createCharacterSchema = z.object({
   name: z.string().min(1).max(255),
