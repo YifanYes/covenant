@@ -1,4 +1,4 @@
-import { default as AttributeCard, default as ClassAttributeCard } from '@/components/inventory/ClassAttributeCard'
+import ClassAttributeCard from '@/components/inventory/ClassAttributeCard'
 import { trpc } from '@/utils/trpc.utils'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -65,12 +65,12 @@ export default function Inventory() {
             value={currentClass.wisdom}
             labelClassName='text-blue-300'
           />
-          <AttributeCard
+          <ClassAttributeCard
             label={t('inventory.resistance')}
             value={currentClass.resistance}
             labelClassName='text-green-300'
           />
-          <AttributeCard label={t('inventory.faith')} value={currentClass.faith} labelClassName='text-white' />
+          <ClassAttributeCard label={t('inventory.faith')} value={currentClass.faith} labelClassName='text-white' />
         </div>
       </div>
     </div>
