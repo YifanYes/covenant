@@ -1,12 +1,14 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  SidebarTrigger
 } from '@/components/ui/sidebar'
 import { Backpack, BookCheck, LayoutDashboard, List, Settings, Trophy } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -53,9 +55,10 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar>
+    <Sidebar collapsible='icon'>
       <SidebarHeader>
-        <img src='/logo.png' alt='logo' width={120} className='p-2 pt-4' />
+        <img src='/logo.png' alt='logo' width={120} className='p-2 pt-4 group-data-[collapsible=icon]:hidden' />
+        <img src='/favicon.ico' alt='logo' width={40} className='hidden p-2 pt-4 group-data-[collapsible=icon]:block' />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -63,7 +66,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {sidebarItems.content.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild tooltip={item.title}>
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -80,7 +83,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {sidebarItems.settings.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild tooltip={item.title}>
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -92,6 +95,13 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarTrigger className='w-full justify-start' showText />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }
