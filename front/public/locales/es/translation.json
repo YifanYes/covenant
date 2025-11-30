@@ -27,6 +27,10 @@
     "today": "Hoy"
   },
   "cancel": "Cancelar",
+  "character_class": {
+    "knight": "Caballero",
+    "sorcerer": "Hechicero"
+  },
   "colors": {
     "amber": "Ámbar",
     "blue": "Azul",
@@ -131,6 +135,19 @@
     "placeholder": "Seleccionar un icono",
     "search_placeholder": "Buscar iconos..."
   },
+  "inventory": {
+    "class": "Clase",
+    "exp": "Experiencia",
+    "faith": "Fe",
+    "health": "Salud",
+    "level": "Nivel",
+    "mana": "Maná",
+    "resistance": "Resistencia",
+    "stats": "Estadísticas",
+    "strength": "Fuerza",
+    "title": "Inventario",
+    "wisdom": "Sabiduría"
+  },
   "login": {
     "account_verified": {
       "description": "Ahora puedes iniciar sesión con tus credenciales.",
@@ -196,6 +213,7 @@
     "calendar": "Calendario",
     "dashboard": "Panel de control",
     "habits": "Hábitos",
+    "inventory": "Inventario",
     "objectives": "Objetivos",
     "review": "Revisión",
     "settings": "Configuración",

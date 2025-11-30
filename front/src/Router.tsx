@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import PrivateRoute from './components/PrivateRoute'
 import DashboardSuspenseFallback from './components/suspense-fallbacks/DashboardSuspenseFallback'
 import HabitsSuspenseFallback from './components/suspense-fallbacks/HabitsSuspenseFallback'
+import InventorySuspenseFallback from './components/suspense-fallbacks/InventorySuspenseFallback'
 import LoginSuspenseFallback from './components/suspense-fallbacks/LoginSuspenseFallback'
 import ObjectivesSuspenseFallback from './components/suspense-fallbacks/ObjectivesSuspenseFallback'
 import SettingsSuspenseFallback from './components/suspense-fallbacks/SettingsSuspenseFallback'
@@ -21,6 +22,7 @@ const Onboarding = lazy(() => import('./views/Onboarding'))
 const Settings = lazy(() => import('./views/Settings'))
 const SignUp = lazy(() => import('./views/SignUp'))
 const Tasks = lazy(() => import('./views/Tasks'))
+const Inventory = lazy(() => import('./views/Inventory'))
 
 export const Router = () => {
   return (
@@ -92,6 +94,14 @@ export const Router = () => {
                 element={
                   <Suspense fallback={<SettingsSuspenseFallback />}>
                     <Settings />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/inventory'
+                element={
+                  <Suspense fallback={<InventorySuspenseFallback />}>
+                    <Inventory />
                   </Suspense>
                 }
               />

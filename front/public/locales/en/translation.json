@@ -27,6 +27,10 @@
     "today": "Today"
   },
   "cancel": "Cancel",
+  "character_class": {
+    "knight": "Knight",
+    "sorcerer": "Sorcerer"
+  },
   "classes": {
     "knight": {
       "description": "I will seek the strength to crush evil.",
@@ -141,6 +145,19 @@
     "placeholder": "Select an icon",
     "search_placeholder": "Search icons..."
   },
+  "inventory": {
+    "class": "Class",
+    "exp": "Experience",
+    "faith": "Faith",
+    "health": "Health",
+    "level": "Level",
+    "mana": "Mana",
+    "resistance": "Resistance",
+    "stats": "Stats",
+    "strength": "Strength",
+    "title": "Inventory",
+    "wisdom": "Wisdom"
+  },
   "login": {
     "account_verified": {
       "description": "You can now log in with your credentials.",
@@ -220,6 +237,7 @@
     "calendar": "Calendar",
     "dashboard": "Dashboard",
     "habits": "Habits",
+    "inventory": "Inventory",
     "objectives": "Objectives",
     "review": "Review",
     "settings": "Settings",
