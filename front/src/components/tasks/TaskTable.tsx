@@ -1,7 +1,6 @@
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import type { Task } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
@@ -12,12 +11,12 @@ import { flatten, values as getValues, filter as lodashFilter, map } from 'es-to
 import { X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import DatePicker from '../forms/DatePicker'
 import { Button } from '../ui/button'
 
 export default function TasksTable() {
   const { t } = useTranslation()
-  const { show } = useSnackbar()
   const { tasks } = useTasksStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -27,12 +26,9 @@ export default function TasksTable() {
     trpc.tasks.update.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
-        show({ variant: 'success', title: t('tasks.success.update') })
+        toast.success(t('tasks.success.update'))
       },
-      onError: (error) => {
-        console.log(error)
-        show({ variant: 'destructive', title: t('tasks.error.internal.update') })
-      }
+      onError: (error) => toast.error(t('tasks.error.internal.update'), { description: error.message })
     })
   )
 

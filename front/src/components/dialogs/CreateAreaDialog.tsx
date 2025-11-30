@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { createAreaSchema, type CreateAreaBodyType } from '@shared/schemas/areas.schemas'
@@ -18,6 +17,7 @@ import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
 import IconPicker from '../forms/IconPicker'
@@ -26,22 +26,15 @@ import TextInput from '../forms/TextInput'
 export const CreateAreaDialog = () => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const { show } = useSnackbar()
 
   const mutation = useMutation(
     trpc.areas.create.mutationOptions({
       onSuccess: () => {
-        show({ variant: 'success', title: t('areas.success.create') })
+        toast.success(t('areas.success.create'))
         queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })
         setOpen(false)
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('areas.error.internal.create')
-        })
-      }
+      onError: (error) => toast.error(t('areas.error.internal.create'), { description: error.message })
     })
   )
 

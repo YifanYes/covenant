@@ -6,7 +6,6 @@ import TasksTable from '@/components/tasks/TaskTable'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { useDebouncedMutation } from '@/hooks/use-debounced-mutation'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -14,11 +13,11 @@ import dayjs from 'dayjs'
 import { isUndefined, keys, map } from 'es-toolkit/compat'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 
 const Tasks = () => {
   const { t } = useTranslation()
   const { data } = useSuspenseQuery(trpc.tasks.getAll.queryOptions())
-  const { show } = useSnackbar()
   const { tasks, setTasks } = useTasksStore()
   const { monthIndex } = useCalendarStore()
 
@@ -31,10 +30,7 @@ const Tasks = () => {
             year: dayjs().year().toString()
           })
         }),
-      onError: (error) => {
-        console.log(error)
-        show({ variant: 'destructive', title: t('tasks.error.internal.reorder') })
-      }
+      onError: (error) => toast.error(t('tasks.error.internal.reorder'), { description: error.message })
     }),
     1000
   )

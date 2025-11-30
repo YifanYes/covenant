@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { allIcons, areaStyles } from '@/types/constants.types'
 import type { Area } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
@@ -19,6 +18,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
 import IconPicker from '../forms/IconPicker'
@@ -28,7 +28,6 @@ import { ConfirmDeleteAreaDialog } from './ConfirmDeleteAreaDialog'
 export function UpdateAreaDialog({ area }: { area: Area }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const { show } = useSnackbar()
 
   const areaStyle = areaStyles.find((defaultArea) => defaultArea.color === area.color)
   const currentIcon = allIcons.find((icon) => icon.name === area.icon)
@@ -36,17 +35,11 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
   const updateMutation = useMutation(
     trpc.areas.update.mutationOptions({
       onSuccess: () => {
-        show({ variant: 'success', title: t('areas.success.create') })
+        toast.success(t('areas.success.create'))
         queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })
         setOpen(false)
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('areas.error.internal.update')
-        })
-      }
+      onError: (error) => toast.error(t('areas.error.internal.update'), { description: error.message })
     })
   )
 

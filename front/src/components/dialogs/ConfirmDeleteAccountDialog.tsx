@@ -11,17 +11,16 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { useAuthStore } from '@/hooks/use-auth-store'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { cn } from '@/lib/utils'
 import { trpc } from '@/utils/trpc.utils'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
+import { toast } from 'sonner'
 
 export const ConfirmDeleteAccountDialog = () => {
   const { t } = useTranslation()
-  const { show } = useSnackbar()
   const { resetUserInfo } = useAuthStore()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
@@ -31,19 +30,10 @@ export const ConfirmDeleteAccountDialog = () => {
       onSuccess: () => {
         resetUserInfo()
         navigate('/login')
-        show({
-          variant: 'success',
-          title: t('confirm_delete_account_dialog.success')
-        })
+        toast.success(t('confirm_delete_account_dialog.success'))
         setOpen(false)
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('confirm_delete_account_dialog.error')
-        })
-      }
+      onError: (error) => toast.error(t('confirm_delete_account_dialog.error'), { description: error.message })
     })
   )
 

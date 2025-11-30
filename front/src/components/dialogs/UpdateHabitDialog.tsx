@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import type { Habit } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -19,6 +18,7 @@ import { map } from 'es-toolkit/compat'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import LoaderButton from '../LoaderButton'
 import MultiSelect from '../forms/MultiSelect'
 import SingleSelect from '../forms/SingleSelect'
@@ -30,24 +30,17 @@ import { ConfirmDeleteHabitDialog } from './ConfirmDeleteHabitDialog'
 export function UpdateHabitDialog({ habit }: { habit: Habit }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const { show } = useSnackbar()
 
   const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
 
   const updateMutation = useMutation(
     trpc.habits.update.mutationOptions({
       onSuccess: async () => {
-        show({ variant: 'success', title: t('habits.success.update') })
+        toast.success(t('habits.success.update'))
         await queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })
         setOpen(false)
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('habits.error.internal.update')
-        })
-      }
+      onError: (error) => toast.error(t('habits.error.internal.update'), { description: error.message })
     })
   )
 

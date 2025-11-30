@@ -10,34 +10,27 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import type { Habit } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { useMutation } from '@tanstack/react-query'
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 
 export const ConfirmDeleteHabitDialog = ({ habit, onDeleteSuccess }: { habit: Habit; onDeleteSuccess: () => void }) => {
   const { t } = useTranslation()
-  const { show } = useSnackbar()
   const [open, setOpen] = useState(false)
 
   const deleteMutation = useMutation(
     trpc.habits.delete.mutationOptions({
       onSuccess: () => {
-        show({ variant: 'success', title: t('habits.success.delete') })
+        toast.success(t('habits.success.delete'))
         queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })
         setOpen(false)
         onDeleteSuccess()
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('habits.error.internal.delete')
-        })
-      }
+      onError: (error) => toast.error(t('habits.error.internal.delete'), { description: error.message })
     })
   )
 

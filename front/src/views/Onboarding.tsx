@@ -1,7 +1,6 @@
 import LoaderButton from '@/components/LoaderButton'
 import TextInput from '@/components/forms/TextInput'
 import { Label } from '@/components/ui/label'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { CharacterClassName } from '@shared/constants/classes'
@@ -10,13 +9,13 @@ import { useMutation } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
+import { toast } from 'sonner'
 import { useHandleMagicLink } from '../hooks/use-handle-magic-link'
 
 export default function Onboarding() {
   const { t } = useTranslation()
   useHandleMagicLink()
   const navigate = useNavigate()
-  const { show } = useSnackbar()
 
   const createCharacterMutation = useMutation({
     ...trpc.character.create.mutationOptions(),
@@ -24,13 +23,7 @@ export default function Onboarding() {
       queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
       navigate('/objectives')
     },
-    onError: (error) => {
-      show({
-        variant: 'destructive',
-        title: t('onboarding.error.title'),
-        description: error.message
-      })
-    }
+    onError: (error) => toast.error(t('onboarding.error.title'), { description: error.message })
   })
 
   const {

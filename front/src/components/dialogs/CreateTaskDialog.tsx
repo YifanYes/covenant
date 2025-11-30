@@ -10,7 +10,6 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createTaskSchema, TaskStatus, type CreateTaskType } from '@shared/schemas/tasks.schemas'
@@ -20,6 +19,7 @@ import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm, type Resolver } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import LoaderButton from '../LoaderButton'
 import DatePicker from '../forms/DatePicker'
 import TextInput from '../forms/TextInput'
@@ -28,13 +28,12 @@ import { Textarea } from '../ui/textarea'
 export const CreateTaskDialog = () => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const { show } = useSnackbar()
   const { monthIndex } = useCalendarStore()
 
   const mutation = useMutation(
     trpc.tasks.create.mutationOptions({
       onSuccess: async () => {
-        show({ variant: 'success', title: t('tasks.success.create') })
+        toast.success(t('tasks.success.create'))
         queryClient.invalidateQueries({
           queryKey: trpc.tasks.getByDate.queryKey({
             monthIndex: monthIndex.toString(),
@@ -44,13 +43,7 @@ export const CreateTaskDialog = () => {
         await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
         setOpen(false)
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('tasks.error.internal.create')
-        })
-      }
+      onError: (error) => toast.error(t('tasks.error.internal.create'), { description: error.message })
     })
   )
 
