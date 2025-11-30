@@ -21,7 +21,7 @@ export default function Onboarding() {
   const createCharacterMutation = useMutation({
     ...trpc.character.create.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrent.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
       navigate('/objectives')
     },
     onError: (error) => {
