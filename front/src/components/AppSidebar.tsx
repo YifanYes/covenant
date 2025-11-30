@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar'
-import { BookCheck, LayoutDashboard, List, Settings, Trophy } from 'lucide-react'
+import { Backpack, BookCheck, LayoutDashboard, List, Settings, Trophy } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Separator } from './ui/separator'
 
@@ -36,6 +36,11 @@ export function AppSidebar() {
         title: t('sidebar.habits'),
         url: '/habits',
         icon: BookCheck
+      },
+      {
+        title: t('sidebar.inventory'),
+        url: '/inventory',
+        icon: Backpack
       }
     ],
     settings: [
