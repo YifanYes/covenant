@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createObjectiveSchema, type CreateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
@@ -18,6 +17,7 @@ import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm, type Resolver } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import LoaderButton from '../LoaderButton'
 import DatePicker from '../forms/DatePicker'
 import MultiSelect from '../forms/MultiSelect'
@@ -27,23 +27,19 @@ import { Textarea } from '../ui/textarea'
 export const CreateObjectiveDialog = () => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const { show } = useSnackbar()
 
   const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
 
   const mutation = useMutation(
     trpc.objectives.create.mutationOptions({
       onSuccess: () => {
-        show({ variant: 'success', title: t('create_objective_dialog.success') })
+        toast.success(t('create_objective_dialog.success'))
         queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })
         setOpen(false)
       },
       onError: (error) => {
         console.error(error)
-        show({
-          variant: 'destructive',
-          title: t('create_objective_dialog.error.internal')
-        })
+        toast.error(t('create_objective_dialog.error.internal'))
       }
     })
   )

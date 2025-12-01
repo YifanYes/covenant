@@ -10,13 +10,13 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import type { Objective } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { useMutation } from '@tanstack/react-query'
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import LoaderButton from '../LoaderButton'
 
 interface Props {
@@ -26,24 +26,17 @@ interface Props {
 
 export const ConfirmDeleteObjectiveDialog = ({ objective, onDeleteSuccess }: Props) => {
   const { t } = useTranslation()
-  const { show } = useSnackbar()
   const [open, setOpen] = useState(false)
 
   const deleteMutation = useMutation(
     trpc.objectives.delete.mutationOptions({
       onSuccess: () => {
-        show({ variant: 'success', title: t('objectives.delete.success') })
+        toast.success(t('objectives.delete.success'))
         queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })
         setOpen(false)
         onDeleteSuccess()
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('objectives.delete.error')
-        })
-      }
+      onError: (error) => toast.error(t('objectives.delete.error'), { description: error.message })
     })
   )
 

@@ -1,12 +1,11 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router'
+import { toast } from 'sonner'
 import { useAuthStore } from './use-auth-store'
-import { useSnackbar } from './use-snackbar'
 
 export const useHandleMagicLink = () => {
   const { updateUserInfo } = useAuthStore()
   const navigate = useNavigate()
-  const { show } = useSnackbar()
 
   useEffect(() => {
     const hash = window.location.hash.substring(1)
@@ -18,9 +17,7 @@ export const useHandleMagicLink = () => {
     const errorDescription = hashParams.get('error_description')
 
     if (error && errorDescription) {
-      show({
-        variant: 'destructive',
-        title: 'Authentication Error',
+      toast.error('Authentication Error', {
         description: errorDescription.replace(/\+/g, ' ')
       })
       window.history.replaceState(null, '', window.location.pathname)
@@ -42,17 +39,15 @@ export const useHandleMagicLink = () => {
 
         // Clear the hash from the URL
         window.history.replaceState(null, '', window.location.pathname)
-        
+
         // We don't force a redirect here, assuming the user is already at the desired destination
         // (e.g. /onboarding) or the router will handle it.
       } catch (error) {
         console.error('Error parsing access token:', error)
-        show({
-          variant: 'destructive',
-          title: 'Error',
+        toast.error('Error', {
           description: 'Failed to parse authentication tokens'
         })
       }
     }
-  }, [updateUserInfo, navigate, show])
+  }, [updateUserInfo, navigate])
 }
