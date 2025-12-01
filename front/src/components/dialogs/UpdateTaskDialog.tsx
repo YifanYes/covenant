@@ -13,7 +13,7 @@ import { useTasksStore } from '@/hooks/use-tasks-store'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { TaskStatus, updateTaskSchema, type UpdateTaskType } from '@shared/schemas/tasks.schemas'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { isNil, isUndefined, map } from 'es-toolkit/compat'
 import { useEffect } from 'react'
@@ -23,6 +23,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 import LoaderButton from '../LoaderButton'
 import DatePicker from '../forms/DatePicker'
+import MultiSelect from '../forms/MultiSelect'
 import SingleSelect from '../forms/SingleSelect'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
@@ -31,6 +32,7 @@ export const UpdateTaskDialog = () => {
   const { t } = useTranslation()
   const { monthIndex } = useCalendarStore()
   const { selectedTask, setSelectedTask } = useTasksStore()
+  const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
 
   const updateMutation = useMutation(
     trpc.tasks.update.mutationOptions({
@@ -146,6 +148,14 @@ export const UpdateTaskDialog = () => {
                   placeholder={t('update_task_dialog.due_date_placeholder')}
                 />
               )}
+            />
+          </div>
+          <div className='grid gap-3'>
+            <MultiSelect
+              name='objectives'
+              control={control}
+              items={objectivesData?.objectives.map(({ id, name: label }) => ({ id, label })) || []}
+              placeholder={t('update_task_dialog.objectives_placeholder')}
             />
           </div>
         </div>
