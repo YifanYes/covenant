@@ -149,6 +149,10 @@
     "title": "Inventario",
     "wisdom": "Sabiduría"
   },
+  "languages": {
+    "en": "Inglés",
+    "es": "Español"
+  },
   "login": {
     "account_verified": {
       "description": "Ahora puedes iniciar sesión con tus credenciales.",
@@ -204,7 +208,11 @@
   },
   "save_changes": "Guardar cambios",
   "settings": {
+    "default_tasks_view_label": "Vista de tareas predeterminada",
+    "default_tasks_view_placeholder": "Seleccionar vista predeterminada",
     "email_label": "Correo electrónico",
+    "language_label": "Idioma",
+    "language_placeholder": "Seleccionar idioma",
     "theme_dark": "Oscuro",
     "theme_label": "Tema",
     "theme_light": "Claro",
