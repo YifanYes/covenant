@@ -1,26 +1,25 @@
 import { Button } from '@/components/ui/button'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import type { Habit } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { useMutation } from '@tanstack/react-query'
 import { Check, Code } from 'lucide-react'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 
 // forwarding ref and event handlers so the trigger can attach to root div
 const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttributes<HTMLDivElement>>(
   ({ habit, ...props }, ref) => {
-    const { show } = useSnackbar()
     const { t } = useTranslation()
 
     const createCompletion = useMutation(
       trpc.habits.createCompletion.mutationOptions({
         onSuccess: async () => {
-          show({ variant: 'success', title: t('habits.success.complete') })
+          toast.success(t('habits.success.complete'))
           await queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })
         },
         onError: () => {
-          show({ variant: 'destructive', title: t('habits.error.complete') })
+          toast.error(t('habits.error.complete'))
         }
       })
     )

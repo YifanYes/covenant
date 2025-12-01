@@ -2,7 +2,6 @@ import Link from '@/components/Link'
 import LoaderButton from '@/components/LoaderButton'
 import TextInput from '@/components/forms/TextInput'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
@@ -12,13 +11,13 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router'
+import { toast } from 'sonner'
 import { useAuthStore } from '../hooks/use-auth-store'
 
 export default function Login() {
   const { t } = useTranslation()
   const { updateUserInfo } = useAuthStore()
   const navigate = useNavigate()
-  const { show } = useSnackbar()
   const [searchParams, setSearchParams] = useSearchParams()
   const [isAccountVerified, setIsAccountVerified] = useState(false)
   const [magicLinkSent, setMagicLinkSent] = useState(false)
@@ -29,19 +28,9 @@ export default function Login() {
     trpc.auth.login.mutationOptions({
       onSuccess: () => {
         setMagicLinkSent(true)
-        show({
-          variant: 'success',
-          title: t('login.success')
-        })
+        toast.success(t('login.success'))
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('login.error.title'),
-          description: error.message
-        })
-      }
+      onError: (error) => toast.error(t('login.error.title'), { description: error.message })
     })
   )
 
@@ -109,9 +98,7 @@ export default function Login() {
       } catch (error) {
         console.error('Error parsing access token:', error)
         setIsVerifyingOTP(false)
-        show({
-          variant: 'destructive',
-          title: t('login.error.invalid_magic_link'),
+        toast.error(t('login.error.invalid_magic_link'), {
           description: 'Failed to parse authentication tokens'
         })
       }
@@ -137,7 +124,7 @@ export default function Login() {
       const destination = redirectTo ? new URL(redirectTo).pathname : '/onboarding'
       navigate(destination)
     }
-  }, [searchParams, setSearchParams, updateUserInfo, navigate, show, t])
+  }, [searchParams, setSearchParams, updateUserInfo, navigate, t])
 
   if (isVerifyingOTP) {
     return (

@@ -10,7 +10,6 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { Button, buttonVariants } from '@/components/ui/button'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { cn } from '@/lib/utils'
 import type { Area } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
@@ -18,6 +17,7 @@ import { useMutation } from '@tanstack/react-query'
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 
 interface Props {
   area: Area
@@ -26,24 +26,17 @@ interface Props {
 
 export const ConfirmDeleteAreaDialog = ({ area, onDeleteSuccess }: Props) => {
   const { t } = useTranslation()
-  const { show } = useSnackbar()
   const [open, setOpen] = useState(false)
 
   const deleteMutation = useMutation(
     trpc.areas.delete.mutationOptions({
       onSuccess: () => {
-        show({ variant: 'success', title: t('areas.success.delete') })
+        toast.success(t('areas.success.delete'))
         queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })
         setOpen(false)
         onDeleteSuccess()
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('areas.error.internal.delete')
-        })
-      }
+      onError: (error) => toast.error(t('areas.error.internal.delete'), { description: error.message })
     })
   )
 

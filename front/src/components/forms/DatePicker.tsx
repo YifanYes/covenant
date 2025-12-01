@@ -177,7 +177,6 @@ export default function DatePicker({
           placeholder={effectivePlaceholder}
           className={cn(
             'bg-background hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 pr-10 transition-all duration-200',
-            required && 'placeholder:text-destructive',
             errorMessage && 'border-destructive'
           )}
           onChange={handleInputChange}

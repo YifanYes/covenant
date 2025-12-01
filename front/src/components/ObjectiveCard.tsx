@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import type { Objective } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -18,6 +17,7 @@ import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { z } from 'zod'
 import AreaBadge from './AreaBadge'
 import { ConfirmDeleteObjectiveDialog } from './dialogs/ConfirmDeleteObjectiveDialog'
@@ -30,24 +30,17 @@ import { Textarea } from './ui/textarea'
 export default function ObjectiveCard({ objective }: { objective: Objective }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const { show } = useSnackbar()
 
   const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
 
   const updateMutation = useMutation(
     trpc.objectives.update.mutationOptions({
       onSuccess: () => {
-        show({ variant: 'success', title: t('objectives.update.success') })
+        toast.success(t('objectives.update.success'))
         queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })
         setOpen(false)
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('objectives.update.error')
-        })
-      }
+      onError: (error) => toast.error(t('objectives.update.error'), { description: error.message })
     })
   )
 

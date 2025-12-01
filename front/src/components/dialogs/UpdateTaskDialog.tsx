@@ -9,7 +9,6 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -20,6 +19,7 @@ import { isNil, isUndefined, map } from 'es-toolkit/compat'
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { z } from 'zod'
 import LoaderButton from '../LoaderButton'
 import DatePicker from '../forms/DatePicker'
@@ -30,7 +30,6 @@ import { Textarea } from '../ui/textarea'
 
 export const UpdateTaskDialog = () => {
   const { t } = useTranslation()
-  const { show } = useSnackbar()
   const { monthIndex } = useCalendarStore()
   const { selectedTask, setSelectedTask } = useTasksStore()
   const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
@@ -38,7 +37,7 @@ export const UpdateTaskDialog = () => {
   const updateMutation = useMutation(
     trpc.tasks.update.mutationOptions({
       onSuccess: async () => {
-        show({ variant: 'success', title: t('tasks.success.update') })
+        toast.success(t('tasks.success.update'))
         await queryClient.invalidateQueries({
           queryKey: trpc.tasks.getByDate.queryKey({
             monthIndex: monthIndex.toString(),
@@ -48,20 +47,14 @@ export const UpdateTaskDialog = () => {
         await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
         setSelectedTask(undefined)
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('tasks.error.internal.update')
-        })
-      }
+      onError: (error) => toast.error(t('tasks.error.internal.update'), { description: error.message })
     })
   )
 
   const deleteMutation = useMutation(
     trpc.tasks.delete.mutationOptions({
       onSuccess: async () => {
-        show({ variant: 'success', title: t('tasks.success.delete') })
+        toast.success(t('tasks.success.delete'))
         await queryClient.invalidateQueries({
           queryKey: trpc.tasks.getByDate.queryKey({
             monthIndex: monthIndex.toString(),
@@ -71,13 +64,7 @@ export const UpdateTaskDialog = () => {
         await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
         setSelectedTask(undefined)
       },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('tasks.error.internal.delete')
-        })
-      }
+      onError: (error) => toast.error(t('tasks.error.internal.delete'), { description: error.message })
     })
   )
 

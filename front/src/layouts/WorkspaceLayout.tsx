@@ -1,5 +1,5 @@
 import { AppSidebar } from '@/components/AppSidebar'
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { SidebarProvider } from '@/components/ui/sidebar'
 import { Outlet } from 'react-router'
 
 export default function WorkspaceLayout() {
@@ -7,7 +7,6 @@ export default function WorkspaceLayout() {
     <SidebarProvider>
       <AppSidebar />
       <main className='flex-1 p-2'>
-        <SidebarTrigger className='dark:hover:bg-accent' />
         <Outlet />
       </main>
     </SidebarProvider>

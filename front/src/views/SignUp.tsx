@@ -1,7 +1,6 @@
 import Link from '@/components/Link'
 import LoaderButton from '@/components/LoaderButton'
 import TextInput from '@/components/forms/TextInput'
-import { useSnackbar } from '@/hooks/use-snackbar'
 import { trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { signUpSchema, type SignUpType } from '@shared/schemas/auth.schemas'
@@ -10,26 +9,17 @@ import { MailCheck } from 'lucide-react'
 import { useState, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 
 export const SignUp: FC = () => {
   const { t } = useTranslation()
-  const { show } = useSnackbar()
 
   const [isSigned, setIsSigned] = useState(false)
 
   const signUpMutation = useMutation(
     trpc.auth.signUp.mutationOptions({
-      onSuccess: () => {
-        setIsSigned(true)
-      },
-      onError: (error) => {
-        console.log(error)
-        show({
-          variant: 'destructive',
-          title: t('sign_up.error.title'),
-          description: error.message
-        })
-      }
+      onSuccess: () => setIsSigned(true),
+      onError: (error) => toast.error(t('sign_up.error.title'), { description: error.message })
     })
   )
 
