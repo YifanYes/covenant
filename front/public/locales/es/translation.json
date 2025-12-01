@@ -97,6 +97,7 @@
     "description": "Modal para crear una nueva tarea",
     "description_placeholder": "Descripción de la tarea",
     "due_date_placeholder": "Fecha de entrega (opcional)",
+    "objectives_placeholder": "Objetivos asociados",
     "title": "Crear nueva tarea",
     "title_placeholder": "Título de la tarea"
   },
@@ -306,6 +307,7 @@
     "description": "Modal para actualizar una tarea",
     "description_placeholder": "Descripción de la tarea",
     "due_date_placeholder": "Fecha de entrega (opcional)",
+    "objectives_placeholder": "Objetivos asociados",
     "onboarding": {
       "button": "Comenzar tu viaje",
       "class_label": "Elige tu clase",
