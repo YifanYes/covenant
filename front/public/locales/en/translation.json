@@ -158,6 +158,10 @@
     "title": "Inventory",
     "wisdom": "Wisdom"
   },
+  "languages": {
+    "en": "English",
+    "es": "Spanish"
+  },
   "login": {
     "account_verified": {
       "description": "You can now log in with your credentials.",
@@ -227,7 +231,11 @@
   },
   "save_changes": "Save changes",
   "settings": {
+    "default_tasks_view_label": "Default Tasks View",
+    "default_tasks_view_placeholder": "Select default view",
     "email_label": "Email",
+    "language_label": "Language",
+    "language_placeholder": "Select language",
     "theme_dark": "Dark",
     "theme_label": "Theme",
     "theme_light": "Light",
