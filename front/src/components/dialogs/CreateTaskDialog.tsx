@@ -14,7 +14,7 @@ import { useSnackbar } from '@/hooks/use-snackbar'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createTaskSchema, TaskStatus, type CreateTaskType } from '@shared/schemas/tasks.schemas'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
@@ -22,6 +22,7 @@ import { Controller, useForm, type Resolver } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import LoaderButton from '../LoaderButton'
 import DatePicker from '../forms/DatePicker'
+import MultiSelect from '../forms/MultiSelect'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
 
@@ -30,6 +31,7 @@ export const CreateTaskDialog = () => {
   const [open, setOpen] = useState(false)
   const { show } = useSnackbar()
   const { monthIndex } = useCalendarStore()
+  const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
 
   const mutation = useMutation(
     trpc.tasks.create.mutationOptions({
@@ -68,7 +70,8 @@ export const CreateTaskDialog = () => {
       title: '',
       description: '',
       status: TaskStatus.TODO,
-      dueDate: undefined
+      dueDate: undefined,
+      objectives: []
     }
   })
 
@@ -125,6 +128,14 @@ export const CreateTaskDialog = () => {
                   placeholder={t('create_task_dialog.due_date_placeholder')}
                 />
               )}
+            />
+          </div>
+          <div className='grid gap-3'>
+            <MultiSelect
+              name='objectives'
+              control={control}
+              items={objectivesData?.objectives.map(({ id, name: label }) => ({ id, label })) || []}
+              placeholder={t('create_task_dialog.objectives_placeholder')}
             />
           </div>
         </div>
