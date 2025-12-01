@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { useDebouncedMutation } from '@/hooks/use-debounced-mutation'
 import { useTasksStore } from '@/hooks/use-tasks-store'
+import { useUserPreferencesStore } from '@/hooks/use-user-preferences-store'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -20,6 +21,7 @@ const Tasks = () => {
   const { data } = useSuspenseQuery(trpc.tasks.getAll.queryOptions())
   const { tasks, setTasks } = useTasksStore()
   const { monthIndex } = useCalendarStore()
+  const { defaultTasksView } = useUserPreferencesStore()
 
   const reorderMutation = useDebouncedMutation(
     trpc.tasks.bulkUpdate.mutationOptions({
@@ -41,7 +43,7 @@ const Tasks = () => {
 
   return (
     <div className='min-h-screen w-full p-6'>
-      <Tabs defaultValue='list' className='w-full'>
+      <Tabs defaultValue={defaultTasksView} className='w-full'>
         <div className='mb-6 flex flex-row items-center justify-between gap-4'>
           <h1 className='text-2xl font-semibold'>{t('tasks.title')}</h1>
           <div className='flex items-center gap-4'>
