@@ -2,4 +2,3 @@
 **/bun.lock
 **/bruno/ARQ/environments
 .DS_Store
-package-lock.json
