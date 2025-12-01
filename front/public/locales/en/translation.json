@@ -107,6 +107,7 @@
     "description": "Modal to create a new task",
     "description_placeholder": "Task description",
     "due_date_placeholder": "Due date (optional)",
+    "objectives_placeholder": "Associated objectives",
     "title": "Create new task",
     "title_placeholder": "Task title"
   },
@@ -312,6 +313,7 @@
     "description": "Modal to update a task",
     "description_placeholder": "Task description",
     "due_date_placeholder": "Due date (optional)",
+    "objectives_placeholder": "Associated objectives",
     "status_placeholder": "Task status",
     "title": "Update task",
     "title_placeholder": "Task title"
