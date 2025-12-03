@@ -8,18 +8,18 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
+import { allIcons, areaSimpleStyles } from '@/types/constants.types'
 import type { Objective } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { format } from 'date-fns'
+import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import AreaBadge from './AreaBadge'
 import { ConfirmDeleteObjectiveDialog } from './dialogs/ConfirmDeleteObjectiveDialog'
 import DatePicker from './forms/DatePicker'
 import MultiSelect from './forms/MultiSelect'
@@ -86,23 +86,32 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <div className='w-full cursor-pointer rounded-xl p-4 shadow-sm transition-shadow hover:shadow-md'>
-          <div className='pb-2'>
-            <h4 className='text-base leading-tight font-semibold'>{objective.name}</h4>
-          </div>
-          <div className='space-y-0.5 py-0 pb-2'>
-            {objective.description && (
-              <p className='text-muted-foreground truncate text-sm leading-snug'>{objective.description}</p>
+        <div className='group border-foreground/20 bg-background hover:border-primary hover:bg-accent/30 w-full cursor-pointer rounded-lg border-2 p-4 transition-all duration-200 hover:scale-[1.02]'>
+          <div className='flex items-start justify-between gap-6'>
+            <div className='flex flex-1 flex-col gap-1'>
+              <h4 className='text-sm leading-tight font-semibold'>{objective.name}</h4>
+              <div className='text-muted-foreground text-xs'>
+                {objective.dueDate ? dayjs(objective.dueDate).format('L') : t('objectives.no_date')}
+              </div>
+            </div>
+            {objective.areas && objective.areas.length > 0 && (
+              <div className='flex shrink-0 gap-2'>
+                {objective.areas.map((area) => {
+                  const areaStyle = areaSimpleStyles.find((defaultArea) => defaultArea.color === area.color)
+                  const currentIcon = allIcons.find((icon) => icon.name === area.icon)
+                  if (!areaStyle || !currentIcon) return null
+                  return (
+                    <div key={area.id} title={t(area.name)}>
+                      <currentIcon.component className={`size-4 ${areaStyle.styles}`} />
+                    </div>
+                  )
+                })}
+              </div>
             )}
-            {objective.dueDate && (
-              <div className='text-muted-foreground text-xs'>{format(new Date(objective.dueDate), 'PPP')}</div>
-            )}
           </div>
-          <div className='flex flex-wrap gap-1 pt-0'>
-            {objective.areas?.map((area) => (
-              <AreaBadge key={area.id} area={area} />
-            ))}
-          </div>
+          {objective.description && (
+            <p className='text-muted-foreground mt-4 line-clamp-2 text-sm leading-relaxed'>{objective.description}</p>
+          )}
         </div>
       </DialogTrigger>
 
