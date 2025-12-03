@@ -419,3 +419,82 @@ export const areaStyles = [
       'dark:text-slate-700 dark:border-slate-700 dark:bg-slate-200 dark:hover:text-slate-600 dark:hover:border-slate-600 dark:hover:bg-slate-100 text-slate-600 border-slate-600 bg-slate-100 hover:text-slate-700 hover:border-slate-700 hover:bg-slate-200'
   }
 ]
+
+export const areaSimpleStyles = [
+  {
+    color: 'green',
+    styles: 'dark:text-green-300 text-green-600'
+  },
+  {
+    color: 'purple',
+    styles: 'dark:text-purple-300 text-purple-600'
+  },
+  {
+    color: 'orange',
+    styles: 'dark:text-orange-300 text-orange-600'
+  },
+  {
+    color: 'red',
+    styles: 'dark:text-red-300 text-red-600'
+  },
+  {
+    color: 'blue',
+    styles: 'dark:text-blue-300 text-blue-600'
+  },
+  {
+    color: 'yellow',
+    styles: 'dark:text-yellow-300 text-yellow-600'
+  },
+  {
+    color: 'teal',
+    styles: 'dark:text-teal-300 text-teal-600'
+  },
+  {
+    color: 'pink',
+    styles: 'dark:text-pink-300 text-pink-600'
+  },
+  {
+    color: 'cyan',
+    styles: 'dark:text-cyan-300 text-cyan-600'
+  },
+  {
+    color: 'indigo',
+    styles: 'dark:text-indigo-300 text-indigo-600'
+  },
+  {
+    color: 'violet',
+    styles: 'dark:text-violet-300 text-violet-600'
+  },
+  {
+    color: 'gray',
+    styles: 'dark:text-gray-300 text-gray-600'
+  },
+  {
+    color: 'black',
+    styles: 'dark:text-black-300 text-black-600'
+  },
+  {
+    color: 'white',
+    styles: 'dark:text-white-300 text-white-600'
+  },
+  {
+    color: 'lime',
+    styles: 'dark:text-lime-300 text-lime-600'
+  },
+  {
+    color: 'rose',
+    styles: 'dark:text-rose-300 text-rose-600'
+  },
+  {
+    color: 'amber',
+    styles: 'dark:text-amber-300 text-amber-600'
+  },
+  {
+    color: 'sky',
+    styles: 'dark:text-sky-300 text-sky-600'
+  },
+  {
+    color: 'slate',
+    styles: 'dark:text-slate-300 text-slate-600'
+  }
+]
