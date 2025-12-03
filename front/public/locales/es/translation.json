@@ -187,6 +187,7 @@
       "success": "Objetivo eliminado exitosamente",
       "title": "Eliminar objetivo"
     },
+    "no_date": "Sin fecha",
     "title": "Objetivos",
     "update": {
       "error": "Ha ocurrido un error al actualizar el objetivo",
