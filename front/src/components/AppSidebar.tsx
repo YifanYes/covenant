@@ -57,8 +57,18 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible='icon'>
       <SidebarHeader>
-        <img src='/logo.png' alt='logo' width={120} className='p-2 pt-4 group-data-[collapsible=icon]:hidden' />
-        <img src='/favicon.ico' alt='logo' width={40} className='hidden p-2 pt-4 group-data-[collapsible=icon]:block' />
+        <div className='relative flex h-12 items-center justify-center px-2 pt-2 group-data-[collapsible=icon]:px-0'>
+          <img
+            src='/logo.png'
+            alt='logo'
+            className='absolute top-2 left-2 h-8 w-auto object-contain transition-opacity duration-200 group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0'
+          />
+          <img
+            src='/favicon.ico'
+            alt='logo'
+            className='absolute top-1/2 left-1/2 h-10 w-auto -translate-x-1/2 -translate-y-1/2 object-contain opacity-0 brightness-75 grayscale transition-opacity duration-200 group-data-[collapsible=icon]:pointer-events-auto group-data-[collapsible=icon]:opacity-100'
+          />
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

@@ -1,11 +1,13 @@
 import LoaderButton from '@/components/LoaderButton'
 import TextInput from '@/components/forms/TextInput'
 import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { CharacterClassName } from '@shared/constants/classes'
 import { createCharacterSchema, type CreateCharacterType } from '@shared/schemas/character.schemas'
 import { useMutation } from '@tanstack/react-query'
+import { Check } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
@@ -47,12 +49,12 @@ export default function Onboarding() {
   return (
     <div className='flex min-h-screen w-full items-center justify-center p-4'>
       <div className='flex w-full max-w-md flex-col gap-6'>
-        <div>
-          <h2>{t('onboarding.title')}</h2>
-          <p className='text-muted-foreground'>{t('onboarding.subtitle')}</p>
+        <div className='mb-6 flex flex-col gap-2'>
+          <h2 className='text-2xl font-bold'>{t('onboarding.title')}</h2>
+          <p className='text-muted-foreground text-sm'>{t('onboarding.subtitle')}</p>
         </div>
 
-        <div className='grid gap-4'>
+        <div className='grid gap-8'>
           <div className='grid gap-2'>
             <Label htmlFor='name'>{t('onboarding.name_label')}</Label>
             <TextInput
@@ -62,6 +64,7 @@ export default function Onboarding() {
               {...register('name')}
               {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
               required
+              className='hover:bg-primary/20 hover:text-primary hover:border-primary dark:hover:bg-primary/20'
             />
           </div>
 
@@ -75,15 +78,27 @@ export default function Onboarding() {
                   {Object.values(CharacterClassName).map((className) => (
                     <label
                       key={className}
-                      className='hover:bg-accent flex cursor-pointer items-start space-y-0 space-x-3 rounded-md border p-4'
+                      className={cn(
+                        'border-input hover:text-primary hover:border-primary flex cursor-pointer items-center gap-3.5 rounded-md border p-4 shadow-xs transition-all duration-200',
+                        field.value === className
+                          ? 'bg-primary/10 border-primary text-primary hover:bg-primary/20 dark:hover:bg-primary/20'
+                          : 'dark:bg-input/30 hover:bg-primary/5 dark:hover:bg-primary/5 bg-transparent'
+                      )}
                     >
                       <input
                         type='radio'
                         value={className}
                         checked={field.value === className}
                         onChange={(e) => field.onChange(e.target.value)}
-                        className='mt-0.5'
+                        className='sr-only'
                       />
+                      <span className='flex h-4 w-4 items-center justify-center'>
+                        {field.value === className ? (
+                          <Check className='h-4 w-4' />
+                        ) : (
+                          <div className='bg-muted-foreground h-1.5 w-1.5 rounded-full' />
+                        )}
+                      </span>
                       <div className='flex-1'>
                         <div className='font-medium'>{t(`classes.${className}.name`)}</div>
                         <p className='text-muted-foreground text-sm'>{t(`classes.${className}.description`)}</p>
