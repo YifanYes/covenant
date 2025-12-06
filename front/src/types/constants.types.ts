@@ -303,13 +303,9 @@ export const iconCollection: Record<Exclude<IconCategoryKey, 'all'>, Icon[]> = {
   weather: [
     { name: 'Sun', component: Sun },
     { name: 'Cloud', component: Cloud },
-    { name: 'Cloud', component: Cloud },
     { name: 'Zap', component: Zap },
-    { name: 'Sun', component: Sun },
-    { name: 'Cloud', component: Cloud },
     { name: 'Drop', component: Drop },
     { name: 'Wind', component: Wind },
-    { name: 'Sun', component: Sun },
     { name: 'Battery', component: Battery },
     { name: 'Map', component: Map }
   ]
