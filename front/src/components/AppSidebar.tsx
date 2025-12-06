@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   SidebarTrigger
 } from '@/components/ui/sidebar'
-import { Backpack, BookCheck, LayoutDashboard, List, Settings, Trophy } from 'lucide-react'
+import { BookOpen, Dashboard, List, Luggage, Sliders, Trophy } from '@nsmr/pixelart-react'
 import { useTranslation } from 'react-i18next'
 import { Separator } from './ui/separator'
 
@@ -22,7 +22,7 @@ export function AppSidebar() {
       {
         title: t('sidebar.dashboard'),
         url: '/dashboard',
-        icon: LayoutDashboard
+        icon: Dashboard
       },
       {
         title: t('sidebar.objectives'),
@@ -37,19 +37,19 @@ export function AppSidebar() {
       {
         title: t('sidebar.habits'),
         url: '/habits',
-        icon: BookCheck
+        icon: BookOpen
       },
       {
         title: t('sidebar.inventory'),
         url: '/inventory',
-        icon: Backpack
+        icon: Luggage
       }
     ],
     settings: [
       {
         title: t('sidebar.settings'),
         url: '/settings',
-        icon: Settings
+        icon: Sliders
       }
     ]
   }

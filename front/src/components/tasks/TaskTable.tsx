@@ -4,11 +4,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import type { Task } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
+import { Close } from '@nsmr/pixelart-react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { flatten, values as getValues, filter as lodashFilter, map } from 'es-toolkit/compat'
-import { X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -106,7 +106,7 @@ export default function TasksTable() {
           />
           {hasActiveFilters && (
             <Button variant='outline' size='sm' onClick={clearFilters}>
-              <X className='mr-2 h-4 w-4' />
+              <Close className='mr-2 h-4 w-4' />
               {t('tasks.filters.clear')}
             </Button>
           )}

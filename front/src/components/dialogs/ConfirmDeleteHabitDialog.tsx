@@ -12,8 +12,8 @@ import {
 import { Button } from '@/components/ui/button'
 import type { Habit } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
+import { Trash } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
-import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -45,7 +45,7 @@ export const ConfirmDeleteHabitDialog = ({ habit, onDeleteSuccess }: { habit: Ha
           disabled={deleteMutation.isPending}
           className='text-destructive hover:text-foreground hover:bg-foreground/10 mr-auto h-auto'
         >
-          <Trash2 className='mr-2 h-4 w-4' />
+          <Trash className='mr-2 h-4 w-4' />
           {t('delete')}
         </Button>
       </AlertDialogTrigger>
