@@ -14,8 +14,7 @@ export const createTaskSchema = z.object({
   order: z.number().int().min(0).optional(),
   dueDate: z
     .date()
-    .nullable()
-    .optional()
+    .nullish()
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
   objectives: z.array(z.uuid()).optional()
 })
@@ -24,9 +23,9 @@ export type CreateTaskType = z.infer<typeof createTaskSchema>
 export const updateTaskSchema = z.object({
   id: z.uuid(),
   title: z.string().min(1, 'errors.required_field'),
-  description: z.string().optional().nullable(),
+  description: z.string().nullish(),
   status: z.string().optional(),
-  color: z.string().optional().nullable(),
+  color: z.string().nullish(),
   order: z.number().int().min(0).optional(),
   dueDate: z
     .date()
