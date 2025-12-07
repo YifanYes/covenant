@@ -119,9 +119,10 @@
       }
     },
     "success": {
-      "complete": "Hábito completado exitosamente",
       "create": "Hábito creado exitosamente",
       "delete": "Hábito eliminado exitosamente",
+      "progress": "Progreso de hábito registrado exitosamente",
+      "target_met": "¡Hábito completado exitosamente! ¡Buen trabajo!",
       "update": "Hábito actualizado exitosamente"
     },
     "timespan": {
