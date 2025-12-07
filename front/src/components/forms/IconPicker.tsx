@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/utils'
 import { allIcons, iconCategories, iconCollection, type Icon, type IconCategoryKey } from '@/types/constants.types'
-import { ChevronDown, Search, X } from 'lucide-react'
+import { ChevronDown, Close, Search } from '@nsmr/pixelart-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../ui/button'
@@ -167,7 +167,7 @@ export default function IconPicker({
               handleClear()
             }}
           >
-            <X className='h-full w-full' />
+            <Close className='h-full w-full [&_svg]:size-full [&_svg]:fill-current' />
           </button>
         )}
       </div>

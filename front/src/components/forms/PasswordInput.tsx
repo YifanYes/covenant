@@ -1,6 +1,6 @@
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/utils'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeClosed } from '@nsmr/pixelart-react'
 import { useState, type ComponentProps } from 'react'
 import { Button } from '../ui/button'
 import FormField from './FormField'
@@ -52,7 +52,7 @@ export default function PasswordInput({
           {showPassword ? (
             <Eye className='h-4 w-4' aria-hidden='true' />
           ) : (
-            <EyeOff className='h-4 w-4' aria-hidden='true' />
+            <EyeClosed className='h-4 w-4' aria-hidden='true' />
           )}
         </Button>
       </div>

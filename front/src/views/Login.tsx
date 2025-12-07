@@ -1,12 +1,12 @@
 import Link from '@/components/Link'
 import LoaderButton from '@/components/LoaderButton'
 import TextInput from '@/components/forms/TextInput'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Alert as AlertComponent, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { Alert, Check, Mail } from '@nsmr/pixelart-react'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
 import { useMutation } from '@tanstack/react-query'
-import { AlertCircle, CheckCircle, Mail } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -130,11 +130,11 @@ export default function Login() {
     return (
       <div className='flex w-md flex-col gap-2.5'>
         <h2>{t('login.verifying_title')}</h2>
-        <Alert>
+        <AlertComponent>
           <Mail />
           <AlertTitle>{t('login.verifying_magic_link')}</AlertTitle>
           <AlertDescription>{t('login.verifying_description')}</AlertDescription>
-        </Alert>
+        </AlertComponent>
       </div>
     )
   }
@@ -143,11 +143,11 @@ export default function Login() {
     return (
       <div className='flex w-md flex-col gap-2.5'>
         <h2>{t('login.check_email_title')}</h2>
-        <Alert variant='success'>
+        <AlertComponent variant='success'>
           <Mail />
           <AlertTitle>{t('login.magic_link_sent_title')}</AlertTitle>
           <AlertDescription>{t('login.magic_link_sent_description')}</AlertDescription>
-        </Alert>
+        </AlertComponent>
       </div>
     )
   }
@@ -156,18 +156,18 @@ export default function Login() {
     <div className='flex w-md flex-col gap-2.5'>
       <h2>{t('login.title')}</h2>
       {isAccountVerified && (
-        <Alert variant='success'>
-          <CheckCircle />
+        <AlertComponent variant='success'>
+          <Check />
           <AlertTitle>{t('login.account_verified.title')}</AlertTitle>
           <AlertDescription>{t('login.account_verified.description')}</AlertDescription>
-        </Alert>
+        </AlertComponent>
       )}
       {magicLinkError && (
-        <Alert variant='destructive'>
-          <AlertCircle />
+        <AlertComponent variant='destructive'>
+          <Alert />
           <AlertTitle>{t('login.error.magic_link_error')}</AlertTitle>
           <AlertDescription>{magicLinkError}</AlertDescription>
-        </Alert>
+        </AlertComponent>
       )}
       <TextInput
         type='email'

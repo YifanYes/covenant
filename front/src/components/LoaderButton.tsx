@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Loader2Icon } from 'lucide-react'
+import { Loader } from '@nsmr/pixelart-react'
 
 export default function LoaderButton({
   disabled,
@@ -22,7 +22,7 @@ export default function LoaderButton({
       className={`${className || ''}`}
       aria-busy={isLoading}
     >
-      {isLoading && <Loader2Icon className='animate-spin' />}
+      {isLoading && <Loader className='animate-spin' />}
       {label}
     </Button>
   )

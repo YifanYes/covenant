@@ -1,6 +1,6 @@
 import { useCalendarStore } from '@/hooks/use-calendar-store'
+import { ChevronLeft, ChevronRight } from '@nsmr/pixelart-react'
 import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { CreateTaskDialog } from '../dialogs/CreateTaskDialog'
 import { Button } from '../ui/button'
