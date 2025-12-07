@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { Plus } from '@nsmr/pixelart-react'
 import { useTranslation } from 'react-i18next'
 import TaskSkeleton from '../skeletons/TaskSkeleton'
 import { Button } from '../ui/button'

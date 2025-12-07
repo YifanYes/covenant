@@ -1,6 +1,6 @@
 import { useFormField } from '@/hooks/use-form-field'
 import { cn, truncateText } from '@/lib/utils'
-import { Check, ChevronDown } from 'lucide-react'
+import { Check, ChevronDown } from '@nsmr/pixelart-react'
 import { useEffect, useRef, useState } from 'react'
 import { type Control, Controller } from 'react-hook-form'
 import FormField from './FormField'

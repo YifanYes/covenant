@@ -1,10 +1,10 @@
-import { Calendar } from '@/components/ui/calendar'
+import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/utils'
+import { Calendar } from '@nsmr/pixelart-react'
 import { enUS } from 'date-fns/locale'
-import { CalendarIcon } from 'lucide-react'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import FormField from './FormField'
 
@@ -192,11 +192,11 @@ export default function DatePicker({
                 'dark:bg-input/30 h-auto rounded-md border bg-transparent px-3 transition-all duration-200'
               )}
             >
-              <CalendarIcon className='h-4 w-4' />
+              <Calendar className='h-4 w-4' />
             </button>
           </PopoverTrigger>
           <PopoverContent className='w-auto p-0' align='start' alignOffset={-8} sideOffset={8}>
-            <Calendar
+            <CalendarComponent
               mode='single'
               selected={value || undefined}
               onSelect={handleDateSelect}
