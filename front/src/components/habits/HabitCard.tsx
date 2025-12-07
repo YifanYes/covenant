@@ -25,7 +25,6 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
     )
 
     const calendarDays = useMemo(() => {
-      const days = []
       const completionCounts = new Map<string, number>()
 
       completions.forEach((c) => {
@@ -33,25 +32,27 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
         completionCounts.set(dateStr, (completionCounts.get(dateStr) || 0) + 1)
       })
 
-      for (let i = 35; i >= 0; i--) {
-        const date = dayjs().subtract(i, 'day')
+      return Array.from({ length: 36 }).map((_, i) => {
+        const date = dayjs().subtract(35 - i, 'day')
         const count = completionCounts.get(date.format('L')) || 0
-        const isFuture = date.isAfter(dayjs())
-        days.push({ date, count, isFuture })
-      }
-
-      return days
-    }, [completions])
-
-    const handleMarkComplete = (e: React.MouseEvent) => {
-      e.stopPropagation()
-      createCompletion.mutate({ id })
-    }
+        return {
+          date: date.format('L'),
+          count,
+          style: count > 0 ? { opacity: Math.max(0.3, Math.min(count / recurrence, 1)) } : {},
+          background: date.isAfter(dayjs(), 'day') ? 'bg-muted/10' : count > 0 ? 'bg-primary' : 'bg-muted/30'
+        }
+      })
+    }, [completions, recurrence])
 
     const { completionsToday, isTodayCompleted } = useMemo(() => {
       const todayCompletions = completions.filter((c) => dayjs(c.completedAt).isSame(dayjs(), 'day'))
       return { completionsToday: todayCompletions.length, isTodayCompleted: todayCompletions.length >= recurrence }
     }, [completions, recurrence])
+
+    const handleMarkComplete = (e: React.MouseEvent) => {
+      e.stopPropagation()
+      createCompletion.mutate({ id })
+    }
 
     return (
       <div ref={ref} {...props} className='cursor-pointer rounded-lg border p-3'>
@@ -100,33 +101,16 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
 
         <div className='mt-4'>
           <div className='grid grid-cols-9 gap-1'>
-            {calendarDays.map((day, index) => {
-              const ratio = Math.min(day.count / recurrence, 1)
-              const opacity = day.count > 0 ? Math.max(0.3, ratio) : 0
-
-              let bgStyle = {}
-              let className = 'bg-muted/30'
-
-              if (day.isFuture) {
-                className = 'bg-muted/10'
-              } else if (day.count > 0) {
-                className = 'bg-primary'
-                bgStyle = { opacity }
-              }
-
-              return (
-                <div
-                  key={index}
-                  className='relative flex aspect-square items-center justify-center overflow-hidden rounded-sm'
-                  title={`${day.date.format('L')}: ${day.count}`}
-                >
-                  <div className={`absolute inset-0 ${className}`} style={bgStyle} />
-                  {day.count > 1 && (
-                    <span className='text-background relative z-10 text-xs font-bold'>+{day.count}</span>
-                  )}
-                </div>
-              )
-            })}
+            {calendarDays.map(({ date, count, background, style }, index) => (
+              <div
+                key={index}
+                className='relative flex aspect-square items-center justify-center overflow-hidden rounded-sm'
+                title={`${date}: ${count}`}
+              >
+                <div className={`absolute inset-0 ${background}`} style={style} />
+                {count > 1 && <span className='text-background relative z-10 text-xs font-bold'>+{count}</span>}
+              </div>
+            ))}
           </div>
         </div>
       </div>
