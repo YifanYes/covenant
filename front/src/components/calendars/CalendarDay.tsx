@@ -1,6 +1,8 @@
 import { cn } from '@/lib/utils'
+import { colorOptions } from '@/types/constants.types'
 import type { Task } from '@/types/models.types'
 import dayjs from 'dayjs'
+import { useTranslation } from 'react-i18next'
 
 interface CalendarDayProps {
   day: dayjs.Dayjs
@@ -8,7 +10,13 @@ interface CalendarDayProps {
   tasks: Task[]
 }
 
+const getTextClass = (color: string | null | undefined) => {
+  const colorOption = colorOptions.find((opt) => opt.color === color)
+  return colorOption?.text ?? 'text-white'
+}
+
 export default function CalendarDay({ day, weekIndex, tasks }: CalendarDayProps) {
+  const { t } = useTranslation()
   const dayTasks = tasks.filter((task) => dayjs(task.dueDate).isSame(day, 'day'))
 
   const getCurrentDayClass = () =>
@@ -21,11 +29,20 @@ export default function CalendarDay({ day, weekIndex, tasks }: CalendarDayProps)
         <p className={cn('my-1 p-1 text-center text-sm', getCurrentDayClass())}>{day.format('D')}</p>
       </header>
       <div className='flex flex-col gap-1 p-1'>
-        {dayTasks.map((task) => (
-          <span key={task.id} className='text-muted-foreground truncate text-xs'>
+        {dayTasks.slice(0, 3).map((task) => (
+          <span
+            key={task.id}
+            className={cn('truncate rounded px-1 text-xs', getTextClass(task.color))}
+            style={{ backgroundColor: task.color || '#3b82f6' }}
+          >
             {task.title}
           </span>
         ))}
+        {dayTasks.length > 3 && (
+          <span className='text-muted-foreground text-xs'>
+            +{dayTasks.length - 3} {t('more')}
+          </span>
+        )}
       </div>
     </div>
   )

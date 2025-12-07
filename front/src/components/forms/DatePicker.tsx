@@ -88,6 +88,18 @@ export default function DatePicker({
     }
   }
 
+  // Track previous value to detect external changes
+  const prevValueRef = useRef<Date | null | undefined>(value)
+
+  // Sync inputValue when value prop changes externally (e.g., when filters are cleared)
+  useEffect(() => {
+    if (prevValueRef.current !== value && !isUserEditing) {
+      setInputValue(formatDate(value || undefined))
+    }
+    prevValueRef.current = value
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
   useEffect(() => {
     if (cursorPosition !== null && inputRef.current) {
       inputRef.current.setSelectionRange(cursorPosition, cursorPosition)

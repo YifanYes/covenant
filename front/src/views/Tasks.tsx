@@ -1,50 +1,20 @@
 import { CreateTaskDialog } from '@/components/dialogs/CreateTaskDialog'
 import { UpdateTaskDialog } from '@/components/dialogs/UpdateTaskDialog'
 import TaskCalendar from '@/components/tasks/TaskCalendar'
-import TaskList from '@/components/tasks/TaskList'
+import TasksListBoard from '@/components/tasks/TasksListBoard'
 import TasksTable from '@/components/tasks/TaskTable'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useCalendarStore } from '@/hooks/use-calendar-store'
-import { useDebouncedMutation } from '@/hooks/use-debounced-mutation'
-import { useTasksStore } from '@/hooks/use-tasks-store'
 import { useUserPreferencesStore } from '@/hooks/use-user-preferences-store'
-import { queryClient, trpc } from '@/utils/trpc.utils'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { isUndefined, keys, map } from 'es-toolkit/compat'
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 
 const Tasks = () => {
   const { t } = useTranslation()
-  const { data } = useSuspenseQuery(trpc.tasks.getAll.queryOptions())
-  const { tasks, setTasks } = useTasksStore()
-  const { monthIndex } = useCalendarStore()
   const { defaultTasksView } = useUserPreferencesStore()
 
-  const reorderMutation = useDebouncedMutation(
-    trpc.tasks.bulkUpdate.mutationOptions({
-      onSuccess: async () =>
-        queryClient.invalidateQueries({
-          queryKey: trpc.tasks.getByDate.queryKey({
-            monthIndex: monthIndex.toString(),
-            year: dayjs().year().toString()
-          })
-        }),
-      onError: (error) => toast.error(t('tasks.error.internal.reorder'), { description: error.message })
-    }),
-    1000
-  )
-
-  useEffect(() => {
-    !isUndefined(data?.tasks) && setTasks(data?.tasks)
-  }, [data, setTasks])
-
   return (
-    <div className='min-h-screen w-full p-6'>
+    <div className='min-h-screen w-full p-2'>
       <Tabs defaultValue={defaultTasksView} className='w-full'>
-        <div className='mb-6 flex flex-row items-center justify-between gap-4'>
+        <div className='flex flex-row items-center justify-between gap-4'>
           <h1 className='text-2xl font-semibold'>{t('tasks.title')}</h1>
           <div className='flex items-center gap-4'>
             <TabsList>
@@ -57,11 +27,7 @@ const Tasks = () => {
         </div>
 
         <TabsContent value='list' className='mt-4'>
-          <div className='flex flex-col gap-4'>
-            {map(keys(tasks), (id) => (
-              <TaskList key={id} id={id} group='tasks' mutation={reorderMutation} />
-            ))}
-          </div>
+          <TasksListBoard />
         </TabsContent>
 
         <TabsContent value='calendar' className='mt-4'>

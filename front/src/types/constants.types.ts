@@ -98,63 +98,78 @@ import {
 export const colorOptions = [
   {
     color: 'green',
-    styles: 'bg-green-500'
+    styles: 'bg-green-500',
+    text: 'text-white'
   },
   {
     color: 'purple',
-    styles: 'bg-purple-500'
+    styles: 'bg-purple-500',
+    text: 'text-white'
   },
   {
     color: 'orange',
-    styles: 'bg-orange-500'
+    styles: 'bg-orange-500',
+    text: 'text-white'
   },
   {
     color: 'red',
-    styles: 'bg-red-500'
+    styles: 'bg-red-500',
+    text: 'text-white'
   },
   {
     color: 'blue',
-    styles: 'bg-blue-500'
+    styles: 'bg-blue-500',
+    text: 'text-white'
   },
   {
     color: 'yellow',
-    styles: 'bg-yellow-500'
+    styles: 'bg-yellow-500',
+    text: 'text-yellow-900'
   },
   {
     color: 'teal',
-    styles: 'bg-teal-500'
+    styles: 'bg-teal-500',
+    text: 'text-white'
   },
   {
     color: 'pink',
-    styles: 'bg-pink-500'
+    styles: 'bg-pink-500',
+    text: 'text-white'
   },
   {
     color: 'cyan',
-    styles: 'bg-cyan-500'
+    styles: 'bg-cyan-500',
+    text: 'text-cyan-900'
   },
   {
     color: 'indigo',
-    styles: 'bg-indigo-500'
+    styles: 'bg-indigo-500',
+    text: 'text-white'
   },
   {
     color: 'lime',
-    styles: 'bg-lime-500'
+    styles: 'bg-lime-500',
+    text: 'text-lime-900'
   },
   {
     color: 'rose',
-    styles: 'bg-rose-500'
+    styles: 'bg-rose-500',
+    text: 'text-white'
   },
   {
     color: 'amber',
-    styles: 'bg-amber-500'
+    styles: 'bg-amber-500',
+    text: 'text-amber-900'
   },
   {
     color: 'sky',
-    styles: 'bg-sky-500'
+    styles: 'bg-sky-500',
+    text: 'text-white'
   },
   {
     color: 'slate',
-    styles: 'bg-slate-500'
+    styles: 'bg-slate-500',
+    text: 'text-white'
   }
 ]
 

@@ -10,6 +10,7 @@ export const createTaskSchema = z.object({
   title: z.string().min(1, 'errors.required_field'),
   description: z.string().optional(),
   status: z.string().min(1, 'errors.required_field'),
+  color: z.string().optional(),
   order: z.number().int().min(0).optional(),
   dueDate: z
     .date()
@@ -25,6 +26,7 @@ export const updateTaskSchema = z.object({
   title: z.string().min(1, 'errors.required_field'),
   description: z.string().optional().nullable(),
   status: z.string().optional(),
+  color: z.string().optional().nullable(),
   order: z.number().int().min(0).optional(),
   dueDate: z
     .date()
