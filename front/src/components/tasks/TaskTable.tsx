@@ -139,7 +139,7 @@ export default function TasksTable() {
               <TableRow
                 key={task.id}
                 className='hover:bg-muted/50 cursor-pointer'
-                onClick={() => setSelectedTask(task)}
+                onClick={() => !updateTaskMutation.isPending && setSelectedTask(task)}
               >
                 <TableCell className='font-medium'>{task.title}</TableCell>
                 <TableCell onClick={(e) => e.stopPropagation() /* Prevent row click when changing status */}>

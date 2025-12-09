@@ -134,7 +134,7 @@ export const colorOptions = [
   {
     color: 'pink',
     styles: 'bg-pink-500',
-    text: 'text-white'
+    text: 'text-black'
   },
   {
     color: 'cyan',
