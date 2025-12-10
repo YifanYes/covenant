@@ -2,10 +2,11 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useTasksStore } from '@/hooks/use-tasks-store'
+import { taskPriorityTypes } from '@/types/constants.types'
 import type { Task } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Close } from '@nsmr/pixelart-react'
-import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
+import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { flatten, values as getValues, isUndefined, filter as lodashFilter, map } from 'es-toolkit/compat'
@@ -22,11 +23,8 @@ const getTaskType = (
   t: (key: string) => string
 ): string => {
   if (!effort || !impact) return '-'
-  if (impact === TaskImpact.HIGH && effort === TaskEffort.LOW) return t('tasks.task_types.quick_win')
-  if (impact === TaskImpact.HIGH && effort === TaskEffort.HIGH) return t('tasks.task_types.major_project')
-  if (impact === TaskImpact.LOW && effort === TaskEffort.LOW) return t('tasks.task_types.fill_in')
-  if (impact === TaskImpact.LOW && effort === TaskEffort.HIGH) return t('tasks.task_types.thankless_task')
-  return '-'
+  const key = taskPriorityTypes[impact]?.[effort]
+  return key ? t(key) : '-'
 }
 
 export default function TasksTable() {
