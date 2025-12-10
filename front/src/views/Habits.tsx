@@ -14,7 +14,7 @@ export default function Habits() {
         <h1 className='text-2xl font-semibold'>{t('habits.title')}</h1>
         <CreateHabitDialog />
       </div>
-      <div className='flex flex-col gap-4 py-2'>
+      <div className='grid grid-cols-1 gap-4 py-2 md:grid-cols-2 lg:grid-cols-3'>
         {data?.habits?.map((habit) => (
           <UpdateHabitDialog key={habit.id} habit={habit} />
         ))}
