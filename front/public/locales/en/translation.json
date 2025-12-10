@@ -190,6 +190,7 @@
     "verifying_magic_link": "Verifying magic link...",
     "verifying_title": "Verifying..."
   },
+  "more": "more",
   "objectives": {
     "add": "Add objective",
     "delete": {
@@ -275,7 +276,9 @@
   },
   "tasks": {
     "add": "Add Task",
+    "color": "Select color",
     "delete": "Delete Task",
+    "empty": "There are no tasks yet",
     "error": {
       "internal": {
         "create": "An error ocurred while creating the task",

@@ -6,7 +6,7 @@ import { Button } from '../ui/button'
 export default function TasksSuspenseFallback() {
   const { t } = useTranslation()
   return (
-    <div className='min-h-screen w-full p-6'>
+    <div className='min-h-screen w-full p-2'>
       <div className='flex flex-row justify-between gap-4'>
         <h1 className='text-2xl font-semibold'>{t('tasks.title')}</h1>
         <Button disabled className='bg-muted h-9 w-30 animate-pulse cursor-not-allowed px-3 py-1'>

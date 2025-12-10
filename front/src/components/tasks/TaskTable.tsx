@@ -6,10 +6,10 @@ import type { Task } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Close } from '@nsmr/pixelart-react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { flatten, values as getValues, filter as lodashFilter, map } from 'es-toolkit/compat'
-import { useMemo, useState } from 'react'
+import { flatten, values as getValues, isUndefined, filter as lodashFilter, map } from 'es-toolkit/compat'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import DatePicker from '../forms/DatePicker'
@@ -17,7 +17,13 @@ import { Button } from '../ui/button'
 
 export default function TasksTable() {
   const { t } = useTranslation()
-  const { tasks } = useTasksStore()
+  const { data } = useSuspenseQuery(trpc.tasks.getAll.queryOptions())
+  const { tasks, setTasks, setSelectedTask } = useTasksStore()
+
+  useEffect(() => {
+    !isUndefined(data?.tasks) && setTasks(data?.tasks)
+  }, [data, setTasks])
+
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [dateFilter, setDateFilter] = useState<Date | null>(null)
@@ -83,10 +89,10 @@ export default function TasksTable() {
             placeholder={t('tasks.filters.search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className='w-[300px]'
+            className='w-[300px] flex-none'
           />
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className='w-[200px]'>
+            <SelectTrigger className='w-[200px] shrink-0'>
               <SelectValue placeholder={t('tasks.filters.status_placeholder')} />
             </SelectTrigger>
             <SelectContent>
@@ -130,16 +136,26 @@ export default function TasksTable() {
             </TableRow>
           ) : (
             map(filteredTasks, (task: Task) => (
-              <TableRow key={task.id}>
+              <TableRow
+                key={task.id}
+                className='hover:bg-muted/50 cursor-pointer'
+                onClick={() => !updateTaskMutation.isPending && setSelectedTask(task)}
+              >
                 <TableCell className='font-medium'>{task.title}</TableCell>
-                <TableCell>
-                  <Select value={task.status} onValueChange={(value) => handleStatusChange(task.id, value)}>
+                <TableCell onClick={(e) => e.stopPropagation() /* Prevent row click when changing status */}>
+                  <Select
+                    value={task.status}
+                    disabled={updateTaskMutation.isPending}
+                    onValueChange={(value) => handleStatusChange(task.id, value)}
+                  >
                     <SelectTrigger className='w-[150px]'>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.values(TaskStatus).map((status) => (
-                        <SelectItem value={status}>{t(`task_status.${status}`)}</SelectItem>
+                        <SelectItem key={status} value={status}>
+                          {t(`task_status.${status}`)}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

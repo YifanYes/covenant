@@ -180,6 +180,7 @@
     "verifying_magic_link": "Verificando enlace mágico...",
     "verifying_title": "Verificando..."
   },
+  "more": "más",
   "objectives": {
     "add": "Añadir objetivo",
     "delete": {
@@ -251,7 +252,9 @@
   },
   "tasks": {
     "add": "Crear tarea",
+    "color": "Selecciona un color",
     "delete": "Eliminar tarea",
+    "empty": "No hay tareas todavía",
     "error": {
       "internal": {
         "create": "Ha ocurrido un error al crear la tarea.",
