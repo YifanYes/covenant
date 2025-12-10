@@ -30,7 +30,10 @@ export default function CalendarDay({ day, weekIndex, tasks }: CalendarDayProps)
             text: 'text-white'
           })
           return (
-            <span key={task.id} className={cn('truncate rounded px-1 text-xs', colorClasses.bg, colorClasses.text)}>
+            <span
+              key={task.id}
+              className={cn('truncate rounded-sm px-1.5 text-xs', colorClasses.bg, colorClasses.text)}
+            >
               {task.title}
             </span>
           )

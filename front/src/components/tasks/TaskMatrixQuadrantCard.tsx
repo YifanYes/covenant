@@ -17,7 +17,7 @@ type MatrixQuadrantCardProps = {
   onTaskClick: (task: Task) => void
 }
 
-export default function MatrixQuadrantCard({ quadrant, t, onTaskClick }: MatrixQuadrantCardProps) {
+export default function TaskMatrixQuadrantCard({ quadrant, t, onTaskClick }: MatrixQuadrantCardProps) {
   return (
     <div className={`flex min-h-[200px] flex-col rounded-lg p-4 ${quadrant.bgColor} ${quadrant.textColor}`}>
       <div className='mb-2'>
@@ -40,7 +40,7 @@ export default function MatrixQuadrantCard({ quadrant, t, onTaskClick }: MatrixQ
                 key={task.id}
                 onClick={() => onTaskClick(task)}
                 className={cn(
-                  'rounded px-2 py-1 text-left text-sm transition-colors',
+                  'pointer cursor-pointer rounded-md px-2 py-1 text-left text-sm transition-colors',
                   hasColor ? [colorClasses.bg, colorClasses.text] : 'hover:bg-white/20'
                 )}
               >
