@@ -28,7 +28,7 @@ export default function TasksListBoard() {
         }),
       onError: (error) => toast.error(t('tasks.error.internal.reorder'), { description: error.message })
     }),
-    1000
+    1400
   )
 
   useEffect(() => {

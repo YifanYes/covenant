@@ -44,7 +44,7 @@ const TaskList = ({ id, group, mutation }: { id: string; group: string; mutation
     const reIndex = (tasks: TaskType[]) => map(tasks, (t, i) => ({ ...t, order: i }))
 
     const from = filter(clone(tasks[formerParentId]), (item) => item.id !== task.id)
-    const to = currentParentId === formerParentId ? from : clone(tasks[currentParentId])
+    const to = currentParentId === formerParentId ? from : clone(tasks[currentParentId] ?? [])
     to.splice(currentIndex, 0, {
       ...task,
       order: currentIndex,
