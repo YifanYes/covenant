@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
-import { colorOptions } from '@/types/constants.types'
 import type { Task } from '@/types/models.types'
+import { getColorClasses } from '@/utils/theme.utils'
 
 export type Quadrant = {
   key: string
@@ -17,14 +17,6 @@ type MatrixQuadrantCardProps = {
   onTaskClick: (task: Task) => void
 }
 
-const getColorClasses = (color: string | null | undefined) => {
-  const colorOption = colorOptions.find((opt) => opt.color === color)
-  return {
-    bg: colorOption?.styles ?? '',
-    text: colorOption?.text ?? ''
-  }
-}
-
 export default function MatrixQuadrantCard({ quadrant, t, onTaskClick }: MatrixQuadrantCardProps) {
   return (
     <div className={`flex min-h-[200px] flex-col rounded-lg p-4 ${quadrant.bgColor} ${quadrant.textColor}`}>
@@ -37,8 +29,12 @@ export default function MatrixQuadrantCard({ quadrant, t, onTaskClick }: MatrixQ
           <p className='text-sm italic opacity-60'>{t('tasks.matrix.no_tasks')}</p>
         ) : (
           quadrant.tasks.map((task) => {
-            const colorClasses = getColorClasses(task.color)
+            const colorClasses = getColorClasses(task.color, {
+              bg: quadrant.bgColor,
+              text: quadrant.textColor
+            })
             const hasColor = Boolean(task.color && colorClasses.bg)
+
             return (
               <button
                 key={task.id}
