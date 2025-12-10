@@ -129,9 +129,10 @@
       }
     },
     "success": {
-      "complete": "Habit completed successfully",
       "create": "Habit created successfully",
       "delete": "Habit deleted successfully",
+      "progress": "Habit progress registered successfully",
+      "target_met": "Habit completed successfully! Great job!",
       "update": "Habit updated successfully"
     },
     "timespan": {
