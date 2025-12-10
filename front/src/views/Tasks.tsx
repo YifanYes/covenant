@@ -1,6 +1,7 @@
 import { CreateTaskDialog } from '@/components/dialogs/CreateTaskDialog'
 import { UpdateTaskDialog } from '@/components/dialogs/UpdateTaskDialog'
 import TaskCalendar from '@/components/tasks/TaskCalendar'
+import TaskMatrix from '@/components/tasks/TaskMatrix'
 import TasksListBoard from '@/components/tasks/TasksListBoard'
 import TasksTable from '@/components/tasks/TaskTable'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -21,6 +22,7 @@ const Tasks = () => {
               <TabsTrigger value='list'>{t('tasks.tabs.list')}</TabsTrigger>
               <TabsTrigger value='calendar'>{t('tasks.tabs.calendar')}</TabsTrigger>
               <TabsTrigger value='table'>{t('tasks.tabs.table')}</TabsTrigger>
+              <TabsTrigger value='matrix'>{t('tasks.tabs.matrix')}</TabsTrigger>
             </TabsList>
             <CreateTaskDialog />
           </div>
@@ -36,6 +38,10 @@ const Tasks = () => {
 
         <TabsContent value='table' className='mt-4'>
           <TasksTable />
+        </TabsContent>
+
+        <TabsContent value='matrix' className='mt-4'>
+          <TaskMatrix />
         </TabsContent>
       </Tabs>
 

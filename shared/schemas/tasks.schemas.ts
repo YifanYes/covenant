@@ -6,11 +6,23 @@ export enum TaskStatus {
   DONE = 'DONE'
 }
 
+export enum TaskEffort {
+  HIGH = 'HIGH',
+  LOW = 'LOW'
+}
+
+export enum TaskImpact {
+  HIGH = 'HIGH',
+  LOW = 'LOW'
+}
+
 export const createTaskSchema = z.object({
   title: z.string().min(1, 'errors.required_field'),
   description: z.string().optional(),
   status: z.string().min(1, 'errors.required_field'),
   color: z.string().optional(),
+  effort: z.enum(TaskEffort).optional(),
+  impact: z.enum(TaskImpact).optional(),
   order: z.number().int().min(0).optional(),
   dueDate: z
     .date()
@@ -26,6 +38,8 @@ export const updateTaskSchema = z.object({
   description: z.string().nullish(),
   status: z.string().optional(),
   color: z.string().nullish(),
+  effort: z.enum(TaskEffort).nullish(),
+  impact: z.enum(TaskImpact).nullish(),
   order: z.number().int().min(0).optional(),
   dueDate: z
     .date()

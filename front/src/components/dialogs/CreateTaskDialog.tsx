@@ -13,7 +13,13 @@ import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus } from '@nsmr/pixelart-react'
-import { createTaskSchema, TaskStatus, type CreateTaskType } from '@shared/schemas/tasks.schemas'
+import {
+  createTaskSchema,
+  TaskEffort,
+  TaskImpact,
+  TaskStatus,
+  type CreateTaskType
+} from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useState } from 'react'
@@ -24,6 +30,7 @@ import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
 import DatePicker from '../forms/DatePicker'
 import MultiSelect from '../forms/MultiSelect'
+import SingleSelect from '../forms/SingleSelect'
 import TextInput from '../forms/TextInput'
 import { Textarea } from '../ui/textarea'
 
@@ -138,6 +145,40 @@ export const CreateTaskDialog = () => {
               control={control}
               render={({ field }) => (
                 <ColorSelector label={t('tasks.color')} value={field.value ?? undefined} onChange={field.onChange} />
+              )}
+            />
+          </div>
+          <div className='grid grid-cols-2 gap-3'>
+            <Controller
+              name='effort'
+              control={control}
+              render={({ field }) => (
+                <SingleSelect
+                  label={t('tasks.effort')}
+                  placeholder={t('tasks.effort_placeholder')}
+                  options={Object.values(TaskEffort).map((effortType) => ({
+                    value: effortType,
+                    label: t(`tasks.effort_values.${effortType}`)
+                  }))}
+                  value={field.value ?? undefined}
+                  onChange={(value) => field.onChange(value)}
+                />
+              )}
+            />
+            <Controller
+              name='impact'
+              control={control}
+              render={({ field }) => (
+                <SingleSelect
+                  label={t('tasks.impact')}
+                  placeholder={t('tasks.impact_placeholder')}
+                  options={Object.values(TaskImpact).map((impactType) => ({
+                    value: impactType,
+                    label: t(`tasks.impact_values.${impactType}`)
+                  }))}
+                  value={field.value ?? undefined}
+                  onChange={(value) => field.onChange(value)}
+                />
               )}
             />
           </div>

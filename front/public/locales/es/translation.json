@@ -254,6 +254,12 @@
     "add": "Crear tarea",
     "color": "Selecciona un color",
     "delete": "Eliminar tarea",
+    "effort": "Esfuerzo",
+    "effort_placeholder": "Seleccionar esfuerzo",
+    "effort_values": {
+      "HIGH": "Alto",
+      "LOW": "Bajo"
+    },
     "empty": "No hay tareas todavía",
     "error": {
       "internal": {
@@ -270,6 +276,23 @@
       "search_placeholder": "Buscar",
       "status_placeholder": "Filtrar por estado"
     },
+    "impact": "Impacto",
+    "impact_placeholder": "Seleccionar impacto",
+    "impact_values": {
+      "HIGH": "Alto",
+      "LOW": "Bajo"
+    },
+    "matrix": {
+      "effort": "Esfuerzo",
+      "high": "ALTO",
+      "high_impact_high_effort": "Alto impacto, alto esfuerzo",
+      "high_impact_low_effort": "Alto impacto, bajo esfuerzo",
+      "impact": "Impacto",
+      "low": "BAJO",
+      "low_impact_high_effort": "Bajo impacto, alto esfuerzo",
+      "low_impact_low_effort": "Bajo impacto, bajo esfuerzo",
+      "no_tasks": "Sin tareas"
+    },
     "success": {
       "create": "Tarea creada exitosamente",
       "delete": "Tarea eliminada exitosamente",
@@ -280,12 +303,20 @@
       "no_tasks": "No se encontraron tareas",
       "objectives": "Objetivos",
       "status": "Estado",
-      "title": "Título"
+      "title": "Título",
+      "type": "Tipo"
     },
     "tabs": {
       "calendar": "Calendario",
       "list": "Lista",
+      "matrix": "Matriz",
       "table": "Tabla"
+    },
+    "task_types": {
+      "fill_in": "Relleno",
+      "major_project": "Proyecto Mayor",
+      "quick_win": "Victoria Rápida",
+      "thankless_task": "Tarea Ingrata"
     },
     "title": "Tareas"
   },
