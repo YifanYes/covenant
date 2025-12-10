@@ -9,6 +9,7 @@ import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
+// forwarding ref and event handlers so the trigger can attach to root div
 const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttributes<HTMLDivElement>>(
   ({ habit: { completions = [], recurrence = 1, id, name, description }, ...props }, ref) => {
     const { t } = useTranslation()
@@ -24,11 +25,12 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
       })
     )
 
+    // Generate calendar data for the last 36 days (5 weeks 1 day)
     const calendarDays = useMemo(() => {
       const completionCounts = new Map<string, number>()
 
-      completions.forEach((c) => {
-        const dateStr = dayjs(c.completedAt).format('L')
+      completions.forEach((completion) => {
+        const dateStr = dayjs(completion?.completedAt).format('L')
         completionCounts.set(dateStr, (completionCounts.get(dateStr) || 0) + 1)
       })
 
