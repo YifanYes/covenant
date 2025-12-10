@@ -1,11 +1,10 @@
+import { Button } from '@/components/ui/button'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { ChevronLeft, ChevronRight } from '@nsmr/pixelart-react'
 import dayjs from 'dayjs'
 import { useTranslation } from 'react-i18next'
-import { CreateTaskDialog } from '../dialogs/CreateTaskDialog'
-import { Button } from '../ui/button'
 
-export default function CalendarSidebar() {
+export default function CalendarNavbar() {
   const { t } = useTranslation()
   const { monthIndex, setMonthIndex } = useCalendarStore()
 
@@ -17,9 +16,9 @@ export default function CalendarSidebar() {
   const formattedMonthYear = currentMonth.format('MMMM YYYY')
 
   return (
-    <aside className='flex flex-col gap-4 p-3'>
-      <div className='flex items-center justify-between'>
-        <p className='text-xl font-semibold'>{formattedMonthYear}</p>
+    <div className='flex items-center justify-between gap-4 py-2'>
+      <div className='flex items-center gap-4'>
+        <p className='transform-capitalize text-xl font-semibold'>{formattedMonthYear}</p>
         <div className='flex gap-1'>
           <Button variant='ghost' size='icon' onClick={handlePrevMonth}>
             <ChevronLeft className='h-5 w-5' />
@@ -29,12 +28,9 @@ export default function CalendarSidebar() {
           </Button>
         </div>
       </div>
-
-      <Button variant='outline' className='w-full' onClick={handleReset}>
+      <Button variant='outline' onClick={handleReset}>
         {t('calendar.today')}
       </Button>
-
-      <CreateTaskDialog />
-    </aside>
+    </div>
   )
 }

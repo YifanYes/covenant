@@ -5,8 +5,7 @@ export const createObjectiveSchema = z.object({
   description: z.string().optional(),
   dueDate: z
     .date()
-    .nullable()
-    .optional()
+    .nullish()
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
   areas: z.array(z.uuid()).optional()
 })
@@ -18,8 +17,7 @@ export const updateObjectiveSchema = z.object({
   description: z.string().optional(),
   dueDate: z
     .date()
-    .nullable()
-    .optional()
+    .nullish()
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
   areas: z.array(z.uuid()).optional()
 })

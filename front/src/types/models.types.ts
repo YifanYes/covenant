@@ -26,6 +26,7 @@ export type Task = {
   title: string
   description?: string | null
   status: string
+  color?: string | null
   order: number
   dueDate?: string | null
   userId?: string
