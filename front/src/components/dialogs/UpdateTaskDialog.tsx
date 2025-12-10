@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import LoaderButton from '../LoaderButton'
+import ColorSelector from '../forms/ColorSelector'
 import DatePicker from '../forms/DatePicker'
 import MultiSelect from '../forms/MultiSelect'
 import SingleSelect from '../forms/SingleSelect'
@@ -156,6 +157,15 @@ export const UpdateTaskDialog = () => {
               control={control}
               items={objectivesData?.objectives.map(({ id, name: label }) => ({ id, label })) || []}
               placeholder={t('update_task_dialog.objectives_placeholder')}
+            />
+          </div>
+          <div className='grid gap-3'>
+            <Controller
+              name='color'
+              control={control}
+              render={({ field }) => (
+                <ColorSelector label={t('tasks.color')} value={field.value ?? undefined} onChange={field.onChange} />
+              )}
             />
           </div>
         </div>
