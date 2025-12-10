@@ -98,78 +98,78 @@ import {
 export const colorOptions = [
   {
     color: 'green',
-    styles: 'bg-green-500',
-    text: 'text-white'
+    styles: 'border-2 border-green-400 bg-green-500/20 hover:bg-green-500/50',
+    text: 'text-foreground'
   },
   {
     color: 'purple',
-    styles: 'bg-purple-500',
-    text: 'text-white'
+    styles: 'border-2 border-purple-400 bg-purple-500/20 hover:bg-purple-500/50',
+    text: 'text-foreground'
   },
   {
     color: 'orange',
-    styles: 'bg-orange-500',
-    text: 'text-white'
+    styles: 'border-2 border-orange-400 bg-orange-500/20 hover:bg-orange-500/50',
+    text: 'text-foreground'
   },
   {
     color: 'red',
-    styles: 'bg-red-500',
-    text: 'text-white'
+    styles: 'border-2 border-red-400 bg-red-500/20 hover:bg-red-500/50',
+    text: 'text-foreground'
   },
   {
     color: 'blue',
-    styles: 'bg-blue-500',
-    text: 'text-white'
+    styles: 'border-2 border-blue-400 bg-blue-500/20 hover:bg-blue-500/50',
+    text: 'text-foreground'
   },
   {
     color: 'yellow',
-    styles: 'bg-yellow-500',
-    text: 'text-yellow-900'
+    styles: 'border-2 border-yellow-400 bg-yellow-500/20 hover:bg-yellow-500/50',
+    text: 'text-foreground'
   },
   {
     color: 'teal',
-    styles: 'bg-teal-500',
-    text: 'text-white'
+    styles: 'border-2 border-teal-400 bg-teal-500/20 hover:bg-teal-500/50',
+    text: 'text-foreground'
   },
   {
     color: 'pink',
-    styles: 'bg-pink-500',
+    styles: 'border-2 border-pink-400 bg-pink-500/20 hover:bg-pink-500/50',
     text: 'text-black'
   },
   {
     color: 'cyan',
-    styles: 'bg-cyan-500',
+    styles: 'border-2 border-cyan-400 bg-cyan-500/20 hover:bg-cyan-500/50',
     text: 'text-cyan-900'
   },
   {
     color: 'indigo',
-    styles: 'bg-indigo-500',
-    text: 'text-white'
+    styles: 'border-2 border-indigo-400 bg-indigo-500/20 hover:bg-indigo-500/50',
+    text: 'text-foreground'
   },
   {
     color: 'lime',
-    styles: 'bg-lime-500',
+    styles: 'border-2 border-lime-400 bg-lime-500/20 hover:bg-lime-500/50',
     text: 'text-lime-900'
   },
   {
     color: 'rose',
-    styles: 'bg-rose-500',
-    text: 'text-white'
+    styles: 'border-2 border-rose-400 bg-rose-500/20 hover:bg-rose-500/50',
+    text: 'text-foreground'
   },
   {
     color: 'amber',
-    styles: 'bg-amber-500',
+    styles: 'border-2 border-amber-400 bg-amber-500/20 hover:bg-amber-500/50',
     text: 'text-amber-900'
   },
   {
     color: 'sky',
-    styles: 'bg-sky-500',
-    text: 'text-white'
+    styles: 'border-2 border-sky-400 bg-sky-500/20 hover:bg-sky-500/50',
+    text: 'text-foreground'
   },
   {
     color: 'slate',
-    styles: 'bg-slate-500',
-    text: 'text-white'
+    styles: 'border-2 border-slate-400 bg-slate-500/20 hover:bg-slate-500/50',
+    text: 'text-foreground'
   }
 ]
 

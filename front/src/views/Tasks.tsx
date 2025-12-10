@@ -13,8 +13,8 @@ const Tasks = () => {
   const { defaultTasksView } = useUserPreferencesStore()
 
   return (
-    <div className='min-h-screen w-full p-2'>
-      <Tabs defaultValue={defaultTasksView} className='w-full'>
+    <div className='min-h-full w-full p-2'>
+      <Tabs defaultValue={defaultTasksView} className='h-full w-full'>
         <div className='flex flex-row items-center justify-between gap-4'>
           <h1 className='text-2xl font-semibold'>{t('tasks.title')}</h1>
           <div className='flex items-center gap-4'>

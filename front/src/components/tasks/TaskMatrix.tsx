@@ -1,4 +1,4 @@
-import MatrixQuadrantCard, { type Quadrant } from '@/components/MatrixQuadrantCard'
+import TaskMatrixQuadrantCard, { type Quadrant } from '@/components/tasks/TaskMatrixQuadrantCard'
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import type { Task } from '@/types/models.types'
 import { trpc } from '@/utils/trpc.utils'
@@ -32,7 +32,7 @@ export default function TaskMatrix() {
         key: 'quick_win',
         titleKey: 'tasks.task_types.quick_win',
         subtitleKey: 'tasks.matrix.high_impact_low_effort',
-        bgColor: 'bg-green-800',
+        bgColor: 'border-2 border-green-400 dark:border-green-600 bg-green-600/20 dark:bg-green-600/20',
         textColor: 'text-white',
         tasks: lodashFilter(
           tasksWithPriority,
@@ -43,7 +43,7 @@ export default function TaskMatrix() {
         key: 'major_project',
         titleKey: 'tasks.task_types.major_project',
         subtitleKey: 'tasks.matrix.high_impact_high_effort',
-        bgColor: 'bg-blue-800',
+        bgColor: 'border-2 border-blue-400 dark:border-blue-600 bg-blue-600/20 dark:bg-blue-600/20',
         textColor: 'text-white',
         tasks: lodashFilter(
           tasksWithPriority,
@@ -54,7 +54,7 @@ export default function TaskMatrix() {
         key: 'fill_in',
         titleKey: 'tasks.task_types.fill_in',
         subtitleKey: 'tasks.matrix.low_impact_low_effort',
-        bgColor: 'bg-gray-300 dark:bg-gray-600',
+        bgColor: 'border-2 border-slate-400 dark:border-slate-600 bg-slate-600/20 dark:bg-slate-600/20',
         textColor: 'text-gray-800 dark:text-gray-100',
         tasks: lodashFilter(
           tasksWithPriority,
@@ -65,7 +65,7 @@ export default function TaskMatrix() {
         key: 'thankless_task',
         titleKey: 'tasks.task_types.thankless_task',
         subtitleKey: 'tasks.matrix.low_impact_high_effort',
-        bgColor: 'bg-gray-400 dark:bg-gray-700',
+        bgColor: 'border-2 border-zinc-400 dark:border-zinc-600 bg-zinc-600/20 dark:bg-zinc-600/20',
         textColor: 'text-gray-800 dark:text-gray-100',
         tasks: lodashFilter(
           tasksWithPriority,
@@ -76,9 +76,9 @@ export default function TaskMatrix() {
   }, [tasksWithPriority])
 
   return (
-    <div className='grid grid-cols-2 gap-2'>
+    <div className='grid h-full grid-cols-2 gap-2'>
       {quadrants.map((quadrant) => (
-        <MatrixQuadrantCard key={quadrant.key} quadrant={quadrant} t={t} onTaskClick={setSelectedTask} />
+        <TaskMatrixQuadrantCard key={quadrant.key} quadrant={quadrant} t={t} onTaskClick={setSelectedTask} />
       ))}
     </div>
   )
