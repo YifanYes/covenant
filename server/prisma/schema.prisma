@@ -78,6 +78,8 @@ model Task {
   description String?
   status      String      @db.VarChar(255)
   color       String?     @db.VarChar(255)
+  effort      String?     @db.VarChar(50)
+  impact      String?     @db.VarChar(50)
   order       Int         @default(0)
   dueDate     DateTime?   @db.Timestamp(6)
   userId      String      @db.Uuid

@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useTasksStore } from '@/hooks/use-tasks-store'
+import { taskPriorityTypes } from '@/types/constants.types'
 import type { Task } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Close } from '@nsmr/pixelart-react'
@@ -14,6 +15,17 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import DatePicker from '../forms/DatePicker'
 import { Button } from '../ui/button'
+
+// Determine task type based on effort and impact
+const getTaskType = (
+  effort: string | null | undefined,
+  impact: string | null | undefined,
+  t: (key: string) => string
+): string => {
+  if (!effort || !impact) return '-'
+  const key = taskPriorityTypes[impact]?.[effort]
+  return key ? t(key) : '-'
+}
 
 export default function TasksTable() {
   const { t } = useTranslation()
@@ -121,16 +133,17 @@ export default function TasksTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className='w-[30%]'>{t('tasks.table.title')}</TableHead>
-            <TableHead className='w-[20%]'>{t('tasks.table.status')}</TableHead>
+            <TableHead className='w-[25%]'>{t('tasks.table.title')}</TableHead>
+            <TableHead className='w-[15%]'>{t('tasks.table.status')}</TableHead>
+            <TableHead className='w-[15%]'>{t('tasks.table.type')}</TableHead>
             <TableHead className='w-[15%]'>{t('tasks.table.dueDate')}</TableHead>
-            <TableHead className='w-[35%]'>{t('tasks.table.objectives')}</TableHead>
+            <TableHead className='w-[30%]'>{t('tasks.table.objectives')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredTasks.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className='text-muted-foreground text-center'>
+              <TableCell colSpan={5} className='text-muted-foreground text-center'>
                 {t('tasks.table.no_tasks')}
               </TableCell>
             </TableRow>
@@ -159,6 +172,9 @@ export default function TasksTable() {
                       ))}
                     </SelectContent>
                   </Select>
+                </TableCell>
+                <TableCell>
+                  <span className='text-muted-foreground text-sm'>{getTaskType(task.effort, task.impact, t)}</span>
                 </TableCell>
                 <TableCell>{task.dueDate ? dayjs(task.dueDate).format('DD-MM-YYYY') : '-'}</TableCell>
                 <TableCell>

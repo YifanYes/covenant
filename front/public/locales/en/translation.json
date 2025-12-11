@@ -278,6 +278,12 @@
     "add": "Add Task",
     "color": "Select color",
     "delete": "Delete Task",
+    "effort": "Effort",
+    "effort_placeholder": "Select effort",
+    "effort_values": {
+      "HIGH": "High",
+      "LOW": "Low"
+    },
     "empty": "There are no tasks yet",
     "error": {
       "internal": {
@@ -294,6 +300,23 @@
       "search_placeholder": "Search",
       "status_placeholder": "Filter by status"
     },
+    "impact": "Impact",
+    "impact_placeholder": "Select impact",
+    "impact_values": {
+      "HIGH": "High",
+      "LOW": "Low"
+    },
+    "matrix": {
+      "effort": "Effort",
+      "high": "HIGH",
+      "high_impact_high_effort": "High impact, high effort",
+      "high_impact_low_effort": "High impact, low effort",
+      "impact": "Impact",
+      "low": "LOW",
+      "low_impact_high_effort": "Low impact, high effort",
+      "low_impact_low_effort": "Low impact, low effort",
+      "no_tasks": "No tasks"
+    },
     "success": {
       "create": "Task created successfully",
       "delete": "Task deleted successfully",
@@ -304,12 +327,20 @@
       "no_tasks": "No tasks found",
       "objectives": "Objectives",
       "status": "Status",
-      "title": "Title"
+      "title": "Title",
+      "type": "Type"
     },
     "tabs": {
       "calendar": "Calendar",
       "list": "List",
+      "matrix": "Matrix",
       "table": "Table"
+    },
+    "task_types": {
+      "fill_in": "Fill-in",
+      "major_project": "Major Project",
+      "quick_win": "Quick Win",
+      "thankless_task": "Thankless Task"
     },
     "title": "Tasks"
   },

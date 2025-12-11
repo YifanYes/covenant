@@ -19,6 +19,8 @@ export const tasksRouter = t.router({
         ...(input.description && { description: input.description }),
         ...(input.dueDate && { dueDate: input.dueDate }),
         ...(input.color && { color: input.color }),
+        ...(input.effort && { effort: input.effort }),
+        ...(input.impact && { impact: input.impact }),
         userId: ctx.user.id,
         objectives: {
           connect: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
@@ -98,6 +100,8 @@ export const tasksRouter = t.router({
         ...(input.dueDate !== undefined && { dueDate: input.dueDate }),
         ...(input.order !== undefined && { order: input.order }),
         ...(input.color !== undefined && { color: input.color }),
+        ...(input.effort !== undefined && { effort: input.effort }),
+        ...(input.impact !== undefined && { impact: input.impact }),
         objectives: {
           set: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
         }
