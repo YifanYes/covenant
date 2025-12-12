@@ -1,4 +1,5 @@
-import { allIcons, areaStyles } from '@/types/constants.types'
+import { areaStyles } from '@/types/colors.types'
+import { allIcons } from '@/types/icons.types'
 import type { Area } from '@/types/models.types'
 import { useTranslation } from 'react-i18next'
 

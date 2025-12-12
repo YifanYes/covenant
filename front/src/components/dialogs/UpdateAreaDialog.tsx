@@ -9,7 +9,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { allIcons, areaStyles } from '@/types/constants.types'
+import { areaStyles } from '@/types/colors.types'
+import { allIcons } from '@/types/icons.types'
 import type { Area } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'

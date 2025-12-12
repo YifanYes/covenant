@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { allIcons, areaSimpleStyles } from '@/types/constants.types'
+import { areaSimpleStyles } from '@/types/colors.types'
+import { allIcons } from '@/types/icons.types'
 import type { Objective } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { queryClient, trpc } from '@/utils/trpc.utils'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
 import {
   createTaskSchema,
@@ -23,9 +23,10 @@ import {
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { Controller, useForm, type Resolver } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { z } from 'zod'
 import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
 import DatePicker from '../forms/DatePicker'
@@ -63,9 +64,8 @@ export const CreateTaskDialog = () => {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<CreateTaskType>({
-    // cast resolver to match date transform
-    resolver: zodResolver(createTaskSchema) as Resolver<CreateTaskType>,
+  } = useForm<z.input<typeof createTaskSchema>>({
+    resolver: standardSchemaResolver(createTaskSchema),
     mode: 'onTouched',
     defaultValues: {
       title: '',
@@ -76,7 +76,7 @@ export const CreateTaskDialog = () => {
     }
   })
 
-  const onSubmit = (data: CreateTaskType) => mutation.mutate(data)
+  const onSubmit = (data: z.input<typeof createTaskSchema>) => mutation.mutate(data as CreateTaskType)
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
@@ -124,7 +124,7 @@ export const CreateTaskDialog = () => {
               render={({ field }) => (
                 <DatePicker
                   className='w-full'
-                  value={field.value}
+                  value={typeof field.value === 'string' ? new Date(field.value) : field.value}
                   onChange={field.onChange}
                   placeholder={t('create_task_dialog.due_date_placeholder')}
                 />
