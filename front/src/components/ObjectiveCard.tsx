@@ -115,7 +115,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
         </div>
       </DialogTrigger>
 
-      <DialogContent className='sm:max-w-[425px]'>
+      <DialogContent className='sm:max-w-[500px]'>
         <DialogHeader>
           <DialogTitle>{t('objectives.update.title')}</DialogTitle>
         </DialogHeader>
