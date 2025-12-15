@@ -4,7 +4,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/utils'
 import { Calendar } from '@nsmr/pixelart-react'
-import { enUS } from 'date-fns/locale'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import FormField from './FormField'
 
@@ -214,7 +213,7 @@ export default function DatePicker({
               onSelect={handleDateSelect}
               month={month}
               onMonthChange={setMonth}
-              locale={enUS}
+              weekStartsOn={1}
               initialFocus
             />
           </PopoverContent>

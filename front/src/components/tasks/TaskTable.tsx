@@ -3,14 +3,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import { taskPriorityTypes } from '@/types/constants.types'
-import type { Task } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Close } from '@nsmr/pixelart-react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { flatten, values as getValues, isUndefined, filter as lodashFilter, map } from 'es-toolkit/compat'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import DatePicker from '../forms/DatePicker'
@@ -30,11 +28,7 @@ const getTaskType = (
 export default function TasksTable() {
   const { t } = useTranslation()
   const { data } = useSuspenseQuery(trpc.tasks.getAll.queryOptions())
-  const { tasks, setTasks, setSelectedTask } = useTasksStore()
-
-  useEffect(() => {
-    !isUndefined(data?.tasks) && setTasks(data?.tasks)
-  }, [data, setTasks])
+  const { setSelectedTask } = useTasksStore()
 
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -50,13 +44,13 @@ export default function TasksTable() {
     })
   )
 
-  // Get all tasks in a flat array for table view
+  // Get all tasks in a flat array for table view - using native methods
   const allTasks = useMemo(() => {
-    return flatten(getValues(tasks))
-  }, [tasks])
+    return Object.values(data?.tasks ?? {}).flat()
+  }, [data?.tasks])
 
   const filteredTasks = useMemo(() => {
-    return lodashFilter(allTasks, (task: Task) => {
+    return allTasks.filter((task) => {
       // Search filter
       const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase())
 
@@ -148,7 +142,7 @@ export default function TasksTable() {
               </TableCell>
             </TableRow>
           ) : (
-            map(filteredTasks, (task: Task) => (
+            filteredTasks.map((task) => (
               <TableRow
                 key={task.id}
                 className='hover:bg-muted/50 cursor-pointer'
@@ -179,7 +173,7 @@ export default function TasksTable() {
                 <TableCell>{task.dueDate ? dayjs(task.dueDate).format('DD-MM-YYYY') : '-'}</TableCell>
                 <TableCell>
                   {task.objectives && task.objectives.length > 0
-                    ? map(task.objectives, (obj) => obj.name).join(', ')
+                    ? task.objectives.map((obj) => obj.name).join(', ')
                     : '-'}
                 </TableCell>
               </TableRow>

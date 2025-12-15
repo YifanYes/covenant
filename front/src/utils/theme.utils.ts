@@ -1,4 +1,4 @@
-import { colorOptions } from '@/types/constants.types'
+import { colorOptions } from '@/types/colors.types'
 
 export const getColorClasses = (
   color: string | null | undefined,

@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { allIcons, areaSimpleStyles } from '@/types/constants.types'
+import { areaSimpleStyles } from '@/types/colors.types'
+import { allIcons } from '@/types/icons.types'
 import type { Objective } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -19,7 +20,6 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { z } from 'zod'
 import { ConfirmDeleteObjectiveDialog } from './dialogs/ConfirmDeleteObjectiveDialog'
 import DatePicker from './forms/DatePicker'
 import MultiSelect from './forms/MultiSelect'
@@ -49,7 +49,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<z.input<typeof updateObjectiveSchema>>({
+  } = useForm<UpdateObjectiveBodyType>({
     resolver: standardSchemaResolver(updateObjectiveSchema),
     mode: 'onTouched',
     defaultValues: {

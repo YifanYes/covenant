@@ -9,7 +9,7 @@ export const createObjectiveSchema = z.object({
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
   areas: z.array(z.uuid()).optional()
 })
-export type CreateObjectiveBodyType = z.infer<typeof createObjectiveSchema>
+export type CreateObjectiveBodyType = z.input<typeof createObjectiveSchema>
 
 export const updateObjectiveSchema = z.object({
   id: z.uuid(),
@@ -21,7 +21,7 @@ export const updateObjectiveSchema = z.object({
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
   areas: z.array(z.uuid()).optional()
 })
-export type UpdateObjectiveBodyType = z.infer<typeof updateObjectiveSchema>
+export type UpdateObjectiveBodyType = z.input<typeof updateObjectiveSchema>
 
 export const deleteObjectiveSchema = z.object({
   id: z.uuid()

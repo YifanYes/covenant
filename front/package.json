@@ -31,7 +31,6 @@
     "@trpc/tanstack-react-query": "^11.7.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
     "dayjs": "^1.11.19",
     "es-toolkit": "^1.42.0",
     "i18next": "^25.6.3",
