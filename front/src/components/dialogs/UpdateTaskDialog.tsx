@@ -26,7 +26,6 @@ import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { z } from 'zod'
 import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
 import DatePicker from '../forms/DatePicker'
@@ -81,7 +80,7 @@ export const UpdateTaskDialog = () => {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<z.input<typeof updateTaskSchema>>({
+  } = useForm<UpdateTaskType>({
     resolver: standardSchemaResolver(updateTaskSchema),
     mode: 'onTouched'
   })
@@ -227,7 +226,7 @@ export const UpdateTaskDialog = () => {
               className='h-auto cursor-pointer'
               isLoading={updateMutation.isPending}
               disabled={!isValid || !isDirty || updateMutation.isPending}
-              onClick={handleSubmit((data) => onUpdate(data as UpdateTaskType))}
+              onClick={handleSubmit(onUpdate)}
               label={t('update')}
             />
           </div>

@@ -26,7 +26,6 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { z } from 'zod'
 import LoaderButton from '../LoaderButton'
 import ColorSelector from '../forms/ColorSelector'
 import DatePicker from '../forms/DatePicker'
@@ -64,7 +63,7 @@ export const CreateTaskDialog = () => {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<z.input<typeof createTaskSchema>>({
+  } = useForm<CreateTaskType>({
     resolver: standardSchemaResolver(createTaskSchema),
     mode: 'onTouched',
     defaultValues: {
@@ -76,7 +75,7 @@ export const CreateTaskDialog = () => {
     }
   })
 
-  const onSubmit = (data: z.input<typeof createTaskSchema>) => mutation.mutate(data as CreateTaskType)
+  const onSubmit = (data: CreateTaskType) => mutation.mutate(data as CreateTaskType)
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)

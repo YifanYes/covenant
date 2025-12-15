@@ -18,7 +18,6 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { z } from 'zod'
 import LoaderButton from '../LoaderButton'
 import DatePicker from '../forms/DatePicker'
 import MultiSelect from '../forms/MultiSelect'
@@ -51,7 +50,7 @@ export const CreateObjectiveDialog = () => {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<z.input<typeof createObjectiveSchema>>({
+  } = useForm<CreateObjectiveBodyType>({
     resolver: standardSchemaResolver(createObjectiveSchema),
     mode: 'onTouched',
     defaultValues: {
@@ -62,7 +61,7 @@ export const CreateObjectiveDialog = () => {
     }
   })
 
-  const onSubmit = (data: z.input<typeof createObjectiveSchema>) => mutation.mutate(data as CreateObjectiveBodyType)
+  const onSubmit = (data: CreateObjectiveBodyType) => mutation.mutate(data)
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)

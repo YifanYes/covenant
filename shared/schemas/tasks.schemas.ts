@@ -30,7 +30,7 @@ export const createTaskSchema = z.object({
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
   objectives: z.array(z.uuid()).optional()
 })
-export type CreateTaskType = z.infer<typeof createTaskSchema>
+export type CreateTaskType = z.input<typeof createTaskSchema>
 
 export const updateTaskSchema = z.object({
   id: z.uuid(),
@@ -47,7 +47,7 @@ export const updateTaskSchema = z.object({
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
   objectives: z.array(z.uuid()).optional()
 })
-export type UpdateTaskType = z.infer<typeof updateTaskSchema>
+export type UpdateTaskType = z.input<typeof updateTaskSchema>
 
 export const taskIdSchema = z.object({
   id: z.uuid()
