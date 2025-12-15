@@ -10,12 +10,12 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { queryClient, trpc } from '@/utils/trpc.utils'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
 import { createObjectiveSchema, type CreateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Controller, useForm, type Resolver } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import LoaderButton from '../LoaderButton'
@@ -51,8 +51,7 @@ export const CreateObjectiveDialog = () => {
     reset,
     formState: { errors, isValid, isDirty }
   } = useForm<CreateObjectiveBodyType>({
-    // cast resolver to match date transform
-    resolver: zodResolver(createObjectiveSchema) as Resolver<CreateObjectiveBodyType>,
+    resolver: standardSchemaResolver(createObjectiveSchema),
     mode: 'onTouched',
     defaultValues: {
       name: '',
@@ -111,7 +110,7 @@ export const CreateObjectiveDialog = () => {
             render={({ field }) => (
               <DatePicker
                 placeholder={t('create_objective_dialog.due_date_placeholder')}
-                value={field.value}
+                value={typeof field.value === 'string' ? new Date(field.value) : field.value}
                 onChange={field.onChange}
               />
             )}
