@@ -32,7 +32,7 @@ export default function TaskMatrix() {
         key: 'quick_win',
         titleKey: 'tasks.task_types.quick_win',
         subtitleKey: 'tasks.matrix.high_impact_low_effort',
-        bgColor: 'border-2 border-green-400 dark:border-green-600 bg-green-600/20 dark:bg-green-600/20',
+        bgColor: 'border-2 border-green-400 dark:border-green-700 bg-green-700/20 dark:bg-green-700/20',
         textColor: 'text-white',
         tasks: lodashFilter(
           tasksWithPriority,
@@ -76,7 +76,7 @@ export default function TaskMatrix() {
   }, [tasksWithPriority])
 
   return (
-    <div className='grid h-full grid-cols-2 gap-2'>
+    <div className='grid h-full grid-cols-2 grid-rows-2 gap-2'>
       {quadrants.map((quadrant) => (
         <TaskMatrixQuadrantCard key={quadrant.key} quadrant={quadrant} t={t} onTaskClick={setSelectedTask} />
       ))}
