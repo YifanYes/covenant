@@ -36,7 +36,7 @@ const Tasks = () => {
           <TaskCalendar />
         </TabsContent>
 
-        <TabsContent value='table' className='mt-4'>
+        <TabsContent value='table' className='mt-4 flex flex-1 flex-col overflow-hidden'>
           <TasksTable />
         </TabsContent>
 
