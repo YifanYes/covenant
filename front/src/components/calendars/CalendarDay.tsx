@@ -40,11 +40,12 @@ export default function CalendarDay({ day, weekIndex, tasks }: CalendarDayProps)
                 e.stopPropagation()
                 setSelectedTask(task)
               }}
-              className='bg-card text-card-foreground border-foreground/10 hover:border-primary flex cursor-pointer items-center gap-1.5 overflow-hidden rounded border-2 px-1 py-0.5 text-xs transition-colors'
+              className={cn(
+                'flex cursor-pointer items-center gap-1.5 overflow-hidden rounded border-2 px-1 py-0.5 text-xs transition-colors',
+                colorClasses.bg,
+                colorClasses.text
+              )}
             >
-              <div
-                className={cn('h-2 w-2 shrink-0 rounded-full', task.color ? colorClasses.bg : 'bg-muted-foreground')}
-              />
               <span className='truncate font-medium'>{task.title}</span>
             </button>
           )

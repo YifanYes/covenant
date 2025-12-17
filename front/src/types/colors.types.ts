@@ -37,12 +37,12 @@ export const colorOptions = [
   {
     color: 'pink',
     styles: 'border-2 border-pink-400 bg-pink-500/20 hover:bg-pink-500/50',
-    text: 'text-black'
+    text: 'text-foreground'
   },
   {
     color: 'cyan',
     styles: 'border-2 border-cyan-400 bg-cyan-500/20 hover:bg-cyan-500/50',
-    text: 'text-cyan-900'
+    text: 'text-foreground'
   },
   {
     color: 'indigo',
@@ -52,7 +52,7 @@ export const colorOptions = [
   {
     color: 'lime',
     styles: 'border-2 border-lime-400 bg-lime-500/20 hover:bg-lime-500/50',
-    text: 'text-lime-900'
+    text: 'text-foreground'
   },
   {
     color: 'rose',
@@ -62,7 +62,7 @@ export const colorOptions = [
   {
     color: 'amber',
     styles: 'border-2 border-amber-400 bg-amber-500/20 hover:bg-amber-500/50',
-    text: 'text-amber-900'
+    text: 'text-foreground'
   },
   {
     color: 'sky',
