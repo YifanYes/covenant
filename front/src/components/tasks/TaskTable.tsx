@@ -2,10 +2,12 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useTasksStore } from '@/hooks/use-tasks-store'
+import { cn } from '@/lib/utils'
 import { taskPriorityTypes } from '@/types/constants.types'
+import { getPriorityStyles } from '@/utils/theme.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Close } from '@nsmr/pixelart-react'
-import { TaskStatus } from '@shared/schemas/tasks.schemas'
+import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
@@ -32,6 +34,7 @@ export default function TasksTable() {
 
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [effortImpactFilter, setEffortImpactFilter] = useState<string>('all')
   const [dateFilter, setDateFilter] = useState<Date | null>(null)
 
   const updateTaskMutation = useMutation(
@@ -57,6 +60,13 @@ export default function TasksTable() {
       // Status filter
       const matchesStatus = statusFilter === 'all' || task.status === statusFilter
 
+      // Effort/Impact filter
+      let matchesEffortImpact = true
+      if (effortImpactFilter !== 'all') {
+        const [impact, effort] = effortImpactFilter.split('|')
+        matchesEffortImpact = task.impact === impact && task.effort === effort
+      }
+
       // Date filter
       let matchesDate = true
       if (dateFilter && task.dueDate) {
@@ -67,9 +77,9 @@ export default function TasksTable() {
         matchesDate = false
       }
 
-      return matchesSearch && matchesStatus && matchesDate
+      return matchesSearch && matchesStatus && matchesEffortImpact && matchesDate
     })
-  }, [allTasks, searchQuery, statusFilter, dateFilter])
+  }, [allTasks, searchQuery, statusFilter, effortImpactFilter, dateFilter])
 
   const handleStatusChange = (taskId: string, newStatus: string) => {
     updateTaskMutation.mutate({
@@ -82,10 +92,12 @@ export default function TasksTable() {
   const clearFilters = () => {
     setSearchQuery('')
     setStatusFilter('all')
+    setEffortImpactFilter('all')
     setDateFilter(null)
   }
 
-  const hasActiveFilters = searchQuery !== '' || statusFilter !== 'all' || dateFilter !== null
+  const hasActiveFilters =
+    searchQuery !== '' || statusFilter !== 'all' || effortImpactFilter !== 'all' || dateFilter !== null
 
   return (
     <div className='flex h-full flex-col'>
@@ -110,6 +122,22 @@ export default function TasksTable() {
               ))}
             </SelectContent>
           </Select>
+          <Select value={effortImpactFilter} onValueChange={setEffortImpactFilter}>
+            <SelectTrigger className='w-[200px] shrink-0'>
+              <SelectValue placeholder={t('tasks.filters.effort_placeholder')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>{t('tasks.filters.all_types')}</SelectItem>
+              <SelectItem value={`${TaskImpact.HIGH}|${TaskEffort.LOW}`}>{t('tasks.task_types.quick_win')}</SelectItem>
+              <SelectItem value={`${TaskImpact.HIGH}|${TaskEffort.HIGH}`}>
+                {t('tasks.task_types.major_project')}
+              </SelectItem>
+              <SelectItem value={`${TaskImpact.LOW}|${TaskEffort.LOW}`}>{t('tasks.task_types.fill_in')}</SelectItem>
+              <SelectItem value={`${TaskImpact.LOW}|${TaskEffort.HIGH}`}>
+                {t('tasks.task_types.thankless_task')}
+              </SelectItem>
+            </SelectContent>
+          </Select>
           <DatePicker
             value={dateFilter}
             onChange={setDateFilter}
@@ -124,64 +152,74 @@ export default function TasksTable() {
           )}
         </div>
       </div>
-      <div className='flex-1 overflow-auto rounded-md border'>
-        <Table className='table-fixed'>
-          <TableHeader>
-            <TableRow>
-              <TableHead className='w-[25%]'>{t('tasks.table.title')}</TableHead>
-              <TableHead className='w-[15%]'>{t('tasks.table.status')}</TableHead>
-              <TableHead className='w-[15%]'>{t('tasks.table.type')}</TableHead>
-              <TableHead className='w-[15%]'>{t('tasks.table.dueDate')}</TableHead>
-              <TableHead className='w-[30%]'>{t('tasks.table.objectives')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTasks.length === 0 ? (
+      <div className='relative min-h-0 flex-1 overflow-hidden rounded-md border'>
+        <div className='absolute inset-0'>
+          <Table className='table-fixed'>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className='text-muted-foreground text-center'>
-                  {t('tasks.table.no_tasks')}
-                </TableCell>
+                <TableHead className='w-[300px]'>{t('tasks.table.title')}</TableHead>
+                <TableHead className='w-[120px]'>{t('tasks.table.type')}</TableHead>
+                <TableHead className='w-[200px]'>{t('tasks.table.status')}</TableHead>
+                <TableHead className='w-[150px]'>{t('tasks.table.dueDate')}</TableHead>
               </TableRow>
-            ) : (
-              filteredTasks.map((task) => (
-                <TableRow
-                  key={task.id}
-                  className='hover:bg-muted/50 cursor-pointer'
-                  onClick={() => !updateTaskMutation.isPending && setSelectedTask(task)}
-                >
-                  <TableCell className='font-medium break-words whitespace-normal'>{task.title}</TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation() /* Prevent row click when changing status */}>
-                    <Select
-                      value={task.status}
-                      disabled={updateTaskMutation.isPending}
-                      onValueChange={(value) => handleStatusChange(task.id, value)}
-                    >
-                      <SelectTrigger className='w-[150px]'>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.values(TaskStatus).map((status) => (
-                          <SelectItem key={status} value={status}>
-                            {t(`task_status.${status}`)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <span className='text-muted-foreground text-sm'>{getTaskType(task.effort, task.impact, t)}</span>
-                  </TableCell>
-                  <TableCell>{task.dueDate ? dayjs(task.dueDate).format('DD-MM-YYYY') : '-'}</TableCell>
-                  <TableCell className='break-words whitespace-normal'>
-                    {task.objectives && task.objectives.length > 0
-                      ? task.objectives.map((obj) => obj.name).join(', ')
-                      : '-'}
+            </TableHeader>
+            <TableBody>
+              {filteredTasks.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className='text-muted-foreground text-center'>
+                    {t('tasks.table.no_tasks')}
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                filteredTasks.map((task) => (
+                  <TableRow
+                    key={task.id}
+                    className='hover:bg-muted/50 cursor-pointer'
+                    onClick={() => !updateTaskMutation.isPending && setSelectedTask(task)}
+                  >
+                    <TableCell className='py-2 pr-4 font-medium wrap-break-word whitespace-normal'>
+                      {task.title}
+                    </TableCell>
+                    <TableCell className='py-2'>
+                      <span
+                        className={cn(
+                          'rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase',
+                          getPriorityStyles(task.effort, task.impact)
+                        )}
+                      >
+                        {getTaskType(task.effort, task.impact, t)}
+                      </span>
+                    </TableCell>
+                    <TableCell
+                      className='py-2'
+                      onClick={(e) => e.stopPropagation() /* Prevent row click when changing status */}
+                    >
+                      <Select
+                        value={task.status}
+                        disabled={updateTaskMutation.isPending}
+                        onValueChange={(value) => handleStatusChange(task.id, value)}
+                      >
+                        <SelectTrigger className='w-[130px]'>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.values(TaskStatus).map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {t(`task_status.${status}`)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className='py-2 text-sm whitespace-nowrap'>
+                      {task.dueDate ? dayjs(task.dueDate).format('L') : '-'}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   )

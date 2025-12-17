@@ -295,8 +295,10 @@
     },
     "filters": {
       "all_statuses": "All statuses",
+      "all_types": "All types",
       "clear": "Clear filters",
       "date_placeholder": "Filter by date",
+      "effort_placeholder": "Filter by type",
       "search_placeholder": "Search",
       "status_placeholder": "Filter by status"
     },
@@ -325,7 +327,6 @@
     "table": {
       "dueDate": "Due Date",
       "no_tasks": "No tasks found",
-      "objectives": "Objectives",
       "status": "Status",
       "title": "Title",
       "type": "Type"

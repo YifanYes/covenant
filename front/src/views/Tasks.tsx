@@ -28,11 +28,11 @@ const Tasks = () => {
           </div>
         </div>
 
-        <TabsContent value='list' className='mt-4'>
+        <TabsContent value='list' className='mt-1'>
           <TasksListBoard />
         </TabsContent>
 
-        <TabsContent value='calendar' className='mt-4'>
+        <TabsContent value='calendar' className='mt-2 flex h-full flex-1 flex-col overflow-hidden'>
           <TaskCalendar />
         </TabsContent>
 
