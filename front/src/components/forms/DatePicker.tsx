@@ -4,7 +4,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/utils'
 import { Calendar } from '@nsmr/pixelart-react'
+import dayjs from 'dayjs'
+import { capitalize } from 'es-toolkit/compat'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import FormField from './FormField'
 
 export default function DatePicker({
@@ -26,6 +29,7 @@ export default function DatePicker({
   errorMessage?: string
   id?: string
 }) {
+  const { i18n } = useTranslation()
   const { fieldId, effectivePlaceholder } = useFormField({
     id,
     placeholder: placeholder || 'Select date',
@@ -208,6 +212,7 @@ export default function DatePicker({
           </PopoverTrigger>
           <PopoverContent className='w-auto p-0' align='start' alignOffset={-8} sideOffset={8}>
             <CalendarComponent
+              key={i18n.language}
               mode='single'
               selected={value || undefined}
               onSelect={handleDateSelect}
@@ -215,6 +220,13 @@ export default function DatePicker({
               onMonthChange={setMonth}
               weekStartsOn={1}
               initialFocus
+              formatters={{
+                formatCaption: (date) => {
+                  const formatted = capitalize(dayjs(date).format('MMMM YYYY'))
+                  return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+                },
+                formatWeekdayName: (date) => dayjs(date).format('dd')
+              }}
             />
           </PopoverContent>
         </Popover>
