@@ -295,8 +295,10 @@
     },
     "filters": {
       "all_statuses": "All statuses",
+      "all_types": "All types",
       "clear": "Clear filters",
       "date_placeholder": "Filter by date",
+      "effort_placeholder": "Filter by type",
       "search_placeholder": "Search",
       "status_placeholder": "Filter by status"
     },
@@ -323,6 +325,9 @@
       "update": "Task updated successfully"
     },
     "table": {
+      "areas": "Areas",
+      "color": "Color",
+      "description": "Description",
       "dueDate": "Due Date",
       "no_tasks": "No tasks found",
       "objectives": "Objectives",

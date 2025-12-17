@@ -271,8 +271,10 @@
     },
     "filters": {
       "all_statuses": "Todos los estados",
+      "all_types": "Todos los tipos",
       "clear": "Limpiar filtros",
       "date_placeholder": "Filtrar por fecha",
+      "effort_placeholder": "Filtrar por tipo",
       "search_placeholder": "Buscar",
       "status_placeholder": "Filtrar por estado"
     },
@@ -299,6 +301,9 @@
       "update": "Tarea actualizada exitosamente"
     },
     "table": {
+      "areas": "Áreas",
+      "color": "Color",
+      "description": "Descripción",
       "dueDate": "Fecha de entrega",
       "no_tasks": "No se encontraron tareas",
       "objectives": "Objetivos",
