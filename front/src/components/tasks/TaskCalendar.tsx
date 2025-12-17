@@ -22,7 +22,7 @@ export default function TaskCalendar() {
   }, [monthIndex])
 
   return (
-    <div className='flex h-[calc(100vh-150px)] flex-col'>
+    <div className='flex h-full flex-col'>
       <CalendarNavbar />
       <div className='h-full flex-1'>
         <MonthlyCalendar month={currentMonth} tasks={tasksData?.tasks || []} />

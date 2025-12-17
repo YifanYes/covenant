@@ -10,7 +10,8 @@ export type Quadrant = {
   titleKey: string
   subtitleKey: string
   bgColor: string
-  textColor: string
+  title: string
+  subtitle: string
   tasks: Task[]
 }
 
@@ -22,10 +23,10 @@ type MatrixQuadrantCardProps = {
 
 export default function TaskMatrixQuadrantCard({ quadrant, t, onTaskClick }: MatrixQuadrantCardProps) {
   return (
-    <div className={`flex min-h-[200px] flex-col rounded-lg p-4 ${quadrant.bgColor} ${quadrant.textColor}`}>
+    <div className={`flex min-h-[200px] flex-col rounded-lg p-4 ${quadrant.bgColor}`}>
       <div className='mb-4'>
-        <h3 className='text-card-foreground text-lg font-semibold'>{t(quadrant.titleKey)}</h3>
-        <p className='text-card-foreground text-sm opacity-80'>{t(quadrant.subtitleKey)}</p>
+        <h3 className={`text-lg font-semibold ${quadrant.title}`}>{t(quadrant.titleKey)}</h3>
+        <p className={`text-sm ${quadrant.subtitle}`}>{t(quadrant.subtitleKey)}</p>
       </div>
       <div className='flex flex-1 flex-col gap-2 overflow-auto'>
         {quadrant.tasks.length === 0 ? (
@@ -36,7 +37,7 @@ export default function TaskMatrixQuadrantCard({ quadrant, t, onTaskClick }: Mat
           quadrant.tasks.map((task) => {
             const colorClasses = getColorClasses(task.color, {
               bg: quadrant.bgColor,
-              text: quadrant.textColor
+              text: quadrant.title
             })
             const taskAreas = uniqBy(task.objectives?.flatMap(({ areas = [] }) => areas) || [], ({ id }: Area) => id)
             const visibleAreas = taskAreas.slice(0, 3)
