@@ -3,17 +3,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import { cn } from '@/lib/utils'
-import { areaSimpleStyles } from '@/types/colors.types'
 import { taskPriorityTypes } from '@/types/constants.types'
-import { allIcons } from '@/types/icons.types'
-import { type Area } from '@/types/models.types'
-import { getColorClasses, getPriorityStyles } from '@/utils/theme.utils'
+import { getPriorityStyles } from '@/utils/theme.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Close } from '@nsmr/pixelart-react'
 import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { uniqBy } from 'es-toolkit/compat'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -163,12 +159,8 @@ export default function TasksTable() {
               <TableRow>
                 <TableHead className='w-[300px]'>{t('tasks.table.title')}</TableHead>
                 <TableHead className='w-[120px]'>{t('tasks.table.type')}</TableHead>
-                <TableHead className='w-[100px] text-center'>{t('tasks.table.color')}</TableHead>
                 <TableHead className='w-[200px]'>{t('tasks.table.status')}</TableHead>
                 <TableHead className='w-[150px]'>{t('tasks.table.dueDate')}</TableHead>
-                <TableHead className='w-[200px]'>{t('tasks.table.objectives')}</TableHead>
-                <TableHead className='w-[200px]'>{t('tasks.table.areas')}</TableHead>
-                <TableHead className='w-[400px]'>{t('tasks.table.description')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -179,92 +171,51 @@ export default function TasksTable() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredTasks.map((task) => {
-                  const taskAreas = uniqBy(
-                    task.objectives?.flatMap(({ areas = [] }) => areas) || [],
-                    ({ id }: Area) => id
-                  )
-
-                  return (
-                    <TableRow
-                      key={task.id}
-                      className='hover:bg-muted/50 cursor-pointer'
-                      onClick={() => !updateTaskMutation.isPending && setSelectedTask(task)}
-                    >
-                      <TableCell className='py-2 pr-4 font-medium wrap-break-word whitespace-normal'>
-                        {task.title}
-                      </TableCell>
-                      <TableCell className='py-2'>
-                        <span
-                          className={cn(
-                            'rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase',
-                            getPriorityStyles(task.effort, task.impact)
-                          )}
-                        >
-                          {getTaskType(task.effort, task.impact, t)}
-                        </span>
-                      </TableCell>
-                      <TableCell className='py-2'>
-                        <div className='flex justify-center'>
-                          <div
-                            className={cn(
-                              'h-3 w-3 rounded-full',
-                              task.color
-                                ? getColorClasses(task.color, { bg: 'bg-muted', text: 'text-muted-foreground' }).bg
-                                : 'bg-muted'
-                            )}
-                          />
-                        </div>
-                      </TableCell>
-                      <TableCell
-                        className='py-2'
-                        onClick={(e) => e.stopPropagation() /* Prevent row click when changing status */}
+                filteredTasks.map((task) => (
+                  <TableRow
+                    key={task.id}
+                    className='hover:bg-muted/50 cursor-pointer'
+                    onClick={() => !updateTaskMutation.isPending && setSelectedTask(task)}
+                  >
+                    <TableCell className='py-2 pr-4 font-medium wrap-break-word whitespace-normal'>
+                      {task.title}
+                    </TableCell>
+                    <TableCell className='py-2'>
+                      <span
+                        className={cn(
+                          'rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase',
+                          getPriorityStyles(task.effort, task.impact)
+                        )}
                       >
-                        <Select
-                          value={task.status}
-                          disabled={updateTaskMutation.isPending}
-                          onValueChange={(value) => handleStatusChange(task.id, value)}
-                        >
-                          <SelectTrigger className='w-[130px]'>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.values(TaskStatus).map((status) => (
-                              <SelectItem key={status} value={status}>
-                                {t(`task_status.${status}`)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell className='py-2 text-sm whitespace-nowrap'>
-                        {task.dueDate ? dayjs(task.dueDate).format('L') : '-'}
-                      </TableCell>
-                      <TableCell className='max-w-0 truncate py-2'>
-                        {task.objectives && task.objectives.length > 0
-                          ? task.objectives.map((obj) => obj.name).join(', ')
-                          : '-'}
-                      </TableCell>
-                      <TableCell className='py-2'>
-                        <div className='flex flex-wrap gap-1'>
-                          {taskAreas.map(({ id, name, icon, color }) => {
-                            const areaStyle = areaSimpleStyles.find(({ color: areaColor }) => areaColor === color)
-                            const currentIcon = allIcons.find(({ name: iconName }) => iconName === icon)
-                            return !areaStyle || !currentIcon ? null : (
-                              <div key={id} title={t(name)} className='flex items-center'>
-                                <currentIcon.component className={cn('size-3.5', areaStyle.styles)} />
-                              </div>
-                            )
-                          })}
-                          {taskAreas.length === 0 && '-'}
-                        </div>
-                      </TableCell>
-                      <TableCell className='text-muted-foreground max-w-0 truncate py-2'>
-                        {task.description || '-'}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
+                        {getTaskType(task.effort, task.impact, t)}
+                      </span>
+                    </TableCell>
+                    <TableCell
+                      className='py-2'
+                      onClick={(e) => e.stopPropagation() /* Prevent row click when changing status */}
+                    >
+                      <Select
+                        value={task.status}
+                        disabled={updateTaskMutation.isPending}
+                        onValueChange={(value) => handleStatusChange(task.id, value)}
+                      >
+                        <SelectTrigger className='w-[130px]'>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.values(TaskStatus).map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {t(`task_status.${status}`)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className='py-2 text-sm whitespace-nowrap'>
+                      {task.dueDate ? dayjs(task.dueDate).format('L') : '-'}
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>

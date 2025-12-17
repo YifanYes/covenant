@@ -301,12 +301,8 @@
       "update": "Tarea actualizada exitosamente"
     },
     "table": {
-      "areas": "Áreas",
-      "color": "Color",
-      "description": "Descripción",
       "dueDate": "Fecha de entrega",
       "no_tasks": "No se encontraron tareas",
-      "objectives": "Objetivos",
       "status": "Estado",
       "title": "Título",
       "type": "Tipo"
