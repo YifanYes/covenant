@@ -34,6 +34,7 @@ async function startServer() {
     await server.listen({ port: env.PORT })
     console.log(`Server is running at port ${env.PORT}`)
   } catch (err) {
+    console.error('Failed to start server:', err)
     server.log.error(err)
     process.exit(1)
   }
