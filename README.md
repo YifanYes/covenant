@@ -6,7 +6,7 @@ A personal productivity app for managing tasks, habits, and objectives with an R
 
 - [Bun](https://bun.sh/) (JavaScript runtime)
 - [Node.js](https://nodejs.org/) (v18+)
-- PostgreSQL database
+- PostgreSQL database in Supabase
 
 ## Installation
 
@@ -67,22 +67,21 @@ cd front && bun run dev
 ```
 arq/
 ├── front/          # React frontend (Vite + TypeScript)
-│   ├── src/
-│   │   ├── components/   # UI components
-│   │   ├── hooks/        # React hooks
-│   │   ├── types/        # TypeScript types
-│   │   ├── utils/        # Utility functions
-│   │   └── views/        # Page components
-│   └── ...
 ├── server/         # Backend server (tRPC + Prisma)
-│   ├── prisma/          # Database schema
-│   ├── routers/         # tRPC routers
-│   ├── services/        # Business logic
-│   └── ...
-├── shared/         # Shared code between front and server
-│   └── schemas/         # Zod validation schemas
-└── docs/           # Documentation
+├── shared/         # Shared code (Zod schemas, types)
+├── .context/       # Coding standards and AI context
+├── .antigravity/   # Agent rules and directives
+├── mission.md      # Project mission and pillars
+└── roadmap.md      # Project timeline and phases
 ```
+
+## Spec-Driven Development (SDD)
+
+This project follows **Spec-Driven Development** principles to ensure architectural consistency and quality:
+
+1.  **Define the Spec**: Before implementing complex features, a technical specification is created.
+2.  **Implementation**: Development follows the approved specification strictly.
+3.  **Validation**: Post-implementation verification to ensure the code meets the spec requirements.
 
 ## Tech Stack
 
