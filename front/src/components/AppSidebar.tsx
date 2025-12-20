@@ -57,16 +57,19 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible='icon'>
       <SidebarHeader>
-        <div className='relative flex h-12 items-center justify-center px-2 pt-2 group-data-[collapsible=icon]:px-0'>
-          <img
-            src='/logo.png'
-            alt='logo'
-            className='absolute top-2 left-2 h-8 w-auto object-contain transition-opacity duration-200 group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0'
-          />
-          <img
-            src='/favicon.ico'
-            alt='logo'
-            className='absolute top-1/2 left-1/2 h-10 w-auto -translate-x-1/2 -translate-y-1/2 object-contain opacity-0 brightness-75 grayscale transition-opacity duration-200 group-data-[collapsible=icon]:pointer-events-auto group-data-[collapsible=icon]:opacity-100'
+        <div className='flex h-16 w-full items-center justify-start px-4 group-data-[collapsible=icon]:h-12 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
+          <div
+            style={{
+              maskImage: 'url(/arq-logo.svg)',
+              maskRepeat: 'no-repeat',
+              maskSize: 'contain',
+              maskPosition: 'center',
+              WebkitMaskImage: 'url(/arq-logo.svg)',
+              WebkitMaskRepeat: 'no-repeat',
+              WebkitMaskSize: 'contain',
+              WebkitMaskPosition: 'center'
+            }}
+            className='bg-foreground h-12 w-32 transition-all duration-200 group-data-[collapsible=icon]:h-9 group-data-[collapsible=icon]:w-9'
           />
         </div>
       </SidebarHeader>
