@@ -31,6 +31,16 @@
     "knight": "Caballero",
     "sorcerer": "Hechicero"
   },
+  "classes": {
+    "knight": {
+      "description": "Buscaré la fuerza para aplastar el mal.",
+      "name": "Caballero"
+    },
+    "sorcerer": {
+      "description": "Buscaré la sabiduría para encontrar la luz.",
+      "name": "Hechicero"
+    }
+  },
   "colors": {
     "amber": "Ámbar",
     "blue": "Azul",
@@ -144,6 +154,11 @@
     "health": "Salud",
     "level": "Nivel",
     "mana": "Maná",
+    "no_character": {
+      "button": "Empezar aventura",
+      "description": "Crea un personaje para empezar tu aventura.",
+      "title": "Todavía no tienes un personaje"
+    },
     "resistance": "Resistencia",
     "stats": "Estadísticas",
     "strength": "Fuerza",
@@ -196,6 +211,20 @@
       "success": "Objetivo actualizado exitosamente",
       "title": "Actualizar objetivo"
     }
+  },
+  "onboarding": {
+    "button": "¡Adelante!",
+    "class_label": "Elige tu clase",
+    "error": {
+      "already_exists": "Ya tienes un personaje",
+      "description": "Ocurrió un error al crear tu personaje",
+      "title": "Error al crear el personaje"
+    },
+    "loading": "Creando tu personaje...",
+    "name_label": "Nombre del personaje",
+    "name_placeholder": "Introduce el nombre de tu personaje",
+    "subtitle": "Elige tu camino y comienza tu aventura",
+    "title": "Crear tu personaje"
   },
   "recover_password": {
     "button": "Restablecer contraseña",
@@ -331,34 +360,10 @@
     "title": "Actualizar hábito"
   },
   "update_task_dialog": {
-    "classes": {
-      "knight": {
-        "description": "Buscaré la fuerza para aplastar el mal.",
-        "name": "Caballero"
-      },
-      "sorcerer": {
-        "description": "Buscaré la sabiduría para encontrar la luz.",
-        "name": "Hechicero"
-      }
-    },
     "description": "Modal para actualizar una tarea",
     "description_placeholder": "Descripción de la tarea",
     "due_date_placeholder": "Fecha de entrega (opcional)",
     "objectives_placeholder": "Objetivos asociados",
-    "onboarding": {
-      "button": "Comenzar tu viaje",
-      "class_label": "Elige tu clase",
-      "error": {
-        "already_exists": "Ya tienes un personaje",
-        "description": "Ocurrió un error al crear tu personaje",
-        "title": "Error al crear el personaje"
-      },
-      "loading": "Creando tu personaje...",
-      "name_label": "Nombre del personaje",
-      "name_placeholder": "Introduce el nombre de tu personaje",
-      "subtitle": "Elige tu camino y comienza tu viaje",
-      "title": "Crear tu personaje"
-    },
     "status_placeholder": "Estado de la tarea",
     "title": "Actualizar tarea",
     "title_placeholder": "Título de la tarea"

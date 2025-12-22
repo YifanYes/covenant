@@ -29,7 +29,7 @@ export const authRouter = t.router({
       email: input.email,
       options: {
         emailRedirectTo: `${env.FRONT_URL}/login`,
-        shouldCreateUser: false
+        shouldCreateUser: true
       }
     })
 

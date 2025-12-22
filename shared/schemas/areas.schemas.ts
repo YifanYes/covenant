@@ -23,12 +23,12 @@ export const defaultAreas = [
   {
     name: 'areas.finances',
     color: 'green',
-    icon: 'Banknote'
+    icon: 'Money'
   },
   {
     name: 'areas.mental_health',
     color: 'purple',
-    icon: 'Brain'
+    icon: 'Zap'
   },
   {
     name: 'areas.family_and_friends',
@@ -43,16 +43,16 @@ export const defaultAreas = [
   {
     name: 'areas.career',
     color: 'blue',
-    icon: 'BriefcaseBusiness'
+    icon: 'Briefcase'
   },
   {
     name: 'areas.physical_health',
     color: 'yellow',
-    icon: 'Dumbbell'
+    icon: 'HumanRun'
   },
   {
     name: 'areas.leisure',
     color: 'teal',
-    icon: 'Gamepad2'
+    icon: 'Gamepad'
   }
 ]

@@ -154,6 +154,11 @@
     "health": "Health",
     "level": "Level",
     "mana": "Mana",
+    "no_character": {
+      "button": "Begin adventure",
+      "description": "Create a character to start your adventure.",
+      "title": "You don't have a character yet"
+    },
     "resistance": "Resistance",
     "stats": "Stats",
     "strength": "Strength",
@@ -208,7 +213,7 @@
     }
   },
   "onboarding": {
-    "button": "Begin Your Journey",
+    "button": "Let's go!",
     "class_label": "Choose Your Class",
     "error": {
       "already_exists": "You already have a character",
@@ -218,7 +223,7 @@
     "loading": "Creating your character...",
     "name_label": "Character Name",
     "name_placeholder": "Enter your character's name",
-    "subtitle": "Choose your path and begin your journey",
+    "subtitle": "Choose your path and begin your adventure",
     "title": "Create Your Character"
   },
   "recover_password": {
