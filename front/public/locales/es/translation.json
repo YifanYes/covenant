@@ -112,6 +112,15 @@
     "title_placeholder": "Título de la tarea"
   },
   "dashboard": {
+    "blindspot": {
+      "all_areas_covered": "¡Todas las áreas están cubiertas!",
+      "all_objectives_covered": "¡Todas los objetivos están cubiertos!",
+      "areas": "Áreas",
+      "days": "días",
+      "objectives": "Objetivos",
+      "title": "El punto ciego",
+      "without_activity": "+2 semanas sin actividad"
+    },
     "title": "¡Bienvenido, {{name}}!",
     "upcoming": {
       "no_tasks": "¡Felicidades! No hay tareas pendientes para hoy o mañana.",

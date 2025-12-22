@@ -112,6 +112,15 @@
     "title_placeholder": "Task title"
   },
   "dashboard": {
+    "blindspot": {
+      "all_areas_covered": "All areas are covered!",
+      "all_objectives_covered": "All objectives are covered!",
+      "areas": "Areas",
+      "days": "días",
+      "objectives": "Objectives",
+      "title": "The Blindspot",
+      "without_activity": "+2 weeks w/o activity"
+    },
     "title": "Welcome back, {{name}}!",
     "upcoming": {
       "no_tasks": "Congratulations! No pending tasks for today or tomorrow.",
