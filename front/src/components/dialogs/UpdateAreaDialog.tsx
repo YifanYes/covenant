@@ -14,7 +14,7 @@ import { allIcons } from '@/types/icons.types'
 import type { Area } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { updateAreaSchema, type UpdateAreaBodyType } from '@shared/schemas/areas.schemas'
+import { defaultAreas, updateAreaSchema, type UpdateAreaBodyType } from '@shared/schemas/areas.schemas'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -81,16 +81,30 @@ export function UpdateAreaDialog({ area }: { area: Area }) {
     reset()
   }
 
-  return !areaStyle ? null : (
+  const isDefaultArea = defaultAreas.some((defaultArea) => defaultArea.name === area.name)
+
+  const Badge = areaStyle ? (
+    <div
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors duration-200 ${
+        areaStyle.styles
+      } ${!isDefaultArea ? 'cursor-pointer hover:brightness-110' : ''}`}
+    >
+      {currentIcon && <currentIcon.component className='size-4' />}
+      <span>{t(area.name)}</span>
+    </div>
+  ) : null
+
+  if (!Badge) {
+    return null
+  }
+
+  if (isDefaultArea) {
+    return Badge
+  }
+
+  return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <div
-          className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors duration-200 ${areaStyle.styles}`}
-        >
-          {currentIcon && <currentIcon.component className='size-4' />}
-          <span>{t(area.name)}</span>
-        </div>
-      </DialogTrigger>
+      <DialogTrigger asChild>{Badge}</DialogTrigger>
       <DialogContent className='sm:max-w-[425px]' aria-describedby='update-area-dialog-desc'>
         <DialogHeader>
           <DialogTitle>{t('update_area_dialog.title')}</DialogTitle>
