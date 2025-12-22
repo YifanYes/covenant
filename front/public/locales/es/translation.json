@@ -113,6 +113,10 @@
   },
   "dashboard": {
     "title": "¡Bienvenido, {{name}}!",
+    "upcoming": {
+      "no_tasks": "¡Felicidades! No hay tareas pendientes para hoy o mañana.",
+      "title": "Siguientes pasos"
+    }
   },
   "delete": "Eliminar",
   "errors": {

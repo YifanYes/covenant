@@ -3,7 +3,7 @@ import { BlindspotSection } from '@/components/dashboard/BlindspotSection'
 import { CompletionMetricsCard } from '@/components/dashboard/CompletionMetricsCard'
 import { HabitsCard } from '@/components/dashboard/HabitsCard'
 import { TaskStatusCard } from '@/components/dashboard/TaskStatusCard'
-import { UpcomingTasksSection } from '@/components/dashboard/UpcomingTasksSection'
+import { UpcomingTasksComponent } from '@/components/dashboard/upcoming-tasks/UpcomingTasks.component'
 import { useAuthStore } from '@/hooks/use-auth-store'
 import { trpc } from '@/utils/trpc.utils'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -36,6 +36,7 @@ export default function Dashboard() {
         </div>
       </div>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+        <UpcomingTasksComponent tasks={allTasks} />
       </div>
     </div>
   )

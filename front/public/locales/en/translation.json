@@ -113,6 +113,10 @@
   },
   "dashboard": {
     "title": "Welcome back, {{name}}!",
+    "upcoming": {
+      "no_tasks": "Congratulations! No pending tasks for today or tomorrow.",
+      "title": "Upcoming"
+    }
   },
   "delete": "Delete",
   "errors": {
