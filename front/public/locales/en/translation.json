@@ -111,6 +111,9 @@
     "title": "Create new task",
     "title_placeholder": "Task title"
   },
+  "dashboard": {
+    "title": "Welcome back, {{name}}!",
+  },
   "delete": "Delete",
   "errors": {
     "invalid_email": "Invalid email",

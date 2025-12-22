@@ -111,6 +111,9 @@
     "title": "Crear nueva tarea",
     "title_placeholder": "Título de la tarea"
   },
+  "dashboard": {
+    "title": "¡Bienvenido, {{name}}!",
+  },
   "delete": "Eliminar",
   "errors": {
     "invalid_email": "Correo electrónico no valido",
