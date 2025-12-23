@@ -119,12 +119,21 @@
     },
     "blindspot": {
       "all_areas_covered": "¡Todas las áreas están cubiertas!",
-      "all_objectives_covered": "¡Todas los objetivos están cubiertos!",
+      "all_objectives_covered": "¡Todos los objetivos están cubiertos!",
       "areas": "Áreas",
       "days": "días",
       "objectives": "Objetivos",
       "title": "El punto ciego",
       "without_activity": "+2 semanas sin actividad"
+    },
+    "efficiency_metrics": {
+      "focused_area": "Área enfocada",
+      "focused_objective": "Objetivo enfocado",
+      "habit_rate": "Ratio hábitos completados",
+      "none": "Ninguno",
+      "task_type": "Tarea más común",
+      "title": "Métricas de eficiencia",
+      "title_efficiency": "Métricas de eficiencia"
     },
     "habits": {
       "completed": "Completados",
