@@ -290,10 +290,12 @@
   },
   "sidebar": {
     "calendar": "Calendar",
+    "close": "Collapse menu",
     "dashboard": "Dashboard",
     "habits": "Habits",
     "inventory": "Inventory",
     "objectives": "Objectives and areas",
+    "open": "Expand menu",
     "review": "Review",
     "settings": "Settings",
     "tasks": "Tasks"

@@ -290,10 +290,12 @@
   },
   "sidebar": {
     "calendar": "Calendario",
+    "close": "Colapsar menú",
     "dashboard": "Panel de control",
     "habits": "Hábitos",
     "inventory": "Inventario",
     "objectives": "Objetivos y áreas",
+    "open": "Expandir menú",
     "review": "Revisión",
     "settings": "Configuración",
     "tasks": "Tareas"
