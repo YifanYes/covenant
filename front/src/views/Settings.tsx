@@ -44,7 +44,10 @@ export default function Settings() {
             placeholder={t('settings.default_tasks_view_placeholder')}
             value={defaultTasksView}
             onChange={handleDefaultViewChange}
-            options={['list', 'calendar', 'table'].map((value) => ({ value, label: t(`tasks.tabs.${value}`) }))}
+            options={['list', 'calendar', 'table', 'matrix'].map((value) => ({
+              value,
+              label: t(`tasks.tabs.${value}`)
+            }))}
           />
         </div>
         <div className='flex flex-col gap-2'>
