@@ -1,4 +1,3 @@
-import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { Area, Task } from '@/types/models.types'
 import { TrackChanges } from '@nsmr/pixelart-react'
@@ -6,6 +5,7 @@ import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from 'recharts'
+import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
 import CustomAngleTick from './components/CustomAngleTick.component'
 
 interface AreasDistributionComponentProps {

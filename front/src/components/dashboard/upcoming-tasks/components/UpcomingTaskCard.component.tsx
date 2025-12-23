@@ -12,7 +12,7 @@ interface UpcomingTaskCardProps {
   task: Task
 }
 
-export function UpcomingTaskCardComponent({ task }: UpcomingTaskCardProps) {
+export default function UpcomingTaskCardComponent({ task }: UpcomingTaskCardProps) {
   const { t } = useTranslation()
 
   const taskAreas = uniqBy(task.objectives?.flatMap(({ areas = [] }) => areas) || [], ({ id }: Area) => id)

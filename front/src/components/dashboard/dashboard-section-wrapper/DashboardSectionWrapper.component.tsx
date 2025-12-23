@@ -15,7 +15,7 @@ interface DashboardSectionWrapperComponentProps {
   contentClassName?: string
 }
 
-export function DashboardSectionWrapperComponent({
+export default function DashboardSectionWrapperComponent({
   title,
   description,
   icon: Icon,

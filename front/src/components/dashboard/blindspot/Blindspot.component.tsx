@@ -1,10 +1,10 @@
-import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import type { Area, Task } from '@/types/models.types'
 import { Alert, BullseyeArrow, Trophy } from '@nsmr/pixelart-react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
 
 interface BlindspotComponentProps {
   areas: Area[]
@@ -20,7 +20,7 @@ const updateIfLater = (map: Record<string, dayjs.Dayjs | null>, id: string, comp
   if (!map[id] || completionDate.isAfter(map[id])) map[id] = completionDate
 }
 
-export function BlindspotComponent({ areas, tasks }: BlindspotComponentProps) {
+export default function BlindspotComponent({ areas, tasks }: BlindspotComponentProps) {
   const { t, i18n } = useTranslation()
 
   const getLabel = (name: string) => {

@@ -1,4 +1,3 @@
-import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import type { Habit, Task } from '@/types/models.types'
 import { Hourglass } from '@nsmr/pixelart-react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
@@ -6,13 +5,14 @@ import dayjs from 'dayjs'
 import { Award, Compass, Flame, Target } from 'lucide-react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
 
 interface EfficiencyMetricsComponentProps {
   tasks?: Task[]
   habits?: Habit[]
 }
 
-export function EfficiencyMetricsComponent({ tasks, habits }: EfficiencyMetricsComponentProps) {
+export default function EfficiencyMetricsComponent({ tasks, habits }: EfficiencyMetricsComponentProps) {
   const { t, i18n } = useTranslation()
 
   const metrics = useMemo(() => {

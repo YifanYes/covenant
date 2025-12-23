@@ -1,4 +1,3 @@
-import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import {
   Carousel,
   CarouselContent,
@@ -12,13 +11,14 @@ import { CalendarMonth } from '@nsmr/pixelart-react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import dayjs from 'dayjs'
 import { useTranslation } from 'react-i18next'
-import { UpcomingTaskCardComponent } from './components/UpcomingTaskCard.component'
+import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
+import UpcomingTaskCardComponent from './components/UpcomingTaskCard.component'
 
 interface UpcomingTasksComponentProps {
   tasks: Task[]
 }
 
-export function UpcomingTasksComponent({ tasks }: UpcomingTasksComponentProps) {
+export default function UpcomingTasksComponent({ tasks }: UpcomingTasksComponentProps) {
   const { t } = useTranslation()
 
   const upcomingTasks = tasks.filter(

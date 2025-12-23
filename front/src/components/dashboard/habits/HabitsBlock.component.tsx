@@ -1,4 +1,3 @@
-import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { Habit } from '@/types/models.types'
 import { Checklist } from '@nsmr/pixelart-react'
@@ -6,6 +5,7 @@ import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Label, Pie, PieChart } from 'recharts'
+import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
 
 interface HabitsBlockComponentProps {
   habits: Habit[]
@@ -22,7 +22,7 @@ const habitConfig = {
   }
 } satisfies ChartConfig
 
-export function HabitsBlockComponent({ habits }: HabitsBlockComponentProps) {
+export default function HabitsBlockComponent({ habits }: HabitsBlockComponentProps) {
   const { t } = useTranslation()
 
   const habitStats = useMemo(() => {

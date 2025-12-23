@@ -1,4 +1,3 @@
-import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { Task } from '@/types/models.types'
 import { Zap } from '@nsmr/pixelart-react'
@@ -7,6 +6,7 @@ import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Label, Pie, PieChart } from 'recharts'
+import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
 
 interface TaskStatusComponentProps {
   tasks: Task[]
@@ -31,7 +31,7 @@ const defaultTaskConfig = {
   }
 } satisfies ChartConfig
 
-export function TaskStatusComponent({ tasks }: TaskStatusComponentProps) {
+export default function TaskStatusComponent({ tasks }: TaskStatusComponentProps) {
   const { t } = useTranslation()
 
   const taskStats = useMemo(() => {
