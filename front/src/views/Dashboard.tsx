@@ -1,4 +1,4 @@
-import { AreasDistributionComponent } from '@/components/dashboard/areas-distribution/AreasDistribution.component'
+import AreasDistributionComponent from '@/components/dashboard/areas-distribution/AreasDistribution.component'
 import { BlindspotComponent } from '@/components/dashboard/blindspot/Blindspot.component'
 import { EfficiencyMetricsComponent } from '@/components/dashboard/efficiency-metrics-component/EfficiencyMetrics.component'
 import { HabitsBlockComponent } from '@/components/dashboard/habits/HabitsBlock.component'

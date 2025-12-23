@@ -113,8 +113,10 @@
   },
   "dashboard": {
     "areas_distribution": {
+      "last_month": "Last month",
       "no_data": "No tasks available",
       "tasks": "Tasks",
+      "this_month": "This month",
       "title": "Areas distribution"
     },
     "blindspot": {
