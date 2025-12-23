@@ -1,4 +1,4 @@
-import { AreasDistributionCard } from '@/components/dashboard/AreasDistributionCard'
+import { AreasDistributionComponent } from '@/components/dashboard/areas-distribution/AreasDistribution.component'
 import { BlindspotComponent } from '@/components/dashboard/blindspot/Blindspot.component'
 import { CompletionMetricsCard } from '@/components/dashboard/CompletionMetricsCard'
 import { HabitsCard } from '@/components/dashboard/HabitsCard'
@@ -38,6 +38,7 @@ export default function Dashboard() {
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <UpcomingTasksComponent tasks={allTasks} />
         <TaskStatusComponent tasks={allTasks} />
+        <AreasDistributionComponent tasks={allTasks} areas={allAreas} />
         <BlindspotComponent areas={allAreas} tasks={allTasks} />
       </div>
     </div>

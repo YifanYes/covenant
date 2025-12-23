@@ -112,6 +112,11 @@
     "title_placeholder": "Task title"
   },
   "dashboard": {
+    "areas_distribution": {
+      "no_data": "No tasks available",
+      "tasks": "Tasks",
+      "title": "Areas distribution"
+    },
     "blindspot": {
       "all_areas_covered": "All areas are covered!",
       "all_objectives_covered": "All objectives are covered!",
