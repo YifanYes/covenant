@@ -21,7 +21,14 @@ const updateIfLater = (map: Record<string, dayjs.Dayjs | null>, id: string, comp
 }
 
 export function BlindspotComponent({ areas, tasks }: BlindspotComponentProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+
+  const getLabel = (name: string) => {
+    if (i18n.exists(name)) return t(name)
+    const namespaced = `areas.${name}`
+    if (i18n.exists(namespaced)) return t(namespaced)
+    return name
+  }
 
   const { blindspotAreas, blindspotObjectives } = useMemo(() => {
     if (!areas || !tasks) {
@@ -61,7 +68,7 @@ export function BlindspotComponent({ areas, tasks }: BlindspotComponentProps) {
       <ul className='list-inside list-disc space-y-1 text-xs'>
         {items.map((item, i) => (
           <li key={i}>
-            {t(item.name)}: {item.lastCompletion ? dayjs(item.lastCompletion).fromNow(true) : '∞'}{' '}
+            {getLabel(item.name)}: {item.lastCompletion ? dayjs(item.lastCompletion).get('days') : '∞'}{' '}
             {t('dashboard.blindspot.days')}
           </li>
         ))}
