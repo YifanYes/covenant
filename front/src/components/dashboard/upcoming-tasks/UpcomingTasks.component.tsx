@@ -1,4 +1,4 @@
-import { DashboardSectionWrapper } from '@/components/dashboard/DashboardSectionWrapper'
+import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import {
   Carousel,
   CarouselContent,
@@ -29,7 +29,7 @@ export function UpcomingTasksComponent({ tasks }: UpcomingTasksComponentProps) {
   )
 
   return (
-    <DashboardSectionWrapper
+    <DashboardSectionWrapperComponent
       title={t('dashboard.upcoming.title')}
       icon={CalendarMonth}
       iconColorClass='text-purple-500'
@@ -54,6 +54,6 @@ export function UpcomingTasksComponent({ tasks }: UpcomingTasksComponentProps) {
           <p className='text-muted-foreground text-sm font-medium'>{t('dashboard.upcoming.no_tasks')}</p>
         </div>
       )}
-    </DashboardSectionWrapper>
+    </DashboardSectionWrapperComponent>
   )
 }

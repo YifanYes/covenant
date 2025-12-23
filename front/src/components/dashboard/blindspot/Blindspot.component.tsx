@@ -1,4 +1,4 @@
-import { DashboardSectionWrapper } from '@/components/dashboard/DashboardSectionWrapper'
+import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import type { Area, Task } from '@/types/models.types'
 import { Alert, BullseyeArrow, Trophy } from '@nsmr/pixelart-react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
@@ -69,7 +69,7 @@ export function BlindspotComponent({ areas, tasks }: BlindspotComponentProps) {
     )
 
   return (
-    <DashboardSectionWrapper
+    <DashboardSectionWrapperComponent
       title={`${t('dashboard.blindspot.title')} (${t('dashboard.blindspot.without_activity')})`}
       icon={Alert}
       iconColorClass='text-destructive'
@@ -94,6 +94,6 @@ export function BlindspotComponent({ areas, tasks }: BlindspotComponentProps) {
           {renderList(blindspotObjectives, 'dashboard.blindspot.all_objectives_covered')}
         </div>
       </div>
-    </DashboardSectionWrapper>
+    </DashboardSectionWrapperComponent>
   )
 }

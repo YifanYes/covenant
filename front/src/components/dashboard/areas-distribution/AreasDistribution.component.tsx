@@ -1,4 +1,4 @@
-import { DashboardSectionWrapper } from '@/components/dashboard/DashboardSectionWrapper'
+import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { Area, Task } from '@/types/models.types'
 import { TrackChanges } from '@nsmr/pixelart-react'
@@ -59,7 +59,7 @@ export function AreasDistributionComponent({ tasks, areas }: AreasDistributionCo
   }, [areas, tasks, t, i18n])
 
   return (
-    <DashboardSectionWrapper
+    <DashboardSectionWrapperComponent
       title={t('dashboard.areas_distribution.title')}
       icon={TrackChanges}
       iconColorClass='text-orange-500'
@@ -106,6 +106,6 @@ export function AreasDistributionComponent({ tasks, areas }: AreasDistributionCo
           </div>
         )}
       </div>
-    </DashboardSectionWrapper>
+    </DashboardSectionWrapperComponent>
   )
 }

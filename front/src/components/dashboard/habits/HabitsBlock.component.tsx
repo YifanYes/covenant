@@ -1,4 +1,4 @@
-import { DashboardSectionWrapper } from '@/components/dashboard/DashboardSectionWrapper'
+import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { Habit } from '@/types/models.types'
 import { Checklist } from '@nsmr/pixelart-react'
@@ -80,7 +80,7 @@ export function HabitsBlockComponent({ habits }: HabitsBlockComponentProps) {
   }, [habits, t])
 
   return (
-    <DashboardSectionWrapper
+    <DashboardSectionWrapperComponent
       title={t('sidebar.habits')}
       icon={Checklist}
       iconColorClass='text-lime-500'
@@ -124,6 +124,6 @@ export function HabitsBlockComponent({ habits }: HabitsBlockComponentProps) {
           </div>
         )}
       </div>
-    </DashboardSectionWrapper>
+    </DashboardSectionWrapperComponent>
   )
 }

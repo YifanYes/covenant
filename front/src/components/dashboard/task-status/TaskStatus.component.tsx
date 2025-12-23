@@ -1,4 +1,4 @@
-import { DashboardSectionWrapper } from '@/components/dashboard/DashboardSectionWrapper'
+import { DashboardSectionWrapperComponent } from '@/components/dashboard/dashboard-section-wrapper/DashboardSectionWrapper.component'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { Task } from '@/types/models.types'
 import { Zap } from '@nsmr/pixelart-react'
@@ -59,7 +59,7 @@ export function TaskStatusComponent({ tasks }: TaskStatusComponentProps) {
   }, [tasks, t])
 
   return (
-    <DashboardSectionWrapper
+    <DashboardSectionWrapperComponent
       title={t('dashboard.task_status.title')}
       icon={Zap}
       iconColorClass='text-yellow-500'
@@ -106,6 +106,6 @@ export function TaskStatusComponent({ tasks }: TaskStatusComponentProps) {
           </div>
         )}
       </div>
-    </DashboardSectionWrapper>
+    </DashboardSectionWrapperComponent>
   )
 }
