@@ -102,7 +102,6 @@ export function AreasDistributionComponent({ tasks, areas }: AreasDistributionCo
           </ChartContainer>
         ) : (
           <div className='text-muted-foreground flex flex-col items-center gap-2 text-center'>
-            <span className='text-2xl'>📊</span>
             <p className='text-xs'>{t('dashboard.areas_distribution.no_data')}</p>
           </div>
         )}

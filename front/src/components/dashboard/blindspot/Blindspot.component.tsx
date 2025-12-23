@@ -61,7 +61,8 @@ export function BlindspotComponent({ areas, tasks }: BlindspotComponentProps) {
       <ul className='list-inside list-disc space-y-1 text-xs'>
         {items.map((item, i) => (
           <li key={i}>
-            {t(item.name)}: {item.lastCompletion ? dayjs(item.lastCompletion).fromNow(true) : '∞'}
+            {t(item.name)}: {item.lastCompletion ? dayjs(item.lastCompletion).fromNow(true) : '∞'}{' '}
+            {t('dashboard.blindspot.days')}
           </li>
         ))}
       </ul>

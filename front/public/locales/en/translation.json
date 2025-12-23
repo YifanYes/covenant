@@ -121,7 +121,7 @@
       "all_areas_covered": "All areas are covered!",
       "all_objectives_covered": "All objectives are covered!",
       "areas": "Areas",
-      "days": "días",
+      "days": "days",
       "objectives": "Objectives",
       "title": "The Blindspot",
       "without_activity": "+2 weeks w/o activity"
@@ -293,7 +293,7 @@
     "dashboard": "Dashboard",
     "habits": "Habits",
     "inventory": "Inventory",
-    "objectives": "Objectives",
+    "objectives": "Objectives and areas",
     "review": "Review",
     "settings": "Settings",
     "tasks": "Tasks"
