@@ -1,7 +1,7 @@
 import { AreasDistributionComponent } from '@/components/dashboard/areas-distribution/AreasDistribution.component'
 import { BlindspotComponent } from '@/components/dashboard/blindspot/Blindspot.component'
 import { CompletionMetricsCard } from '@/components/dashboard/CompletionMetricsCard'
-import { HabitsCard } from '@/components/dashboard/HabitsCard'
+import { HabitsBlockComponent } from '@/components/dashboard/habits/HabitsBlock.component'
 import { TaskStatusComponent } from '@/components/dashboard/task-status/TaskStatus.component'
 import { UpcomingTasksComponent } from '@/components/dashboard/upcoming-tasks/UpcomingTasks.component'
 import { useAuthStore } from '@/hooks/use-auth-store'
@@ -39,6 +39,7 @@ export default function Dashboard() {
         <UpcomingTasksComponent tasks={allTasks} />
         <TaskStatusComponent tasks={allTasks} />
         <AreasDistributionComponent tasks={allTasks} areas={allAreas} />
+        <HabitsBlockComponent habits={allHabits} />
         <BlindspotComponent areas={allAreas} tasks={allTasks} />
       </div>
     </div>

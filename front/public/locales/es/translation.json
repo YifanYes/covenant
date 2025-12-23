@@ -126,6 +126,13 @@
       "title": "El punto ciego",
       "without_activity": "+2 semanas sin actividad"
     },
+    "habits": {
+      "completed": "Completados",
+      "completion": "Progreso",
+      "no_habits": "Sin hábitos",
+      "none": "Ninguno",
+      "remaining": "Pendiente"
+    },
     "task_status": {
       "DOING": "En proceso",
       "DONE": "Completadas",

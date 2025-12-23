@@ -126,6 +126,13 @@
       "title": "The Blindspot",
       "without_activity": "+2 weeks w/o activity"
     },
+    "habits": {
+      "completed": "Completed",
+      "completion": "Completion",
+      "no_habits": "No habits",
+      "none": "None",
+      "remaining": "Remaining"
+    },
     "task_status": {
       "DOING": "Doing",
       "DONE": "Done",
