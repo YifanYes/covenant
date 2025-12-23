@@ -121,6 +121,16 @@
       "title": "El punto ciego",
       "without_activity": "+2 semanas sin actividad"
     },
+    "task_status": {
+      "DOING": "En proceso",
+      "DONE": "Completadas",
+      "OVERDUE": "Vencidas",
+      "TODO": "Por hacer",
+      "no_status": "Sin estado",
+      "no_tasks": "No hay tareas",
+      "tasks": "Tareas",
+      "title": "Estado de tareas"
+    },
     "title": "¡Bienvenido, {{name}}!",
     "upcoming": {
       "no_tasks": "¡Felicidades! No hay tareas pendientes para hoy o mañana.",

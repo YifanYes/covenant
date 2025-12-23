@@ -121,6 +121,16 @@
       "title": "The Blindspot",
       "without_activity": "+2 weeks w/o activity"
     },
+    "task_status": {
+      "DOING": "Doing",
+      "DONE": "Done",
+      "OVERDUE": "Overdue",
+      "TODO": "To do",
+      "no_status": "No status",
+      "no_tasks": "No tasks",
+      "tasks": "Tasks",
+      "title": "Task status"
+    },
     "title": "Welcome back, {{name}}!",
     "upcoming": {
       "no_tasks": "Congratulations! No pending tasks for today or tomorrow.",
