@@ -58,12 +58,12 @@ export const authRouter = t.router({
     }
   }),
   refreshToken: publicProcedure.input(refreshTokenSchema).mutation(async ({ ctx, input }) => {
-    const { data, error } = await ctx.supabase.auth.setSession({
-      access_token: input.accessToken,
+    const { data, error } = await ctx.supabase.auth.refreshSession({
       refresh_token: input.refreshToken
     })
 
     if (error || !data.session) {
+      console.error('Token refresh failed:', error)
       throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Token refresh failed' })
     }
 
