@@ -1,10 +1,11 @@
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { Area, Task } from '@/types/models.types'
+import { parseTranslationKey } from '@/utils/locale.utils'
 import { TrackChanges } from '@nsmr/pixelart-react'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from 'recharts'
+import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, type RadarProps } from 'recharts'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
 import CustomAngleTick from './components/CustomAngleTick.component'
 
@@ -14,12 +15,13 @@ interface AreasDistributionComponentProps {
 }
 
 export default function AreasDistributionComponent({ tasks, areas }: AreasDistributionComponentProps) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   const areaChartData = useMemo(() => {
-    if (!areas || !tasks) return { data: [], config: {} as ChartConfig }
+    if (!areas || !tasks) return { data: [], config: {} }
 
     const [thisM, lastM] = [dayjs(), dayjs().subtract(1, 'month')]
+
     const counts = tasks.reduce(
       (acc, task) => {
         if (!task.createdAt) return acc
@@ -37,20 +39,27 @@ export default function AreasDistributionComponent({ tasks, areas }: AreasDistri
       { curr: {} as Record<string, number>, prev: {} as Record<string, number> }
     )
 
-    const data = areas
-      .filter((a) => counts.curr[a.id] || counts.prev[a.id])
-      .map((a) => {
-        const label = i18n.exists(a.name) ? t(a.name) : i18n.exists(`areas.${a.name}`) ? t(`areas.${a.name}`) : a.name
-        return {
-          area: label,
+    const data = areas.reduce(
+      (acc, a) => {
+        const curr = counts.curr[a.id]
+        const prev = counts.prev[a.id]
+
+        if (!curr && !prev) return acc
+
+        acc.push({
+          name: parseTranslationKey(`areas.${a.name}`),
           iconName: a.icon,
           color: a.color,
-          thisMonth: counts.curr[a.id] || 0,
-          lastMonth: counts.prev[a.id] || 0
-        }
-      })
+          thisMonth: curr || 0,
+          lastMonth: prev || 0
+        })
 
-    const config: ChartConfig = {
+        return acc
+      },
+      [] as { name: string; iconName: string | null; color: string | null; thisMonth: number; lastMonth: number }[]
+    )
+
+    const config: Record<string, RadarProps> & ChartConfig = {
       thisMonth: {
         name: t('dashboard.areas_distribution.this_month'),
         color: 'var(--chart-4)',
@@ -58,7 +67,7 @@ export default function AreasDistributionComponent({ tasks, areas }: AreasDistri
         fill: 'var(--chart-4)',
         fillOpacity: 0.6,
         dataKey: 'thisMonth'
-      } as any,
+      },
       lastMonth: {
         name: t('dashboard.areas_distribution.last_month'),
         color: 'var(--chart-2)',
@@ -66,11 +75,11 @@ export default function AreasDistributionComponent({ tasks, areas }: AreasDistri
         fill: 'var(--chart-2)',
         fillOpacity: 0.2,
         dataKey: 'lastMonth'
-      } as any
+      }
     }
 
     return { data, config }
-  }, [areas, tasks, t, i18n])
+  }, [areas, tasks, t])
 
   return (
     <DashboardSectionWrapperComponent
@@ -86,8 +95,8 @@ export default function AreasDistributionComponent({ tasks, areas }: AreasDistri
             <PolarGrid stroke='var(--muted-foreground)' opacity={0.2} />
             <PolarAngleAxis dataKey='area' tick={<CustomAngleTick data={areaChartData.data} />} />
             <PolarRadiusAxis axisLine={false} tick={false} domain={['dataMin', 'dataMax']} />
-            <Radar {...(areaChartData.config.thisMonth as ChartConfig)} />
-            <Radar {...(areaChartData.config.lastMonth as ChartConfig)} />
+            <Radar {...areaChartData.config.thisMonth} />
+            <Radar {...areaChartData.config.lastMonth} />
           </RadarChart>
         </ChartContainer>
       ) : (

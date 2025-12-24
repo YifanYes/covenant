@@ -1,4 +1,5 @@
 import type { Habit, Task } from '@/types/models.types'
+import { parseTranslationKey } from '@/utils/locale.utils'
 import { Hourglass } from '@nsmr/pixelart-react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import dayjs from 'dayjs'
@@ -13,7 +14,7 @@ interface EfficiencyMetricsComponentProps {
 }
 
 export default function EfficiencyMetricsComponent({ tasks, habits }: EfficiencyMetricsComponentProps) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   const metrics = useMemo(() => {
     const lastMonth = dayjs().subtract(1, 'month')
@@ -80,14 +81,7 @@ export default function EfficiencyMetricsComponent({ tasks, habits }: Efficiency
     const mostFocusedAreaName =
       Object.entries(areaCount).sort((a, b) => b[1] - a[1])[0]?.[0] || t('dashboard.completion_metrics.none')
 
-    const getAreaLabel = (name: string) => {
-      if (i18n.exists(name)) return t(name)
-      const namespaced = `areas.${name}`
-      if (i18n.exists(namespaced)) return t(namespaced)
-      return name
-    }
-
-    const mostFocusedArea = getAreaLabel(mostFocusedAreaName)
+    const mostFocusedArea = parseTranslationKey(`areas.${mostFocusedAreaName}`)
 
     // 4. Most focused objective (last month)
     const objectiveCount: Record<string, number> = {}
@@ -106,7 +100,7 @@ export default function EfficiencyMetricsComponent({ tasks, habits }: Efficiency
       mostFocusedArea,
       mostFocusedObjective
     }
-  }, [tasks, habits, t, i18n])
+  }, [tasks, habits, t])
 
   return (
     <DashboardSectionWrapperComponent

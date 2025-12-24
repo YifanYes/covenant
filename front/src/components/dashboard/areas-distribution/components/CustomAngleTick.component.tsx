@@ -8,8 +8,8 @@ export default function CustomAngleTick({ payload, x, y, textAnchor, data }: any
 
   if (!area) return null
 
-  const icon = allIcons.find((i) => i.name === area.iconName)
-  const styles = areaSimpleStyles?.find((s) => s.color === area.color)?.styles
+  const icon = allIcons.find((icon) => icon.name === area.iconName)
+  const styles = areaSimpleStyles?.find((style) => style.color === area.color)?.styles
 
   return (
     <g transform={`translate(${x},${y})`}>

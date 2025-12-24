@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
+import BlindspotListComponent from './components/BlindspotList.component'
 
 interface BlindspotComponentProps {
   areas: Area[]
@@ -12,23 +13,22 @@ interface BlindspotComponentProps {
 }
 
 const getBlindspot = (items: any[], completions: Record<string, dayjs.Dayjs | null>, threshold: dayjs.Dayjs) =>
-  items
-    .filter((item) => !completions[item.id] || completions[item.id]!.isBefore(threshold))
-    .map((item) => ({ name: item.name, lastCompletion: completions[item.id] }))
+  items.reduce(
+    (acc, item) => {
+      const lastCompletion = completions[item.id]
+      return !lastCompletion || lastCompletion!.isBefore(threshold)
+        ? [...acc, { name: item.name, lastCompletion }]
+        : acc
+    },
+    [] as { name: string; lastCompletion: dayjs.Dayjs | null }[]
+  )
 
 const updateIfLater = (map: Record<string, dayjs.Dayjs | null>, id: string, completionDate: dayjs.Dayjs) => {
   if (!map[id] || completionDate.isAfter(map[id])) map[id] = completionDate
 }
 
 export default function BlindspotComponent({ areas, tasks }: BlindspotComponentProps) {
-  const { t, i18n } = useTranslation()
-
-  const getLabel = (name: string) => {
-    if (i18n.exists(name)) return t(name)
-    const namespaced = `areas.${name}`
-    if (i18n.exists(namespaced)) return t(namespaced)
-    return name
-  }
+  const { t } = useTranslation()
 
   const { blindspotAreas, blindspotObjectives } = useMemo(() => {
     if (!areas || !tasks) {
@@ -61,20 +61,6 @@ export default function BlindspotComponent({ areas, tasks }: BlindspotComponentP
     }
   }, [areas, tasks])
 
-  const renderList = (items: { name: string; lastCompletion: dayjs.Dayjs | null }[], emptyKey: string) =>
-    items.length === 0 ? (
-      <p className='text-muted-foreground text-xs'>{t(emptyKey)}</p>
-    ) : (
-      <ul className='list-inside list-disc space-y-1 text-xs'>
-        {items.map((item, i) => (
-          <li key={i}>
-            {getLabel(item.name)}: {item.lastCompletion ? dayjs(item.lastCompletion).get('days') : '∞'}{' '}
-            {t('dashboard.blindspot.days')}
-          </li>
-        ))}
-      </ul>
-    )
-
   return (
     <DashboardSectionWrapperComponent
       title={`${t('dashboard.blindspot.title')} (${t('dashboard.blindspot.without_activity')})`}
@@ -89,7 +75,7 @@ export default function BlindspotComponent({ areas, tasks }: BlindspotComponentP
           {t('dashboard.blindspot.areas')}
         </div>
         <div className='scrollbar-thin scrollbar-thumb-destructive/20 overflow-y-auto'>
-          {renderList(blindspotAreas, 'dashboard.blindspot.all_areas_covered')}
+          <BlindspotListComponent items={blindspotAreas} emptyKey='dashboard.blindspot.all_areas_covered' />
         </div>
       </div>
       <div className='border-destructive/10 bg-destructive/5 flex max-h-[200px] flex-col rounded-lg border p-4'>
@@ -98,7 +84,7 @@ export default function BlindspotComponent({ areas, tasks }: BlindspotComponentP
           {t('dashboard.blindspot.objectives')}
         </div>
         <div className='scrollbar-thin scrollbar-thumb-destructive/20 overflow-y-auto'>
-          {renderList(blindspotObjectives, 'dashboard.blindspot.all_objectives_covered')}
+          <BlindspotListComponent items={blindspotObjectives} emptyKey='dashboard.blindspot.all_objectives_covered' />
         </div>
       </div>
     </DashboardSectionWrapperComponent>
