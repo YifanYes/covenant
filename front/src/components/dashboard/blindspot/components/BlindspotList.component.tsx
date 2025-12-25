@@ -18,8 +18,8 @@ export default function BlindspotListComponent({ items, emptyKey }: BlindspotLis
     <ul className='list-inside list-disc space-y-1 text-xs'>
       {items.map((item, i) => (
         <li key={i}>
-          {parseTranslationKey(`areas.${item.name}`)}:{' '}
-          {item.lastCompletion ? dayjs(item.lastCompletion).get('days') : '∞'} {t('dashboard.blindspot.days')}
+          {parseTranslationKey(item.name)}: {item.lastCompletion ? dayjs(item.lastCompletion).get('days') : '∞'}{' '}
+          {t('dashboard.blindspot.days')}
         </li>
       ))}
     </ul>

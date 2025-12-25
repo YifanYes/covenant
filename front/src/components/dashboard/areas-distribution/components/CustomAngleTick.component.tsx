@@ -1,15 +1,19 @@
 import useTheme from '@/hooks/use-theme'
-import { areaSimpleStyles } from '@/types/colors.types'
-import { allIcons } from '@/types/icons.types'
+import { getAreaStylesAndIcon } from '@/utils/areas.utils'
+import type { TickItemTextProps } from 'recharts/types/polar/PolarAngleAxis'
+import type { AreasDistributionDataItem } from '../AreasDistribution.model'
 
-export default function CustomAngleTick({ payload, x, y, textAnchor, data }: any) {
+interface CustomAngleTickComponentProps extends TickItemTextProps {
+  data: AreasDistributionDataItem[]
+}
+
+export default function CustomAngleTickComponent({ payload, x, y, textAnchor, data }: CustomAngleTickComponentProps) {
   const { theme } = useTheme()
   const area = data?.[payload.index]
 
   if (!area) return null
 
-  const icon = allIcons.find((icon) => icon.name === area.iconName)
-  const styles = areaSimpleStyles?.find((style) => style.color === area.color)?.styles
+  const { icon, styles } = getAreaStylesAndIcon(area)
 
   return (
     <g transform={`translate(${x},${y})`}>

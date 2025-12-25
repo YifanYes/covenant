@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { parseTranslationKey } from '@/utils/locale.utils'
 import { type ReactNode } from 'react'
 import { Link } from 'react-router'
 
@@ -32,7 +33,7 @@ export default function DashboardSectionWrapperComponent({
         <div className='space-y-1'>
           <CardTitle className='flex items-center gap-2'>
             <Icon className={`h-5 w-5 ${iconColorClass}`} />
-            {title}
+            {parseTranslationKey(title)}
           </CardTitle>
           <CardDescription>{description}</CardDescription>
         </div>
