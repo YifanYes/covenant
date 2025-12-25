@@ -1,14 +1,15 @@
+import { supabase } from '@/lib/supabase'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 type AuthStore = {
   email: string
   userId: string
-  accessToken: string
-  refreshToken: string
-  updateUserInfo: (userInfo: { email: string; userId: string; accessToken: string; refreshToken: string }) => void
+  isLoading: boolean
+  updateUserInfo: (userInfo: { email: string; userId: string }) => void
   resetUserInfo: () => void
-  setTokens: (tokens: { accessToken: string; refreshToken: string }) => void
+  setLoading: (loading: boolean) => void
+  signOut: () => Promise<void>
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -16,25 +17,18 @@ export const useAuthStore = create<AuthStore>()(
     (set) => ({
       email: '',
       userId: '',
-      accessToken: '',
-      refreshToken: '',
-      updateUserInfo: ({
-        email,
-        userId,
-        accessToken,
-        refreshToken
-      }: {
-        email: string
-        userId: string
-        accessToken: string
-        refreshToken: string
-      }) => set({ email, userId, accessToken, refreshToken }),
-      resetUserInfo: () => set({ email: '', userId: '', accessToken: '', refreshToken: '' }),
-      setTokens: ({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) =>
-        set({ accessToken, refreshToken })
+      isLoading: true,
+      updateUserInfo: ({ email, userId }: { email: string; userId: string }) => set({ email, userId }),
+      resetUserInfo: () => set({ email: '', userId: '' }),
+      setLoading: (loading: boolean) => set({ isLoading: loading }),
+      signOut: async () => {
+        await supabase.auth.signOut()
+        set({ email: '', userId: '' })
+      }
     }),
     {
-      name: 'arq-store'
+      name: 'arq-store',
+      partialize: (state) => ({ email: state.email, userId: state.userId })
     }
   )
 )
