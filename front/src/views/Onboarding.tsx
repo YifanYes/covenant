@@ -12,9 +12,11 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
+import { useHandleMagicLink } from '../hooks/use-handle-magic-link'
 
 export default function Onboarding() {
   const { t } = useTranslation()
+  useHandleMagicLink()
   const navigate = useNavigate()
 
   const createCharacterMutation = useMutation({

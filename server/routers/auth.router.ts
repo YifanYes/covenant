@@ -1,4 +1,4 @@
-import { loginSchema, signUpSchema } from '@shared/schemas/auth.schemas'
+import { loginSchema, refreshTokenSchema, signUpSchema } from '@shared/schemas/auth.schemas'
 import { TRPCError } from '@trpc/server'
 import { env } from '../config'
 import { protectedProcedure, publicProcedure, t } from '../trpc'
@@ -42,6 +42,34 @@ export const authRouter = t.router({
 
     return {
       message: 'Magic link sent to your email'
+    }
+  }),
+  logout: protectedProcedure.mutation(async ({ ctx }) => {
+    const { error } = await ctx.supabase.auth.signOut()
+
+    if (error) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR'
+      })
+    }
+
+    return {
+      message: 'Logout successfully'
+    }
+  }),
+  refreshToken: publicProcedure.input(refreshTokenSchema).mutation(async ({ ctx, input }) => {
+    const { data, error } = await ctx.supabase.auth.setSession({
+      access_token: input.accessToken,
+      refresh_token: input.refreshToken
+    })
+
+    if (error || !data.session) {
+      throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Token refresh failed' })
+    }
+
+    return {
+      accessToken: data.session.access_token,
+      refreshToken: data.session.refresh_token
     }
   }),
   deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {

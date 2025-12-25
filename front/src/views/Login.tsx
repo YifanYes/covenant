@@ -2,26 +2,27 @@ import Link from '@/components/Link'
 import LoaderButton from '@/components/LoaderButton'
 import TextInput from '@/components/forms/TextInput'
 import { Alert as AlertComponent, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { useAuthStore } from '@/hooks/use-auth-store'
-import { supabase } from '@/lib/supabase'
 import { trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Alert, Check, Mail } from '@nsmr/pixelart-react'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
 import { useMutation } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router'
 import { toast } from 'sonner'
+import { useAuthStore } from '../hooks/use-auth-store'
 
 export default function Login() {
   const { t } = useTranslation()
   const { updateUserInfo } = useAuthStore()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const [isAccountVerified, setIsAccountVerified] = useState(false)
   const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [isVerifyingOTP, setIsVerifyingOTP] = useState(false)
+  const [magicLinkError, setMagicLinkError] = useState<string | null>(null)
 
   const loginMutation = useMutation(
     trpc.auth.login.mutationOptions({
@@ -47,44 +48,68 @@ export default function Login() {
     mode: 'onTouched'
   })
 
-  // Parse hash and search params once during render to compute initial state
-  const urlState = useMemo(() => {
-    const hash = typeof window !== 'undefined' ? window.location.hash.substring(1) : ''
+  useEffect(() => {
+    // Parse hash fragment for Supabase magic link callback
+    const hash = window.location.hash.substring(1) // Remove the '#'
     const hashParams = new URLSearchParams(hash)
 
-    const error = hashParams.get('error')
-    const errorDescription = hashParams.get('error_description')
+    const accessToken = hashParams.get('access_token')
+    const refreshToken = hashParams.get('refresh_token')
     const hashType = hashParams.get('type')
 
-    // Compute derived state from URL
-    const magicLinkError = error && errorDescription ? errorDescription.replace(/\+/g, ' ') : null
-    const hasError = Boolean(error && errorDescription)
+    // Check for errors in hash (e.g., expired magic link)
+    const error = hashParams.get('error')
+    const errorDescription = hashParams.get('error_description')
 
-    return {
-      error,
-      errorDescription,
-      hashType,
-      magicLinkError,
-      hasError
-    }
-  }, [])
-
-  // Clean up URL if there was an error in the hash
-  useEffect(() => {
-    if (urlState.hasError) {
-      window.history.replaceState(null, '', window.location.pathname)
-    }
-  }, [urlState.hasError])
-
-  // Handle verification redirect on mount
-  useEffect(() => {
+    // Check search params for other scenarios
     const verified = searchParams.get('verified')
     const type = searchParams.get('type')
     const redirectTo = searchParams.get('redirect_to')
 
-    const isVerified = verified === 'true' || type === 'signup' || urlState.hashType === 'signup'
+    if (error && errorDescription) {
+      setMagicLinkError(errorDescription.replace(/\+/g, ' '))
 
-    if (isVerified) {
+      window.history.replaceState(null, '', window.location.pathname)
+      return
+    }
+
+    // Handle Supabase magic link callback (tokens in URL hash)
+    if (accessToken && refreshToken) {
+      setIsVerifyingOTP(true)
+
+      try {
+        const payload = JSON.parse(atob(accessToken.split('.')[1]))
+        const userEmail = payload.email
+        const userId = payload.sub
+
+        updateUserInfo({
+          email: userEmail,
+          userId: userId,
+          accessToken: accessToken,
+          refreshToken: refreshToken
+        })
+
+        // Clear the hash from the URL
+        window.history.replaceState(null, '', window.location.pathname)
+
+        // Navigate to the desired location after successful login
+        const destination = redirectTo ? new URL(redirectTo).pathname : '/dashboard'
+        navigate(destination)
+      } catch (error) {
+        console.error('Error parsing access token:', error)
+        setIsVerifyingOTP(false)
+        toast.error(t('login.error.invalid_magic_link'), {
+          description: 'Failed to parse authentication tokens'
+        })
+      }
+      return
+    }
+
+    // Check if account was verified (either via 'verified' param or 'type=signup' from hash)
+    if (verified === 'true' || type === 'signup' || hashType === 'signup') {
+      setIsAccountVerified(true)
+
+      // Clean up the URL parameters
       const newSearchParams = new URLSearchParams(searchParams)
       newSearchParams.delete('verified')
       newSearchParams.delete('type')
@@ -95,40 +120,11 @@ export default function Login() {
         window.history.replaceState(null, '', window.location.pathname + window.location.search)
       }
 
+      // After verification, redirect to the provided destination (default to onboarding)
       const destination = redirectTo ? new URL(redirectTo).pathname : '/onboarding'
       navigate(destination)
     }
-  }, [searchParams, setSearchParams, navigate, urlState.hashType])
-
-  // Listen to Supabase auth state changes
-  useEffect(() => {
-    const {
-      data: { subscription }
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        setIsVerifyingOTP(true)
-
-        updateUserInfo({
-          email: session.user.email || '',
-          userId: session.user.id
-        })
-
-        window.history.replaceState(null, '', window.location.pathname)
-
-        const redirectTo = searchParams.get('redirect_to')
-        const destination = redirectTo ? new URL(redirectTo).pathname : '/dashboard'
-        navigate(destination)
-      }
-    })
-
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [updateUserInfo, navigate, searchParams])
-
-  // Compute display state from URL
-  const isAccountVerified =
-    searchParams.get('verified') === 'true' || searchParams.get('type') === 'signup' || urlState.hashType === 'signup'
+  }, [searchParams, setSearchParams, updateUserInfo, navigate, t])
 
   if (isVerifyingOTP) {
     return (
@@ -166,11 +162,11 @@ export default function Login() {
           <AlertDescription>{t('login.account_verified.description')}</AlertDescription>
         </AlertComponent>
       )}
-      {urlState.magicLinkError && (
+      {magicLinkError && (
         <AlertComponent variant='destructive'>
           <Alert />
           <AlertTitle>{t('login.error.magic_link_error')}</AlertTitle>
-          <AlertDescription>{urlState.magicLinkError}</AlertDescription>
+          <AlertDescription>{magicLinkError}</AlertDescription>
         </AlertComponent>
       )}
       <TextInput

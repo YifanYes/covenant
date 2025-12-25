@@ -1,59 +1,27 @@
-import { supabase } from '@/lib/supabase'
-import { useEffect, useState } from 'react'
+import { useAuthStore } from '@/hooks/use-auth-store'
+import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router'
 
 export default function PrivateRoute() {
+  const { accessToken, refreshToken } = useAuthStore()
   const navigate = useNavigate()
 
-  // Check if there's a hash with tokens (magic link callback)
-  const hash = typeof window !== 'undefined' ? window.location.hash.substring(1) : ''
-  const hashParams = new URLSearchParams(hash)
-  const hasTokensInUrl = !!hashParams.get('access_token') && !!hashParams.get('refresh_token')
-
-  const [isLoading, setIsLoading] = useState(true)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-
   useEffect(() => {
-    // If tokens are in URL, wait for Supabase to process them
-    if (hasTokensInUrl) {
-      return
-    }
+    // If we don't have tokens, but a Supabase magic‑link hash is present, wait for the hook to populate the store
+    const hash = window.location.hash.substring(1)
+    const hashParams = new URLSearchParams(hash)
+    const hasAccess = !!hashParams.get('access_token')
+    const hasRefresh = !!hashParams.get('refresh_token')
 
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setIsAuthenticated(true)
-      } else {
-        navigate('/login')
+    if (!accessToken || !refreshToken) {
+      if (hasAccess && hasRefresh) {
+        // Tokens will be set by useHandleMagicLink
+        return
       }
-      setIsLoading(false)
-    })
-
-    // Listen for auth changes
-    const {
-      data: { subscription }
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        setIsAuthenticated(true)
-        setIsLoading(false)
-      } else if (event === 'SIGNED_OUT') {
-        setIsAuthenticated(false)
-        navigate('/login')
-      }
-    })
-
-    return () => {
-      subscription.unsubscribe()
+      
+      navigate('/login')
     }
-  }, [navigate, hasTokensInUrl])
-
-  if (isLoading || hasTokensInUrl) {
-    return null // Or a loading spinner
-  }
-
-  if (!isAuthenticated) {
-    return null
-  }
+  }, [accessToken, refreshToken, navigate])
 
   return <Outlet />
 }
