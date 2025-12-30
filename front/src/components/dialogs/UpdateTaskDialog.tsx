@@ -138,7 +138,7 @@ export const UpdateTaskDialog = () => {
                 <SingleSelect
                   value={field.value}
                   placeholder={t('update_task_dialog.status_placeholder')}
-                  options={map(TaskStatus, (status) => ({ value: status, label: t(status) }))}
+                  options={map(TaskStatus, (status) => ({ value: status, label: t(`task_status.${status}`) }))}
                   onChange={field.onChange}
                 />
               )}
