@@ -12,7 +12,8 @@ export default function MultiSelect({
   placeholder = 'Select...',
   label,
   required,
-  errorMessage
+  errorMessage,
+  exclusiveValue
 }: {
   name: string
   control: Control<any>
@@ -24,6 +25,7 @@ export default function MultiSelect({
   label?: string
   required?: boolean
   errorMessage?: string
+  exclusiveValue?: string
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -53,11 +55,24 @@ export default function MultiSelect({
         const value: string[] = field.value || []
 
         const toggleItem = (id: string) => {
-          if (value.includes(id)) {
-            field.onChange(value.filter((v) => v !== id))
-          } else {
-            field.onChange([...value, id])
+          if (exclusiveValue && id === exclusiveValue) {
+            field.onChange([exclusiveValue])
+            return
           }
+
+          let newValue = [...value]
+
+          if (exclusiveValue && newValue.includes(exclusiveValue)) {
+            newValue = []
+          }
+
+          if (newValue.includes(id)) {
+            newValue = newValue.filter((v) => v !== id)
+          } else {
+            newValue.push(id)
+          }
+
+          field.onChange(newValue)
         }
 
         const displayText =

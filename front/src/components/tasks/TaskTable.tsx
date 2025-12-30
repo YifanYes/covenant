@@ -11,10 +11,12 @@ import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schema
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { omit } from 'es-toolkit/compat'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import DatePicker from '../forms/DatePicker'
+import MultiSelect from '../forms/MultiSelect'
 import { Button } from '../ui/button'
 
 // Determine task type based on effort and impact
@@ -33,10 +35,23 @@ export default function TasksTable() {
   const { data } = useSuspenseQuery(trpc.tasks.getAll.queryOptions())
   const { setSelectedTask } = useTasksStore()
 
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [effortImpactFilter, setEffortImpactFilter] = useState<string>('all')
-  const [dateFilter, setDateFilter] = useState<Date | null>(null)
+  const form = useForm({
+    defaultValues: {
+      searchQuery: '',
+      statusFilter: ['all'],
+      effortImpactFilter: ['all'],
+      dateFilter: null as Date | null
+    }
+  })
+
+  const {
+    searchQuery = '',
+    statusFilter = ['all'],
+    effortImpactFilter = ['all'],
+    dateFilter = null
+  } = useWatch({
+    control: form.control
+  })
 
   const updateTaskMutation = useMutation(
     trpc.tasks.update.mutationOptions({
@@ -59,13 +74,13 @@ export default function TasksTable() {
       const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase())
 
       // Status filter
-      const matchesStatus = statusFilter === 'all' || task.status === statusFilter
+      const matchesStatus = statusFilter.includes('all') || statusFilter.includes(task.status)
 
       // Effort/Impact filter
       let matchesEffortImpact = true
-      if (effortImpactFilter !== 'all') {
-        const [impact, effort] = effortImpactFilter.split('|')
-        matchesEffortImpact = task.impact === impact && task.effort === effort
+      if (!effortImpactFilter.includes('all')) {
+        const key = `${task.impact}|${task.effort}`
+        matchesEffortImpact = effortImpactFilter.includes(key)
       }
 
       // Date filter
@@ -91,14 +106,16 @@ export default function TasksTable() {
   }
 
   const clearFilters = () => {
-    setSearchQuery('')
-    setStatusFilter('all')
-    setEffortImpactFilter('all')
-    setDateFilter(null)
+    form.reset({
+      searchQuery: '',
+      statusFilter: ['all'],
+      effortImpactFilter: ['all'],
+      dateFilter: null
+    })
   }
 
   const hasActiveFilters =
-    searchQuery !== '' || statusFilter !== 'all' || effortImpactFilter !== 'all' || dateFilter !== null
+    searchQuery !== '' || !statusFilter.includes('all') || !effortImpactFilter.includes('all') || dateFilter !== null
 
   return (
     <div className='flex h-full flex-col'>
@@ -106,42 +123,56 @@ export default function TasksTable() {
         <div className='flex items-center gap-4'>
           <Input
             placeholder={t('tasks.filters.search_placeholder')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            {...form.register('searchQuery')}
             className='w-[300px] flex-none'
           />
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className='w-[200px] shrink-0'>
-              <SelectValue placeholder={t('tasks.filters.status_placeholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>{t('tasks.filters.all_statuses')}</SelectItem>
-              {Object.values(TaskStatus).map((status) => (
-                <SelectItem key={status} value={status}>
-                  {t(`task_status.${status}`)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={effortImpactFilter} onValueChange={setEffortImpactFilter}>
-            <SelectTrigger className='w-[200px] shrink-0'>
-              <SelectValue placeholder={t('tasks.filters.effort_placeholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>{t('tasks.filters.all_types')}</SelectItem>
-              <SelectItem value={`${TaskImpact.HIGH}|${TaskEffort.LOW}`}>{t('tasks.task_types.quick_win')}</SelectItem>
-              <SelectItem value={`${TaskImpact.HIGH}|${TaskEffort.HIGH}`}>
-                {t('tasks.task_types.major_project')}
-              </SelectItem>
-              <SelectItem value={`${TaskImpact.LOW}|${TaskEffort.LOW}`}>{t('tasks.task_types.fill_in')}</SelectItem>
-              <SelectItem value={`${TaskImpact.LOW}|${TaskEffort.HIGH}`}>
-                {t('tasks.task_types.thankless_task')}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <div className='w-[200px] shrink-0'>
+            <MultiSelect
+              control={form.control}
+              name='statusFilter'
+              placeholder={t('tasks.filters.status_placeholder')}
+              exclusiveValue='all'
+              items={[
+                { id: 'all', label: t('tasks.filters.all_statuses') },
+                ...Object.values(TaskStatus)
+                  .filter((status) => status !== TaskStatus.DONE)
+                  .map((status) => ({
+                    id: status,
+                    label: t(`task_status.${status}`)
+                  }))
+              ]}
+            />
+          </div>
+          <div className='w-[200px] shrink-0'>
+            <MultiSelect
+              control={form.control}
+              name='effortImpactFilter'
+              placeholder={t('tasks.filters.effort_placeholder')}
+              exclusiveValue='all'
+              items={[
+                { id: 'all', label: t('tasks.filters.all_types') },
+                {
+                  id: `${TaskImpact.HIGH}|${TaskEffort.LOW}`,
+                  label: t('tasks.task_types.quick_win')
+                },
+                {
+                  id: `${TaskImpact.HIGH}|${TaskEffort.HIGH}`,
+                  label: t('tasks.task_types.major_project')
+                },
+                {
+                  id: `${TaskImpact.LOW}|${TaskEffort.LOW}`,
+                  label: t('tasks.task_types.fill_in')
+                },
+                {
+                  id: `${TaskImpact.LOW}|${TaskEffort.HIGH}`,
+                  label: t('tasks.task_types.thankless_task')
+                }
+              ]}
+            />
+          </div>
           <DatePicker
             value={dateFilter}
-            onChange={setDateFilter}
+            onChange={(date) => form.setValue('dateFilter', date)}
             placeholder={t('tasks.filters.date_placeholder')}
             className='w-[210px]'
           />
