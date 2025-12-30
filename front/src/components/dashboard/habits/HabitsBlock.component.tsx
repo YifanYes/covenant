@@ -1,4 +1,3 @@
-import type { Habit } from '@/types/models.types'
 import { Checklist } from '@nsmr/pixelart-react'
 import { useMemo } from 'react'
 import DashboardPieChartComponent from '../dashboard-pie-chart/DashboardPieChart.component'
@@ -7,11 +6,14 @@ import { defaultHabitConfig } from './HabitsBlock.config'
 import { getHabitStats } from './HabitsBlock.utils'
 
 interface HabitsBlockComponentProps {
-  habits: Habit[]
+  metrics: {
+    completedToday: number
+    totalDaily: number
+  }
 }
 
-export default function HabitsBlockComponent({ habits }: HabitsBlockComponentProps) {
-  const { chartData, completionRate } = useMemo(() => getHabitStats(habits), [habits])
+export default function HabitsBlockComponent({ metrics }: HabitsBlockComponentProps) {
+  const { chartData, completionRate } = useMemo(() => getHabitStats(metrics), [metrics])
 
   return (
     <DashboardSectionWrapperComponent
@@ -23,9 +25,9 @@ export default function HabitsBlockComponent({ habits }: HabitsBlockComponentPro
     >
       <DashboardPieChartComponent
         data={chartData}
-        collectionLength={chartData?.length || 0}
+        collectionLength={metrics?.completedToday}
         config={defaultHabitConfig}
-        labelValue={`${completionRate?.toLocaleString()}%`}
+        labelValue={completionRate}
         chartLabel='dashboard.habits.completion'
         emptyLabel='dashboard.habits.no_habits'
       />

@@ -1,4 +1,3 @@
-import type { Task } from '@/types/models.types'
 import { Zap } from '@nsmr/pixelart-react'
 import { useMemo } from 'react'
 import DashboardPieChartComponent from '../dashboard-pie-chart/DashboardPieChart.component'
@@ -7,11 +6,11 @@ import { defaultTaskConfig } from './TaskStatus.config'
 import { getTaskStatusStats } from './TaskStatus.utils'
 
 interface TaskStatusComponentProps {
-  tasks: Task[]
+  stats: Record<string, number>
 }
 
-export default function TaskStatusComponent({ tasks }: TaskStatusComponentProps) {
-  const taskStats = useMemo(() => getTaskStatusStats(tasks), [tasks])
+export default function TaskStatusComponent({ stats }: TaskStatusComponentProps) {
+  const { taskStats, totalTasks } = useMemo(() => getTaskStatusStats(stats), [stats])
 
   return (
     <DashboardSectionWrapperComponent
@@ -23,9 +22,9 @@ export default function TaskStatusComponent({ tasks }: TaskStatusComponentProps)
     >
       <DashboardPieChartComponent
         data={taskStats}
-        collectionLength={tasks?.length || 0}
+        collectionLength={totalTasks}
         config={defaultTaskConfig}
-        labelValue={tasks?.length?.toLocaleString() || '0'}
+        labelValue={totalTasks.toLocaleString()}
         chartLabel='dashboard.task_status.tasks'
         emptyLabel='dashboard.task_status.no_tasks'
       />

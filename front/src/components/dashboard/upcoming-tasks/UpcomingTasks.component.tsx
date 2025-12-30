@@ -11,7 +11,6 @@ import { CalendarMonth } from '@nsmr/pixelart-react'
 import { useTranslation } from 'react-i18next'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
 import UpcomingTaskCardComponent from './components/UpcomingTaskCard.component'
-import { getUpcomingTasks } from './UpcomingTasks.utils'
 
 interface UpcomingTasksComponentProps {
   tasks: Task[]
@@ -19,7 +18,6 @@ interface UpcomingTasksComponentProps {
 
 export default function UpcomingTasksComponent({ tasks }: UpcomingTasksComponentProps) {
   const { t } = useTranslation()
-  const upcomingTasks = getUpcomingTasks(tasks)
 
   return (
     <DashboardSectionWrapperComponent
@@ -29,10 +27,10 @@ export default function UpcomingTasksComponent({ tasks }: UpcomingTasksComponent
       className='lg:col-span-2'
       contentClassName='flex-1 px-18'
     >
-      {upcomingTasks && upcomingTasks.length > 0 ? (
+      {tasks && tasks.length > 0 ? (
         <Carousel className='align-center flex flex-1 flex-col justify-center gap-6'>
           <CarouselContent>
-            {upcomingTasks.map((task, index) => (
+            {tasks.map((task, index) => (
               <CarouselItem key={index} className='flex basis-full items-stretch'>
                 <UpcomingTaskCardComponent task={task} />
               </CarouselItem>

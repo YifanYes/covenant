@@ -1,24 +1,20 @@
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
-import type { Area, Task } from '@/types/models.types'
 import { TrackChanges } from '@nsmr/pixelart-react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from 'recharts'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
+import type { AreasDistributionDataItem } from './AreasDistribution.model'
 import { getAreasDistributionData } from './AreasDistribution.utils'
 import CustomAngleTickComponent from './components/CustomAngleTick.component'
 
-interface AreasDistributionComponentProps {
-  tasks: Task[]
-  areas: Area[]
+export interface AreasDistributionComponentProps {
+  areas: AreasDistributionDataItem[]
 }
 
-export default function AreasDistributionComponent({ tasks, areas }: AreasDistributionComponentProps) {
+export default function AreasDistributionComponent({ areas }: AreasDistributionComponentProps) {
   const { t } = useTranslation()
-  const { data = [], config = {} } = useMemo(
-    () => areas && tasks && getAreasDistributionData(areas, tasks),
-    [areas, tasks]
-  )
+  const { localizedData, config } = useMemo(() => getAreasDistributionData(areas), [areas])
 
   return (
     <DashboardSectionWrapperComponent
@@ -27,12 +23,15 @@ export default function AreasDistributionComponent({ tasks, areas }: AreasDistri
       iconColorClass='text-orange-500'
       className='gap-0'
     >
-      {data.length > 0 ? (
+      {localizedData.length > 0 ? (
         <ChartContainer config={config} className='min-h-[220px] w-full'>
-          <RadarChart data={data}>
+          <RadarChart data={localizedData}>
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <PolarGrid stroke='var(--muted-foreground)' opacity={0.2} />
-            <PolarAngleAxis dataKey='area' tick={(props) => <CustomAngleTickComponent {...props} data={data} />} />
+            <PolarAngleAxis
+              dataKey='name'
+              tick={(props) => <CustomAngleTickComponent {...props} data={localizedData} />}
+            />
             <PolarRadiusAxis axisLine={false} tick={false} domain={['dataMin', 'dataMax']} />
             <Radar {...config.thisMonth} />
             <Radar {...config.lastMonth} />

@@ -1,22 +1,15 @@
-import type { Area, Task } from '@/types/models.types'
 import { Alert, BullseyeArrow, Trophy } from '@nsmr/pixelart-react'
-import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
-import { getBlindspotsData } from './Blindspot.utils'
 import BlindspotListComponent from './components/BlindspotList.component'
 
 interface BlindspotComponentProps {
-  areas: Area[]
-  tasks: Task[]
+  areas: { name: string; lastCompletion: string | null }[]
+  objectives: { name: string; lastCompletion: string | null }[]
 }
 
-export default function BlindspotComponent({ areas, tasks }: BlindspotComponentProps) {
+export default function BlindspotComponent({ areas, objectives }: BlindspotComponentProps) {
   const { t } = useTranslation()
-  const { blindspotAreas = [], blindspotObjectives = [] } = useMemo(
-    () => areas && tasks && getBlindspotsData(areas, tasks),
-    [areas, tasks]
-  )
 
   return (
     <DashboardSectionWrapperComponent
@@ -32,7 +25,7 @@ export default function BlindspotComponent({ areas, tasks }: BlindspotComponentP
           {t('dashboard.blindspot.areas')}
         </div>
         <div className='scrollbar-thin scrollbar-thumb-destructive/20 overflow-y-auto'>
-          <BlindspotListComponent items={blindspotAreas} emptyKey='dashboard.blindspot.all_areas_covered' />
+          <BlindspotListComponent items={areas} emptyKey='dashboard.blindspot.all_areas_covered' />
         </div>
       </div>
       <div className='border-destructive/10 bg-destructive/5 flex max-h-[200px] flex-col rounded-lg border p-4'>
@@ -41,7 +34,7 @@ export default function BlindspotComponent({ areas, tasks }: BlindspotComponentP
           {t('dashboard.blindspot.objectives')}
         </div>
         <div className='scrollbar-thin scrollbar-thumb-destructive/20 overflow-y-auto'>
-          <BlindspotListComponent items={blindspotObjectives} emptyKey='dashboard.blindspot.all_objectives_covered' />
+          <BlindspotListComponent items={objectives} emptyKey='dashboard.blindspot.all_objectives_covered' />
         </div>
       </div>
     </DashboardSectionWrapperComponent>

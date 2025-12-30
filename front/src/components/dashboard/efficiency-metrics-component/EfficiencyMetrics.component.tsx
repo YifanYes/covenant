@@ -1,22 +1,21 @@
-import type { Habit, Task } from '@/types/models.types'
 import { Hourglass } from '@nsmr/pixelart-react'
 import { Award, Compass, Flame, Target } from 'lucide-react'
-import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
 import { getEfficiencyMetricsData } from './EfficiencyMetrics.utils'
 
 interface EfficiencyMetricsComponentProps {
-  tasks?: Task[]
-  habits?: Habit[]
+  metrics: {
+    meanHabitRate: number
+    mostCommonType: string | null
+    mostFocusedArea: string | null
+    mostFocusedObjective: string | null
+  }
 }
 
-export default function EfficiencyMetricsComponent({ tasks, habits }: EfficiencyMetricsComponentProps) {
+export default function EfficiencyMetricsComponent({ metrics }: EfficiencyMetricsComponentProps) {
   const { t } = useTranslation()
-  const { meanHabitRate, mostCommonType, mostFocusedArea, mostFocusedObjective } = useMemo(
-    () => getEfficiencyMetricsData(tasks || [], habits || []),
-    [tasks, habits]
-  )
+  const { meanHabitRate, mostCommonType, mostFocusedArea, mostFocusedObjective } = getEfficiencyMetricsData(metrics)
 
   return (
     <DashboardSectionWrapperComponent
