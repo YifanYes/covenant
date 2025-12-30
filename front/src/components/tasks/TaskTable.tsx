@@ -10,6 +10,7 @@ import { Close } from '@nsmr/pixelart-react'
 import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
+import { omit } from 'es-toolkit/compat'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -49,7 +50,7 @@ export default function TasksTable() {
 
   // Get all tasks in a flat array for table view - using native methods
   const allTasks = useMemo(() => {
-    return Object.values(data?.tasks ?? {}).flat()
+    return Object.values(omit(data?.tasks, [TaskStatus.DONE])).flat()
   }, [data?.tasks])
 
   const filteredTasks = useMemo(() => {
