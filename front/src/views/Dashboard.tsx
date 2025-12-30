@@ -18,13 +18,7 @@ export default function Dashboard() {
   const name = startCase(email ? email.split('@')[0] : '')
   const date = dayjs().format('L')
 
-  const { data: habitsData } = useSuspenseQuery(trpc.habits.getAll.queryOptions())
-  const { data: tasksData } = useSuspenseQuery(trpc.tasks.getAll.queryOptions())
-  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
-
-  const allTasks = tasksData?.tasks ? Object.values(tasksData.tasks).flat() : []
-  const allHabits = habitsData?.habits || []
-  const allAreas = areasData?.areas || []
+  const { data: dashboardData } = useSuspenseQuery(trpc.dashboard.get.queryOptions())
 
   return (
     <div className='flex flex-col gap-6 p-6'>
@@ -36,12 +30,12 @@ export default function Dashboard() {
         </div>
       </div>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <UpcomingTasksComponent tasks={allTasks} />
-        <EfficiencyMetricsComponent tasks={allTasks} habits={allHabits} />
-        <TaskStatusComponent tasks={allTasks} />
-        <AreasDistributionComponent tasks={allTasks} areas={allAreas} />
-        <HabitsBlockComponent habits={allHabits} />
-        <BlindspotComponent areas={allAreas} tasks={allTasks} />
+        <UpcomingTasksComponent tasks={dashboardData.upcomingTasks} />
+        <EfficiencyMetricsComponent metrics={dashboardData.efficiencyMetrics} />
+        <TaskStatusComponent stats={dashboardData.statusStats} />
+        <AreasDistributionComponent areas={dashboardData.taskMetrics.areas} />
+        <HabitsBlockComponent metrics={dashboardData.habitsMetrics} />
+        <BlindspotComponent {...dashboardData.taskMetrics} />
       </div>
     </div>
   )
