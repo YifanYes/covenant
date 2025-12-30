@@ -1,6 +1,7 @@
 import { areasRouter } from './routers/areas.router'
 import { authRouter } from './routers/auth.router'
 import { characterRouter } from './routers/character.router'
+import { dashboardRouter } from './routers/dashboard.router'
 import { habitsRouter } from './routers/habits.router'
 import { objectivesRouter } from './routers/objectives.router'
 import { tasksRouter } from './routers/tasks.router'
@@ -17,7 +18,8 @@ export const appRouter = t.router({
   objectives: objectivesRouter,
   areas: areasRouter,
   tasks: tasksRouter,
-  habits: habitsRouter
+  habits: habitsRouter,
+  dashboard: dashboardRouter
 })
 
 export type AppRouter = typeof appRouter

@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
@@ -10,10 +9,11 @@ import { LayoutSidebarLeft } from '@nsmr/pixelart-react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = '16rem'
-const SIDEBAR_WIDTH_MOBILE = '18rem'
+const SIDEBAR_WIDTH = '12rem'
+const SIDEBAR_WIDTH_MOBILE = '14rem'
 const SIDEBAR_WIDTH_ICON = '3rem'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
 
@@ -229,32 +229,25 @@ function Sidebar({
   )
 }
 
-function SidebarTrigger({
-  className,
-  onClick,
-  showText = false,
-  ...props
-}: React.ComponentProps<typeof Button> & { showText?: boolean }) {
-  const { toggleSidebar } = useSidebar()
+function SidebarTrigger() {
+  const { toggleSidebar, open } = useSidebar()
+  const { t } = useTranslation()
 
   return (
-    <Button
-      data-sidebar='trigger'
-      data-slot='sidebar-trigger'
-      variant='ghost'
-      size='icon'
-      className={cn('size-7', showText && 'w-full justify-start px-2', className)}
-      onClick={(event) => {
-        onClick?.(event)
-        toggleSidebar()
-      }}
-      {...props}
-    >
-      <LayoutSidebarLeft />
-      <span className={cn('sr-only', showText && 'not-sr-only ml-2 group-data-[collapsible=icon]:hidden')}>
-        Toggle Sidebar
-      </span>
-    </Button>
+    <SidebarMenuItem key={t(open ? 'sidebar.close' : 'sidebar.open')}>
+      <SidebarMenuButton asChild tooltip={t(open ? 'sidebar.close' : 'sidebar.open')}>
+        <a
+          href='#'
+          onClick={(event) => {
+            event.preventDefault()
+            toggleSidebar()
+          }}
+        >
+          <LayoutSidebarLeft />
+          <span>{t(open ? 'sidebar.close' : 'sidebar.open')}</span>
+        </a>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   )
 }
 
@@ -434,7 +427,7 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<'ul'>) {
 
 function SidebarMenuItem({ className, ...props }: React.ComponentProps<'li'>) {
   return (
-    <li
+    <span
       data-slot='sidebar-menu-item'
       data-sidebar='menu-item'
       className={cn('group/menu-item relative', className)}
@@ -444,13 +437,13 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<'li'>) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
+  'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-primary hover:text-primary-foreground focus-visible:ring-2 active:bg-primary active:text-primary-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-primary data-[active=true]:font-medium data-[active=true]:text-primary-foreground data-[state=open]:hover:bg-primary data-[state=open]:hover:text-primary-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
   {
     variants: {
       variant: {
-        default: 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+        default: 'hover:bg-primary hover:text-primary-foreground',
         outline:
-          'bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]'
+          'bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-primary hover:text-primary-foreground hover:shadow-[0_0_0_1px_hsl(var(--primary))]'
       },
       size: {
         default: 'h-8 text-sm',
@@ -568,11 +561,6 @@ function SidebarMenuSkeleton({
 }: React.ComponentProps<'div'> & {
   showIcon?: boolean
 }) {
-  // Random width between 50 to 90%.
-  const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`
-  }, [])
-
   return (
     <div
       data-slot='sidebar-menu-skeleton'
@@ -586,7 +574,7 @@ function SidebarMenuSkeleton({
         data-sidebar='menu-skeleton-text'
         style={
           {
-            '--skeleton-width': width
+            '--skeleton-width': '70%'
           } as React.CSSProperties
         }
       />
