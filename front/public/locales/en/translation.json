@@ -111,6 +111,55 @@
     "title": "Create new task",
     "title_placeholder": "Task title"
   },
+  "dashboard": {
+    "areas_distribution": {
+      "last_month": "Last month",
+      "no_data": "No tasks available",
+      "tasks": "Tasks",
+      "this_month": "This month",
+      "title": "Areas distribution"
+    },
+    "blindspot": {
+      "all_areas_covered": "All areas are covered!",
+      "all_objectives_covered": "All objectives are covered!",
+      "areas": "Areas",
+      "days": "days",
+      "objectives": "Objectives",
+      "title": "The Blindspot",
+      "without_activity": "+2 weeks w/o activity"
+    },
+    "efficiency_metrics": {
+      "focused_area": "Focused area",
+      "focused_objective": "Focused objective",
+      "habit_rate": "Completed habit rate",
+      "none": "None",
+      "task_type": "Most common task",
+      "title": "Efficiency Metrics",
+      "title_efficiency": "Efficiency Metrics"
+    },
+    "habits": {
+      "completed": "Completed",
+      "completion": "Completion",
+      "no_habits": "No habits",
+      "none": "None",
+      "remaining": "Remaining"
+    },
+    "task_status": {
+      "DOING": "Doing",
+      "DONE": "Done",
+      "OVERDUE": "Overdue",
+      "TODO": "To do",
+      "no_status": "No status",
+      "no_tasks": "No tasks",
+      "tasks": "Tasks",
+      "title": "Task status"
+    },
+    "title": "Welcome back, {{name}}!",
+    "upcoming": {
+      "no_tasks": "Congratulations! No pending tasks for today or tomorrow.",
+      "title": "Upcoming"
+    }
+  },
   "delete": "Delete",
   "errors": {
     "invalid_email": "Invalid email",
@@ -252,10 +301,12 @@
   },
   "sidebar": {
     "calendar": "Calendar",
+    "close": "Collapse menu",
     "dashboard": "Dashboard",
     "habits": "Habits",
     "inventory": "Inventory",
-    "objectives": "Objectives",
+    "objectives": "Objectives and areas",
+    "open": "Expand menu",
     "review": "Review",
     "settings": "Settings",
     "tasks": "Tasks"

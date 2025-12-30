@@ -111,6 +111,55 @@
     "title": "Crear nueva tarea",
     "title_placeholder": "Título de la tarea"
   },
+  "dashboard": {
+    "areas_distribution": {
+      "last_month": "Mes pasado",
+      "no_data": "No hay tareas disponibles",
+      "tasks": "Tareas",
+      "this_month": "Este mes",
+      "title": "Distribución de áreas"
+    },
+    "blindspot": {
+      "all_areas_covered": "¡Todas las áreas están cubiertas!",
+      "all_objectives_covered": "¡Todos los objetivos están cubiertos!",
+      "areas": "Áreas",
+      "days": "días",
+      "objectives": "Objetivos",
+      "title": "El punto ciego",
+      "without_activity": "+2 semanas sin actividad"
+    },
+    "efficiency_metrics": {
+      "focused_area": "Área enfocada",
+      "focused_objective": "Objetivo enfocado",
+      "habit_rate": "Ratio hábitos completados",
+      "none": "Ninguno",
+      "task_type": "Tarea más común",
+      "title": "Métricas de eficiencia",
+      "title_efficiency": "Métricas de eficiencia"
+    },
+    "habits": {
+      "completed": "Completados",
+      "completion": "Progreso",
+      "no_habits": "Sin hábitos",
+      "none": "Ninguno",
+      "remaining": "Pendiente"
+    },
+    "task_status": {
+      "DOING": "En proceso",
+      "DONE": "Completadas",
+      "OVERDUE": "Vencidas",
+      "TODO": "Por hacer",
+      "no_status": "Sin estado",
+      "no_tasks": "No hay tareas",
+      "tasks": "Tareas",
+      "title": "Estado de tareas"
+    },
+    "title": "¡Bienvenido, {{name}}!",
+    "upcoming": {
+      "no_tasks": "¡Felicidades! No hay tareas pendientes para hoy o mañana.",
+      "title": "Siguientes pasos"
+    }
+  },
   "delete": "Eliminar",
   "errors": {
     "invalid_email": "Correo electrónico no valido",
@@ -252,10 +301,12 @@
   },
   "sidebar": {
     "calendar": "Calendario",
+    "close": "Colapsar menú",
     "dashboard": "Panel de control",
     "habits": "Hábitos",
     "inventory": "Inventario",
-    "objectives": "Objetivos",
+    "objectives": "Objetivos y áreas",
+    "open": "Expandir menú",
     "review": "Revisión",
     "settings": "Configuración",
     "tasks": "Tareas"
