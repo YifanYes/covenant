@@ -21,15 +21,15 @@ import { toast } from 'sonner'
 
 export const ConfirmDeleteAccountDialog = () => {
   const { t } = useTranslation()
-  const { resetUserInfo } = useAuthStore()
+  const { signOut } = useAuthStore()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
 
   const deleteAccountMutation = useMutation(
     trpc.auth.deleteAccount.mutationOptions({
-      onSuccess: () => {
-        resetUserInfo()
-        navigate('/login')
+      onSuccess: async () => {
+        await signOut()
+        navigate('/sign-up')
         toast.success(t('confirm_delete_account_dialog.success'))
         setOpen(false)
       },

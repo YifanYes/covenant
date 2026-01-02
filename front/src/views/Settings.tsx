@@ -1,6 +1,7 @@
 import { ConfirmDeleteAccountDialog } from '@/components/dialogs/ConfirmDeleteAccountDialog'
 import SingleSelect from '@/components/forms/SingleSelect'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/hooks/use-auth-store'
@@ -9,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 
 export default function Settings() {
   const { t, i18n } = useTranslation()
-  const { email } = useAuthStore()
+  const { email, signOut } = useAuthStore()
   const { language, defaultTasksView, setDefaultTasksView, setLanguage } = useUserPreferencesStore()
 
   const handleLanguageChange = (value: string | null) => {
@@ -53,6 +54,11 @@ export default function Settings() {
         <div className='flex flex-col gap-2'>
           <Label htmlFor='theme'>{t('settings.theme_label')}</Label>
           <ThemeToggle />
+        </div>
+        <div className='pt-4'>
+          <Button onClick={() => signOut()} variant='secondary' className='w-fit'>
+            {t('settings.logout_button')}
+          </Button>
         </div>
         <div className='pt-4'>
           <ConfirmDeleteAccountDialog />

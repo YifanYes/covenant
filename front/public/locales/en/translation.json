@@ -240,8 +240,17 @@
     "recover_password": "Recover password",
     "success": "A login link has been sent to your email.",
     "title": "Login to ARQ",
-    "verifying_description": "Please wait while we verify your email link...",
-    "verifying_magic_link": "Verifying magic link...",
+    "verifying_messages": [
+      "Sharpening sacred steel...",
+      "Blessing battle gear...",
+      "Consulting tomes of wisdom...",
+      "Unrolling regional maps...",
+      "Lighting sanctuary torches...",
+      "Meditating on the Doctrines of Order...",
+      "Preparing ritual incense...",
+      "Gathering supplies for the expedition...",
+      "Watching the shadows for heresy..."
+    ],
     "verifying_title": "Verifying..."
   },
   "more": "more",
@@ -294,6 +303,8 @@
     "email_label": "Email",
     "language_label": "Language",
     "language_placeholder": "Select language",
+    "logout_button": "Logout",
+    "logout_label": "Logout",
     "theme_dark": "Dark",
     "theme_label": "Theme",
     "theme_light": "Light",

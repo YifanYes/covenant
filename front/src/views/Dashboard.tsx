@@ -15,10 +15,10 @@ import { useTranslation } from 'react-i18next'
 export default function Dashboard() {
   const { t } = useTranslation()
   const { email } = useAuthStore()
-  const name = startCase(email ? email.split('@')[0] : '')
-  const date = dayjs().format('L')
-
   const { data: dashboardData } = useSuspenseQuery(trpc.dashboard.get.queryOptions())
+
+  const name = dashboardData.characterName || startCase(email ? email.split('@')[0] : '')
+  const date = dayjs().format('L')
 
   return (
     <div className='flex flex-col gap-6 p-6'>
