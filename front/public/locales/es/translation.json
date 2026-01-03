@@ -240,8 +240,17 @@
     "recover_password": "Recuperar contraseña",
     "success": "Se ha enviado un enlace de inicio de sesión a tu correo.",
     "title": "Inicia sesión en ARQ",
-    "verifying_description": "Por favor espera mientras verificamos tu enlace...",
-    "verifying_magic_link": "Verificando enlace mágico...",
+    "verifying_messages": [
+      "Afilando el acero sagrado...",
+      "Bendiciendo el equipo de batalla...",
+      "Consultando los tomos de sabiduría...",
+      "Desplegando mapas de la región...",
+      "Encendiendo las antorchas del santuario...",
+      "Meditando sobre las Doctrinas del Orden...",
+      "Preparando el incienso ritual...",
+      "Reuniendo suministros para la expedición...",
+      "Vigilando las sombras en busca de herejía..."
+    ],
     "verifying_title": "Verificando..."
   },
   "more": "más",
@@ -294,6 +303,7 @@
     "email_label": "Correo electrónico",
     "language_label": "Idioma",
     "language_placeholder": "Seleccionar idioma",
+    "logout_button": "Cerrar sesión",
     "theme_dark": "Oscuro",
     "theme_label": "Tema",
     "theme_light": "Claro",

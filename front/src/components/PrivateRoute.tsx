@@ -1,9 +1,11 @@
+import { useAuthStore } from '@/hooks/use-auth-store'
 import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router'
 
 export default function PrivateRoute() {
   const navigate = useNavigate()
+  const updateUserInfo = useAuthStore((state) => state.updateUserInfo)
 
   // Check if there's a hash with tokens (magic link callback)
   const hash = typeof window !== 'undefined' ? window.location.hash.substring(1) : ''
@@ -23,6 +25,10 @@ export default function PrivateRoute() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setIsAuthenticated(true)
+        updateUserInfo({
+          email: session.user.email || '',
+          userId: session.user.id
+        })
       } else {
         navigate('/login')
       }
@@ -45,7 +51,7 @@ export default function PrivateRoute() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [navigate, hasTokensInUrl])
+  }, [navigate, hasTokensInUrl, updateUserInfo])
 
   if (isLoading || hasTokensInUrl) {
     return null // Or a loading spinner

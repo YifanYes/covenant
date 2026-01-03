@@ -157,7 +157,7 @@ const parseUpcomingTasks = (tasks: Task[]) => {
 export const getDashboardData = async (prisma: PrismaClient, userId: string) => {
   const now = dayjs()
 
-  const [overdueCount, doingCount, doneCount, todoCount, upcomingTasks, habits, metricsTasks, allAreas] =
+  const [overdueCount, doingCount, doneCount, todoCount, upcomingTasks, habits, metricsTasks, allAreas, character] =
     await Promise.all([
       // 1. Overdue Count
       prisma.task.count({
@@ -241,6 +241,10 @@ export const getDashboardData = async (prisma: PrismaClient, userId: string) => 
             }
           }
         }
+      }),
+      // 9. Character
+      prisma.character.findUnique({
+        where: { userId }
       })
     ])
 
@@ -249,7 +253,10 @@ export const getDashboardData = async (prisma: PrismaClient, userId: string) => 
   const parsedUpcomingTasks = parseUpcomingTasks(upcomingTasks)
   const { areas, objectives } = getActiveAreasAndObjectives(allAreas, now)
 
+  const characterName = character?.name || null
+
   return {
+    characterName,
     upcomingTasks: parsedUpcomingTasks,
     statusStats: {
       TODO: todoCount,
