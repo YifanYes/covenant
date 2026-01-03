@@ -6,10 +6,10 @@ import { useAuthStore } from '@/hooks/use-auth-store'
 import { supabase } from '@/lib/supabase'
 import { trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { Alert, Check, Mail } from '@nsmr/pixelart-react'
+import { Alert, Check, Loader, Mail } from '@nsmr/pixelart-react'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
 import { useMutation } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router'
@@ -17,37 +17,18 @@ import { toast } from 'sonner'
 
 export default function Login() {
   const { t } = useTranslation()
-  const { updateUserInfo } = useAuthStore()
+  const updateUserInfo = useAuthStore((state) => state.updateUserInfo)
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [magicLinkSent, setMagicLinkSent] = useState(false)
-  const [isVerifyingOTP, setIsVerifyingOTP] = useState(false)
-
-  const loginMutation = useMutation(
-    trpc.auth.login.mutationOptions({
-      onSuccess: () => {
-        setMagicLinkSent(true)
-        toast.success(t('login.success'))
-      },
-      onError: (error) => toast.error(t('login.error.title'), { description: error.message })
-    })
-  )
-
-  const onSubmit = (data: LoginType) => {
-    loginMutation.mutate(data)
-  }
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid, isDirty }
-  } = useForm<LoginType>({
-    defaultValues: { email: '' },
-    resolver: standardSchemaResolver(loginSchema),
-    mode: 'onTouched'
+  const [isVerifyingOTP, setIsVerifyingOTP] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const hash = window.location.hash.substring(1)
+    const params = new URLSearchParams(hash)
+    return params.has('access_token') && !params.has('error')
   })
 
-  // Parse hash and search params once during render to compute initial state
+  // Compute derived state from URL
   const urlState = useMemo(() => {
     const hash = typeof window !== 'undefined' ? window.location.hash.substring(1) : ''
     const hashParams = new URLSearchParams(hash)
@@ -56,7 +37,6 @@ export default function Login() {
     const errorDescription = hashParams.get('error_description')
     const hashType = hashParams.get('type')
 
-    // Compute derived state from URL
     const magicLinkError = error && errorDescription ? errorDescription.replace(/\+/g, ' ') : null
     const hasError = Boolean(error && errorDescription)
 
@@ -68,6 +48,33 @@ export default function Login() {
       hasError
     }
   }, [])
+
+  const loginMutation = useMutation(
+    trpc.auth.login.mutationOptions({
+      onSuccess: () => {
+        setMagicLinkSent(true)
+        toast.success(t('login.success'))
+      },
+      onError: (error) => toast.error(t('login.error.title'), { description: error.message })
+    })
+  )
+
+  const onSubmit = useCallback(
+    (data: LoginType) => {
+      loginMutation.mutate(data)
+    },
+    [loginMutation]
+  )
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isDirty }
+  } = useForm<LoginType>({
+    defaultValues: { email: '' },
+    resolver: standardSchemaResolver(loginSchema),
+    mode: 'onTouched'
+  })
 
   // Clean up URL if there was an error in the hash
   useEffect(() => {
@@ -105,7 +112,8 @@ export default function Login() {
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      const isSignInEvent = event === 'SIGNED_IN' || event === 'INITIAL_SESSION'
+      if (isSignInEvent && session) {
         setIsVerifyingOTP(true)
 
         updateUserInfo({
@@ -126,19 +134,32 @@ export default function Login() {
     }
   }, [updateUserInfo, navigate, searchParams])
 
-  // Compute display state from URL
-  const isAccountVerified =
-    searchParams.get('verified') === 'true' || searchParams.get('type') === 'signup' || urlState.hashType === 'signup'
+  const isAccountVerified = useMemo(
+    () =>
+      searchParams.get('verified') === 'true' ||
+      searchParams.get('type') === 'signup' ||
+      urlState.hashType === 'signup',
+    [searchParams, urlState.hashType]
+  )
+
+  const [randomQuoteIndex] = useState(() => Math.random())
+
+  const verifyingMessage = useMemo(() => {
+    const messages = t('login.verifying_messages', { returnObjects: true }) as string[]
+    if (Array.isArray(messages) && messages.length > 0) {
+      return messages[Math.floor(randomQuoteIndex * messages.length)]
+    }
+    return t('login.verifying_title')
+  }, [t, randomQuoteIndex])
 
   if (isVerifyingOTP) {
     return (
-      <div className='flex w-md flex-col gap-2.5'>
-        <h2>{t('login.verifying_title')}</h2>
-        <AlertComponent>
-          <Mail />
-          <AlertTitle>{t('login.verifying_magic_link')}</AlertTitle>
-          <AlertDescription>{t('login.verifying_description')}</AlertDescription>
-        </AlertComponent>
+      <div className='flex w-md flex-col items-center justify-center gap-6 py-8'>
+        <Loader className='h-10 w-10 animate-spin' />
+        <div className='flex flex-col items-center gap-2 text-center'>
+          <h2 className='text-xl font-semibold'>{t('login.verifying_title')}</h2>
+          <p className='text-muted-foreground text-sm'>{verifyingMessage}</p>
+        </div>
       </div>
     )
   }
@@ -170,7 +191,11 @@ export default function Login() {
         <AlertComponent variant='destructive'>
           <Alert />
           <AlertTitle>{t('login.error.magic_link_error')}</AlertTitle>
-          <AlertDescription>{urlState.magicLinkError}</AlertDescription>
+          <AlertDescription>
+            {urlState.magicLinkError === 'Email link is invalid or has expired'
+              ? t('login.error.invalid_magic_link')
+              : urlState.magicLinkError}
+          </AlertDescription>
         </AlertComponent>
       )}
       <TextInput
