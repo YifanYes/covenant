@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This document outlines the technical specification for implementing the initial gamification layer in ARQ. The goal is to transform the user's productivity (completing tasks/habits/objectives) into in-game progress (combat, leveling, crafting, looting).
+This document outlines the technical specification for implementing the initial gamification layer in ARQ. The goal is to transform the user's productivity (completing tasks/habits/objectives) into in-game progress (combat, leveling).
 
 ## 2. Progression Models
 
@@ -11,10 +11,10 @@ We are considering three models for character progression. **Proposal C (Gating)
 ### Core Loop
 
 1.  **Action**: User completes a Task or Habit.
-2.  **Reward**: User gains Gold, XP, and Dice Rolls.
-3.  **Conflict**: User spends Dice in the Adventure tab to reach the end of a Mission.
-4.  **Loot**: If mission is successful, User gets specific Gold, XP and items.
-5.  **Equip**: User uses Gold to buy or finds Equipment to improve stats. (Crafting moved to roadmap).
+2.  **Reward**: User gains Dice Rolls.
+3.  **Conflict**: User spends Dice in the Adventure tab to complete a Mission.
+4.  **Loot**: If mission is successful, User gets gold, XP and items.
+5.  **Equip**: User uses gold to buy or finds Equipment to improve stats. (Crafting moved to roadmap). Gold can be used to make decisions that impact the story.
 
 ### Models
 
@@ -23,15 +23,13 @@ We are considering three models for character progression. **Proposal C (Gating)
   - Better Gear = Higher multipliers.
 - **Proposal B: Impact Doctrines (Overpower)**
   - Leveling unlocks Doctrine slots.
-  - Better Gear = Stronger Doctrine effects (e.g., kill 2 enemies at once).
 - **Proposal C: Gating & Preparation (Recommended)**
   - **Level Gating**: Must be Level X to enter Tier Y missions.
-  - **Gear Gating**: Tier X enemies have "Shields" only penetrable by Tier X weapons.
   - **Loop**: Complete tasks/habits -> Get dice -> Enter Adventure -> Defeat enemies -> Level up/Get Gear.
 
 ## 3. Dice-Based Combat System
 
-Combat uses the board game's dice mechanics, where completing tasks earns dice rolls that can be spent to attack enemies in the **Adventure** tab. Combat is **Reactive**: when the user attacks, the enemy defends and counter-attacks simultaneously.
+Combat uses the board game's dice mechanics, where completing tasks earns dice rolls that can be spent to attack enemies in the **Adventure** tab. Combat is **Reactive**: when the user attacks, the enemy defends and counter-attacks simultaneously. This is designed to be fast and engaging, with the goal of making the user feel like they are part of the story.
 
 ### Dice Economy
 
@@ -54,18 +52,17 @@ Combat uses the board game's dice mechanics, where completing tasks earns dice r
 
 - **Storage**: Dice are stored in `character.data.diceBank` (integer)
 - **Maximum Capacity**: Based on character tier to prevent hoarding
-  - Tier 1: 20 dice max
-  - Tier 2: 30 dice max
-  - Tier 3: 40 dice max
-- **No Reset**: Dice do not reset weekly; they are kept until used.
+  - Tier 1: 10 dice max
+  - Tier 2: 15 dice max
+  - Tier 3: 20 dice max
 - **Daily Allowance**: Each day, users receive bonus dice based on tier (added to bank, up to max)
 
 #### Dice Spending Limits
 
 - **Maximum dice per turn**: Capped based on tier to prevent "100 dice" scenarios
-  - Tier 1: 6 dice max per attack
-  - Tier 2: 8 dice max per attack
-  - Tier 3: 10 dice max per attack
+  - Tier 1: 5 dice max per attack
+  - Tier 2: 6 dice max per attack
+  - Tier 3: 7 dice max per attack
 
 ### Combat Flow
 
@@ -135,20 +132,17 @@ Attributes determine **Success Thresholds** for dice rolls (matching board game 
 - **Strength (Defense)**: Threshold for blocking physical attacks
 - **Magic (Attack)**: Threshold for magic attack dice
 - **Magic (Defense)**: Threshold for blocking magic attacks
-- **Speed**: Determines movement in missions (future feature)
 
 **Secondary Effects**:
 
 - **Critical Hits**: Rolling a 6 always hits and can only be blocked by another 6
-- **Critical Drops**: Higher attack attributes increase rare material drop rates
-- **Overdue Penalties**: Defense attributes reduce HP loss when tasks become overdue
 
 ### Doctrines & Mana System
 
 - **Mana Cost**: Doctrines consume mana as specified in each class's doctrine list (see `arq-lore/Mecanicas/Clases.md`)
 - **Spam Prevention**: Mana cost alone prevents doctrine spamming (no cooldowns)
 - **Mana Regeneration**: After each complete turn (player + enemy), mana regenerates:
-  - Base regeneration: 2 mana/turn
+  - Base regeneration: 1 mana/turn
   - Modified by tier and equipment
 - **Strategic Use**: Since doctrines cost 2-10 mana and regeneration is slow, players must choose when to use powerful abilities
 
@@ -184,8 +178,10 @@ Current Schema uses `Strength, Wisdom, Resistance, Faith`.
 **Proposed Update**:
 Simplify `CharacterClass` attributes to match the new simplified App mechanics:
 
-- `strength`: Physical Attack/Defense modifier. Replaces strength and resistance.
-- `magic`: Magical Attack/Defense modifier. Replaces wisdom and faith.
+- `strength_atk`: Physical Attack modifier. Replaces strength and resistance.
+- `strength_def`: Physical Defense modifier. Replaces strength and resistance.
+- `magic_atk`: Magical Attack modifier. Replaces wisdom and faith.
+- `magic_def`: Magical Defense modifier. Replaces wisdom and faith.
 - `health` and `mana` should be initialized to the class base values.
 
 In `Character`, we will add:
@@ -259,7 +255,7 @@ interface Enemy {
 State of the current "Mission".
 
 ```prisma
-model ActiveEncounter {
+model Mission {
   id            String @id @default(uuid())
   characterId   String @unique
   currentEnemyId String // ID referencing the Enemy constant
@@ -287,11 +283,3 @@ Based on `Mecanicas/Equipamiento.md`.
 - **Manual Interaction**: Combat is not automated. Users must manually spend dice in the "Adventure" tab.
 - **Backend Focus**: Initial focus is on implementing the backend logic and JSON storage. Inventory UI will be simplified for the MVP.
 - **No Migration**: Since the project is in early development, no database migration for existing user data is required. Global state can be reset.
-
-## 6. Proposals
-
-### Improvements
-
-1.  **Visual Feedback**: When an item is equipped, the avatar should reflect this (requires asset generation/management).
-2.  **Sound FX**: "Ding" sound when completing a task that kills a minion.
-3.  **Loot Box Effect**: When a Boss dies, show a "Chest Opening" animation for the rewards.
