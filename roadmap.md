@@ -28,3 +28,19 @@
 - [ ] Sistema de Misiones.
 - [ ] Sistema de Combate.
 - [ ] Módulo de journaling
+
+## 🔮 Fase 3: Características Avanzadas (Futuro)
+
+- [ ] **Sistema PvP**: Duelos entre jugadores usando el sistema de dados
+- [ ] **Leaderboards**: Tablas de clasificación para competencia entre usuarios
+- - [ ] **Misiones Estacionales**: Contenido basado en momentos de la historia
+- [ ] **Sistema Co-op**: Juego cooperativo con sistema de party (2-4 jugadores)
+  - [ ] Orden de turnos round-robin
+  - [ ] Mecánicas de revivir con doctrinas/objetos raros
+  - [ ] Sistema de loot individual
+- [ ] **Escalado Dinámico de Enemigos**: Dificultad de enemigos basada en el banco de dados del jugador (previene acumulación excesiva)
+
+## 📝 Notas
+
+- **Tier 3 = Demo Completo**: Después de implementar Tier 3, se planificarán los próximos pasos de la aplicación
+- **No Trading de Dados**: Los dados no se pueden intercambiar entre jugadores
