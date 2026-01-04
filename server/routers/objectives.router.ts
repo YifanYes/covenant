@@ -1,4 +1,9 @@
-import { createObjectiveSchema, deleteObjectiveSchema, updateObjectiveSchema } from '@shared/schemas/objectives.schemas'
+import {
+  completeObjectiveSchema,
+  createObjectiveSchema,
+  deleteObjectiveSchema,
+  updateObjectiveSchema
+} from '@shared/schemas/objectives.schemas'
 import { getUserObjective } from '../services/objectives.services'
 import { protectedProcedure, t } from '../trpc'
 
@@ -26,7 +31,8 @@ export const objectivesRouter = t.router({
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const objectives = await ctx.prisma.objective.findMany({
       where: {
-        userId: ctx.user.id
+        userId: ctx.user.id,
+        completedAt: null
       },
       include: {
         areas: true
@@ -54,6 +60,22 @@ export const objectivesRouter = t.router({
       },
       include: {
         areas: true
+      }
+    })
+
+    return {
+      objective
+    }
+  }),
+  complete: protectedProcedure.input(completeObjectiveSchema).mutation(async ({ ctx, input }) => {
+    await getUserObjective(ctx.prisma, input.id, ctx.user.id)
+
+    const objective = await ctx.prisma.objective.update({
+      where: {
+        id: input.id
+      },
+      data: {
+        completedAt: new Date()
       }
     })
 
