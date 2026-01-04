@@ -257,7 +257,7 @@
   "objectives": {
     "add": "Añadir objetivo",
     "complete": {
-      "button": "Marcar como completado",
+      "button": "Completar",
       "error": "Ocurrió un error al completar el objetivo",
       "success": "Objetivo completado exitosamente"
     },

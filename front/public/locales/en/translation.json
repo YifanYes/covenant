@@ -257,7 +257,7 @@
   "objectives": {
     "add": "Add objective",
     "complete": {
-      "button": "Mark as completed",
+      "button": "Complete",
       "error": "An error occurred while completing the objective",
       "success": "Objective completed successfully"
     },
