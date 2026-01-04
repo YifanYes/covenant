@@ -263,6 +263,7 @@
       "title": "Eliminar objetivo"
     },
     "no_date": "Sin fecha",
+    "no_tasks": "No hay tareas vinculadas",
     "title": "Objetivos",
     "update": {
       "error": "Ha ocurrido un error al actualizar el objetivo",

@@ -263,6 +263,7 @@
       "title": "Delete objective"
     },
     "no_date": "No date",
+    "no_tasks": "No linked tasks",
     "title": "Objectives",
     "update": {
       "error": "An error occurred while updating the objective",
