@@ -77,7 +77,6 @@ model Task {
   status      String      @db.VarChar(255)
   order       Int         @default(0)
   dueDate     DateTime?   @db.Timestamp(6)
-  completedAt DateTime? @db.Timestamp(6)
   userId      String      @db.Uuid
   createdAt   DateTime    @default(now()) @db.Timestamp(6)
   updatedAt   DateTime    @updatedAt @db.Timestamp(6)
