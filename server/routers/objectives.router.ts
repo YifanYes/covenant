@@ -29,7 +29,8 @@ export const objectivesRouter = t.router({
         userId: ctx.user.id
       },
       include: {
-        areas: true
+        areas: true,
+        tasks: true
       }
     })
 
