@@ -256,6 +256,11 @@
   "more": "más",
   "objectives": {
     "add": "Añadir objetivo",
+    "complete": {
+      "button": "Marcar como completado",
+      "error": "Ocurrió un error al completar el objetivo",
+      "success": "Objetivo completado exitosamente"
+    },
     "delete": {
       "description": "Esta acción es irreversible. Esto eliminará permanentemente el objetivo.",
       "error": "Ha ocurrido un error al eliminar el objetivo",
