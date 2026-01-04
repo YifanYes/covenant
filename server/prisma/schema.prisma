@@ -50,6 +50,7 @@ model Objective {
   createdAt   DateTime  @default(now()) @db.Timestamp(6)
   updatedAt   DateTime  @updatedAt @db.Timestamp(6)
   dueDate     DateTime? @db.Timestamp(6)
+  completedAt DateTime? @db.Timestamp(6)
   areas       Area[]    @relation("AreaToObjective")
   habits      Habit[]   @relation("HabitToObjective")
   tasks       Task[]    @relation("ObjectiveToTask")
@@ -83,6 +84,7 @@ model Task {
   color       String?     @db.VarChar(255)
   effort      String?     @db.VarChar(50)
   impact      String?     @db.VarChar(50)
+  completedAt DateTime?   @db.Timestamp(6)
   objectives  Objective[] @relation("ObjectiveToTask")
 
   @@map("tasks")
