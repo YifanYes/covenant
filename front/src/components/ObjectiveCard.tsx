@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { ConfirmCompleteObjectiveDialog } from './dialogs/ConfirmCompleteObjectiveDialog'
 import { ConfirmDeleteObjectiveDialog } from './dialogs/ConfirmDeleteObjectiveDialog'
 import DatePicker from './forms/DatePicker'
 import MultiSelect from './forms/MultiSelect'
@@ -78,6 +79,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
   const onSubmit = (data: UpdateObjectiveBodyType) => updateMutation.mutate(data)
 
   const handleDeleteSuccess = () => setOpen(false)
+  const handleCompleteSuccess = () => setOpen(false)
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
@@ -139,12 +141,12 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
         </div>
       </DialogTrigger>
 
-      <DialogContent className='sm:max-w-[500px]'>
+      <DialogContent className='sm:max-w-[600px]'>
         <DialogHeader>
           <DialogTitle>{t('objectives.update.title')}</DialogTitle>
         </DialogHeader>
 
-        <div className='grid gap-4'>
+        <div className='grid gap-4 p-1'>
           <Controller
             name='name'
             control={control}
@@ -153,7 +155,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
                 {...field}
                 type='text'
                 placeholder={t('create_objective_dialog.name_placeholder')}
-                className='h-9'
+                className='h-9 w-full'
                 tabIndex={-1}
                 {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
               />
@@ -165,7 +167,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
             render={({ field }) => (
               <Textarea
                 placeholder={t('create_objective_dialog.description_placeholder')}
-                className='h-20'
+                className='h-20 w-full resize-none'
                 value={field.value}
                 onChange={field.onChange}
               />
@@ -191,7 +193,10 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
         </div>
 
         <DialogFooter className='flex h-auto justify-end'>
-          <ConfirmDeleteObjectiveDialog objective={objective} onDeleteSuccess={handleDeleteSuccess} />
+          <div className='mr-auto flex gap-2'>
+            <ConfirmDeleteObjectiveDialog objective={objective} onDeleteSuccess={handleDeleteSuccess} />
+            <ConfirmCompleteObjectiveDialog objective={objective} onCompleteSuccess={handleCompleteSuccess} />
+          </div>
           <div className='flex gap-2'>
             <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
               <Button variant='outline'>{t('cancel')}</Button>

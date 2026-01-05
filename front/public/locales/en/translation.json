@@ -256,6 +256,13 @@
   "more": "more",
   "objectives": {
     "add": "Add objective",
+    "complete": {
+      "button": "Complete",
+      "description": "Are you sure you want to mark this objective as completed?",
+      "error": "An error occurred while completing the objective",
+      "success": "Objective completed successfully",
+      "title": "Complete objective?"
+    },
     "delete": {
       "description": "This action is irreversible. This will permanently delete the objective.",
       "error": "An error occurred while deleting the objective",
