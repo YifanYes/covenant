@@ -1,11 +1,9 @@
-import Task from '@/components/tasks/Task'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import { cn } from '@/lib/utils'
 import type { Task as TaskType } from '@/types/models.types'
 import { getColorClasses } from '@/utils/theme.utils'
 import dayjs from 'dayjs'
-import { useTranslation } from 'react-i18next'
+import TaskSummaryListComponent from '../tasks/TaskSummaryList'
 
 interface CalendarDayProps {
   day: dayjs.Dayjs
@@ -14,7 +12,6 @@ interface CalendarDayProps {
 }
 
 export default function CalendarDay({ day, weekIndex, tasks }: CalendarDayProps) {
-  const { t } = useTranslation()
   const { setSelectedTask } = useTasksStore()
   const dayTasks = tasks.filter((task) => dayjs(task.dueDate).isSame(day, 'day'))
 
@@ -50,28 +47,11 @@ export default function CalendarDay({ day, weekIndex, tasks }: CalendarDayProps)
             </button>
           )
         })}
-        {dayTasks.length > 2 && (
-          <Dialog>
-            <DialogTrigger asChild>
-              <button
-                className='text-muted-foreground hover:text-foreground w-full cursor-pointer text-left text-xs'
-                onClick={(e) => e.stopPropagation()}
-              >
-                +{dayTasks.length - 2} {t('more')}
-              </button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{day.format('D MMMM YYYY')}</DialogTitle>
-              </DialogHeader>
-              <ul className='flex flex-col gap-1'>
-                {dayTasks.map((task) => (
-                  <Task key={task.id} task={task} setSelectedTask={setSelectedTask} hideHandle />
-                ))}
-              </ul>
-            </DialogContent>
-          </Dialog>
-        )}
+        <TaskSummaryListComponent
+          title={day.format('D MMMM YYYY')}
+          setSelectedTask={setSelectedTask}
+          tasks={dayTasks}
+        />
       </div>
     </div>
   )

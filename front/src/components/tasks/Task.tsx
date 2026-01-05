@@ -15,7 +15,7 @@ const Task = ({
   hideHandle = false
 }: {
   task: TaskType
-  setSelectedTask: (task?: TaskType) => void
+  setSelectedTask?: (task?: TaskType) => void
   hideHandle?: boolean
 }) => {
   const { t } = useTranslation()
@@ -30,7 +30,7 @@ const Task = ({
 
   return (
     <li
-      onClick={() => setSelectedTask(task)}
+      onClick={() => setSelectedTask?.(task)}
       className='group border-input flex cursor-pointer items-center gap-6 border-b px-2 py-4 transition-all last:border-b-0 hover:rounded-md hover:border-transparent hover:bg-gray-50/10'
     >
       {!hideHandle && <DragAndDrop className='drag-handle cursor-grab' />}
