@@ -202,8 +202,21 @@ Instead of database models, we will use JSON fields and Code Constants.
 Stored in the `character.inventory` JSONB column. Available equipment will be defined in code.
 
 ```typescript
-type ItemType = 'WEAPON_MELEE' | 'WEAPON_RANGED' | 'WEAPON_MAGIC' | 'ARMOR' | 'ACCESSORY'
-type ItemRarity = 'COMMON' | 'RARE' | 'LEGENDARY'
+export const ItemType = {
+  WEAPON_MELEE: 'WEAPON_MELEE',
+  WEAPON_RANGED: 'WEAPON_RANGED',
+  WEAPON_MAGIC: 'WEAPON_MAGIC',
+  ARMOR: 'ARMOR',
+  ACCESSORY: 'ACCESSORY'
+} as const
+export type ItemType = (typeof ItemType)[keyof typeof ItemType]
+
+export const ItemRarity = {
+  COMMON: 'COMMON',
+  RARE: 'RARE',
+  LEGENDARY: 'LEGENDARY'
+} as const
+export type ItemRarity = (typeof ItemRarity)[keyof typeof ItemRarity]
 
 interface InventoryItem {
   id: string // uuid
@@ -298,13 +311,12 @@ This section outlines the frontend modifications required to support the gamific
 
 ### New Views
 
-| View               | Route                            | Description                                                                                                                            |
-| :----------------- | :------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
-| **Adventure**      | `/adventure`                     | Main combat hub. Displays active mission, dice bank, and combat controls. Houses the dice rolling UI and combat resolution animations. |
-| **Missions**       | `/adventure/missions`            | Mission selection screen. Lists available missions by tier, shows tier-gating, and mission requirements.                               |
-| **Mission Detail** | `/adventure/missions/:id`        | Detailed view of a specific mission: phases, enemies, possible rewards.                                                                |
-| **Combat**         | `/adventure/missions/:id/combat` | Active combat view with enemy display, turn resolution, and combat log.                                                                |
-| **Bestiary**       | `/adventure/bestiary`            | Encyclopedia of discovered enemies with stats and lore (optional, lower priority).                                                     |
+| View               | Route                     | Description                                                                                                                                                                                                                                             |
+| :----------------- | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Adventure**      | `/adventure`              | Main combat hub. Displays active mission, dice bank, and combat controls. Houses the dice rolling UI and combat resolution animations.                                                                                                                  |
+| **Missions**       | `/adventure/missions`     | Mission selection screen. Lists available missions by tier, shows tier-gating, and mission requirements.                                                                                                                                                |
+| **Mission Detail** | `/adventure/missions/:id` | Detailed view of a specific mission. If the mission hasn't started yet, it shows the details. If it has started, it displays the mission details (reduced or collapsible) on one side and the combat on the other, occupying most or all of the screen. |
+| **Bestiary**       | `/adventure/bestiary`     | Encyclopedia of discovered enemies with stats and lore (optional, lower priority).                                                                                                                                                                      |
 
 ### Component Modifications
 
@@ -323,8 +335,8 @@ This section outlines the frontend modifications required to support the gamific
 #### `Dashboard.tsx` (View)
 
 - **Add dice bank widget**: Small card showing current dice available and max capacity.
-- **Add character status widget**: Show current HP, Mana, downed status, and time until recovery.
-- **Add active mission widget**: If in a mission, show mission name and progress.
+- **Add character status widget**: Show current HP, Mana, downed status, and time until recovery. Should include a direct link to the character status/inventory view.
+- **Add active mission widget**: If in a mission, show mission name and progress. Should include a direct link to the mission URL (`/adventure/missions/:id`).
 
 ### New Components
 
@@ -398,8 +410,21 @@ Add new types in `types/` directory:
 // types/gamification.types.ts
 
 // Item types (should be in the shared directory)
-type ItemType = 'WEAPON_MELEE' | 'WEAPON_RANGED' | 'WEAPON_MAGIC' | 'ARMOR' | 'ACCESSORY'
-type ItemRarity = 'COMMON' | 'RARE' | 'LEGENDARY'
+export const ItemType = {
+  WEAPON_MELEE: 'WEAPON_MELEE',
+  WEAPON_RANGED: 'WEAPON_RANGED',
+  WEAPON_MAGIC: 'WEAPON_MAGIC',
+  ARMOR: 'ARMOR',
+  ACCESSORY: 'ACCESSORY'
+} as const
+export type ItemType = (typeof ItemType)[keyof typeof ItemType]
+
+export const ItemRarity = {
+  COMMON: 'COMMON',
+  RARE: 'RARE',
+  LEGENDARY: 'LEGENDARY'
+} as const
+export type ItemRarity = (typeof ItemRarity)[keyof typeof ItemRarity]
 
 interface InventoryItem {
   id: string
@@ -428,7 +453,7 @@ interface Enemy {
 // Combat types
 interface DiceRollResult {
   value: number
-  isHit: boolean
+  isSuccess: boolean
   isCritical: boolean
 }
 
