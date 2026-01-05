@@ -13,6 +13,7 @@ import type { Objective } from '@/types/models.types'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
+import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
@@ -121,10 +122,10 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
                 {objective.tasks.slice(0, 2).map((task) => (
                   <div key={task.id} className='flex items-center gap-2'>
                     <div
-                      className={`size-1.5 rounded-full ${task.status === 'DONE' ? 'bg-muted-foreground/30' : 'bg-primary'}`}
+                      className={`size-1.5 rounded-full ${task.status === TaskStatus.DONE ? 'bg-muted-foreground/30' : 'bg-primary'}`}
                     />
                     <span
-                      className={`text-xs ${task.status === 'DONE' ? 'text-muted-foreground line-through' : 'text-foreground'}`}
+                      className={`text-xs ${task.status === TaskStatus.DONE ? 'text-muted-foreground line-through' : 'text-foreground'}`}
                     >
                       {task.title}
                     </span>
