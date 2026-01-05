@@ -35,7 +35,8 @@ export const objectivesRouter = t.router({
         completedAt: null
       },
       include: {
-        areas: true
+        areas: true,
+        tasks: true
       }
     })
 
