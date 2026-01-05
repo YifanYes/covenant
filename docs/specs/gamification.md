@@ -1,35 +1,33 @@
 # Gamification Technical Specification
 
-## 1. Overview
+## Overview
 
 This document outlines the technical specification for implementing the initial gamification layer in ARQ. The goal is to transform the user's productivity (completing tasks/habits/objectives) into in-game progress (combat, leveling).
 
-## 2. Progression Models
+## Progression Models
 
-We are considering three models for character progression. **Proposal C (Gating)** is currently recommended for ensuring users engage with all app features, but the system should support the core loop common to all.
+We will implement different mechanics for character progression to ensure users engage with all app features, but the system should support the core loop common to all.
 
-### Core Loop
+- Efficiency Scaling (Classic RPG)
+  - Leveling up increases Gold/XP multipliers.
+  - Better Gear = Higher multipliers.
+- Doctrines (Abilities and Spells)
+  - Leveling unlocks Doctrine slots.
+- Gating & Preparation
+  - Level Gating: Must be Tier X to enter Tier X missions.
+  - Loop: Complete tasks/habits -> Get dice -> Enter Adventure -> Defeat enemies -> Level up/Get Gear.
 
-1.  **Action**: User completes a Task or Habit.
+## Core Loop
+
+1.  **Action**: User completes a Task, Habit or Objective.
 2.  **Reward**: User gains Dice Rolls.
 3.  **Conflict**: User spends Dice in the Adventure tab to complete a Mission.
 4.  **Loot**: If mission is successful, User gets gold, XP and items.
 5.  **Equip**: User uses gold to buy or finds Equipment to improve stats. (Crafting moved to roadmap). Gold can be used to make decisions that impact the story.
 
-### Models
+## Dice-Based Combat System
 
-- **Proposal A: Efficiency Scaling (Classic RPG)**
-  - Leveling up increases Gold/XP multipliers.
-  - Better Gear = Higher multipliers.
-- **Proposal B: Impact Doctrines (Overpower)**
-  - Leveling unlocks Doctrine slots.
-- **Proposal C: Gating & Preparation (Recommended)**
-  - **Level Gating**: Must be Level X to enter Tier Y missions.
-  - **Loop**: Complete tasks/habits -> Get dice -> Enter Adventure -> Defeat enemies -> Level up/Get Gear.
-
-## 3. Dice-Based Combat System
-
-Combat uses the board game's dice mechanics, where completing tasks earns dice rolls that can be spent to attack enemies in the **Adventure** tab. Combat is **Reactive**: when the user attacks, the enemy defends and counter-attacks simultaneously. This is designed to be fast and engaging, with the goal of making the user feel like they are part of the story.
+Combat uses the board game's dice mechanics, where completing tasks, habits and objectives earns dice rolls that can be spent to attack enemies in the **Adventure** tab. Combat is **Reactive**: when the user attacks, the enemy defends and counter-attacks simultaneously. This is designed to be fast and engaging, with the goal of making the user feel like they are part of the story.
 
 ### Dice Economy
 
@@ -70,13 +68,13 @@ Combat uses the board game's dice mechanics, where completing tasks earns dice r
 
 1. **User Action**:
    - User navigates to the **Adventure/Missions** tab.
-   - User selects an active mission and spends dice from bank (up to per-turn maximum).
-   - System rolls attack dice using character's attribute threshold.
+   - User selects an active mission and spends dice from bank (up to per-turn maximum). User rolls the dice manually and sees an animation of the dice rolling.
+   - System calculates which dice are counted as hits based on the character's attributes.
 
 2. **Reactive Resolution**:
    - System rolls Enemy defense dice.
    - System rolls Enemy counter-attack dice.
-   - System rolls Player defense dice (from armor).
+   - User rolls defense dice (from armor).
    - All results are calculated and applied instantly:
      - Final Damage to Enemy = (Hits - Blocks).
      - Final Damage to Player = (Enemy Hits - Player Blocks).
@@ -89,26 +87,26 @@ Combat uses the board game's dice mechanics, where completing tasks earns dice r
 #### Combat Example (Reactive Resolution)
 
 ```
-You have 8 Physical Dice in your bank.
-Enemy: Corrupted Soldier (6 HP, 2 Physical Defense Dice)
+You have 8 Physical Dice in your bank. You play as Templar class. Your weapon is physical.
+Enemy: Skeleton (3 health, 1 Physical Defense Dice)
 
-User spends 4 dice to attack. Your weapon is physical.
-Your Strength (Attack): 3+ threshold
+User spends 4 dice to attack.
+Your Strength (Attack): 4+ threshold
 
 REACTIVE RESOLUTION:
-1. Player Rolls: [5, 2, 6, 4] → 3 hits (6 is critical)
-2. Enemy Defense (5+): [6, 3] → 1 block
+1. Player Rolls: [5, 2, 6, 4] → 2 hits (6 is critical)
+2. Enemy Defense (4+): [6] → 1 block (can block critical)
 3. Enemy Counter (4+): [5, 4, 2] → 2 hits
 4. Player Defense (4+): [6, 3] → 1 block
 
 RESULTS:
 - Damage to Enemy: 3 (hits) - 1 (block) = 2 wounds
 - Damage to Player: 2 (hits) - 1 (block) = 1 wound
-- Mana regenerated: +2
+- Player Mana regenerated: +1
 
 Status:
-- Enemy: 4/6 HP remaining
-- Player: 11/12 HP remaining
+- Enemy: 1/3 HP remaining
+- Player: 7/8 HP remaining
 ```
 
 ### Habit Consistency Bonus
@@ -127,8 +125,7 @@ To gamify consistency, users who complete habits daily receive bonus dice:
 
 Attributes determine **Success Thresholds** for dice rolls (matching board game mechanics):
 
-- **Strength (Attack)**: Threshold for physical attack dice (lower is better)
-  - Range: 2+ (master) to 6+ (untrained)
+- **Strength (Attack)**: Threshold for physical attack dice (lower is better).
 - **Strength (Defense)**: Threshold for blocking physical attacks
 - **Magic (Attack)**: Threshold for magic attack dice
 - **Magic (Defense)**: Threshold for blocking magic attacks
@@ -138,6 +135,8 @@ Attributes determine **Success Thresholds** for dice rolls (matching board game 
 - **Critical Hits**: Rolling a 6 always hits and can only be blocked by another 6
 
 ### Doctrines & Mana System
+
+Doctrines should be stored in an object in code.
 
 - **Mana Cost**: Doctrines consume mana as specified in each class's doctrine list (see `arq-lore/Mecanicas/Clases.md`)
 - **Spam Prevention**: Mana cost alone prevents doctrine spamming (no cooldowns)
@@ -166,7 +165,7 @@ The system is designed to support party-based gameplay:
 - **Shared Victory**: All party members receive rewards when mission is completed
 - **Loot Distribution**: Each player rolls separately from the same drop table
 
-## 4. Database Schema Changes
+## Database Schema Changes
 
 The current schema must be updated to reflect the Lore attributes and support the new Mechanics.
 
@@ -178,11 +177,11 @@ Current Schema uses `Strength, Wisdom, Resistance, Faith`.
 **Proposed Update**:
 Simplify `CharacterClass` attributes to match the new simplified App mechanics:
 
-- `strength_atk`: Physical Attack modifier. Replaces strength and resistance.
-- `strength_def`: Physical Defense modifier. Replaces strength and resistance.
-- `magic_atk`: Magical Attack modifier. Replaces wisdom and faith.
-- `magic_def`: Magical Defense modifier. Replaces wisdom and faith.
-- `health` and `mana` should be initialized to the class base values.
+- `strength_atk` (int): Physical Attack modifier. Replaces strength and resistance.
+- `strength_def` (int): Physical Defense modifier. Replaces strength and resistance.
+- `magic_atk` (int): Magical Attack modifier. Replaces wisdom and faith.
+- `magic_def` (int): Magical Defense modifier. Replaces wisdom and faith.
+- `health` and `mana` should be initialized to the class base values. Health default will be 5 and mana will be 5.
 
 In `Character`, we will add:
 
@@ -198,9 +197,9 @@ In `Character`, we will add:
 
 Instead of database models, we will use JSON fields and Code Constants.
 
-#### 1. Equipment & Inventory (JSON in Character)
+#### Equipment & Inventory (JSON in Character)
 
-Stored in the `character.inventory` JSONB column.
+Stored in the `character.inventory` JSONB column. Available equipment will be defined in code.
 
 ```typescript
 type ItemType = 'WEAPON_MELEE' | 'WEAPON_RANGED' | 'WEAPON_MAGIC' | 'ARMOR' | 'ACCESSORY'
@@ -218,7 +217,7 @@ interface InventoryItem {
 }
 ```
 
-#### 2. Bestiary (Code Constants)
+#### Bestiary (Code Constants)
 
 Enemies are defined in code for constant lookup (`src/constants/enemies.ts`).
 
@@ -250,36 +249,243 @@ interface Enemy {
 }
 ```
 
-#### 4. ActiveEncounter (Combat State)
+#### Party
+
+We will prepare the dabatase schema for future party and multiplayer features. One party has many characters.
+
+```prisma
+model Party {
+    id          String    @id @default(uuid()) @db.Uuid
+    characters  Character[]
+}
+```
+
+We will need to add `partyId` to `Character` model.
+
+#### Mission (Combat State)
 
 State of the current "Mission".
 
 ```prisma
 model Mission {
   id            String @id @default(uuid())
-  characterId   String @unique
-  currentEnemyId String // ID referencing the Enemy constant
-  currentHp     Int    // Remaining HP of enemy
+  name          String
+  description   String
+  partyId       String @unique
+  requiredTier  Int
+  enemies       Json // Array of enemy objects
+  Rewards       Json // Array of reward objects
+  createdAt     DateTime @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime @updatedAt @db.Timestamp(6)
 
-  character     Character @relation(...)
+  party     Party @relation(...)
 }
 ```
 
-## 5. Equipment System Implementation
+## Equipment System Implementation
 
 Based on `Mecanicas/Equipamiento.md`.
 
 - **Tiers**: Implementing Tiers 1-3 initially.
-  - _Tier 1 (Military)_: Basic stats.
-  - _Tier 2 (Superior)_: Adds Passive Effects.
-  - _Tier 3 (Masterpiece)_: Adds Ultimate Effects.
 - **Slots**:
   - Main Weapon
   - Armor
   - Accessory (Ring/Amulet)
 
-## 6. Implementation Notes
+## Frontend Changes
+
+This section outlines the frontend modifications required to support the gamification features.
+
+### New Views
+
+| View               | Route                            | Description                                                                                                                            |
+| :----------------- | :------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| **Adventure**      | `/adventure`                     | Main combat hub. Displays active mission, dice bank, and combat controls. Houses the dice rolling UI and combat resolution animations. |
+| **Missions**       | `/adventure/missions`            | Mission selection screen. Lists available missions by tier, shows tier-gating, and mission requirements.                               |
+| **Mission Detail** | `/adventure/missions/:id`        | Detailed view of a specific mission: phases, enemies, possible rewards.                                                                |
+| **Combat**         | `/adventure/missions/:id/combat` | Active combat view with enemy display, turn resolution, and combat log.                                                                |
+| **Bestiary**       | `/adventure/bestiary`            | Encyclopedia of discovered enemies with stats and lore (optional, lower priority).                                                     |
+
+### Component Modifications
+
+#### `AppSidebar.tsx`
+
+- Add new sidebar item: **Adventure** with an appropriate icon (e.g., `Sword` or `Map`).
+
+#### `Inventory.tsx` (View)
+
+- **Update attribute cards**: Replace current attributes (`strength`, `wisdom`, `resistance`, `faith`) with new system (`strength_atk`, `strength_def`, `magic_atk`, `magic_def`).
+- **Add new stat cards**: `Gold`, `Dice Bank` (current/max), `Health` (current/max), `Mana` (current/max).
+- **Add equipment section**: Display equipped items (Weapon, Armor, Accessory slots) with item cards.
+- **Add inventory grid**: Scrollable grid showing all `inventory` items with tooltips showing item stats.
+- **Add loadout management**: Ability to equip/unequip items from inventory to loadout.
+
+#### `Dashboard.tsx` (View)
+
+- **Add dice bank widget**: Small card showing current dice available and max capacity.
+- **Add character status widget**: Show current HP, Mana, downed status, and time until recovery.
+- **Add active mission widget**: If in a mission, show mission name and progress.
+
+### New Components
+
+#### Combat System Components
+
+| Component         | Description                                                                                                                    |
+| :---------------- | :----------------------------------------------------------------------------------------------------------------------------- |
+| `DiceBankDisplay` | Shows current dice count, max capacity, and visual representation of dice. Used in Dashboard and Adventure views.              |
+| `DiceRoller`      | Interactive dice rolling interface with animation. User selects number of dice to spend, triggers roll, sees animated results. |
+| `DiceResult`      | Displays individual die result with hit/miss visual feedback based on threshold.                                               |
+| `CombatArena`     | Main combat container showing player character, enemy, and combat state.                                                       |
+| `EnemyCard`       | Displays enemy sprite, name, health bar, type badge (Minion/Elite/Boss).                                                       |
+| `CombatLog`       | Scrollable log of combat events with color-coded entries (damage dealt, damage received, blocks, criticals).                   |
+| `TurnResolver`    | Animated display of turn resolution: player attack → enemy defense → enemy counter → player defense → results.                 |
+| `HealthBar`       | Reusable health bar component with current/max HP display.                                                                     |
+| `ManaBar`         | Reusable mana bar component with current/max mana display.                                                                     |
+
+#### Mission Components
+
+| Component               | Description                                                                                 |
+| :---------------------- | :------------------------------------------------------------------------------------------ |
+| `MissionCard`           | Card displaying mission name, tier, difficulty, rewards preview. Clickable to view details. |
+| `MissionList`           | Filtered/sorted list of available missions with tier tabs.                                  |
+| `MissionPhaseIndicator` | Shows current phase in a multi-phase mission with progress dots.                            |
+| `RewardDisplay`         | Shows potential/earned rewards: XP, Gold, Items.                                            |
+| `TierGate`              | Visual indicator when content is locked due to tier requirements.                           |
+
+#### Inventory/Equipment Components
+
+| Component       | Description                                                                               |
+| :-------------- | :---------------------------------------------------------------------------------------- |
+| `ItemCard`      | Displays item with name, icon, rarity border color, and type badge.                       |
+| `ItemTooltip`   | Hover tooltip showing full item stats and description.                                    |
+| `EquipmentSlot` | Single equipment slot (Weapon/Armor/Accessory) that can hold an item or show empty state. |
+| `LoadoutPanel`  | Panel containing all equipment slots for the character's loadout.                         |
+| `InventoryGrid` | Grid layout of owned items with filtering by type.                                        |
+
+#### Character Status Components
+
+| Component            | Description                                                                                    |
+| :------------------- | :--------------------------------------------------------------------------------------------- |
+| `CharacterStatusBar` | Compact bar showing HP, Mana, Dice count for use in headers/sidebars.                          |
+| `DownedOverlay`      | Full-screen or modal overlay shown when character is downed, with countdown timer to recovery. |
+| `HabitStreakBadge`   | Small badge showing streak count on habit cards in Habits view.                                |
+
+### New Dialogs
+
+| Dialog                    | Description                                                                                              |
+| :------------------------ | :------------------------------------------------------------------------------------------------------- |
+| `StartMissionDialog`      | Confirmation dialog before starting a mission. Shows requirements, party info, and estimated difficulty. |
+| `MissionCompleteDialog`   | Victory screen displaying earned rewards, XP gained, items dropped.                                      |
+| `MissionFailedDialog`     | Defeat screen. Shows what happened and recovery time if downed.                                          |
+| `EquipItemDialog`         | Confirmation when equipping an item, showing stat comparison.                                            |
+| `DoctrineSelectionDialog` | During combat, select which doctrine to use. Shows mana cost and effect.                                 |
+| `CharacterDownedDialog`   | Alert when character is downed. Explains 24-hour recovery period.                                        |
+
+### State Management
+
+We will leverage **TanStack Query** (via TRPC) to manage character, combat, and mission states.
+
+- **Character State**: Fetched via `trpc.character.get.useQuery()`.
+- **Combat Resolution**: Handled via `trpc.combat.resolveTurn.useMutation()`, which will invalidate the character and mission queries to trigger UI updates.
+- **Mission Progress**: Managed via `trpc.mission.getActive.useQuery()`.
+- **Local UI State**: Simple components will use local `useState` for UI-only transitions (e.g., dice roll animations before mutation is called).
+
+### Type Definitions
+
+Add new types in `types/` directory:
+
+```typescript
+// types/gamification.types.ts
+
+// Item types (should be in the shared directory)
+type ItemType = 'WEAPON_MELEE' | 'WEAPON_RANGED' | 'WEAPON_MAGIC' | 'ARMOR' | 'ACCESSORY'
+type ItemRarity = 'COMMON' | 'RARE' | 'LEGENDARY'
+
+interface InventoryItem {
+  id: string
+  name: string
+  description?: string
+  type: ItemType
+  tier: number
+  rarity: ItemRarity
+  stats: Record<string, number>
+  obtainedAt: Date
+}
+
+// Enemy types (for display)
+type EnemyType = 'MINION' | 'ELITE' | 'BOSS'
+
+interface Enemy {
+  id: string
+  name: string
+  tier: number
+  type: EnemyType
+  health: number
+  currentHealth: number
+  damage: number
+}
+
+// Combat types
+interface DiceRollResult {
+  value: number
+  isHit: boolean
+  isCritical: boolean
+}
+
+interface CombatTurnResult {
+  playerRolls: DiceRollResult[]
+  enemyDefenseRolls: DiceRollResult[]
+  enemyAttackRolls: DiceRollResult[]
+  playerDefenseRolls: DiceRollResult[]
+  damageToEnemy: number
+  damageToPlayer: number
+  manaRegenerated: number
+}
+
+// Mission types
+type MissionStatus = 'AVAILABLE' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED'
+
+interface MissionPhase {
+  enemies: Enemy[]
+  completed: boolean
+}
+
+interface Mission {
+  id: string
+  name: string
+  description: string
+  requiredTier: number
+  phases: MissionPhase[]
+  currentPhase: number
+  rewards: {
+    xp: number
+    gold: number
+    items?: InventoryItem[]
+  }
+}
+```
+
+### Translation Keys
+
+Add new i18n keys for:
+
+- Adventure tab labels and combat UI
+- Mission names and descriptions
+- Item names, descriptions, and types
+- Combat log messages
+- Status effect names
+- Error states (out of dice, character downed, tier-gated)
+
+### UI Assets Required
+
+- Dice sprites (d6 faces, rolling animation)
+- Enemy sprites (from Lore assets or generated)
+- Item icons by type and rarity
+- Combat effect animations (hit, miss, critical, block)
+- Health/Mana bar designs
+- Mission/dungeon background art
+
+## Implementation Notes
 
 - **Manual Interaction**: Combat is not automated. Users must manually spend dice in the "Adventure" tab.
-- **Backend Focus**: Initial focus is on implementing the backend logic and JSON storage. Inventory UI will be simplified for the MVP.
 - **No Migration**: Since the project is in early development, no database migration for existing user data is required. Global state can be reset.
