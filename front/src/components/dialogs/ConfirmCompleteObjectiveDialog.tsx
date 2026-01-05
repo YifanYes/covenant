@@ -30,8 +30,9 @@ export const ConfirmCompleteObjectiveDialog = ({ objective, onCompleteSuccess }:
 
   const completeMutation = useMutation(
     trpc.objectives.complete.mutationOptions({
-      onSuccess: () => {
-        toast.success(t('objectives.complete.success'))
+      onSuccess: (data) => {
+        const rewardMsg = data.diceEarned > 0 ? ` (+${data.diceEarned} 🎲)` : ''
+        toast.success(t('objectives.complete.success') + rewardMsg)
         queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })
         setOpen(false)
         onCompleteSuccess()

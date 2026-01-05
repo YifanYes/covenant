@@ -28,17 +28,17 @@
   },
   "cancel": "Cancelar",
   "character_class": {
-    "knight": "Caballero",
-    "sorcerer": "Hechicero"
+    "herald": "Heraldo",
+    "templar": "Templario"
   },
   "classes": {
-    "knight": {
-      "description": "Buscaré la fuerza para aplastar el mal.",
-      "name": "Caballero"
-    },
-    "sorcerer": {
+    "herald": {
       "description": "Buscaré la sabiduría para encontrar la luz.",
-      "name": "Hechicero"
+      "name": "Heraldo"
+    },
+    "templar": {
+      "description": "Buscaré la fuerza para aplastar el mal.",
+      "name": "Templario"
     }
   },
   "colors": {
@@ -198,21 +198,23 @@
   },
   "inventory": {
     "class": "Clase",
+    "dice_bank": "Banco de Dados",
     "exp": "Experiencia",
-    "faith": "Fe",
+    "gold": "Oro",
     "health": "Salud",
     "level": "Nivel",
+    "magic_atk": "Ataque Mágico",
+    "magic_def": "Defensa Mágica",
     "mana": "Maná",
     "no_character": {
       "button": "Empezar aventura",
       "description": "Crea un personaje para empezar tu aventura.",
       "title": "Todavía no tienes un personaje"
     },
-    "resistance": "Resistencia",
     "stats": "Estadísticas",
-    "strength": "Fuerza",
-    "title": "Inventario",
-    "wisdom": "Sabiduría"
+    "strength_atk": "Ataque Físico",
+    "strength_def": "Defensa Física",
+    "title": "Inventario"
   },
   "languages": {
     "en": "Inglés",

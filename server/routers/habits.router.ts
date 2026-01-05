@@ -5,6 +5,7 @@ import {
   updateHabitSchema
 } from '@shared/schemas/habits.schemas'
 import { TRPCError } from '@trpc/server'
+import { addDiceToBank, calculateHabitStreak } from '../services/dice.services'
 import { getUserHabit, getUserHabitCompletion } from '../services/habits.services'
 import { protectedProcedure, t } from '../trpc'
 
@@ -170,14 +171,30 @@ export const habitsRouter = t.router({
   }),
 
   createCompletion: protectedProcedure.input(habitIdSchema).mutation(async ({ ctx, input }) => {
-    await getUserHabit(ctx.prisma, input.id, ctx.user.id)
+    const habit = await getUserHabit(ctx.prisma, input.id, ctx.user.id)
 
     const completion = await ctx.prisma.habitCompletion.create({
       data: { habitId: input.id, userId: ctx.user.id }
     })
 
+    // Calculate streak and award dice
+    const completions = await ctx.prisma.habitCompletion.findMany({
+      where: { habitId: input.id, userId: ctx.user.id }
+    })
+    const streak = calculateHabitStreak(completions)
+
+    // Base 2 dice + streak bonus
+    let diceToAward = 2
+    if (streak >= 21) diceToAward += 3
+    else if (streak >= 14) diceToAward += 2
+    else if (streak >= 7) diceToAward += 1
+
+    const result = await addDiceToBank(ctx.prisma, ctx.user.id, diceToAward)
+
     return {
-      completion
+      completion,
+      diceEarned: result.earned,
+      streak
     }
   }),
 

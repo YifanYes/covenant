@@ -1,4 +1,4 @@
 export enum CharacterClassName {
-  KNIGHT = 'knight',
-  SORCERER = 'sorcerer'
+  TEMPLAR = 'templar',
+  HERALD = 'herald'
 }

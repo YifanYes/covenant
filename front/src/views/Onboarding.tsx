@@ -34,7 +34,7 @@ export default function Onboarding() {
   } = useForm<CreateCharacterType>({
     defaultValues: {
       name: '',
-      className: CharacterClassName.KNIGHT
+      className: CharacterClassName.TEMPLAR
     },
     resolver: standardSchemaResolver(createCharacterSchema),
     mode: 'onTouched'

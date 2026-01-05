@@ -1,3 +1,4 @@
+import { getMaxDiceForTier, getTierFromLevel } from '@shared/constants/dice.constants'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import { createCharacterSchema, switchClassSchema } from '@shared/schemas/character.schemas'
 import { TRPCError } from '@trpc/server'
@@ -10,6 +11,10 @@ export const characterRouter = t.router({
         userId: ctx.user.id,
         name: input.name,
         currentClass: input.className,
+        data: { diceBank: 0 }, // Start with 0 dice
+        gold: 0,
+        inventory: [],
+        loadout: [],
         classes: {
           create: {
             className: input.className
@@ -38,7 +43,34 @@ export const characterRouter = t.router({
       include: { classes: true }
     })
 
-    return character
+    if (!character) return null
+
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    const tier = getTierFromLevel(currentClass?.level || 1)
+    const maxDice = getMaxDiceForTier(tier)
+
+    return {
+      id: character.id,
+      name: character.name,
+      title: character.title,
+      orderName: character.orderName,
+      currentClass: character.currentClass,
+      data: character.data as any,
+      gold: character.gold,
+      maxDice,
+      classes: character.classes.map((c) => ({
+        id: c.id,
+        className: c.className,
+        level: c.level,
+        exp: c.exp,
+        health: c.health,
+        mana: c.mana,
+        strengthAtk: c.strengthAtk,
+        strengthDef: c.strengthDef,
+        magicAtk: c.magicAtk,
+        magicDef: c.magicDef
+      }))
+    }
   }),
 
   switchClass: protectedProcedure.input(switchClassSchema).mutation(async ({ ctx, input }) => {

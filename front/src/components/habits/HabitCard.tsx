@@ -16,9 +16,12 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
 
     const createCompletion = useMutation(
       trpc.habits.createCompletion.mutationOptions({
-        onSuccess: async () => {
+        onSuccess: async (data) => {
           const currentCount = completions.filter(({ completedAt }) => dayjs().isSame(completedAt, 'day')).length + 1
-          toast.success(t(currentCount >= recurrence ? 'habits.success.target_met' : 'habits.success.progress'))
+          const rewardMsg = data.diceEarned > 0 ? ` (+${data.diceEarned} 🎲)` : ''
+          toast.success(
+            t(currentCount >= recurrence ? 'habits.success.target_met' : 'habits.success.progress') + rewardMsg
+          )
           await queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })
         },
         onError: () => toast.error(t('habits.error.complete'))
