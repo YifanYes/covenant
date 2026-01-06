@@ -27,14 +27,7 @@ export interface InventoryItem {
   obtainedAt: Date
 }
 
-export interface CharacterData {
-  diceBank: number
-  lastDiceReset?: string
-  habitStreaks?: Record<string, number>
-  downedUntil?: string
-}
-
-export const CharacterDataSchema = z.object({
+export const characterDataSchema = z.object({
   diceBank: z.number().default(0),
   lastDiceReset: z.string().optional(),
   habitStreaks: z.record(z.string(), z.number()).optional(),

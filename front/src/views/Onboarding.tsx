@@ -73,7 +73,7 @@ export default function Onboarding() {
               control={control}
               render={({ field }) => (
                 <div className='grid gap-3'>
-                  {Object.values(CharacterClassName).map((className) => (
+                  {[CharacterClassName.TEMPLAR, CharacterClassName.HERALD].map((className) => (
                     <label
                       key={className}
                       className={cn(

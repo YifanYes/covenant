@@ -12,7 +12,7 @@ interface CharacterStatusProps {
   } | null
 }
 
-export default function CharacterStatusComponent({ status }: CharacterStatusProps) {
+export default function CharacterStatus({ status }: CharacterStatusProps) {
   const { t } = useTranslation()
 
   if (!status) return null

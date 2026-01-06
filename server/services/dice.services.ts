@@ -1,32 +1,6 @@
-import {
-  DICE_REWARDS,
-  getMaxDiceForTier,
-  getTierFromLevel,
-  HABIT_STREAK_THRESHOLDS
-} from '@shared/constants/dice.constants'
-import { CharacterDataSchema } from '@shared/types/gamification.types'
+import { getMaxDiceForTier, getTierFromLevel } from '@shared/constants/dice.constants'
+import { characterDataSchema } from '@shared/types/gamification.types'
 import { PrismaClient } from '../generated/prisma/client'
-
-/**
- * Calculates dice reward including habit consistency bonus
- */
-export const calculateDiceReward = (
-  actionType: keyof typeof DICE_REWARDS,
-  level: number,
-  streakDays: number = 0
-): number => {
-  let baseReward = DICE_REWARDS[actionType]
-
-  // Add habit streak bonus if applicable
-  if (actionType === 'HABIT_BASE' && streakDays > 0) {
-    const threshold = HABIT_STREAK_THRESHOLDS.find((t) => streakDays >= t.days)
-    if (threshold) {
-      baseReward += threshold.bonus
-    }
-  }
-
-  return baseReward
-}
 
 /**
  * Adds dice to character bank, respecting capacity limits
@@ -43,8 +17,8 @@ export const addDiceToBank = async (prisma: PrismaClient, userId: string, amount
   const tier = getTierFromLevel(currentClass?.level || 1)
   const maxCapacity = getMaxDiceForTier(tier)
 
-  const rawData = (character.data as any) || {}
-  const parsedData = CharacterDataSchema.parse(rawData)
+  const rawCharacterData = (character.data as any) || {}
+  const parsedData = characterDataSchema.parse(rawCharacterData)
 
   const currentDice = parsedData.diceBank || 0
   const newDice = Math.min(currentDice + amount, maxCapacity)
@@ -54,7 +28,7 @@ export const addDiceToBank = async (prisma: PrismaClient, userId: string, amount
     where: { id: character.id },
     data: {
       data: {
-        ...rawData,
+        ...rawCharacterData,
         diceBank: newDice
       }
     }

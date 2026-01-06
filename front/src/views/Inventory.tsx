@@ -1,4 +1,4 @@
-import CharacterStatusComponent from '@/components/inventory/CharacterStatus.component'
+import CharacterStatus from '@/components/inventory/CharacterStatus.component'
 import ClassAttributeCard from '@/components/inventory/ClassAttributeCard'
 import { Button } from '@/components/ui/button'
 import { trpc } from '@/utils/trpc.utils'
@@ -33,12 +33,11 @@ export default function Inventory() {
 
   const currentClass = character.classes.find((characterClass) => characterClass.className === character.currentClass)!
 
-  const characterData = character.data
   const statusValues = {
     health: currentClass.health,
     mana: currentClass.mana,
     gold: character.gold,
-    diceBank: characterData?.diceBank || 0,
+    diceBank: character.data?.diceBank || 0,
     maxDice: character.maxDice || 10
   }
 
@@ -75,7 +74,7 @@ export default function Inventory() {
           </div>
 
           <div className='w-full'>
-            <CharacterStatusComponent status={statusValues} />
+            <CharacterStatus status={statusValues} />
           </div>
         </div>
 

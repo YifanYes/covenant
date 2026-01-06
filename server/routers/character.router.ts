@@ -1,3 +1,4 @@
+import { CharacterClassName, CLASS_INITIAL_STATS } from '@shared/constants/classes'
 import { getMaxDiceForTier, getTierFromLevel } from '@shared/constants/dice.constants'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import { createCharacterSchema, switchClassSchema } from '@shared/schemas/character.schemas'
@@ -11,13 +12,14 @@ export const characterRouter = t.router({
         userId: ctx.user.id,
         name: input.name,
         currentClass: input.className,
-        data: { diceBank: 0 }, // Start with 0 dice
+        data: { diceBank: 0 },
         gold: 0,
         inventory: [],
         loadout: [],
         classes: {
           create: {
-            className: input.className
+            className: input.className,
+            ...CLASS_INITIAL_STATS[input.className as CharacterClassName]
           }
         }
       },
@@ -91,7 +93,8 @@ export const characterRouter = t.router({
       characterClass = await ctx.prisma.characterClass.create({
         data: {
           characterId: character.id,
-          className: input.className
+          className: input.className,
+          ...CLASS_INITIAL_STATS[input.className as CharacterClassName]
         }
       })
     }
