@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import type { Habit } from '@/types/models.types'
+import { getRewardText } from '@/utils/text.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Check, Code, Loader } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
@@ -18,9 +19,10 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
       trpc.habits.createCompletion.mutationOptions({
         onSuccess: async (data) => {
           const currentCount = completions.filter(({ completedAt }) => dayjs().isSame(completedAt, 'day')).length + 1
-          const rewardMsg = data.diceEarned > 0 ? ` (+${data.diceEarned} 🎲)` : ''
           toast.success(
-            t(currentCount >= recurrence ? 'habits.success.target_met' : 'habits.success.progress') + rewardMsg
+            t(currentCount >= recurrence ? 'habits.success.target_met' : 'habits.success.progress', {
+              diceReward: getRewardText(data.diceEarned)
+            })
           )
           await queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })
         },

@@ -1,10 +1,6 @@
-import { getMaxDiceForTier, getTierFromLevel } from '@shared/constants/dice.constants'
-import { characterDataSchema } from '@shared/types/gamification.types'
 import { PrismaClient } from '../generated/prisma/client'
+import { getCharacterProgress } from './character.services'
 
-/**
- * Adds dice to character bank, respecting capacity limits
- */
 export const addDiceToBank = async (prisma: PrismaClient, userId: string, amount: number) => {
   const character = await prisma.character.findUnique({
     where: { userId },
@@ -13,14 +9,8 @@ export const addDiceToBank = async (prisma: PrismaClient, userId: string, amount
 
   if (!character) return { success: false, earned: 0 }
 
-  const currentClass = character.classes.find((c) => c.className === character.currentClass)
-  const tier = getTierFromLevel(currentClass?.level || 1)
-  const maxCapacity = getMaxDiceForTier(tier)
-
+  const { maxDice: maxCapacity, diceBank: currentDice } = getCharacterProgress(character)
   const rawCharacterData = (character.data as any) || {}
-  const parsedData = characterDataSchema.parse(rawCharacterData)
-
-  const currentDice = parsedData.diceBank || 0
   const newDice = Math.min(currentDice + amount, maxCapacity)
   const earned = newDice - currentDice
 
@@ -42,9 +32,6 @@ export const addDiceToBank = async (prisma: PrismaClient, userId: string, amount
   }
 }
 
-/**
- * Calculates current habit streak from completions
- */
 export const calculateHabitStreak = (completions: { completedAt: Date }[]): number => {
   if (completions.length === 0) return 0
 

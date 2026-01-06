@@ -1,7 +1,7 @@
-import { getMaxDiceForTier, getTierFromLevel } from '@shared/constants/dice.constants'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import dayjs from 'dayjs'
-import { Area, CharacterClass, HabitCompletion, Objective, PrismaClient, Task } from '../generated/prisma/client'
+import { Area, HabitCompletion, Objective, PrismaClient, Task } from '../generated/prisma/client'
+import { getCharacterProgress } from './character.services'
 
 const getMax = (record: Record<string, number>) => Object.entries(record).sort((a, b) => b[1] - a[1])[0]?.[0] || null
 
@@ -250,10 +250,9 @@ export const getDashboardData = async (prisma: PrismaClient, userId: string) => 
       })
     ])
 
-  const currentClass = character?.classes.find((c: CharacterClass) => c.className === character.currentClass)
-  const tier = getTierFromLevel(currentClass?.level || 1)
-  const maxDice = getMaxDiceForTier(tier)
-  const diceBank = (character?.data as any)?.diceBank || 0
+  const { currentClass, maxDice, diceBank } = character
+    ? getCharacterProgress(character)
+    : { currentClass: undefined, maxDice: 0, diceBank: 0 }
 
   const { completedToday, totalDaily, meanHabitRate } = getHabitMetrics(habits, now)
   const { mostCommonType, mostFocusedArea, mostFocusedObjective } = getEfficiencyMetrics(metricsTasks)

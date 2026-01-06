@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import type { Objective } from '@/types/models.types'
+import { getRewardText } from '@/utils/text.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Check } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
@@ -31,8 +32,7 @@ export const ConfirmCompleteObjectiveDialog = ({ objective, onCompleteSuccess }:
   const completeMutation = useMutation(
     trpc.objectives.complete.mutationOptions({
       onSuccess: (data) => {
-        const rewardMsg = data.diceEarned > 0 ? ` (+${data.diceEarned} 🎲)` : ''
-        toast.success(t('objectives.complete.success') + rewardMsg)
+        toast.success(t('objectives.complete.success', { diceReward: getRewardText(data.diceEarned) }))
         queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })
         setOpen(false)
         onCompleteSuccess()

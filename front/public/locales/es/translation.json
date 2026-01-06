@@ -180,8 +180,8 @@
     "success": {
       "create": "Hábito creado exitosamente",
       "delete": "Hábito eliminado exitosamente",
-      "progress": "Progreso de hábito registrado exitosamente",
-      "target_met": "¡Hábito completado exitosamente! ¡Buen trabajo!",
+      "progress": "Progreso de hábito registrado exitosamente {{diceReward}}",
+      "target_met": "¡Hábito completado exitosamente! ¡Buen trabajo! {{diceReward}}",
       "update": "Hábito actualizado exitosamente"
     },
     "timespan": {
@@ -262,7 +262,7 @@
       "button": "Completar",
       "description": "¿Estás seguro de que quieres marcar este objetivo como completado?",
       "error": "Ocurrió un error al completar el objetivo",
-      "success": "Objetivo completado exitosamente",
+      "success": "Objetivo completado exitosamente {{diceReward}}",
       "title": "¿Completar objetivo?"
     },
     "delete": {
@@ -398,7 +398,7 @@
     "success": {
       "create": "Tarea creada exitosamente",
       "delete": "Tarea eliminada exitosamente",
-      "update": "Tarea actualizada exitosamente"
+      "update": "Tarea actualizada exitosamente {{diceReward}}"
     },
     "table": {
       "dueDate": "Fecha de entrega",

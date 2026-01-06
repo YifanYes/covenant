@@ -1,8 +1,8 @@
 import { CharacterClassName, CLASS_INITIAL_STATS } from '@shared/constants/classes'
-import { getMaxDiceForTier, getTierFromLevel } from '@shared/constants/dice.constants'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import { createCharacterSchema, switchClassSchema } from '@shared/schemas/character.schemas'
 import { TRPCError } from '@trpc/server'
+import { getCharacterProgress } from '../services/character.services'
 import { protectedProcedure, t } from '../trpc'
 
 export const characterRouter = t.router({
@@ -47,9 +47,7 @@ export const characterRouter = t.router({
 
     if (!character) return null
 
-    const currentClass = character.classes.find((c) => c.className === character.currentClass)
-    const tier = getTierFromLevel(currentClass?.level || 1)
-    const maxDice = getMaxDiceForTier(tier)
+    const { maxDice } = getCharacterProgress(character)
 
     return {
       id: character.id,

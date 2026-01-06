@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useTasksStore } from '@/hooks/use-tasks-store'
 import { cn } from '@/lib/utils'
 import { taskPriorityTypes } from '@/types/constants.types'
+import { getRewardText } from '@/utils/text.utils'
 import { getPriorityStyles } from '@/utils/theme.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Close } from '@nsmr/pixelart-react'
@@ -57,8 +58,7 @@ export default function TasksTable() {
     trpc.tasks.update.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
-        const rewardMsg = data.diceEarned > 0 ? ` (+${data.diceEarned} 🎲)` : ''
-        toast.success(t('tasks.success.update') + rewardMsg)
+        toast.success(t('tasks.success.update', { diceReward: getRewardText(data.diceEarned) }))
       },
       onError: (error) => toast.error(t('tasks.error.internal.update'), { description: error.message })
     })

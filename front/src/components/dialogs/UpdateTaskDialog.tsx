@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { useTasksStore } from '@/hooks/use-tasks-store'
+import { getRewardText } from '@/utils/text.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import {
@@ -43,8 +44,7 @@ export const UpdateTaskDialog = () => {
   const updateMutation = useMutation(
     trpc.tasks.update.mutationOptions({
       onSuccess: async (data: { diceEarned: number }) => {
-        const rewardMsg = data.diceEarned > 0 ? ` (+${data.diceEarned} 🎲)` : ''
-        toast.success(t('tasks.success.update') + rewardMsg)
+        toast.success(t('tasks.success.update', { diceReward: getRewardText(data.diceEarned) }))
         await queryClient.invalidateQueries({
           queryKey: trpc.tasks.getByDate.queryKey({
             monthIndex: monthIndex.toString(),
