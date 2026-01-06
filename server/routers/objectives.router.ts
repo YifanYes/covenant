@@ -4,6 +4,7 @@ import {
   deleteObjectiveSchema,
   updateObjectiveSchema
 } from '@shared/schemas/objectives.schemas'
+import { addDiceToBank } from '../services/dice.services'
 import { getUserObjective } from '../services/objectives.services'
 import { protectedProcedure, t } from '../trpc'
 
@@ -80,8 +81,11 @@ export const objectivesRouter = t.router({
       }
     })
 
+    const result = await addDiceToBank(ctx.prisma, ctx.user.id, 6)
+
     return {
-      objective
+      objective,
+      diceEarned: result.earned
     }
   }),
   delete: protectedProcedure.input(deleteObjectiveSchema).mutation(async ({ ctx, input }) => {

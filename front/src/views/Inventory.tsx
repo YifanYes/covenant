@@ -1,3 +1,4 @@
+import CharacterStatus from '@/components/inventory/CharacterStatus.component'
 import ClassAttributeCard from '@/components/inventory/ClassAttributeCard'
 import { Button } from '@/components/ui/button'
 import { trpc } from '@/utils/trpc.utils'
@@ -32,6 +33,14 @@ export default function Inventory() {
 
   const currentClass = character.classes.find((characterClass) => characterClass.className === character.currentClass)!
 
+  const statusValues = {
+    health: currentClass.health,
+    mana: currentClass.mana,
+    gold: character.gold,
+    diceBank: character.data?.diceBank || 0,
+    maxDice: character.maxDice || 10
+  }
+
   return (
     <div className='flex h-full w-full flex-col gap-6 p-6'>
       <div className='flex items-center justify-between'>
@@ -63,29 +72,35 @@ export default function Inventory() {
               )}
             </div>
           </div>
+
+          <div className='w-full'>
+            <CharacterStatus status={statusValues} />
+          </div>
         </div>
 
         <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4'>
           <ClassAttributeCard label={t('inventory.level')} value={currentClass.level} />
           <ClassAttributeCard label={t('inventory.exp')} value={currentClass.exp} />
-          <ClassAttributeCard label={t('inventory.health')} value={currentClass.health} />
-          <ClassAttributeCard label={t('inventory.mana')} value={currentClass.mana} />
           <ClassAttributeCard
-            label={t('inventory.strength')}
-            value={currentClass.strength}
-            labelClassName='text-red-300'
+            label={t('inventory.strength_atk')}
+            value={currentClass.strengthAtk}
+            labelClassName='text-red-400'
           />
           <ClassAttributeCard
-            label={t('inventory.wisdom')}
-            value={currentClass.wisdom}
-            labelClassName='text-blue-300'
+            label={t('inventory.strength_def')}
+            value={currentClass.strengthDef}
+            labelClassName='text-red-200'
           />
           <ClassAttributeCard
-            label={t('inventory.resistance')}
-            value={currentClass.resistance}
-            labelClassName='text-green-300'
+            label={t('inventory.magic_atk')}
+            value={currentClass.magicAtk}
+            labelClassName='text-blue-400'
           />
-          <ClassAttributeCard label={t('inventory.faith')} value={currentClass.faith} labelClassName='text-white' />
+          <ClassAttributeCard
+            label={t('inventory.magic_def')}
+            value={currentClass.magicDef}
+            labelClassName='text-blue-200'
+          />
         </div>
       </div>
     </div>

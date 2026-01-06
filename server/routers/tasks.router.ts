@@ -1,11 +1,15 @@
+import { DICE_REWARDS } from '@shared/constants/dice.constants'
 import {
   bulkUpdateTasksSchema,
   createTaskSchema,
   getByDateInputSchema,
   taskIdSchema,
+  TaskImpact,
+  TaskStatus,
   updateTaskSchema
 } from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
+import { addDiceToBank } from '../services/dice.services'
 import { getUserTask } from '../services/tasks.services'
 import { protectedProcedure, t } from '../trpc'
 
@@ -87,7 +91,9 @@ export const tasksRouter = t.router({
     return { tasks }
   }),
   update: protectedProcedure.input(updateTaskSchema).mutation(async ({ ctx, input }) => {
-    await getUserTask(ctx.prisma, input.id, ctx.user.id)
+    const existingTask = await getUserTask(ctx.prisma, input.id, ctx.user.id)
+
+    const isCompleting = input.status === TaskStatus.DONE && existingTask.status !== TaskStatus.DONE
 
     const task = await ctx.prisma.task.update({
       where: {
@@ -102,6 +108,7 @@ export const tasksRouter = t.router({
         ...(input.color !== undefined && { color: input.color }),
         ...(input.effort !== undefined && { effort: input.effort }),
         ...(input.impact !== undefined && { impact: input.impact }),
+        ...(isCompleting && { completedAt: new Date() }),
         objectives: {
           set: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
         }
@@ -115,8 +122,16 @@ export const tasksRouter = t.router({
       }
     })
 
+    let diceEarned = 0
+    if (isCompleting) {
+      const diceToAward = task.impact === TaskImpact.HIGH ? DICE_REWARDS.TASK_HIGH_IMPACT : DICE_REWARDS.TASK_LOW_IMPACT
+      const result = await addDiceToBank(ctx.prisma, ctx.user.id, diceToAward)
+      diceEarned = result.earned
+    }
+
     return {
-      task
+      task,
+      diceEarned
     }
   }),
   bulkUpdate: protectedProcedure.input(bulkUpdateTasksSchema).mutation(async ({ ctx, input }) => {
