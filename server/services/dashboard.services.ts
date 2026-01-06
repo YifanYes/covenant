@@ -1,6 +1,7 @@
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import dayjs from 'dayjs'
 import { Area, HabitCompletion, Objective, PrismaClient, Task } from '../generated/prisma/client'
+import { getCharacterProgress } from './character.services'
 
 const getMax = (record: Record<string, number>) => Object.entries(record).sort((a, b) => b[1] - a[1])[0]?.[0] || null
 
@@ -244,9 +245,14 @@ export const getDashboardData = async (prisma: PrismaClient, userId: string) => 
       }),
       // 9. Character
       prisma.character.findUnique({
-        where: { userId }
+        where: { userId },
+        include: { classes: true }
       })
     ])
+
+  const { currentClass, maxDice, diceBank } = character
+    ? getCharacterProgress(character)
+    : { currentClass: undefined, maxDice: 0, diceBank: 0 }
 
   const { completedToday, totalDaily, meanHabitRate } = getHabitMetrics(habits, now)
   const { mostCommonType, mostFocusedArea, mostFocusedObjective } = getEfficiencyMetrics(metricsTasks)
@@ -257,6 +263,15 @@ export const getDashboardData = async (prisma: PrismaClient, userId: string) => 
 
   return {
     characterName,
+    character: character
+      ? {
+          gold: character.gold,
+          diceBank,
+          maxDice,
+          health: currentClass?.health || 5,
+          mana: currentClass?.mana || 5
+        }
+      : null,
     upcomingTasks: parsedUpcomingTasks,
     statusStats: {
       TODO: todoCount,

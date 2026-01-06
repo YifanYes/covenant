@@ -28,17 +28,17 @@
   },
   "cancel": "Cancel",
   "character_class": {
-    "knight": "Knight",
-    "sorcerer": "Sorcerer"
+    "herald": "Herald",
+    "templar": "Templar"
   },
   "classes": {
-    "knight": {
-      "description": "I will seek the strength to crush evil.",
-      "name": "Knight"
-    },
-    "sorcerer": {
+    "herald": {
       "description": "I will seek wisdom to find the light.",
-      "name": "Sorcerer"
+      "name": "Herald"
+    },
+    "templar": {
+      "description": "I will seek the strength to crush evil.",
+      "name": "Templar"
     }
   },
   "colors": {
@@ -198,21 +198,23 @@
   },
   "inventory": {
     "class": "Class",
+    "dice_bank": "Dice Bank",
     "exp": "Experience",
-    "faith": "Faith",
+    "gold": "Gold",
     "health": "Health",
     "level": "Level",
+    "magic_atk": "Magic Atk",
+    "magic_def": "Magic Def",
     "mana": "Mana",
     "no_character": {
       "button": "Begin adventure",
       "description": "Create a character to start your adventure.",
       "title": "You don't have a character yet"
     },
-    "resistance": "Resistance",
     "stats": "Stats",
-    "strength": "Strength",
-    "title": "Inventory",
-    "wisdom": "Wisdom"
+    "strength_atk": "Strength Atk",
+    "strength_def": "Strength Def",
+    "title": "Inventory"
   },
   "languages": {
     "en": "English",

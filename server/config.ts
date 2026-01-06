@@ -1,4 +1,7 @@
+import dotenv from 'dotenv'
 import { z } from 'zod'
+
+dotenv.config()
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['dev', 'prod', 'test']).default('dev'),
@@ -17,8 +20,11 @@ const envSchema = z.object({
 
 const _env = envSchema.safeParse(process.env)
 
-if (_env.error) {
-  console.error('❌ Invalid environment variables:', z.treeifyError(_env.error))
+if (_env.success === false) {
+  console.error('❌ Invalid environment variables:')
+  _env.error.issues.forEach((issue) => {
+    console.error(`   - ${issue.path.join('.')}: ${issue.message}`)
+  })
   process.exit(1)
 }
 
