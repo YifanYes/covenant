@@ -206,6 +206,7 @@
     "magic_atk": "Magic Atk",
     "magic_def": "Magic Def",
     "mana": "Mana",
+    "mana_regen": "Mana Regeneration",
     "no_character": {
       "button": "Begin adventure",
       "description": "Create a character to start your adventure.",

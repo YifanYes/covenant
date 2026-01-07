@@ -9,6 +9,7 @@ interface CharacterStatusProps {
     gold: number
     diceBank: number
     maxDice: number
+    manaRegen: number
   } | null
 }
 
@@ -37,6 +38,13 @@ export default function CharacterStatus({ status }: CharacterStatusProps) {
             <span className='text-sm font-medium'>{t('inventory.mana')}</span>
           </div>
           <span className='text-sm font-bold text-blue-500'>{status.mana}</span>
+        </div>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-2'>
+            <Sparkles className='h-4 w-4 text-blue-300' />
+            <span className='text-sm font-medium'>{t('inventory.mana_regen')}</span>
+          </div>
+          <span className='text-sm font-bold text-blue-300'>{status.manaRegen}</span>
         </div>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>

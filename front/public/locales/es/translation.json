@@ -206,6 +206,7 @@
     "magic_atk": "Ataque Mágico",
     "magic_def": "Defensa Mágica",
     "mana": "Maná",
+    "mana_regen": "Regeneración de Maná",
     "no_character": {
       "button": "Empezar aventura",
       "description": "Crea un personaje para empezar tu aventura.",

@@ -68,7 +68,8 @@ export const characterRouter = t.router({
         strengthAtk: c.strengthAtk,
         strengthDef: c.strengthDef,
         magicAtk: c.magicAtk,
-        magicDef: c.magicDef
+        magicDef: c.magicDef,
+        manaRegen: c.manaRegen
       }))
     }
   }),

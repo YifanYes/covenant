@@ -38,7 +38,8 @@ export default function Inventory() {
     mana: currentClass.mana,
     gold: character.gold,
     diceBank: character.data?.diceBank || 0,
-    maxDice: character.maxDice || 10
+    maxDice: character.maxDice || 10,
+    manaRegen: currentClass.manaRegen
   }
 
   return (
@@ -100,6 +101,11 @@ export default function Inventory() {
             label={t('inventory.magic_def')}
             value={currentClass.magicDef}
             labelClassName='text-blue-200'
+          />
+          <ClassAttributeCard
+            label={t('inventory.mana_regen')}
+            value={currentClass.manaRegen}
+            labelClassName='text-blue-300'
           />
         </div>
       </div>

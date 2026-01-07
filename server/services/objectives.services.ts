@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { type Objective, type PrismaClient } from '../generated/prisma/client'
+import { type Objective, type PrismaClient } from '../generated/prisma'
 
 export const getUserObjective = async (
   prisma: PrismaClient,

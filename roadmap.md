@@ -24,8 +24,8 @@
 - [ ] Crear componentes base reutilizables `BaseFormDialog.tsx` y `BaseConfirmDialog.tsx`. Refactorizar diálogos CRUD para usar componentes base.
 - [ ] Optimizar `index.css`. Actualmente tiene **4,058 bytes**. Usar más variables CSS de Tailwind y extraer tokens de diseño a un archivo separado.
 - **Gamificación - Fase 1: Motor RPG y Economía de Dados**
-  - [ ] Migración de base de datos (Atributos Lore, Inventario, DiceBank).
-  - [ ] Lógica de obtención de dados por Tareas/Hábitos/Objetivos y Bonus de consistencia.
+  - [x] Migración de base de datos (Atributos Lore, Inventario, DiceBank).
+  - [x] Lógica de obtención de dados por Tareas/Hábitos/Objetivos y Bonus de consistencia.
 - **Gamificación - Fase 2: Identidad y Equipamiento**
   - [ ] Rediseño de vista de Personaje con nuevos atributos y sistema de Inventario/Loadout.
   - [ ] Definición de constantes de ítems Tier 1.
