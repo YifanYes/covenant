@@ -1,5 +1,5 @@
 import { getMaxDiceForTier, getTierFromLevel } from '@shared/constants/dice.constants'
-import { Character, CharacterClass } from '../generated/prisma/client'
+import { type Character, type CharacterClass } from '../generated/prisma'
 
 export const getCharacterProgress = (
   character: Character & {

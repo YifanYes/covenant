@@ -1,0 +1,40 @@
+import type { InventoryCharacter } from '@shared/types/gamification.types'
+import { useTranslation } from 'react-i18next'
+import { Card, CardContent } from '../ui/card'
+
+interface CharacterPreviewProps {
+  character: InventoryCharacter
+}
+
+export default function CharacterPreview({ character }: CharacterPreviewProps) {
+  const { t } = useTranslation()
+
+  return (
+    <Card className='flex min-h-0 w-full flex-1 flex-col gap-0'>
+      <CardContent className='flex h-full flex-col items-center justify-center pb-12'>
+        <div className='relative flex h-40 w-40 items-center justify-center'>
+          <img
+            src={`/assets/${character.currentClass!}.png`}
+            alt={character.currentClass!}
+            className='pixelated h-full w-full object-contain'
+            style={{ imageRendering: 'pixelated' }}
+          />
+        </div>
+        <div className='flex flex-col items-center gap-1 text-center'>
+          <h3 className='text-2xl font-bold'>
+            {character.title ? `${character.name}, ${character.title}` : character.name}
+          </h3>
+          <div className='flex items-center justify-center gap-2'>
+            <span className='text-muted-foreground font-medium capitalize'>
+              {t(`character_class.${character.currentClass}`)}
+            </span>
+            <span className='text-primary bg-primary/10 rounded-full px-2 py-0.5 text-xs font-bold uppercase'>
+              {t('inventory.tier')} {character.tier}
+            </span>
+          </div>
+          {character.orderName && <span className='text-muted-foreground text-sm'>{character.orderName}</span>}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}

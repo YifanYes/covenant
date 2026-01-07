@@ -17,11 +17,11 @@ model Character {
   createdAt    DateTime         @default(now()) @db.Timestamp(6)
   updatedAt    DateTime         @updatedAt @db.Timestamp(6)
   userId       String           @unique @db.Uuid
-  classes      CharacterClass[]
+  gold         Int              @default(0)
   inventory    Json?            @default("[]")
   loadout      Json?            @default("[]")
-  gold         Int              @default(0)
   partyId      String?          @db.Uuid
+  classes      CharacterClass[]
   party        Party?           @relation(fields: [partyId], references: [id])
 
   @@map("characters")
@@ -35,12 +35,13 @@ model CharacterClass {
   level       Int       @default(1)
   health      Int       @default(5)
   mana        Int       @default(5)
-  strengthAtk Int       @default(4)
-  strengthDef Int       @default(4)
-  magicAtk    Int       @default(5)
-  magicDef    Int       @default(5)
   createdAt   DateTime  @default(now()) @db.Timestamp(6)
   updatedAt   DateTime  @updatedAt @db.Timestamp(6)
+  magicAtk    Int       @default(5)
+  magicDef    Int       @default(5)
+  strengthAtk Int       @default(4)
+  strengthDef Int       @default(4)
+  manaRegen   Int       @default(1)
   character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@unique([characterId, className])
