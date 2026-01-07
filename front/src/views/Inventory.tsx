@@ -1,15 +1,34 @@
 import CharacterStatus from '@/components/inventory/CharacterStatus.component'
-import ClassAttributeCard from '@/components/inventory/ClassAttributeCard'
+import InventoryGrid from '@/components/inventory/InventoryGrid'
+import LoadoutPanel from '@/components/inventory/LoadoutPanel'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { trpc } from '@/utils/trpc.utils'
-import { User } from '@nsmr/pixelart-react'
+import { Luggage, User } from '@nsmr/pixelart-react'
+import type { InventoryItem } from '@shared/types/gamification.types'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
 export default function Inventory() {
   const { t } = useTranslation()
   const { data: character } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
+
+  // Parse loadout items by type
+  const loadoutItems = useMemo(() => {
+    const loadout = (character?.loadout || []) as InventoryItem[]
+    return {
+      weapon: loadout.find((item) => item.type.startsWith('WEAPON_')),
+      armor: loadout.find((item) => item.type === 'ARMOR'),
+      accessory: loadout.find((item) => item.type === 'ACCESSORY')
+    }
+  }, [character?.loadout])
+
+  // Parse inventory items
+  const inventoryItems = useMemo(() => {
+    return (character?.inventory || []) as InventoryItem[]
+  }, [character?.inventory])
 
   if (!character) {
     return (
@@ -34,6 +53,13 @@ export default function Inventory() {
   const currentClass = character.classes.find((characterClass) => characterClass.className === character.currentClass)!
 
   const statusValues = {
+    level: currentClass.level,
+    exp: currentClass.exp,
+    maxExp: currentClass.level * 100,
+    physAtk: currentClass.strengthAtk,
+    physDef: currentClass.strengthDef,
+    magicAtk: currentClass.magicAtk,
+    magicDef: currentClass.magicDef,
     health: currentClass.health,
     mana: currentClass.mana,
     gold: character.gold,
@@ -48,9 +74,10 @@ export default function Inventory() {
         <h1 className='text-3xl font-bold'>{t('inventory.title')}</h1>
       </div>
 
-      <div className='grid grid-cols-1 gap-6 md:grid-cols-[350px_1fr]'>
-        <div className='bg-card flex flex-col items-center justify-center gap-6 rounded-xl border p-8 shadow-sm'>
-          <div className='relative flex h-48 w-48 items-center justify-center'>
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-[350px_1fr]'>
+        {/* Character Panel */}
+        <div className='bg-card flex flex-col items-center gap-6 rounded-xl border p-6 shadow-sm'>
+          <div className='relative flex h-40 w-40 items-center justify-center'>
             <img
               src={`/assets/${character.currentClass}.png`}
               alt={character.currentClass}
@@ -59,56 +86,45 @@ export default function Inventory() {
             />
           </div>
 
-          <div className='flex flex-col items-center gap-2 text-center'>
-            <h3 className='text-3xl'>{character.title ? `${character.name}, ${character.title}` : character.name}</h3>
-
-            <div className='mt-4 flex flex-col gap-1'>
-              <div className='flex items-center gap-2'>
-                <span className='font-semibold capitalize'>{t(`character_class.${character.currentClass}`)}</span>
-              </div>
-              {character.orderName && (
-                <div className='flex items-center gap-2'>
-                  <span className='font-semibold'>{character.orderName}</span>
-                </div>
-              )}
+          <div className='flex flex-col items-center gap-1 text-center'>
+            <h3 className='text-2xl font-bold'>
+              {character.title ? `${character.name}, ${character.title}` : character.name}
+            </h3>
+            <div className='flex items-center gap-2'>
+              <span className='text-muted-foreground font-medium capitalize'>
+                {t(`character_class.${character.currentClass}`)}
+              </span>
+              <span className='text-primary bg-primary/10 rounded-full px-2 py-0.5 text-xs font-bold uppercase'>
+                Tier {character.tier}
+              </span>
             </div>
-          </div>
-
-          <div className='w-full'>
-            <CharacterStatus status={statusValues} />
+            {character.orderName && <span className='text-muted-foreground text-sm'>{character.orderName}</span>}
           </div>
         </div>
 
-        <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4'>
-          <ClassAttributeCard label={t('inventory.level')} value={currentClass.level} />
-          <ClassAttributeCard label={t('inventory.exp')} value={currentClass.exp} />
-          <ClassAttributeCard
-            label={t('inventory.strength_atk')}
-            value={currentClass.strengthAtk}
-            labelClassName='text-red-400'
-          />
-          <ClassAttributeCard
-            label={t('inventory.strength_def')}
-            value={currentClass.strengthDef}
-            labelClassName='text-red-200'
-          />
-          <ClassAttributeCard
-            label={t('inventory.magic_atk')}
-            value={currentClass.magicAtk}
-            labelClassName='text-blue-400'
-          />
-          <ClassAttributeCard
-            label={t('inventory.magic_def')}
-            value={currentClass.magicDef}
-            labelClassName='text-blue-200'
-          />
-          <ClassAttributeCard
-            label={t('inventory.mana_regen')}
-            value={currentClass.manaRegen}
-            labelClassName='text-blue-300'
-          />
-        </div>
+        {/* Stats Panel */}
+        <CharacterStatus status={statusValues} />
       </div>
+
+      {/* Loadout Section - Full Width */}
+      <Card>
+        <CardContent className='pt-6'>
+          <LoadoutPanel weapon={loadoutItems.weapon} armor={loadoutItems.armor} accessory={loadoutItems.accessory} />
+        </CardContent>
+      </Card>
+
+      {/* Armory Section - Full Width */}
+      <Card className='w-full'>
+        <CardHeader className='flex flex-row items-center justify-between pb-2'>
+          <CardTitle className='flex items-center gap-2 text-sm font-medium tracking-wider uppercase'>
+            <Luggage className='h-4 w-4' />
+            {t('inventory.armory')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <InventoryGrid items={inventoryItems} />
+        </CardContent>
+      </Card>
     </div>
   )
 }

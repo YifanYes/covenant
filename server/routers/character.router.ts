@@ -47,7 +47,7 @@ export const characterRouter = t.router({
 
     if (!character) return null
 
-    const { maxDice } = getCharacterProgress(character)
+    const { maxDice, tier } = getCharacterProgress(character)
 
     return {
       id: character.id,
@@ -58,6 +58,10 @@ export const characterRouter = t.router({
       data: character.data as any,
       gold: character.gold,
       maxDice,
+      tier,
+      // Use unknown to break Prisma's recursive JsonValue type
+      inventory: character.inventory as unknown,
+      loadout: character.loadout as unknown,
       classes: character.classes.map((c) => ({
         id: c.id,
         className: c.className,

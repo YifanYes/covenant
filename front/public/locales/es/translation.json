@@ -197,12 +197,22 @@
     "search_placeholder": "Buscar iconos..."
   },
   "inventory": {
+    "armory": "Armería",
+    "backpack": "Mochila",
     "class": "Clase",
     "dice_bank": "Banco de Dados",
+    "empty": "No hay objetos en el inventario",
+    "equipment_slot": {
+      "ACCESSORY": "Accesorio",
+      "ARMOR": "Armadura",
+      "WEAPON": "Arma"
+    },
     "exp": "Experiencia",
     "gold": "Oro",
     "health": "Salud",
     "level": "Nivel",
+    "loadout": "Equipamiento",
+    "magic": "Magia",
     "magic_atk": "Ataque Mágico",
     "magic_def": "Defensa Mágica",
     "mana": "Maná",
@@ -212,7 +222,20 @@
       "description": "Crea un personaje para empezar tu aventura.",
       "title": "Todavía no tienes un personaje"
     },
-    "stats": "Estadísticas",
+    "phys": "Físico",
+    "rarity": {
+      "common": "Común",
+      "legendary": "Legendario",
+      "rare": "Raro"
+    },
+    "stats": {
+      "attack_dice": "Dados de Ataque",
+      "magic_def": "Def Mágica",
+      "phys_def": "Def Física",
+      "range": "Alcance",
+      "speed": "Velocidad"
+    },
+    "stats_title": "Estadísticas",
     "strength_atk": "Ataque Físico",
     "strength_def": "Defensa Física",
     "title": "Inventario"

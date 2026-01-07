@@ -27,8 +27,8 @@
   - [x] Migración de base de datos (Atributos Lore, Inventario, DiceBank).
   - [x] Lógica de obtención de dados por Tareas/Hábitos/Objetivos y Bonus de consistencia.
 - **Gamificación - Fase 2: Identidad y Equipamiento**
-  - [ ] Rediseño de vista de Personaje con nuevos atributos y sistema de Inventario/Loadout.
-  - [ ] Definición de constantes de ítems Tier 1.
+  - [x] Rediseño de vista de Personaje con nuevos atributos y sistema de Inventario/Loadout.
+  - [x] Definición de constantes de ítems Tier 1.
 - **Gamificación - Fase 3: El Centro de Aventuras (Misiones)**
   - [ ] Pestaña de "Aventura" y selector de misiones con persistencia y gating por Tier.
 - **Gamificación - Fase 4: Combate Reactivo**

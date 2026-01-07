@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { ItemStats } from '../constants/items'
 
 export const ItemType = {
   WEAPON_MELEE: 'WEAPON_MELEE',
@@ -23,7 +24,7 @@ export interface InventoryItem {
   type: ItemType
   tier: number
   rarity: ItemRarity
-  stats: Record<string, any>
+  stats: ItemStats
   obtainedAt: Date
 }
 
@@ -33,3 +34,10 @@ export const characterDataSchema = z.object({
   habitStreaks: z.record(z.string(), z.number()).optional(),
   downedUntil: z.string().optional()
 })
+
+export const SlotType = {
+  WEAPON: 'WEAPON',
+  ARMOR: 'ARMOR',
+  ACCESSORY: 'ACCESSORY'
+} as const
+export type SlotType = (typeof SlotType)[keyof typeof SlotType]

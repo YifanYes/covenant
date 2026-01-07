@@ -197,12 +197,22 @@
     "search_placeholder": "Search icons..."
   },
   "inventory": {
+    "armory": "Armory",
+    "backpack": "Backpack",
     "class": "Class",
     "dice_bank": "Dice Bank",
+    "empty": "No items in inventory",
+    "equipment_slot": {
+      "ACCESSORY": "Accessory",
+      "ARMOR": "Armor",
+      "WEAPON": "Weapon"
+    },
     "exp": "Experience",
     "gold": "Gold",
     "health": "Health",
     "level": "Level",
+    "loadout": "Loadout",
+    "magic": "Magic",
     "magic_atk": "Magic Atk",
     "magic_def": "Magic Def",
     "mana": "Mana",
@@ -212,7 +222,20 @@
       "description": "Create a character to start your adventure.",
       "title": "You don't have a character yet"
     },
-    "stats": "Stats",
+    "phys": "Physical",
+    "rarity": {
+      "common": "Common",
+      "legendary": "Legendary",
+      "rare": "Rare"
+    },
+    "stats": {
+      "attack_dice": "Attack Dice",
+      "magic_def": "Magic Def",
+      "phys_def": "Phys Def",
+      "range": "Range",
+      "speed": "Speed"
+    },
+    "stats_title": "Stats",
     "strength_atk": "Strength Atk",
     "strength_def": "Strength Def",
     "title": "Inventory"
