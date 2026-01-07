@@ -75,7 +75,6 @@ export default function Inventory() {
       </div>
 
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-[350px_1fr]'>
-        {/* Character Panel */}
         <div className='bg-card flex flex-col items-center gap-6 rounded-xl border p-6 shadow-sm'>
           <div className='relative flex h-40 w-40 items-center justify-center'>
             <img
@@ -102,18 +101,15 @@ export default function Inventory() {
           </div>
         </div>
 
-        {/* Stats Panel */}
         <CharacterStatus status={statusValues} />
       </div>
 
-      {/* Loadout Section - Full Width */}
       <Card>
         <CardContent className='pt-6'>
           <LoadoutPanel weapon={loadoutItems.weapon} armor={loadoutItems.armor} accessory={loadoutItems.accessory} />
         </CardContent>
       </Card>
 
-      {/* Armory Section - Full Width */}
       <Card className='w-full'>
         <CardHeader className='flex flex-row items-center justify-between pb-2'>
           <CardTitle className='flex items-center gap-2 text-sm font-medium tracking-wider uppercase'>
