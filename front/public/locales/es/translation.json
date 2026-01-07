@@ -198,7 +198,6 @@
   },
   "inventory": {
     "armory": "Armería",
-    "backpack": "Mochila",
     "class": "Clase",
     "dice_bank": "Banco de Dados",
     "empty": "No hay objetos en el inventario",

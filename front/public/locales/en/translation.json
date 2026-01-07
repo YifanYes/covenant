@@ -198,7 +198,6 @@
   },
   "inventory": {
     "armory": "Armory",
-    "backpack": "Backpack",
     "class": "Class",
     "dice_bank": "Dice Bank",
     "empty": "No items in inventory",
