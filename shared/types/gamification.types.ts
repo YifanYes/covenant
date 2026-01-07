@@ -41,3 +41,17 @@ export const SlotType = {
   ACCESSORY: 'ACCESSORY'
 } as const
 export type SlotType = (typeof SlotType)[keyof typeof SlotType]
+
+export interface InventoryCharacter {
+  name: string | null
+  title: string | null
+  currentClass: string | null
+  tier: number | null
+  orderName: string | null
+  gold: number
+  maxDice: number | null
+  data: any
+  inventory: InventoryItem[] | any[] | null
+  loadout: InventoryItem[] | any[] | null
+  classes: any[]
+}
