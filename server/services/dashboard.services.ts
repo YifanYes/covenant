@@ -1,6 +1,6 @@
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import dayjs from 'dayjs'
-import { Area, HabitCompletion, Objective, PrismaClient, Task } from '../generated/prisma/client'
+import { type Area, type HabitCompletion, type Objective, type PrismaClient, type Task } from '../generated/prisma'
 import { getCharacterProgress } from './character.services'
 
 const getMax = (record: Record<string, number>) => Object.entries(record).sort((a, b) => b[1] - a[1])[0]?.[0] || null

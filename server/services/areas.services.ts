@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { type Area, type PrismaClient } from '../generated/prisma/client'
+import { type Area, type PrismaClient } from '../generated/prisma'
 
 export const getUserArea = async (prisma: PrismaClient, areaId: string, userId: string): Promise<Area> => {
   const area = await prisma.area.findFirst({

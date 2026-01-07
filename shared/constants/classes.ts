@@ -12,7 +12,8 @@ export const CLASS_INITIAL_STATS = {
     strengthAtk: 4,
     strengthDef: 4,
     magicAtk: 5,
-    magicDef: 5
+    magicDef: 5,
+    manaRegen: 1
   },
   [CharacterClassName.HERALD]: {
     health: 5,
@@ -20,7 +21,8 @@ export const CLASS_INITIAL_STATS = {
     strengthAtk: 5,
     strengthDef: 5,
     magicAtk: 4,
-    magicDef: 4
+    magicDef: 4,
+    manaRegen: 2
   },
   [CharacterClassName.INQUISITOR]: {
     health: 8,
@@ -28,7 +30,8 @@ export const CLASS_INITIAL_STATS = {
     strengthAtk: 5,
     strengthDef: 4,
     magicAtk: 4,
-    magicDef: 5
+    magicDef: 5,
+    manaRegen: 2
   },
   [CharacterClassName.DEMON_HUNTER]: {
     health: 6,
@@ -36,6 +39,7 @@ export const CLASS_INITIAL_STATS = {
     strengthAtk: 4,
     strengthDef: 5,
     magicAtk: 5,
-    magicDef: 4
+    magicDef: 4,
+    manaRegen: 1
   }
 }

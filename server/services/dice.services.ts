@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient } from '../generated/prisma'
 import { getCharacterProgress } from './character.services'
 
 export const addDiceToBank = async (prisma: PrismaClient, userId: string, amount: number) => {
