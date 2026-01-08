@@ -117,10 +117,6 @@ export default function MissionDetail() {
         </CardHeader>
         <CardContent>
           <div className='flex flex-wrap gap-4'>
-            <div className='flex items-center gap-2'>
-              <span className='text-muted-foreground text-sm'>XP:</span>
-              <span className='font-medium text-amber-500'>+{mission.rewards.xp}</span>
-            </div>
             {mission.rewards.gold && (
               <div className='flex items-center gap-2'>
                 <span className='text-muted-foreground text-sm'>{t('inventory.gold')}:</span>

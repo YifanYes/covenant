@@ -52,7 +52,8 @@ export interface InventoryCharacter {
   name: string | null
   title: string | null
   currentClass: string | null
-  tier: number | null
+  tier: number
+  missionProgress: Record<string, number>
   orderName: string | null
   gold: number
   maxDice: number | null

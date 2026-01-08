@@ -4,7 +4,6 @@ export interface MissionPhase {
 }
 
 export interface MissionReward {
-  xp: number
   gold?: number
   items?: string[]
 }
@@ -20,6 +19,18 @@ export interface MissionTemplate {
   rewards: MissionReward
 }
 
+export const TIER_PROGRESSION: Record<number, number> = {
+  1: 2, // 2 missions to reach Tier 2
+  2: 3, // 3 missions to reach Tier 3
+  3: 3, // 3 missions to reach Tier 4
+  4: 4, // 4 missions to reach Tier 5
+  5: 4, // 4 missions to reach Tier 6
+  6: 5, // 5 missions to reach Tier 7
+  7: 5, // 5 missions to reach Tier 8
+  8: 5, // 5 missions to reach Tier 9
+  9: 5 // 5 missions to reach Tier 10
+}
+
 export const MISSIONS: Record<string, MissionTemplate> = {
   // Tier 1
   asalto_frontera: {
@@ -33,7 +44,7 @@ export const MISSIONS: Record<string, MissionTemplate> = {
       { enemies: ['bandit_chief', 'skeleton', 'skeleton'], description: 'missions.asalto_frontera.phase2' }
     ],
     scaling: '+1 enemy per extra player',
-    rewards: { xp: 50, gold: 25 }
+    rewards: { gold: 50 }
   },
   ruta_suministros: {
     id: 'ruta_suministros',
@@ -43,7 +54,7 @@ export const MISSIONS: Record<string, MissionTemplate> = {
     requiredTier: 1,
     phases: [{ enemies: ['heretic_templar', 'heretic_templar'], description: 'missions.ruta_suministros.phase1' }],
     scaling: '+2 HP per extra player',
-    rewards: { xp: 75, gold: 30 }
+    rewards: { gold: 50 }
   },
   limpieza_ruinas: {
     id: 'limpieza_ruinas',
@@ -56,7 +67,7 @@ export const MISSIONS: Record<string, MissionTemplate> = {
       { enemies: ['skeleton_warrior_elite'], description: 'missions.limpieza_ruinas.phase2' }
     ],
     scaling: '+1 Ghost per player, Guardian +2 HP per extra player',
-    rewards: { xp: 75, gold: 35 }
+    rewards: { gold: 50 }
   },
 
   // Tier 2
@@ -74,7 +85,7 @@ export const MISSIONS: Record<string, MissionTemplate> = {
       { enemies: ['heretic_templar', 'heretic_templar'], description: 'missions.profundidades_catedral.phase2' }
     ],
     scaling: '+1 Cultist per player, Phase 2 +1 Templar per 2 players',
-    rewards: { xp: 250, gold: 100 }
+    rewards: { gold: 100 }
   },
   caza_luna: {
     id: 'caza_luna',
@@ -87,7 +98,7 @@ export const MISSIONS: Record<string, MissionTemplate> = {
       { enemies: ['alpha_werewolf', 'young_werewolf', 'young_werewolf'], description: 'missions.caza_luna.phase2' }
     ],
     scaling: '+1 Young Wolf per player, Alpha +1 attack die with 3+ players',
-    rewards: { xp: 300, gold: 120 }
+    rewards: { gold: 100 }
   },
   puente_suspiros: {
     id: 'puente_suspiros',
@@ -103,7 +114,7 @@ export const MISSIONS: Record<string, MissionTemplate> = {
       { enemies: ['tank_heretic_templar'], description: 'missions.puente_suspiros.phase2' }
     ],
     scaling: '+2 minor enemies per player',
-    rewards: { xp: 300, gold: 150 }
+    rewards: { gold: 100 }
   },
 
   // Tier 3
@@ -121,7 +132,7 @@ export const MISSIONS: Record<string, MissionTemplate> = {
       { enemies: ['vampire_chief'], description: 'missions.sabotaje_naval.phase2' }
     ],
     scaling: '+1 enemy per player',
-    rewards: { xp: 500, gold: 200 }
+    rewards: { gold: 200 }
   },
   mansion_sangrienta: {
     id: 'mansion_sangrienta',
@@ -137,7 +148,7 @@ export const MISSIONS: Record<string, MissionTemplate> = {
       { enemies: ['herald_vampire'], description: 'missions.mansion_sangrienta.phase2' }
     ],
     scaling: '+1 enemy per player in phase 1, Boss +1 attack die per 2 players',
-    rewards: { xp: 600, gold: 250 }
+    rewards: { gold: 200 }
   },
   ecos_abismo: {
     id: 'ecos_abismo',
@@ -164,7 +175,7 @@ export const MISSIONS: Record<string, MissionTemplate> = {
       { enemies: ['minor_nephilim'], description: 'missions.ecos_abismo.phase2' }
     ],
     scaling: '+2 demons per wave per player',
-    rewards: { xp: 600, gold: 300 }
+    rewards: { gold: 200 }
   }
 }
 

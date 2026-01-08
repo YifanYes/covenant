@@ -72,8 +72,8 @@ export const characterRouter = t.router({
       classes: character.classes.map((c) => ({
         id: c.id,
         className: c.className,
-        level: c.level,
-        exp: c.exp,
+        tier: c.tier,
+        missionProgress: c.missionProgress as Record<string, number>,
         health: c.health,
         mana: c.mana,
         strengthAtk: c.strengthAtk,

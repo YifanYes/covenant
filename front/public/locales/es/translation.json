@@ -234,16 +234,15 @@
       "ARMOR": "Armadura",
       "WEAPON": "Arma"
     },
-    "exp": "Experiencia",
     "gold": "Oro",
     "health": "Salud",
-    "level": "Nivel",
     "loadout": "Equipamiento",
     "magic": "Magia",
     "magic_atk": "Ataque Mágico",
     "magic_def": "Defensa Mágica",
     "mana": "Maná",
     "mana_regen": "Regeneración de Maná",
+    "missions": "Misiones",
     "no_character": {
       "button": "Empezar aventura",
       "description": "Crea un personaje para empezar tu aventura.",

@@ -1,4 +1,4 @@
-import { MISSIONS, getMission } from '@shared/constants/missions'
+import { MISSIONS, TIER_PROGRESSION, getMission } from '@shared/constants/missions'
 import { MissionStatus } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
@@ -137,5 +137,69 @@ export const missionsRouter = t.router({
     })
 
     return { success: true }
+  }),
+
+  complete: protectedProcedure.mutation(async ({ ctx }) => {
+    const character = await ctx.prisma.character.findUnique({
+      where: { userId: ctx.user.id },
+      include: { party: true, classes: true }
+    })
+
+    if (!character || !character.party || !character.party.currentMissionId) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'No active mission to complete' })
+    }
+
+    const mission = await ctx.prisma.mission.findUnique({
+      where: { id: character.party.currentMissionId }
+    })
+
+    if (!mission) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Mission not found' })
+    }
+
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
+    }
+
+    // Update mission progress
+    const progress = (currentClass.missionProgress as Record<string, number>) || {}
+    const missionTier = mission.requiredTier
+    progress[missionTier] = (progress[missionTier] || 0) + 1
+
+    // Check for tier upgrade
+    let newTier = currentClass.tier
+    const requiredForNext = TIER_PROGRESSION[newTier]
+    if (requiredForNext && progress[newTier] >= requiredForNext) {
+      newTier += 1
+    }
+
+    // Reward gold
+    const rewards = (mission.rewards as any) || {}
+    const goldReward = rewards.gold || 0
+
+    await ctx.prisma.$transaction([
+      ctx.prisma.mission.update({
+        where: { id: mission.id },
+        data: { status: MissionStatus.COMPLETED, completedAt: new Date() }
+      }),
+      ctx.prisma.party.update({
+        where: { id: character.party.id },
+        data: { currentMissionId: null }
+      }),
+      ctx.prisma.characterClass.update({
+        where: { id: currentClass.id },
+        data: {
+          tier: newTier,
+          missionProgress: progress
+        }
+      }),
+      ctx.prisma.character.update({
+        where: { id: character.id },
+        data: { gold: character.gold + goldReward }
+      })
+    ])
+
+    return { success: true, newTier, rewards }
   })
 })

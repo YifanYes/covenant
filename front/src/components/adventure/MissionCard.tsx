@@ -30,7 +30,6 @@ export default function MissionCard({ mission, isLocked }: MissionCardProps) {
           <span className='text-muted-foreground'>
             {mission.phases.length} {t('missions.phases')}
           </span>
-          <span className='text-amber-500'>+{mission.rewards.xp} XP</span>
           {mission.rewards.gold && (
             <span className='text-yellow-500'>
               +{mission.rewards.gold} {t('inventory.gold')}

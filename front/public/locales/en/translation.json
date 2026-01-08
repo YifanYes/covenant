@@ -234,16 +234,15 @@
       "ARMOR": "Armor",
       "WEAPON": "Weapon"
     },
-    "exp": "Experience",
     "gold": "Gold",
     "health": "Health",
-    "level": "Level",
     "loadout": "Loadout",
     "magic": "Magic",
     "magic_atk": "Magic Atk",
     "magic_def": "Magic Def",
     "mana": "Mana",
     "mana_regen": "Mana Regeneration",
+    "missions": "Missions",
     "no_character": {
       "button": "Begin adventure",
       "description": "Create a character to start your adventure.",
