@@ -6,8 +6,14 @@
   "workspaces": [
     "front",
     "server",
-    "shared"
+    "shared",
+    "aws"
   ],
+  "scripts": {
+    "deploy:all": "npm install && npm run build:prod -w front && cd aws && npm run cdk deploy -- --all",
+    "deploy:front": "npm install && npm run build:prod -w front && cd aws && npm run cdk deploy Front",
+    "deploy:server": "npm install && cd aws && npm run cdk deploy Server"
+  },
   "dependencies": {
     "@trpc/server": "^11.8.0",
     "@trpc/client": "^11.8.0",
