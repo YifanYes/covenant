@@ -66,5 +66,13 @@ export const handler = async (event: APIGatewayProxyEvent, context: any) => {
     })
   }
 
+  // Fix: Strip /trpc prefix from path so the router matches 'auth.signUp' instead of 'trpc/auth.signUp'
+  if (event.pathParameters && event.pathParameters.proxy) {
+    // For proxy integration {proxy+}
+    if (event.pathParameters.proxy.startsWith('trpc/')) {
+      event.pathParameters.proxy = event.pathParameters.proxy.substring(5)
+    }
+  }
+
   return handlerInstance(event, context)
 }
