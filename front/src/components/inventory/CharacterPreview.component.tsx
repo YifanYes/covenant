@@ -11,8 +11,8 @@ export default function CharacterPreview({ character }: CharacterPreviewProps) {
 
   return (
     <Card className='flex min-h-0 w-full flex-1 flex-col gap-0'>
-      <CardContent className='flex h-full flex-col items-center justify-center pb-12'>
-        <div className='relative flex h-40 w-40 items-center justify-center'>
+      <CardContent className='flex h-full flex-col items-center justify-center p-6'>
+        <div className='relative flex h-56 w-56 items-center justify-center'>
           <img
             src={`/assets/${character.currentClass!}.png`}
             alt={character.currentClass!}

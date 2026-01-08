@@ -232,10 +232,11 @@ interface InventoryItem {
 
 #### Bestiary (Code Constants)
 
-Enemies are defined in code for constant lookup (`src/constants/enemies.ts`).
+Enemies are defined in code for constant lookup (`shared/constants/enemies.ts`). Attributes match `CharacterClass` for consistency.
 
 ```typescript
 type EnemyType = 'MINION' | 'ELITE' | 'BOSS'
+type DamageType = 'PHYSICAL' | 'MAGIC' | 'BOTH'
 
 interface DropTable {
   materials: {
@@ -246,14 +247,20 @@ interface DropTable {
 }
 
 interface Enemy {
-  id: string // specific ID (e.g., "rat_lvl1")
+  id: string
   name: string
   tier: number
   type: EnemyType
 
-  // Stats
-  health: number // "Hits" to kill
-  damage: number // HP lost if user fails
+  // Stats (matching CharacterClass)
+  health: number
+  mana: number
+  damageType: DamageType
+  strengthAtk: number // Physical attack threshold
+  strengthDef: number // Physical defense threshold
+  magicAtk: number // Magic attack threshold
+  magicDef: number // Magic defense threshold
+  manaRegen: number
 
   // Rewards
   xpReward: number
@@ -264,12 +271,17 @@ interface Enemy {
 
 #### Party
 
-We will prepare the dabatase schema for future party and multiplayer features. One party has many characters.
+We will prepare the database schema for future party and multiplayer features. One party has many characters. A Party is auto-created with a random name when a Character is created.
 
 ```prisma
 model Party {
-    id          String    @id @default(uuid()) @db.Uuid
-    characters  Character[]
+  id                String      @id @default(uuid()) @db.Uuid
+  name              String?     @db.VarChar(255)
+  currentMissionId  String?     @db.Uuid
+  createdAt         DateTime    @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime    @updatedAt @db.Timestamp(6)
+  characters        Character[]
+  missions          Mission[]
 }
 ```
 
@@ -277,21 +289,25 @@ We will need to add `partyId` to `Character` model.
 
 #### Mission (Combat State)
 
-State of the current "Mission".
+State of the current "Mission". The `name` field references the mission constant.
 
 ```prisma
 model Mission {
-  id            String @id @default(uuid())
-  name          String
-  description   String
-  partyId       String @unique
-  requiredTier  Int
-  enemies       Json // Array of enemy objects
-  Rewards       Json // Array of reward objects
-  createdAt     DateTime @default(now()) @db.Timestamp(6)
-  updatedAt     DateTime @updatedAt @db.Timestamp(6)
+  id            String    @id @default(uuid()) @db.Uuid
+  partyId       String    @db.Uuid
+  name          String    @db.VarChar(255)  // Reference to mission constant
+  description   String?
+  requiredTier  Int       @default(1)
+  status        String    @db.VarChar(20)   // ACTIVE, COMPLETED, FAILED
+  currentPhase  Int       @default(0)
+  enemyState    Json?     // Current enemy HP states
+  rewards       Json?     // {xp, gold, items}
+  createdAt     DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @db.Timestamp(6)
+  completedAt   DateTime? @db.Timestamp(6)
+  party         Party     @relation(fields: [partyId], references: [id], onDelete: Cascade)
 
-  party     Party @relation(...)
+  @@map("missions")
 }
 ```
 

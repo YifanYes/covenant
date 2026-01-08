@@ -2,11 +2,17 @@ import { CharacterClassName, CLASS_INITIAL_STATS } from '@shared/constants/class
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import { createCharacterSchema, switchClassSchema } from '@shared/schemas/character.schemas'
 import { TRPCError } from '@trpc/server'
-import { getCharacterProgress } from '../services/character.services'
+import { createRandomPartyName, getCharacterProgress } from '../services/character.services'
 import { protectedProcedure, t } from '../trpc'
 
 export const characterRouter = t.router({
   create: protectedProcedure.input(createCharacterSchema).mutation(async ({ ctx, input }) => {
+    const randomPartyName = createRandomPartyName()
+
+    const party = await ctx.prisma.party.create({
+      data: { name: randomPartyName }
+    })
+
     const character = await ctx.prisma.character.create({
       data: {
         userId: ctx.user.id,
@@ -16,6 +22,7 @@ export const characterRouter = t.router({
         gold: 0,
         inventory: [],
         loadout: [],
+        partyId: party.id,
         classes: {
           create: {
             className: input.className,
@@ -65,8 +72,8 @@ export const characterRouter = t.router({
       classes: character.classes.map((c) => ({
         id: c.id,
         className: c.className,
-        level: c.level,
-        exp: c.exp,
+        tier: c.tier,
+        missionProgress: c.missionProgress as Record<string, number>,
         health: c.health,
         mana: c.mana,
         strengthAtk: c.strengthAtk,

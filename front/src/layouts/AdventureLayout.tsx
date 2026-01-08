@@ -1,19 +1,20 @@
-import CharacterPreview from '@/components/inventory/CharacterPreview.component'
-import CharacterStatus from '@/components/inventory/CharacterStatus.component'
-import InventoryGrid from '@/components/inventory/InventoryGrid'
-import LoadoutPanel from '@/components/inventory/LoadoutPanel'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { trpc } from '@/utils/trpc.utils'
-import { User } from '@nsmr/pixelart-react'
+import { Luggage, ScriptText, User } from '@nsmr/pixelart-react'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
+import { Link, Outlet, useLocation } from 'react-router'
 
-export default function Inventory() {
+export default function AdventureLayout() {
   const { t } = useTranslation()
+  const location = useLocation()
   const { data: characterData } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
   const character = characterData as InventoryCharacter
+
+  const isMissions = location.pathname.includes('/missions')
+  const activeTab = isMissions ? 'missions' : 'inventory'
 
   if (!character) {
     return (
@@ -36,18 +37,31 @@ export default function Inventory() {
   }
 
   return (
-    <div className='flex h-full w-full flex-col gap-6 overflow-hidden p-6'>
+    <div className='flex h-full w-full flex-col gap-4 overflow-hidden p-6'>
       <div className='flex shrink-0 items-center justify-between'>
-        <h1 className='text-3xl font-bold'>{t('inventory.title')}</h1>
+        <h1 className='text-3xl font-bold'>{t('adventure.title')}</h1>
       </div>
 
-      <div className='grid shrink-0 grid-cols-1 gap-6 lg:grid-cols-[2fr_2fr_2fr]'>
-        <CharacterPreview character={character} />
-        <LoadoutPanel character={character} />
-        <CharacterStatus character={character} />
-      </div>
+      <Tabs value={activeTab} className='flex h-full flex-col overflow-hidden'>
+        <TabsList className='shrink-0'>
+          <TabsTrigger value='inventory' asChild>
+            <Link to='/adventure/inventory'>
+              <Luggage className='mr-1 h-4 w-4' />
+              {t('adventure.tabs.inventory')}
+            </Link>
+          </TabsTrigger>
+          <TabsTrigger value='missions' asChild>
+            <Link to='/adventure/missions'>
+              <ScriptText className='mr-1 h-4 w-4' />
+              {t('adventure.tabs.missions')}
+            </Link>
+          </TabsTrigger>
+        </TabsList>
 
-      <InventoryGrid character={character} />
+        <div className='mt-4 flex flex-1 overflow-hidden'>
+          <Outlet />
+        </div>
+      </Tabs>
     </div>
   )
 }
