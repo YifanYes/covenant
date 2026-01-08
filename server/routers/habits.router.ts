@@ -171,8 +171,6 @@ export const habitsRouter = t.router({
   }),
 
   createCompletion: protectedProcedure.input(habitIdSchema).mutation(async ({ ctx, input }) => {
-    const habit = await getUserHabit(ctx.prisma, input.id, ctx.user.id)
-
     const completion = await ctx.prisma.habitCompletion.create({
       data: { habitId: input.id, userId: ctx.user.id }
     })
