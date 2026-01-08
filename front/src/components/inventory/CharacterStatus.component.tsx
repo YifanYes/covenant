@@ -30,18 +30,18 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
         {/* Basic Info */}
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Trophy className='h-4 w-4 text-yellow-500' />
+            <Trophy className='text-muted-foreground h-4 w-4' />
             <span className='text-sm font-medium'>{t('inventory.tier')}</span>
           </div>
-          <span className='text-sm font-bold'>{currentClass.tier}</span>
+          <span className='text-muted-foreground text-sm font-bold'>{currentClass.tier}</span>
         </div>
 
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Bullseye className='h-4 w-4 text-orange-500' />
+            <Bullseye className='text-muted-foreground h-4 w-4' />
             <span className='text-sm font-medium'>{t('inventory.missions')}</span>
           </div>
-          <span className='text-sm font-bold'>
+          <span className='text-muted-foreground text-sm font-bold'>
             {currentClass.missionProgress[currentClass.tier] || 0} / {TIER_PROGRESSION[currentClass.tier] || 5}
           </span>
         </div>
@@ -51,20 +51,20 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
         {/* Combat Stats */}
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Shield className='h-4 w-4 text-red-500' />
+            <Shield className='h-4 w-4 text-orange-400' />
             <span className='text-sm font-medium'>{t('inventory.phys')}</span>
           </div>
-          <span className='text-sm font-bold text-red-500'>
+          <span className='text-sm font-bold text-orange-400/90'>
             {currentClass.strengthAtk} / {currentClass.strengthDef}
           </span>
         </div>
 
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Zap className='h-4 w-4 text-blue-500' />
+            <Zap className='h-4 w-4 text-sky-400' />
             <span className='text-sm font-medium'>{t('inventory.magic')}</span>
           </div>
-          <span className='text-sm font-bold text-blue-500'>
+          <span className='text-sm font-bold text-sky-400/90'>
             {currentClass.magicAtk} / {currentClass.magicDef}
           </span>
         </div>
@@ -74,18 +74,18 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
         {/* Survival Stats */}
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Heart className='h-4 w-4 text-red-500' />
+            <Heart className='h-4 w-4 text-emerald-500' />
             <span className='text-sm font-medium'>{t('inventory.health')}</span>
           </div>
-          <span className='text-sm font-bold text-red-500'>{currentClass.health}</span>
+          <span className='text-sm font-bold text-emerald-500/90'>{currentClass.health}</span>
         </div>
 
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Zap className='h-4 w-4 text-blue-500' />
+            <Zap className='h-4 w-4 text-blue-400' />
             <span className='text-sm font-medium'>{t('inventory.mana')}</span>
           </div>
-          <span className='text-sm font-bold text-blue-500'>{currentClass.mana}</span>
+          <span className='text-sm font-bold text-blue-400/90'>{currentClass.mana}</span>
         </div>
 
         <div className='flex items-center justify-between'>
@@ -93,27 +93,27 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
             <Zap className='h-4 w-4 text-blue-300' />
             <span className='text-sm font-medium'>{t('inventory.mana_regen')}</span>
           </div>
-          <span className='text-sm font-bold text-blue-300'>{currentClass.manaRegen}</span>
+          <span className='text-sm font-bold text-blue-300/90'>{currentClass.manaRegen}</span>
         </div>
 
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Money className='h-4 w-4 text-yellow-500' />
+            <Money className='h-4 w-4 text-amber-400' />
             <span className='text-sm font-medium'>{t('inventory.gold')}</span>
           </div>
-          <span className='text-sm font-bold text-yellow-500'>{character.gold}</span>
+          <span className='text-sm font-bold text-amber-400/90'>{character.gold}</span>
         </div>
 
         <Separator className='bg-sidebar-border my-1 w-auto' />
 
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <div className='flex items-center justify-center rounded-md bg-purple-500/10 p-1'>
+            <div className='flex items-center justify-center rounded-md bg-purple-400/10 p-1'>
               <span className='text-[10px]'>🎲</span>
             </div>
             <span className='text-sm font-medium'>{t('inventory.dice_bank')}</span>
           </div>
-          <span className='text-sm font-black text-purple-500'>
+          <span className='text-sm font-black text-purple-400/90'>
             {character.data?.diceBank || 0} / {character.maxDice || 10}
           </span>
         </div>
