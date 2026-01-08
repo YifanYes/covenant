@@ -6,10 +6,10 @@ import TaskStatusComponent from '@/components/dashboard/task-status/TaskStatus.c
 import UpcomingTasksComponent from '@/components/dashboard/upcoming-tasks/UpcomingTasks.component'
 import { useAuthStore } from '@/hooks/use-auth-store'
 import { trpc } from '@/utils/trpc.utils'
+import { Calendar } from '@nsmr/pixelart-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { startCase } from 'es-toolkit/compat'
-import { Calendar } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 export default function Dashboard() {
