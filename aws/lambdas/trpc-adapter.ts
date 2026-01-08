@@ -1,4 +1,3 @@
-import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
 import type { CreateAWSLambdaContextOptions } from '@trpc/server/adapters/aws-lambda'
 import { awsLambdaRequestHandler } from '@trpc/server/adapters/aws-lambda'
 import type { APIGatewayProxyEvent } from 'aws-lambda'
@@ -27,16 +26,17 @@ let handlerInstance: any
 
 export const handler = async (event: APIGatewayProxyEvent, context: any) => {
   if (!handlerInstance) {
-    if (process.env.SECRETS_NAME) {
+    if (process.env.SECRETS_PARAM_NAME) {
       try {
-        const client = new SecretsManagerClient({})
-        const response = await client.send(new GetSecretValueCommand({ SecretId: process.env.SECRETS_NAME }))
-        if (response.SecretString) {
-          const secrets = JSON.parse(response.SecretString)
+        const { SSMClient, GetParameterCommand } = await import('@aws-sdk/client-ssm')
+        const client = new SSMClient({})
+        const response = await client.send(new GetParameterCommand({ Name: process.env.SECRETS_PARAM_NAME }))
+        if (response.Parameter?.Value) {
+          const secrets = JSON.parse(response.Parameter.Value)
           Object.assign(process.env, secrets)
         }
       } catch (e) {
-        console.error('Failed to fetch secrets', e)
+        console.error('Failed to fetch secrets form SSM', e)
         // Fallthrough, maybe env vars are set manually
       }
     }

@@ -23,7 +23,6 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.965.0",
     "@aws-sdk/client-ssm": "^3.965.0",
     "@trpc/server": "^11.8.1",
     "@types/aws-lambda": "^8.10.159",

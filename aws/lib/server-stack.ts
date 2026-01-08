@@ -2,7 +2,7 @@ import * as cdk from 'aws-cdk-lib'
 import * as apigateway from 'aws-cdk-lib/aws-apigateway'
 import * as lambda from 'aws-cdk-lib/aws-lambda'
 import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs'
-import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
+import * as ssm from 'aws-cdk-lib/aws-ssm'
 import { Construct } from 'constructs'
 import * as path from 'path'
 
@@ -14,10 +14,11 @@ export class ServerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
 
-    // 1. Secrets Manager
-    const secret = new secretsmanager.Secret(this, 'ArqSecrets', {
-      secretName: 'arq/prod/secrets',
-      description: 'Supabase credentials for Arq'
+    // 1. SSM Parameter Store
+    const secretParam = new ssm.StringParameter(this, 'ArqSecrets', {
+      parameterName: '/arq/prod/secrets',
+      stringValue: '{"note": "Replace with real secrets"}',
+      description: 'Supabase credentials for Arq (Placeholder)'
     })
 
     // 2. Lambda
@@ -32,10 +33,10 @@ export class ServerStack extends cdk.Stack {
       bundling: {
         minify: true,
         sourceMap: true,
-        externalModules: ['@aws-sdk/client-secrets-manager', '@aws-sdk/client-ssm']
+        externalModules: ['@aws-sdk/client-ssm']
       },
       environment: {
-        SECRETS_NAME: secret.secretName,
+        SECRETS_PARAM_NAME: secretParam.parameterName,
         NODE_ENV: 'prod',
         FRONT_URL_PARAM: '/arq/prod/front-url',
         PORT: '3000' // Required by server config validation, though unused in Lambda
@@ -44,7 +45,7 @@ export class ServerStack extends cdk.Stack {
       memorySize: 512
     })
 
-    secret.grantRead(this.apiHandler)
+    secretParam.grantRead(this.apiHandler)
 
     // Grant permission to read the SSM parameter
     // We construct the ARN manually to avoid depending on the FrontStack resource
