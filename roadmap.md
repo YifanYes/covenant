@@ -30,7 +30,7 @@
   - [x] Rediseño de vista de Personaje con nuevos atributos y sistema de Inventario/Loadout.
   - [x] Definición de constantes de ítems Tier 1.
 - **Gamificación - Fase 3: El Centro de Aventuras (Misiones)**
-  - [ ] Pestaña de "Aventura" y selector de misiones con persistencia y gating por Tier.
+  - [x] Pestaña de "Aventura" y selector de misiones con persistencia y gating por Tier.
 - **Gamificación - Fase 4: Combate Reactivo**
   - [ ] UI de lanzamiento de dados animado y resolver de combate (Ataque/Defensa simultánea).
   - [ ] Arena de combate, visualización de enemigos y log de eventos.

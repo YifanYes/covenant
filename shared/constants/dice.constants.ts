@@ -6,17 +6,31 @@ export const DICE_REWARDS = {
   DAILY_LOGIN_BASE: 2
 } as const
 
-export const DICE_BANK_LIMITS = {
-  TIER_1: 10,
-  TIER_2: 15,
-  TIER_3: 20
-} as const
+export const DICE_BANK_LIMITS: Record<number, number> = {
+  1: 10,
+  2: 15,
+  3: 20,
+  4: 25,
+  5: 30,
+  6: 35,
+  7: 40,
+  8: 45,
+  9: 50,
+  10: 55
+}
 
-export const DICE_PER_TURN_LIMITS = {
-  TIER_1: 5,
-  TIER_2: 6,
-  TIER_3: 7
-} as const
+export const DICE_PER_TURN_LIMITS: Record<number, number> = {
+  1: 5,
+  2: 6,
+  3: 7,
+  4: 8,
+  5: 9,
+  6: 10,
+  7: 11,
+  8: 12,
+  9: 13,
+  10: 14
+}
 
 export const HABIT_STREAK_THRESHOLDS = [
   { days: 21, bonus: 3 },
@@ -24,14 +38,6 @@ export const HABIT_STREAK_THRESHOLDS = [
   { days: 7, bonus: 1 }
 ] as const
 
-export const getTierFromLevel = (level: number): number => {
-  if (level >= 20) return 3
-  if (level >= 10) return 2
-  return 1
-}
-
 export const getMaxDiceForTier = (tier: number): number => {
-  if (tier >= 3) return DICE_BANK_LIMITS.TIER_3
-  if (tier >= 2) return DICE_BANK_LIMITS.TIER_2
-  return DICE_BANK_LIMITS.TIER_1
+  return DICE_BANK_LIMITS[tier] || DICE_BANK_LIMITS[1]
 }

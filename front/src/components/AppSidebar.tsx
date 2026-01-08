@@ -40,8 +40,8 @@ export function AppSidebar() {
         icon: BookOpen
       },
       {
-        title: t('sidebar.inventory'),
-        url: '/inventory',
+        title: t('sidebar.adventure'),
+        url: '/adventure/inventory',
         icon: Luggage
       }
     ],
@@ -110,9 +110,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarTrigger />
-          </SidebarMenuItem>
+          <SidebarTrigger />
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
