@@ -35,6 +35,12 @@ export const characterDataSchema = z.object({
   downedUntil: z.string().optional()
 })
 
+export enum MissionStatus {
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED'
+}
+
 export const SlotType = {
   WEAPON: 'WEAPON',
   ARMOR: 'ARMOR',
@@ -42,16 +48,33 @@ export const SlotType = {
 } as const
 export type SlotType = (typeof SlotType)[keyof typeof SlotType]
 
+export interface CharacterClassProgress {
+  id: string
+  className: string
+  tier: number
+  missionProgress: Record<string, number>
+  health: number
+  mana: number
+  strengthAtk: number
+  strengthDef: number
+  magicAtk: number
+  magicDef: number
+  manaRegen: number
+}
+
 export interface InventoryCharacter {
+  id: string
   name: string | null
   title: string | null
   currentClass: string | null
-  tier: number | null
+  tier: number
   orderName: string | null
   gold: number
   maxDice: number | null
   data: any
   inventory: InventoryItem[] | any[] | null
   loadout: InventoryItem[] | any[] | null
-  classes: any[]
+  classes: CharacterClassProgress[]
 }
+
+export const AVAILABLE_TIERS = [1, 2, 3] as const
