@@ -18,15 +18,15 @@ export default function MissionCard({ mission, isLocked }: MissionCardProps) {
         isLocked ? 'opacity-50 grayscale' : 'hover:border-primary/50 cursor-pointer hover:shadow-md'
       }`}
     >
-      <CardHeader className='pb-2'>
+      <CardHeader className='pb-1'>
         <div className='flex items-start justify-between gap-2'>
           <CardTitle className='text-base'>{t(mission.name)}</CardTitle>
           <TierBadge tier={mission.requiredTier} />
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className='pt-0'>
         <p className='text-muted-foreground line-clamp-2 text-sm'>{t(mission.description)}</p>
-        <div className='mt-3 flex items-center gap-4 text-xs'>
+        <div className='mt-2 flex items-center gap-4 text-xs'>
           <span className='text-muted-foreground'>
             {mission.phases.length} {t('missions.phases')}
           </span>
