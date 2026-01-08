@@ -1,4 +1,15 @@
 {
+  "adventure": {
+    "active_mission": "Misión Activa",
+    "no_active_mission": "Sin misión activa",
+    "no_missions": "¡Todas las misiones completadas! Bien hecho, aventurero.",
+    "tabs": {
+      "inventory": "Inventario",
+      "missions": "Misiones"
+    },
+    "tier_locked": "Requiere Tier {{tier}}",
+    "title": "Aventura"
+  },
   "areas": {
     "add": "Añadir área",
     "career": "Carrera profesional",
@@ -161,6 +172,23 @@
     }
   },
   "delete": "Eliminar",
+  "enemies": {
+    "alpha_werewolf": "Hombre Lobo Alfa",
+    "bandit_chief": "Jefe Bandido",
+    "elite_bandit": "Bandido Élite",
+    "ghost": "Fantasma",
+    "herald_vampire": "Vampiro Heraldo",
+    "heretic_cultist": "Cultista Hereje",
+    "heretic_templar": "Templario Hereje",
+    "minor_demon": "Demonio Menor",
+    "minor_nephilim": "Nefilim Menor",
+    "minor_vampire": "Vampiro Menor",
+    "skeleton": "Esqueleto",
+    "skeleton_warrior_elite": "Esqueleto Guerrero Élite",
+    "tank_heretic_templar": "Templario Hereje Tanque",
+    "vampire_chief": "Jefe Vampiro",
+    "young_werewolf": "Hombre Lobo Joven"
+  },
   "errors": {
     "invalid_email": "Correo electrónico no valido",
     "invalid_password_length": "La contraseña debe tener al menos 6 caracteres",
@@ -279,6 +307,91 @@
     ],
     "verifying_title": "Verificando..."
   },
+  "missions": {
+    "abandon": "Abandonar Misión",
+    "asalto_frontera": {
+      "description": "Un bandido nigromante lidera un asalto al pueblo extramuros.",
+      "name": "Asalto en la Frontera",
+      "narrative": "\"¡Maldición! Cubrid mi flanco\" —grita el sargento mientras desenfunda contra los esqueletos.",
+      "phase1": "Sobrevivir 2 turnos",
+      "phase2": "Derrotar al Líder"
+    },
+    "caza_luna": {
+      "description": "Granjeros reportan desapariciones en noches de luna llena. Bestias que caminan como hombres.",
+      "name": "Caza Bajo la Luna",
+      "narrative": "El bosque denso limita la visibilidad. Algo se mueve en las sombras.",
+      "phase1": "Rastrear a la presa",
+      "phase2": "La Guarida"
+    },
+    "combat_coming_soon": "Combate (Próximamente)",
+    "continue": "Continuar",
+    "ecos_abismo": {
+      "description": "Una grieta en la realidad se ha abierto cerca de las minas. Una horda de demonios menores cruzó.",
+      "name": "Ecos del Abismo",
+      "narrative": "Los mineros no escaparon. Ahora debéis cerrar lo que se abrió.",
+      "phase1": "Oleadas de defensa",
+      "phase2": "El Guardián del Umbral"
+    },
+    "error": {
+      "internal": {
+        "abandon": "Ocurrió un error al abandonar la misión",
+        "start": "Ocurrió un error al iniciar la misión"
+      }
+    },
+    "has_active_mission": "Completa la misión activa primero",
+    "limpieza_ruinas": {
+      "description": "Una antigua atalaya ha sido ocupada por espíritus inquietos. Purificadla para restaurar la línea de visión.",
+      "name": "Limpieza de Ruinas",
+      "narrative": "La vieja torre cruje con cada ráfaga de viento. Susurros resuenan desde arriba.",
+      "phase1": "Ascender las escaleras",
+      "phase2": "El Guardián de la Cima"
+    },
+    "mansion_sangrienta": {
+      "description": "Un noble local ha sido acusado de vampirismo. La orden os envía a 'entrevistarlo'.",
+      "name": "Mansión Sangrienta",
+      "narrative": "El salón de baile está vacío, pero las lámparas se balancean sin viento.",
+      "phase1": "Los invitados se transforman",
+      "phase2": "El Conde"
+    },
+    "narrative": "Narrativa",
+    "not_found": "Misión no encontrada",
+    "phase": "Fase",
+    "phases": "Fases",
+    "profundidades_catedral": {
+      "description": "Los vecinos se quejan de ruidos extraños bajo la ciudad. Un culto hereje en las catacumbas.",
+      "name": "Profundidades de la Catedral",
+      "narrative": "\"Necesitamos investigar más a fondo. Estad alerta.\" El aire huele a azufre.",
+      "phase1": "Limpiar el nido de bestias",
+      "phase2": "Interrumpir el ritual"
+    },
+    "puente_suspiros": {
+      "description": "Un convoy enemigo intenta cruzar el río con prisioneros. Interceptadlo.",
+      "name": "Puente de los Suspiros",
+      "narrative": "El puente estrecho no ofrece retirada. Victoria o muerte.",
+      "phase1": "Asalto frontal al puente",
+      "phase2": "El Carcelero"
+    },
+    "rewards": "Recompensas",
+    "ruta_suministros": {
+      "description": "Tu escuadra escolta un carro de suministros al frente. El bosque está extrañamente silencioso.",
+      "name": "Ruta de Suministros",
+      "narrative": "\"Los pájaros no cantan cuando hay depredadores cerca.\" \"Ojos abiertos. No me fío de esas sombras.\"",
+      "phase1": "Limpiar el bloqueo del camino"
+    },
+    "sabotaje_naval": {
+      "description": "Infiltraos en los barcos de asedio durante una tormenta.",
+      "name": "Sabotaje Naval",
+      "narrative": "\"Nadar con esta lluvia es un suicidio, pero es nuestra única oportunidad.\"",
+      "phase1": "Cubierta Superior",
+      "phase2": "La Bodega"
+    },
+    "start": "Iniciar Misión",
+    "success": {
+      "abandon": "Misión abandonada",
+      "start": "Misión iniciada exitosamente"
+    },
+    "tier": "Tier {{tier}}"
+  },
   "more": "más",
   "objectives": {
     "add": "Añadir objetivo",
@@ -344,6 +457,7 @@
     "title": "Configuración"
   },
   "sidebar": {
+    "adventure": "Aventura",
     "calendar": "Calendario",
     "close": "Colapsar menú",
     "dashboard": "Panel de control",

@@ -49,13 +49,33 @@ model CharacterClass {
 }
 
 model Party {
-  id         String      @id @default(uuid()) @db.Uuid
-  name       String?     @db.VarChar(255)
-  createdAt  DateTime    @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime    @updatedAt @db.Timestamp(6)
-  characters Character[]
+  id               String      @id @default(uuid()) @db.Uuid
+  name             String?     @db.VarChar(255)
+  currentMissionId String?     @db.Uuid
+  createdAt        DateTime    @default(now()) @db.Timestamp(6)
+  updatedAt        DateTime    @updatedAt @db.Timestamp(6)
+  characters       Character[]
+  missions         Mission[]
 
   @@map("parties")
+}
+
+model Mission {
+  id           String    @id @default(uuid()) @db.Uuid
+  partyId      String    @db.Uuid
+  name         String    @db.VarChar(255)
+  description  String?
+  requiredTier Int       @default(1)
+  status       String    @db.VarChar(20)
+  currentPhase Int       @default(0)
+  enemyState   Json?
+  rewards      Json?
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamp(6)
+  completedAt  DateTime? @db.Timestamp(6)
+  party        Party     @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@map("missions")
 }
 
 model Objective {

@@ -1,14 +1,15 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import PrivateRoute from './components/PrivateRoute'
+import AdventureSuspenseFallback from './components/suspense-fallbacks/AdventureSuspenseFallback'
 import DashboardSuspenseFallback from './components/suspense-fallbacks/DashboardSuspenseFallback'
 import HabitsSuspenseFallback from './components/suspense-fallbacks/HabitsSuspenseFallback'
-import InventorySuspenseFallback from './components/suspense-fallbacks/InventorySuspenseFallback'
 import LoginSuspenseFallback from './components/suspense-fallbacks/LoginSuspenseFallback'
 import ObjectivesSuspenseFallback from './components/suspense-fallbacks/ObjectivesSuspenseFallback'
 import SettingsSuspenseFallback from './components/suspense-fallbacks/SettingsSuspenseFallback'
 import SignUpSuspenseFallback from './components/suspense-fallbacks/SignUpSuspenseFallback'
 import TasksSuspenseFallback from './components/suspense-fallbacks/TasksSuspenseFallback'
+import AdventureLayout from './layouts/AdventureLayout'
 import AppLayout from './layouts/AppLayout'
 import CenteredLayout from './layouts/CenteredLayout'
 import WorkspaceLayout from './layouts/WorkspaceLayout'
@@ -22,7 +23,9 @@ const Onboarding = lazy(() => import('./views/Onboarding'))
 const Settings = lazy(() => import('./views/Settings'))
 const SignUp = lazy(() => import('./views/SignUp'))
 const Tasks = lazy(() => import('./views/Tasks'))
-const Inventory = lazy(() => import('./views/Inventory'))
+const AdventureInventory = lazy(() => import('./views/AdventureInventory'))
+const AdventureMissions = lazy(() => import('./views/AdventureMissions'))
+const MissionDetail = lazy(() => import('./views/MissionDetail'))
 
 export const Router = () => {
   return (
@@ -97,11 +100,30 @@ export const Router = () => {
                   </Suspense>
                 }
               />
+              <Route path='/adventure' element={<AdventureLayout />}>
+                <Route index element={<Navigate to='inventory' replace />} />
+                <Route
+                  path='inventory'
+                  element={
+                    <Suspense fallback={<AdventureSuspenseFallback />}>
+                      <AdventureInventory />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path='missions'
+                  element={
+                    <Suspense fallback={<AdventureSuspenseFallback />}>
+                      <AdventureMissions />
+                    </Suspense>
+                  }
+                />
+              </Route>
               <Route
-                path='/inventory'
+                path='/adventure/missions/:missionId'
                 element={
-                  <Suspense fallback={<InventorySuspenseFallback />}>
-                    <Inventory />
+                  <Suspense fallback={<AdventureSuspenseFallback />}>
+                    <MissionDetail />
                   </Suspense>
                 }
               />

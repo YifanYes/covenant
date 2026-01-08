@@ -35,6 +35,12 @@ export const characterDataSchema = z.object({
   downedUntil: z.string().optional()
 })
 
+export enum MissionStatus {
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED'
+}
+
 export const SlotType = {
   WEAPON: 'WEAPON',
   ARMOR: 'ARMOR',
@@ -55,3 +61,5 @@ export interface InventoryCharacter {
   loadout: InventoryItem[] | any[] | null
   classes: any[]
 }
+
+export const AVAILABLE_TIERS = [1, 2, 3] as const

@@ -22,12 +22,13 @@ The project is a monorepo managed with workspaces:
 - **Internationalization**: Always use `i18next` for user-facing strings. Do not hardcode text in components. Add the translation keys to `front/public/locales/en/translation.json` and `front/public/locales/es/translation.json`.
 - **Forms**: Use `react-hook-form` with `zod` resolvers for validation.
 - **Type Safety**: Avoid `any` at all costs. Use proper TypeScript interfaces and types.
+- **Icons**: Use `@nsmr/pixelart-react` for icons.
 
 ## 4. Backend & Type Safety
 
 - **tRPC Procedures**: Define all inputs and outputs using Zod schemas located in the `@arq/shared` workspace.
 - **Shared Logic**: Place all Zod schemas, shared types, and constants in `/shared` to maintain end-to-end consistency.
-- **Database**: Use Prisma for all database operations. Ensure `db:generate` is run after schema changes.
+- **Database**: Use Prisma for all database operations. After schema changes, push them to Supabase using `npx prisma db push`. Ensure `db:generate` is run after schema changes.
 
 ## 5. State Management
 

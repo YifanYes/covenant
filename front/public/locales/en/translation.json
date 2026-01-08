@@ -1,4 +1,15 @@
 {
+  "adventure": {
+    "active_mission": "Active Mission",
+    "no_active_mission": "No active mission",
+    "no_missions": "All missions completed! Well done, adventurer.",
+    "tabs": {
+      "inventory": "Inventory",
+      "missions": "Missions"
+    },
+    "tier_locked": "Requires Tier {{tier}}",
+    "title": "Adventure"
+  },
   "areas": {
     "add": "Add Area",
     "career": "Professional career",
@@ -161,6 +172,23 @@
     }
   },
   "delete": "Delete",
+  "enemies": {
+    "alpha_werewolf": "Alpha Werewolf",
+    "bandit_chief": "Bandit Chief",
+    "elite_bandit": "Elite Bandit",
+    "ghost": "Ghost",
+    "herald_vampire": "Herald Vampire",
+    "heretic_cultist": "Heretic Cultist",
+    "heretic_templar": "Heretic Templar",
+    "minor_demon": "Minor Demon",
+    "minor_nephilim": "Minor Nephilim",
+    "minor_vampire": "Minor Vampire",
+    "skeleton": "Skeleton",
+    "skeleton_warrior_elite": "Skeleton Warrior Elite",
+    "tank_heretic_templar": "Tank Heretic Templar",
+    "vampire_chief": "Vampire Chief",
+    "young_werewolf": "Young Werewolf"
+  },
   "errors": {
     "invalid_email": "Invalid email",
     "invalid_password_length": "Password must have at least 6 characters",
@@ -279,6 +307,91 @@
     ],
     "verifying_title": "Verifying..."
   },
+  "missions": {
+    "abandon": "Abandon Mission",
+    "asalto_frontera": {
+      "description": "A necromancer bandit leads a raid on the village outside the wall.",
+      "name": "Frontier Assault",
+      "narrative": "\"Damn it! Cover my flank.\" —the sergeant shouts as he draws his sword against the skeletons.",
+      "phase1": "Survive 2 turns",
+      "phase2": "Defeat the Leader"
+    },
+    "caza_luna": {
+      "description": "Farmers report disappearances on full moon nights. Beasts that walk like men.",
+      "name": "Hunt Under the Moon",
+      "narrative": "The dense forest limits visibility. Something moves in the shadows.",
+      "phase1": "Track the prey",
+      "phase2": "The Lair"
+    },
+    "combat_coming_soon": "Combat (Coming Soon)",
+    "continue": "Continue",
+    "ecos_abismo": {
+      "description": "A rift in reality has opened near the mines. A horde of minor demons crossed through.",
+      "name": "Echoes of the Abyss",
+      "narrative": "The miners didn't escape. Now you must close what was opened.",
+      "phase1": "Defense waves",
+      "phase2": "The Threshold Guardian"
+    },
+    "error": {
+      "internal": {
+        "abandon": "An error occurred while abandoning the mission",
+        "start": "An error occurred while starting the mission"
+      }
+    },
+    "has_active_mission": "Complete active mission first",
+    "limpieza_ruinas": {
+      "description": "An old watchtower has been occupied by restless spirits. Purify it to restore the line of sight.",
+      "name": "Ruins Cleansing",
+      "narrative": "The old tower creaks with each gust of wind. Whispers echo from above.",
+      "phase1": "Ascend the stairs",
+      "phase2": "The Guardian of the Summit"
+    },
+    "mansion_sangrienta": {
+      "description": "A local noble has been accused of vampirism. The order sends you to 'interview' him.",
+      "name": "Bloody Mansion",
+      "narrative": "The ballroom is empty, but the chandeliers sway without wind.",
+      "phase1": "The guests transform",
+      "phase2": "The Count"
+    },
+    "narrative": "Narrative",
+    "not_found": "Mission not found",
+    "phase": "Phase",
+    "phases": "Phases",
+    "profundidades_catedral": {
+      "description": "Neighbors complain about strange noises beneath the city. A heretic cult in the catacombs.",
+      "name": "Cathedral Depths",
+      "narrative": "\"We need to investigate further. Stay alert.\" The air smells of sulfur.",
+      "phase1": "Clear the beast nest",
+      "phase2": "Interrupt the ritual"
+    },
+    "puente_suspiros": {
+      "description": "An enemy convoy attempts to cross the river with prisoners. Intercept them.",
+      "name": "Bridge of Sighs",
+      "narrative": "The narrow bridge offers no retreat. Victory or death.",
+      "phase1": "Frontal bridge assault",
+      "phase2": "The Jailer"
+    },
+    "rewards": "Rewards",
+    "ruta_suministros": {
+      "description": "Your squad escorts a supply cart to the front. The forest is eerily silent.",
+      "name": "Supply Route",
+      "narrative": "\"Birds don't sing when predators are near.\" \"Eyes open. I don't trust those shadows.\"",
+      "phase1": "Clear the road blockade"
+    },
+    "sabotaje_naval": {
+      "description": "Infiltrate the siege ships during a storm.",
+      "name": "Naval Sabotage",
+      "narrative": "\"Swimming in this rain is suicide, but it's our only chance.\"",
+      "phase1": "Upper Deck",
+      "phase2": "The Hold"
+    },
+    "start": "Start Mission",
+    "success": {
+      "abandon": "Mission abandoned",
+      "start": "Mission started successfully"
+    },
+    "tier": "Tier {{tier}}"
+  },
   "more": "more",
   "objectives": {
     "add": "Add objective",
@@ -344,6 +457,7 @@
     "title": "Settings"
   },
   "sidebar": {
+    "adventure": "Adventure",
     "calendar": "Calendar",
     "close": "Collapse menu",
     "dashboard": "Dashboard",
