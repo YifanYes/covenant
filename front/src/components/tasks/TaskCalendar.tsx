@@ -4,22 +4,25 @@ import { useCalendarStore } from '@/hooks/use-calendar-store'
 import { getMonth } from '@/utils/calendar.utils'
 import { trpc } from '@/utils/trpc.utils'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import dayjs from 'dayjs'
+import { useMemo } from 'react'
 
 export default function TaskCalendar() {
-  const [currentMonth, setCurrentMonth] = useState(getMonth())
   const { monthIndex } = useCalendarStore()
+
+  const currentMonth = useMemo(() => getMonth(monthIndex), [monthIndex])
+
+  // Calculate year from monthIndex using dayjs to handle year rollover
+  const targetDate = dayjs().month(monthIndex)
+  const year = targetDate.year()
+  const normalizedMonthIndex = targetDate.month()
 
   const { data: tasksData } = useQuery(
     trpc.tasks.getByDate.queryOptions({
-      monthIndex: monthIndex.toString(),
-      year: currentMonth[0]?.[0]?.year().toString()
+      monthIndex: normalizedMonthIndex.toString(),
+      year: year.toString()
     })
   )
-
-  useEffect(() => {
-    setCurrentMonth(getMonth(monthIndex))
-  }, [monthIndex])
 
   return (
     <div className='flex h-full flex-col'>
