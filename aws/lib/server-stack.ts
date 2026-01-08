@@ -15,7 +15,7 @@ export class ServerStack extends cdk.Stack {
     super(scope, id, props)
 
     // 1. SSM Parameter Store
-    const secretParam = new ssm.StringParameter(this, 'ArqSecrets', {
+    const secretParam = new ssm.StringParameter(this, 'ArqSecretsParam', {
       parameterName: '/arq/prod/secrets',
       stringValue: '{"note": "Replace with real secrets"}',
       description: 'Supabase credentials for Arq (Placeholder)'
