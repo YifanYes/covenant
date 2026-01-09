@@ -44,6 +44,25 @@ export const authRouter = t.router({
       message: 'Magic link sent to your email'
     }
   }),
+  loginWithGoogle: publicProcedure.mutation(async ({ ctx }) => {
+    const { data, error } = await ctx.supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${env.FRONT_URL}/login`
+      }
+    })
+
+    if (error) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message
+      })
+    }
+
+    return {
+      url: data.url
+    }
+  }),
   deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {
     const userId = ctx.user.id
 
