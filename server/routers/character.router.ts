@@ -53,6 +53,13 @@ export const characterRouter = t.router({
     return character
   }),
 
+  hasCharacter: protectedProcedure.query(async ({ ctx }) => {
+    const count = await ctx.prisma.character.count({
+      where: { userId: ctx.user.id }
+    })
+    return { hasCharacter: count > 0 }
+  }),
+
   getCurrentClass: protectedProcedure.query(async ({ ctx }) => {
     const character = await ctx.prisma.character.findUnique({
       where: { userId: ctx.user.id },
