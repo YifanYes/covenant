@@ -14,7 +14,7 @@ export default function CharacterPreview({ character }: CharacterPreviewProps) {
       <CardContent className='flex h-full flex-col items-center justify-center p-6'>
         <div className='relative flex h-56 w-56 items-center justify-center'>
           <img
-            src={`/assets/${character.currentClass!}.png`}
+            src={`/assets/classes/${character.currentClass!}.png`}
             alt={character.currentClass!}
             className='pixelated h-full w-full object-contain'
             style={{ imageRendering: 'pixelated' }}
