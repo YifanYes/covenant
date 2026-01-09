@@ -46,7 +46,7 @@ export default function InventoryGrid({ character, selectedItemId, onItemClick }
             <span className='text-muted-foreground text-sm'>{t('inventory.empty')}</span>
           </div>
         ) : (
-          <div className='flex flex-wrap gap-2'>
+          <div className='flex flex-wrap gap-2 py-1'>
             {availableItems.map((item) => (
               <ItemCard
                 key={item.id}
