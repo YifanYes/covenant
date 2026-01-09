@@ -1,26 +1,20 @@
 import { trpc } from '@/utils/trpc.utils'
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import LoaderButton from '../LoaderButton'
 
 export default function GoogleLoginButton() {
   const { t } = useTranslation()
-  const [isPending, setIsPending] = useState(false)
 
   const loginWithGoogleMutation = useMutation(
     trpc.auth.loginWithGoogle.mutationOptions({
       onSuccess: ({ url }) => {
-        setIsPending(true)
         if (url) {
           location.replace(url)
         }
       },
-      onError: () => {
-        setIsPending(false)
-        toast.error(t('login.error.title'), { description: t('login.error.google_unavailable') })
-      }
+      onError: () => toast.error(t('login.error.title'), { description: t('login.error.google_unavailable') })
     })
   )
 
@@ -29,7 +23,7 @@ export default function GoogleLoginButton() {
   return (
     <LoaderButton
       onClick={handleGoogleLogin}
-      isLoading={isPending}
+      isLoading={loginWithGoogleMutation.isPending || loginWithGoogleMutation.isSuccess}
       label={t('login.google_button')}
       className='flex flex-row items-center gap-2.5'
       icon={

@@ -127,7 +127,7 @@ export default function Login() {
         const redirectTo = searchParams.get('redirect_to')
 
         if (redirectTo) {
-          window.location.href = redirectTo
+          navigate(redirectTo)
         } else {
           try {
             const { hasCharacter } = await queryClient.fetchQuery(trpc.character.hasCharacter.queryOptions())
