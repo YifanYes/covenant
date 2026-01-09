@@ -227,12 +227,20 @@
   "inventory": {
     "armory": "Armería",
     "class": "Clase",
+    "damage_type": {
+      "MAGIC": "Mágico",
+      "PHYSICAL": "Físico"
+    },
     "dice_bank": "Banco de Dados",
     "empty": "No hay objetos en el inventario",
     "equipment_slot": {
       "ACCESSORY": "Accesorio",
       "ARMOR": "Armadura",
       "WEAPON": "Arma"
+    },
+    "error": {
+      "equip": "Error al equipar el objeto",
+      "unequip": "Error al desequipar el objeto"
     },
     "gold": "Oro",
     "health": "Salud",
@@ -256,6 +264,7 @@
     },
     "stats": {
       "attack_dice": "Dados de Ataque",
+      "damage_type": "Tipo de Daño",
       "magic_def": "Def Mágica",
       "phys_def": "Def Física",
       "range": "Alcance",
@@ -264,8 +273,110 @@
     "stats_title": "Estadísticas",
     "strength_atk": "Ataque Físico",
     "strength_def": "Defensa Física",
+    "success": {
+      "equip": "Objeto equipado correctamente",
+      "unequip": "Objeto desequipado correctamente"
+    },
     "tier": "Tier",
     "title": "Inventario"
+  },
+  "items": {
+    "advanced_revolver": {
+      "description": "Ingeniería moderna. Permite repetir un dado de ataque una vez por combate.",
+      "name": "Revolver Avanzado"
+    },
+    "arcanist_codex": {
+      "description": "Tomo de cuero de bestia. +1 Impacto adicional si el atacante no se ha movido.",
+      "name": "Codex de Arcanista"
+    },
+    "bronze_plate_armor": {
+      "description": "Aleación conductora. Restaura 1 de maná al comienzo de cada encuentro.",
+      "name": "Armadura de Placas de Bronce"
+    },
+    "chainmail": {
+      "description": "Protección flexible basada en anillos de hierro entrelazados. Eficaz contra cortes y estocadas.",
+      "name": "Cota de Malla"
+    },
+    "compendium_of_truths": {
+      "description": "Secretos fundamentales. Al lanzar una doctrina, lanza 1 dado extra.",
+      "name": "Compendio de Verdades"
+    },
+    "copper_plate_armor": {
+      "description": "Mejora ligeramente la canalización de maná al lanzar doctrinas.",
+      "name": "Armadura de Placas de Cobre"
+    },
+    "ebony_staff": {
+      "description": "Madera oscura. Reduce en 1 el coste de maná de la primera doctrina usada.",
+      "name": "Báculo de Ébano"
+    },
+    "ether_whisper": {
+      "description": "Vara de cristal. Permite realizar ataques mágicos teledirigidos.",
+      "name": "Susurro del Éter"
+    },
+    "full_plate_armor": {
+      "description": "Láminas de acero entrelazadas. Aumenta las Heridas máximas en +1 mientras se porte.",
+      "name": "Armadura de Placas Completa"
+    },
+    "gold_plate_armor": {
+      "description": "Espejo místico. Una vez por combate, devuelve 1 impacto mágico bloqueado.",
+      "name": "Armadura de Placas de Oro"
+    },
+    "gothic_armor": {
+      "description": "Refractan la fuerza de los golpes. Si bloqueas todos los ataques, el enemigo es empujado.",
+      "name": "Armadura Gótica"
+    },
+    "great_war_axe": {
+      "description": "Arma brutal. Los éxitos críticos (6 natural) ignoran 1 dado de defensa del enemigo.",
+      "name": "Gran Hacha de Guerra"
+    },
+    "infantry_sword": {
+      "description": "Acero funcional. Sencillo, brillante y letal.",
+      "name": "Espada de Infantería"
+    },
+    "lucerne_hammer": {
+      "description": "Arma de dos manos diseñada para destrozar huesos y penetrar armaduras.",
+      "name": "Martillo de Lucerna"
+    },
+    "marksman_musket": {
+      "description": "Cañón estriado de alta precisión para distancias extremas.",
+      "name": "Mosquete de Tirador"
+    },
+    "official_sabre": {
+      "description": "Hoja grabada con insignias de mando. Otorga +1 a la Velocidad solo en el primer turno.",
+      "name": "Sable de Oficial"
+    },
+    "recruit_grimoire": {
+      "description": "Contiene fórmulas mágicas básicas y directas.",
+      "name": "Grimorio de Recluta"
+    },
+    "spark_musket": {
+      "description": "Arma larga con llave de chispa. Estándar de la infantería moderna temprana.",
+      "name": "Mosquete de Chispa"
+    },
+    "spark_pistol": {
+      "description": "Mecanismo rudo pero efectivo para la defensa personal.",
+      "name": "Pistola de Chispa"
+    },
+    "the_verdict": {
+      "description": "Cañón de mano pesado. +1 dado de ataque contra enemigos con <50% de vida.",
+      "name": "El Veredicto"
+    },
+    "war_breaker": {
+      "description": "Martillo monumental. Un impacto crítico (6 natural) aturde al enemigo.",
+      "name": "Rompe-Guerras"
+    },
+    "water_drop": {
+      "description": "Hoja de filo legendario. Aumenta la Velocidad base en +1 de forma permanente.",
+      "name": "Gota de Agua"
+    },
+    "willow_wand": {
+      "description": "Una vara flexible que canaliza los primeros brotes de maná.",
+      "name": "Vara de Sauce"
+    },
+    "wind_color": {
+      "description": "Pistola aerodinámica. Aumenta el rango efectivo en +1.",
+      "name": "Color del Viento"
+    }
   },
   "languages": {
     "en": "Inglés",

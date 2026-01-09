@@ -1,4 +1,5 @@
 import { getMaxDiceForTier } from '@shared/constants/dice.constants'
+import { SlotType } from '@shared/types/gamification.types'
 import { type Character, type CharacterClass } from '../generated/prisma'
 
 export const getCharacterProgress = (
@@ -91,4 +92,10 @@ export const createRandomPartyName = () => {
     'Griffins'
   ]
   return `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`
+}
+
+export const getSlotType = (itemType: string): SlotType => {
+  if (itemType.startsWith('WEAPON_')) return SlotType.WEAPON
+  if (itemType === SlotType.ARMOR) return SlotType.ARMOR
+  return SlotType.ACCESSORY
 }
