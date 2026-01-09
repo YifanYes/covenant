@@ -393,13 +393,16 @@
     "dont_have_account": "Don't have an account?",
     "email": "Email",
     "error": {
+      "google_unavailable": "The login with Google is currently unavailable, please try again later",
       "internal_error": "An error ocurred while logging in",
       "invalid_credentials": "Invalid credentials. Please check your email and password.",
       "invalid_magic_link": "Invalid or expired magic link",
       "magic_link_error": "Magic Link Error"
     },
+    "google_button": "Sign in with Google",
     "magic_link_sent_description": "Click the link in the email to log in to your account.",
     "magic_link_sent_title": "Magic link sent!",
+    "or": "or",
     "password": "Password",
     "recover_password": "Recover password",
     "success": "A login link has been sent to your email.",

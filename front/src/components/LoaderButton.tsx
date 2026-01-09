@@ -6,13 +6,15 @@ export default function LoaderButton({
   isLoading,
   label,
   onClick,
-  className
+  className,
+  icon
 }: {
-  disabled: boolean
+  disabled?: boolean
   isLoading: boolean
   label: string
   onClick: () => void
   className?: string
+  icon?: React.ReactNode
 }) {
   return (
     <Button
@@ -23,6 +25,7 @@ export default function LoaderButton({
       aria-busy={isLoading}
     >
       {isLoading && <Loader className='animate-spin' />}
+      {!isLoading && icon}
       {label}
     </Button>
   )
