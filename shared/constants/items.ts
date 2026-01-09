@@ -404,6 +404,7 @@ export function getItemById(id: string): ItemDefinition | undefined {
 export function createInventoryItem(definition: ItemDefinition): InventoryItem {
   return {
     id: crypto.randomUUID(),
+    definitionId: definition.id,
     name: definition.name,
     description: definition.description,
     type: definition.type,

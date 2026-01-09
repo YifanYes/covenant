@@ -19,6 +19,7 @@ export type ItemRarity = (typeof ItemRarity)[keyof typeof ItemRarity]
 
 export interface InventoryItem {
   id: string
+  definitionId: string
   name: string
   description?: string
   type: ItemType
@@ -47,6 +48,7 @@ export const SlotType = {
   ACCESSORY: 'ACCESSORY'
 } as const
 export type SlotType = (typeof SlotType)[keyof typeof SlotType]
+export const slotTypeValues = Object.values(SlotType) as [string, ...string[]]
 
 export interface CharacterClassProgress {
   id: string

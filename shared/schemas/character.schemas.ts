@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { CharacterClassName } from '../constants/classes'
+import { slotTypeValues } from '../types/gamification.types'
 
 export const createCharacterSchema = z.object({
   name: z.string().min(1).max(255),
@@ -12,3 +13,13 @@ export const switchClassSchema = z.object({
 })
 
 export type SwitchClassType = z.infer<typeof switchClassSchema>
+
+export const equipItemSchema = z.object({
+  itemId: z.string().min(1)
+})
+export type EquipItemType = z.infer<typeof equipItemSchema>
+
+export const unequipItemSchema = z.object({
+  slotType: z.enum(slotTypeValues)
+})
+export type UnequipItemType = z.infer<typeof unequipItemSchema>

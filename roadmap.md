@@ -28,7 +28,8 @@
   - [x] Lógica de obtención de dados por Tareas/Hábitos/Objetivos y Bonus de consistencia.
 - **Gamificación - Fase 2: Identidad y Equipamiento**
   - [x] Rediseño de vista de Personaje con nuevos atributos y sistema de Inventario/Loadout.
-  - [x] Definición de constantes de ítems Tier 1.
+  - [x] Definición de constantes de ítems Tier 1, 2 y 3.
+  - [x] Sistema de equipar/desequipar items del inventario con traducciones i18n.
 - **Gamificación - Fase 3: El Centro de Aventuras (Misiones)**
   - [x] Pestaña de "Aventura" y selector de misiones con persistencia y gating por Tier.
 - **Gamificación - Fase 4: Combate Reactivo**
@@ -36,6 +37,7 @@
   - [ ] Arena de combate, visualización de enemigos y log de eventos.
 - **Gamificación - Fase 5: Cierre del Bucle y Pulido**
   - [ ] Sistema de Mana, Doctrinas, recompensas (XP/Oro/Loot) y estados de derrota.
+  - [ ] Tienda para comprar equipamiento con oro.
 
 ## 🔮 Fase 3: Características Avanzadas (Futuro)
 

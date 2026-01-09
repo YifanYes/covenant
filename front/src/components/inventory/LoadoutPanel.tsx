@@ -1,6 +1,6 @@
 import { Luggage } from '@nsmr/pixelart-react'
-import type { InventoryCharacter } from '@shared/types/gamification.types'
-import { SlotType } from '@shared/types/gamification.types'
+import type { InventoryCharacter, SlotType } from '@shared/types/gamification.types'
+import { SlotType as SlotTypeEnum } from '@shared/types/gamification.types'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
@@ -8,25 +8,18 @@ import EquipmentSlot from './EquipmentSlot'
 
 interface LoadoutPanelProps {
   character: InventoryCharacter
-  onUnequipWeapon?: () => void
-  onUnequipArmor?: () => void
-  onUnequipAccessory?: () => void
+  onUnequip?: (slotType: SlotType) => void
 }
 
-export default function LoadoutPanel({
-  character,
-  onUnequipWeapon,
-  onUnequipArmor,
-  onUnequipAccessory
-}: LoadoutPanelProps) {
+export default function LoadoutPanel({ character, onUnequip }: LoadoutPanelProps) {
   const { t } = useTranslation()
 
   // Parse loadout items by type
   const loadoutItems = useMemo(
     () => ({
       weapon: character?.loadout?.find((item) => item.type.startsWith('WEAPON_')),
-      armor: character?.loadout?.find((item) => item.type === 'ARMOR'),
-      accessory: character?.loadout?.find((item) => item.type === 'ACCESSORY')
+      armor: character?.loadout?.find((item) => item.type === SlotTypeEnum.ARMOR),
+      accessory: character?.loadout?.find((item) => item.type === SlotTypeEnum.ACCESSORY)
     }),
     [character?.loadout]
   )
@@ -42,9 +35,21 @@ export default function LoadoutPanel({
       <CardContent className='flex h-full flex-col justify-center pt-2'>
         <div className='flex h-full flex-row gap-3'>
           <div className='flex flex-1 flex-col items-center justify-center gap-4'>
-            <EquipmentSlot type={SlotType.WEAPON} item={loadoutItems.weapon} onUnequip={onUnequipWeapon} />
-            <EquipmentSlot type={SlotType.ARMOR} item={loadoutItems.armor} onUnequip={onUnequipArmor} />
-            <EquipmentSlot type={SlotType.ACCESSORY} item={loadoutItems.accessory} onUnequip={onUnequipAccessory} />
+            <EquipmentSlot
+              type={SlotTypeEnum.WEAPON}
+              item={loadoutItems.weapon}
+              onUnequip={() => onUnequip?.(SlotTypeEnum.WEAPON)}
+            />
+            <EquipmentSlot
+              type={SlotTypeEnum.ARMOR}
+              item={loadoutItems.armor}
+              onUnequip={() => onUnequip?.(SlotTypeEnum.ARMOR)}
+            />
+            <EquipmentSlot
+              type={SlotTypeEnum.ACCESSORY}
+              item={loadoutItems.accessory}
+              onUnequip={() => onUnequip?.(SlotTypeEnum.ACCESSORY)}
+            />
           </div>
         </div>
       </CardContent>

@@ -33,7 +33,7 @@ export default function EquipmentSlot({ type, item, onUnequip }: EquipmentSlotPr
     <div className='flex flex-col items-center gap-1'>
       <div
         className={cn(
-          'bg-muted/50 flex h-16 w-16 flex-col items-center justify-center rounded-lg border-2 border-dashed',
+          'bg-muted/50 flex h-25 w-25 flex-col items-center justify-center rounded-lg border-2 border-dashed',
           'text-muted-foreground'
         )}
       >

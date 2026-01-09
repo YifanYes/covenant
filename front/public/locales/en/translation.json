@@ -227,12 +227,20 @@
   "inventory": {
     "armory": "Armory",
     "class": "Class",
+    "damage_type": {
+      "MAGIC": "Magic",
+      "PHYSICAL": "Physical"
+    },
     "dice_bank": "Dice Bank",
     "empty": "No items in inventory",
     "equipment_slot": {
       "ACCESSORY": "Accessory",
       "ARMOR": "Armor",
       "WEAPON": "Weapon"
+    },
+    "error": {
+      "equip": "Failed to equip item",
+      "unequip": "Failed to unequip item"
     },
     "gold": "Gold",
     "health": "Health",
@@ -256,6 +264,7 @@
     },
     "stats": {
       "attack_dice": "Attack Dice",
+      "damage_type": "Damage Type",
       "magic_def": "Magic Def",
       "phys_def": "Phys Def",
       "range": "Range",
@@ -264,8 +273,110 @@
     "stats_title": "Stats",
     "strength_atk": "Strength Atk",
     "strength_def": "Strength Def",
+    "success": {
+      "equip": "Item equipped successfully",
+      "unequip": "Item unequipped successfully"
+    },
     "tier": "Tier",
     "title": "Inventory"
+  },
+  "items": {
+    "advanced_revolver": {
+      "description": "Modern engineering. Allows rerolling one attack die once per combat.",
+      "name": "Advanced Revolver"
+    },
+    "arcanist_codex": {
+      "description": "Beast leather tome. +1 additional Impact if the attacker hasn't moved.",
+      "name": "Arcanist Codex"
+    },
+    "bronze_plate_armor": {
+      "description": "Conductive alloy. Restores 1 mana at the start of each encounter.",
+      "name": "Bronze Plate Armor"
+    },
+    "chainmail": {
+      "description": "Flexible protection based on interlocked iron rings. Effective against cuts and thrusts.",
+      "name": "Chainmail"
+    },
+    "compendium_of_truths": {
+      "description": "Fundamental secrets. When casting a doctrine, roll 1 extra die.",
+      "name": "Compendium of Truths"
+    },
+    "copper_plate_armor": {
+      "description": "Slightly improves mana channeling when casting doctrines.",
+      "name": "Copper Plate Armor"
+    },
+    "ebony_staff": {
+      "description": "Dark wood. Reduces the mana cost of the first doctrine used by 1.",
+      "name": "Ebony Staff"
+    },
+    "ether_whisper": {
+      "description": "Crystal wand. Allows performing homing magical attacks.",
+      "name": "Ether Whisper"
+    },
+    "full_plate_armor": {
+      "description": "Interlocked steel plates. Increases maximum Wounds by +1 while worn.",
+      "name": "Full Plate Armor"
+    },
+    "gold_plate_armor": {
+      "description": "Mystic mirror. Once per combat, returns 1 blocked magic impact.",
+      "name": "Gold Plate Armor"
+    },
+    "gothic_armor": {
+      "description": "Refracts the force of blows. If you block all attacks, the enemy is pushed back.",
+      "name": "Gothic Armor"
+    },
+    "great_war_axe": {
+      "description": "Brutal weapon. Critical successes (natural 6) ignore 1 enemy defense die.",
+      "name": "Great War Axe"
+    },
+    "infantry_sword": {
+      "description": "Functional steel. Simple, shiny, and lethal.",
+      "name": "Infantry Sword"
+    },
+    "lucerne_hammer": {
+      "description": "Two-handed weapon designed to crush bones and pierce armor.",
+      "name": "Lucerne Hammer"
+    },
+    "marksman_musket": {
+      "description": "Rifled high-precision barrel for extreme distances.",
+      "name": "Marksman Musket"
+    },
+    "official_sabre": {
+      "description": "Blade engraved with command insignia. Grants +1 Speed only on the first turn.",
+      "name": "Officer's Sabre"
+    },
+    "recruit_grimoire": {
+      "description": "Contains basic and straightforward magical formulas.",
+      "name": "Recruit Grimoire"
+    },
+    "spark_musket": {
+      "description": "Long flintlock weapon. Standard of early modern infantry.",
+      "name": "Spark Musket"
+    },
+    "spark_pistol": {
+      "description": "Crude but effective mechanism for personal defense.",
+      "name": "Spark Pistol"
+    },
+    "the_verdict": {
+      "description": "Heavy hand cannon. +1 attack die against enemies with <50% health.",
+      "name": "The Verdict"
+    },
+    "war_breaker": {
+      "description": "Monumental hammer. A critical impact (natural 6) stuns the enemy.",
+      "name": "War Breaker"
+    },
+    "water_drop": {
+      "description": "Legendary edge blade. Permanently increases base Speed by +1.",
+      "name": "Water Drop"
+    },
+    "willow_wand": {
+      "description": "A flexible wand that channels the first sprouts of mana.",
+      "name": "Willow Wand"
+    },
+    "wind_color": {
+      "description": "Aerodynamic pistol. Increases effective range by +1.",
+      "name": "Wind Color"
+    }
   },
   "languages": {
     "en": "English",
