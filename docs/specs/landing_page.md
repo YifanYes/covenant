@@ -40,10 +40,6 @@ Define Áreas de vida y Objetivos a largo plazo. No son listas aspiracionales—
 
 No es un avatar decorativo. Tu personaje refleja tu comportamiento real: estadísticas de Fuerza, Magia, Vida y Maná que evolucionan según lo que haces.
 
-### 🎲 Sistema de Dados
-
-Completa tareas → Gana dados. Los dados son tu recurso de combate. Hábitos diarios dan 2 dados. Tareas de alto impacto dan 4. Objetivos completados dan 6. Mantén un hábito 21 días seguidos y gana hasta 5 dados por completarlo.
-
 ### 🗡️ Misiones y Aventuras
 
 Las tareas no se tachan—se convierten en poder para completar misiones. Elige entre misiones de diferentes Tiers. Cada victoria otorga oro, experiencia y equipo.
@@ -63,6 +59,14 @@ Desbloquea habilidades especiales según tu clase. Cada doctrina tiene coste de 
 ### 🏪 Tienda de Equipamiento
 
 Gasta tu oro en armas, armaduras y accesorios. El progreso se siente porque lo puedes equipar.
+
+---
+
+## Mecánicas de juego
+
+### 🎲 Sistema de Dados
+
+Completa tareas → Gana dados. Los dados son tu recurso de combate. Hábitos diarios dan 2 dados. Tareas de alto impacto dan 4. Objetivos completados dan 6. Mantén un hábito 21 días seguidos y gana hasta 5 dados por completarlo.
 
 ## Próximamente
 
@@ -106,6 +110,6 @@ ARQ no te empuja a hacer más.
 
 **Te obliga a hacer lo que dices que importa.**
 
-Cada tarea completada son dados. Cada dado es una tirada. Cada tirada es un impacto en la historia.
+Cada tarea completada son dados. Cada dado es una tirada. Cada tirada es un impacto, tanto en la historia como en tu vida.
 
 **Tu productividad tiene consecuencias. Hazlas contar.**
