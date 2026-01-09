@@ -1,10 +1,11 @@
+import GoogleLoginButton from '@/components/auth/GoogleLoginButton'
+import TextInput from '@/components/forms/TextInput'
 import Link from '@/components/Link'
 import LoaderButton from '@/components/LoaderButton'
-import TextInput from '@/components/forms/TextInput'
 import { Alert as AlertComponent, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useAuthStore } from '@/hooks/use-auth-store'
 import { supabase } from '@/lib/supabase'
-import { trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Alert, Check, Loader, Mail } from '@nsmr/pixelart-react'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
@@ -124,8 +125,18 @@ export default function Login() {
         window.history.replaceState(null, '', window.location.pathname)
 
         const redirectTo = searchParams.get('redirect_to')
-        const destination = redirectTo ? new URL(redirectTo).pathname : '/dashboard'
-        navigate(destination)
+
+        if (redirectTo) {
+          window.location.href = redirectTo
+        } else {
+          try {
+            const { hasCharacter } = await queryClient.fetchQuery(trpc.character.hasCharacter.queryOptions())
+            navigate(hasCharacter ? '/dashboard' : '/onboarding')
+          } catch (error) {
+            console.error('Failed to check character status:', error)
+            navigate('/dashboard')
+          }
+        }
       }
     })
 
@@ -211,6 +222,12 @@ export default function Login() {
         label={t('login.button')}
         onClick={handleSubmit(onSubmit)}
       />
+      <div className='relative flex items-center gap-2 py-2'>
+        <div className='bg-border h-px w-full' />
+        <span className='text-muted-foreground text-xs uppercase'>{t('login.or')}</span>
+        <div className='bg-border h-px w-full' />
+      </div>
+      <GoogleLoginButton />
       <div className='flex flex-row gap-1'>
         <p>{t('login.dont_have_account')}</p>
         <Link href='/sign-up'>{t('login.create_account')}</Link>
