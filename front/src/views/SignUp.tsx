@@ -1,6 +1,7 @@
+import GoogleLoginButton from '@/components/auth/GoogleLoginButton'
+import TextInput from '@/components/forms/TextInput'
 import Link from '@/components/Link'
 import LoaderButton from '@/components/LoaderButton'
-import TextInput from '@/components/forms/TextInput'
 import { trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { MailCheck } from '@nsmr/pixelart-react'
@@ -65,6 +66,12 @@ export const SignUp: FC = () => {
             label={t('sign_up.button')}
             onClick={handleSubmit(onSubmit)}
           />
+          <div className='relative flex items-center gap-2 py-2'>
+            <div className='bg-border h-px w-full' />
+            <span className='text-muted-foreground text-xs uppercase'>{t('login.or')}</span>
+            <div className='bg-border h-px w-full' />
+          </div>
+          <GoogleLoginButton />
           <div className='flex flex-row gap-1'>
             <p>{t('sign_up.already_have_account')}</p>
             <Link href='/login'>{t('sign_up.login')}</Link>
