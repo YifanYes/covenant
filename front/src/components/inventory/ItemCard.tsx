@@ -31,7 +31,7 @@ export default function ItemCard({ item, isSelected, onClick }: ItemCardProps) {
       <button
         onClick={onClick}
         className={cn(
-          'bg-card flex h-25 w-25 cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-1.5 transition-all hover:scale-105',
+          'bg-card z-10 flex h-25 w-25 cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-1.5 transition-all hover:z-50 hover:scale-105',
           rarityBorderColors[item.rarity],
           isSelected && 'ring-primary ring-2 ring-offset-2',
           item.rarity !== ItemRarity.COMMON && `shadow-lg ${rarityGlowColors[item.rarity]}`
