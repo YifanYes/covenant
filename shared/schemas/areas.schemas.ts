@@ -54,5 +54,10 @@ export const defaultAreas = [
     name: 'areas.leisure',
     color: 'teal',
     icon: 'Gamepad'
+  },
+  {
+    name: 'areas.spirituality',
+    color: 'lime',
+    icon: 'Visible'
   }
 ]
