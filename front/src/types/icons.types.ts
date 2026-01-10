@@ -88,6 +88,7 @@ import {
   User,
   Users,
   Video,
+  Visible,
   Volume2,
   Wind,
   Zap,
@@ -139,7 +140,8 @@ export const iconCollection: Record<Exclude<IconCategoryKey, 'all'>, Icon[]> = {
     { name: 'Search', component: Search },
     { name: 'Users', component: Users },
     { name: 'HumanRun', component: HumanRun },
-    { name: 'Gamepad', component: Gamepad }
+    { name: 'Gamepad', component: Gamepad },
+    { name: 'Visible', component: Visible }
   ],
   navigation: [
     { name: 'ArrowRight', component: ArrowRight },
