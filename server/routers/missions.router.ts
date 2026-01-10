@@ -251,12 +251,17 @@ export const missionsRouter = t.router({
       const newHealth = Math.max(0, currentClass.health - result.damageToPlayer)
       const newMana = Math.min(currentClass.maxMana, currentClass.mana + result.manaRegenerated)
 
+      // Check if character died
+      const characterDead = newHealth <= 0
+
+      // Build transaction operations
       await ctx.prisma.$transaction([
         ctx.prisma.mission.update({
           where: { id: mission.id },
           data: {
             enemyState: updatedEnemyState as any,
-            combatLog: updatedLog as any
+            combatLog: updatedLog as any,
+            ...(characterDead && { status: MissionStatus.FAILED, completedAt: new Date() })
           }
         }),
         ctx.prisma.character.update({
@@ -274,6 +279,14 @@ export const missionsRouter = t.router({
         })
       ])
 
+      // If character died, clear the party's active mission
+      if (characterDead) {
+        await ctx.prisma.party.update({
+          where: { id: character.party.id },
+          data: { currentMissionId: null }
+        })
+      }
+
       // Check if all enemies in phase are defeated
       const allDefeated = updatedEnemyState.every((e) => e.currentHealth <= 0)
 
@@ -281,7 +294,8 @@ export const missionsRouter = t.router({
         ...result,
         updatedEnemyState,
         allEnemiesDefeated: allDefeated,
-        newDiceBank
+        newDiceBank,
+        characterDead
       }
     }),
 

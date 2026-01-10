@@ -1,5 +1,14 @@
 import TierBadge from '@/components/adventure/TierBadge'
 import CombatArena from '@/components/combat/CombatArena'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { trpc } from '@/utils/trpc.utils'
@@ -31,6 +40,7 @@ export default function MissionDetail() {
   const { data: activeMission, refetch: refetchActiveMission } = useSuspenseQuery<ActiveMissionData>(queryOptions)
 
   const [lastAttackResults, setLastAttackResults] = useState<DiceRollResult[]>([])
+  const [showDeathDialog, setShowDeathDialog] = useState(false)
 
   const mission = getMission(missionId || '')
   const isActive = activeMission?.mission?.name === missionId
@@ -62,8 +72,17 @@ export default function MissionDetail() {
     ...trpc.missions.attack.mutationOptions(),
     onSuccess: async (result) => {
       setLastAttackResults(result.playerAttackRolls)
-      await refetchActiveMission()
       queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+
+      // Check if character died
+      if (result.characterDead) {
+        queryClient.invalidateQueries({ queryKey: trpc.missions.getActive.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpc.missions.list.queryKey() })
+        setShowDeathDialog(true)
+        return
+      }
+
+      await refetchActiveMission()
 
       if (result.allEnemiesDefeated) {
         toast.success(t('combat.phase_complete'))
@@ -129,6 +148,25 @@ export default function MissionDetail() {
   const combatLog = (activeMission?.mission?.combatLog as unknown as CombatLogEntry[]) || []
   const allEnemiesDefeated = enemyState.length > 0 && enemyState.every((e) => e.currentHealth <= 0)
 
+  // Show death dialog if character died - must be checked BEFORE isActive since mission becomes inactive after death
+  if (showDeathDialog) {
+    return (
+      <AlertDialog open={showDeathDialog} onOpenChange={setShowDeathDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('combat.death_dialog.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('combat.death_dialog.description')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => navigate('/adventure/inventory')}>
+              {t('combat.death_dialog.continue')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    )
+  }
+
   if (isActive && character) {
     return (
       <div className='flex h-full w-full flex-col gap-4 overflow-auto p-4'>
@@ -162,17 +200,14 @@ export default function MissionDetail() {
           onAttack={handleAttack}
           isAttacking={attackMutation.isPending}
           lastAttackResults={lastAttackResults}
+          onNextPhase={allEnemiesDefeated ? () => advancePhaseMutation.mutate() : undefined}
+          isAdvancing={advancePhaseMutation.isPending}
+          nextPhaseLabel={
+            (activeMission?.mission?.currentPhase ?? 0) + 1 >= mission.phases.length
+              ? t('combat.complete_mission')
+              : t('combat.next_phase')
+          }
         />
-
-        {allEnemiesDefeated && (
-          <div className='flex justify-center'>
-            <Button size='lg' onClick={() => advancePhaseMutation.mutate()} disabled={advancePhaseMutation.isPending}>
-              {(activeMission?.mission?.currentPhase ?? 0) + 1 >= mission.phases.length
-                ? t('combat.complete_mission')
-                : t('combat.next_phase')}
-            </Button>
-          </div>
-        )}
       </div>
     )
   }

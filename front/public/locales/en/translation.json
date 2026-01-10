@@ -74,6 +74,11 @@
   "combat": {
     "complete_mission": "Complete Mission",
     "criticals": "Criticals",
+    "death_dialog": {
+      "continue": "Continue",
+      "description": "Your character has fallen in battle. The mission has failed.",
+      "title": "Character Defeated"
+    },
     "dice_to_spend": "Dice to spend",
     "enemies": "Enemies",
     "error": {

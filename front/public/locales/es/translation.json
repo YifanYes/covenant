@@ -74,6 +74,11 @@
   "combat": {
     "complete_mission": "Completar Misión",
     "criticals": "Críticos",
+    "death_dialog": {
+      "continue": "Continuar",
+      "description": "Tu personaje ha caído en batalla. La misión ha fracasado.",
+      "title": "Personaje Derrotado"
+    },
     "dice_to_spend": "Dados a gastar",
     "enemies": "Enemigos",
     "error": {

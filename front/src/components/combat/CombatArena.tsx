@@ -14,6 +14,9 @@ interface CombatArenaProps {
   onAttack: (diceCount: number) => void
   isAttacking: boolean
   lastAttackResults?: DiceRollResult[]
+  onNextPhase?: () => void
+  isAdvancing?: boolean
+  nextPhaseLabel?: string
   className?: string
 }
 
@@ -25,6 +28,9 @@ export default function CombatArena({
   onAttack,
   isAttacking,
   lastAttackResults,
+  onNextPhase,
+  isAdvancing,
+  nextPhaseLabel,
   className
 }: CombatArenaProps) {
   const { t } = useTranslation()
@@ -76,7 +82,9 @@ export default function CombatArena({
           onRoll={onAttack}
           isRolling={isAttacking}
           lastResults={lastAttackResults}
-          compact
+          onNextPhase={onNextPhase}
+          isAdvancing={isAdvancing}
+          nextPhaseLabel={nextPhaseLabel}
         />
       </div>
 
