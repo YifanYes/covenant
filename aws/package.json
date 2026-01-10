@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "deploy": "npm run build --prefix ../front && npx cdk deploy --all"
+    "deploy": "npm run build:prod --prefix ../front && npx cdk deploy --all"
   },
   "devDependencies": {
     "@aws-cdk/aws-apigatewayv2-alpha": "^2.99.1-alpha.0",
