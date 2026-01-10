@@ -86,6 +86,7 @@
     "description": "This action is irreversible. This will permanently delete the habit.",
     "title": "Are you sure you want to delete the habit?"
   },
+  "copy_suffix": "(Copy)",
   "create": "Create",
   "create_area_dialog": {
     "color": "Color",
@@ -606,6 +607,7 @@
     "add": "Add Task",
     "color": "Select color",
     "delete": "Delete Task",
+    "duplicate": "Duplicate Task",
     "effort": "Effort",
     "effort_placeholder": "Select effort",
     "effort_values": {
@@ -617,6 +619,7 @@
       "internal": {
         "create": "An error ocurred while creating the task",
         "delete": "An error ocurred while deleting the task",
+        "duplicate": "An error occurred while duplicating the task",
         "reorder": "An error ocurred while reordering the tasks",
         "update": "An error ocurred while updating the task"
       }
@@ -650,6 +653,7 @@
     "success": {
       "create": "Task created successfully",
       "delete": "Task deleted successfully",
+      "duplicate": "Task duplicated successfully",
       "update": "Task updated successfully"
     },
     "table": {
