@@ -394,13 +394,16 @@
     "dont_have_account": "¿No tienes cuenta?",
     "email": "Correo electrónico",
     "error": {
+      "google_unavailable": "El inicio de sesión con Google no está disponible actualmente, por favor inténtalo más tarde",
       "internal_error": "Ocurrió un error al iniciar sesión",
       "invalid_credentials": "Credenciales inválidas. Por favor, verifica tu correo y contraseña.",
       "invalid_magic_link": "Enlace mágico inválido o expirado",
       "magic_link_error": "Error del enlace mágico"
     },
+    "google_button": "Iniciar sesión con Google",
     "magic_link_sent_description": "Haz clic en el enlace del correo para iniciar sesión en tu cuenta.",
     "magic_link_sent_title": "¡Enlace mágico enviado!",
+    "or": "o",
     "password": "Contraseña",
     "recover_password": "Recuperar contraseña",
     "success": "Se ha enviado un enlace de inicio de sesión a tu correo.",
