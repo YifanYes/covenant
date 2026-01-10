@@ -75,6 +75,23 @@ export const UpdateTaskDialog = () => {
     })
   )
 
+  const duplicateMutation = useMutation(
+    trpc.tasks.duplicate.mutationOptions({
+      onSuccess: async () => {
+        toast.success(t('tasks.success.duplicate'))
+        await queryClient.invalidateQueries({
+          queryKey: trpc.tasks.getByDate.queryKey({
+            monthIndex: monthIndex.toString(),
+            year: dayjs().year().toString()
+          })
+        })
+        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
+        setSelectedTask(undefined)
+      },
+      onError: (error) => toast.error(t('tasks.error.internal.duplicate'), { description: error.message })
+    })
+  )
+
   const {
     register,
     control,
@@ -88,6 +105,9 @@ export const UpdateTaskDialog = () => {
 
   const onDelete = () => !isUndefined(selectedTask) && deleteMutation.mutate({ id: selectedTask.id })
   const onUpdate = (data: UpdateTaskType) => updateMutation.mutate(data)
+  const onDuplicate = () =>
+    !isUndefined(selectedTask) &&
+    duplicateMutation.mutate({ id: selectedTask.id, titleSuffix: t('copy_suffix', { defaultValue: '(Copy)' }) })
 
   const handleOpenChange = () => {
     setSelectedTask(undefined)
@@ -107,7 +127,7 @@ export const UpdateTaskDialog = () => {
 
   return (
     <Dialog open={!isUndefined(selectedTask)} onOpenChange={handleOpenChange}>
-      <DialogContent className='sm:max-w-[425px]' aria-describedby='update-task-dialog-desc'>
+      <DialogContent className='sm:max-w-[425px] md:max-w-fit' aria-describedby='update-task-dialog-desc'>
         <DialogHeader>
           <DialogTitle>{t('update_task_dialog.title')}</DialogTitle>
           <DialogDescription className='sr-only'>{t('update_task_dialog.description')}</DialogDescription>
@@ -211,14 +231,23 @@ export const UpdateTaskDialog = () => {
             />
           </div>
         </div>
-        <DialogFooter className='flex h-auto justify-between'>
-          <LoaderButton
-            className='text-destructive border-destructive hover:text-background hover:bg-destructive h-auto cursor-pointer border-2 bg-transparent'
-            isLoading={deleteMutation.isPending}
-            disabled={isUndefined(selectedTask)}
-            onClick={onDelete}
-            label={t('tasks.delete')}
-          />
+        <DialogFooter className='flex h-auto justify-between gap-12'>
+          <div className='ml-auto flex gap-2'>
+            <LoaderButton
+              className='text-destructive border-destructive hover:text-background hover:bg-destructive h-auto cursor-pointer border-2 bg-transparent'
+              isLoading={deleteMutation.isPending}
+              disabled={isUndefined(selectedTask)}
+              onClick={onDelete}
+              label={t('tasks.delete')}
+            />
+            <LoaderButton
+              className='text-accent border-accent hover:text-background hover:bg-accent h-auto cursor-pointer border-2 bg-transparent'
+              isLoading={duplicateMutation.isPending}
+              disabled={isUndefined(selectedTask)}
+              onClick={onDuplicate}
+              label={t('tasks.duplicate')}
+            />
+          </div>
           <div className='ml-auto flex gap-2'>
             <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
               <Button variant='outline'>{t('cancel')}</Button>
