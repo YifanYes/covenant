@@ -27,6 +27,7 @@
     "love": "Love",
     "mental_health": "Mental health",
     "physical_health": "Physical health",
+    "spirituality": "Spirituality",
     "success": {
       "create": "Area created successfully",
       "delete": "Area deleted successfully",
