@@ -7,7 +7,7 @@ import {
   switchClassSchema,
   unequipItemSchema
 } from '@shared/schemas/character.schemas'
-import { InventoryItem } from '@shared/types/gamification.types'
+import type { InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import { createRandomPartyName, getCharacterProgress, getSlotType } from '../services/character.services'
 import { protectedProcedure, t } from '../trpc'

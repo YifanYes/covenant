@@ -1,5 +1,6 @@
 import { getMission } from '@shared/constants/missions'
-import { EnemyState, MissionStatus } from '@shared/types/gamification.types'
+import type { EnemyState } from '@shared/types/gamification.types'
+import { MissionStatus } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import { type Character, type CharacterClass, type Mission, type Party, type PrismaClient } from '../generated/prisma'
 
