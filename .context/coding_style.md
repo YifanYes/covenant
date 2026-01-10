@@ -28,7 +28,7 @@ The project is a monorepo managed with workspaces:
 
 - **tRPC Procedures**: Define all inputs and outputs using Zod schemas located in the `@arq/shared` workspace.
 - **Shared Logic**: Place all Zod schemas, shared types, and constants in `/shared` to maintain end-to-end consistency.
-- **Database**: Use Prisma for all database operations. After schema changes, push them to Supabase using `npx prisma db push`. Ensure `db:generate` is run after schema changes.
+- **Database**: Use Prisma for all database operations. After schema changes, push them to Supabase using `npx prisma db push` and then run `npx prisma generate`. We're in development phase, so there's no production environment.
 
 ## 5. State Management
 
@@ -45,6 +45,10 @@ We follow SDD principles:
 3.  **Validation**: Verify that the code meets the initial spec.
 
 ## 7. Code Style (Formatting)
+
+### Comments
+
+Don't use any comments unless it's necessary to explain the logic or add context.
 
 ### General (Prettier)
 

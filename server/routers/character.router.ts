@@ -90,6 +90,8 @@ export const characterRouter = t.router({
         missionProgress: c.missionProgress as Record<string, number>,
         health: c.health,
         mana: c.mana,
+        maxHealth: c.maxHealth,
+        maxMana: c.maxMana,
         strengthAtk: c.strengthAtk,
         strengthDef: c.strengthDef,
         magicAtk: c.magicAtk,

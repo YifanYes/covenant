@@ -70,6 +70,39 @@
     "teal": "Verde azulado",
     "yellow": "Amarillo"
   },
+  "combat": {
+    "complete_mission": "Completar Misión",
+    "criticals": "Críticos",
+    "dice_to_spend": "Dados a gastar",
+    "enemies": "Enemigos",
+    "error": {
+      "advance": "Error al avanzar de fase",
+      "attack": "El ataque falló",
+      "complete": "Error al completar la misión"
+    },
+    "log": {
+      "damage_to_enemy": "{{enemy}} recibe {{damage}} de daño",
+      "damage_to_player": "Recibes {{damage}} de daño",
+      "empty": "Sin eventos de combate aún",
+      "enemy_attacks": "El enemigo ataca con {{hits}} impactos",
+      "enemy_defeated": "¡{{enemy}} ha sido derrotado!",
+      "enemy_defends": "El enemigo bloquea {{blocks}}",
+      "mana_regen": "+{{mana}} maná regenerado",
+      "player_attack": "Atacas con {{dice}} dados",
+      "player_defends": "Bloqueas {{blocks}}",
+      "player_hits": "Consigues {{hits}} impactos"
+    },
+    "mission_complete": "¡Misión Completada!",
+    "next_phase": "Siguiente Fase",
+    "no_attacks_yet": "Sin ataques aún",
+    "no_dice": "Sin dados disponibles",
+    "phase_advanced": "Fase avanzada",
+    "phase_complete": "¡Fase Completada!",
+    "roll_dice": "Lanzar Dados",
+    "rolling": "Lanzando",
+    "turn_summary": "Resumen del Turno",
+    "your_hits": "Tus Impactos"
+  },
   "confirm_delete_account_dialog": {
     "button": "Eliminar cuenta",
     "description": "Esta acción es irreversible. Esto eliminará permanentemente tu cuenta y todos los datos asociados a ella.",

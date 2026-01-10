@@ -1,11 +1,20 @@
 import TierBadge from '@/components/adventure/TierBadge'
+import CombatArena from '@/components/combat/CombatArena'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { trpc } from '@/utils/trpc.utils'
 import { ChevronLeft } from '@nsmr/pixelart-react'
 import { getEnemy } from '@shared/constants/enemies'
 import { getMission } from '@shared/constants/missions'
+import type {
+  ActiveMissionData,
+  CombatLogEntry,
+  DiceRollResult,
+  EnemyState,
+  InventoryCharacter
+} from '@shared/types/gamification.types'
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router'
 import { toast } from 'sonner'
@@ -17,7 +26,11 @@ export default function MissionDetail() {
   const queryClient = useQueryClient()
 
   const { data: characterData } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
-  const { data: activeMission } = useSuspenseQuery(trpc.missions.getActive.queryOptions())
+
+  const queryOptions = trpc.missions.getActive.queryOptions() as any
+  const { data: activeMission, refetch: refetchActiveMission } = useSuspenseQuery<ActiveMissionData>(queryOptions)
+
+  const [lastAttackResults, setLastAttackResults] = useState<DiceRollResult[]>([])
 
   const mission = getMission(missionId || '')
   const isActive = activeMission?.mission?.name === missionId
@@ -28,6 +41,7 @@ export default function MissionDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: trpc.missions.getActive.queryKey() })
       queryClient.invalidateQueries({ queryKey: trpc.missions.list.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
       toast.success(t('missions.success.start'))
     },
     onError: (error) => toast.error(t('missions.error.internal.start'), { description: error.message })
@@ -44,6 +58,48 @@ export default function MissionDetail() {
     onError: (error) => toast.error(t('missions.error.internal.abandon'), { description: error.message })
   })
 
+  const attackMutation = useMutation({
+    ...trpc.missions.attack.mutationOptions(),
+    onSuccess: async (result) => {
+      setLastAttackResults(result.playerAttackRolls)
+      await refetchActiveMission()
+      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+
+      if (result.allEnemiesDefeated) {
+        toast.success(t('combat.phase_complete'))
+      }
+    },
+    onError: (error) => toast.error(t('combat.error.attack'), { description: error.message })
+  })
+
+  const advancePhaseMutation = useMutation({
+    ...trpc.missions.advancePhase.mutationOptions(),
+    onSuccess: async (result) => {
+      await refetchActiveMission()
+      setLastAttackResults([])
+      if (result.missionComplete) {
+        completeMutation.mutate()
+      } else {
+        toast.success(t('combat.phase_advanced'))
+      }
+    },
+    onError: (error) => toast.error(t('combat.error.advance'), { description: error.message })
+  })
+
+  const completeMutation = useMutation({
+    ...trpc.missions.complete.mutationOptions(),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: trpc.missions.getActive.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpc.missions.list.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+      toast.success(t('combat.mission_complete'), {
+        description: `+${result.rewards?.gold || 0} ${t('inventory.gold')}`
+      })
+      navigate('/adventure/missions')
+    },
+    onError: (error) => toast.error(t('combat.error.complete'), { description: error.message })
+  })
+
   if (!mission) {
     return (
       <div className='flex h-full items-center justify-center'>
@@ -52,8 +108,10 @@ export default function MissionDetail() {
     )
   }
 
-  const characterTier = (characterData as any)?.tier ?? 1
+  const character = characterData as InventoryCharacter
+  const characterTier = character?.tier ?? 1
   const canStart = characterTier >= mission.requiredTier && !hasActiveMission
+  const diceBank = (character?.data as any)?.diceBank ?? 0
 
   const handleStart = () => {
     startMutation.mutate({ missionId: mission.id })
@@ -63,6 +121,63 @@ export default function MissionDetail() {
     abandonMutation.mutate()
   }
 
+  const handleAttack = (diceCount: number) => {
+    attackMutation.mutate({ diceCount })
+  }
+
+  const enemyState = (activeMission?.mission?.enemyState as unknown as EnemyState[]) || []
+  const combatLog = (activeMission?.mission?.combatLog as unknown as CombatLogEntry[]) || []
+  const allEnemiesDefeated = enemyState.length > 0 && enemyState.every((e) => e.currentHealth <= 0)
+
+  if (isActive && character) {
+    return (
+      <div className='flex h-full w-full flex-col gap-4 overflow-auto p-4'>
+        <div className='flex items-center gap-4'>
+          <Button variant='ghost' size='icon' onClick={() => navigate('/adventure/missions')}>
+            <ChevronLeft className='h-5 w-5' />
+          </Button>
+          <div className='flex flex-1 items-center gap-3'>
+            <h1 className='text-xl font-bold'>{t(mission.name)}</h1>
+            <TierBadge tier={mission.requiredTier} />
+            <span className='text-muted-foreground text-sm'>
+              {t('missions.phase')} {(activeMission?.mission?.currentPhase ?? 0) + 1}/{mission.phases.length}
+            </span>
+          </div>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={handleAbandon}
+            disabled={abandonMutation.isPending}
+            className='cursor-pointer'
+          >
+            {t('missions.abandon')}
+          </Button>
+        </div>
+
+        <CombatArena
+          character={character}
+          enemies={enemyState}
+          combatLog={combatLog}
+          diceBank={diceBank}
+          onAttack={handleAttack}
+          isAttacking={attackMutation.isPending}
+          lastAttackResults={lastAttackResults}
+        />
+
+        {allEnemiesDefeated && (
+          <div className='flex justify-center'>
+            <Button size='lg' onClick={() => advancePhaseMutation.mutate()} disabled={advancePhaseMutation.isPending}>
+              {(activeMission?.mission?.currentPhase ?? 0) + 1 >= mission.phases.length
+                ? t('combat.complete_mission')
+                : t('combat.next_phase')}
+            </Button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Show mission details when not active
   return (
     <div className='flex h-full w-full flex-col gap-6 overflow-auto p-6'>
       <div className='flex items-center gap-4'>
@@ -128,22 +243,13 @@ export default function MissionDetail() {
       </Card>
 
       <div className='flex gap-4'>
-        {isActive ? (
-          <>
-            <Button variant='destructive' onClick={handleAbandon} disabled={abandonMutation.isPending}>
-              {t('missions.abandon')}
-            </Button>
-            <Button disabled>{t('missions.combat_coming_soon')}</Button>
-          </>
-        ) : (
-          <Button onClick={handleStart} disabled={!canStart || startMutation.isPending}>
-            {!canStart && hasActiveMission
-              ? t('missions.has_active_mission')
-              : characterTier < mission.requiredTier
-                ? t('adventure.tier_locked', { tier: mission.requiredTier })
-                : t('missions.start')}
-          </Button>
-        )}
+        <Button onClick={handleStart} disabled={!canStart || startMutation.isPending}>
+          {!canStart && hasActiveMission
+            ? t('missions.has_active_mission')
+            : characterTier < mission.requiredTier
+              ? t('adventure.tier_locked', { tier: mission.requiredTier })
+              : t('missions.start')}
+        </Button>
       </div>
     </div>
   )

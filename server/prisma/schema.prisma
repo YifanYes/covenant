@@ -35,6 +35,8 @@ model CharacterClass {
   missionProgress Json      @default("{\"1\": 0, \"2\": 0, \"3\": 0, \"4\": 0, \"5\": 0, \"6\": 0, \"7\": 0, \"8\": 0, \"9\": 0, \"10\": 0}")
   health          Int       @default(5)
   mana            Int       @default(5)
+  maxHealth       Int       @default(5)
+  maxMana         Int       @default(5)
   createdAt       DateTime  @default(now()) @db.Timestamp(6)
   updatedAt       DateTime  @updatedAt @db.Timestamp(6)
   magicAtk        Int       @default(5)
@@ -69,6 +71,7 @@ model Mission {
   status       String    @db.VarChar(20)
   currentPhase Int       @default(0)
   enemyState   Json?
+  combatLog    Json?     @default("[]")
   rewards      Json?
   createdAt    DateTime  @default(now()) @db.Timestamp(6)
   updatedAt    DateTime  @updatedAt @db.Timestamp(6)
