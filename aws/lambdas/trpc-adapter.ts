@@ -47,7 +47,9 @@ export const handler = async (event: APIGatewayProxyEvent, context: any) => {
         const ssm = new SSMClient({})
         const response = await ssm.send(new GetParameterCommand({ Name: process.env.FRONT_URL_PARAM }))
         if (response.Parameter?.Value) {
-          process.env.FRONT_URL = `https://${response.Parameter.Value}`
+          const value = response.Parameter.Value
+          // Don't add https:// if the value already contains a protocol
+          process.env.FRONT_URL = value.includes('://') ? value : `https://${value}`
         }
       } catch (e) {
         console.error('Failed to fetch front url param', e)

@@ -33,6 +33,7 @@ export const Router = () => {
       <Routes>
         <Route element={<AppLayout />}>
           <Route element={<CenteredLayout />}>
+            <Route path='/' element={<Navigate to='/login' replace />} />
             <Route
               path='/login'
               element={
