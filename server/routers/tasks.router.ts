@@ -2,6 +2,7 @@ import { DICE_REWARDS } from '@shared/constants/dice.constants'
 import {
   bulkUpdateTasksSchema,
   createTaskSchema,
+  duplicateTaskSchema,
   getByDateInputSchema,
   taskIdSchema,
   TaskImpact,
@@ -10,7 +11,7 @@ import {
 } from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
 import { addDiceToBank } from '../services/dice.services'
-import { getUserTask } from '../services/tasks.services'
+import { duplicateTask, getUserTask } from '../services/tasks.services'
 import { protectedProcedure, t } from '../trpc'
 
 export const tasksRouter = t.router({
@@ -182,5 +183,9 @@ export const tasksRouter = t.router({
     return {
       message: 'Task deleted successfully'
     }
+  }),
+  duplicate: protectedProcedure.input(duplicateTaskSchema).mutation(async ({ ctx, input }) => {
+    const task = await duplicateTask(ctx.prisma, input.id, ctx.user.id, input.titleSuffix)
+    return { task }
   })
 })

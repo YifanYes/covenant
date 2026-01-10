@@ -53,6 +53,11 @@ export const taskIdSchema = z.object({
   id: z.uuid()
 })
 
+export const duplicateTaskSchema = z.object({
+  id: z.uuid(),
+  titleSuffix: z.string().optional()
+})
+
 export const bulkUpdateTasksSchema = z.object({
   tasks: z.array(
     z.object({

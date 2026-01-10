@@ -18,3 +18,49 @@ export const getUserTask = async (prisma: PrismaClient, taskId: string, userId: 
 
   return task
 }
+
+export const duplicateTask = async (
+  prisma: PrismaClient,
+  taskId: string,
+  userId: string,
+  titleSuffix?: string
+): Promise<Task> => {
+  const existingTask = await getUserTask(prisma, taskId, userId)
+
+  const { id, createdAt, updatedAt, completedAt, ...taskData } = existingTask
+
+  const newTask = await prisma.task.create({
+    data: {
+      ...taskData,
+      title: `${taskData.title} ${titleSuffix || '(Copy)'}`,
+      userId
+    },
+    include: {
+      objectives: {
+        include: {
+          areas: true
+        }
+      }
+    }
+  })
+
+  if (existingTask) {
+    const taskObjectives = await prisma.task.findUnique({
+      where: { id: taskId },
+      select: { objectives: { select: { id: true } } }
+    })
+
+    if (taskObjectives?.objectives.length) {
+      await prisma.task.update({
+        where: { id: newTask.id },
+        data: {
+          objectives: {
+            connect: taskObjectives.objectives.map((obj) => ({ id: obj.id }))
+          }
+        }
+      })
+    }
+  }
+
+  return newTask
+}
