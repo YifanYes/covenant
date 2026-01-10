@@ -8,13 +8,14 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy": "npm run build --prefix ../front && npx cdk deploy --all"
   },
   "devDependencies": {
     "@aws-cdk/aws-apigatewayv2-alpha": "^2.99.1-alpha.0",
     "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.99.1-alpha.0",
     "@types/jest": "^29.5.5",
-    "@types/node": "^22.19.3",
+    "@types/node": "^25.0.6",
     "aws-cdk": "2.99.1",
     "esbuild": "^0.17.19",
     "jest": "^29.7.0",

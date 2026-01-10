@@ -60,6 +60,15 @@ export const handler = async (event: APIGatewayProxyEvent, context: any) => {
     handlerInstance = awsLambdaRequestHandler({
       router: appRouter,
       createContext: createLambdaContext,
+      responseMeta() {
+        return {
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With'
+          }
+        }
+      },
       onError({ path, error }) {
         console.error(`Error in tRPC handler on path '${path}':`, error)
       }
