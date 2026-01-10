@@ -85,6 +85,7 @@
     "description": "Esta acción es irreversible. Esto eliminará permanentemente el hábito.",
     "title": "¿Estás seguro de que quieres eliminar el hábito?"
   },
+  "copy_suffix": "(Copia)",
   "create": "Crear",
   "create_area_dialog": {
     "color": "Color",
@@ -605,6 +606,7 @@
     "add": "Crear tarea",
     "color": "Selecciona un color",
     "delete": "Eliminar tarea",
+    "duplicate": "Duplicar tarea",
     "effort": "Esfuerzo",
     "effort_placeholder": "Seleccionar esfuerzo",
     "effort_values": {
@@ -616,6 +618,7 @@
       "internal": {
         "create": "Ha ocurrido un error al crear la tarea.",
         "delete": "Ha ocurrido un error al eliminar la tarea.",
+        "duplicate": "Ocurrió un error al duplicar la tarea",
         "reorder": "Ha ocurrido un error al reordenar las tareas.",
         "update": "Ha ocurrido un error al actualizar la tarea."
       }
@@ -649,6 +652,7 @@
     "success": {
       "create": "Tarea creada exitosamente",
       "delete": "Tarea eliminada exitosamente",
+      "duplicate": "Tarea duplicada exitosamente",
       "update": "Tarea actualizada exitosamente {{diceReward}}"
     },
     "table": {
