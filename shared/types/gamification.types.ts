@@ -1,5 +1,7 @@
 import { z } from 'zod'
-import type { ItemStats } from '../constants/items'
+import type { EnemyTemplate } from '../constants/enemies'
+import type { ItemStats, WeaponDamageType } from '../constants/items'
+import type { MissionTemplate } from '../constants/missions'
 
 export const ItemType = {
   WEAPON_MELEE: 'WEAPON_MELEE',
@@ -57,6 +59,8 @@ export interface CharacterClassProgress {
   missionProgress: Record<string, number>
   health: number
   mana: number
+  maxHealth: number
+  maxMana: number
   strengthAtk: number
   strengthDef: number
   magicAtk: number
@@ -80,3 +84,76 @@ export interface InventoryCharacter {
 }
 
 export const AVAILABLE_TIERS = [1, 2, 3] as const
+
+export interface DiceRollResult {
+  value: number
+  isSuccess: boolean
+  isCritical: boolean
+}
+
+export interface EnemyState {
+  id: string
+  enemyId: string
+  currentHealth: number
+  maxHealth: number
+}
+
+export enum CombatLogType {
+  PLAYER_ATTACK = 'player_attack',
+  PLAYER_HITS = 'player_hits',
+  ENEMY_DEFENDS = 'enemy_defends',
+  ENEMY_ATTACKS = 'enemy_attacks',
+  PLAYER_DEFENDS = 'player_defends',
+  DAMAGE_TO_ENEMY = 'damage_to_enemy',
+  DAMAGE_TO_PLAYER = 'damage_to_player',
+  ENEMY_DEFEATED = 'enemy_defeated',
+  MANA_REGEN = 'mana_regen',
+  PHASE_COMPLETE = 'phase_complete'
+}
+
+export interface CombatLogEntry {
+  timestamp: number
+  type: CombatLogType
+  data: Record<string, string | number | number[]>
+}
+
+export interface CombatTurnResult {
+  playerAttackRolls: DiceRollResult[]
+  enemyDefenseRolls: DiceRollResult[]
+  enemyAttackRolls: DiceRollResult[]
+  playerDefenseRolls: DiceRollResult[]
+  playerHits: number
+  enemyBlocks: number
+  enemyHits: number
+  playerBlocks: number
+  damageToEnemy: number
+  damageToPlayer: number
+  manaRegenerated: number
+  targetEnemyId: string
+  logEntries: CombatLogEntry[]
+}
+
+export interface ResolveCombatParams {
+  diceCount: number
+  targetEnemyId: string
+  playerStrengthAtk: number
+  playerStrengthDef: number
+  playerMagicAtk: number
+  playerMagicDef: number
+  playerArmorDice: number
+  playerManaRegen: number
+  weaponDamageType: WeaponDamageType
+  enemy: EnemyTemplate
+  tier: number
+}
+
+export type ActiveMissionData = {
+  mission: {
+    id: string
+    name: string
+    currentPhase: number
+    enemyState: unknown
+    combatLog: unknown
+  } | null
+  template: MissionTemplate | undefined
+} | null

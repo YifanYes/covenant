@@ -192,6 +192,7 @@ In `Character`, we will add:
   - `diceBank`: integer, current dice available for combat
   - `lastDiceReset`: timestamp of last weekly reset
   - `habitStreaks`: object mapping habit IDs to consecutive completion days
+  - `morality`: integer, character alignment (0-100)
 
 ### Type Definitions
 
@@ -530,3 +531,57 @@ Add new i18n keys for:
 
 - **Manual Interaction**: Combat is not automated. Users must manually spend dice in the "Adventure" tab.
 - **No Migration**: Since the project is in early development, no database migration for existing user data is required. Global state can be reset.
+
+## Morality System
+
+The Morality System tracks the character's ethical alignment based on narrative choices and actions. This system influences how the world reacts to the player and unlocks unique gameplay paths.
+
+### Morality Attribute
+
+- **Range**: 0 to 100.
+- **Starting Point**: 50 (Neutral).
+
+### Alignment Thresholds
+
+- **Saint (75 - 100)**: Characters who consistently choose the path of righteousness.
+  - **Effects**: Unlocks "Holy" quest branches, reputation bonuses with law-abiding factions, and access to exclusive divine equipment.
+  - **Visuals**: Radiant UI elements and saintly titles.
+- **Neutral (26 - 74)**: Most characters will reside here, maintaining a balance.
+  - **Effects**: Standard interactions and balanced access to most world content.
+- **Demon (0 - 25)**: Characters who embrace chaos or selfishness.
+  - **Effects**: Unlocks "Shadow" quest branches, access to black markets, and intimidation-based narrative shortcuts.
+  - **Visuals**: Fiery or dark UI accents and demonic titles.
+
+### Impact of Narrative Decisions
+
+Morality is primarily shaped by the player's choices:
+
+- **Dialogue Choices**: Decisions made during mission dialogues can shift morality points in either direction.
+- **Mission Outcomes**: Choosing how to resolve a conflict (e.g., mercy vs. vengeance) has significant morality weight.
+- **World Events**: Random narrative events triggered by productivity milestones can present moral dilemmas.
+
+## Achievement-Based Title System
+
+This system defines the hierarchy and legal standing within the Order, earned through cumulative achievements and progression.
+
+| Rank | Title                               | Role & Responsibility                                                                                               | Forms of Address              |
+| :--- | :---------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :---------------------------- |
+| 1    | **Grand Master**                    | Supreme authority. Directs strategy, policy, and administration. Accountable only to the Pope or the founding King. | _"My Lord Grand Master"_      |
+| 2    | **Provincial Master / Grand Prior** | Regional governor. Executes orders from the Grand Master; coordinates castles and local campaigns.                  | _"My Lord"_                   |
+| 3    | **Commander**                       | Commander of a fortress or territory. Manages resources, internal justice, and local troops.                        | _"My Lord"_                   |
+| 4    | **Knights of the Order**            | Military elite. Nobles bound by vows of obedience and poverty. Lead smaller combat units.                           | _"Brother Knight"_ or _"Sir"_ |
+| 5    | **Sergeants-at-Arms**               | Non-noble professional warriors. Heavy infantry, scouts, or light cavalry.                                          | _"Brother"_                   |
+| 6    | **Chaplains**                       | Clerical branch. Spiritual guidance, sacraments, and doctrinal integrity. No military command.                      | _"Brother"_                   |
+| 7    | **Serving Brothers / Squires**      | Logistical support. Maintain equipment, stables, and fortifications.                                                | _"Brother"_                   |
+
+### Internal Protocol
+
+Members of the Order typically address one another as **"Brother"** regardless of rank, emphasizing their shared commitment. Formal titles are used in official commands or when representing the Order to outsiders.
+
+### Post-Implementation Roadmap
+
+- [ ] Technical copy for the landing page.
+- [ ] Map out narrative decision branches.
+- [ ] Expand equipment variety and mission diversity.
+- [ ] Review game development community feedback.
+- [ ] Evaluate randomized mission delivery (deck-based mechanics).
