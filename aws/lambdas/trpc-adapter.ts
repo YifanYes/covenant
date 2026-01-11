@@ -47,7 +47,9 @@ export const handler = async (event: APIGatewayProxyEvent, context: any) => {
         const ssm = new SSMClient({})
         const response = await ssm.send(new GetParameterCommand({ Name: process.env.FRONT_URL_PARAM }))
         if (response.Parameter?.Value) {
-          process.env.FRONT_URL = `https://${response.Parameter.Value}`
+          const value = response.Parameter.Value
+          // Don't add https:// if the value already contains a protocol
+          process.env.FRONT_URL = value.includes('://') ? value : `https://${value}`
         }
       } catch (e) {
         console.error('Failed to fetch front url param', e)
@@ -60,6 +62,15 @@ export const handler = async (event: APIGatewayProxyEvent, context: any) => {
     handlerInstance = awsLambdaRequestHandler({
       router: appRouter,
       createContext: createLambdaContext,
+      responseMeta() {
+        return {
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With'
+          }
+        }
+      },
       onError({ path, error }) {
         console.error(`Error in tRPC handler on path '${path}':`, error)
       }

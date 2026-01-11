@@ -65,7 +65,9 @@ export class ServerStack extends cdk.Stack {
         stageName: 'prod'
       },
       defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
       }
     })
 

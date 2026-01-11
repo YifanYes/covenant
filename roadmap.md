@@ -33,11 +33,15 @@
 - **Gamificación - Fase 3: El Centro de Aventuras (Misiones)**
   - [x] Pestaña de "Aventura" y selector de misiones con persistencia y gating por Tier.
 - **Gamificación - Fase 4: Combate Reactivo**
-  - [ ] UI de lanzamiento de dados animado y resolver de combate (Ataque/Defensa simultánea).
-  - [ ] Arena de combate, visualización de enemigos y log de eventos.
+  - [x] UI de lanzamiento de dados animado y resolver de combate (Ataque/Defensa simultánea).
+  - [x] Arena de combate, visualización de enemigos y log de eventos.
 - **Gamificación - Fase 5: Cierre del Bucle y Pulido**
   - [ ] Sistema de Mana, Doctrinas, recompensas (XP/Oro/Loot) y estados de derrota.
   - [ ] Tienda para comprar equipamiento con oro.
+  - [ ] Renderizar el personaje con los items equipados.
+  - [ ] Sección de mapa en la aventura para ver el estado del mundo.
+  - [ ] Definir accesorios
+  - [ ] Definir decisiones de la historia
 
 ## 🔮 Fase 3: Características Avanzadas (Futuro)
 
