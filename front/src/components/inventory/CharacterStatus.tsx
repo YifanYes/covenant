@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Bullseye, Heart, Money, ScriptText, Shield, Trophy, Zap } from '@nsmr/pixelart-react'
-import { MagicNature } from '@shared/constants/classes'
+import { Bullseye, Heart, Money, ScriptText, Shield, Zap } from '@nsmr/pixelart-react'
 import { TIER_PROGRESSION } from '@shared/constants/missions'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
@@ -31,32 +30,6 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
         {/* Basic Info */}
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Trophy className='text-muted-foreground h-4 w-4' />
-            <span className='text-sm font-medium'>{t('inventory.tier')}</span>
-          </div>
-          <span className='text-muted-foreground text-sm font-bold'>{currentClass.tier}</span>
-        </div>
-
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <Zap
-              className={character.magicNature === MagicNature.ORDER ? 'h-4 w-4 text-blue-400' : 'h-4 w-4 text-red-400'}
-            />
-            <span className='text-sm font-medium'>{t('inventory.magic_nature.label')}</span>
-          </div>
-          <span
-            className={
-              character.magicNature === MagicNature.ORDER
-                ? 'text-sm font-bold text-blue-400'
-                : 'text-sm font-bold text-red-400'
-            }
-          >
-            {t(`inventory.magic_nature.${character.magicNature}`)}
-          </span>
-        </div>
-
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
             <Bullseye className='text-muted-foreground h-4 w-4' />
             <span className='text-sm font-medium'>{t('inventory.missions')}</span>
           </div>
@@ -64,8 +37,6 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
             {currentClass.missionProgress[currentClass.tier] || 0} / {TIER_PROGRESSION[currentClass.tier] || 5}
           </span>
         </div>
-
-        <Separator className='bg-sidebar-border my-1 w-auto' />
 
         {/* Combat Stats */}
         <div className='flex items-center justify-between'>

@@ -1,5 +1,5 @@
-import CharacterPreview from '@/components/inventory/CharacterPreview.component'
-import CharacterStatus from '@/components/inventory/CharacterStatus.component'
+import CharacterPreview from '@/components/inventory/CharacterPreview'
+import CharacterStatus from '@/components/inventory/CharacterStatus'
 import InventoryGrid from '@/components/inventory/InventoryGrid'
 import LoadoutPanel from '@/components/inventory/LoadoutPanel'
 import { queryClient, trpc } from '@/utils/trpc.utils'
