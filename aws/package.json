@@ -10,7 +10,7 @@
     "test": "jest",
     "cdk": "cdk",
     "db:push:prod": "cd ../server && npx tsx scripts/db-push-prod.ts",
-    "deploy": "npm run db:push:prod && npm run build:prod --prefix ../front && npx cdk deploy --all"
+    "deploy": "npm run db:push:prod && npx prisma generate --schema ../server/prisma/schema.prisma && npm run build:prod --prefix ../front && npx cdk deploy --all"
   },
   "devDependencies": {
     "@aws-cdk/aws-apigatewayv2-alpha": "^2.99.1-alpha.0",
