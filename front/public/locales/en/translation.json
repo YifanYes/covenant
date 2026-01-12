@@ -79,6 +79,8 @@
     "yellow": "Yellow"
   },
   "combat": {
+    "attack_rolls": "Attacks",
+    "attack_set": "Attack set: {{count}} dice",
     "complete_mission": "Complete Mission",
     "criticals": "Criticals",
     "death_dialog": {
@@ -86,6 +88,8 @@
       "description": "Your character has fallen in battle. The mission has failed.",
       "title": "Character Defeated"
     },
+    "defense_rolls": "Defense",
+    "defense_set": "Defense set: {{count}} dice",
     "dice_to_spend": "Dice to spend",
     "enemies": "Enemies",
     "error": {
@@ -111,8 +115,13 @@
     "no_dice": "No dice available",
     "phase_advanced": "Phase advanced",
     "phase_complete": "Phase Complete!",
+    "resolve_turn": "Resolve Turn",
+    "resolving_turn": "Resolving turn...",
+    "roll_attack": "Prepare Attack",
+    "roll_defense": "Prepare Defense",
     "roll_dice": "Roll Dice",
     "rolling": "Rolling",
+    "to_battle": "To Battle!",
     "turn_summary": "Turn Summary",
     "your_hits": "Your Hits"
   },

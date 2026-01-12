@@ -79,6 +79,8 @@
     "yellow": "Amarillo"
   },
   "combat": {
+    "attack_rolls": "Ataques",
+    "attack_set": "Ataque preparado: {{count}} dados",
     "complete_mission": "Completar Misión",
     "criticals": "Críticos",
     "death_dialog": {
@@ -86,6 +88,8 @@
       "description": "Tu personaje ha caído en batalla. La misión ha fracasado.",
       "title": "Personaje Derrotado"
     },
+    "defense_rolls": "Defensas",
+    "defense_set": "Defensa preparada: {{count}} dados",
     "dice_to_spend": "Dados a gastar",
     "enemies": "Enemigos",
     "error": {
@@ -111,8 +115,13 @@
     "no_dice": "Sin dados disponibles",
     "phase_advanced": "Fase avanzada",
     "phase_complete": "¡Fase Completada!",
+    "resolve_turn": "Resolver Turno",
+    "resolving_turn": "Resolviendo turno...",
+    "roll_attack": "Preparar Ataque",
+    "roll_defense": "Preparar Defensa",
     "roll_dice": "Lanzar Dados",
     "rolling": "Lanzando",
+    "to_battle": "¡Al ataque!",
     "turn_summary": "Resumen del Turno",
     "your_hits": "Tus Impactos"
   },

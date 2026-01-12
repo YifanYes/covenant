@@ -18,7 +18,7 @@ import { getMission } from '@shared/constants/missions'
 import type {
   ActiveMissionData,
   CombatLogEntry,
-  DiceRollResult,
+  CombatTurnResult,
   EnemyState,
   InventoryCharacter
 } from '@shared/types/gamification.types'
@@ -39,7 +39,7 @@ export default function MissionDetail() {
   const queryOptions = trpc.missions.getActive.queryOptions() as any
   const { data: activeMission, refetch: refetchActiveMission } = useSuspenseQuery<ActiveMissionData>(queryOptions)
 
-  const [lastAttackResults, setLastAttackResults] = useState<DiceRollResult[]>([])
+  const [lastTurnResult, setLastTurnResult] = useState<CombatTurnResult | null>(null)
   const [showDeathDialog, setShowDeathDialog] = useState(false)
 
   const mission = getMission(missionId || '')
@@ -71,7 +71,7 @@ export default function MissionDetail() {
   const attackMutation = useMutation({
     ...trpc.missions.attack.mutationOptions(),
     onSuccess: async (result) => {
-      setLastAttackResults(result.playerAttackRolls)
+      setLastTurnResult(result)
       queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
 
       // Check if character died
@@ -95,7 +95,7 @@ export default function MissionDetail() {
     ...trpc.missions.advancePhase.mutationOptions(),
     onSuccess: async (result) => {
       await refetchActiveMission()
-      setLastAttackResults([])
+      setLastTurnResult(null)
       if (result.missionComplete) {
         completeMutation.mutate()
       } else {
@@ -141,8 +141,8 @@ export default function MissionDetail() {
     abandonMutation.mutate()
   }
 
-  const handleAttack = (diceCount: number) => {
-    attackMutation.mutate({ diceCount })
+  const handleAttack = ({ attackRolls, defenseRolls }: { attackRolls: number[]; defenseRolls: number[] }) => {
+    attackMutation.mutate({ attackRolls, defenseRolls })
   }
 
   const enemyState = (activeMission?.mission?.enemyState as unknown as EnemyState[]) || []
@@ -200,7 +200,7 @@ export default function MissionDetail() {
           diceBank={diceBank}
           onAttack={handleAttack}
           isAttacking={attackMutation.isPending}
-          lastAttackResults={lastAttackResults}
+          lastTurnResult={lastTurnResult}
           onNextPhase={allEnemiesDefeated ? () => advancePhaseMutation.mutate() : undefined}
           isAdvancing={advancePhaseMutation.isPending}
           nextPhaseLabel={
