@@ -1,9 +1,14 @@
 import { defineConfig } from 'prisma/config'
-import { env } from './config'
+
+const directUrl = process.env.DIRECT_URL
+
+if (!directUrl) {
+  throw new Error('DIRECT_URL is missing from environment variables')
+}
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   datasource: {
-    url: env.DIRECT_URL
+    url: directUrl
   }
 })
