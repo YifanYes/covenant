@@ -133,3 +133,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes play-sprite {
+  100% {
+    background-position: -1024px 0;
+  }
+}
+
+.animate-dice-flip {
+  width: 124px;
+  height: 124px;
+  background-image: url('/assets/dice-animation-spritesheet.png');
+  background-repeat: no-repeat;
+  animation: play-sprite 1s steps(8) infinite;
+  image-rendering: pixelated;
+  zoom: 0.75;
+}
