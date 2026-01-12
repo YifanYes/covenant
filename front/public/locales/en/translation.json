@@ -290,6 +290,7 @@
       "WEAPON": "Weapon"
     },
     "error": {
+      "active_mission": "Cannot change inventory while a mission is active.",
       "equip": "Failed to equip item",
       "unequip": "Failed to unequip item"
     },
@@ -503,6 +504,7 @@
       }
     },
     "has_active_mission": "Complete active mission first",
+    "health_too_low": "Health too low to start mission",
     "limpieza_ruinas": {
       "description": "An old watchtower has been occupied by restless spirits. Purify it to restore the line of sight.",
       "name": "Ruins Cleansing",

@@ -290,6 +290,7 @@
       "WEAPON": "Arma"
     },
     "error": {
+      "active_mission": "No puedes cambiar el inventario mientras hay una misión activa.",
       "equip": "Error al equipar el objeto",
       "unequip": "Error al desequipar el objeto"
     },
@@ -503,6 +504,7 @@
       }
     },
     "has_active_mission": "Completa la misión activa primero",
+    "health_too_low": "Salud insuficiente para iniciar misión",
     "limpieza_ruinas": {
       "description": "Una antigua atalaya ha sido ocupada por espíritus inquietos. Purificadla para restaurar la línea de visión.",
       "name": "Limpieza de Ruinas",
