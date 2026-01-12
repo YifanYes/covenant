@@ -129,7 +129,8 @@ export default function MissionDetail() {
 
   const character = characterData as InventoryCharacter
   const characterTier = character?.tier ?? 1
-  const canStart = characterTier >= mission.requiredTier && !hasActiveMission
+  const currentHealth = character?.classes?.find((c) => c.className === character.currentClass)?.health ?? 0
+  const canStart = characterTier >= mission.requiredTier && !hasActiveMission && currentHealth > 0
   const diceBank = (character?.data as any)?.diceBank ?? 0
 
   const handleStart = () => {
@@ -283,7 +284,9 @@ export default function MissionDetail() {
             ? t('missions.has_active_mission')
             : characterTier < mission.requiredTier
               ? t('adventure.tier_locked', { tier: mission.requiredTier })
-              : t('missions.start')}
+              : currentHealth <= 0
+                ? t('missions.health_too_low')
+                : t('missions.start')}
         </Button>
       </div>
     </div>
