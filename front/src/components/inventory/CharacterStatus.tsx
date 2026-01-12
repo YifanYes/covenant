@@ -26,7 +26,7 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
           {t('inventory.stats_title')}
         </CardTitle>
       </CardHeader>
-      <CardContent className='flex h-full flex-col justify-center gap-2 pt-6'>
+      <CardContent className='flex h-full flex-col justify-start gap-2 pt-6'>
         {/* Basic Info */}
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
