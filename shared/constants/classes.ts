@@ -5,6 +5,11 @@ export enum CharacterClassName {
   DEMON_HUNTER = 'demon_hunter'
 }
 
+export enum MagicNature {
+  ORDER = 'order',
+  CHAOS = 'chaos'
+}
+
 export const CLASS_INITIAL_STATS = {
   [CharacterClassName.TEMPLAR]: {
     health: 8,

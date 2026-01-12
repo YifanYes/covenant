@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Bullseye, Heart, Money, ScriptText, Shield, Trophy, Zap } from '@nsmr/pixelart-react'
+import { Bullseye, Heart, Money, ScriptText, Shield, Zap } from '@nsmr/pixelart-react'
 import { TIER_PROGRESSION } from '@shared/constants/missions'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
@@ -26,16 +26,8 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
           {t('inventory.stats_title')}
         </CardTitle>
       </CardHeader>
-      <CardContent className='flex h-full flex-col justify-center gap-2 pt-6'>
+      <CardContent className='flex h-full flex-col justify-start gap-2 pt-6'>
         {/* Basic Info */}
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <Trophy className='text-muted-foreground h-4 w-4' />
-            <span className='text-sm font-medium'>{t('inventory.tier')}</span>
-          </div>
-          <span className='text-muted-foreground text-sm font-bold'>{currentClass.tier}</span>
-        </div>
-
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
             <Bullseye className='text-muted-foreground h-4 w-4' />
@@ -45,8 +37,6 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
             {currentClass.missionProgress[currentClass.tier] || 0} / {TIER_PROGRESSION[currentClass.tier] || 5}
           </span>
         </div>
-
-        <Separator className='bg-sidebar-border my-1 w-auto' />
 
         {/* Combat Stats */}
         <div className='flex items-center justify-between'>

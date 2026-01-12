@@ -12,6 +12,7 @@ model Character {
   name         String           @db.VarChar(255)
   title        String?          @db.VarChar(255)
   orderName    String?
+  magicNature  String?          @db.VarChar(50)
   currentClass String           @db.VarChar(50)
   data         Json?            @default("{\"diceBank\": 0}")
   createdAt    DateTime         @default(now()) @db.Timestamp(6)
