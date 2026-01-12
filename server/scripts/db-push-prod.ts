@@ -5,12 +5,26 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// Load .env.prod explicitly
-const envPath = path.resolve(__dirname, '../.env.prod')
-dotenv.config({ path: envPath, override: true })
+// Load .env.prod explicitly ONLY if DIRECT_URL is invalid/missing
+if (!process.env.DIRECT_URL) {
+  const envPath = path.resolve(__dirname, '../.env.prod')
+  const result = dotenv.config({ path: envPath })
 
-const directUrl = new URL(process.env.DIRECT_URL!)
-console.log('✅ Loaded environment from .env.prod')
+  if (result.error) {
+    console.log('⚠️  Could not load .env.prod (This is expected in CI if secrets are injected)')
+  } else {
+    console.log('✅ Loaded environment from .env.prod')
+  }
+} else {
+  console.log('✅ Used existing environment variables')
+}
+
+if (!process.env.DIRECT_URL) {
+  console.error('❌ DIRECT_URL is missing from environment')
+  process.exit(1)
+}
+
+const directUrl = new URL(process.env.DIRECT_URL)
 console.log(`   DIRECT_URL host: ${directUrl.hostname}`)
 
 // Run prisma db push
