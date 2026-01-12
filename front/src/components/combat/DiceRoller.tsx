@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Minus, Plus } from '@nsmr/pixelart-react'
-import { DICE_PER_TURN_LIMITS } from '@shared/constants/dice.constants'
 import type { DiceRollResult } from '@shared/types/gamification.types'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -9,34 +8,36 @@ import DiceResult from './DiceResult'
 
 interface DiceRollerProps {
   diceBank: number
-  tier: number
+  diceLimit: number
   onRoll: (diceCount: number) => void
   isRolling: boolean
   lastResults?: DiceRollResult[]
   onNextPhase?: () => void
   isAdvancing?: boolean
   nextPhaseLabel?: string
+  customButtonLabel?: string
   className?: string
+  title?: string
 }
 
 export default function DiceRoller({
   diceBank,
-  tier,
   onRoll,
   isRolling,
   lastResults,
   onNextPhase,
   isAdvancing,
   nextPhaseLabel,
-  className
+  customButtonLabel,
+  className,
+  diceLimit,
+  title
 }: DiceRollerProps) {
   const { t } = useTranslation()
-  const maxPerTurn = DICE_PER_TURN_LIMITS[tier] || 5
-  const maxDice = Math.min(diceBank, maxPerTurn)
-  const [selectedDice, setSelectedDice] = useState(Math.min(1, maxDice))
+  const [selectedDice, setSelectedDice] = useState(Math.min(1, diceLimit))
 
   const handleIncrement = () => {
-    if (selectedDice < maxDice) {
+    if (selectedDice < diceLimit) {
       setSelectedDice(selectedDice + 1)
     }
   }
@@ -48,8 +49,9 @@ export default function DiceRoller({
   }
 
   const handleRoll = () => {
-    if (selectedDice > 0 && selectedDice <= maxDice) {
+    if (selectedDice > 0 && selectedDice <= diceLimit) {
       onRoll(selectedDice)
+      setSelectedDice(1)
     }
   }
 
@@ -59,7 +61,7 @@ export default function DiceRoller({
     <div className={cn('flex flex-col gap-4 rounded-lg border p-4', className)}>
       <div className='flex items-center justify-between'>
         <span className='text-sm font-medium'>
-          {onNextPhase ? t('combat.phase_complete') : t('combat.dice_to_spend')}
+          {title || (onNextPhase ? t('combat.phase_complete') : t('combat.dice_to_spend'))}
         </span>
         <span className='text-muted-foreground text-xs'>
           {t('inventory.dice_bank')}: {diceBank}
@@ -76,7 +78,7 @@ export default function DiceRoller({
             variant='outline'
             size='icon'
             onClick={handleIncrement}
-            disabled={!canRoll || selectedDice >= maxDice}
+            disabled={!canRoll || selectedDice >= diceLimit}
           >
             <Plus className='h-4 w-4' />
           </Button>
@@ -94,7 +96,7 @@ export default function DiceRoller({
           ) : diceBank === 0 ? (
             t('combat.no_dice')
           ) : (
-            `${t('combat.roll_dice')} (${selectedDice})`
+            `${customButtonLabel || t('combat.roll_dice')} (${selectedDice})`
           )}
         </Button>
       )}

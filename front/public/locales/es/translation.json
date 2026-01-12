@@ -1,9 +1,16 @@
 {
   "adventure": {
     "active_mission": "Misión Activa",
+    "history": {
+      "empty": "No se encontraron misiones completadas.",
+      "log_title": "Registro de Combate",
+      "select_mission": "Selecciona una misión para ver su registro de combate.",
+      "title": "Historial de Misiones"
+    },
     "no_active_mission": "Sin misión activa",
     "no_missions": "¡Todas las misiones completadas! Bien hecho, aventurero.",
     "tabs": {
+      "history": "Historial",
       "inventory": "Inventario",
       "missions": "Misiones"
     },
@@ -72,6 +79,8 @@
     "yellow": "Amarillo"
   },
   "combat": {
+    "attack_rolls": "Ataques",
+    "attack_set": "Ataque preparado: {{count}} dados",
     "complete_mission": "Completar Misión",
     "criticals": "Críticos",
     "death_dialog": {
@@ -79,6 +88,8 @@
       "description": "Tu personaje ha caído en batalla. La misión ha fracasado.",
       "title": "Personaje Derrotado"
     },
+    "defense_rolls": "Defensas",
+    "defense_set": "Defensa preparada: {{count}} dados",
     "dice_to_spend": "Dados a gastar",
     "enemies": "Enemigos",
     "error": {
@@ -104,10 +115,19 @@
     "no_dice": "Sin dados disponibles",
     "phase_advanced": "Fase avanzada",
     "phase_complete": "¡Fase Completada!",
+    "resolve_turn": "Resolver Turno",
+    "resolving_turn": "Resolviendo turno...",
+    "roll_attack": "Preparar Ataque",
+    "roll_defense": "Preparar Defensa",
     "roll_dice": "Lanzar Dados",
     "rolling": "Lanzando",
+    "to_battle": "¡Al ataque!",
     "turn_summary": "Resumen del Turno",
     "your_hits": "Tus Impactos"
+  },
+  "common": {
+    "completed": "Completada",
+    "failed": "Fallida"
   },
   "confirm_delete_account_dialog": {
     "button": "Eliminar cuenta",
@@ -279,6 +299,7 @@
       "WEAPON": "Arma"
     },
     "error": {
+      "active_mission": "No puedes cambiar el inventario mientras hay una misión activa.",
       "equip": "Error al equipar el objeto",
       "unequip": "Error al desequipar el objeto"
     },
@@ -497,6 +518,7 @@
       }
     },
     "has_active_mission": "Completa la misión activa primero",
+    "health_too_low": "Salud insuficiente para iniciar misión",
     "limpieza_ruinas": {
       "description": "Una antigua atalaya ha sido ocupada por espíritus inquietos. Purificadla para restaurar la línea de visión.",
       "name": "Limpieza de Ruinas",
