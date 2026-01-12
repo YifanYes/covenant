@@ -1,4 +1,3 @@
-import { DICE_PER_TURN_LIMITS } from '@shared/constants/dice.constants'
 import { DamageType, EnemyType, getEnemy } from '@shared/constants/enemies'
 import { WeaponDamageType } from '@shared/constants/items'
 import { getMission } from '@shared/constants/missions'
@@ -69,13 +68,13 @@ export const getFirstAliveEnemy = (enemyState: EnemyState[]): EnemyState | null 
 
 export const resolveCombatTurn = (params: ResolveCombatParams): CombatTurnResult => {
   const {
-    diceCount,
+    attackRolls,
+    defenseRolls,
     targetEnemyId,
     playerStrengthAtk,
     playerStrengthDef,
     playerMagicAtk,
     playerMagicDef,
-    playerArmorDice,
     playerManaRegen,
     weaponDamageType,
     enemy,
@@ -88,19 +87,18 @@ export const resolveCombatTurn = (params: ResolveCombatParams): CombatTurnResult
   // Get enemy dice counts from lookup table
   const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type] ?? { defense: 1, attack: 2 }
 
-  // Clamp dice to per-turn limit
-  const maxDice = DICE_PER_TURN_LIMITS[tier] || 5
-  const actualDice = Math.min(diceCount, maxDice)
+  // We trust the provided rolls length is validated by the router
+  const actualDice = attackRolls.length
 
   // 1. Player attack phase
   const playerThreshold = getThreshold(weaponDamageType, playerStrengthAtk, playerMagicAtk)
-  const playerAttackValues = rollDice(actualDice)
-  const { results: playerAttackRolls, count: playerHits } = calculateHitsWithCount(playerAttackValues, playerThreshold)
+  // Use provided rolls
+  const { results: playerAttackRolls, count: playerHits } = calculateHitsWithCount(attackRolls, playerThreshold)
 
   logEntries.push({
     timestamp,
     type: CombatLogType.PLAYER_ATTACK,
-    data: { dice: actualDice, rolls: playerAttackValues }
+    data: { dice: actualDice, rolls: attackRolls }
   })
 
   logEntries.push({
@@ -136,16 +134,13 @@ export const resolveCombatTurn = (params: ResolveCombatParams): CombatTurnResult
 
   // 4. Player defense (from armor)
   const playerDefThreshold = getThreshold(enemy.damageType, playerStrengthDef, playerMagicDef)
-  const playerDefenseValues = rollDice(playerArmorDice)
-  const { results: playerDefenseRolls, count: playerBlocks } = calculateHitsWithCount(
-    playerDefenseValues,
-    playerDefThreshold
-  )
+  // Use provided rolls
+  const { results: playerDefenseRolls, count: playerBlocks } = calculateHitsWithCount(defenseRolls, playerDefThreshold)
 
   logEntries.push({
     timestamp: timestamp + 4,
     type: CombatLogType.PLAYER_DEFENDS,
-    data: { blocks: playerBlocks, rolls: playerDefenseValues }
+    data: { blocks: playerBlocks, rolls: defenseRolls }
   })
 
   // 5. Calculate final damage
