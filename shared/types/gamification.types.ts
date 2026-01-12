@@ -134,13 +134,13 @@ export interface CombatTurnResult {
 }
 
 export interface ResolveCombatParams {
-  diceCount: number
+  attackRolls: number[]
+  defenseRolls: number[]
   targetEnemyId: string
   playerStrengthAtk: number
   playerStrengthDef: number
   playerMagicAtk: number
   playerMagicDef: number
-  playerArmorDice: number
   playerManaRegen: number
   weaponDamageType: WeaponDamageType
   enemy: EnemyTemplate

@@ -1,9 +1,16 @@
 {
   "adventure": {
     "active_mission": "Active Mission",
+    "history": {
+      "empty": "No completed missions found.",
+      "log_title": "Combat Log",
+      "select_mission": "Select a mission to view its combat log.",
+      "title": "Mission History"
+    },
     "no_active_mission": "No active mission",
     "no_missions": "All missions completed! Well done, adventurer.",
     "tabs": {
+      "history": "History",
       "inventory": "Inventory",
       "missions": "Missions"
     },
@@ -72,6 +79,8 @@
     "yellow": "Yellow"
   },
   "combat": {
+    "attack_rolls": "Attacks",
+    "attack_set": "Attack set: {{count}} dice",
     "complete_mission": "Complete Mission",
     "criticals": "Criticals",
     "death_dialog": {
@@ -79,6 +88,8 @@
       "description": "Your character has fallen in battle. The mission has failed.",
       "title": "Character Defeated"
     },
+    "defense_rolls": "Defense",
+    "defense_set": "Defense set: {{count}} dice",
     "dice_to_spend": "Dice to spend",
     "enemies": "Enemies",
     "error": {
@@ -104,10 +115,19 @@
     "no_dice": "No dice available",
     "phase_advanced": "Phase advanced",
     "phase_complete": "Phase Complete!",
+    "resolve_turn": "Resolve Turn",
+    "resolving_turn": "Resolving turn...",
+    "roll_attack": "Prepare Attack",
+    "roll_defense": "Prepare Defense",
     "roll_dice": "Roll Dice",
     "rolling": "Rolling",
+    "to_battle": "To Battle!",
     "turn_summary": "Turn Summary",
     "your_hits": "Your Hits"
+  },
+  "common": {
+    "completed": "Completed",
+    "failed": "Failed"
   },
   "confirm_delete_account_dialog": {
     "button": "Delete Account",
@@ -279,6 +299,7 @@
       "WEAPON": "Weapon"
     },
     "error": {
+      "active_mission": "Cannot change inventory while a mission is active.",
       "equip": "Failed to equip item",
       "unequip": "Failed to unequip item"
     },
@@ -492,6 +513,7 @@
       }
     },
     "has_active_mission": "Complete active mission first",
+    "health_too_low": "Health too low to start mission",
     "limpieza_ruinas": {
       "description": "An old watchtower has been occupied by restless spirits. Purify it to restore the line of sight.",
       "name": "Ruins Cleansing",

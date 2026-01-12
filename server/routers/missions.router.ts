@@ -172,7 +172,12 @@ export const missionsRouter = t.router({
   }),
 
   attack: protectedProcedure
-    .input(z.object({ diceCount: z.number().min(1).max(14) }))
+    .input(
+      z.object({
+        attackRolls: z.array(z.number().min(1).max(6)).min(1),
+        defenseRolls: z.array(z.number().min(1).max(6)).min(0)
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const character = await getCharacterWithParty(ctx.prisma, ctx.user.id, { classes: true })
 
@@ -184,8 +189,10 @@ export const missionsRouter = t.router({
       const currentClass = getCurrentClassOrThrow(character)
       const { tier, diceBank } = getCharacterProgress(character)
 
+      const diceCost = input.attackRolls.length + input.defenseRolls.length
+
       // Check dice availability
-      if (diceBank < input.diceCount) {
+      if (diceBank < diceCost) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not enough dice' })
       }
 
@@ -208,19 +215,15 @@ export const missionsRouter = t.router({
       const weaponDamageType: WeaponDamageType =
         weapon?.type === ItemType.WEAPON_MAGIC ? WeaponDamageType.MAGIC : WeaponDamageType.PHYSICAL
 
-      // Get armor dice from loadout (default to 1)
-      const armor = loadout.find((item) => item.type === ItemType.ARMOR)
-      const armorDice = armor?.stats?.physDef || armor?.stats?.magicDef || 1
-
       // Resolve combat turn
       const result = resolveCombatTurn({
-        diceCount: input.diceCount,
+        attackRolls: input.attackRolls,
+        defenseRolls: input.defenseRolls,
         targetEnemyId: targetEnemy.id,
         playerStrengthAtk: currentClass.strengthAtk,
         playerStrengthDef: currentClass.strengthDef,
         playerMagicAtk: currentClass.magicAtk,
         playerMagicDef: currentClass.magicDef,
-        playerArmorDice: armorDice,
         playerManaRegen: currentClass.manaRegen,
         weaponDamageType,
         enemy: enemyTemplate,
@@ -246,7 +249,7 @@ export const missionsRouter = t.router({
 
       // Update dice bank (subtract used dice)
       const characterData = (character.data as any) || {}
-      const newDiceBank = Math.max(0, diceBank - input.diceCount)
+      const newDiceBank = Math.max(0, diceBank - diceCost)
 
       // Calculate updated health and mana
       const newHealth = Math.max(0, currentClass.health - result.damageToPlayer)
@@ -337,5 +340,25 @@ export const missionsRouter = t.router({
     })
 
     return { phaseAdvanced: true, missionComplete: false, newPhase: nextPhase, newEnemyState }
+  }),
+
+  history: protectedProcedure.query(async ({ ctx }) => {
+    const character = await getCharacterWithParty(ctx.prisma, ctx.user.id)
+
+    const missions = await ctx.prisma.mission.findMany({
+      where: {
+        partyId: character.party.id,
+        status: { in: [MissionStatus.COMPLETED, MissionStatus.FAILED] }
+      },
+      orderBy: { completedAt: 'desc' }
+    })
+
+    return missions.map((mission) => ({
+      id: mission.id,
+      name: mission.name,
+      status: mission.status,
+      completedAt: mission.completedAt,
+      combatLog: (mission.combatLog as unknown as CombatLogEntry[]) || []
+    }))
   })
 })

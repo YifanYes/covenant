@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { trpc } from '@/utils/trpc.utils'
-import { Luggage, ScriptText, User } from '@nsmr/pixelart-react'
+import { Clock, Luggage, ScriptText, User } from '@nsmr/pixelart-react'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -14,7 +14,8 @@ export default function AdventureLayout() {
   const character = characterData as InventoryCharacter
 
   const isMissions = location.pathname.includes('/missions')
-  const activeTab = isMissions ? 'missions' : 'inventory'
+  const isHistory = location.pathname.includes('/history')
+  const activeTab = isMissions ? 'missions' : isHistory ? 'history' : 'inventory'
 
   if (!character) {
     return (
@@ -54,6 +55,12 @@ export default function AdventureLayout() {
             <Link to='/adventure/missions'>
               <ScriptText className='mr-1 h-4 w-4' />
               {t('adventure.tabs.missions')}
+            </Link>
+          </TabsTrigger>
+          <TabsTrigger value='history' asChild>
+            <Link to='/adventure/history'>
+              <Clock className='mr-1 h-4 w-4' />
+              {t('adventure.tabs.history')}
             </Link>
           </TabsTrigger>
         </TabsList>
