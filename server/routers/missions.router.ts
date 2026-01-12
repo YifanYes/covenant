@@ -337,5 +337,25 @@ export const missionsRouter = t.router({
     })
 
     return { phaseAdvanced: true, missionComplete: false, newPhase: nextPhase, newEnemyState }
+  }),
+
+  history: protectedProcedure.query(async ({ ctx }) => {
+    const character = await getCharacterWithParty(ctx.prisma, ctx.user.id)
+
+    const missions = await ctx.prisma.mission.findMany({
+      where: {
+        partyId: character.party.id,
+        status: { in: [MissionStatus.COMPLETED, MissionStatus.FAILED] }
+      },
+      orderBy: { completedAt: 'desc' }
+    })
+
+    return missions.map((mission) => ({
+      id: mission.id,
+      name: mission.name,
+      status: mission.status,
+      completedAt: mission.completedAt,
+      combatLog: (mission.combatLog as unknown as CombatLogEntry[]) || []
+    }))
   })
 })
