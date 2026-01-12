@@ -77,8 +77,7 @@ export const resolveCombatTurn = (params: ResolveCombatParams): CombatTurnResult
     playerMagicDef,
     playerManaRegen,
     weaponDamageType,
-    enemy,
-    tier
+    enemy
   } = params
 
   const logEntries: CombatLogEntry[] = []

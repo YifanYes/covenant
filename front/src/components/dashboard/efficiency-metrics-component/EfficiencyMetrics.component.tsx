@@ -1,5 +1,4 @@
-import { Hourglass } from '@nsmr/pixelart-react'
-import { Award, Compass, Flame, Target } from 'lucide-react'
+import { Bullseye, Hourglass, Search, SpeedFast, TrendingUp } from '@nsmr/pixelart-react'
 import { useTranslation } from 'react-i18next'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
 import { getEfficiencyMetricsData } from './EfficiencyMetrics.utils'
@@ -27,7 +26,7 @@ export default function EfficiencyMetricsComponent({ metrics }: EfficiencyMetric
         <div className='grid h-full w-full gap-2'>
           <div className='flex flex-col items-start gap-2 rounded-md border p-2'>
             <div className='text-muted-foreground flex items-center gap-1.5 text-xs leading-tight font-medium'>
-              <Flame className='h-3 w-3 shrink-0' />
+              <TrendingUp className='h-4 w-4 shrink-0' />
               {t('dashboard.efficiency_metrics.habit_rate')}
             </div>
             <div title={meanHabitRate} className='w-full truncate text-end text-xs font-semibold'>
@@ -36,7 +35,7 @@ export default function EfficiencyMetricsComponent({ metrics }: EfficiencyMetric
           </div>
           <div className='flex flex-col items-start gap-2 rounded-md border p-2'>
             <div className='text-muted-foreground flex items-center gap-1.5 text-xs leading-tight font-medium'>
-              <Target className='h-3 w-3 shrink-0' />
+              <Bullseye className='h-4 w-4 shrink-0' />
               {t('dashboard.efficiency_metrics.task_type')}
             </div>
             <div title={mostCommonType} className='w-full truncate text-end text-xs font-semibold'>
@@ -45,7 +44,7 @@ export default function EfficiencyMetricsComponent({ metrics }: EfficiencyMetric
           </div>
           <div className='flex flex-col items-start gap-2 rounded-md border p-2'>
             <div className='text-muted-foreground flex items-center gap-1.5 text-xs leading-tight font-medium'>
-              <Compass className='h-3 w-3 shrink-0' />
+              <SpeedFast className='h-4 w-4 shrink-0' />
               {t('dashboard.efficiency_metrics.focused_area')}
             </div>
             <div className='w-full truncate text-end text-xs font-semibold' title={mostFocusedArea}>
@@ -54,7 +53,7 @@ export default function EfficiencyMetricsComponent({ metrics }: EfficiencyMetric
           </div>
           <div className='flex flex-col items-start gap-2 rounded-md border p-2'>
             <div className='text-muted-foreground flex items-center gap-1.5 text-xs leading-tight font-medium'>
-              <Award className='h-3 w-3 shrink-0' />
+              <Search className='h-4 w-4 shrink-0' />
               {t('dashboard.efficiency_metrics.focused_objective')}
             </div>
             <div className='w-full truncate text-end text-xs font-semibold' title={mostFocusedObjective}>
