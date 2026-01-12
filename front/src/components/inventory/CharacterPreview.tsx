@@ -1,6 +1,7 @@
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '../ui/card'
+import MagicNatureBadge from './MagicNatureBadge'
 
 interface CharacterPreviewProps {
   character: InventoryCharacter
@@ -31,6 +32,7 @@ export default function CharacterPreview({ character }: CharacterPreviewProps) {
             <span className='text-primary bg-primary/10 rounded-full px-2 py-0.5 text-xs font-bold uppercase'>
               {t('inventory.tier')} {character.tier}
             </span>
+            {character.magicNature && <MagicNatureBadge magicNature={character.magicNature} />}
           </div>
           {character.orderName && <span className='text-muted-foreground text-sm'>{character.orderName}</span>}
         </div>
