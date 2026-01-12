@@ -73,6 +73,7 @@ export interface InventoryCharacter {
   name: string | null
   title: string | null
   currentClass: string | null
+  magicNature: string | null
   tier: number
   orderName: string | null
   gold: number

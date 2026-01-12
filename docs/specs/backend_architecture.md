@@ -6,35 +6,37 @@
 
 ## Executive Summary
 
-Evolucionar el backend actual hacia una arquitectura más limpia **sin añadir complejidad innecesaria**. El objetivo es:
+Evolve the current backend towards a cleaner architecture **without adding unnecessary complexity**. The goals are:
 
-1. Sacar lógica de los routers
-2. Organizar servicios por dominio
+1. Extract logic from routers
+2. Organize services by domain
+3. Organize repositories by domain
+4. Improve typing for `jsonb` fields.
 
-**No usaremos**: DI containers, CQRS, eventos complejos, value objects separados.
+**We will NOT use**: DI containers, CQRS, complex events, separate value objects.
 
-## 1. Problemas Actuales
+## 1. Current Problems
 
-| Problema            | Ejemplo                                                     |
-| ------------------- | ----------------------------------------------------------- |
-| Lógica en routers   | `missions.router.ts` tiene 130 líneas de lógica en `attack` |
-| `as any` everywhere | `enemyState as unknown as EnemyState[]`                     |
+| Problem             | Example                                                 |
+| ------------------- | ------------------------------------------------------- |
+| Logic in routers    | `missions.router.ts` has 130 lines of logic in `attack` |
+| `as any` everywhere | `enemyState as unknown as EnemyState[]`                 |
 
-## 2. Arquitectura Simplificada
+## 2. Simplified Architecture
 
 ```
 ┌─────────────────────────────────┐
-│         Routers (tRPC)          │  ← Validación + llamar servicios
+│         Routers (tRPC)          │  ← Validation + call services
 └─────────────────────────────────┘
                 │
                 ▼
 ┌─────────────────────────────────┐
-│           Services              │  ← Toda la lógica de negocio
+│           Services              │  ← All business logic
 └─────────────────────────────────┘
                 │
                 ▼
 ┌─────────────────────────────────┐
-│         Repositories            │  ← Queries reutilizables
+│         Repositories            │  ← Reusable queries
 └─────────────────────────────────┘
                 │
                 ▼
@@ -43,16 +45,16 @@ Evolucionar el backend actual hacia una arquitectura más limpia **sin añadir c
 └─────────────────────────────────┘
 ```
 
-## 3. Nueva Estructura de Carpetas
+## 3. New Folder Structure
 
 ```
 server/
-├── routers/                # Solo input/output
+├── routers/                # Input/output only
 │   ├── character.router.ts
 │   ├── mission.router.ts
 │   └── ...
 │
-├── services/               # Lógica de negocio
+├── services/               # Business logic
 │   ├── combat/
 │   │   ├── combat.service.ts
 │   │   └── dice.service.ts
@@ -63,38 +65,37 @@ server/
 │       ├── mission.service.ts
 │       └── phase.service.ts
 │
-├── repositories/           # Queries reutilizables
+├── repositories/           # Reusable queries
 │   ├── character.repository.ts
 │   ├── mission.repository.ts
 │   └── party.repository.ts
 │
 ├── lib/
-│   ├── prisma.ts
-│   └── errors.ts
+│   └──  prisma.ts
 │
 └── server.ts
 
-shared/                     # Ya existente
+shared/                     # Already exists
 ├── types/
 │   ├── combat.types.ts     # CombatParams, CombatResult, etc.
 │   └── ...
 └── ...
 ```
 
-## 4. Servicios como Clases
+## 4. Services as Classes
 
-En lugar de funciones sueltas, agrupar en clases con métodos relacionados:
+Instead of standalone functions, group them into classes with related methods:
 
-### Antes (Actual)
+### Before (Current)
 
 ```typescript
-// services/combat.services.ts - funciones sueltas
+// services/combat.services.ts - standalone functions
 export const rollDice = (count: number) => { ... }
 export const calculateHitsWithCount = (...) => { ... }
 export const resolveCombatTurn = (...) => { ... }
 ```
 
-### Después (Propuesto)
+### After (Proposed)
 
 ```typescript
 // services/combat/combat.service.ts
@@ -110,22 +111,22 @@ export class CombatService {
   }
 
   resolveTurn(params: CombatParams): CombatResult {
-    // Toda la lógica de combate aquí
+    // All combat logic here
   }
 
   async executeAttack(userId: string, diceCount: number): Promise<AttackResult> {
-    // 1. Cargar datos
+    // 1. Load data
     const character = await this.getCharacterWithMission(userId)
 
-    // 2. Validar
+    // 2. Validate
     if (character.diceBank < diceCount) {
       throw new AppError('NOT_ENOUGH_DICE')
     }
 
-    // 3. Ejecutar combate
+    // 3. Execute combat
     const result = this.resolveTurn({ ... })
 
-    // 4. Guardar
+    // 4. Save
     await this.saveResults(character, result)
 
     return result
@@ -133,82 +134,47 @@ export class CombatService {
 }
 ```
 
-## 5. Router Simplificado
+## 5. Simplified Router
 
 ```typescript
 // routers/missions.router.ts
 import { CombatService } from '../services/combat/combat.service'
 
-// Instanciar servicios (sin DI container)
+// Instantiate services (without DI container)
 const combatService = new CombatService(prisma)
 
 export const missionsRouter = t.router({
   attack: protectedProcedure
     .input(z.object({ diceCount: z.number().min(1).max(14) }))
     .mutation(async ({ ctx, input }) => {
-      // El router solo llama al servicio
+      // The router only calls the service
       return combatService.executeAttack(ctx.user.id, input.diceCount)
     })
 
-  // ... otros procedures igual de simples
+  // ... other procedures equally simple
 })
 ```
 
-## 6. Manejo de Errores Simple
+## 6. Migration Plan
 
-```typescript
-// lib/errors.ts
-export class AppError extends Error {
-  constructor(
-    public readonly code: string,
-    message?: string
-  ) {
-    super(message || code)
-  }
-}
+- [ ] Create missing service and repository folder structure.
+- [ ] Convert current functions to classes `CombatService`, `MissionService`
+- [ ] Move logic from `missions.router.ts` to `CombatService.executeAttack()`
 
-// Uso en servicios
-throw new AppError('NOT_ENOUGH_DICE')
-throw new AppError('NO_ACTIVE_MISSION')
+## 7. Summary of Changes
 
-// Middleware en router
-const withErrorHandling = t.middleware(async ({ next }) => {
-  try {
-    return await next()
-  } catch (error) {
-    if (error instanceof AppError) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: error.code
-      })
-    }
-    throw error
-  }
-})
-```
+| Before               | After                |
+| -------------------- | -------------------- |
+| Logic in routers     | Logic in services    |
+| Standalone functions | Classes with methods |
+| Scattered `as any`   | Centralized types    |
 
-## 7. Plan de Migración
-
-### Fase 1: Reorganizar servicios (1 semana)
-
-- [ ] Crear estructura de carpetas `services/combat/`, `services/character/`, etc.
-- [ ] Convertir funciones actuales a clases `CombatService`, `MissionService`
-- [ ] Mover lógica de `missions.router.ts` a `CombatService.executeAttack()`
-
-## 8. Resumen de Cambios
-
-| Antes              | Después             |
-| ------------------ | ------------------- |
-| Lógica en routers  | Lógica en servicios |
-| Funciones sueltas  | Clases con métodos  |
-| `as any` dispersos | Tipos centralizados |
-
-## 9. Lo que NO hacemos
+## 8. What We Are NOT Doing
 
 - ❌ CQRS / Commands / Queries
-- ❌ Event Bus complejo
-- ❌ Value Objects separados
+- ❌ Complex Event Bus
+- ❌ Separate Value Objects
 - ❌ DI Container (InversifyJS, etc.)
-- ❌ Domain Events formales
+- ❌ Formal Domain Events
 
-Mantenemos la arquitectura **simple y pragmática**.
+We keep the architecture **simple and pragmatic**.

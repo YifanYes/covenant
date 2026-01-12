@@ -288,6 +288,11 @@
     "magic": "Magic",
     "magic_atk": "Magic Atk",
     "magic_def": "Magic Def",
+    "magic_nature": {
+      "chaos": "Chaos",
+      "label": "Magic Nature",
+      "order": "Order"
+    },
     "mana": "Mana",
     "mana_regen": "Mana Regeneration",
     "missions": "Missions",
@@ -571,6 +576,7 @@
     }
   },
   "onboarding": {
+    "back": "Back",
     "button": "Let's go!",
     "class_label": "Choose Your Class",
     "error": {
@@ -579,8 +585,38 @@
       "title": "Failed to create character"
     },
     "loading": "Creating your character...",
+    "magic_nature": {
+      "q1": {
+        "chaos": "I marvel at the new form of the fragments and use them to create a mosaic or a spike trap. The breakage is an opportunity.",
+        "order": "I search for every speck of dust and use my will to restore its exact molecular structure. What was perfect must be perfect again.",
+        "question": "You find a millennial vase shattered to pieces. What is your reaction?"
+      },
+      "q2": {
+        "chaos": "The rebels'. I'd rather die in the explosion of uncertain change than live a life dictated by another's design.",
+        "order": "The crown's side. Disorder only brings hunger and death; the law is the only shield against the abyss.",
+        "question": "A kingdom lives in total peace, but under laws so strict that no one can choose their own profession. A violent revolution is brewing. Whose side are you on?"
+      },
+      "q3": {
+        "chaos": "I throw a small doctrine into the center to see what happens. If it explodes, at least I'll have learned something about its raw power.",
+        "order": "I build a series of containment seals and study its cycles for years before attempting to channel a single drop.",
+        "question": "You discover a flow of immense but totally unpredictable energy. What do you do?"
+      },
+      "q4": {
+        "chaos": "An untamed jungle full of strange hybrids that grow according to their own will, where every walk is a different adventure.",
+        "order": "A perfectly symmetrical design, with paths aligned to the stars and plants that bloom in strict chronological order.",
+        "question": "You are granted a barren land to create whatever you want. What is the final result?"
+      },
+      "q5": {
+        "chaos": "You shout 'Entropy!', throw the menu out the window, and decide you'll eat whatever you find first.",
+        "order": "You devise a weighted voting system by seniority and hunger level, ensuring the olive distribution is geometrically equitable.",
+        "question": "You're with friends and no one agrees on pizza toppings. Time passes and hunger sets in. How do you resolve it?"
+      },
+      "subtitle": "Answer these questions to discover your magical affinity.",
+      "title": "Magic Nature"
+    },
     "name_label": "Character Name",
     "name_placeholder": "Enter your character's name",
+    "next": "Next",
     "subtitle": "Choose your path and begin your adventure",
     "title": "Create Your Character"
   },

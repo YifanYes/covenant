@@ -288,6 +288,11 @@
     "magic": "Magia",
     "magic_atk": "Ataque Mágico",
     "magic_def": "Defensa Mágica",
+    "magic_nature": {
+      "chaos": "Caos",
+      "label": "Naturaleza Mágica",
+      "order": "Orden"
+    },
     "mana": "Maná",
     "mana_regen": "Regeneración de Maná",
     "missions": "Misiones",
@@ -571,6 +576,7 @@
     }
   },
   "onboarding": {
+    "back": "Atrás",
     "button": "¡Adelante!",
     "class_label": "Elige tu clase",
     "error": {
@@ -579,8 +585,38 @@
       "title": "Error al crear el personaje"
     },
     "loading": "Creando tu personaje...",
+    "magic_nature": {
+      "q1": {
+        "chaos": "Me maravillo con la nueva forma de los fragmentos y los uso para crear un mosaico o una trampa de pinchos. La rotura es una oportunidad.",
+        "order": "Busco cada mota de polvo y uso mi voluntad para restaurar su estructura molecular exacta. Lo que fue perfecto, debe volver a serlo.",
+        "question": "Encuentras un jarrón milenario hecho añicos. ¿Cuál es tu reacción?"
+      },
+      "q2": {
+        "chaos": "De los rebeldes. Prefiero morir en el estallido de un cambio incierto que vivir una vida dictada por el diseño de otro.",
+        "order": "Del lado de la corona. El desorden solo trae hambre y muerte; la ley es el único escudo contra el abismo.",
+        "question": "Un reino vive en paz total, pero bajo leyes tan estrictas que nadie puede elegir su propia profesión. Se gesta una revolución violenta. ¿De qué lado estás?"
+      },
+      "q3": {
+        "chaos": "Lanzo una pequeña doctrina al centro para ver qué pasa. Si explota, al menos habré aprendido algo sobre su fuerza bruta.",
+        "order": "Construyo una serie de sellos de contención y estudio sus ciclos durante años antes de intentar canalizar una sola gota.",
+        "question": "Descubres un flujo de energía inmensa pero totalmente impredecible. ¿Qué haces?"
+      },
+      "q4": {
+        "chaos": "Una selva indómita llena de híbridos extraños que crecen según su propia voluntad, donde cada paseo es una aventura diferente.",
+        "order": "Un diseño perfectamente simétrico, con senderos alineados con los astros y plantas que florecen en un orden cronológico estricto.",
+        "question": "Te conceden un terreno baldío para que crees lo que quieras. ¿Cómo es el resultado final?"
+      },
+      "q5": {
+        "chaos": "Gritas '¡Entropía!', lanzas la carta por la ventana y decides que hoy se cena lo que sea que encuentres primero.",
+        "order": "Elaboras un sistema de votación ponderado por antigüedad y nivel de hambre, asegurándote de que el reparto de aceitunas sea geométricamente equitativo.",
+        "question": "Estás con tus amigos y nadie se pone de acuerdo con los ingredientes de la pizza. El tiempo pasa y el hambre aprieta. ¿Cómo lo resuelves?"
+      },
+      "subtitle": "Responde estas preguntas para descubrir tu afinidad mágica.",
+      "title": "Naturaleza Mágica"
+    },
     "name_label": "Nombre del personaje",
     "name_placeholder": "Introduce el nombre de tu personaje",
+    "next": "Siguiente",
     "subtitle": "Elige tu camino y comienza tu aventura",
     "title": "Crear tu personaje"
   },
