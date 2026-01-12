@@ -46,31 +46,43 @@ export default function CombatArena({
       {/* Left: Character Status + Dice Roller */}
       <div className='flex flex-col gap-4'>
         <div className='rounded-lg border p-4'>
-          <h3 className='mb-3 font-semibold'>{character.name}</h3>
-
-          <div className='space-y-3'>
-            <div>
-              <div className='text-muted-foreground mb-1 flex justify-between text-xs'>
-                <span>{t('inventory.health')}</span>
-                <span>
-                  {currentClass.health}/{currentClass.maxHealth}
-                </span>
-              </div>
-              <HealthBar current={currentClass.health} max={currentClass.maxHealth} showLabel={false} />
+          <div className='flex h-full gap-4'>
+            <div className='bg-muted/50 relative flex h-full w-24 shrink-0 items-center justify-center rounded-md border p-2'>
+              <img
+                src={`/assets/classes/${character.currentClass!}.png`}
+                alt={character.currentClass!}
+                className='h-full w-full object-contain'
+                style={{ imageRendering: 'pixelated' }}
+              />
             </div>
+            <div className='flex flex-1 flex-col justify-center'>
+              <h3 className='mb-3 font-semibold'>{character.name}</h3>
 
-            <div>
-              <div className='text-muted-foreground mb-1 flex justify-between text-xs'>
-                <span>{t('inventory.mana')}</span>
-                <span>
-                  {currentClass.mana}/{currentClass.maxMana}
-                </span>
-              </div>
-              <div className='bg-muted relative h-2.5 overflow-hidden rounded-full'>
-                <div
-                  className='absolute inset-y-0 left-0 bg-blue-500 transition-all duration-300'
-                  style={{ width: `${(currentClass.mana / currentClass.maxMana) * 100}%` }}
-                />
+              <div className='space-y-3'>
+                <div>
+                  <div className='text-muted-foreground mb-1 flex justify-between text-xs'>
+                    <span>{t('inventory.health')}</span>
+                    <span>
+                      {currentClass.health}/{currentClass.maxHealth}
+                    </span>
+                  </div>
+                  <HealthBar current={currentClass.health} max={currentClass.maxHealth} showLabel={false} />
+                </div>
+
+                <div>
+                  <div className='text-muted-foreground mb-1 flex justify-between text-xs'>
+                    <span>{t('inventory.mana')}</span>
+                    <span>
+                      {currentClass.mana}/{currentClass.maxMana}
+                    </span>
+                  </div>
+                  <div className='bg-muted relative h-2.5 overflow-hidden rounded-full'>
+                    <div
+                      className='absolute inset-y-0 left-0 bg-blue-500 transition-all duration-300'
+                      style={{ width: `${(currentClass.mana / currentClass.maxMana) * 100}%` }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
