@@ -19,19 +19,6 @@ export const DICE_BANK_LIMITS: Record<number, number> = {
   10: 55
 }
 
-export const DICE_PER_TURN_LIMITS: Record<number, number> = {
-  1: 5,
-  2: 6,
-  3: 7,
-  4: 8,
-  5: 9,
-  6: 10,
-  7: 11,
-  8: 12,
-  9: 13,
-  10: 14
-}
-
 export const HABIT_STREAK_THRESHOLDS = [
   { days: 21, bonus: 3 },
   { days: 14, bonus: 2 },
