@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Minus, Plus } from '@nsmr/pixelart-react'
 import type { DiceRollResult } from '@shared/types/gamification.types'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import DiceResult from './DiceResult'
 
@@ -34,7 +34,11 @@ export default function DiceRoller({
   title
 }: DiceRollerProps) {
   const { t } = useTranslation()
-  const [selectedDice, setSelectedDice] = useState(Math.min(1, diceLimit))
+  const [selectedDice, setSelectedDice] = useState(diceLimit)
+
+  useEffect(() => {
+    setSelectedDice(diceLimit)
+  }, [diceLimit])
 
   const handleIncrement = () => {
     if (selectedDice < diceLimit) {
@@ -51,7 +55,7 @@ export default function DiceRoller({
   const handleRoll = () => {
     if (selectedDice > 0 && selectedDice <= diceLimit) {
       onRoll(selectedDice)
-      setSelectedDice(1)
+      setSelectedDice(diceLimit)
     }
   }
 
