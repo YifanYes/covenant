@@ -85,7 +85,7 @@ export default function CombatArena({
     }
   }, [pendingAttackRolls, pendingDefenseRolls, isAttacking, onAttack])
 
-  const showResults = !!(lastTurnResult && !isAttacking && !pendingAttackRolls && !pendingDefenseRolls)
+  const showResults = !!(lastTurnResult && !isAttacking && !pendingAttackRolls && !pendingDefenseRolls && !isAdvancing)
 
   if (!currentClass) return null
 
@@ -195,13 +195,15 @@ export default function CombatArena({
           isAdvancing={isWaitingForResolve || isAdvancing}
           nextPhaseLabel={nextPhaseLabel}
           customButtonLabel={rollButtonLabel}
-          title={pendingDefenseRolls ? t('combat.to_battle') : undefined}
+          title={isAttacking ? t('combat.to_battle') : undefined}
           diceLimit={diceLimit}
         />
 
         <div className='space-y-4 text-center'>
           {/* Show attack dice block - pending (rolling locally) OR submitted (waiting for backend) OR resolved */}
-          {(pendingAttackRolls || submittedAttackRolls || (showResults && lastTurnResult)) && (
+          {(pendingAttackRolls ||
+            (isAttacking && submittedAttackRolls) ||
+            (showResults && !!lastTurnResult?.playerAttackRolls?.length)) && (
             <div className='rounded-lg border p-4'>
               <div className='mb-2 text-sm font-medium'>{t('combat.attack_rolls')}</div>
               <div className='flex flex-wrap justify-center gap-2'>
@@ -212,7 +214,9 @@ export default function CombatArena({
           )}
 
           {/* Show defense dice block - pending (rolling locally) OR submitted (waiting for backend) OR resolved */}
-          {(pendingDefenseRolls || submittedDefenseRolls || (showResults && lastTurnResult)) && (
+          {(pendingDefenseRolls ||
+            (isAttacking && submittedDefenseRolls) ||
+            (showResults && !!lastTurnResult?.playerDefenseRolls?.length)) && (
             <div className='rounded-lg border p-4'>
               <div className='mb-2 text-sm font-medium'>{t('combat.defense_rolls')}</div>
               <div className='flex flex-wrap justify-center gap-2'>
