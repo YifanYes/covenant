@@ -288,6 +288,7 @@
     "armory": "Armory",
     "class": "Class",
     "damage_type": {
+      "BOTH": "Both",
       "MAGIC": "Magic",
       "PHYSICAL": "Physical"
     },
