@@ -12,7 +12,8 @@
     "tabs": {
       "history": "Historial",
       "inventory": "Inventario",
-      "missions": "Misiones"
+      "missions": "Misiones",
+      "store": "Tienda"
     },
     "tier_locked": "Requiere Tier {{tier}}",
     "title": "Aventura"
@@ -346,6 +347,17 @@
     },
     "tier": "Tier",
     "title": "Inventario"
+  },
+  "item_categories": {
+    "rarity": {
+      "common": "Común",
+      "legendary": "Legendario",
+      "rare": "Raro"
+    },
+    "type": {
+      "armor": "Armadura",
+      "weapon": "Arma"
+    }
   },
   "items": {
     "advanced_revolver": {
@@ -694,6 +706,29 @@
     "success_message": "Te hemos enviado un correo de vertificación. Comprueba tu bandeja de entrada.",
     "success_title": "¡Cuenta creada!",
     "title": "Crear una cuenta en ARQ"
+  },
+  "store": {
+    "buy": "Comprar",
+    "buying": "Comprando...",
+    "cart": "Carrito",
+    "empty_cart": "Tu carrito está vacío",
+    "error": {
+      "buy": "Error al comprar los objetos"
+    },
+    "filter": {
+      "all_tiers": "Todos los Tiers",
+      "all_types": "Todos los Tipos",
+      "tier": "Tier",
+      "type": "Tipo"
+    },
+    "items_purchased": "objetos comprados",
+    "no_items": "No hay objetos disponibles",
+    "success": {
+      "buy": "¡Compra exitosa!"
+    },
+    "tier": "Tier",
+    "title": "Tienda",
+    "total": "Total"
   },
   "task_status": {
     "DOING": "En progreso",
