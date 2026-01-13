@@ -1,3 +1,4 @@
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import {
   ItemType,
@@ -6,7 +7,7 @@ import {
   type EnemyState,
   type InventoryCharacter
 } from '@shared/types/gamification.types'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CombatLog from './CombatLog'
 import DiceResult from './DiceResult'
@@ -28,6 +29,8 @@ interface CombatArenaProps {
   className?: string
 }
 
+const RESOLVE_DELAY_MS = 500
+
 export default function CombatArena({
   character,
   enemies,
@@ -42,9 +45,12 @@ export default function CombatArena({
   className
 }: CombatArenaProps) {
   const { t } = useTranslation()
-  const [pendingAttackRolls, setPendingAttackRolls] = useState<number[] | null>(null)
-  const [pendingDefenseRolls, setPendingDefenseRolls] = useState<number[] | null>(null)
+  const [pendingAttackRolls, setPendingAttackRolls] = useState<number[] | undefined>()
+  const [pendingDefenseRolls, setPendingDefenseRolls] = useState<number[] | undefined>()
+  const [submittedAttackRolls, setSubmittedAttackRolls] = useState<number[] | undefined>()
+  const [submittedDefenseRolls, setSubmittedDefenseRolls] = useState<number[] | undefined>()
   const [submittedCost, setSubmittedCost] = useState(0)
+  const isResolvingRef = useRef(false)
 
   const currentClass = character.classes.find((c) => c.className === character.currentClass)
 
@@ -58,7 +64,33 @@ export default function CombatArena({
     return Math.max(0, diceBank - usedDice)
   }, [diceBank, isAttacking, submittedCost, pendingAttackRolls, pendingDefenseRolls])
 
+  // Auto-resolve after defense rolls are set with a delay
+  useEffect(() => {
+    if (pendingAttackRolls && pendingDefenseRolls && !isResolvingRef.current && !isAttacking) {
+      isResolvingRef.current = true
+      const timer = setTimeout(() => {
+        // Transfer pending to submitted (keep them visible while waiting for backend)
+        setSubmittedAttackRolls(pendingAttackRolls)
+        setSubmittedDefenseRolls(pendingDefenseRolls)
+        setSubmittedCost(pendingAttackRolls.length + pendingDefenseRolls.length)
+        onAttack({ attackRolls: pendingAttackRolls, defenseRolls: pendingDefenseRolls })
+        setPendingAttackRolls(undefined)
+        setPendingDefenseRolls(undefined)
+        isResolvingRef.current = false
+      }, RESOLVE_DELAY_MS)
+      return () => {
+        clearTimeout(timer)
+        isResolvingRef.current = false
+      }
+    }
+  }, [pendingAttackRolls, pendingDefenseRolls, isAttacking, onAttack])
+
+  const showResults = !!(lastTurnResult && !isAttacking && !pendingAttackRolls && !pendingDefenseRolls)
+
   if (!currentClass) return null
+
+  const rollButtonLabel = pendingAttackRolls ? t('combat.roll_defense') : t('combat.roll_attack')
+  const isWaitingForResolve = !!(pendingAttackRolls && pendingDefenseRolls) || isAttacking
 
   // Find equipped items
   const armor = character?.loadout?.find((item) => item.type === ItemType.ARMOR)
@@ -70,25 +102,43 @@ export default function CombatArena({
   )
   const weaponDice = weapon?.stats?.attackDice || 1
 
-  const diceLimit = !pendingAttackRolls ? Math.min(diceBank, weaponDice) : armorDice
+  const diceLimit = Math.min(diceBank, !pendingAttackRolls ? weaponDice : armorDice)
 
   const targetEnemy = enemies.find((e) => e.currentHealth > 0)
 
-  const handleRoll = (count: number) =>
-    (!pendingAttackRolls ? setPendingAttackRolls : setPendingDefenseRolls)(
-      Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1)
-    )
-
-  const handleResolve = () => {
-    if (!pendingAttackRolls || !pendingDefenseRolls) return
-
-    setSubmittedCost(pendingAttackRolls.length + pendingDefenseRolls.length)
-    onAttack({ attackRolls: pendingAttackRolls, defenseRolls: pendingDefenseRolls })
-    setPendingAttackRolls(null)
-    setPendingDefenseRolls(null)
+  const handleRoll = (count: number) => {
+    if (!pendingAttackRolls) {
+      // Clear previous turn's submitted rolls when starting a new turn
+      setSubmittedAttackRolls(undefined)
+      setSubmittedDefenseRolls(undefined)
+      setSubmittedCost(0)
+      setPendingAttackRolls(Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1))
+    } else {
+      const defenseRolls = Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1)
+      setPendingDefenseRolls(defenseRolls)
+    }
   }
 
-  const rollButtonLabel = pendingAttackRolls ? t('combat.roll_defense') : t('combat.roll_attack')
+  const renderDice = (
+    pending?: number[],
+    submitted?: number[],
+    resolved?: { value: number; isSuccess: boolean; isCritical: boolean }[],
+    prefix: string = 'dice'
+  ) => {
+    if (pending) {
+      return pending.map((v, i) => (
+        <DiceResult key={`${prefix}-p-${i}`} value={v} isSuccess={false} isCritical={false} isRolling />
+      ))
+    }
+    if (isAttacking && submitted) {
+      return submitted.map((v, i) => (
+        <DiceResult key={`${prefix}-s-${i}`} value={v} isSuccess={false} isCritical={false} isRolling />
+      ))
+    }
+    return resolved?.map((r, i) => (
+      <DiceResult key={`${prefix}-${i}`} value={r.value} isSuccess={r.isSuccess} isCritical={r.isCritical} />
+    ))
+  }
 
   return (
     <div className={cn('grid gap-4 lg:grid-cols-[1fr_3fr]', className)}>
@@ -140,67 +190,36 @@ export default function CombatArena({
         <DiceRoller
           diceBank={tempDiceBank}
           onRoll={handleRoll}
-          isRolling={isAttacking}
-          onNextPhase={pendingDefenseRolls ? handleResolve : onNextPhase}
-          isAdvancing={isAttacking || isAdvancing}
-          nextPhaseLabel={pendingDefenseRolls ? t('combat.resolve_turn') : nextPhaseLabel}
+          isRolling={isWaitingForResolve}
+          onNextPhase={!pendingAttackRolls && !pendingDefenseRolls && !isWaitingForResolve ? onNextPhase : undefined}
+          isAdvancing={isWaitingForResolve || isAdvancing}
+          nextPhaseLabel={nextPhaseLabel}
           customButtonLabel={rollButtonLabel}
           title={pendingDefenseRolls ? t('combat.to_battle') : undefined}
           diceLimit={diceLimit}
         />
 
         <div className='space-y-4 text-center'>
-          {pendingAttackRolls && !isAttacking && (
-            <div className='text-muted-foreground animate-pulse text-sm font-medium'>
-              {t('combat.attack_set', { count: pendingAttackRolls.length })}
-            </div>
-          )}
-
-          {pendingDefenseRolls && !isAttacking && (
-            <div className='text-muted-foreground animate-pulse text-sm font-medium'>
-              {t('combat.defense_set', { count: pendingDefenseRolls.length })}
-            </div>
-          )}
-
-          {isAttacking && (
-            <div className='flex flex-col items-center justify-center gap-2'>
-              <div className='animate-dice-flip' />
-              <div className='text-muted-foreground animate-pulse text-sm font-medium'>
-                {t('combat.resolving_turn')}
+          {/* Show attack dice block - pending (rolling locally) OR submitted (waiting for backend) OR resolved */}
+          {(pendingAttackRolls || submittedAttackRolls || (showResults && lastTurnResult)) && (
+            <div className='rounded-lg border p-4'>
+              <div className='mb-2 text-sm font-medium'>{t('combat.attack_rolls')}</div>
+              <div className='flex flex-wrap justify-center gap-2'>
+                {/* Priority: pending > submitted > resolved */}
+                {renderDice(pendingAttackRolls, submittedAttackRolls, lastTurnResult?.playerAttackRolls, 'atk')}
               </div>
             </div>
           )}
 
-          {!pendingAttackRolls && !pendingDefenseRolls && !isAttacking && lastTurnResult && (
-            <>
-              <div className='rounded-lg border p-4'>
-                <div className='mb-2 text-sm font-medium'>{t('combat.attack_rolls')}</div>
-                <div className='flex flex-wrap justify-center gap-2'>
-                  {lastTurnResult.playerAttackRolls.map((result, i) => (
-                    <DiceResult
-                      key={`atk-${i}`}
-                      value={result.value}
-                      isSuccess={result.isSuccess}
-                      isCritical={result.isCritical}
-                    />
-                  ))}
-                </div>
+          {/* Show defense dice block - pending (rolling locally) OR submitted (waiting for backend) OR resolved */}
+          {(pendingDefenseRolls || submittedDefenseRolls || (showResults && lastTurnResult)) && (
+            <div className='rounded-lg border p-4'>
+              <div className='mb-2 text-sm font-medium'>{t('combat.defense_rolls')}</div>
+              <div className='flex flex-wrap justify-center gap-2'>
+                {/* Priority: pending > submitted > resolved */}
+                {renderDice(pendingDefenseRolls, submittedDefenseRolls, lastTurnResult?.playerDefenseRolls, 'def')}
               </div>
-
-              <div className='rounded-lg border p-4'>
-                <div className='mb-2 text-sm font-medium'>{t('combat.defense_rolls')}</div>
-                <div className='flex flex-wrap justify-center gap-2'>
-                  {lastTurnResult.playerDefenseRolls.map((result, i) => (
-                    <DiceResult
-                      key={`def-${i}`}
-                      value={result.value}
-                      isSuccess={result.isSuccess}
-                      isCritical={result.isCritical}
-                    />
-                  ))}
-                </div>
-              </div>
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -209,14 +228,16 @@ export default function CombatArena({
       <div className='flex flex-col gap-4'>
         <div className='rounded-lg border p-4'>
           <h3 className='mb-3 font-semibold'>{t('combat.enemies')}</h3>
-          <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
-            {enemies.map((enemy) => (
-              <EnemyCard key={enemy.id} enemy={enemy} isTarget={targetEnemy?.id === enemy.id} />
-            ))}
-          </div>
+          <ScrollArea className='h-full max-h-[264px]'>
+            <div className='grid gap-3 pr-4 sm:grid-cols-2 lg:grid-cols-3'>
+              {enemies.map((enemy) => (
+                <EnemyCard key={enemy.id} enemy={enemy} isTarget={targetEnemy?.id === enemy.id} />
+              ))}
+            </div>
+          </ScrollArea>
         </div>
 
-        <CombatLog entries={combatLog} className='max-h-[500px] min-h-[300px]' />
+        <CombatLog entries={combatLog} className='max-h-[350px] min-h-[300px]' />
       </div>
     </div>
   )
