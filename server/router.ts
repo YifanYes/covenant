@@ -5,6 +5,7 @@ import { dashboardRouter } from './routers/dashboard.router'
 import { habitsRouter } from './routers/habits.router'
 import { missionsRouter } from './routers/missions.router'
 import { objectivesRouter } from './routers/objectives.router'
+import { storeRouter } from './routers/store.router'
 import { tasksRouter } from './routers/tasks.router'
 import { publicProcedure, t } from './trpc'
 
@@ -21,7 +22,8 @@ export const appRouter = t.router({
   tasks: tasksRouter,
   habits: habitsRouter,
   dashboard: dashboardRouter,
-  missions: missionsRouter
+  missions: missionsRouter,
+  store: storeRouter
 })
 
 export type AppRouter = typeof appRouter
