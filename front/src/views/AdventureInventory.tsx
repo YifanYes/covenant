@@ -55,7 +55,7 @@ export default function AdventureInventory() {
   }
 
   return (
-    <div className='flex h-full w-full flex-col gap-6 overflow-hidden'>
+    <div className='flex h-full w-full flex-col gap-6 overflow-auto pr-4'>
       <div className='grid shrink-0 grid-cols-1 gap-6 lg:grid-cols-[2fr_2fr_2fr]'>
         <CharacterPreview character={character} />
         <LoadoutPanel character={character} onUnequip={handleUnequipItem} />

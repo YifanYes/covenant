@@ -16,8 +16,8 @@ export default function AdventureHistory() {
   const selectedMission = !isPending && missions.find((m) => m.id === selectedMissionId)
 
   return (
-    <div className='flex h-full min-h-0 w-full gap-4 overflow-hidden'>
-      <Card className='bg-background/50 flex max-h-[calc(100vh-180px)] w-1/3 flex-col gap-0 overflow-hidden rounded-lg py-0 backdrop-blur-sm'>
+    <div className='flex h-full w-full gap-4 overflow-hidden pr-4'>
+      <Card className='bg-background/50 flex h-full w-1/3 flex-col gap-0 overflow-hidden rounded-lg py-0 backdrop-blur-sm'>
         <div className='flex items-center gap-2 border-b p-4'>
           <ScriptText className='text-primary h-5 w-5' />
           <h2 className='font-semibold'>{t('adventure.history.title')}</h2>
@@ -59,7 +59,7 @@ export default function AdventureHistory() {
         </div>
       </Card>
 
-      <Card className='bg-background/50 flex max-h-[calc(100vh-180px)] flex-1 flex-col gap-0 overflow-hidden rounded-lg py-0 backdrop-blur-sm'>
+      <Card className='bg-background/50 flex h-full flex-1 flex-col gap-0 overflow-hidden rounded-lg py-0 backdrop-blur-sm'>
         {selectedMission ? (
           <>
             <div className='flex items-center justify-between border-b p-4'>

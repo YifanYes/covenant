@@ -33,7 +33,7 @@ export default function InventoryGrid({ character, selectedItemId, onItemClick }
   }, [character?.inventory, character?.loadout])
 
   return (
-    <Card className='flex min-h-[200px] w-full flex-1 flex-col gap-0'>
+    <Card className='flex h-fit w-full flex-1 flex-col gap-0'>
       <CardHeader className='flex shrink-0 flex-row items-center justify-between pb-2'>
         <CardTitle className='flex items-center gap-2 text-sm font-medium'>
           <Group className='h-4 w-4' />

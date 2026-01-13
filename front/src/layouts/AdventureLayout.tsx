@@ -38,12 +38,12 @@ export default function AdventureLayout() {
   }
 
   return (
-    <div className='flex h-full w-full flex-col gap-4 overflow-hidden p-6'>
+    <div className='flex h-[calc(100vh-1rem)] w-full flex-col gap-4 overflow-hidden px-6 py-4 pr-2'>
       <div className='flex shrink-0 items-center justify-between'>
         <h1 className='text-3xl font-bold'>{t('adventure.title')}</h1>
       </div>
 
-      <Tabs value={activeTab} className='flex h-full flex-col overflow-hidden'>
+      <Tabs value={activeTab} className='flex min-h-0 flex-1 flex-col overflow-hidden'>
         <TabsList className='shrink-0'>
           <TabsTrigger value='inventory' asChild>
             <Link to='/adventure/inventory'>
@@ -65,7 +65,7 @@ export default function AdventureLayout() {
           </TabsTrigger>
         </TabsList>
 
-        <div className='mt-4 flex flex-1 overflow-hidden'>
+        <div className='mt-4 min-h-0 flex-1 overflow-hidden'>
           <Outlet />
         </div>
       </Tabs>
