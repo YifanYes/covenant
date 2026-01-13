@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils'
-import { DICE_PER_TURN_LIMITS } from '@shared/constants/dice.constants'
 import {
   ItemType,
   type CombatLogEntry,
@@ -61,11 +60,17 @@ export default function CombatArena({
 
   if (!currentClass) return null
 
-  // Find the first alive enemy (target)
+  // Find equipped items
   const armor = character?.loadout?.find((item) => item.type === ItemType.ARMOR)
   const armorDice = armor?.stats?.physDef || armor?.stats?.magicDef || 1
 
-  const diceLimit = !pendingAttackRolls ? Math.min(diceBank, DICE_PER_TURN_LIMITS[character.tier] || 5) : armorDice
+  const weapon = character?.loadout?.find(
+    (item) =>
+      item.type === ItemType.WEAPON_MELEE || item.type === ItemType.WEAPON_RANGED || item.type === ItemType.WEAPON_MAGIC
+  )
+  const weaponDice = weapon?.stats?.attackDice || 1
+
+  const diceLimit = !pendingAttackRolls ? Math.min(diceBank, weaponDice) : armorDice
 
   const targetEnemy = enemies.find((e) => e.currentHealth > 0)
 
