@@ -288,6 +288,7 @@
     "armory": "Armería",
     "class": "Clase",
     "damage_type": {
+      "BOTH": "Ambos",
       "MAGIC": "Mágico",
       "PHYSICAL": "Físico"
     },

@@ -134,18 +134,33 @@
   }
 }
 
-@keyframes play-sprite {
-  100% {
-    background-position: -1024px 0;
-  }
+/* Color overlays for dice results */
+.dice-success {
+  position: relative;
+}
+.dice-success::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgb(16 185 129 / 0.3);
 }
 
-.animate-dice-flip {
-  width: 124px;
-  height: 124px;
-  background-image: url('/assets/dice-animation-spritesheet.png');
-  background-repeat: no-repeat;
-  animation: play-sprite 1s steps(8) infinite;
-  image-rendering: pixelated;
-  zoom: 0.75;
+.dice-critical {
+  position: relative;
+}
+.dice-critical::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgb(234 179 8 / 0.4);
+}
+
+.dice-fail {
+  position: relative;
+}
+.dice-fail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgb(239 68 68 / 0.25);
 }
