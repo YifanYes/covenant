@@ -6,11 +6,16 @@ import { useTranslation } from 'react-i18next'
 interface StoreItemTooltipProps {
   item: ItemDefinition
   children: React.ReactNode
-  isTierRestricted: boolean
-  characterTier: number
+  isTierRestricted?: boolean
+  characterTier?: number
 }
 
-export default function StoreItemTooltip({ item, children, isTierRestricted, characterTier }: StoreItemTooltipProps) {
+export default function StoreItemTooltip({
+  item,
+  children,
+  isTierRestricted = false,
+  characterTier = 1
+}: StoreItemTooltipProps) {
   const { t } = useTranslation()
 
   const itemName = t(`items.${item.id}.name`, { defaultValue: item.name })
