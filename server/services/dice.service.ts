@@ -1,5 +1,5 @@
 import { getMaxDiceForTier } from '@shared/constants/dice.constants'
-import { CharacterWithClasses } from '@shared/types/character.types'
+import type { CharacterWithClasses } from '@shared/types/character.types'
 import type { DiceAddResult } from '@shared/types/dice.types'
 import type { PrismaClient } from '../generated/prisma'
 import { CharacterRepository } from '../repositories/character.repository'
@@ -7,8 +7,8 @@ import { CharacterRepository } from '../repositories/character.repository'
 export class DiceService {
   private characterRepository: CharacterRepository
 
-  constructor(private prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(prisma)
+  constructor(private _prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(_prisma)
   }
 
   async addDiceToBank(userId: string, amount: number): Promise<DiceAddResult> {

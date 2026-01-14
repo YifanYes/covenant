@@ -7,9 +7,9 @@ export class ObjectiveService {
   private diceService: DiceService
   private objectiveRepository: ObjectiveRepository
 
-  constructor(private prisma: PrismaClient) {
-    this.diceService = new DiceService(prisma)
-    this.objectiveRepository = new ObjectiveRepository(prisma)
+  constructor(private _prisma: PrismaClient) {
+    this.diceService = new DiceService(_prisma)
+    this.objectiveRepository = new ObjectiveRepository(_prisma)
   }
 
   async create(userId: string, input: CreateObjectiveBodyType) {

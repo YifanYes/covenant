@@ -1,7 +1,11 @@
 import { CharacterClassName, CLASS_INITIAL_STATS } from '@shared/constants/classes'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
-import { CharacterWithClasses, CharacterWithClassesAndParty, CharacterWithParty } from '@shared/types/character.types'
+import type {
+  CharacterWithClasses,
+  CharacterWithClassesAndParty,
+  CharacterWithParty
+} from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
 import { type Character, type CharacterClass, type PrismaClient } from '../generated/prisma'
 

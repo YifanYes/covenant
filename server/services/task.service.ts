@@ -8,9 +8,9 @@ export class TaskService {
   private diceService: DiceService
   private taskRepository: TaskRepository
 
-  constructor(private prisma: PrismaClient) {
-    this.diceService = new DiceService(prisma)
-    this.taskRepository = new TaskRepository(prisma)
+  constructor(private _prisma: PrismaClient) {
+    this.diceService = new DiceService(_prisma)
+    this.taskRepository = new TaskRepository(_prisma)
   }
 
   async create(userId: string, input: CreateTaskType) {

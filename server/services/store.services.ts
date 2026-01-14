@@ -1,6 +1,6 @@
 import { ALL_ITEMS, createInventoryItem, getItemById } from '@shared/constants/items'
 import type { InventoryItem } from '@shared/types/gamification.types'
-import { PurchaseResult, StoreListResult } from '@shared/types/store.types'
+import type { PurchaseResult, StoreListResult } from '@shared/types/store.types'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '../generated/prisma'
 import { CharacterRepository } from '../repositories/character.repository'
@@ -8,8 +8,8 @@ import { CharacterRepository } from '../repositories/character.repository'
 export class StoreService {
   private characterRepository: CharacterRepository
 
-  constructor(private prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(prisma)
+  constructor(private _prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(_prisma)
   }
 
   async listAvailableItems(userId: string): Promise<StoreListResult> {

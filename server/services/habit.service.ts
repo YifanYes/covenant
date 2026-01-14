@@ -8,9 +8,9 @@ export class HabitService {
   private diceService: DiceService
   private habitRepository: HabitRepository
 
-  constructor(private prisma: PrismaClient) {
-    this.diceService = new DiceService(prisma)
-    this.habitRepository = new HabitRepository(prisma)
+  constructor(private _prisma: PrismaClient) {
+    this.diceService = new DiceService(_prisma)
+    this.habitRepository = new HabitRepository(_prisma)
   }
 
   async create(userId: string, input: CreateHabitType) {
