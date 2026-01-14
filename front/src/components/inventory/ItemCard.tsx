@@ -10,15 +10,15 @@ interface ItemCardProps {
 }
 
 const rarityBorderColors = {
-  COMMON: 'border-gray-500',
-  RARE: 'border-purple-500',
-  LEGENDARY: 'border-yellow-500'
+  [ItemRarity.COMMON]: 'border-gray-500',
+  [ItemRarity.RARE]: 'border-purple-500',
+  [ItemRarity.LEGENDARY]: 'border-yellow-500'
 }
 
 const rarityGlowColors = {
-  COMMON: '',
-  RARE: 'shadow-purple-500/20',
-  LEGENDARY: 'shadow-yellow-500/30'
+  [ItemRarity.COMMON]: '',
+  [ItemRarity.RARE]: 'shadow-purple-500/20',
+  [ItemRarity.LEGENDARY]: 'shadow-yellow-500/30'
 }
 
 export default function ItemCard({ item, isSelected, onClick }: ItemCardProps) {
