@@ -26,6 +26,7 @@ const Tasks = lazy(() => import('./views/Tasks'))
 const AdventureInventory = lazy(() => import('./views/AdventureInventory'))
 const AdventureMissions = lazy(() => import('./views/AdventureMissions'))
 const AdventureHistory = lazy(() => import('./views/AdventureHistory'))
+const AdventureStore = lazy(() => import('./views/AdventureStore'))
 const MissionDetail = lazy(() => import('./views/MissionDetail'))
 
 export const Router = () => {
@@ -125,6 +126,14 @@ export const Router = () => {
                   element={
                     <Suspense fallback={<AdventureSuspenseFallback />}>
                       <AdventureHistory />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path='store'
+                  element={
+                    <Suspense fallback={<AdventureSuspenseFallback />}>
+                      <AdventureStore />
                     </Suspense>
                   }
                 />

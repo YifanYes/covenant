@@ -12,7 +12,8 @@
     "tabs": {
       "history": "History",
       "inventory": "Inventory",
-      "missions": "Missions"
+      "missions": "Missions",
+      "store": "Store"
     },
     "tier_locked": "Requires Tier {{tier}}",
     "title": "Adventure"
@@ -346,6 +347,17 @@
     },
     "tier": "Tier",
     "title": "Inventory"
+  },
+  "item_categories": {
+    "rarity": {
+      "common": "Common",
+      "legendary": "Legendary",
+      "rare": "Rare"
+    },
+    "type": {
+      "armor": "Armor",
+      "weapon": "Weapon"
+    }
   },
   "items": {
     "advanced_revolver": {
@@ -694,6 +706,29 @@
     "success_message": "We have sent you a verification email. Please check your inbox.",
     "success_title": "Account created!",
     "title": "Create an ARQ account"
+  },
+  "store": {
+    "buy": "Buy",
+    "buying": "Buying...",
+    "cart": "Cart",
+    "empty_cart": "Your cart is empty",
+    "error": {
+      "buy": "Failed to purchase items"
+    },
+    "filter": {
+      "all_tiers": "All Tiers",
+      "all_types": "All Types",
+      "tier": "Tier",
+      "type": "Type"
+    },
+    "items_purchased": "items purchased",
+    "no_items": "No items available",
+    "success": {
+      "buy": "Purchase successful!"
+    },
+    "tier": "Tier",
+    "title": "Store",
+    "total": "Total"
   },
   "task_status": {
     "DOING": "In Progress",
