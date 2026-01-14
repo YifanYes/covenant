@@ -6,7 +6,11 @@ The project is a monorepo managed with workspaces:
 
 - **/shared**: Shared logic, Zod schemas, and tRPC types. Essential for end-to-end type safety.
 - **/front**: React 19 + Vite + Tailwind CSS v4.
-- **/server**: Bun + tRPC + Fastify + Prisma + PostgreSQL.
+- **/server**: Bun + tRPC + Fastify + Prisma + PostgreSQL. Follows a layered architecture:
+  - **Routers**: Protocol handling and validation.
+  - **Services**: Business logic and orchestration.
+  - **Repositories**: Direct data access using Prisma.
+  - **ServiceFactory**: Lazily initializes and provides services to the request context.
 
 ## 2. Naming Conventions
 
@@ -26,9 +30,14 @@ The project is a monorepo managed with workspaces:
 
 ## 4. Backend & Type Safety
 
-- **tRPC Procedures**: Define all inputs and outputs using Zod schemas located in the `@arq/shared` workspace.
-- **Shared Logic**: Place all Zod schemas, shared types, and constants in `/shared` to maintain end-to-end consistency.
+- **Layered Architecture**:
+  - **Routers** must be lean. They only handle input validation (via Zod) and call service methods.
+  - **Services** contain business logic. They should be class-based and receive their dependencies (like repositories or other services) via constructor injection.
+  - **Repositories** handle Prisma queries. Each entity (e.g., Task, Habit) should have its own repository in `server/repositories`.
+- **Dependency Injection**: Use `server/services/service.factory.ts` to manage service instantiation. Access services in tRPC procedures via `ctx.services`.
+- **Source of Truth**: All Zod schemas MUST be in the `@shared` workspace. Use `z.infer` to generate TypeScript types from these schemas to ensure end-to-end type safety.
 - **Database**: Use Prisma for all database operations. After schema changes, push them to Supabase using `npx prisma db push` and then run `npx prisma generate`. We're in development phase, so there's no production environment.
+- **Type Inference**: Prefer inferring types from Zod schemas in `shared/schemas` rather than declaring manual interfaces in service files.
 
 ## 5. State Management
 
