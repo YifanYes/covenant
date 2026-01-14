@@ -9,6 +9,8 @@ interface StoreItemCardProps {
   item: ItemDefinition
   isSelected: boolean
   canAfford: boolean
+  isTierRestricted: boolean
+  characterTier: number
   onToggle: () => void
 }
 
@@ -18,13 +20,20 @@ const rarityBorderColors: Record<ItemRarity, string> = {
   [ItemRarity.LEGENDARY]: 'border-yellow-500/50 bg-yellow-500/5'
 }
 
-export default function StoreItemCard({ item, isSelected, canAfford, onToggle }: StoreItemCardProps) {
+export default function StoreItemCard({
+  item,
+  isSelected,
+  canAfford,
+  isTierRestricted,
+  characterTier,
+  onToggle
+}: StoreItemCardProps) {
   const { t } = useTranslation()
-  const isDisabled = !canAfford && !isSelected
+  const isDisabled = (isTierRestricted || !canAfford) && !isSelected
   const itemImagePath = `/assets/items/${item.id}.png`
 
   return (
-    <StoreItemTooltip item={item}>
+    <StoreItemTooltip item={item} isTierRestricted={isTierRestricted} characterTier={characterTier}>
       <button
         onClick={onToggle}
         disabled={isDisabled}
