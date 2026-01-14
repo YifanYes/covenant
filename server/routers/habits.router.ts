@@ -4,211 +4,42 @@ import {
   habitIdSchema,
   updateHabitSchema
 } from '@shared/schemas/habits.schemas'
-import { TRPCError } from '@trpc/server'
-import { addDiceToBank, calculateHabitStreak } from '../services/dice.services'
-import { getUserHabit, getUserHabitCompletion } from '../services/habits.services'
 import { protectedProcedure, t } from '../trpc'
 
 export const habitsRouter = t.router({
   create: protectedProcedure.input(createHabitSchema).mutation(async ({ ctx, input }) => {
-    const habit = await ctx.prisma.habit.create({
-      data: {
-        name: input.name,
-        ...(input.description && { description: input.description }),
-        recurrence: input.recurrence,
-        timespan: input.timespan,
-        userId: ctx.user.id,
-        objectives: {
-          connect: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
-        }
-      },
-      include: {
-        objectives: true
-      }
-    })
-
-    return {
-      habit
-    }
+    return ctx.services.habit.create(ctx.user.id, input)
   }),
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
-    const habits = await ctx.prisma.habit.findMany({
-      where: {
-        userId: ctx.user.id,
-        deletedAt: null
-      },
-      include: {
-        objectives: true,
-        completions: {
-          orderBy: {
-            completedAt: 'desc'
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
-
-    return {
-      habits
-    }
+    return ctx.services.habit.getAll(ctx.user.id)
   }),
 
   getById: protectedProcedure.input(habitIdSchema).query(async ({ ctx, input }) => {
-    const habitWithDetails = await ctx.prisma.habit.findUnique({
-      where: {
-        id: input.id,
-        deletedAt: null
-      },
-      include: {
-        objectives: true,
-        completions: {
-          orderBy: {
-            completedAt: 'desc'
-          },
-          take: 20
-        }
-      }
-    })
-
-    if (!habitWithDetails) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Habit not found'
-      })
-    }
-
-    return {
-      habit: habitWithDetails
-    }
+    return ctx.services.habit.getById(ctx.user.id, input.id)
   }),
 
   update: protectedProcedure.input(updateHabitSchema).mutation(async ({ ctx, input }) => {
-    await getUserHabit(ctx.prisma, input.id, ctx.user.id)
-
-    const habit = await ctx.prisma.habit.update({
-      where: {
-        id: input.id
-      },
-      data: {
-        ...(input.name && { name: input.name }),
-        ...(input.description && { description: input.description }),
-        ...(input.recurrence && { recurrence: input.recurrence }),
-        ...(input.timespan && { timespan: input.timespan }),
-        objectives: {
-          set: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
-        }
-      },
-      include: {
-        objectives: true
-      }
-    })
-
-    return {
-      habit
-    }
+    return ctx.services.habit.update(ctx.user.id, input)
   }),
 
   delete: protectedProcedure.input(habitIdSchema).mutation(async ({ ctx, input }) => {
-    await getUserHabit(ctx.prisma, input.id, ctx.user.id)
-
-    await ctx.prisma.habit.update({
-      where: {
-        id: input.id
-      },
-      data: {
-        deletedAt: new Date()
-      }
-    })
-
-    return {
-      message: 'Habit deleted successfully'
-    }
+    return ctx.services.habit.delete(ctx.user.id, input.id)
   }),
 
   restore: protectedProcedure.input(habitIdSchema).mutation(async ({ ctx, input }) => {
-    await getUserHabit(ctx.prisma, input.id, ctx.user.id)
-
-    const restoredHabit = await ctx.prisma.habit.update({
-      where: {
-        id: input.id
-      },
-      data: {
-        deletedAt: null
-      },
-      include: {
-        objectives: true
-      }
-    })
-
-    return {
-      habit: restoredHabit,
-      message: 'Habit restored successfully'
-    }
+    return ctx.services.habit.restore(ctx.user.id, input.id)
   }),
 
   getDeleted: protectedProcedure.query(async ({ ctx }) => {
-    const deletedHabits = await ctx.prisma.habit.findMany({
-      where: {
-        userId: ctx.user.id,
-        deletedAt: {
-          not: null
-        }
-      },
-      include: {
-        objectives: true
-      },
-      orderBy: {
-        deletedAt: 'desc'
-      }
-    })
-
-    return {
-      habits: deletedHabits
-    }
+    return ctx.services.habit.getDeleted(ctx.user.id)
   }),
 
   createCompletion: protectedProcedure.input(habitIdSchema).mutation(async ({ ctx, input }) => {
-    await getUserHabit(ctx.prisma, input.id, ctx.user.id)
-
-    const completion = await ctx.prisma.habitCompletion.create({
-      data: { habitId: input.id, userId: ctx.user.id }
-    })
-
-    // Calculate streak and award dice
-    const completions = await ctx.prisma.habitCompletion.findMany({
-      where: { habitId: input.id, userId: ctx.user.id }
-    })
-    const streak = calculateHabitStreak(completions)
-
-    // Base 2 dice + streak bonus
-    let diceToAward = 2
-    if (streak >= 21) diceToAward += 3
-    else if (streak >= 14) diceToAward += 2
-    else if (streak >= 7) diceToAward += 1
-
-    const result = await addDiceToBank(ctx.prisma, ctx.user.id, diceToAward)
-
-    return {
-      completion,
-      diceEarned: result.earned,
-      streak
-    }
+    return ctx.services.habit.createCompletion(ctx.user.id, input.id)
   }),
 
   deleteCompletion: protectedProcedure.input(habitCompletionIdSchema).mutation(async ({ ctx, input }) => {
-    await getUserHabitCompletion(ctx.prisma, input.id, ctx.user.id)
-
-    await ctx.prisma.habitCompletion.delete({
-      where: {
-        id: input.id
-      }
-    })
-
-    return {
-      message: 'Habit completion deleted successfully'
-    }
+    return ctx.services.habit.deleteCompletion(ctx.user.id, input.id)
   })
 })

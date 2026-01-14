@@ -1,62 +1,20 @@
 import { createAreaSchema, deleteAreaSchema, updateAreaSchema } from '@shared/schemas/areas.schemas'
-import { getUserArea } from '../services/areas.services'
 import { protectedProcedure, t } from '../trpc'
 
 export const areasRouter = t.router({
   create: protectedProcedure.input(createAreaSchema).mutation(async ({ ctx, input }) => {
-    const area = await ctx.prisma.area.create({
-      data: {
-        name: input.name,
-        ...(input.color && { color: input.color }),
-        ...(input.icon && { icon: input.icon }),
-        userId: ctx.user.id
-      }
-    })
-
-    return {
-      area
-    }
+    return ctx.services.area.create(ctx.user.id, input)
   }),
+
   getAll: protectedProcedure.query(async ({ ctx }) => {
-    const areas = await ctx.prisma.area.findMany({
-      where: {
-        userId: ctx.user.id
-      }
-    })
-
-    return {
-      areas
-    }
+    return ctx.services.area.getAll(ctx.user.id)
   }),
+
   update: protectedProcedure.input(updateAreaSchema).mutation(async ({ ctx, input }) => {
-    await getUserArea(ctx.prisma, input.id, ctx.user.id)
-
-    const area = await ctx.prisma.area.update({
-      where: {
-        id: input.id
-      },
-      data: {
-        ...(input.name && { name: input.name }),
-        ...(input.color && { color: input.color }),
-        ...(input.icon && { icon: input.icon })
-      }
-    })
-
-    return {
-      area
-    }
+    return ctx.services.area.update(ctx.user.id, input)
   }),
+
   delete: protectedProcedure.input(deleteAreaSchema).mutation(async ({ ctx, input }) => {
-    await getUserArea(ctx.prisma, input.id, ctx.user.id)
-
-    await ctx.prisma.area.delete({
-      where: {
-        id: input.id
-      }
-    })
-
-    return {
-      message: 'Area deleted successfully'
-    }
+    return ctx.services.area.delete(ctx.user.id, input.id)
   })
 })
