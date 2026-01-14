@@ -71,7 +71,7 @@ export class HabitRepository {
     })
   }
 
-  async update(id: string, input: UpdateHabitType): Promise<Habit> {
+  async update(_id: string, input: UpdateHabitType): Promise<Habit> {
     return this.prisma.habit.update({
       where: { id: input.id },
       data: {

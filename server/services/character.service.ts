@@ -1,7 +1,7 @@
 import { getMaxDiceForTier } from '@shared/constants/dice.constants'
 import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
-import { CharacterClassType, CharacterProgress, CharacterWithClasses } from '@shared/types/character.types'
+import type { CharacterClassType, CharacterProgress, CharacterWithClasses } from '@shared/types/character.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '../generated/prisma'
@@ -12,9 +12,9 @@ export class CharacterService {
   private characterRepository: CharacterRepository
   private partyRepository: PartyRepository
 
-  constructor(private prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(prisma)
-    this.partyRepository = new PartyRepository(prisma)
+  constructor(private _prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(_prisma)
+    this.partyRepository = new PartyRepository(_prisma)
   }
 
   getCharacterProgress(character: CharacterWithClasses): CharacterProgress {

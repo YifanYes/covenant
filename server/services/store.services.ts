@@ -1,24 +1,28 @@
 import { ALL_ITEMS, createInventoryItem, getItemById } from '@shared/constants/items'
 import type { InventoryItem } from '@shared/types/gamification.types'
-import { PurchaseResult, StoreListResult } from '@shared/types/store.types'
+import type { PurchaseResult, StoreListResult } from '@shared/types/store.types'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '../generated/prisma'
 import { CharacterRepository } from '../repositories/character.repository'
+import { CharacterService } from './character.service'
 
 export class StoreService {
   private characterRepository: CharacterRepository
+  private characterService: CharacterService
 
-  constructor(private prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(prisma)
+  constructor(private _prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(_prisma)
+    this.characterService = new CharacterService(_prisma)
   }
 
   async listAvailableItems(userId: string): Promise<StoreListResult> {
-    const character = await this.characterRepository.findByUserId(userId)
+    const character = await this.characterRepository.findWithClasses(userId)
 
     if (!character) {
       throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${userId} not found` })
     }
 
+    const { tier } = this.characterService.getCharacterProgress(character)
     const inventory = (character.inventory as unknown as InventoryItem[]) || []
     const ownedItemIds = new Set(inventory.map((item) => item.definitionId))
 
@@ -27,16 +31,19 @@ export class StoreService {
 
     return {
       items: availableItems,
-      gold: character.gold
+      gold: character.gold,
+      characterTier: tier
     }
   }
 
   async purchaseItems(userId: string, itemIds: string[]): Promise<PurchaseResult> {
-    const character = await this.characterRepository.findByUserId(userId)
+    const character = await this.characterRepository.findWithClasses(userId)
 
     if (!character) {
       throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${userId} not found` })
     }
+
+    const { tier: characterTier } = this.characterService.getCharacterProgress(character)
 
     // Get item definitions and calculate total cost
     const itemsToBuy = itemIds.map((id) => {
@@ -46,6 +53,9 @@ export class StoreService {
       }
       if (item.price <= 0) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: `Item ${id} is not purchasable` })
+      }
+      if (item.tier > characterTier) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: `Item ${item.name} requires Tier ${item.tier}` })
       }
       return item
     })

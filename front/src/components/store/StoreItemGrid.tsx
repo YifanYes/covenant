@@ -7,10 +7,17 @@ interface StoreItemGridProps {
   itemsByTier: Record<number, ItemDefinition[]>
   selectedIds: Set<string>
   availableGold: number
+  characterTier: number
   onToggle: (itemId: string) => void
 }
 
-export default function StoreItemGrid({ itemsByTier, selectedIds, availableGold, onToggle }: StoreItemGridProps) {
+export default function StoreItemGrid({
+  itemsByTier,
+  selectedIds,
+  availableGold,
+  characterTier,
+  onToggle
+}: StoreItemGridProps) {
   const { t } = useTranslation()
   const sortedTiers = Object.entries(itemsByTier).sort(([a], [b]) => parseInt(a) - parseInt(b))
   const isEmpty = sortedTiers.length === 0
@@ -32,6 +39,8 @@ export default function StoreItemGrid({ itemsByTier, selectedIds, availableGold,
                   item={item}
                   isSelected={selectedIds.has(item.id)}
                   canAfford={canAfford(item.price)}
+                  isTierRestricted={item.tier > characterTier}
+                  characterTier={characterTier}
                   onToggle={() => onToggle(item.id)}
                 />
               ))}

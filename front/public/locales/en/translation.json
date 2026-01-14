@@ -727,6 +727,7 @@
       "buy": "Purchase successful!"
     },
     "tier": "Tier",
+    "tier_required": "Requires Tier {{tier}} (You are Tier {{current}})",
     "title": "Store",
     "total": "Total"
   },
