@@ -1,5 +1,5 @@
-import { ItemDefinition } from '../constants/items'
-import { InventoryItem } from './gamification.types'
+import type { ItemDefinition } from '../constants/items'
+import type { InventoryItem } from './gamification.types'
 
 export interface StoreListResult {
   items: ItemDefinition[]
