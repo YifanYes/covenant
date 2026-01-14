@@ -1,6 +1,7 @@
 import type { FastifyRequest } from 'fastify'
 import { prisma } from './lib/prisma'
 import { supabase } from './lib/supabase'
+import { ServiceFactory } from './services/service.factory'
 
 export async function createContext({ req }: { req: FastifyRequest }) {
   const authHeader = req.headers.authorization
@@ -12,7 +13,9 @@ export async function createContext({ req }: { req: FastifyRequest }) {
     if (!error) user = data.user
   }
 
-  return { user, supabase, prisma }
+  const services = new ServiceFactory(prisma, supabase)
+
+  return { user, supabase, prisma, services }
 }
 
 export type Context = Awaited<ReturnType<typeof createContext>>

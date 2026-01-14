@@ -1,0 +1,257 @@
+import { getMaxDiceForTier } from '@shared/constants/dice.constants'
+import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
+import type { CreateCharacterType } from '@shared/schemas/character.schemas'
+import { CharacterClassType, CharacterProgress, CharacterWithClasses } from '@shared/types/character.types'
+import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
+import { TRPCError } from '@trpc/server'
+import type { PrismaClient } from '../generated/prisma'
+import { CharacterRepository } from '../repositories/character.repository'
+import { PartyRepository } from '../repositories/party.repository'
+
+export class CharacterService {
+  private characterRepository: CharacterRepository
+  private partyRepository: PartyRepository
+
+  constructor(private prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(prisma)
+    this.partyRepository = new PartyRepository(prisma)
+  }
+
+  getCharacterProgress(character: CharacterWithClasses): CharacterProgress {
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    const tier = currentClass?.tier || 1
+    const missionProgress = (currentClass?.missionProgress as Record<string, number>) || {}
+    const maxDice = getMaxDiceForTier(tier)
+    const diceBank = (character.data as any)?.diceBank || 0
+
+    return {
+      currentClass: currentClass as unknown as CharacterClassType | undefined,
+      tier,
+      missionProgress,
+      maxDice,
+      diceBank
+    }
+  }
+
+  async createCharacter(userId: string, input: CreateCharacterType) {
+    const randomPartyName = this.createRandomPartyName()
+
+    const party = await this.partyRepository.create(randomPartyName)
+    const character = await this.characterRepository.create(userId, input, party.id)
+    await this.characterRepository.createAreas(userId)
+
+    return character
+  }
+
+  async getCurrentClass(userId: string) {
+    const character = await this.characterRepository.findWithClasses(userId)
+    if (!character) return null
+
+    const { maxDice, tier } = this.getCharacterProgress(character)
+
+    return {
+      id: character.id,
+      name: character.name,
+      title: character.title,
+      orderName: character.orderName,
+      magicNature: character.magicNature,
+      currentClass: character.currentClass,
+      data: character.data as any,
+      gold: character.gold,
+      maxDice,
+      tier,
+      inventory: character.inventory as unknown,
+      loadout: character.loadout as unknown,
+      classes: character.classes.map((c) => ({
+        id: c.id,
+        className: c.className,
+        tier: c.tier,
+        missionProgress: c.missionProgress as Record<string, number>,
+        health: c.health,
+        mana: c.mana,
+        maxHealth: c.maxHealth,
+        maxMana: c.maxMana,
+        strengthAtk: c.strengthAtk,
+        strengthDef: c.strengthDef,
+        magicAtk: c.magicAtk,
+        magicDef: c.magicDef,
+        manaRegen: c.manaRegen
+      }))
+    }
+  }
+
+  async switchClass(userId: string, className: string) {
+    const character = await this.characterRepository.findWithClassesOrThrow(userId)
+
+    let characterClass = character.classes.find((c) => c.className === className)
+
+    if (!characterClass) {
+      characterClass = await this.characterRepository.createClass(character.id, className)
+    }
+
+    const updatedCharacter = await this.characterRepository.updateCurrentClass(character.id, className)
+
+    return updatedCharacter
+  }
+
+  async equipItem(userId: string, itemId: string): Promise<{ success: boolean }> {
+    const character = await this.characterRepository.findByUserIdOrThrow(userId)
+
+    const inventory = (character.inventory as unknown as InventoryItem[]) || []
+    const loadout = (character.loadout as unknown as InventoryItem[]) || []
+
+    let itemToEquip: InventoryItem | undefined
+    let itemIndex = inventory.findIndex((item) => item.id === itemId)
+
+    if (itemIndex !== -1) {
+      itemToEquip = inventory[itemIndex]
+    } else {
+      const tier1Definition = TIER_1_ITEMS.find((def) => def.id === itemId)
+      if (tier1Definition) {
+        itemToEquip = {
+          ...createInventoryItem(tier1Definition),
+          id: tier1Definition.id
+        }
+      }
+    }
+
+    if (!itemToEquip) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Item ${itemId} not found` })
+    }
+
+    const slotType = this.getSlotType(itemToEquip.type)
+
+    const existingItemIndex = loadout.findIndex((item) => {
+      const existingSlot = this.getSlotType(item.type)
+      return existingSlot === slotType
+    })
+
+    const newInventory = [...inventory]
+    if (itemIndex !== -1) {
+      newInventory.splice(itemIndex, 1)
+    }
+
+    const newLoadout = [...loadout]
+    if (existingItemIndex !== -1) {
+      const existingItem = newLoadout[existingItemIndex]
+      const isTier1 = TIER_1_ITEMS.some((def) => def.id === existingItem.definitionId)
+      if (!isTier1) {
+        newInventory.push(existingItem)
+      }
+      newLoadout.splice(existingItemIndex, 1)
+    }
+
+    newLoadout.push(itemToEquip)
+
+    await this.characterRepository.updateInventoryAndLoadout(character.id, newInventory, newLoadout)
+
+    return { success: true }
+  }
+
+  async unequipItem(userId: string, slotType: string): Promise<{ success: boolean }> {
+    const character = await this.characterRepository.findByUserIdOrThrow(userId)
+
+    const inventory = (character.inventory as unknown as InventoryItem[]) || []
+    const loadout = (character.loadout as unknown as InventoryItem[]) || []
+
+    const itemIndex = loadout.findIndex((item) => this.getSlotType(item.type) === slotType)
+    if (itemIndex === -1) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'No item equipped in that slot' })
+    }
+
+    const itemToUnequip = loadout[itemIndex]
+
+    const newLoadout = [...loadout]
+    newLoadout.splice(itemIndex, 1)
+
+    const isTier1 = TIER_1_ITEMS.some((def) => def.id === itemToUnequip.definitionId)
+    const newInventory = isTier1 ? [...inventory] : [...inventory, itemToUnequip]
+
+    await this.characterRepository.updateInventoryAndLoadout(character.id, newInventory, newLoadout)
+
+    return { success: true }
+  }
+
+  async hasCharacter(userId: string): Promise<boolean> {
+    const count = await this.characterRepository.count(userId)
+    return count > 0
+  }
+
+  private createRandomPartyName(): string {
+    const adjectives = [
+      'Brave',
+      'Silent',
+      'Iron',
+      'Shadow',
+      'Golden',
+      'Crimson',
+      'Silver',
+      'Storm',
+      'Eternal',
+      'Fierce',
+      'Noble',
+      'Mystic',
+      'Dark',
+      'Blazing',
+      'Frozen',
+      'Thunder',
+      'Ancient',
+      'Wild',
+      'Swift',
+      'Proud',
+      'Vengeful',
+      'Radiant',
+      'Lunar',
+      'Solar',
+      'Scarlet',
+      'Azure',
+      'Emerald',
+      'Onyx',
+      'Ivory',
+      'Dread',
+      'Valiant',
+      'Hollow'
+    ]
+    const nouns = [
+      'Wolves',
+      'Ravens',
+      'Knights',
+      'Seekers',
+      'Guards',
+      'Blades',
+      'Shields',
+      'Hunters',
+      'Dragons',
+      'Sentinels',
+      'Vanguard',
+      'Phoenix',
+      'Falcons',
+      'Lions',
+      'Reapers',
+      'Wardens',
+      'Titans',
+      'Crusaders',
+      'Phantoms',
+      'Legion',
+      'Serpents',
+      'Talons',
+      'Vipers',
+      'Corsairs',
+      'Champions',
+      'Marauders',
+      'Templars',
+      'Stalkers',
+      'Wraiths',
+      'Paladins',
+      'Shadows',
+      'Griffins'
+    ]
+    return `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`
+  }
+
+  private getSlotType(itemType: string): string {
+    if (itemType.startsWith('WEAPON_')) return 'WEAPON'
+    if (itemType === ItemType.ARMOR) return ItemType.ARMOR
+    return ItemType.ACCESSORY
+  }
+}

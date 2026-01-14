@@ -1,93 +1,20 @@
 import { loginSchema, signUpSchema } from '@shared/schemas/auth.schemas'
-import { TRPCError } from '@trpc/server'
-import { env } from '../config'
 import { protectedProcedure, publicProcedure, t } from '../trpc'
 
 export const authRouter = t.router({
   signUp: publicProcedure.input(signUpSchema).mutation(async ({ ctx, input }) => {
-    const { error } = await ctx.supabase.auth.signInWithOtp({
-      email: input.email,
-      options: {
-        emailRedirectTo: `${env.FRONT_URL}/onboarding`,
-        shouldCreateUser: true
-      }
-    })
-
-    if (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message
-      })
-    }
-
-    return {
-      message: 'Magic link sent to your email'
-    }
+    return ctx.services.auth.signUp(input)
   }),
+
   login: publicProcedure.input(loginSchema).mutation(async ({ ctx, input }) => {
-    const { error } = await ctx.supabase.auth.signInWithOtp({
-      email: input.email,
-      options: {
-        emailRedirectTo: `${env.FRONT_URL}/login`,
-        shouldCreateUser: true
-      }
-    })
-
-    if (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message
-      })
-    }
-
-    return {
-      message: 'Magic link sent to your email'
-    }
+    return ctx.services.auth.login(input)
   }),
+
   loginWithGoogle: publicProcedure.mutation(async ({ ctx }) => {
-    const { data, error } = await ctx.supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${env.FRONT_URL}/login`
-      }
-    })
-
-    if (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message
-      })
-    }
-
-    return {
-      url: data.url
-    }
+    return ctx.services.auth.loginWithGoogle()
   }),
+
   deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {
-    const userId = ctx.user.id
-
-    // Delete character first (cascade deletes CharacterClass)
-    await ctx.prisma.character.deleteMany({ where: { userId: userId } })
-
-    await ctx.prisma.$transaction([
-      ctx.prisma.habitCompletion.deleteMany({ where: { userId } }),
-      ctx.prisma.task.deleteMany({ where: { userId } }),
-      ctx.prisma.habit.deleteMany({ where: { userId } }),
-      ctx.prisma.objective.deleteMany({ where: { userId } }),
-      ctx.prisma.area.deleteMany({ where: { userId } })
-    ])
-
-    const { error: supabaseError } = await ctx.supabase.auth.admin.deleteUser(userId)
-
-    if (supabaseError) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: `Failed to delete account ${userId}`
-      })
-    }
-
-    return {
-      message: 'Account deleted successfully'
-    }
+    return ctx.services.auth.deleteAccount(ctx.user.id)
   })
 })
