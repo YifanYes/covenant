@@ -98,6 +98,7 @@ export default function AdventureStore() {
             itemsByTier={itemsByTier}
             selectedIds={selectedIds}
             availableGold={availableGold}
+            characterTier={store.characterTier}
             onToggle={toggleItem}
           />
         </CardContent>

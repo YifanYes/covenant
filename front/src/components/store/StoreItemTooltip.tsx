@@ -6,9 +6,11 @@ import { useTranslation } from 'react-i18next'
 interface StoreItemTooltipProps {
   item: ItemDefinition
   children: React.ReactNode
+  isTierRestricted: boolean
+  characterTier: number
 }
 
-export default function StoreItemTooltip({ item, children }: StoreItemTooltipProps) {
+export default function StoreItemTooltip({ item, children, isTierRestricted, characterTier }: StoreItemTooltipProps) {
   const { t } = useTranslation()
 
   const itemName = t(`items.${item.id}.name`, { defaultValue: item.name })
@@ -32,6 +34,11 @@ export default function StoreItemTooltip({ item, children }: StoreItemTooltipPro
             <span className='font-semibold text-zinc-100'>{itemName}</span>
           </div>
           {itemDescription && <p className='text-xs text-zinc-400'>{itemDescription}</p>}
+          {isTierRestricted && (
+            <div className='rounded bg-red-900/30 px-2 py-1 text-xs text-red-400'>
+              {t('store.tier_required', { tier: item.tier, current: characterTier })}
+            </div>
+          )}
           <div className='border-t border-zinc-700 pt-2'>
             <div className='flex flex-wrap gap-x-4 gap-y-1 text-xs'>
               {item.stats.attackDice && (

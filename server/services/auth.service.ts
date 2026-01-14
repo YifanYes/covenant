@@ -17,14 +17,14 @@ export class AuthService {
   private areaRepository: AreaRepository
 
   constructor(
-    private prisma: PrismaClient,
+    private _prisma: PrismaClient,
     private supabase: SupabaseClient
   ) {
-    this.characterRepository = new CharacterRepository(prisma)
-    this.habitRepository = new HabitRepository(prisma)
-    this.taskRepository = new TaskRepository(prisma)
-    this.objectiveRepository = new ObjectiveRepository(prisma)
-    this.areaRepository = new AreaRepository(prisma)
+    this.characterRepository = new CharacterRepository(_prisma)
+    this.habitRepository = new HabitRepository(_prisma)
+    this.taskRepository = new TaskRepository(_prisma)
+    this.objectiveRepository = new ObjectiveRepository(_prisma)
+    this.areaRepository = new AreaRepository(_prisma)
   }
 
   async signUp(input: SignUpType) {

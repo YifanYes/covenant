@@ -1,8 +1,8 @@
 import { DamageType, EnemyType, getEnemy } from '@shared/constants/enemies'
 import { WeaponDamageType } from '@shared/constants/items'
 import { getMission } from '@shared/constants/missions'
-import { AttackType } from '@shared/schemas/missions.schemas'
-import { CharacterWithClassesAndParty } from '@shared/types/character.types'
+import type { AttackType } from '@shared/schemas/missions.schemas'
+import type { CharacterWithClassesAndParty } from '@shared/types/character.types'
 import type { AttackResult } from '@shared/types/combat.types'
 import type {
   CombatLogEntry,
@@ -31,11 +31,11 @@ export class CombatService {
   private partyRepository: PartyRepository
   private combatRepository: CombatRepository
 
-  constructor(private prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(prisma)
-    this.missionRepository = new MissionRepository(prisma)
-    this.partyRepository = new PartyRepository(prisma)
-    this.combatRepository = new CombatRepository(prisma)
+  constructor(private _prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(_prisma)
+    this.missionRepository = new MissionRepository(_prisma)
+    this.partyRepository = new PartyRepository(_prisma)
+    this.combatRepository = new CombatRepository(_prisma)
   }
 
   rollDice(count: number): number[] {

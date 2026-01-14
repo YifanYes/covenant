@@ -727,6 +727,7 @@
       "buy": "¡Compra exitosa!"
     },
     "tier": "Tier",
+    "tier_required": "Requiere Tier {{tier}} (Estás en Tier {{current}})",
     "title": "Tienda",
     "total": "Total"
   },

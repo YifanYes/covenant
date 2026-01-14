@@ -67,7 +67,7 @@ export class TaskRepository {
     return task
   }
 
-  async update(id: string, input: UpdateTaskType, isCompleting: boolean): Promise<Task> {
+  async update(_id: string, input: UpdateTaskType, isCompleting: boolean): Promise<Task> {
     return this.prisma.task.update({
       where: { id: input.id },
       data: {
