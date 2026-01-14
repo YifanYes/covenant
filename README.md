@@ -67,13 +67,25 @@ cd front && bun run dev
 ```
 arq/
 ├── front/          # React frontend (Vite + TypeScript)
-├── server/         # Backend server (tRPC + Prisma)
+├── server/         # Backend server (tRPC + Fastify)
+│   ├── routers/    # tRPC router definitions
+│   ├── services/   # Business logic layer
+│   └── repositories/ # Data access layer (Prisma)
 ├── shared/         # Shared code (Zod schemas, types)
 ├── .context/       # Coding standards and AI context
 ├── .antigravity/   # Agent rules and directives
 ├── mission.md      # Project mission and pillars
 └── roadmap.md      # Project timeline and phases
 ```
+
+## Architecture
+
+The backend follows a layered architecture to ensure separation of concerns and maintainability:
+
+1.  **tRPC Routers**: Handle incoming requests, validation, and protocol logic. They should be "thin" and delegate business logic to services.
+2.  **Services**: Contain the core business logic. They are orchestrated by a `ServiceFactory` and use Repositories for data access.
+3.  **Repositories**: Encapsulate all database operations using Prisma. This allows for cleaner services and easier testing/refactoring.
+4.  **Shared Layer**: Centralizes Zod schemas and inferred types, serving as the single source of truth for both frontend and backend.
 
 ## Spec-Driven Development (SDD)
 

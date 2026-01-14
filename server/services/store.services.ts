@@ -1,31 +1,22 @@
 import { ALL_ITEMS, createInventoryItem, getItemById } from '@shared/constants/items'
 import type { InventoryItem } from '@shared/types/gamification.types'
+import { PurchaseResult, StoreListResult } from '@shared/types/store.types'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '../generated/prisma'
-
-interface StoreListResult {
-  items: typeof ALL_ITEMS
-  gold: number
-}
-
-interface PurchaseResult {
-  success: boolean
-  purchasedItems: InventoryItem[]
-  remainingGold: number
-}
+import { CharacterRepository } from '../repositories/character.repository'
 
 export class StoreService {
-  private prisma: PrismaClient
+  private characterRepository: CharacterRepository
 
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma
+  constructor(private prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(prisma)
   }
 
   async listAvailableItems(userId: string): Promise<StoreListResult> {
-    const character = await this.prisma.character.findUnique({ where: { userId } })
+    const character = await this.characterRepository.findByUserId(userId)
 
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${userId} not found` })
     }
 
     const inventory = (character.inventory as unknown as InventoryItem[]) || []
@@ -41,10 +32,10 @@ export class StoreService {
   }
 
   async purchaseItems(userId: string, itemIds: string[]): Promise<PurchaseResult> {
-    const character = await this.prisma.character.findUnique({ where: { userId } })
+    const character = await this.characterRepository.findByUserId(userId)
 
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${userId} not found` })
     }
 
     // Get item definitions and calculate total cost
@@ -80,10 +71,7 @@ export class StoreService {
     const newInventory: any = [...inventory, ...newItems]
     const newGold = character.gold - totalCost
 
-    await this.prisma.character.update({
-      where: { id: character.id },
-      data: { inventory: newInventory, gold: newGold }
-    })
+    await this.characterRepository.updateInventoryAndGold(character.id, newInventory, newGold)
 
     return {
       success: true,

@@ -67,6 +67,8 @@ export const bulkUpdateTasksSchema = z.object({
     })
   )
 })
+export type BulkUpdateTasksType = z.infer<typeof bulkUpdateTasksSchema>
+export type BulkUpdateTaskItem = BulkUpdateTasksType['tasks'][number]
 
 export const getByDateInputSchema = z.object({
   monthIndex: z.string().optional(),
