@@ -31,11 +31,11 @@ export class CombatService {
   private partyRepository: PartyRepository
   private combatRepository: CombatRepository
 
-  constructor(private _prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(_prisma)
-    this.missionRepository = new MissionRepository(_prisma)
-    this.partyRepository = new PartyRepository(_prisma)
-    this.combatRepository = new CombatRepository(_prisma)
+  constructor(prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(prisma)
+    this.missionRepository = new MissionRepository(prisma)
+    this.partyRepository = new PartyRepository(prisma)
+    this.combatRepository = new CombatRepository(prisma)
   }
 
   rollDice(count: number): number[] {

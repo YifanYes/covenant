@@ -10,9 +10,9 @@ export class StoreService {
   private characterRepository: CharacterRepository
   private characterService: CharacterService
 
-  constructor(private _prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(_prisma)
-    this.characterService = new CharacterService(_prisma)
+  constructor(prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(prisma)
+    this.characterService = new CharacterService(prisma)
   }
 
   async listAvailableItems(userId: string): Promise<StoreListResult> {

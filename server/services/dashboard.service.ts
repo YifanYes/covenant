@@ -15,12 +15,12 @@ export class DashboardService {
   private areaRepository: AreaRepository
   private characterRepository: CharacterRepository
 
-  constructor(private _prisma: PrismaClient) {
-    this.characterService = new CharacterService(_prisma)
-    this.taskRepository = new TaskRepository(_prisma)
-    this.habitRepository = new HabitRepository(_prisma)
-    this.areaRepository = new AreaRepository(_prisma)
-    this.characterRepository = new CharacterRepository(_prisma)
+  constructor(prisma: PrismaClient) {
+    this.characterService = new CharacterService(prisma)
+    this.taskRepository = new TaskRepository(prisma)
+    this.habitRepository = new HabitRepository(prisma)
+    this.areaRepository = new AreaRepository(prisma)
+    this.characterRepository = new CharacterRepository(prisma)
   }
 
   private getMax(record: Record<string, number>) {
