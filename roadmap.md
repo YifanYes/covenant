@@ -21,8 +21,8 @@
 
 ## 🔜 Fase 2: Expansión de Mecánicas (Próximamente)
 
-- [ ] Crear componentes base reutilizables `BaseFormDialog.tsx` y `BaseConfirmDialog.tsx`. Refactorizar diálogos CRUD para usar componentes base.
-- [ ] Optimizar `index.css`. Actualmente tiene **4,058 bytes**. Usar más variables CSS de Tailwind y extraer tokens de diseño a un archivo separado.
+- [x] Crear componentes base reutilizables `BaseFormDialog.tsx` y `BaseConfirmDialog.tsx`. Refactorizar diálogos CRUD para usar componentes base.
+- [x] Optimizar `index.css`. Actualmente tiene **4,058 bytes**. Usar más variables CSS de Tailwind y extraer tokens de diseño a un archivo separado.
 - **Gamificación - Fase 1: Motor RPG y Economía de Dados**
   - [x] Migración de base de datos (Atributos Lore, Inventario, DiceBank).
   - [x] Lógica de obtención de dados por Tareas/Hábitos/Objetivos y Bonus de consistencia.
@@ -37,7 +37,7 @@
   - [x] Arena de combate, visualización de enemigos y log de eventos.
 - **Gamificación - Fase 5: Cierre del Bucle y Pulido**
   - [ ] Sistema de Mana, Doctrinas, recompensas (XP/Oro/Loot) y estados de derrota.
-  - [ ] Tienda para comprar equipamiento con oro.
+  - [x] Tienda para comprar equipamiento con oro.
   - [ ] Renderizar el personaje con los items equipados.
   - [ ] Sección de mapa en la aventura para ver el estado del mundo.
   - [ ] Definir accesorios
