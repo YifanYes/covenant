@@ -17,7 +17,8 @@ export default defineConfig({
       '@/layouts': path.resolve(__dirname, './src/layouts'),
       '@/stores': path.resolve(__dirname, './src/stores'),
       '@/lib': path.resolve(__dirname, './src/lib'),
-      '@/tasks': path.resolve(__dirname, './src/components/tasks')
+      '@/tasks': path.resolve(__dirname, './src/components/tasks'),
+      '@/styles': path.resolve(__dirname, './src/styles')
     }
   }
 })

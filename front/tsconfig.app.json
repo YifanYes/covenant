@@ -17,7 +17,8 @@
       "@/layouts": ["./src/layouts"],
       "@/stores": ["./src/stores"],
       "@/lib": ["./src/lib"],
-      "@/tasks": ["./src/components/tasks"]
+      "@/tasks": ["./src/components/tasks"],
+      "@/styles": ["./src/styles"]
     },
 
     /* Bundler mode */
