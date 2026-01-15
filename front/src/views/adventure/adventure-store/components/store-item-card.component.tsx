@@ -15,9 +15,9 @@ interface StoreItemCardProps {
 }
 
 const rarityBorderColors: Record<ItemRarity, string> = {
-  [ItemRarity.COMMON]: 'border-gray-500/50',
-  [ItemRarity.RARE]: 'border-purple-500/50 bg-purple-500/5',
-  [ItemRarity.LEGENDARY]: 'border-yellow-500/50 bg-yellow-500/5'
+  [ItemRarity.COMMON]: 'border-rarity-common/50',
+  [ItemRarity.RARE]: 'border-rarity-rare/50 bg-rarity-rare/5',
+  [ItemRarity.LEGENDARY]: 'border-rarity-legendary/50 bg-rarity-legendary/5'
 }
 
 export default function StoreItemCard({

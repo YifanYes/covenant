@@ -3,10 +3,10 @@ interface TierBadgeProps {
 }
 
 const tierColors: Record<number, string> = {
-  1: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  2: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  3: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  4: 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+  1: 'bg-tier-1/20 text-tier-1 border-tier-1/30',
+  2: 'bg-tier-2/20 text-tier-2 border-tier-2/30',
+  3: 'bg-tier-3/20 text-tier-3 border-tier-3/30',
+  4: 'bg-tier-4/20 text-tier-4 border-tier-4/30'
 }
 
 export default function TierBadge({ tier }: TierBadgeProps) {

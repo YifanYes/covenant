@@ -95,15 +95,15 @@ export default function DiceResult({ value, isSuccess, isCritical, isRolling, cl
   }
 
   const getOverlayClass = () => {
-    if (isCritical) return 'dice-critical'
-    if (isSuccess) return 'dice-success'
-    return 'dice-fail'
+    if (isCritical) return 'after:bg-dice-critical-overlay'
+    if (isSuccess) return 'after:bg-dice-success-overlay'
+    return 'after:bg-dice-fail-overlay'
   }
 
   const getBorderColor = () => {
-    if (isCritical) return 'border-yellow-500 bg-yellow-500/10'
-    if (isSuccess) return 'border-emerald-500 bg-emerald-500/10'
-    return 'border-red-500/50 bg-red-500/5'
+    if (isCritical) return 'border-dice-critical-border bg-dice-critical-bg'
+    if (isSuccess) return 'border-dice-success-border bg-dice-success-bg'
+    return 'border-dice-fail-border bg-dice-fail-bg'
   }
 
   return (
@@ -111,6 +111,7 @@ export default function DiceResult({ value, isSuccess, isCritical, isRolling, cl
       className={cn(
         'relative flex h-10 w-10 items-center justify-center border-3 p-1',
         'animate-in zoom-in-50 duration-300',
+        'after:absolute after:inset-0 after:content-[""]',
         getBorderColor(),
         getOverlayClass(),
         className
