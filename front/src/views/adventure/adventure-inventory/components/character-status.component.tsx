@@ -1,9 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui'
+import { Card, CardContent, CardHeader, CardTitle, Separator } from '@/ui'
 import { Bullseye, Heart, Money, ScriptText, Shield, Zap } from '@nsmr/pixelart-react'
 import { TIER_PROGRESSION } from '@shared/constants/missions'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
-import { Separator } from '@/ui'
 
 interface CharacterStatusProps {
   character: InventoryCharacter

@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui'
 import { Luggage } from '@nsmr/pixelart-react'
-import type { InventoryCharacter, SlotType } from '@shared/types/gamification.types'
-import { SlotType as SlotTypeEnum } from '@shared/types/gamification.types'
+import { SlotType as SlotTypeEnum, type InventoryCharacter, type SlotType } from '@shared/types/gamification.types'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import EquipmentSlot from './equipment-slot.component'

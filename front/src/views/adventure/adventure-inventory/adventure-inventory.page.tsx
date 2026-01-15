@@ -1,6 +1,5 @@
 import { queryClient, trpc } from '@/utils/trpc.utils'
-import type { InventoryCharacter, InventoryItem } from '@shared/types/gamification.types'
-import { SlotType } from '@shared/types/gamification.types'
+import { SlotType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'

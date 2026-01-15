@@ -1,5 +1,5 @@
-import { Separator } from '@/ui'
 import {
+  Separator,
   Sidebar,
   SidebarContent,
   SidebarFooter,

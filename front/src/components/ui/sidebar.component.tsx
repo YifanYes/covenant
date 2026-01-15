@@ -1,10 +1,19 @@
-import { Input } from '@/ui'
-import { Separator } from '@/ui'
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/ui'
-import { Skeleton } from '@/ui'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/cn.lib'
+import {
+  Input,
+  Separator,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/ui'
 import { LayoutSidebarLeft } from '@nsmr/pixelart-react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
