@@ -1,17 +1,6 @@
-import { LoaderButton } from '@/common'
+import { BaseConfirmDialog } from '@/common'
 import type { Objective } from '@/types/models.types'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-  Button
-} from '@/ui'
+import { Button } from '@/ui'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Trash } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
@@ -43,8 +32,15 @@ export default function ConfirmDeleteObjectiveDialog({ objective, onDeleteSucces
   const handleDelete = () => deleteMutation.mutate({ id: objective.id })
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
+    <BaseConfirmDialog
+      open={open}
+      onOpenChange={setOpen}
+      title='objectives.delete.title'
+      description='objectives.delete.description'
+      onConfirm={handleDelete}
+      confirmLabel='delete'
+      isLoading={deleteMutation.isPending}
+      trigger={
         <Button
           variant='outline'
           size='sm'
@@ -54,26 +50,7 @@ export default function ConfirmDeleteObjectiveDialog({ objective, onDeleteSucces
           <Trash className='h-4 w-4' />
           {t('delete')}
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t('objectives.delete.title')}</AlertDialogTitle>
-          <AlertDialogDescription>{t('objectives.delete.description')}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel className='hover:bg-foreground/10 cursor-pointer'>{t('cancel')}</AlertDialogCancel>
-
-          <AlertDialogAction asChild>
-            <LoaderButton
-              className='text-destructive hover:text-foreground hover:bg-foreground/10 bg-transparent'
-              disabled={deleteMutation.isPending}
-              isLoading={deleteMutation.isPending}
-              label={t('delete')}
-              onClick={handleDelete}
-            />
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      }
+    />
   )
 }

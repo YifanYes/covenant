@@ -1,18 +1,8 @@
-import { LoaderButton } from '@/common'
+import { BaseFormDialog, LoaderButton } from '@/common'
 import { ColorSelector, DatePicker, MultiSelect, SingleSelect, TextInput } from '@/forms'
 import { useTasksStore } from '@/stores'
 import { useCalendarStore } from '@/stores/calendar.store'
-import {
-  Button,
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  Textarea
-} from '@/ui'
+import { Textarea } from '@/ui'
 import { getRewardText } from '@/utils/text.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -122,142 +112,134 @@ export default function UpdateTaskDialog() {
   }, [selectedTask, reset])
 
   return (
-    <Dialog open={!isUndefined(selectedTask)} onOpenChange={handleOpenChange}>
-      <DialogContent className='sm:max-w-[425px] md:max-w-fit' aria-describedby='update-task-dialog-desc'>
-        <DialogHeader>
-          <DialogTitle>{t('update_task_dialog.title')}</DialogTitle>
-          <DialogDescription className='sr-only'>{t('update_task_dialog.description')}</DialogDescription>
-        </DialogHeader>
-        <div className='grid gap-4' key={`update-task-form-${open}`}>
-          <div className='grid gap-3'>
-            <TextInput
-              type='text'
-              placeholder={t('update_task_dialog.title_placeholder')}
-              className='h-9'
-              {...register('title')}
-              {...(errors.title?.message && { errorMessage: t(errors.title.message.toString()) })}
-              required
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Textarea
-              placeholder={t('update_task_dialog.description_placeholder')}
-              className='min-h-[80px] resize-none'
-              {...register('description')}
-              {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Controller
-              name='status'
-              control={control}
-              render={({ field }) => (
-                <SingleSelect
-                  value={field.value}
-                  placeholder={t('update_task_dialog.status_placeholder')}
-                  options={map(TaskStatus, (status) => ({ value: status, label: t(`task_status.${status}`) }))}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Controller
-              name='dueDate'
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  className='w-full'
-                  value={typeof field.value === 'string' ? new Date(field.value) : field.value}
-                  onChange={field.onChange}
-                  placeholder={t('update_task_dialog.due_date_placeholder')}
-                />
-              )}
-            />
-          </div>
-          <div className='grid gap-3'>
-            <MultiSelect
-              name='objectives'
-              control={control}
-              items={objectivesData?.objectives.map(({ id, name: label }) => ({ id, label })) || []}
-              placeholder={t('update_task_dialog.objectives_placeholder')}
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Controller
-              name='color'
-              control={control}
-              render={({ field }) => (
-                <ColorSelector label={t('tasks.color')} value={field.value ?? undefined} onChange={field.onChange} />
-              )}
-            />
-          </div>
-          <div className='grid grid-cols-2 gap-3'>
-            <Controller
-              name='effort'
-              control={control}
-              render={({ field }) => (
-                <SingleSelect
-                  label={t('tasks.effort')}
-                  placeholder={t('tasks.effort_placeholder')}
-                  options={Object.values(TaskEffort).map((effortType) => ({
-                    value: effortType,
-                    label: t(`tasks.effort_values.${effortType}`)
-                  }))}
-                  value={field.value ?? undefined}
-                  onChange={(value) => field.onChange(value)}
-                />
-              )}
-            />
-            <Controller
-              name='impact'
-              control={control}
-              render={({ field }) => (
-                <SingleSelect
-                  label={t('tasks.impact')}
-                  placeholder={t('tasks.impact_placeholder')}
-                  options={Object.values(TaskImpact).map((impactType) => ({
-                    value: impactType,
-                    label: t(`tasks.impact_values.${impactType}`)
-                  }))}
-                  value={field.value ?? undefined}
-                  onChange={(value) => field.onChange(value)}
-                />
-              )}
-            />
-          </div>
+    <BaseFormDialog
+      open={!isUndefined(selectedTask)}
+      onOpenChange={handleOpenChange}
+      title='update_task_dialog.title'
+      description='update_task_dialog.description'
+      onSubmit={handleSubmit(onUpdate)}
+      submitLabel='update'
+      isLoading={updateMutation.isPending}
+      isSubmitDisabled={!isValid || !isDirty || updateMutation.isPending}
+      className='sm:max-w-[425px] md:max-w-fit'
+      extraFooterActions={
+        <div className='flex gap-2'>
+          <LoaderButton
+            className='text-destructive border-destructive hover:text-background hover:bg-destructive h-auto cursor-pointer border-2 bg-transparent'
+            isLoading={deleteMutation.isPending}
+            disabled={isUndefined(selectedTask)}
+            onClick={onDelete}
+            label={t('tasks.delete')}
+          />
+          <LoaderButton
+            className='text-accent border-accent hover:text-background hover:bg-accent h-auto cursor-pointer border-2 bg-transparent'
+            isLoading={duplicateMutation.isPending}
+            disabled={isUndefined(selectedTask)}
+            onClick={onDuplicate}
+            label={t('tasks.duplicate')}
+          />
         </div>
-        <DialogFooter className='flex h-auto justify-between gap-12'>
-          <div className='ml-auto flex gap-2'>
-            <LoaderButton
-              className='text-destructive border-destructive hover:text-background hover:bg-destructive h-auto cursor-pointer border-2 bg-transparent'
-              isLoading={deleteMutation.isPending}
-              disabled={isUndefined(selectedTask)}
-              onClick={onDelete}
-              label={t('tasks.delete')}
-            />
-            <LoaderButton
-              className='text-accent border-accent hover:text-background hover:bg-accent h-auto cursor-pointer border-2 bg-transparent'
-              isLoading={duplicateMutation.isPending}
-              disabled={isUndefined(selectedTask)}
-              onClick={onDuplicate}
-              label={t('tasks.duplicate')}
-            />
-          </div>
-          <div className='ml-auto flex gap-2'>
-            <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
-              <Button variant='outline'>{t('cancel')}</Button>
-            </DialogClose>
-            <LoaderButton
-              className='h-auto cursor-pointer'
-              isLoading={updateMutation.isPending}
-              disabled={!isValid || !isDirty || updateMutation.isPending}
-              onClick={handleSubmit(onUpdate)}
-              label={t('update')}
-            />
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      }
+    >
+      <div className='grid gap-4'>
+        <div className='grid gap-3'>
+          <TextInput
+            type='text'
+            placeholder={t('update_task_dialog.title_placeholder')}
+            className='h-9'
+            {...register('title')}
+            {...(errors.title?.message && { errorMessage: t(errors.title.message.toString()) })}
+            required
+          />
+        </div>
+        <div className='grid gap-3'>
+          <Textarea
+            placeholder={t('update_task_dialog.description_placeholder')}
+            className='min-h-[80px] resize-none'
+            {...register('description')}
+            {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
+          />
+        </div>
+        <div className='grid gap-3'>
+          <Controller
+            name='status'
+            control={control}
+            render={({ field }) => (
+              <SingleSelect
+                value={field.value}
+                placeholder={t('update_task_dialog.status_placeholder')}
+                options={map(TaskStatus, (status) => ({ value: status, label: t(`task_status.${status}`) }))}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        </div>
+        <div className='grid gap-3'>
+          <Controller
+            name='dueDate'
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                className='w-full'
+                value={typeof field.value === 'string' ? new Date(field.value) : field.value}
+                onChange={field.onChange}
+                placeholder={t('update_task_dialog.due_date_placeholder')}
+              />
+            )}
+          />
+        </div>
+        <div className='grid gap-3'>
+          <MultiSelect
+            name='objectives'
+            control={control}
+            items={objectivesData?.objectives.map(({ id, name: label }) => ({ id, label })) || []}
+            placeholder={t('update_task_dialog.objectives_placeholder')}
+          />
+        </div>
+        <div className='grid gap-3'>
+          <Controller
+            name='color'
+            control={control}
+            render={({ field }) => (
+              <ColorSelector label={t('tasks.color')} value={field.value ?? undefined} onChange={field.onChange} />
+            )}
+          />
+        </div>
+        <div className='grid grid-cols-2 gap-3'>
+          <Controller
+            name='effort'
+            control={control}
+            render={({ field }) => (
+              <SingleSelect
+                label={t('tasks.effort')}
+                placeholder={t('tasks.effort_placeholder')}
+                options={Object.values(TaskEffort).map((effortType) => ({
+                  value: effortType,
+                  label: t(`tasks.effort_values.${effortType}`)
+                }))}
+                value={field.value ?? undefined}
+                onChange={(value) => field.onChange(value)}
+              />
+            )}
+          />
+          <Controller
+            name='impact'
+            control={control}
+            render={({ field }) => (
+              <SingleSelect
+                label={t('tasks.impact')}
+                placeholder={t('tasks.impact_placeholder')}
+                options={Object.values(TaskImpact).map((impactType) => ({
+                  value: impactType,
+                  label: t(`tasks.impact_values.${impactType}`)
+                }))}
+                value={field.value ?? undefined}
+                onChange={(value) => field.onChange(value)}
+              />
+            )}
+          />
+        </div>
+      </div>
+    </BaseFormDialog>
   )
 }

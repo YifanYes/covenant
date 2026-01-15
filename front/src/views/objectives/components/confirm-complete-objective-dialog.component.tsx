@@ -1,17 +1,6 @@
-import { LoaderButton } from '@/common'
+import { BaseConfirmDialog } from '@/common'
 import type { Objective } from '@/types/models.types'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-  Button
-} from '@/ui'
+import { Button } from '@/ui'
 import { getRewardText } from '@/utils/text.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Check } from '@nsmr/pixelart-react'
@@ -44,8 +33,16 @@ export default function ConfirmCompleteObjectiveDialog({ objective, onCompleteSu
   const handleComplete = () => completeMutation.mutate({ id: objective.id })
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
+    <BaseConfirmDialog
+      open={open}
+      onOpenChange={setOpen}
+      title='objectives.complete.title'
+      description='objectives.complete.description'
+      onConfirm={handleComplete}
+      confirmLabel='objectives.complete.button'
+      confirmClassName='hover:bg-foreground/10 bg-transparent text-green-400 hover:text-green-400 cursor-pointer'
+      isLoading={completeMutation.isPending}
+      trigger={
         <Button
           variant='outline'
           size='sm'
@@ -55,25 +52,7 @@ export default function ConfirmCompleteObjectiveDialog({ objective, onCompleteSu
           <Check className='h-4 w-4' />
           {t('objectives.complete.button')}
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t('objectives.complete.title')}</AlertDialogTitle>
-          <AlertDialogDescription>{t('objectives.complete.description')}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel className='hover:bg-foreground/10 cursor-pointer'>{t('cancel')}</AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <LoaderButton
-              className='hover:bg-foreground/10 bg-transparent text-green-400 hover:text-green-400'
-              disabled={completeMutation.isPending}
-              isLoading={completeMutation.isPending}
-              label={t('objectives.complete.button')}
-              onClick={handleComplete}
-            />
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      }
+    />
   )
 }

@@ -1,17 +1,6 @@
-import { LoaderButton } from '@/common'
+import { BaseFormDialog } from '@/common'
 import { DatePicker, MultiSelect, TextInput } from '@/forms'
-import {
-  Button,
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  Textarea
-} from '@/ui'
+import { Button, Textarea } from '@/ui'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
@@ -67,72 +56,62 @@ export default function CreateObjectiveDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
+    <BaseFormDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      title='create_objective_dialog.title'
+      description='create_objective_dialog.description'
+      onSubmit={handleSubmit(onSubmit)}
+      submitLabel='save_changes'
+      isLoading={mutation.isPending}
+      isSubmitDisabled={!isValid || !isDirty}
+      className='sm:max-w-[500px]'
+      trigger={
         <Button>
           <Plus />
           <span>{t('objectives.add')}</span>
         </Button>
-      </DialogTrigger>
-      <DialogContent className='sm:max-w-[500px]' aria-describedby='create-objective-dialog-desc'>
-        <DialogHeader>
-          <DialogTitle>{t('create_objective_dialog.title')}</DialogTitle>
-          <DialogDescription className='sr-only'>
-            {t('create_objective_dialog.description') || 'Dialog to create a new objective'}
-          </DialogDescription>
-        </DialogHeader>
-        <div className='grid gap-4'>
-          <TextInput
-            type='text'
-            placeholder={t('create_objective_dialog.name_placeholder')}
-            className='h-9'
-            {...register('name')}
-            {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
-            required
-          />
-          <Controller
-            name='description'
-            control={control}
-            render={({ field }) => (
-              <Textarea
-                placeholder={t('create_objective_dialog.description_placeholder')}
-                className='h-20'
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-          <Controller
-            name='dueDate'
-            control={control}
-            render={({ field }) => (
-              <DatePicker
-                placeholder={t('create_objective_dialog.due_date_placeholder')}
-                value={typeof field.value === 'string' ? new Date(field.value) : field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-          <MultiSelect
-            name='areas'
-            control={control}
-            items={areasData?.areas.map((a) => ({ id: a.id, label: t(a.name) })) || []}
-            placeholder={t('create_objective_dialog.select_areas_placeholder')}
-          />
-        </div>
-        <DialogFooter className='flex h-auto justify-end'>
-          <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
-            <Button variant='outline'>{t('cancel')}</Button>
-          </DialogClose>
-          <LoaderButton
-            className='h-auto cursor-pointer'
-            disabled={!isValid || !isDirty}
-            isLoading={mutation.isPending}
-            onClick={handleSubmit(onSubmit)}
-            label={t('save_changes')}
-          />
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      }
+    >
+      <div className='grid gap-4'>
+        <TextInput
+          type='text'
+          placeholder={t('create_objective_dialog.name_placeholder')}
+          className='h-9'
+          {...register('name')}
+          {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
+          required
+        />
+        <Controller
+          name='description'
+          control={control}
+          render={({ field }) => (
+            <Textarea
+              placeholder={t('create_objective_dialog.description_placeholder')}
+              className='h-20'
+              value={field.value}
+              onChange={field.onChange}
+            />
+          )}
+        />
+        <Controller
+          name='dueDate'
+          control={control}
+          render={({ field }) => (
+            <DatePicker
+              placeholder={t('create_objective_dialog.due_date_placeholder')}
+              value={typeof field.value === 'string' ? new Date(field.value) : field.value}
+              onChange={field.onChange}
+            />
+          )}
+        />
+        <MultiSelect
+          name='areas'
+          control={control}
+          items={areasData?.areas.map((a) => ({ id: a.id, label: t(a.name) })) || []}
+          placeholder={t('create_objective_dialog.select_areas_placeholder')}
+        />
+      </div>
+    </BaseFormDialog>
   )
 }

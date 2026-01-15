@@ -1,16 +1,6 @@
-import { LoaderButton } from '@/common'
+import { BaseFormDialog } from '@/common'
 import { ColorSelector, IconPicker, TextInput } from '@/forms'
-import {
-  Button,
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/ui'
+import { Button } from '@/ui'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
@@ -52,59 +42,48 @@ export default function CreateAreaDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
+    <BaseFormDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      title='create_area_dialog.title'
+      description='create_area_dialog.description'
+      onSubmit={handleSubmit(onSubmit)}
+      submitLabel='save_changes'
+      isLoading={mutation.isPending}
+      isSubmitDisabled={!isValid || !isDirty}
+      trigger={
         <Button>
           <Plus />
           <span>{t('areas.add')}</span>
         </Button>
-      </DialogTrigger>
-      <DialogContent className='sm:max-w-[425px]' aria-describedby='create-area-dialog-desc'>
-        <DialogHeader>
-          <DialogTitle>{t('create_area_dialog.title')}</DialogTitle>
-          <DialogDescription className='sr-only'>
-            {t('create_area_dialog.description') || 'Dialog to create a new area'}
-          </DialogDescription>
-        </DialogHeader>
-        <div className='grid gap-4'>
-          <div className='grid gap-3'>
-            <TextInput
-              type='text'
-              placeholder={t('create_area_dialog.name')}
-              className='h-9'
-              {...register('name')}
-              {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
-              required
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Controller
-              name='color'
-              control={control}
-              render={({ field }) => <ColorSelector className='w-full' value={field.value} onChange={field.onChange} />}
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Controller
-              name='icon'
-              control={control}
-              render={({ field }) => <IconPicker className='w-full' value={field.value} onChange={field.onChange} />}
-            />
-          </div>
-        </div>
-        <DialogFooter className='flex h-auto justify-end'>
-          <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
-            <Button variant='outline'>{t('cancel')}</Button>
-          </DialogClose>
-          <LoaderButton
-            className='h-auto cursor-pointer'
-            disabled={!isValid || !isDirty}
-            isLoading={mutation.isPending}
-            onClick={handleSubmit(onSubmit)}
-            label={t('save_changes')}
+      }
+    >
+      <div className='grid gap-4'>
+        <div className='grid gap-3'>
+          <TextInput
+            type='text'
+            placeholder={t('create_area_dialog.name')}
+            className='h-9'
+            {...register('name')}
+            {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
+            required
           />
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+        <div className='grid gap-3'>
+          <Controller
+            name='color'
+            control={control}
+            render={({ field }) => <ColorSelector className='w-full' value={field.value} onChange={field.onChange} />}
+          />
+        </div>
+        <div className='grid gap-3'>
+          <Controller
+            name='icon'
+            control={control}
+            render={({ field }) => <IconPicker className='w-full' value={field.value} onChange={field.onChange} />}
+          />
+        </div>
+      </div>
+    </BaseFormDialog>
   )
 }

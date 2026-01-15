@@ -1,18 +1,7 @@
-import { LoaderButton } from '@/common'
+import { BaseFormDialog } from '@/common'
 import { MultiSelect, SingleSelect, TextInput } from '@/forms'
 import type { Habit } from '@/types/models.types'
-import {
-  Button,
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  Textarea
-} from '@/ui'
+import { Textarea } from '@/ui'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { HabitTimespan, updateHabitSchema, type UpdateHabitType } from '@shared/schemas/habits.schemas'
@@ -90,95 +79,77 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
   }))
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <HabitCard habit={habit} />
-      </DialogTrigger>
-
-      <DialogContent className='sm:max-w-[425px]' aria-describedby='update-habit-dialog-desc'>
-        <DialogHeader>
-          <DialogTitle>{t('update_habit_dialog.title')}</DialogTitle>
-          <DialogDescription className='sr-only'>
-            {t('update_habit_dialog.description') || 'Dialog to update an existing habit'}
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className='grid gap-4'>
-          <div className='grid gap-3'>
-            <TextInput
-              type='text'
-              label={t('create_habit_dialog.name_placeholder')}
-              placeholder={t('create_habit_dialog.name_placeholder')}
-              className='h-9'
-              {...register('name')}
-              {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
-              tabIndex={-1}
-              required
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Textarea
-              placeholder={t('create_habit_dialog.description_placeholder')}
-              className='min-h-[80px] resize-none'
-              {...register('description')}
-              {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
-            />
-          </div>
-          <div className='grid gap-3'>
-            <TextInput
-              type='number'
-              label={t('create_habit_dialog.recurrence_placeholder')}
-              placeholder={t('create_habit_dialog.recurrence_placeholder')}
-              className='h-9'
-              min={1}
-              {...register('recurrence', { valueAsNumber: true })}
-              {...(errors.recurrence?.message && { errorMessage: t(errors.recurrence.message.toString()) })}
-              required
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Controller
-              name='timespan'
-              control={control}
-              render={({ field }) => (
-                <SingleSelect
-                  label={t('create_habit_dialog.timespan_placeholder')}
-                  placeholder={t('create_habit_dialog.timespan_placeholder')}
-                  options={timespanOptions}
-                  value={field.value}
-                  onChange={(value) => field.onChange(value || HabitTimespan.DAILY)}
-                  required
-                />
-              )}
-            />
-          </div>
-          <div className='grid gap-3'>
-            <MultiSelect
-              name='objectives'
-              control={control}
-              items={objectivesData?.objectives.map((o) => ({ id: o.id, label: o.name })) || []}
-              placeholder={t('create_habit_dialog.objectives_placeholder')}
-              label={t('create_habit_dialog.objectives_placeholder')}
-            />
-          </div>
+    <BaseFormDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      title='update_habit_dialog.title'
+      description='update_habit_dialog.description'
+      onSubmit={handleSubmit(onSubmit)}
+      submitLabel='save_changes'
+      isLoading={updateMutation.isPending}
+      isSubmitDisabled={!isValid || !isDirty}
+      extraFooterActions={<ConfirmDeleteHabitDialog habit={habit} onDeleteSuccess={handleDeleteSuccess} />}
+      trigger={<HabitCard habit={habit} />}
+    >
+      <div className='grid gap-4'>
+        <div className='grid gap-3'>
+          <TextInput
+            type='text'
+            label={t('create_habit_dialog.name_placeholder')}
+            placeholder={t('create_habit_dialog.name_placeholder')}
+            className='h-9'
+            {...register('name')}
+            {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
+            tabIndex={-1}
+            required
+          />
         </div>
-
-        <DialogFooter className='flex h-auto justify-end'>
-          <ConfirmDeleteHabitDialog habit={habit} onDeleteSuccess={handleDeleteSuccess} />
-          <div className='flex gap-2'>
-            <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
-              <Button variant='outline'>{t('cancel')}</Button>
-            </DialogClose>
-            <LoaderButton
-              className='h-auto cursor-pointer'
-              disabled={!isValid || !isDirty}
-              isLoading={updateMutation.isPending}
-              onClick={handleSubmit(onSubmit)}
-              label={t('save_changes')}
-            />
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <div className='grid gap-3'>
+          <Textarea
+            placeholder={t('create_habit_dialog.description_placeholder')}
+            className='min-h-[80px] resize-none'
+            {...register('description')}
+            {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
+          />
+        </div>
+        <div className='grid gap-3'>
+          <TextInput
+            type='number'
+            label={t('create_habit_dialog.recurrence_placeholder')}
+            placeholder={t('create_habit_dialog.recurrence_placeholder')}
+            className='h-9'
+            min={1}
+            {...register('recurrence', { valueAsNumber: true })}
+            {...(errors.recurrence?.message && { errorMessage: t(errors.recurrence.message.toString()) })}
+            required
+          />
+        </div>
+        <div className='grid gap-3'>
+          <Controller
+            name='timespan'
+            control={control}
+            render={({ field }) => (
+              <SingleSelect
+                label={t('create_habit_dialog.timespan_placeholder')}
+                placeholder={t('create_habit_dialog.timespan_placeholder')}
+                options={timespanOptions}
+                value={field.value}
+                onChange={(value) => field.onChange(value || HabitTimespan.DAILY)}
+                required
+              />
+            )}
+          />
+        </div>
+        <div className='grid gap-3'>
+          <MultiSelect
+            name='objectives'
+            control={control}
+            items={objectivesData?.objectives.map((o) => ({ id: o.id, label: o.name })) || []}
+            placeholder={t('create_habit_dialog.objectives_placeholder')}
+            label={t('create_habit_dialog.objectives_placeholder')}
+          />
+        </div>
+      </div>
+    </BaseFormDialog>
   )
 }

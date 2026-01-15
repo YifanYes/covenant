@@ -1,16 +1,6 @@
+import { BaseConfirmDialog } from '@/common'
 import type { Habit } from '@/types/models.types'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-  Button
-} from '@/ui'
+import { Button } from '@/ui'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Trash } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
@@ -43,8 +33,14 @@ export default function ConfirmDeleteHabitDialog({
   const handleDelete = () => deleteMutation.mutate({ id: habit.id })
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
+    <BaseConfirmDialog
+      open={open}
+      onOpenChange={setOpen}
+      title='confirm_delete_habit_dialog.title'
+      description='confirm_delete_habit_dialog.description'
+      onConfirm={handleDelete}
+      isLoading={deleteMutation.isPending}
+      trigger={
         <Button
           variant='outline'
           size='sm'
@@ -54,25 +50,7 @@ export default function ConfirmDeleteHabitDialog({
           <Trash className='mr-2 h-4 w-4' />
           {t('delete')}
         </Button>
-      </AlertDialogTrigger>
-
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t('confirm_delete_habit_dialog.title')}</AlertDialogTitle>
-          <AlertDialogDescription>{t('confirm_delete_habit_dialog.description')}</AlertDialogDescription>
-        </AlertDialogHeader>
-
-        <AlertDialogFooter>
-          <AlertDialogCancel className='hover:bg-foreground/10 cursor-pointer'>{t('cancel')}</AlertDialogCancel>
-          <AlertDialogAction
-            className='text-destructive hover:text-foreground hover:bg-foreground/10 cursor-pointer bg-transparent'
-            onClick={handleDelete}
-            disabled={deleteMutation.isPending}
-          >
-            {t('delete')}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      }
+    />
   )
 }

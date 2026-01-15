@@ -1,19 +1,8 @@
-import { LoaderButton } from '@/common'
+import { BaseFormDialog } from '@/common'
 import { ColorSelector, IconPicker, TextInput } from '@/forms'
 import { areaStyles } from '@/types/colors.types'
 import { allIcons } from '@/types/icons.types'
 import type { Area } from '@/types/models.types'
-import {
-  Button,
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/ui'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { defaultAreas, updateAreaSchema, type UpdateAreaBodyType } from '@shared/schemas/areas.schemas'
@@ -101,65 +90,52 @@ export default function UpdateAreaDialog({ area }: { area: Area }) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>{Badge}</DialogTrigger>
-      <DialogContent className='sm:max-w-[425px]' aria-describedby='update-area-dialog-desc'>
-        <DialogHeader>
-          <DialogTitle>{t('update_area_dialog.title')}</DialogTitle>
-          <DialogDescription className='sr-only'>
-            {t('update_area_dialog.description') || 'Dialog to update an existing area'}
-          </DialogDescription>
-        </DialogHeader>
-        <div className='grid gap-4'>
-          <div className='grid gap-3'>
-            <Controller
-              name='name'
-              control={control}
-              render={({ field }) => (
-                <TextInput
-                  type='text'
-                  placeholder={t('create_area_dialog.name')}
-                  className='h-9'
-                  tabIndex={-1}
-                  {...field}
-                  value={t(field.value || '')}
-                  {...(errors.name?.message && { errorMessage: t(errors.name.message) })}
-                  required
-                />
-              )}
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Controller
-              name='color'
-              control={control}
-              render={({ field }) => <ColorSelector className='w-full' value={field.value} onChange={field.onChange} />}
-            />
-          </div>
-          <div className='grid gap-3'>
-            <Controller
-              name='icon'
-              control={control}
-              render={({ field }) => <IconPicker className='w-full' value={field.value} onChange={field.onChange} />}
-            />
-          </div>
+    <BaseFormDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      title='update_area_dialog.title'
+      description='update_area_dialog.description'
+      onSubmit={handleSubmit(onSubmit)}
+      submitLabel='save_changes'
+      isLoading={updateMutation.isPending}
+      isSubmitDisabled={!isValid || !isDirty}
+      extraFooterActions={<ConfirmDeleteAreaDialog area={area} onDeleteSuccess={handleDeleteSuccess} />}
+      trigger={Badge}
+    >
+      <div className='grid gap-4'>
+        <div className='grid gap-3'>
+          <Controller
+            name='name'
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                type='text'
+                placeholder={t('create_area_dialog.name')}
+                className='h-9'
+                tabIndex={-1}
+                {...field}
+                value={t(field.value || '')}
+                {...(errors.name?.message && { errorMessage: t(errors.name.message) })}
+                required
+              />
+            )}
+          />
         </div>
-        <DialogFooter className='flex h-auto justify-end'>
-          <ConfirmDeleteAreaDialog area={area} onDeleteSuccess={handleDeleteSuccess} />
-          <div className='flex gap-2'>
-            <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
-              <Button variant='outline'>{t('cancel')}</Button>
-            </DialogClose>
-            <LoaderButton
-              className='h-auto cursor-pointer'
-              disabled={!isValid || !isDirty}
-              isLoading={updateMutation.isPending}
-              onClick={handleSubmit(onSubmit)}
-              label={t('save_changes')}
-            />
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <div className='grid gap-3'>
+          <Controller
+            name='color'
+            control={control}
+            render={({ field }) => <ColorSelector className='w-full' value={field.value} onChange={field.onChange} />}
+          />
+        </div>
+        <div className='grid gap-3'>
+          <Controller
+            name='icon'
+            control={control}
+            render={({ field }) => <IconPicker className='w-full' value={field.value} onChange={field.onChange} />}
+          />
+        </div>
+      </div>
+    </BaseFormDialog>
   )
 }
