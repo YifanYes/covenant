@@ -130,6 +130,7 @@
     "completed": "Completed",
     "failed": "Failed"
   },
+  "confirm": "Confirm",
   "confirm_delete_account_dialog": {
     "button": "Delete Account",
     "description": "This action is irreversible. This will permanently delete your account and all associated data.",
