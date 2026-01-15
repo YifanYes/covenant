@@ -1,0 +1,72 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/ui'
+import { type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+
+interface BaseConfirmDialogProps {
+  title: string
+  description?: string
+  onConfirm: () => void
+  confirmLabel?: string
+  cancelLabel?: string
+  isLoading?: boolean
+  variant?: 'default' | 'destructive'
+  confirmClassName?: string
+  trigger?: ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+export default function BaseConfirmDialog({
+  title,
+  description,
+  onConfirm,
+  confirmLabel,
+  cancelLabel,
+  isLoading,
+  variant = 'destructive',
+  confirmClassName,
+  trigger,
+  open,
+  onOpenChange
+}: BaseConfirmDialogProps) {
+  const { t } = useTranslation()
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      {trigger && <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>}
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t(title)}</AlertDialogTitle>
+          <AlertDialogDescription>{description ? t(description) : null}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className='hover:bg-foreground/10 cursor-pointer'>
+            {cancelLabel ? t(cancelLabel) : t('cancel')}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            className={
+              confirmClassName ||
+              (variant === 'destructive'
+                ? 'text-destructive hover:text-foreground hover:bg-foreground/10 cursor-pointer bg-transparent'
+                : 'cursor-pointer')
+            }
+            onClick={onConfirm}
+            disabled={isLoading}
+          >
+            {confirmLabel ? t(confirmLabel) : t('confirm')}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
