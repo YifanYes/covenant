@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { FormError } from './form-error.component'
-import { FormLabel } from './form-label.component'
+import FormError from './form-error.component'
+import FormLabel from './form-label.component'
 
 export default function FormField({
   label,

@@ -9,7 +9,7 @@ import dayjs from 'dayjs'
 import { uniqBy } from 'es-toolkit/compat'
 import { useTranslation } from 'react-i18next'
 
-const Task = ({
+export default function Task({
   task,
   setSelectedTask,
   hideHandle = false
@@ -17,7 +17,7 @@ const Task = ({
   task: TaskType
   setSelectedTask?: (task?: TaskType) => void
   hideHandle?: boolean
-}) => {
+}) {
   const { t } = useTranslation()
 
   const getTaskType = (effort: string | null | undefined, impact: string | null | undefined): string => {
@@ -95,5 +95,3 @@ const Task = ({
     </li>
   )
 }
-
-export default Task

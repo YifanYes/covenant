@@ -1,4 +1,0 @@
-export { default as ConfirmCompleteObjectiveDialog } from './confirm-complete-objective-dialog.component'
-export { default as ConfirmDeleteObjectiveDialog } from './confirm-delete-objective-dialog.component'
-export { default as CreateObjectiveDialog } from './create-objective-dialog.component'
-export { default as ObjectiveCard } from './objective-card.component'

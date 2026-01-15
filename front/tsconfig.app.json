@@ -9,7 +9,15 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@shared/*": ["../shared/*"]
+      "@shared/*": ["../shared/*"],
+      "@/auth": ["./src/components/auth"],
+      "@/ui": ["./src/components/ui"],
+      "@/common": ["./src/components/common"],
+      "@/forms": ["./src/components/forms"],
+      "@/layouts": ["./src/layouts"],
+      "@/stores": ["./src/stores"],
+      "@/lib": ["./src/lib"],
+      "@/tasks": ["./src/components/tasks"]
     },
 
     /* Bundler mode */

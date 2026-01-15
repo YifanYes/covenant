@@ -1,14 +1,11 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/ui'
-import { Input } from '@/ui'
-import { ScrollArea } from '@/ui'
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/cn.lib'
 import { allIcons, iconCategories, iconCollection, type Icon, type IconCategoryKey } from '@/types/icons.types'
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Input, ScrollArea } from '@/ui'
 import { ChevronDown, Close, Search } from '@nsmr/pixelart-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/ui'
-import { FormField } from './form-field.component'
+import FormField from './form-field.component'
 
 export default function IconPicker({
   value = '',

@@ -9,7 +9,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@shared': path.resolve(__dirname, '../shared')
+      '@shared': path.resolve(__dirname, '../shared'),
+      '@/auth': path.resolve(__dirname, './src/components/auth'),
+      '@/ui': path.resolve(__dirname, './src/components/ui'),
+      '@/common': path.resolve(__dirname, './src/components/common'),
+      '@/forms': path.resolve(__dirname, './src/components/forms'),
+      '@/layouts': path.resolve(__dirname, './src/layouts'),
+      '@/stores': path.resolve(__dirname, './src/stores'),
+      '@/lib': path.resolve(__dirname, './src/lib'),
+      '@/tasks': path.resolve(__dirname, './src/components/tasks')
     }
   }
 })

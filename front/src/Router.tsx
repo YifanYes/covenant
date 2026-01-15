@@ -14,19 +14,19 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 
 // Lazy load views
-const Dashboard = lazy(() => import('./views/productivity/dashboard.page'))
-const Habits = lazy(() => import('./views/productivity/habits.page'))
-const Login = lazy(() => import('./views/auth/login.page'))
-const Objectives = lazy(() => import('./views/productivity/objectives.page'))
-const Onboarding = lazy(() => import('./views/auth/onboarding.page'))
-const Settings = lazy(() => import('./views/productivity/settings.page'))
-const SignUp = lazy(() => import('./views/auth/sign-up.page'))
-const Tasks = lazy(() => import('./views/productivity/tasks.page'))
-const AdventureInventory = lazy(() => import('./views/adventure/adventure-inventory.page'))
-const AdventureMissions = lazy(() => import('./views/adventure/adventure-missions.page'))
-const AdventureHistory = lazy(() => import('./views/adventure/adventure-history.page'))
-const AdventureStore = lazy(() => import('./views/adventure/adventure-store.page'))
-const MissionDetail = lazy(() => import('./views/adventure/mission-detail.page'))
+const Dashboard = lazy(() => import('./views/dashboard/dashboard.page'))
+const Habits = lazy(() => import('./views/habits/habits.page'))
+const Login = lazy(() => import('./views/auth/login/login.page'))
+const Objectives = lazy(() => import('./views/objectives/objectives.page'))
+const Onboarding = lazy(() => import('./views/auth/onboarding/onboarding.page'))
+const Settings = lazy(() => import('./views/settings/settings.page'))
+const SignUp = lazy(() => import('./views/auth/sign-up/sign-up.page'))
+const Tasks = lazy(() => import('./views/tasks/tasks.page'))
+const AdventureInventory = lazy(() => import('./views/adventure/adventure-inventory/adventure-inventory.page'))
+const AdventureMissions = lazy(() => import('./views/adventure/adventure-missions/adventure-missions.page'))
+const AdventureHistory = lazy(() => import('./views/adventure/adventure-history/adventure-history.page'))
+const AdventureStore = lazy(() => import('./views/adventure/adventure-store/adventure-store.page'))
+const MissionDetail = lazy(() => import('./views/adventure/mission-detail/mission-detail.page'))
 
 export const Router = () => {
   return (

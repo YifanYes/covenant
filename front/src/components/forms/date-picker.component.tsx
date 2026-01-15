@@ -1,14 +1,12 @@
-import { Calendar as CalendarComponent } from '@/ui'
-import { Input } from '@/ui'
-import { Popover, PopoverContent, PopoverTrigger } from '@/ui'
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/cn.lib'
+import { Calendar as CalendarComponent, Input, Popover, PopoverContent, PopoverTrigger } from '@/ui'
 import { Calendar } from '@nsmr/pixelart-react'
 import dayjs from 'dayjs'
 import { capitalize } from 'es-toolkit/compat'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FormField } from './form-field.component'
+import FormField from './form-field.component'
 
 export default function DatePicker({
   value,

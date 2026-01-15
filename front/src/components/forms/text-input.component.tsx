@@ -1,7 +1,7 @@
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/cn.lib'
 import type { ComponentProps } from 'react'
-import { FormField } from './form-field.component'
+import FormField from './form-field.component'
 
 export default function TextInput({
   label,

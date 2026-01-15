@@ -1,9 +1,9 @@
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/cn.lib'
+import { Button } from '@/ui'
 import { Eye, EyeClosed } from '@nsmr/pixelart-react'
 import { useState, type ComponentProps } from 'react'
-import { Button } from '@/ui'
-import { FormField } from './form-field.component'
+import FormField from './form-field.component'
 
 export default function PasswordInput({
   label,

@@ -1,6 +1,6 @@
 import type { Task } from '@/types/models.types'
 import type { Dayjs } from 'dayjs'
-import { CalendarDay } from './calendar-day.component'
+import CalendarDay from './calendar-day.component'
 
 export default function MonthlyCalendar({ month, tasks }: { month: Dayjs[][]; tasks: Task[] }) {
   // Force 5 rows by slicing

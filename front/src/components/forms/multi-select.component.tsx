@@ -3,7 +3,7 @@ import { cn, truncateText } from '@/lib/cn.lib'
 import { Check, ChevronDown } from '@nsmr/pixelart-react'
 import { useEffect, useRef, useState } from 'react'
 import { type Control, Controller } from 'react-hook-form'
-import { FormField } from './form-field.component'
+import FormField from './form-field.component'
 
 export default function MultiSelect({
   name,
