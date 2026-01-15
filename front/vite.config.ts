@@ -8,8 +8,6 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@shared': path.resolve(__dirname, '../shared'),
       '@/auth': path.resolve(__dirname, './src/components/auth'),
       '@/ui': path.resolve(__dirname, './src/components/ui'),
       '@/common': path.resolve(__dirname, './src/components/common'),
@@ -18,7 +16,9 @@ export default defineConfig({
       '@/stores': path.resolve(__dirname, './src/stores'),
       '@/lib': path.resolve(__dirname, './src/lib'),
       '@/tasks': path.resolve(__dirname, './src/components/tasks'),
-      '@/styles': path.resolve(__dirname, './src/styles')
+      '@/styles': path.resolve(__dirname, './src/styles'),
+      '@': path.resolve(__dirname, './src'),
+      '@shared': path.resolve(__dirname, '../shared')
     }
   }
 })
