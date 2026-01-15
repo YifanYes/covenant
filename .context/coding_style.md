@@ -14,12 +14,93 @@ The project is a monorepo managed with workspaces:
 
 ## 2. Naming Conventions
 
-- **Frontend Components**: `PascalCase` for files and component names (e.g., `ObjectiveCard.tsx`).
-- **Hooks**: `camelCase` with the `use` prefix (e.g., `useTaskActions.ts`).
-- **Files & Folders**: `kebab-case` for folders (e.g., `suspense-fallbacks/`) and `dot.export` for server routers (e.g., `tasks.router.ts`).
+- **Files**: `kebab-case` with subdomain suffix (e.g., `objective-card.component.tsx`, `auth.store.ts`).
+- **Folders**: `kebab-case` (e.g., `suspense-fallbacks/`, `objective-card/`).
+- **Hooks**: `kebab-case` with `use-` prefix (e.g., `use-theme.ts`). Exception to subdomain suffix rule.
+- **Layouts**: `kebab-case` without suffix (e.g., `app-layout.tsx`). Exception to subdomain suffix rule.
+- **Server Routers**: `dot.export` pattern (e.g., `tasks.router.ts`).
 - **Variables & Functions**: `camelCase` consistently across the codebase.
 
-## 3. Frontend Best Practices
+### File Subdomain Suffixes
+
+| Type             | Suffix           | Example                     |
+| ---------------- | ---------------- | --------------------------- |
+| Components       | `.component.tsx` | `app-sidebar.component.tsx` |
+| Views/Pages      | `.page.tsx`      | `dashboard.page.tsx`        |
+| Utilities        | `.utils.ts`      | `objective-card.utils.ts`   |
+| Models           | `.model.ts`      | `objective-card.model.ts`   |
+| Config/Constants | `.config.ts`     | `theme.config.ts`           |
+| Libraries        | `.lib.ts`        | `config.lib.ts`             |
+| Stores           | `.store.ts`      | `auth.store.ts`             |
+| Types            | `.types.ts`      | `colors.types.ts`           |
+
+## 3. Frontend Architecture
+
+### Directory Structure
+
+```
+front/src/
+├── components/          # ONLY shared/reusable components
+│   ├── ui/              # Shadcn primitives
+│   ├── common/          # Shared non-ui components
+│   ├── forms/           # Form-related components
+│   ├── [domain]/        # Domain-specific components shared between domains (tasks, habits, objectives, etc.)
+│   ├── auth/            # ONLY PrivateRoute (used by router)
+│   ├── skeletons/       # Loading skeletons
+│   └── suspense-fallbacks/
+├── views/               # Each view in its own kebab-case folder
+│   ├── adventure/       # Adventure domain (grouped pages)
+│   │   ├── adventure-history/
+│   │   ├── adventure-inventory/
+│   │   ├── adventure-store/
+│   │   ├── mission-detail/
+│   │   └── components/  # Shared adventure components
+│   ├── auth/            # Auth domain (grouped pages)
+│   │   ├── login/
+│   │   ├── sign-up/
+│   │   ├── onboarding/
+│   │   └── components/  # Shared auth components
+│   ├── dashboard/       # Individual view folders
+│   ├── habits/
+│   ├── objectives/
+│   ├── tasks/
+│   └── settings/
+├── hooks/               # Custom React hooks (use-*.ts)
+├── stores/              # Zustand stores (*.store.ts)
+├── layouts/             # Layout components (no suffix)
+├── styles/              # Design tokens and global styles
+│   ├── tokens.css       # Tailwind theme and CSS variables
+│   └── ...
+├── lib/                 # External library configs (*.lib.ts)
+├── utils/               # Domain utilities (*.utils.ts)
+└── types/               # Global type definitions (*.types.ts)
+```
+
+### Component/View Folder Structure (4 Subdomains)
+
+Each component or view lives in a **kebab-case folder** with up to 4 optional subdomain files:
+
+```
+component-name/
+├── component-name.config.ts     # Constants, configuration
+├── component-name.utils.ts      # Helper methods
+├── component-name.model.ts      # Types/interfaces (except FC props)
+└── component-name.component.tsx # Main component (FC props defined here)
+```
+
+For views/pages:
+
+```
+dashboard/
+├── dashboard.config.ts
+├── dashboard.utils.ts
+├── dashboard.model.ts
+└── dashboard.page.tsx
+```
+
+Subdomain files are optional—simple components may only need `.component.tsx`.
+
+### Best Practices
 
 - **Component Structure**: Use atomic components and base styles on `shadcn/ui`.
 - **Styling**: Use Tailwind CSS v4. For dynamic classes, use the `cn()` utility (`clsx` + `tailwind-merge`).
@@ -27,6 +108,82 @@ The project is a monorepo managed with workspaces:
 - **Forms**: Use `react-hook-form` with `zod` resolvers for validation.
 - **Type Safety**: Avoid `any` at all costs. Use proper TypeScript interfaces and types.
 - **Icons**: Use `@nsmr/pixelart-react` for icons.
+- **Dialogs**: Use `BaseFormDialog` for forms and `BaseConfirmDialog` for alerts/confirmations (found in `@/common`). Avoid using `Dialog` or `AlertDialog` directly in views to maintain UI consistency.
+- **Styling Tokens**: Centralize all design tokens (colors, tiers, rarities) in `src/styles/tokens.css`. Reference them via Tailwind utilities (e.g., `text-tier-1`, `border-rarity-rare`).
+
+### Architecture Guidelines
+
+#### When to Use Folder Structure
+
+Not every component needs the 4-subdomain split:
+
+- **Single file**: Use for simple components with no shared logic (< 150 lines, e.g., `button.component.tsx`)
+- **Folder with subdomains**: Use when you need to split logic into `.utils.ts`, `.model.ts`, or `.config.ts` files (e.g., `areas-distribution/`)
+
+#### Default Exports with Barrel Mapping
+
+All UI and domain components **must use direct default function exports** in their primary file to maintain compatibility with standard React toolchains (e.g., `React.lazy`) and improve IDE discoverability. Avoid `const` exports for the main component.
+
+- **Component File**: `export default function ObjectiveCard() { ... }`
+- **Barrel File (`index.ts`)**: `export { default as ObjectiveCard } from './objective-card.component'`
+- **Consumer**: `import { ObjectiveCard, CreateObjectiveDialog } from '@/objectives'`
+
+#### Function Components & Direct Exports
+
+All UI and domain components **must use direct default function exports** instead of `const` arrow functions. This ensures better compatibility with React toolchains and improves readability.
+
+- **Good**: `export default function MyComponent() { ... }`
+- **Avoid**: `const MyComponent = () => { ... }` then `export default MyComponent`
+
+#### Component Relocation & Colocation
+
+1. **Global/Shared Components**: Live in `src/components/[domain]/`. These are components used across multiple unrelated views or domains (e.g., `ui/`, `common/`, `forms/`, `calendars/`).
+2. **Domain-Shared Components**: Components shared between views within the same domain go in the domain's `components/` folder:
+   ```
+   views/adventure/
+   ├── adventure-history/
+   ├── adventure-store/
+   └── components/              # Shared across adventure views
+       ├── tier-badge.component.tsx
+       ├── combat-log.component.tsx
+       └── index.ts
+   ```
+3. **View-Local Components**: Components used exclusively by a single view MUST be in a `components/` folder within that view's directory:
+   ```
+   views/dashboard/
+   ├── dashboard.page.tsx
+   └── components/              # Only used by dashboard
+       ├── areas-distribution/
+       ├── upcoming-tasks/
+       └── index.ts
+   ```
+4. **General Colocation**: Keep related logic (.utils, .model, .config) together within the component/view folder.
+
+#### Reducing Import Verbosity
+
+1. **Path Aliases**: Use descriptive aliases only for truly shared components:
+   - `@/tasks` → Only for shared Task/TaskSummaryList
+   - `@/auth` → Only for PrivateRoute
+   - `@/ui`, `@/common`, `@/forms` → Shared UI components
+   - `@/stores`, `@/lib`, `@/utils`, `@/layouts`, `@/styles`
+2. **View-Local Imports**: Use relative imports for view-local components:
+   ```ts
+   // views/dashboard/dashboard.page.tsx
+   import { UpcomingTasks, EfficiencyMetrics } from './components'
+   ```
+3. **Barrel Files**: Every component directory must have an `index.ts` file that groups named exports:
+   ```ts
+   // views/dashboard/components/index.ts
+   export { default as UpcomingTasks } from './upcoming-tasks/upcoming-tasks.component'
+   export { default as EfficiencyMetrics } from './efficiency-metrics/efficiency-metrics.component'
+   ```
+
+#### Colocation Principle
+
+Keep related files together:
+
+- **Good**: `components/tasks/create-task-dialog.component.tsx` (dialog lives with task components)
+- **Avoid**: Separate `dialogs/` folder far from the domain it serves
 
 ## 4. Backend & Type Safety
 
