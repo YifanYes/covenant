@@ -1,7 +1,7 @@
 import { Alert, BullseyeArrow, Trophy } from '@nsmr/pixelart-react'
 import { useTranslation } from 'react-i18next'
-import DashboardSectionWrapperComponent from '../dashboard-section-wrapper/DashboardSectionWrapper.component'
-import BlindspotListComponent from './components/BlindspotList.component'
+import { DashboardSectionWrapperComponent } from '../dashboard-section-wrapper.component'
+import { BlindspotListComponent } from './blindspot-list/blindspot-list.component'
 
 interface BlindspotComponentProps {
   areas: { name: string; lastCompletion: string | null }[]

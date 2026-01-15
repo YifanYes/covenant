@@ -1,4 +1,4 @@
-import type { AreasDistributionDataItem } from '@/components/dashboard/areas-distribution/AreasDistribution.model'
+import type { AreasDistributionDataItem } from '@/components/dashboard/areas-distribution/areas-distribution.model'
 import { areaSimpleStyles } from '@/types/colors.types'
 import { allIcons } from '@/types/icons.types'
 import type { Area } from '@/types/models.types'

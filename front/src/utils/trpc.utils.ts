@@ -1,5 +1,5 @@
-import { env } from '@/lib/config'
-import { supabase } from '@/lib/supabase'
+import { env } from '@/lib/config.lib'
+import { supabase } from '@/lib/supabase.lib'
 import { QueryClient } from '@tanstack/react-query'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'

@@ -1,33 +1,32 @@
+import { PrivateRoute } from '@/auth'
+import {
+  AdventureSuspenseFallback,
+  DashboardSuspenseFallback,
+  HabitsSuspenseFallback,
+  LoginSuspenseFallback,
+  ObjectivesSuspenseFallback,
+  SettingsSuspenseFallback,
+  SignUpSuspenseFallback,
+  TasksSuspenseFallback
+} from '@/components/suspense-fallbacks'
+import { AdventureLayout, AppLayout, CenteredLayout, WorkspaceLayout } from '@/layouts'
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
-import PrivateRoute from './components/PrivateRoute'
-import AdventureSuspenseFallback from './components/suspense-fallbacks/AdventureSuspenseFallback'
-import DashboardSuspenseFallback from './components/suspense-fallbacks/DashboardSuspenseFallback'
-import HabitsSuspenseFallback from './components/suspense-fallbacks/HabitsSuspenseFallback'
-import LoginSuspenseFallback from './components/suspense-fallbacks/LoginSuspenseFallback'
-import ObjectivesSuspenseFallback from './components/suspense-fallbacks/ObjectivesSuspenseFallback'
-import SettingsSuspenseFallback from './components/suspense-fallbacks/SettingsSuspenseFallback'
-import SignUpSuspenseFallback from './components/suspense-fallbacks/SignUpSuspenseFallback'
-import TasksSuspenseFallback from './components/suspense-fallbacks/TasksSuspenseFallback'
-import AdventureLayout from './layouts/AdventureLayout'
-import AppLayout from './layouts/AppLayout'
-import CenteredLayout from './layouts/CenteredLayout'
-import WorkspaceLayout from './layouts/WorkspaceLayout'
 
 // Lazy load views
-const Dashboard = lazy(() => import('./views/Dashboard'))
-const Habits = lazy(() => import('./views/Habits'))
-const Login = lazy(() => import('./views/Login'))
-const Objectives = lazy(() => import('./views/Objectives'))
-const Onboarding = lazy(() => import('./views/Onboarding'))
-const Settings = lazy(() => import('./views/Settings'))
-const SignUp = lazy(() => import('./views/SignUp'))
-const Tasks = lazy(() => import('./views/Tasks'))
-const AdventureInventory = lazy(() => import('./views/AdventureInventory'))
-const AdventureMissions = lazy(() => import('./views/AdventureMissions'))
-const AdventureHistory = lazy(() => import('./views/AdventureHistory'))
-const AdventureStore = lazy(() => import('./views/AdventureStore'))
-const MissionDetail = lazy(() => import('./views/MissionDetail'))
+const Dashboard = lazy(() => import('./views/productivity/dashboard.page'))
+const Habits = lazy(() => import('./views/productivity/habits.page'))
+const Login = lazy(() => import('./views/auth/login.page'))
+const Objectives = lazy(() => import('./views/productivity/objectives.page'))
+const Onboarding = lazy(() => import('./views/auth/onboarding.page'))
+const Settings = lazy(() => import('./views/productivity/settings.page'))
+const SignUp = lazy(() => import('./views/auth/sign-up.page'))
+const Tasks = lazy(() => import('./views/productivity/tasks.page'))
+const AdventureInventory = lazy(() => import('./views/adventure/adventure-inventory.page'))
+const AdventureMissions = lazy(() => import('./views/adventure/adventure-missions.page'))
+const AdventureHistory = lazy(() => import('./views/adventure/adventure-history.page'))
+const AdventureStore = lazy(() => import('./views/adventure/adventure-store.page'))
+const MissionDetail = lazy(() => import('./views/adventure/mission-detail.page'))
 
 export const Router = () => {
   return (
