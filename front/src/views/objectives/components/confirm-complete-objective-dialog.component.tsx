@@ -45,9 +45,8 @@ export default function ConfirmCompleteObjectiveDialog({ objective, onCompleteSu
       trigger={
         <Button
           variant='outline'
-          size='sm'
           disabled={completeMutation.isPending}
-          className='hover:text-foreground hover:bg-foreground/10 mr-auto h-auto text-green-400'
+          className='hover:text-foreground hover:bg-foreground/10 mr-auto text-green-400'
         >
           <Check className='h-4 w-4' />
           {t('objectives.complete.button')}

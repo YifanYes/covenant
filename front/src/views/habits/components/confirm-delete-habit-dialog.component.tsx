@@ -39,13 +39,13 @@ export default function ConfirmDeleteHabitDialog({
       title='confirm_delete_habit_dialog.title'
       description='confirm_delete_habit_dialog.description'
       onConfirm={handleDelete}
+      confirmLabel='delete'
       isLoading={deleteMutation.isPending}
       trigger={
         <Button
           variant='outline'
-          size='sm'
           disabled={deleteMutation.isPending}
-          className='text-destructive hover:text-foreground hover:bg-foreground/10 mr-auto h-auto'
+          className='text-destructive hover:text-foreground hover:bg-foreground/10 mr-auto'
         >
           <Trash className='mr-2 h-4 w-4' />
           {t('delete')}

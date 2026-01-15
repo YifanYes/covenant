@@ -66,7 +66,7 @@ export default function BaseFormDialog({
               <Button variant='outline'>{cancelLabel ? t(cancelLabel) : t('cancel')}</Button>
             </DialogClose>
             <LoaderButton
-              className='h-auto cursor-pointer'
+              className='cursor-pointer'
               disabled={isSubmitDisabled}
               isLoading={!!isLoading}
               onClick={onSubmit}

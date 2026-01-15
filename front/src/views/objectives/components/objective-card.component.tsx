@@ -201,7 +201,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
               <Button variant='outline'>{t('cancel')}</Button>
             </DialogClose>
             <LoaderButton
-              className='h-auto cursor-pointer'
+              className='cursor-pointer'
               disabled={!isValid || !isDirty}
               isLoading={updateMutation.isPending}
               onClick={handleSubmit((data) => onSubmit(data as UpdateObjectiveBodyType))}

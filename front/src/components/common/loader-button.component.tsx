@@ -6,6 +6,7 @@ export default function LoaderButton({
   isLoading,
   label,
   onClick,
+  size,
   className,
   icon
 }: {
@@ -13,12 +14,13 @@ export default function LoaderButton({
   isLoading: boolean
   label: string
   onClick: () => void
+  size?: 'default' | 'sm' | 'lg' | 'icon'
   className?: string
   icon?: React.ReactNode
 }) {
   return (
     <Button
-      size='sm'
+      size={size}
       disabled={disabled || isLoading}
       onClick={onClick}
       className={`${className || ''}`}

@@ -43,9 +43,8 @@ export default function ConfirmDeleteObjectiveDialog({ objective, onDeleteSucces
       trigger={
         <Button
           variant='outline'
-          size='sm'
           disabled={deleteMutation.isPending}
-          className='text-destructive hover:text-foreground hover:bg-foreground/10 h-auto'
+          className='text-destructive hover:text-foreground hover:bg-foreground/10'
         >
           <Trash className='h-4 w-4' />
           {t('delete')}

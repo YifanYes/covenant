@@ -125,14 +125,14 @@ export default function UpdateTaskDialog() {
       extraFooterActions={
         <div className='flex gap-2'>
           <LoaderButton
-            className='text-destructive border-destructive hover:text-background hover:bg-destructive h-auto cursor-pointer border-2 bg-transparent'
+            className='text-destructive border-destructive hover:text-background hover:bg-destructive cursor-pointer border bg-transparent'
             isLoading={deleteMutation.isPending}
             disabled={isUndefined(selectedTask)}
             onClick={onDelete}
             label={t('tasks.delete')}
           />
           <LoaderButton
-            className='text-accent border-accent hover:text-background hover:bg-accent h-auto cursor-pointer border-2 bg-transparent'
+            className='text-accent border-accent hover:text-background hover:bg-accent cursor-pointer border bg-transparent'
             isLoading={duplicateMutation.isPending}
             disabled={isUndefined(selectedTask)}
             onClick={onDuplicate}
