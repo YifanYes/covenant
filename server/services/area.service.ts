@@ -5,8 +5,8 @@ import { AreaRepository } from '../repositories/area.repository'
 export class AreaService {
   private areaRepository: AreaRepository
 
-  constructor(private _prisma: PrismaClient) {
-    this.areaRepository = new AreaRepository(_prisma)
+  constructor(prisma: PrismaClient) {
+    this.areaRepository = new AreaRepository(prisma)
   }
 
   async create(userId: string, input: CreateAreaBodyType) {

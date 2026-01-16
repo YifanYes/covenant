@@ -130,6 +130,7 @@
     "completed": "Completada",
     "failed": "Fallida"
   },
+  "confirm": "Confirmar",
   "confirm_delete_account_dialog": {
     "button": "Eliminar cuenta",
     "description": "Esta acción es irreversible. Esto eliminará permanentemente tu cuenta y todos los datos asociados a ella.",

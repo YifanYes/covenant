@@ -1,33 +1,33 @@
+import PrivateRoute from '@/auth/private-route.component'
+import AdventureSuspenseFallback from '@/components/suspense-fallbacks/adventure-suspense-fallback.component'
+import DashboardSuspenseFallback from '@/components/suspense-fallbacks/dashboard-suspense-fallback.component'
+import HabitsSuspenseFallback from '@/components/suspense-fallbacks/habits-suspense-fallback.component'
+import LoginSuspenseFallback from '@/components/suspense-fallbacks/login-suspense-fallback.component'
+import ObjectivesSuspenseFallback from '@/components/suspense-fallbacks/objectives-suspense-fallback.component'
+import SettingsSuspenseFallback from '@/components/suspense-fallbacks/settings-suspense-fallback.component'
+import SignUpSuspenseFallback from '@/components/suspense-fallbacks/sign-up-suspense-fallback.component'
+import TasksSuspenseFallback from '@/components/suspense-fallbacks/tasks-suspense-fallback.component'
+import AdventureLayout from '@/layouts/adventure-layout'
+import AppLayout from '@/layouts/app-layout'
+import CenteredLayout from '@/layouts/centered-layout'
+import WorkspaceLayout from '@/layouts/workspace-layout'
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
-import PrivateRoute from './components/PrivateRoute'
-import AdventureSuspenseFallback from './components/suspense-fallbacks/AdventureSuspenseFallback'
-import DashboardSuspenseFallback from './components/suspense-fallbacks/DashboardSuspenseFallback'
-import HabitsSuspenseFallback from './components/suspense-fallbacks/HabitsSuspenseFallback'
-import LoginSuspenseFallback from './components/suspense-fallbacks/LoginSuspenseFallback'
-import ObjectivesSuspenseFallback from './components/suspense-fallbacks/ObjectivesSuspenseFallback'
-import SettingsSuspenseFallback from './components/suspense-fallbacks/SettingsSuspenseFallback'
-import SignUpSuspenseFallback from './components/suspense-fallbacks/SignUpSuspenseFallback'
-import TasksSuspenseFallback from './components/suspense-fallbacks/TasksSuspenseFallback'
-import AdventureLayout from './layouts/AdventureLayout'
-import AppLayout from './layouts/AppLayout'
-import CenteredLayout from './layouts/CenteredLayout'
-import WorkspaceLayout from './layouts/WorkspaceLayout'
 
 // Lazy load views
-const Dashboard = lazy(() => import('./views/Dashboard'))
-const Habits = lazy(() => import('./views/Habits'))
-const Login = lazy(() => import('./views/Login'))
-const Objectives = lazy(() => import('./views/Objectives'))
-const Onboarding = lazy(() => import('./views/Onboarding'))
-const Settings = lazy(() => import('./views/Settings'))
-const SignUp = lazy(() => import('./views/SignUp'))
-const Tasks = lazy(() => import('./views/Tasks'))
-const AdventureInventory = lazy(() => import('./views/AdventureInventory'))
-const AdventureMissions = lazy(() => import('./views/AdventureMissions'))
-const AdventureHistory = lazy(() => import('./views/AdventureHistory'))
-const AdventureStore = lazy(() => import('./views/AdventureStore'))
-const MissionDetail = lazy(() => import('./views/MissionDetail'))
+const Dashboard = lazy(() => import('./views/dashboard/dashboard.page'))
+const Habits = lazy(() => import('./views/habits/habits.page'))
+const Login = lazy(() => import('./views/auth/login/login.page'))
+const Objectives = lazy(() => import('./views/objectives/objectives.page'))
+const Onboarding = lazy(() => import('./views/auth/onboarding/onboarding.page'))
+const Settings = lazy(() => import('./views/settings/settings.page'))
+const SignUp = lazy(() => import('./views/auth/sign-up/sign-up.page'))
+const Tasks = lazy(() => import('./views/tasks/tasks.page'))
+const AdventureInventory = lazy(() => import('./views/adventure/adventure-inventory/adventure-inventory.page'))
+const AdventureMissions = lazy(() => import('./views/adventure/adventure-missions/adventure-missions.page'))
+const AdventureHistory = lazy(() => import('./views/adventure/adventure-history/adventure-history.page'))
+const AdventureStore = lazy(() => import('./views/adventure/adventure-store/adventure-store.page'))
+const MissionDetail = lazy(() => import('./views/adventure/mission-detail/mission-detail.page'))
 
 export const Router = () => {
   return (
