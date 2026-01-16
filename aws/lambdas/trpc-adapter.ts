@@ -8,6 +8,7 @@ async function createLambdaContext(opts: CreateAWSLambdaContextOptions<APIGatewa
   // We need to import these dynamically too if their init depends on env
   const { supabase } = await import('../../server/lib/supabase')
   const { prisma } = await import('../../server/lib/prisma')
+  const { ServiceFactory } = await import('../../server/services/service.factory')
 
   const event = opts.event
   const authHeader = event.headers.authorization || event.headers.Authorization
@@ -19,7 +20,9 @@ async function createLambdaContext(opts: CreateAWSLambdaContextOptions<APIGatewa
     if (!error) user = data.user
   }
 
-  return { user, supabase, prisma, event }
+  const services = new ServiceFactory(prisma, supabase)
+
+  return { user, supabase, prisma, services, event }
 }
 
 let handlerInstance: any
