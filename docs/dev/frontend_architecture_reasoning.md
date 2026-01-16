@@ -52,5 +52,5 @@ Migrated to **Tailwind CSS v4** for a centralized, CSS-first theme.
 
 ## 5. New Infrastructure Changes
 
-- **Barrel Files (`index.ts`)**: **Reasoning**: Creates a public API for each folder. Consumers import multiple items from a clean path (e.g., `import { TaskCard, TaskList } from '@/tasks'`) instead of deeply nested internal files.
+- **Deep Imports via Aliases**: **Reasoning**: Instead of barrel files (`index.ts`), we use explicit deep imports (e.g., `import Button from '@/ui/button.component'`). This improves tree-shaking, reduces circular dependency risks, and makes it clearer exactly where a component is located. Path aliases are maintained to keep these deep imports concise.
 - **Path Aliases**: **Reasoning**: Simplifies imports by replacing fragile relative paths (`../../../`) with descriptive aliases (`@/ui`, `@/stores`). This makes code relocation significantly less painful.

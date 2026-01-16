@@ -120,13 +120,17 @@ Not every component needs the 4-subdomain split:
 - **Single file**: Use for simple components with no shared logic (< 150 lines, e.g., `button.component.tsx`)
 - **Folder with subdomains**: Use when you need to split logic into `.utils.ts`, `.model.ts`, or `.config.ts` files (e.g., `areas-distribution/`)
 
-#### Default Exports with Barrel Mapping
+#### Function Components & Direct Exports
 
 All UI and domain components **must use direct default function exports** in their primary file to maintain compatibility with standard React toolchains (e.g., `React.lazy`) and improve IDE discoverability. Avoid `const` exports for the main component.
 
 - **Component File**: `export default function ObjectiveCard() { ... }`
-- **Barrel File (`index.ts`)**: `export { default as ObjectiveCard } from './objective-card.component'`
-- **Consumer**: `import { ObjectiveCard, CreateObjectiveDialog } from '@/objectives'`
+- **Consumer**: `import ObjectiveCard from '@/objectives/objective-card.component'`
+- **Consumer (Multiple)**:
+  ```ts
+  import ObjectiveCard from '@/objectives/objective-card.component'
+  import CreateObjectiveDialog from '@/objectives/create-objective-dialog.component'
+  ```
 
 #### Function Components & Direct Exports
 
@@ -140,42 +144,39 @@ All UI and domain components **must use direct default function exports** instea
 1. **Global/Shared Components**: Live in `src/components/[domain]/`. These are components used across multiple unrelated views or domains (e.g., `ui/`, `common/`, `forms/`, `calendars/`).
 2. **Domain-Shared Components**: Components shared between views within the same domain go in the domain's `components/` folder:
    ```
-   views/adventure/
-   ├── adventure-history/
-   ├── adventure-store/
-   └── components/              # Shared across adventure views
-       ├── tier-badge.component.tsx
-       ├── combat-log.component.tsx
-       └── index.ts
+    views/adventure/
+    ├── adventure-history/
+    ├── adventure-store/
+    └── components/              # Shared across adventure views
+        ├── tier-badge.component.tsx
+        └── combat-log.component.tsx
    ```
 3. **View-Local Components**: Components used exclusively by a single view MUST be in a `components/` folder within that view's directory:
    ```
-   views/dashboard/
-   ├── dashboard.page.tsx
-   └── components/              # Only used by dashboard
-       ├── areas-distribution/
-       ├── upcoming-tasks/
-       └── index.ts
+    views/dashboard/
+    ├── dashboard.page.tsx
+    └── components/              # Only used by dashboard
+        ├── areas-distribution/
+        └── upcoming-tasks/
    ```
 4. **General Colocation**: Keep related logic (.utils, .model, .config) together within the component/view folder.
 
 #### Reducing Import Verbosity
 
-1. **Path Aliases**: Use descriptive aliases only for truly shared components:
-   - `@/tasks` → Only for shared Task/TaskSummaryList
-   - `@/auth` → Only for PrivateRoute
-   - `@/ui`, `@/common`, `@/forms` → Shared UI components
+1. **Path Aliases**: Use descriptive aliases to point to high-level directories:
+   - `@/ui` → `src/components/ui/`
+   - `@/common` → `src/components/common/`
+   - `@/forms` → `src/components/forms/`
    - `@/stores`, `@/lib`, `@/utils`, `@/layouts`, `@/styles`
-2. **View-Local Imports**: Use relative imports for view-local components:
+2. **Deep Imports**: Use explicit deep imports via aliases:
+   ```ts
+   import Button from '@/ui/button.component'
+   import { Card, CardContent } from '@/ui/card.component'
+   ```
+3. **View-Local Imports**: Use relative paths for view-local components:
    ```ts
    // views/dashboard/dashboard.page.tsx
-   import { UpcomingTasks, EfficiencyMetrics } from './components'
-   ```
-3. **Barrel Files**: Every component directory must have an `index.ts` file that groups named exports:
-   ```ts
-   // views/dashboard/components/index.ts
-   export { default as UpcomingTasks } from './upcoming-tasks/upcoming-tasks.component'
-   export { default as EfficiencyMetrics } from './efficiency-metrics/efficiency-metrics.component'
+   import UpcomingTasks from './components/upcoming-tasks/upcoming-tasks.component'
    ```
 
 #### Colocation Principle
