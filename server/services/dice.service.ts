@@ -7,8 +7,8 @@ import { CharacterRepository } from '../repositories/character.repository'
 export class DiceService {
   private characterRepository: CharacterRepository
 
-  constructor(private _prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(_prisma)
+  constructor(prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(prisma)
   }
 
   async addDiceToBank(userId: string, amount: number): Promise<DiceAddResult> {

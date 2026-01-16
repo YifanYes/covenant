@@ -98,7 +98,7 @@ export class TaskRepository {
   async bulkUpdate(userId: string, tasks: BulkUpdateTaskItem[]): Promise<void> {
     if (tasks.length === 0) return
 
-    const values = tasks.map((t) => Prisma.sql`(${t.id}::uuid, ${t.status}, ${t.order})`)
+    const values = tasks.map((t) => Prisma.sql`(${t.id}::uuid, ${t.status}::varchar, ${t.order}::integer)`)
 
     const count = await this.prisma.$executeRaw`
       UPDATE "tasks" as t

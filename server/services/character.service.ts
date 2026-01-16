@@ -12,9 +12,9 @@ export class CharacterService {
   private characterRepository: CharacterRepository
   private partyRepository: PartyRepository
 
-  constructor(private _prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(_prisma)
-    this.partyRepository = new PartyRepository(_prisma)
+  constructor(prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(prisma)
+    this.partyRepository = new PartyRepository(prisma)
   }
 
   getCharacterProgress(character: CharacterWithClasses): CharacterProgress {
