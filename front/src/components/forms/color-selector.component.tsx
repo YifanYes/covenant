@@ -1,7 +1,7 @@
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/cn.lib'
 import { colorOptions } from '@/types/colors.types'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui'
+import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select.component'
 import { useTranslation } from 'react-i18next'
 import FormField from './form-field.component'
 

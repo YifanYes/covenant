@@ -1,8 +1,11 @@
-import { ThemeToggle } from '@/common'
-import { SingleSelect } from '@/forms'
-import { useAuthStore, useUserPreferencesStore } from '@/stores'
-import { Button, Input, Label } from '@/ui'
-import { ConfirmDeleteAccountDialog } from '@/views/settings/components'
+import ThemeToggle from '@/common/theme-toggle.component'
+import SingleSelect from '@/forms/single-select.component'
+import { useAuthStore } from '@/stores/auth.store'
+import { useUserPreferencesStore } from '@/stores/user-preferences.store'
+import Button from '@/ui/button.component'
+import Input from '@/ui/input.component'
+import Label from '@/ui/label.component'
+import { ConfirmDeleteAccountDialog } from '@/views/settings/components/confirm-delete-account-dialog.component'
 import { useTranslation } from 'react-i18next'
 
 export default function Settings() {

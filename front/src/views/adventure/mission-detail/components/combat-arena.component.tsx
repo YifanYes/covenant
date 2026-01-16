@@ -1,6 +1,9 @@
 import { cn } from '@/lib/cn.lib'
-import { ScrollArea } from '@/ui'
-import { DiceResult, DiceRoller, EnemyCard, HealthBar } from '@/views/adventure/mission-detail/components'
+import ScrollArea from '@/ui/scroll-area.component'
+import DiceResult from '@/views/adventure/mission-detail/components/dice-result.component'
+import DiceRoller from '@/views/adventure/mission-detail/components/dice-roller.component'
+import EnemyCard from '@/views/adventure/mission-detail/components/enemy-card.component'
+import HealthBar from '@/views/adventure/mission-detail/components/health-bar.component'
 import {
   ItemType,
   type CombatLogEntry,
@@ -10,7 +13,7 @@ import {
 } from '@shared/types/gamification.types'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CombatLog } from '../../components'
+import CombatLog from '../../components/combat-log.component'
 
 interface CombatArenaProps {
   character: InventoryCharacter

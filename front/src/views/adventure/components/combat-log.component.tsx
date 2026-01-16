@@ -1,5 +1,5 @@
-import { Separator } from '@/ui'
 import { cn } from '@/lib/cn.lib'
+import Separator from '@/ui/separator.component'
 import { Alert, Battery, Bullseye, Flag, Heart, Shield, Trophy, Zap } from '@nsmr/pixelart-react'
 import { CombatLogType, type CombatLogEntry } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'

@@ -1,6 +1,6 @@
-import { Task } from '@/tasks'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/ui'
+import Task from '@/tasks/task.component'
 import type { Task as TaskType } from '@/types/models.types'
+import Dialog, { DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/ui/dialog.component'
 import { useTranslation } from 'react-i18next'
 
 interface TaskSummaryListProps {

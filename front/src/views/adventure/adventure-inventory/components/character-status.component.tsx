@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle, Separator } from '@/ui'
+import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
+import Separator from '@/ui/separator.component'
 import { Bullseye, Heart, Money, ScriptText, Shield, Zap } from '@nsmr/pixelart-react'
 import { TIER_PROGRESSION } from '@shared/constants/missions'
 import type { InventoryCharacter } from '@shared/types/gamification.types'

@@ -1,6 +1,8 @@
 import { trpc } from '@/utils/trpc.utils'
-import { CreateObjectiveDialog, ObjectiveCard } from '@/views/objectives/components'
-import { CreateAreaDialog, UpdateAreaDialog } from '@/views/objectives/components/areas'
+import CreateAreaDialog from '@/views/objectives/components/areas/create-area-dialog.component'
+import UpdateAreaDialog from '@/views/objectives/components/areas/update-area-dialog.component'
+import CreateObjectiveDialog from '@/views/objectives/components/create-objective-dialog.component'
+import ObjectiveCard from '@/views/objectives/components/objective-card.component'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 

@@ -1,13 +1,11 @@
-import { useUserPreferencesStore } from '@/stores'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui'
-import {
-  CreateTaskDialog,
-  TaskCalendar,
-  TaskMatrix,
-  TaskTable,
-  TasksListBoard,
-  UpdateTaskDialog
-} from '@/views/tasks/components'
+import { useUserPreferencesStore } from '@/stores/user-preferences.store'
+import Tabs, { TabsContent, TabsList, TabsTrigger } from '@/ui/tabs.component'
+import CreateTaskDialog from '@/views/tasks/components/create-task-dialog.component'
+import TaskCalendar from '@/views/tasks/components/task-calendar.component'
+import TaskMatrix from '@/views/tasks/components/task-matrix.component'
+import TaskTable from '@/views/tasks/components/task-table.component'
+import TasksListBoard from '@/views/tasks/components/tasks-list-board.component'
+import UpdateTaskDialog from '@/views/tasks/components/update-task-dialog.component'
 import { useTranslation } from 'react-i18next'
 
 export default function Tasks() {

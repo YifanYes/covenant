@@ -3,7 +3,10 @@ import { SlotType, type InventoryCharacter, type InventoryItem } from '@shared/t
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { CharacterPreview, CharacterStatus, InventoryGrid, LoadoutPanel } from './components'
+import CharacterPreview from './components/character-preview.component'
+import CharacterStatus from './components/character-status.component'
+import InventoryGrid from './components/inventory-grid.component'
+import LoadoutPanel from './components/loadout-panel.component'
 
 export default function AdventureInventory() {
   const { t } = useTranslation()

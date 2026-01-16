@@ -1,19 +1,10 @@
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/cn.lib'
-import {
-  Input,
-  Separator,
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  Skeleton,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/ui'
+import Input from '@/ui/input.component'
+import Separator from '@/ui/separator.component'
+import Sheet, { SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/ui/sheet.component'
+import Skeleton from '@/ui/skeleton.component'
+import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/tooltip.component'
 import { LayoutSidebarLeft } from '@nsmr/pixelart-react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'

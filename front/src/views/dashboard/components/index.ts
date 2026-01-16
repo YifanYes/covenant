@@ -1,7 +1,0 @@
-export { default as AreasDistribution } from './areas-distribution/areas-distribution.component'
-export { default as Blindspot } from './blindspot/blindspot.component'
-export { default as DashboardSectionWrapper } from './dashboard-section-wrapper.component'
-export { default as EfficiencyMetrics } from './efficiency-metrics-component/efficiency-metrics.component'
-export { default as HabitsBlock } from './habits/habits-block.component'
-export { default as TaskStatusWidget } from './task-status/task-status.component'
-export { default as UpcomingTasks } from './upcoming-tasks/upcoming-tasks.component'

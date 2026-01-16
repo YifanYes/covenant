@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@/ui'
+import Card, { CardContent } from '@/ui/card.component'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 import MagicNatureBadge from './magic-nature-badge.component'

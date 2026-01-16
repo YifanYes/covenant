@@ -1,15 +1,16 @@
-import { PrivateRoute } from '@/auth'
-import {
-  AdventureSuspenseFallback,
-  DashboardSuspenseFallback,
-  HabitsSuspenseFallback,
-  LoginSuspenseFallback,
-  ObjectivesSuspenseFallback,
-  SettingsSuspenseFallback,
-  SignUpSuspenseFallback,
-  TasksSuspenseFallback
-} from '@/components/suspense-fallbacks'
-import { AdventureLayout, AppLayout, CenteredLayout, WorkspaceLayout } from '@/layouts'
+import PrivateRoute from '@/auth/private-route.component'
+import AdventureSuspenseFallback from '@/components/suspense-fallbacks/adventure-suspense-fallback.component'
+import DashboardSuspenseFallback from '@/components/suspense-fallbacks/dashboard-suspense-fallback.component'
+import HabitsSuspenseFallback from '@/components/suspense-fallbacks/habits-suspense-fallback.component'
+import LoginSuspenseFallback from '@/components/suspense-fallbacks/login-suspense-fallback.component'
+import ObjectivesSuspenseFallback from '@/components/suspense-fallbacks/objectives-suspense-fallback.component'
+import SettingsSuspenseFallback from '@/components/suspense-fallbacks/settings-suspense-fallback.component'
+import SignUpSuspenseFallback from '@/components/suspense-fallbacks/sign-up-suspense-fallback.component'
+import TasksSuspenseFallback from '@/components/suspense-fallbacks/tasks-suspense-fallback.component'
+import AdventureLayout from '@/layouts/adventure-layout'
+import AppLayout from '@/layouts/app-layout'
+import CenteredLayout from '@/layouts/centered-layout'
+import WorkspaceLayout from '@/layouts/workspace-layout'
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 

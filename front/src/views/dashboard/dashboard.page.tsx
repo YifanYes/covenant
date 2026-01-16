@@ -1,13 +1,11 @@
-import { useAuthStore } from '@/stores'
+import { useAuthStore } from '@/stores/auth.store'
 import { trpc } from '@/utils/trpc.utils'
-import {
-  AreasDistribution,
-  Blindspot,
-  EfficiencyMetrics,
-  HabitsBlock,
-  TaskStatusWidget,
-  UpcomingTasks
-} from '@/views/dashboard/components'
+import AreasDistribution from '@/views/dashboard/components/areas-distribution/areas-distribution.component'
+import Blindspot from '@/views/dashboard/components/blindspot/blindspot.component'
+import EfficiencyMetrics from '@/views/dashboard/components/efficiency-metrics-component/efficiency-metrics.component'
+import HabitsBlock from '@/views/dashboard/components/habits/habits-block.component'
+import TaskStatusWidget from '@/views/dashboard/components/task-status/task-status.component'
+import UpcomingTasks from '@/views/dashboard/components/upcoming-tasks/upcoming-tasks.component'
 import { Calendar } from '@nsmr/pixelart-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'

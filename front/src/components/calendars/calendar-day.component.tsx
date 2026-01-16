@@ -1,6 +1,6 @@
 import { cn } from '@/lib/cn.lib'
-import { useTasksStore } from '@/stores'
-import { TaskSummaryList } from '@/tasks'
+import { useTasksStore } from '@/stores/tasks.store'
+import TaskSummaryList from '@/tasks/task-summary-list.component'
 import type { Task as TaskType } from '@/types/models.types'
 import { getColorClasses } from '@/utils/theme.utils'
 import dayjs from 'dayjs'

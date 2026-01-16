@@ -1,4 +1,4 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui'
+import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select.component'
 import { Money } from '@nsmr/pixelart-react'
 import { useTranslation } from 'react-i18next'
 

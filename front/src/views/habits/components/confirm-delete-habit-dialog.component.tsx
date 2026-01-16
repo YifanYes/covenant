@@ -1,6 +1,6 @@
-import { BaseConfirmDialog } from '@/common'
+import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
 import type { Habit } from '@/types/models.types'
-import { Button } from '@/ui'
+import Button from '@/ui/button.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Trash } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'

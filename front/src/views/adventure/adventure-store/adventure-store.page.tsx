@@ -1,11 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui'
+import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import type { ItemDefinition } from '@shared/constants/items'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { CartPanel, StoreFilters, StoreItemGrid } from './components'
+import CartPanel from './components/cart-panel.component'
+import StoreFilters from './components/store-filters.component'
+import StoreItemGrid from './components/store-item-grid.component'
 
 export default function AdventureStore() {
   const { t } = useTranslation()

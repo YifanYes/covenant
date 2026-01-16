@@ -1,6 +1,0 @@
-export { default as CartItem } from './cart-item.component'
-export { default as CartPanel } from './cart-panel.component'
-export { default as StoreFilters } from './store-filters.component'
-export { default as StoreItemCard } from './store-item-card.component'
-export { default as StoreItemGrid } from './store-item-grid.component'
-export { default as StoreItemTooltip } from './store-item-tooltip.component'

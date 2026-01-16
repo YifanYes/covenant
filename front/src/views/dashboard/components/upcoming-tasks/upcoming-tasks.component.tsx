@@ -1,5 +1,11 @@
 import type { Task } from '@/types/models.types'
-import { Carousel, CarouselContent, CarouselDots, CarouselItem, CarouselNext, CarouselPrevious } from '@/ui'
+import Carousel, {
+  CarouselContent,
+  CarouselDots,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
+} from '@/ui/carousel.component'
 import { CalendarMonth } from '@nsmr/pixelart-react'
 import { useTranslation } from 'react-i18next'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper.component'

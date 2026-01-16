@@ -1,4 +1,4 @@
-import { Button } from '@/ui'
+import Button from '@/ui/button.component'
 import { Loader } from '@nsmr/pixelart-react'
 
 export default function LoaderButton({

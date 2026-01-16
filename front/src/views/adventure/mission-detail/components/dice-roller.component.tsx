@@ -1,5 +1,5 @@
 import { cn } from '@/lib/cn.lib'
-import { Button } from '@/ui'
+import Button from '@/ui/button.component'
 import { Minus, Plus } from '@nsmr/pixelart-react'
 import type { DiceRollResult } from '@shared/types/gamification.types'
 import { useEffect, useState } from 'react'

@@ -1,8 +1,0 @@
-export { default as AppSidebar } from './app-sidebar.component'
-export { default as AreaBadge } from './area-badge.component'
-export { default as BaseConfirmDialog } from './base-confirm-dialog.component'
-export { default as BaseFormDialog } from './base-form-dialog.component'
-export { default as Link } from './link.component'
-export { default as LoaderButton } from './loader-button.component'
-export { default as ThemeProvider } from './theme-provider.component'
-export { default as ThemeToggle } from './theme-toggle.component'

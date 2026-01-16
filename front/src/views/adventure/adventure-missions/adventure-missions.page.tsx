@@ -1,4 +1,4 @@
-import { MissionList } from '../components'
+import MissionList from '../components/mission-list.component'
 
 export default function AdventureMissions() {
   return (

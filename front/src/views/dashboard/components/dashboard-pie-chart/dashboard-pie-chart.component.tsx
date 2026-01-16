@@ -1,4 +1,4 @@
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/ui'
+import ChartContainer, { ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/ui/chart.component'
 import { parseTranslationKey } from '@/utils/locale.utils'
 import { useMemo } from 'react'
 import { Label, Pie, PieChart, type PieProps } from 'recharts'

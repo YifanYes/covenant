@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui'
+import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import type { MissionTemplate } from '@shared/constants/missions'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'

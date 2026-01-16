@@ -1,4 +1,4 @@
-import { ScrollArea } from '@/ui'
+import ScrollArea from '@/ui/scroll-area.component'
 import type { ItemDefinition } from '@shared/constants/items'
 import { useTranslation } from 'react-i18next'
 import StoreItemCard from './store-item-card.component'

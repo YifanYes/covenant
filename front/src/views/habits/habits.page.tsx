@@ -1,5 +1,6 @@
 import { trpc } from '@/utils/trpc.utils'
-import { CreateHabitDialog, UpdateHabitDialog } from '@/views/habits/components'
+import CreateHabitDialog from '@/views/habits/components/create-habit-dialog.component'
+import UpdateHabitDialog from '@/views/habits/components/update-habit-dialog.component'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 

@@ -1,5 +1,5 @@
 import { cn } from '@/lib/cn.lib'
-import { Card } from '@/ui'
+import Card from '@/ui/card.component'
 import { trpc } from '@/utils/trpc.utils'
 import { ScriptText } from '@nsmr/pixelart-react'
 import { MissionStatus } from '@shared/types/gamification.types'
@@ -7,7 +7,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CombatLog } from '../components'
+import CombatLog from '../components/combat-log.component'
 
 export default function AdventureHistory() {
   const { t } = useTranslation()

@@ -1,4 +1,5 @@
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui'
+import Button from '@/ui/button.component'
+import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/card.component'
 import { parseTranslationKey } from '@/utils/locale.utils'
 import { type ReactNode } from 'react'
 import { Link } from 'react-router'

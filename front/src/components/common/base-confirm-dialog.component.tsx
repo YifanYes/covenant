@@ -1,5 +1,4 @@
-import {
-  AlertDialog,
+import AlertDialog, {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
@@ -8,7 +7,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger
-} from '@/ui'
+} from '@/ui/alert-dialog.component'
 import { type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 

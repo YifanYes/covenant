@@ -1,22 +1,12 @@
-import { DatePicker, MultiSelect } from '@/forms'
+import DatePicker from '@/forms/date-picker.component'
+import MultiSelect from '@/forms/multi-select.component'
 import { cn } from '@/lib/cn.lib'
-import { useTasksStore } from '@/stores'
+import { useTasksStore } from '@/stores/tasks.store'
 import { taskPriorityTypes } from '@/types/constants.types'
-import {
-  Button,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/ui'
+import Button from '@/ui/button.component'
+import Input from '@/ui/input.component'
+import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select.component'
+import Table, { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table.component'
 import { getRewardText } from '@/utils/text.utils'
 import { getPriorityStyles } from '@/utils/theme.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'

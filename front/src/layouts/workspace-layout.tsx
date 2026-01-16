@@ -1,5 +1,5 @@
-import { AppSidebar } from '@/common'
-import { SidebarProvider } from '@/ui'
+import AppSidebar from '@/common/app-sidebar.component'
+import { SidebarProvider } from '@/ui/sidebar.component'
 import { Outlet } from 'react-router'
 
 export default function WorkspaceLayout() {

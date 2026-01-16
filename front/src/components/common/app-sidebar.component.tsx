@@ -1,6 +1,5 @@
-import {
-  Separator,
-  Sidebar,
+import Separator from '@/ui/separator.component'
+import Sidebar, {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -10,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger
-} from '@/ui'
+} from '@/ui/sidebar.component'
 import { BookOpen, Dashboard, List, Luggage, Sliders, Trophy } from '@nsmr/pixelart-react'
 import { useTranslation } from 'react-i18next'
 

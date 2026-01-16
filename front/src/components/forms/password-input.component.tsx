@@ -1,6 +1,6 @@
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/cn.lib'
-import { Button } from '@/ui'
+import Button from '@/ui/button.component'
 import { Eye, EyeClosed } from '@nsmr/pixelart-react'
 import { useState, type ComponentProps } from 'react'
 import FormField from './form-field.component'

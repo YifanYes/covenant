@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui'
+import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { Luggage } from '@nsmr/pixelart-react'
 import { SlotType as SlotTypeEnum, type InventoryCharacter, type SlotType } from '@shared/types/gamification.types'
 import { useMemo } from 'react'

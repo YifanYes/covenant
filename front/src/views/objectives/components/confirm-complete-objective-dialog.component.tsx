@@ -1,6 +1,6 @@
-import { BaseConfirmDialog } from '@/common'
+import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
 import type { Objective } from '@/types/models.types'
-import { Button } from '@/ui'
+import Button from '@/ui/button.component'
 import { getRewardText } from '@/utils/text.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Check } from '@nsmr/pixelart-react'

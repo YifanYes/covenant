@@ -1,4 +1,4 @@
-import type { ChartConfig } from '@/ui'
+import type { ChartConfig } from '@/ui/chart.component'
 
 export const defaultHabitConfig = {
   completed: {

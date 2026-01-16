@@ -1,4 +1,4 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui'
+import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import { ItemRarity, type InventoryItem } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 

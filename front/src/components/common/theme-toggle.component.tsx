@@ -1,5 +1,5 @@
-import { Switch } from '@/ui'
 import useTheme from '@/hooks/use-theme'
+import Switch from '@/ui/switch.component'
 import { Moon, Sun } from '@nsmr/pixelart-react'
 
 export default function ThemeToggle() {

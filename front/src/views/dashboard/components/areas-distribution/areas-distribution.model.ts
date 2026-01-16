@@ -1,4 +1,4 @@
-import type { ChartConfig } from '@/ui'
+import type { ChartConfig } from '@/ui/chart.component'
 import type { RadarProps } from 'recharts'
 
 export type AreasDistributionData = Record<string, Omit<RadarProps, 'name'> & { name: string }> & ChartConfig

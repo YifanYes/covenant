@@ -1,4 +1,4 @@
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/ui'
+import ChartContainer, { ChartTooltip, ChartTooltipContent } from '@/ui/chart.component'
 import { TrackChanges } from '@nsmr/pixelart-react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase.lib'
-import { useAuthStore } from '@/stores'
+import { useAuthStore } from '@/stores/auth.store'
 import { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router'
 

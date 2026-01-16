@@ -1,5 +1,5 @@
 import { useFormField } from '@/hooks/use-form-field'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui'
+import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select.component'
 import FormField from './form-field.component'
 
 export default function SingleSelect({

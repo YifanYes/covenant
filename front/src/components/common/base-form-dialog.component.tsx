@@ -1,7 +1,6 @@
-import { LoaderButton } from '@/common'
-import {
-  Button,
-  Dialog,
+import LoaderButton from '@/common/loader-button.component'
+import Button from '@/ui/button.component'
+import Dialog, {
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -9,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '@/ui'
+} from '@/ui/dialog.component'
 import { type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 

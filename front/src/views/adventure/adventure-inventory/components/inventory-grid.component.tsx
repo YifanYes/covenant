@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui'
+import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { Group } from '@nsmr/pixelart-react'
 import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
 import type { InventoryCharacter, InventoryItem } from '@shared/types/gamification.types'

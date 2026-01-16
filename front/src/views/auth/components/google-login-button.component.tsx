@@ -1,4 +1,4 @@
-import { LoaderButton } from '@/common'
+import LoaderButton from '@/common/loader-button.component'
 import { trpc } from '@/utils/trpc.utils'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'

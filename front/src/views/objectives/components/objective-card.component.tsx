@@ -1,20 +1,21 @@
-import { LoaderButton } from '@/common'
-import { DatePicker, MultiSelect, TextInput } from '@/forms'
-import { TaskSummaryList } from '@/tasks'
+import LoaderButton from '@/common/loader-button.component'
+import DatePicker from '@/forms/date-picker.component'
+import MultiSelect from '@/forms/multi-select.component'
+import TextInput from '@/forms/text-input.component'
+import TaskSummaryList from '@/tasks/task-summary-list.component'
 import { areaSimpleStyles } from '@/types/colors.types'
 import { allIcons } from '@/types/icons.types'
 import type { Objective } from '@/types/models.types'
-import {
-  Button,
-  Dialog,
+import Button from '@/ui/button.component'
+import Dialog, {
   DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  Textarea
-} from '@/ui'
+  DialogTrigger
+} from '@/ui/dialog.component'
+import Textarea from '@/ui/textarea.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'

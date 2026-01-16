@@ -1,5 +1,5 @@
-import { Button } from '@/ui'
 import { useCalendarStore } from '@/stores/calendar.store'
+import Button from '@/ui/button.component'
 import { ChevronLeft, ChevronRight } from '@nsmr/pixelart-react'
 import dayjs from 'dayjs'
 import { capitalize } from 'es-toolkit/compat'

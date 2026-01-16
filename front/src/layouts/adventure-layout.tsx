@@ -1,4 +1,5 @@
-import { Button, Tabs, TabsList, TabsTrigger } from '@/ui'
+import Button from '@/ui/button.component'
+import Tabs, { TabsList, TabsTrigger } from '@/ui/tabs.component'
 import { trpc } from '@/utils/trpc.utils'
 import { Cart, Clock, Luggage, ScriptText, User } from '@nsmr/pixelart-react'
 import type { InventoryCharacter } from '@shared/types/gamification.types'

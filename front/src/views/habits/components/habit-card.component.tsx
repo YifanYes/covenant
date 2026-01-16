@@ -1,5 +1,6 @@
 import type { Habit } from '@/types/models.types'
-import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui'
+import Button from '@/ui/button.component'
+import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/tooltip.component'
 import { getRewardText } from '@/utils/text.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Check, Code, Loader } from '@nsmr/pixelart-react'

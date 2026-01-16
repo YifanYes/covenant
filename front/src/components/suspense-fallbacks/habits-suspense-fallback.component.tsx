@@ -1,5 +1,5 @@
+import Button from '@/ui/button.component'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/ui'
 
 export default function HabitsSuspenseFallback() {
   const { t } = useTranslation()

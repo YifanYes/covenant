@@ -1,5 +1,5 @@
-import { useTasksStore } from '@/stores'
-import { Task } from '@/tasks'
+import { useTasksStore } from '@/stores/tasks.store'
+import Task from '@/tasks/task.component'
 import { type Task as TaskType } from '@/types/models.types'
 import { useDragAndDrop } from '@formkit/drag-and-drop/react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'

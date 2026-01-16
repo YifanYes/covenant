@@ -1,4 +1,4 @@
-import { Button } from '@/ui'
+import Button from '@/ui/button.component'
 import { Plus } from '@nsmr/pixelart-react'
 import { useTranslation } from 'react-i18next'
 import TaskSkeleton from '../skeletons/task-skeleton.component'

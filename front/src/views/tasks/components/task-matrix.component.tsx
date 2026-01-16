@@ -1,4 +1,4 @@
-import { useTasksStore } from '@/stores'
+import { useTasksStore } from '@/stores/tasks.store'
 import type { Task } from '@/types/models.types'
 import { getPriorityStyles, getPriorityTextColors } from '@/utils/theme.utils'
 import { trpc } from '@/utils/trpc.utils'
@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import { flatten, values as getValues, isUndefined, filter as lodashFilter } from 'es-toolkit/compat'
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TaskMatrixQuadrantCard, type Quadrant } from './'
+import TaskMatrixQuadrantCard, { type Quadrant } from './task-matrix-quadrant-card.component'
 
 export default function TaskMatrix() {
   const { t } = useTranslation()

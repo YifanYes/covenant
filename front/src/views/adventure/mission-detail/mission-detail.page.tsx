@@ -1,17 +1,13 @@
-import {
-  AlertDialog,
+import AlertDialog, {
   AlertDialogAction,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from '@/ui'
+  AlertDialogTitle
+} from '@/ui/alert-dialog.component'
+import Button from '@/ui/button.component'
+import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { trpc } from '@/utils/trpc.utils'
 import { ChevronLeft } from '@nsmr/pixelart-react'
 import { getEnemy } from '@shared/constants/enemies'
@@ -28,8 +24,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router'
 import { toast } from 'sonner'
-import { TierBadge } from '../components'
-import { CombatArena } from './components'
+import TierBadge from '../components/tier-badge.component'
+import CombatArena from './components/combat-arena.component'
 
 export default function MissionDetail() {
   const { t } = useTranslation()

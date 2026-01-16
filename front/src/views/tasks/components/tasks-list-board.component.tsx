@@ -1,6 +1,6 @@
 import { useDebouncedMutation } from '@/hooks/use-debounced-mutation'
-import { useTasksStore } from '@/stores'
 import { useCalendarStore } from '@/stores/calendar.store'
+import { useTasksStore } from '@/stores/tasks.store'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useSuspenseQuery } from '@tanstack/react-query'
