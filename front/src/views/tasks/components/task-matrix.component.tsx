@@ -2,7 +2,7 @@ import { useTasksStore } from '@/stores/tasks.store'
 import type { Task } from '@/types/models.types'
 import { getPriorityStyles, getPriorityTextColors } from '@/utils/theme.utils'
 import { trpc } from '@/utils/trpc.utils'
-import { TaskEffort, TaskImpact } from '@shared/schemas/tasks.schemas'
+import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useQuery } from '@tanstack/react-query'
 import { flatten, values as getValues, isUndefined, filter as lodashFilter } from 'es-toolkit/compat'
 import { useEffect, useMemo } from 'react'
@@ -22,9 +22,11 @@ export default function TaskMatrix() {
     return flatten(getValues(tasks))
   }, [tasks])
 
-  // Filter tasks that have both effort and impact set
+  // Filter tasks that have both effort and impact set, and are not completed
   const tasksWithPriority = useMemo(() => {
-    return lodashFilter(allTasks, (task: Task) => Boolean(task.effort && task.impact))
+    return lodashFilter(allTasks, (task: Task) =>
+      Boolean(task.effort && task.impact && task.status !== TaskStatus.DONE)
+    )
   }, [allTasks])
 
   const quadrants: Quadrant[] = useMemo(() => {
