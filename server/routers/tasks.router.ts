@@ -3,6 +3,7 @@ import {
   createTaskSchema,
   duplicateTaskSchema,
   getByDateInputSchema,
+  getTasksFilteredSchema,
   taskIdSchema,
   TaskStatus,
   updateTaskSchema
@@ -16,6 +17,10 @@ export const tasksRouter = t.router({
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
     return ctx.services.task.getAll(ctx.user.id)
+  }),
+
+  getFiltered: protectedProcedure.input(getTasksFilteredSchema).query(async ({ ctx, input }) => {
+    return ctx.services.task.getFiltered(ctx.user.id, input)
   }),
 
   getByDate: protectedProcedure.input(getByDateInputSchema).query(async ({ ctx, input }) => {

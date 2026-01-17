@@ -1,4 +1,8 @@
+import { config } from 'dotenv'
 import { defineConfig } from 'prisma/config'
+
+// Load .env file before accessing environment variables
+config()
 
 const directUrl = process.env.DIRECT_URL
 

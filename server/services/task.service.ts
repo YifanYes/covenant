@@ -1,5 +1,10 @@
 import { DICE_REWARDS } from '@shared/constants/dice.constants'
-import type { BulkUpdateTaskItem, CreateTaskType, UpdateTaskType } from '@shared/schemas/tasks.schemas'
+import type {
+  BulkUpdateTaskItem,
+  CreateTaskType,
+  GetTasksFilteredInput,
+  UpdateTaskType
+} from '@shared/schemas/tasks.schemas'
 import type { PrismaClient } from '../generated/prisma'
 import { TaskRepository } from '../repositories/task.repository'
 import { DiceService } from './dice.service'
@@ -31,6 +36,29 @@ export class TaskService {
     )
 
     return { tasks: groupedTasks }
+  }
+
+  async getFiltered(userId: string, input: GetTasksFilteredInput) {
+    const { search, status, effortImpact, dueDate, page, pageSize } = input
+
+    const result = await this.taskRepository.findFiltered(
+      userId,
+      {
+        search,
+        status,
+        effortImpact,
+        dueDate: dueDate ? new Date(dueDate) : undefined
+      },
+      { page, pageSize }
+    )
+
+    return {
+      tasks: result.tasks,
+      totalCount: result.totalCount,
+      page,
+      pageSize,
+      totalPages: Math.ceil(result.totalCount / pageSize)
+    }
   }
 
   async getByDate(userId: string, year?: number, monthIndex?: number) {
