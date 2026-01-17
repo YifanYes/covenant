@@ -40,6 +40,59 @@ export class TaskRepository {
     })
   }
 
+  async findFiltered(
+    userId: string,
+    filters: {
+      search?: string
+      status?: string[]
+      effortImpact?: string[] // HIGH | LOW
+      dueDate?: Date
+    },
+    pagination: { page: number; pageSize: number }
+  ): Promise<{ tasks: Task[]; totalCount: number }> {
+    const where: Prisma.TaskWhereInput = { userId }
+
+    // Search filter (case-insensitive title match)
+    if (filters.search) {
+      where.title = { contains: filters.search, mode: 'insensitive' }
+    }
+
+    // Status filter
+    if (filters.status?.length) {
+      where.status = { in: filters.status }
+    }
+
+    // Effort/Impact filter
+    if (filters.effortImpact?.length) {
+      where.OR = filters.effortImpact.map((combo) => {
+        const [impact, effort] = combo.split('|')
+        return { impact, effort }
+      })
+    }
+
+    // Due date filter (exact day match)
+    if (filters.dueDate) {
+      const startOfDay = new Date(filters.dueDate)
+      startOfDay.setHours(0, 0, 0, 0)
+      const endOfDay = new Date(filters.dueDate)
+      endOfDay.setHours(23, 59, 59, 999)
+      where.dueDate = { gte: startOfDay, lte: endOfDay }
+    }
+
+    const [tasks, totalCount] = await Promise.all([
+      this.prisma.task.findMany({
+        where,
+        include: TASK_INCLUDE,
+        orderBy: [{ status: 'asc' }, { order: 'asc' }],
+        skip: (pagination.page - 1) * pagination.pageSize,
+        take: pagination.pageSize
+      }),
+      this.prisma.task.count({ where })
+    ])
+
+    return { tasks, totalCount }
+  }
+
   async findByDate(userId: string, startDate: Date, endDate: Date): Promise<Task[]> {
     return this.prisma.task.findMany({
       where: {

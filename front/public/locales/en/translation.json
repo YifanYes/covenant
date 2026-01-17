@@ -128,7 +128,8 @@
   },
   "common": {
     "completed": "Completed",
-    "failed": "Failed"
+    "failed": "Failed",
+    "loading": "Loading..."
   },
   "confirm": "Confirm",
   "confirm_delete_account_dialog": {
@@ -259,6 +260,7 @@
   },
   "habits": {
     "add": "Add Habit",
+    "empty": "You don't have any habits yet. Create one to get started!",
     "error": {
       "internal": {
         "complete": "An error occurred while completing the habit",
@@ -792,7 +794,11 @@
     },
     "table": {
       "dueDate": "Due Date",
+      "empty": "You don't have any tasks yet. Create one to get started!",
+      "no_matching_tasks": "No tasks match the current filters",
       "no_tasks": "No tasks found",
+      "page_info": "Page {{page}} of {{totalPages}}",
+      "pagination_info": "Showing {{start}}-{{end}} of {{total}}",
       "status": "Status",
       "title": "Title",
       "type": "Type"

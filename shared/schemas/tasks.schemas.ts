@@ -74,3 +74,13 @@ export const getByDateInputSchema = z.object({
   monthIndex: z.string().optional(),
   year: z.string().optional()
 })
+
+export const getTasksFilteredSchema = z.object({
+  search: z.string().optional(),
+  status: z.array(z.enum(TaskStatus)).optional(),
+  effortImpact: z.array(z.string()).optional(),
+  dueDate: z.string().optional(),
+  page: z.number().int().min(1).default(1),
+  pageSize: z.number().int().min(1).max(100).default(20)
+})
+export type GetTasksFilteredInput = z.infer<typeof getTasksFilteredSchema>

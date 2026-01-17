@@ -128,7 +128,8 @@
   },
   "common": {
     "completed": "Completada",
-    "failed": "Fallida"
+    "failed": "Fallida",
+    "loading": "Cargando..."
   },
   "confirm": "Confirmar",
   "confirm_delete_account_dialog": {
@@ -259,6 +260,7 @@
   },
   "habits": {
     "add": "Añadir hábito",
+    "empty": "Todavía no tienes hábitos. ¡Crea uno para empezar!",
     "error": {
       "internal": {
         "complete": "Ocurrió un error al completar el hábito",
@@ -792,10 +794,14 @@
     },
     "table": {
       "dueDate": "Fecha de entrega",
+      "empty": "Todavía no tienes tareas. ¡Crea una para empezar!",
+      "no_matching_tasks": "No hay tareas que coincidan con los filtros",
       "no_tasks": "No se encontraron tareas",
       "status": "Estado",
       "title": "Título",
-      "type": "Tipo"
+      "type": "Tipo",
+      "pagination_info": "Mostrando {{start}}-{{end}} de {{total}}",
+      "page_info": "Página {{page}} de {{totalPages}}"
     },
     "tabs": {
       "calendar": "Calendario",
