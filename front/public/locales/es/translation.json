@@ -323,6 +323,25 @@
       "PHYSICAL": "Físico"
     },
     "dice_bank": "Banco de Dados",
+    "divine_quotes": [
+      "“Te levantarás de nuevo, hijo mío, pues tu deber aún no ha terminado...”",
+      "“La muerte no es más que un puente hacia un propósito mayor. Regresa a la luz...”",
+      "“Las sombras pueden reclamar tu carne, pero tu alma pertenece a la lucha eterna...”",
+      "“Incluso en el abismo más profundo, la brasa de tu voluntad encenderá el amanecer...”",
+      "“Tu linaje está grabado en sangre y oro; la tumba no puede retener lo que el destino ha elegido...”",
+      "“Camina por el valle del silencio y regresa con el trueno de la redención...”",
+      "“Los cielos lloran tu caída, pero las estrellas se alinean para tu renacimiento...”",
+      "“La campana no dobla por tu final, sino por tu despertar...”",
+      "“Tu camino está pavimentado con los huesos de los que se rindieron. No seas como ellos...”",
+      "“El fuego que quema tu carne forjará tu espíritu en un arma...”",
+      "“Las estrellas se atenúan cuando tu voluntad flaquea. Mira hacia arriba y levántate...”",
+      "“Eres el pesado martillo de la Orden; el mundo es el yunque...”",
+      "“El destino es una cadena que solo tú puedes romper. Destrúyela y regresa...”",
+      "“El silencio es el santuario de los débiles. Que tu regreso se escuche en los cielos...”",
+      "“El abismo solo consume lo que puede contener. Tu alma es demasiado grande para su hambre...”",
+      "“Cada gota de sangre derramada es una semilla de venganza que aún debe florecer...”",
+      "“La luz de los cielos es cegadora, pero te guiará a través de la oscuridad...”"
+    ],
     "empty": "No hay objetos en el inventario",
     "equipment_slot": {
       "ACCESSORY": "Accesorio",

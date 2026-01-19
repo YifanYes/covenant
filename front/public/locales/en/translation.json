@@ -323,6 +323,25 @@
       "PHYSICAL": "Physical"
     },
     "dice_bank": "Dice Bank",
+    "divine_quotes": [
+      "“You will rise again, my son, for your duty is not yet finished...”",
+      "“Death is but a bridge to a greater purpose. Step back into the light...”",
+      "“The shadows may claim your flesh, but your soul belongs to the eternal fight...”",
+      "“Even in the deepest abyss, the ember of your will shall ignite the dawn...”",
+      "“Your lineage is etched in blood and gold; the grave cannot hold what destiny has chosen...”",
+      "“Walk through the valley of silence, and return with the thunder of redemption...”",
+      "“The heavens weep for your fall, yet the stars align for your rebirth...”",
+      "“The bell tolls not for your end, but for your awakening...”",
+      "“Your path is paved with the bones of those who gave up. Be not like them...”",
+      "“The fire that burns your flesh shall forge your spirit into a weapon...”",
+      "“The stars grow dim when your resolve wavers. Look up, and rise...”",
+      "“You are the heavy hammer of the Order; the world is the anvil...”",
+      "“Fate is a chain only you can break. Sunder it and return...”",
+      "“Silence is the sanctuary of the weak. Let your return be heard in the heavens...”",
+      "“The abyss consumes only what it can hold. Your soul is too vast for its hunger...”",
+      "“Every drop of blood spilled is a seed of vengeance yet to bloom...”",
+      "“The light of the heavens is blinding, but it shall guide you through the dark...”"
+    ],
     "empty": "No items in inventory",
     "equipment_slot": {
       "ACCESSORY": "Accessory",
