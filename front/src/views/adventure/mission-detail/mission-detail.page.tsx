@@ -39,7 +39,7 @@ export default function MissionDetail() {
   const { data: activeMission, refetch: refetchActiveMission } = useSuspenseQuery<ActiveMissionData>(queryOptions)
 
   const [lastTurnResult, setLastTurnResult] = useState<CombatTurnResult | null>(null)
-  const [showDeathDialog, setShowDeathDialog] = useState(false)
+  const [showResultDialog, setShowResultDialog] = useState<'success' | 'failure' | null>(null)
 
   const mission = getMission(missionId || '')
   const isActive = activeMission?.mission?.name === missionId
@@ -77,7 +77,7 @@ export default function MissionDetail() {
       if (result.characterDead) {
         queryClient.invalidateQueries({ queryKey: trpc.missions.getActive.queryKey() })
         queryClient.invalidateQueries({ queryKey: trpc.missions.list.queryKey() })
-        setShowDeathDialog(true)
+        setShowResultDialog('failure')
         return
       }
 
@@ -113,7 +113,7 @@ export default function MissionDetail() {
       toast.success(t('combat.mission_complete'), {
         description: `+${result.rewards?.gold || 0} ${t('inventory.gold')}`
       })
-      navigate('/adventure/missions')
+      setShowResultDialog('success')
     },
     onError: (error) => toast.error(t('combat.error.complete'), { description: error.message })
   })
@@ -148,18 +148,22 @@ export default function MissionDetail() {
   const combatLog = (activeMission?.mission?.combatLog as unknown as CombatLogEntry[]) || []
   const allEnemiesDefeated = enemyState.length > 0 && enemyState.every((e) => e.currentHealth <= 0)
 
-  // Show death dialog if character died - must be checked BEFORE isActive since mission becomes inactive after death
-  if (showDeathDialog) {
+  // Show result dialog on mission completion or failure
+  if (showResultDialog) {
+    const isSuccess = showResultDialog === 'success'
+    const dialogTitle = isSuccess ? t('combat.result_dialog.success_title') : t('combat.result_dialog.failure_title')
+    const dialogDescription = isSuccess ? t(mission.successText) : t(mission.failureText)
+
     return (
-      <AlertDialog open={showDeathDialog} onOpenChange={setShowDeathDialog}>
+      <AlertDialog open={!!showResultDialog} onOpenChange={() => setShowResultDialog(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('combat.death_dialog.title')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('combat.death_dialog.description')}</AlertDialogDescription>
+            <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{dialogDescription}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => navigate('/adventure/inventory')}>
-              {t('combat.death_dialog.continue')}
+            <AlertDialogAction onClick={() => navigate('/adventure/missions')}>
+              {t('combat.result_dialog.continue')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -227,7 +231,7 @@ export default function MissionDetail() {
 
       <Card>
         <CardContent>
-          <p className='text-muted-foreground italic'>{t(mission.narrative)}</p>
+          <p className='text-muted-foreground italic'>{t(mission.description)}</p>
         </CardContent>
       </Card>
 

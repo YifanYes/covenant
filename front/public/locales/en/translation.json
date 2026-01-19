@@ -118,6 +118,11 @@
     "phase_complete": "Phase Complete!",
     "resolve_turn": "Resolve Turn",
     "resolving_turn": "Resolving turn...",
+    "result_dialog": {
+      "continue": "Continue",
+      "failure_title": "Defeat",
+      "success_title": "Victory!"
+    },
     "roll_attack": "Prepare Attack",
     "roll_defense": "Prepare Defense",
     "roll_dice": "Roll Dice",
@@ -237,19 +242,40 @@
   "delete": "Delete",
   "enemies": {
     "alpha_werewolf": "Alpha Werewolf",
+    "armored_templar": "Armored Templar",
     "bandit_chief": "Bandit Chief",
+    "bandit_runic": "Runic Bandit",
+    "bandit_stalker": "Stalker Bandit",
+    "behemoth": "Behemoth",
+    "belphegor_avatar": "Avatar of Belphegor",
+    "demon_lord": "Demon Lord",
+    "elite_armored_templar": "Elite Armored Templar",
     "elite_bandit": "Elite Bandit",
+    "elite_demon": "Elite Demon",
+    "fallen_angel": "Fallen Angel",
+    "fallen_inquisitor": "Fallen Inquisitor",
+    "fallen_inquisitor_boss": "Fallen Inquisitor Boss",
+    "fallen_templar": "Fallen Templar",
     "ghost": "Ghost",
+    "giant_spider": "Giant Spider",
     "herald_vampire": "Herald Vampire",
     "heretic_cultist": "Heretic Cultist",
     "heretic_templar": "Heretic Templar",
+    "magma_demon": "Magma Demon",
     "minor_demon": "Minor Demon",
     "minor_nephilim": "Minor Nephilim",
     "minor_vampire": "Minor Vampire",
+    "nephilim": "Nephilim",
+    "shadow_demon": "Shadow Demon",
+    "shadow_demon_elite": "Elite Shadow Demon",
     "skeleton": "Skeleton",
     "skeleton_warrior_elite": "Skeleton Warrior Elite",
     "tank_heretic_templar": "Tank Heretic Templar",
+    "vampire": "Vampire",
     "vampire_chief": "Vampire Chief",
+    "vampire_count": "Vampire Count",
+    "werewolf": "Werewolf",
+    "werewolf_alpha": "Alpha Werewolf",
     "young_werewolf": "Young Werewolf"
   },
   "errors": {
@@ -297,6 +323,25 @@
       "PHYSICAL": "Physical"
     },
     "dice_bank": "Dice Bank",
+    "divine_quotes": [
+      "“You will rise again, my son, for your duty is not yet finished...”",
+      "“Death is but a bridge to a greater purpose. Step back into the light...”",
+      "“The shadows may claim your flesh, but your soul belongs to the eternal fight...”",
+      "“Even in the deepest abyss, the ember of your will shall ignite the dawn...”",
+      "“Your lineage is etched in blood and gold; the grave cannot hold what destiny has chosen...”",
+      "“Walk through the valley of silence, and return with the thunder of redemption...”",
+      "“The heavens weep for your fall, yet the stars align for your rebirth...”",
+      "“The bell tolls not for your end, but for your awakening...”",
+      "“Your path is paved with the bones of those who gave up. Be not like them...”",
+      "“The fire that burns your flesh shall forge your spirit into a weapon...”",
+      "“The stars grow dim when your resolve wavers. Look up, and rise...”",
+      "“You are the heavy hammer of the Order; the world is the anvil...”",
+      "“Fate is a chain only you can break. Sunder it and return...”",
+      "“Silence is the sanctuary of the weak. Let your return be heard in the heavens...”",
+      "“The abyss consumes only what it can hold. Your soul is too vast for its hunger...”",
+      "“Every drop of blood spilled is a seed of vengeance yet to bloom...”",
+      "“The light of the heavens is blinding, but it shall guide you through the dark...”"
+    ],
     "empty": "No items in inventory",
     "equipment_slot": {
       "ACCESSORY": "Accessory",
@@ -306,6 +351,7 @@
     "error": {
       "active_mission": "Cannot change inventory while a mission is active.",
       "equip": "Failed to equip item",
+      "revive": "Failed to revive character",
       "unequip": "Failed to unequip item"
     },
     "gold": "Gold",
@@ -333,6 +379,7 @@
       "legendary": "Legendary",
       "rare": "Rare"
     },
+    "revive": "Revive",
     "stats": {
       "attack_dice": "Attack Dice",
       "damage_type": "Damage Type",
@@ -346,6 +393,7 @@
     "strength_def": "Strength Def",
     "success": {
       "equip": "Item equipped successfully",
+      "revive": "Character revived!",
       "unequip": "Item unequipped successfully"
     },
     "tier": "Tier",
@@ -505,27 +553,55 @@
   "missions": {
     "abandon": "Abandon Mission",
     "asalto_frontera": {
-      "description": "A necromancer bandit leads a raid on the village outside the wall.",
+      "description": "A necromancer bandit leads a raid on the village outside the wall. \"Damn it! Cover my flank.\" —the sergeant shouts as he draws his sword against the skeletons.",
+      "failure": "The sergeant survived. You didn't. He doesn't seem too affected, honestly. (눈_눈)",
       "name": "Frontier Assault",
-      "narrative": "\"Damn it! Cover my flank.\" —the sergeant shouts as he draws his sword against the skeletons.",
       "phase1": "Survive 2 turns",
-      "phase2": "Defeat the Leader"
+      "phase2": "Defeat the Leader",
+      "success": "Nothing like starting the day crushing skeletons. The sergeant almost seems impressed. Almost."
+    },
+    "asedio_avanzadilla": {
+      "description": "Your mountain outpost is being assaulted by demonic forces. Reinforcements are on the way. \"Hold the line! Reinforcements will arrive, we just have to survive!\"",
+      "failure": "The outpost fell. When reinforcements arrived, they found only silence and ashes. (◞‸◟；)",
+      "name": "Outpost Siege",
+      "phase1": "First wave",
+      "phase2": "Second wave",
+      "phase3": "The siege commander",
+      "success": "The war horns sound! The cavalry arrives. You survived. GLORY TO THE ORDER! 🏰"
+    },
+    "asedio_final": {
+      "description": "Belphegor, the Prince of Sloth, assaults the walls of Santa Cruz with his demonic army. The cathedral bells toll as the city burns. This is the decisive moment.",
+      "failure": "Belphegor now has a new city. And you a new form of existence... as ash (҂⌣̀_⌣́)",
+      "name": "Final Siege",
+      "phase1": "Raid Boss: Avatar of Belphegor",
+      "success": "VICTORY! The cathedral bells ring for the heroes who saved the city. ETERNAL GLORY!"
+    },
+    "bestia_despierta": {
+      "description": "An earthquake has awakened an ancient Behemoth that slept beneath the mountains. The creature advances inexorably toward Santa Cruz, crushing everything in its path.",
+      "failure": "Well, at least the city was insured... right? ...Right? (；一_一)",
+      "name": "The Beast Awakens",
+      "phase1": "Break the Shell",
+      "phase2": "Kill the Beast",
+      "success": "The titan falls. The earth trembles one last time. Today you have defeated an ancient evil. (ノಠ益ಠ)ノ彡 🗿"
     },
     "caza_luna": {
-      "description": "Farmers report disappearances on full moon nights. Beasts that walk like men.",
+      "description": "Farmers report disappearances on full moon nights. Beasts that walk like men. The dense forest limits visibility. Something moves in the shadows.",
+      "failure": "Turns out the wolf was also hungry... and you were the snack ʕ•ᴥ•ʔ",
       "name": "Hunt Under the Moon",
-      "narrative": "The dense forest limits visibility. Something moves in the shadows.",
       "phase1": "Track the prey",
-      "phase2": "The Lair"
+      "phase2": "The Lair",
+      "success": "The beast has fallen. Tonight the moon weeps for its lost children. 🌑"
     },
     "combat_coming_soon": "Combat (Coming Soon)",
     "continue": "Continue",
     "ecos_abismo": {
-      "description": "A rift in reality has opened near the mines. A horde of minor demons crossed through.",
+      "description": "A rift in reality has opened near the mines. A horde of minor demons crossed through. The miners didn't escape. Now you must close what was opened.",
+      "failure": "The void whispers: 'Welcome home'. What emerges from the rift has no name... ∞_∞",
       "name": "Echoes of the Abyss",
-      "narrative": "The miners didn't escape. Now you must close what was opened.",
-      "phase1": "Defense waves",
-      "phase2": "The Threshold Guardian"
+      "phase1": "First wave",
+      "phase2": "Second wave",
+      "phase3": "The Threshold Guardian",
+      "success": "The rift closes with a blinding flash. You stared into the abyss and the abyss blinked first. ◉_◉"
     },
     "error": {
       "internal": {
@@ -535,51 +611,84 @@
     },
     "has_active_mission": "Complete active mission first",
     "health_too_low": "Health too low to start mission",
+    "informante": {
+      "description": "An Order spy has been captured. He has vital information about the next demonic move. \"If he talks, we lose the advantage. If he dies, we lose a brother. We can't allow either.\"",
+      "failure": "You arrived too late. You only found a cold body and a note: 'The Order will fall'. (╥﹏╥)",
+      "name": "The Informant",
+      "phase1": "Assault on the tower",
+      "phase2": "Free the informant",
+      "success": "The informant is safe. The information he brings will change the course of the war. (•̀ᴗ•́)و"
+    },
+    "juicio_celestial": {
+      "description": "A Fallen Angel has taken a sacred temple. Its presence darkens the sky and sickens all living things. The temple priests were its first victims, turned to ash by its black fire sword.",
+      "failure": "'Arrogant mortal', were the last words you heard. It was right. (⌐■_■)→☆",
+      "name": "Celestial Judgment",
+      "phase1": "The Ascension",
+      "phase2": "The Duel",
+      "success": "The angel lies defeated. You have proven that hell cannot defeat your faith."
+    },
     "limpieza_ruinas": {
-      "description": "An old watchtower has been occupied by restless spirits. Purify it to restore the line of sight.",
+      "description": "An old watchtower has been occupied by restless spirits. Purify it to restore the line of sight. The old tower creaks with each gust of wind. Whispers echo from above.",
+      "failure": "In the end, the exorcist was exorcized ¬‿¬",
       "name": "Ruins Cleansing",
-      "narrative": "The old tower creaks with each gust of wind. Whispers echo from above.",
-      "phase1": "Ascend the stairs",
-      "phase2": "The Guardian of the Summit"
+      "phase1": "Clear the spider nest",
+      "phase2": "The Guardian of the Summit",
+      "success": "Begone spirits of the abyss!"
     },
     "mansion_sangrienta": {
-      "description": "A local noble has been accused of vampirism. The order sends you to 'interview' him.",
+      "description": "A local noble has been accused of vampirism. The order sends you to 'interview' him. The ballroom is empty, but the chandeliers sway without wind.",
+      "failure": "Congratulations, now you're part of the... 'family'. Hope you enjoy eternal night (⊙_⊙)?",
       "name": "Bloody Mansion",
-      "narrative": "The ballroom is empty, but the chandeliers sway without wind.",
-      "phase1": "The guests transform",
-      "phase2": "The Count"
+      "phase1": "The masquerade",
+      "phase2": "The guests transform",
+      "phase3": "The Count",
+      "success": "The party is over, Count! Your waltz was your last dance"
     },
     "narrative": "Narrative",
     "not_found": "Mission not found",
     "phase": "Phase",
     "phases": "Phases",
+    "pozo_maldito": {
+      "description": "The village well has been contaminated by dark magic. Villagers are getting sick from its waters. \"No one has gone down there for generations. They say something lives at the bottom.\"",
+      "failure": "The well swallowed another fool. At least the water now tastes like templar. (︶︹︺)",
+      "name": "The Cursed Well",
+      "phase1": "The well's nest",
+      "phase2": "The Guardian of the Depths awakens",
+      "success": "The crystal glows in your hands. The well is safe again. The villagers look at you like a hero ✧◝(⁰▿⁰)◜✧"
+    },
     "profundidades_catedral": {
-      "description": "Neighbors complain about strange noises beneath the city. A heretic cult in the catacombs.",
+      "description": "Neighbors complain about strange noises beneath the city. A heretic cult in the catacombs. \"We need to investigate further. Stay alert.\" The air smells of sulfur.",
+      "failure": "The counter reached 6. Something emerges from the altar... and it doesn't seem happy. (╯°□°)╯︵ ┻━┻",
       "name": "Cathedral Depths",
-      "narrative": "\"We need to investigate further. Stay alert.\" The air smells of sulfur.",
       "phase1": "Clear the beast nest",
-      "phase2": "Interrupt the ritual"
+      "phase2": "Interrupt the ritual",
+      "success": "The altar crumbles. The chanting ceases. This is how you purge heretics! ᕙ(`▽´)ᕗ"
     },
     "puente_suspiros": {
-      "description": "An enemy convoy attempts to cross the river with prisoners. Intercept them.",
+      "description": "An enemy convoy attempts to cross the river with prisoners. Intercept them. The narrow bridge offers no retreat. Victory or death.",
+      "failure": "The cages crossed the bridge. You hear the prisoners' screams fade into the distance. ┐(´д`)┌",
       "name": "Bridge of Sighs",
-      "narrative": "The narrow bridge offers no retreat. Victory or death.",
       "phase1": "Frontal bridge assault",
-      "phase2": "The Jailer"
+      "phase2": "The Jailer",
+      "success": "The prisoners are free. Bards will sing of your feat in taverns. ♫ \\(^_^)/ ♫"
     },
     "rewards": "Rewards",
     "ruta_suministros": {
-      "description": "Your squad escorts a supply cart to the front. The forest is eerily silent.",
+      "description": "Your squad escorts a supply cart to the front. The forest is eerily silent. \"Birds don't sing when predators are near.\" \"Eyes open. I don't trust those shadows.\"",
+      "failure": "The supplies burn in the forest. The front will go hungry tonight (；￣Д￣)",
       "name": "Supply Route",
-      "narrative": "\"Birds don't sing when predators are near.\" \"Eyes open. I don't trust those shadows.\"",
-      "phase1": "Clear the road blockade"
+      "phase1": "Repel the anti-magic ambush",
+      "phase2": "Clear the blockade",
+      "success": "That was close. The cart has more holes than swiss cheese, but it arrived ._.)/\\(._."
     },
     "sabotaje_naval": {
-      "description": "Infiltrate the siege ships during a storm.",
+      "description": "Infiltrate the siege ships during a storm. \"Swimming in this rain is suicide, but it's our only chance.\"",
+      "failure": "You swam to your grave. Literally. At least the fish will have company (≖_≖)",
       "name": "Naval Sabotage",
-      "narrative": "\"Swimming in this rain is suicide, but it's our only chance.\"",
       "phase1": "Upper Deck",
-      "phase2": "The Hold"
+      "phase2": "Sabotage in the hold",
+      "phase3": "The Captain",
+      "success": "The ship sinks and with it its immortal captain. The sea claims what belongs to it. Mission accomplished! 🌊"
     },
     "start": "Start Mission",
     "success": {

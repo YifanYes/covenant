@@ -12,7 +12,8 @@ export interface MissionTemplate {
   id: string
   name: string
   description: string
-  narrative: string
+  successText: string
+  failureText: string
   requiredTier: number
   phases: MissionPhase[]
   scaling: string
@@ -37,11 +38,14 @@ export const MISSIONS: Record<string, MissionTemplate> = {
     id: 'asalto_frontera',
     name: 'missions.asalto_frontera.name',
     description: 'missions.asalto_frontera.description',
-    narrative: 'missions.asalto_frontera.narrative',
+    successText: 'missions.asalto_frontera.success',
+    failureText: 'missions.asalto_frontera.failure',
     requiredTier: 1,
     phases: [
-      { enemies: ['skeleton', 'skeleton'], description: 'missions.asalto_frontera.phase1' },
-      { enemies: ['bandit_chief', 'skeleton', 'skeleton'], description: 'missions.asalto_frontera.phase2' }
+      {
+        enemies: ['skeleton', 'skeleton', 'bandit_stalker'],
+        description: 'missions.asalto_frontera.phase1'
+      }
     ],
     scaling: '+1 enemy per extra player',
     rewards: { gold: 50 }
@@ -50,23 +54,39 @@ export const MISSIONS: Record<string, MissionTemplate> = {
     id: 'ruta_suministros',
     name: 'missions.ruta_suministros.name',
     description: 'missions.ruta_suministros.description',
-    narrative: 'missions.ruta_suministros.narrative',
+    successText: 'missions.ruta_suministros.success',
+    failureText: 'missions.ruta_suministros.failure',
     requiredTier: 1,
-    phases: [{ enemies: ['heretic_templar', 'heretic_templar'], description: 'missions.ruta_suministros.phase1' }],
-    scaling: '+2 HP per extra player',
+    phases: [{ enemies: ['bandit_runic', 'bandit_runic'], description: 'missions.ruta_suministros.phase1' }],
+    scaling: '+1 Bandit per extra player',
     rewards: { gold: 50 }
   },
   limpieza_ruinas: {
     id: 'limpieza_ruinas',
     name: 'missions.limpieza_ruinas.name',
     description: 'missions.limpieza_ruinas.description',
-    narrative: 'missions.limpieza_ruinas.narrative',
+    successText: 'missions.limpieza_ruinas.success',
+    failureText: 'missions.limpieza_ruinas.failure',
     requiredTier: 1,
     phases: [
-      { enemies: ['ghost', 'ghost'], description: 'missions.limpieza_ruinas.phase1' },
-      { enemies: ['skeleton_warrior_elite'], description: 'missions.limpieza_ruinas.phase2' }
+      { enemies: ['giant_spider', 'giant_spider'], description: 'missions.limpieza_ruinas.phase1' },
+      { enemies: ['ghost', 'ghost'], description: 'missions.limpieza_ruinas.phase2' }
     ],
     scaling: '+1 Ghost per player, Guardian +2 HP per extra player',
+    rewards: { gold: 50 }
+  },
+  pozo_maldito: {
+    id: 'pozo_maldito',
+    name: 'missions.pozo_maldito.name',
+    description: 'missions.pozo_maldito.description',
+    successText: 'missions.pozo_maldito.success',
+    failureText: 'missions.pozo_maldito.failure',
+    requiredTier: 1,
+    phases: [
+      { enemies: ['giant_spider', 'giant_spider'], description: 'missions.pozo_maldito.phase1' },
+      { enemies: ['skeleton', 'ghost', 'ghost'], description: 'missions.pozo_maldito.phase2' }
+    ],
+    scaling: '+1 Ghost per extra player',
     rewards: { gold: 50 }
   },
 
@@ -75,45 +95,67 @@ export const MISSIONS: Record<string, MissionTemplate> = {
     id: 'profundidades_catedral',
     name: 'missions.profundidades_catedral.name',
     description: 'missions.profundidades_catedral.description',
-    narrative: 'missions.profundidades_catedral.narrative',
+    successText: 'missions.profundidades_catedral.success',
+    failureText: 'missions.profundidades_catedral.failure',
     requiredTier: 2,
     phases: [
       {
-        enemies: ['heretic_cultist', 'heretic_cultist', 'heretic_cultist'],
+        enemies: ['fallen_inquisitor', 'fallen_inquisitor', 'fallen_inquisitor'],
         description: 'missions.profundidades_catedral.phase1'
       },
-      { enemies: ['heretic_templar', 'heretic_templar'], description: 'missions.profundidades_catedral.phase2' }
+      {
+        enemies: ['fallen_inquisitor', 'fallen_inquisitor', 'shadow_demon'],
+        description: 'missions.profundidades_catedral.phase2'
+      }
     ],
-    scaling: '+1 Cultist per player, Phase 2 +1 Templar per 2 players',
+    scaling: '+1 Inquisitor per player, Phase 2 altar gains +2 HP per 2 players',
     rewards: { gold: 100 }
   },
   caza_luna: {
     id: 'caza_luna',
     name: 'missions.caza_luna.name',
     description: 'missions.caza_luna.description',
-    narrative: 'missions.caza_luna.narrative',
+    successText: 'missions.caza_luna.success',
+    failureText: 'missions.caza_luna.failure',
     requiredTier: 2,
     phases: [
-      { enemies: ['young_werewolf', 'young_werewolf'], description: 'missions.caza_luna.phase1' },
-      { enemies: ['alpha_werewolf', 'young_werewolf', 'young_werewolf'], description: 'missions.caza_luna.phase2' }
+      { enemies: ['werewolf', 'werewolf'], description: 'missions.caza_luna.phase1' },
+      { enemies: ['werewolf_alpha'], description: 'missions.caza_luna.phase2' }
     ],
-    scaling: '+1 Young Wolf per player, Alpha +1 attack die with 3+ players',
+    scaling: '+1 Werewolf per player, Alpha +1 attack die with 3+ players',
     rewards: { gold: 100 }
   },
   puente_suspiros: {
     id: 'puente_suspiros',
     name: 'missions.puente_suspiros.name',
     description: 'missions.puente_suspiros.description',
-    narrative: 'missions.puente_suspiros.narrative',
+    successText: 'missions.puente_suspiros.success',
+    failureText: 'missions.puente_suspiros.failure',
     requiredTier: 2,
     phases: [
       {
-        enemies: ['elite_bandit', 'elite_bandit', 'elite_bandit', 'elite_bandit'],
+        enemies: ['armored_templar', 'armored_templar', 'fallen_inquisitor', 'fallen_inquisitor'],
         description: 'missions.puente_suspiros.phase1'
-      },
-      { enemies: ['tank_heretic_templar'], description: 'missions.puente_suspiros.phase2' }
+      }
     ],
-    scaling: '+2 minor enemies per player',
+    scaling: '+1 Templar per player',
+    rewards: { gold: 100 }
+  },
+  informante: {
+    id: 'informante',
+    name: 'missions.informante.name',
+    description: 'missions.informante.description',
+    successText: 'missions.informante.success',
+    failureText: 'missions.informante.failure',
+    requiredTier: 2,
+    phases: [
+      {
+        enemies: ['skeleton', 'skeleton', 'skeleton', 'fallen_templar', 'fallen_templar'],
+        description: 'missions.informante.phase1'
+      },
+      { enemies: ['bandit_chief', 'skeleton', 'skeleton'], description: 'missions.informante.phase2' }
+    ],
+    scaling: '+1 Skeleton per floor per player, Informant gains +2 HP with 3+ players',
     rewards: { gold: 100 }
   },
 
@@ -122,60 +164,113 @@ export const MISSIONS: Record<string, MissionTemplate> = {
     id: 'sabotaje_naval',
     name: 'missions.sabotaje_naval.name',
     description: 'missions.sabotaje_naval.description',
-    narrative: 'missions.sabotaje_naval.narrative',
+    successText: 'missions.sabotaje_naval.success',
+    failureText: 'missions.sabotaje_naval.failure',
     requiredTier: 3,
     phases: [
-      {
-        enemies: ['heretic_templar', 'heretic_templar', 'heretic_templar', 'heretic_templar'],
-        description: 'missions.sabotaje_naval.phase1'
-      },
-      { enemies: ['vampire_chief'], description: 'missions.sabotaje_naval.phase2' }
+      { enemies: ['armored_templar', 'armored_templar'], description: 'missions.sabotaje_naval.phase1' },
+      { enemies: ['magma_demon', 'magma_demon'], description: 'missions.sabotaje_naval.phase2' },
+      { enemies: ['elite_armored_templar'], description: 'missions.sabotaje_naval.phase3' }
     ],
-    scaling: '+1 enemy per player',
+    scaling: '+1 Templar per player, +1 escape turn with 4 players',
     rewards: { gold: 200 }
   },
   mansion_sangrienta: {
     id: 'mansion_sangrienta',
     name: 'missions.mansion_sangrienta.name',
     description: 'missions.mansion_sangrienta.description',
-    narrative: 'missions.mansion_sangrienta.narrative',
+    successText: 'missions.mansion_sangrienta.success',
+    failureText: 'missions.mansion_sangrienta.failure',
     requiredTier: 3,
     phases: [
+      { enemies: ['vampire', 'vampire', 'vampire'], description: 'missions.mansion_sangrienta.phase1' },
       {
-        enemies: ['minor_vampire', 'minor_vampire', 'minor_vampire', 'minor_vampire', 'minor_vampire'],
-        description: 'missions.mansion_sangrienta.phase1'
+        enemies: ['vampire', 'vampire', 'vampire', 'vampire'],
+        description: 'missions.mansion_sangrienta.phase2'
       },
-      { enemies: ['herald_vampire'], description: 'missions.mansion_sangrienta.phase2' }
+      { enemies: ['vampire', 'ghost', 'ghost'], description: 'missions.mansion_sangrienta.phase3' }
     ],
-    scaling: '+1 enemy per player in phase 1, Boss +1 attack die per 2 players',
+    scaling: '+1 Vampire per player in phase 1, Boss +1 attack die per 2 players',
     rewards: { gold: 200 }
   },
   ecos_abismo: {
     id: 'ecos_abismo',
     name: 'missions.ecos_abismo.name',
     description: 'missions.ecos_abismo.description',
-    narrative: 'missions.ecos_abismo.narrative',
+    successText: 'missions.ecos_abismo.success',
+    failureText: 'missions.ecos_abismo.failure',
     requiredTier: 3,
     phases: [
       {
-        enemies: [
-          'minor_demon',
-          'minor_demon',
-          'minor_demon',
-          'minor_demon',
-          'minor_demon',
-          'minor_demon',
-          'minor_demon',
-          'minor_demon',
-          'minor_demon',
-          'minor_demon'
-        ],
+        enemies: ['shadow_demon', 'shadow_demon', 'shadow_demon'],
         description: 'missions.ecos_abismo.phase1'
       },
-      { enemies: ['minor_nephilim'], description: 'missions.ecos_abismo.phase2' }
+      {
+        enemies: ['shadow_demon', 'shadow_demon', 'shadow_demon', 'shadow_demon'],
+        description: 'missions.ecos_abismo.phase2'
+      },
+      { enemies: ['fallen_inquisitor_boss'], description: 'missions.ecos_abismo.phase3' }
     ],
-    scaling: '+2 demons per wave per player',
+    scaling: '+1 Demon per wave per player',
     rewards: { gold: 200 }
+  },
+  asedio_avanzadilla: {
+    id: 'asedio_avanzadilla',
+    name: 'missions.asedio_avanzadilla.name',
+    description: 'missions.asedio_avanzadilla.description',
+    successText: 'missions.asedio_avanzadilla.success',
+    failureText: 'missions.asedio_avanzadilla.failure',
+    requiredTier: 3,
+    phases: [
+      { enemies: ['minor_demon', 'minor_demon', 'minor_demon'], description: 'missions.asedio_avanzadilla.phase1' },
+      {
+        enemies: ['minor_demon', 'minor_demon', 'minor_demon', 'elite_demon', 'elite_demon'],
+        description: 'missions.asedio_avanzadilla.phase2'
+      },
+      { enemies: ['demon_lord', 'elite_demon', 'elite_demon'], description: 'missions.asedio_avanzadilla.phase3' }
+    ],
+    scaling: '+1 Minor Demon per wave per extra player',
+    rewards: { gold: 200 }
+  },
+  // Tier 4 (Boss Raids)
+  asedio_final: {
+    id: 'asedio_final',
+    name: 'missions.asedio_final.name',
+    description: 'missions.asedio_final.description',
+    successText: 'missions.asedio_final.success',
+    failureText: 'missions.asedio_final.failure',
+    requiredTier: 4,
+    phases: [{ enemies: ['belphegor_avatar'], description: 'missions.asedio_final.phase1' }],
+    scaling: 'Boss has [Players x 3] actions per round',
+    rewards: { gold: 400 }
+  },
+  bestia_despierta: {
+    id: 'bestia_despierta',
+    name: 'missions.bestia_despierta.name',
+    description: 'missions.bestia_despierta.description',
+    successText: 'missions.bestia_despierta.success',
+    failureText: 'missions.bestia_despierta.failure',
+    requiredTier: 4,
+    phases: [
+      { enemies: ['behemoth'], description: 'missions.bestia_despierta.phase1' },
+      { enemies: ['behemoth'], description: 'missions.bestia_despierta.phase2' }
+    ],
+    scaling: 'Boss HP = 20 * Players',
+    rewards: { gold: 400 }
+  },
+  juicio_celestial: {
+    id: 'juicio_celestial',
+    name: 'missions.juicio_celestial.name',
+    description: 'missions.juicio_celestial.description',
+    successText: 'missions.juicio_celestial.success',
+    failureText: 'missions.juicio_celestial.failure',
+    requiredTier: 4,
+    phases: [
+      { enemies: ['ghost', 'ghost', 'ghost'], description: 'missions.juicio_celestial.phase1' },
+      { enemies: ['nephilim'], description: 'missions.juicio_celestial.phase2' }
+    ],
+    scaling: 'Angel summons [Players - 1] Reflections (1 HP) each turn',
+    rewards: { gold: 400 }
   }
 }
 

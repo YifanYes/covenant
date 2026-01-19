@@ -86,7 +86,7 @@
     "criticals": "Críticos",
     "death_dialog": {
       "continue": "Continuar",
-      "description": "Tu personaje ha caído en batalla. La misión ha fracasado.",
+      "description": "Tu personaje ha caído en batalla. La misión ha fallado.",
       "title": "Personaje Derrotado"
     },
     "defense_rolls": "Defensas",
@@ -118,6 +118,11 @@
     "phase_complete": "¡Fase Completada!",
     "resolve_turn": "Resolver Turno",
     "resolving_turn": "Resolviendo turno...",
+    "result_dialog": {
+      "continue": "Continuar",
+      "failure_title": "Derrota",
+      "success_title": "¡Victoria!"
+    },
     "roll_attack": "Preparar Ataque",
     "roll_defense": "Preparar Defensa",
     "roll_dice": "Lanzar Dados",
@@ -237,19 +242,40 @@
   "delete": "Eliminar",
   "enemies": {
     "alpha_werewolf": "Hombre Lobo Alfa",
+    "armored_templar": "Templario Acorazado",
     "bandit_chief": "Jefe Bandido",
+    "bandit_runic": "Bandido Rúnico",
+    "bandit_stalker": "Bandido Salteador",
+    "behemoth": "Behemot",
+    "belphegor_avatar": "Avatar de Belfegor",
+    "demon_lord": "Señor Demonio",
+    "elite_armored_templar": "Templario Acorazado de Élite",
     "elite_bandit": "Bandido Élite",
+    "elite_demon": "Demonio Élite",
+    "fallen_angel": "Ángel Caído",
+    "fallen_inquisitor": "Inquisidor Caído",
+    "fallen_inquisitor_boss": "Inquisidor Caído Jefe",
+    "fallen_templar": "Templario Caído",
     "ghost": "Fantasma",
+    "giant_spider": "Araña Gigante",
     "herald_vampire": "Vampiro Heraldo",
     "heretic_cultist": "Cultista Hereje",
     "heretic_templar": "Templario Hereje",
+    "magma_demon": "Demonio de Magma",
     "minor_demon": "Demonio Menor",
     "minor_nephilim": "Nefilim Menor",
     "minor_vampire": "Vampiro Menor",
+    "nephilim": "Nefilim",
+    "shadow_demon": "Demonio de las Sombras",
+    "shadow_demon_elite": "Demonio de las Sombras Élite",
     "skeleton": "Esqueleto",
     "skeleton_warrior_elite": "Esqueleto Guerrero Élite",
     "tank_heretic_templar": "Templario Hereje Tanque",
+    "vampire": "Vampiro",
     "vampire_chief": "Jefe Vampiro",
+    "vampire_count": "Conde Vampiro",
+    "werewolf": "Hombre Lobo",
+    "werewolf_alpha": "Hombre Lobo Alfa",
     "young_werewolf": "Hombre Lobo Joven"
   },
   "errors": {
@@ -297,6 +323,25 @@
       "PHYSICAL": "Físico"
     },
     "dice_bank": "Banco de Dados",
+    "divine_quotes": [
+      "“Te levantarás de nuevo, hijo mío, pues tu deber aún no ha terminado...”",
+      "“La muerte no es más que un puente hacia un propósito mayor. Regresa a la luz...”",
+      "“Las sombras pueden reclamar tu carne, pero tu alma pertenece a la lucha eterna...”",
+      "“Incluso en el abismo más profundo, la brasa de tu voluntad encenderá el amanecer...”",
+      "“Tu linaje está grabado en sangre y oro; la tumba no puede retener lo que el destino ha elegido...”",
+      "“Camina por el valle del silencio y regresa con el trueno de la redención...”",
+      "“Los cielos lloran tu caída, pero las estrellas se alinean para tu renacimiento...”",
+      "“La campana no dobla por tu final, sino por tu despertar...”",
+      "“Tu camino está pavimentado con los huesos de los que se rindieron. No seas como ellos...”",
+      "“El fuego que quema tu carne forjará tu espíritu en un arma...”",
+      "“Las estrellas se atenúan cuando tu voluntad flaquea. Mira hacia arriba y levántate...”",
+      "“Eres el pesado martillo de la Orden; el mundo es el yunque...”",
+      "“El destino es una cadena que solo tú puedes romper. Destrúyela y regresa...”",
+      "“El silencio es el santuario de los débiles. Que tu regreso se escuche en los cielos...”",
+      "“El abismo solo consume lo que puede contener. Tu alma es demasiado grande para su hambre...”",
+      "“Cada gota de sangre derramada es una semilla de venganza que aún debe florecer...”",
+      "“La luz de los cielos es cegadora, pero te guiará a través de la oscuridad...”"
+    ],
     "empty": "No hay objetos en el inventario",
     "equipment_slot": {
       "ACCESSORY": "Accesorio",
@@ -306,6 +351,7 @@
     "error": {
       "active_mission": "No puedes cambiar el inventario mientras hay una misión activa.",
       "equip": "Error al equipar el objeto",
+      "revive": "Error al revivir el personaje",
       "unequip": "Error al desequipar el objeto"
     },
     "gold": "Oro",
@@ -333,6 +379,7 @@
       "legendary": "Legendario",
       "rare": "Raro"
     },
+    "revive": "Revivir",
     "stats": {
       "attack_dice": "Dados de Ataque",
       "damage_type": "Tipo de Daño",
@@ -346,6 +393,7 @@
     "strength_def": "Defensa Física",
     "success": {
       "equip": "Objeto equipado correctamente",
+      "revive": "¡Personaje revivido!",
       "unequip": "Objeto desequipado correctamente"
     },
     "tier": "Tier",
@@ -505,27 +553,54 @@
   "missions": {
     "abandon": "Abandonar Misión",
     "asalto_frontera": {
-      "description": "Un bandido nigromante lidera un asalto al pueblo extramuros.",
+      "description": "Un bandido nigromante está liderando un saqueo en la aldea fuera de la muralla de Santa Cruz. Los gritos de los aldeanos resuenan entre las columnas de humo que se elevan desde los tejados. Esqueletos emergen de la tierra seca mientras el nigromante canaliza su magia oscura desde el centro de la plaza. El caos te rodea. \"¡Maldita sea! Cubre mi flanco.\" —te grita el sargento mientras desenvaina su espada contra los esqueletos.",
+      "failure": "El sargento sobrevivió. Tú no. Él no parece muy afectado, la verdad. (눈_눈)",
       "name": "Asalto en la Frontera",
-      "narrative": "\"¡Maldición! Cubrid mi flanco\" —grita el sargento mientras desenfunda contra los esqueletos.",
-      "phase1": "Sobrevivir 2 turnos",
-      "phase2": "Derrotar al Líder"
+      "phase1": "Sobrevivir y derrotar al Líder",
+      "success": "Nada como empezar el día aplastando esqueletos. El sargento casi parece impresionado. Casi."
+    },
+    "asedio_avanzadilla": {
+      "description": "Tu avanzadilla en las montañas está siendo asaltada por fuerzas demoníacas. Los refuerzos están en camino, pero tardarán. Tu misión es simple: no morir. Aguanta hasta que llegue la caballería. \"¡Mantened la línea! ¡Los refuerzos llegarán, solo tenemos que sobrevivir!\"",
+      "failure": "La avanzadilla cayó. Cuando llegaron los refuerzos, solo encontraron silencio y cenizas. (◞‸◟；)",
+      "name": "Asedio a la Avanzadilla",
+      "phase1": "Primera oleada",
+      "phase2": "Segunda oleada",
+      "phase3": "El comandante del asedio",
+      "success": "¡Los cuernos de guerra suenan! La caballería llega. Has sobrevivido. ¡GLORIA A LA ORDEN! 🏰"
+    },
+    "asedio_final": {
+      "description": "Belfegor, el Príncipe de la Pereza convertido en general del infierno, asalta las murallas de Santa Cruz con su ejército demoníaco. Las campanas de la catedral repican mientras la ciudad arde a tu alrededor. Este es el momento decisivo: todo por lo que has luchado culmina aquí. Si caes, la humanidad caerá contigo.",
+      "failure": "Belfegor ahora tiene una nueva ciudad. Y tú una nueva forma de existencia... como ceniza (҂⌣̀_⌣́)",
+      "name": "Asedio Final",
+      "phase1": "Raid Boss: Avatar de Belfegor",
+      "success": "¡VICTORIA! Las campanas de la catedral repican por los héroes que salvaron la ciudad. ¡GLORIA ETERNA!"
+    },
+    "bestia_despierta": {
+      "description": "Un terremoto ha despertado a un Behemot ancestral que dormía bajo las montañas desde antes de que existiera la ciudad. La criatura avanza inexorablemente hacia Santa Cruz, aplastando todo a su paso como una avalancha viviente. Tienes pocas horas antes de que llegue a las murallas exteriores. Nadie ha matado a un Behemot en siglos; hoy tendrás que cambiar esa estadística.",
+      "failure": "Bueno, al menos la ciudad estaba asegurada... ¿verdad? ...¿Verdad? (；一_一)",
+      "name": "La Bestia Despierta",
+      "phase1": "Romper la Coraza",
+      "phase2": "Matar a la Bestia",
+      "success": "El titán cae. La tierra tiembla una última vez. Hoy has derrotado a un mal antiguo. (ノಠ益ಠ)ノ彡 🗿"
     },
     "caza_luna": {
-      "description": "Granjeros reportan desapariciones en noches de luna llena. Bestias que caminan como hombres.",
+      "description": "Los granjeros reportan desapariciones en las noches de luna llena. Dicen haber visto bestias que caminan como hombres, con ojos que brillan como brasas en la oscuridad. Esta noche la luna está llena otra vez, y los aullidos resuenan demasiado cerca de las granjas. Tu misión es cazar a los cazadores antes de que el amanecer traiga más cuerpos mutilados.",
+      "failure": "Resulta que el lobo también tenía hambre... y tú eras el snack ʕ•ᴥ•ʔ",
       "name": "Caza Bajo la Luna",
-      "narrative": "El bosque denso limita la visibilidad. Algo se mueve en las sombras.",
       "phase1": "Rastrear a la presa",
-      "phase2": "La Guarida"
+      "phase2": "La Guarida",
+      "success": "La bestia ha caído. Esta noche la luna llora por sus hijos perdidos. 🌑"
     },
     "combat_coming_soon": "Combate (Próximamente)",
     "continue": "Continuar",
     "ecos_abismo": {
-      "description": "Una grieta en la realidad se ha abierto cerca de las minas. Una horda de demonios menores cruzó.",
+      "description": "Se ha abierto una grieta en la realidad cerca de las minas, un desgarro brillante en el tejido del mundo que pulsa con energía del vacío. Una horda de demonios menores ha cruzado desde el otro lado, y los mineros quedaron atrapados en los túneles. La grieta se está ensanchando cada hora que pasa. Si no la cierras antes del anochecer, lo que venga después no será menor.",
+      "failure": "El vacío susurra: \"Bienvenido a casa\". Lo que emerge de la grieta no tiene nombre... ∞_∞",
       "name": "Ecos del Abismo",
-      "narrative": "Los mineros no escaparon. Ahora debéis cerrar lo que se abrió.",
-      "phase1": "Oleadas de defensa",
-      "phase2": "El Guardián del Umbral"
+      "phase1": "Primera oleada",
+      "phase2": "Segunda oleada",
+      "phase3": "El Guardián del Umbral",
+      "success": "La grieta se cierra con un destello cegador. Has mirado al abismo y el abismo ha parpadeado primero. ◉_◉"
     },
     "error": {
       "internal": {
@@ -535,51 +610,83 @@
     },
     "has_active_mission": "Completa la misión activa primero",
     "health_too_low": "Salud insuficiente para iniciar misión",
+    "informante": {
+      "description": "Un espía enviado por la Orden ha sido capturado y está siendo interrogado en una torre de vigilancia hereje. Tiene información vital sobre el próximo movimiento demoníaco. Debes rescatarlo antes de que lo ejecuten al amanecer... o antes de que hable. \"Si habla, perdemos la ventaja. Si muere, perdemos un hermano. No podemos permitir ninguna.\"",
+      "failure": "Llegaste tarde. Solo encontraste un cuerpo frío y una nota: \"La Orden caerá\". (╥﹏╥)",
+      "name": "El Informante",
+      "phase1": "Asalto a la torre",
+      "phase2": "Liberar al informante. El interrogador no se rendirá fácilmente.",
+      "success": "El informante está a salvo. La información que trae cambiará el curso de la guerra. (•̀ᴗ•́)و"
+    },
+    "juicio_celestial": {
+      "description": "Un Ángel Caído ha tomado un templo sagrado en la cima de la montaña, corrompiendo su santidad con cada momento que permanece allí. Su mera presencia oscurece el cielo y una miasma densa se extiende por los valles, enfermando a todo ser vivo que toca. Los sacerdotes del templo fueron sus primeras víctimas, convertidos en ceniza por su espada de fuego negro. Nadie ha desafiado a un ángel y vivido para contarlo.",
+      "failure": "\"Arrogante mortal\", fueron las últimas palabras que escuchaste. Tenía razón. (⌐■_■)→☆",
+      "name": "Juicio Celestial",
+      "phase1": "La Ascensión",
+      "phase2": "El Duelo",
+      "success": "El ángel yace derrotado. Has demostrado que el infierno no puede vencer a tu fe."
+    },
     "limpieza_ruinas": {
-      "description": "Una antigua atalaya ha sido ocupada por espíritus inquietos. Purificadla para restaurar la línea de visión.",
+      "description": "Una antigua torre de vigía en la muralla ha sido ocupada por espíritus inquietos. Los centinelas reportan luces fantasmales y lamentos que hielan la sangre durante las noches sin luna. Nadie ha subido a la cima desde que el último vigía desapareció hace tres semanas. Debes purificarla para restablecer la línea de visión y descubrir qué pasó con él.",
+      "failure": "Al final el exorcista ha sido exorcizado ¬‿¬",
       "name": "Limpieza de Ruinas",
-      "narrative": "La vieja torre cruje con cada ráfaga de viento. Susurros resuenan desde arriba.",
-      "phase1": "Ascender las escaleras",
-      "phase2": "El Guardián de la Cima"
+      "phase1": "Limpiar el nido de arañas",
+      "phase2": "Purificar la cima",
+      "success": "¡Atrás espíritus del averno!"
     },
     "mansion_sangrienta": {
-      "description": "Un noble local ha sido acusado de vampirismo. La orden os envía a 'entrevistarlo'.",
+      "description": "Un noble local ha sido acusado de vampirismo por varios testigos que prefirieron permanecer anónimos. Las invitaciones a sus fiestas nocturnas son codiciadas, pero los invitados nunca parecen recordar qué pasó al día siguiente. La orden te envía a \"entrevistarlo\" en su mansión durante su próxima celebración. Los rumores dicen que nadie ha salido vivo de ese salón de baile después de medianoche.",
+      "failure": "Enhorabuena, ahora formas parte de la... \"familia\". Espero que te guste la noche eterna (⊙_⊙)?",
       "name": "Mansión Sangrienta",
-      "narrative": "El salón de baile está vacío, pero las lámparas se balancean sin viento.",
-      "phase1": "Los invitados se transforman",
-      "phase2": "El Conde"
+      "phase1": "La mascarada",
+      "phase2": "Los invitados se transforman",
+      "phase3": "El Conde",
+      "success": "¡La fiesta ha terminado, Conde! Tu vals fue tu último baile"
     },
-    "narrative": "Narrativa",
     "not_found": "Misión no encontrada",
     "phase": "Fase",
     "phases": "Fases",
+    "pozo_maldito": {
+      "description": "El pozo de la aldea ha sido contaminado por magia oscura. Los aldeanos enferman bebiendo de sus aguas negras. Los ancianos recuerdan que los fundadores dejaron un Cristal de Purificación en las profundidades, sellado para emergencias como esta. Debes descender al pozo y eliminar a la amenaza. \"Nadie ha bajado ahí desde hace generaciones. Dicen que algo vive en el fondo.\"",
+      "failure": "El pozo se tragó otro incauto. Al menos el agua ahora sabe a templario. (︶︹︺)",
+      "name": "El Pozo Maldito",
+      "phase1": "El nido del pozo",
+      "phase2": "El Guardián del Fondo despierta",
+      "success": "El cristal brilla en tus manos. El pozo vuelve a ser seguro. Los aldeanos te miran como a un héroe ✧◝(⁰▿⁰)◜✧"
+    },
     "profundidades_catedral": {
-      "description": "Los vecinos se quejan de ruidos extraños bajo la ciudad. Un culto hereje en las catacumbas.",
+      "description": "Las quejas de los vecinos sobre ruidos extraños bajo la ciudad revelan un culto herético en las catacumbas. Los túneles serpentean bajo la catedral, olvidados desde hace siglos, ahora profanados por rituales oscuros. El aire huele a azufre y a sangre seca. Los cánticos distantes prometen que algo terrible está a punto de despertar. \"Necesitamos investigar un poco más. Mantente alerta.\"",
+      "failure": "El contador llegó a 6. Algo emerge del altar... y no parece contento. (╯°□°)╯︵ ┻━┻",
       "name": "Profundidades de la Catedral",
-      "narrative": "\"Necesitamos investigar más a fondo. Estad alerta.\" El aire huele a azufre.",
-      "phase1": "Limpiar el nido de bestias",
-      "phase2": "Interrumpir el ritual"
+      "phase1": "Despejar el nido de sectarios",
+      "phase2": "Interrumpir el ritual",
+      "success": "El altar se desmorona. Los cánticos cesan. ¡Así es como se purgan los herejes! ᕙ(`▽´)ᕗ"
     },
     "puente_suspiros": {
-      "description": "Un convoy enemigo intenta cruzar el río con prisioneros. Interceptadlo.",
+      "description": "Un convoy enemigo intenta cruzar el río con prisioneros de guerra. Entre ellos hay soldados, exploradores y, según los informes, un capitán con información vital. El puente es angosto y traicionero, con una caída mortal hacia las aguas heladas del desfiladero. Si cruzan al otro lado, los prisioneros estarán perdidos para siempre.",
+      "failure": "Las jaulas cruzaron el puente. Escuchas los gritos de los prisioneros desvanecerse en la distancia. ┐(´д`)┌",
       "name": "Puente de los Suspiros",
-      "narrative": "El puente estrecho no ofrece retirada. Victoria o muerte.",
-      "phase1": "Asalto frontal al puente",
-      "phase2": "El Carcelero"
+      "phase1": "Asalto",
+      "phase2": "El Carcelero",
+      "success": "Los prisioneros son libres. Los bardos cantarán tu hazaña en las tabernas. ♫ \\(^_^)/ ♫"
     },
     "rewards": "Recompensas",
     "ruta_suministros": {
-      "description": "Tu escuadra escolta un carro de suministros al frente. El bosque está extrañamente silencioso.",
+      "description": "Tu escuadrón escolta un carromato con suministros hacia el frente. El camino serpentea entre árboles centenarios cuyas ramas bloquean la luz del sol. El bosque está inquietantemente silencioso; ni un pájaro, ni un insecto. Algo os observa desde las sombras, esperando el momento perfecto para atacar. \"Los pájaros no cantan cuando hay depredadores cerca.\" \"Ojos abiertos. No me fío de esas sombras.\"",
+      "failure": "Los suministros arden en el bosque. El frente pasará hambre esta noche (；￣Д￣)",
       "name": "Ruta de Suministros",
-      "narrative": "\"Los pájaros no cantan cuando hay depredadores cerca.\" \"Ojos abiertos. No me fío de esas sombras.\"",
-      "phase1": "Limpiar el bloqueo del camino"
+      "phase1": "Repeler la emboscada antimagia",
+      "phase2": "Despejar el bloqueo",
+      "success": "Eso ha estado cerca. El carromato tiene más agujeros que un queso, pero llegó ._.)/\\(._."
     },
     "sabotaje_naval": {
-      "description": "Infiltraos en los barcos de asedio durante una tormenta.",
+      "description": "Los navíos de asedio enemigos se preparan para bombardear el puerto al amanecer. Una tormenta brutal azota la bahía, el único momento donde la vigilancia será mínima. Debes nadar hasta los barcos en la oscuridad y eliminar la amenaza. El capitán de la flota enemiga es un vampiro que nunca duerme. \"Nadar con esta lluvia es un suicidio, pero es nuestra única oportunidad.\"",
+      "failure": "Nadaste hacia tu tumba. Literalmente. Al menos los peces tendrán compañía (≖_≖)",
       "name": "Sabotaje Naval",
-      "narrative": "\"Nadar con esta lluvia es un suicidio, pero es nuestra única oportunidad.\"",
       "phase1": "Cubierta Superior",
-      "phase2": "La Bodega"
+      "phase2": "Sabotaje en la bodega",
+      "phase3": "El Capitán",
+      "success": "El barco se hunde y con él su capitán inmortal. El mar reclama lo que le pertenece. ¡Misión cumplida! 🌊"
     },
     "start": "Iniciar Misión",
     "success": {
@@ -797,11 +904,11 @@
       "empty": "Todavía no tienes tareas. ¡Crea una para empezar!",
       "no_matching_tasks": "No hay tareas que coincidan con los filtros",
       "no_tasks": "No se encontraron tareas",
+      "page_info": "Página {{page}} de {{totalPages}}",
+      "pagination_info": "Mostrando {{start}}-{{end}} de {{total}}",
       "status": "Estado",
       "title": "Título",
-      "type": "Tipo",
-      "pagination_info": "Mostrando {{start}}-{{end}} de {{total}}",
-      "page_info": "Página {{page}} de {{totalPages}}"
+      "type": "Tipo"
     },
     "tabs": {
       "calendar": "Calendario",
