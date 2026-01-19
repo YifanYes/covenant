@@ -177,6 +177,19 @@ export class CharacterService {
     return count > 0
   }
 
+  async revive(userId: string): Promise<{ success: boolean }> {
+    const character = await this.characterRepository.findWithClassesOrThrow(userId)
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+
+    if (!currentClass) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
+    }
+
+    await this.characterRepository.updateHealth(currentClass.id, currentClass.maxHealth, currentClass.maxMana)
+
+    return { success: true }
+  }
+
   private createRandomPartyName(): string {
     const adjectives = [
       'Brave',

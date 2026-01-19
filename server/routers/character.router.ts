@@ -30,5 +30,9 @@ export const characterRouter = t.router({
   hasCharacter: protectedProcedure.query(async ({ ctx }) => {
     const hasCharacter = await ctx.services.character.hasCharacter(ctx.user.id)
     return { hasCharacter }
+  }),
+
+  revive: protectedProcedure.mutation(async ({ ctx }) => {
+    return ctx.services.character.revive(ctx.user.id)
   })
 })

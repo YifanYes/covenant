@@ -1,9 +1,13 @@
+import Button from '@/ui/button.component'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import Separator from '@/ui/separator.component'
+import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Bullseye, Heart, Money, ScriptText, Shield, Zap } from '@nsmr/pixelart-react'
 import { TIER_PROGRESSION } from '@shared/constants/missions'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
+import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 
 interface CharacterStatusProps {
   character: InventoryCharacter
@@ -11,6 +15,17 @@ interface CharacterStatusProps {
 
 export default function CharacterStatus({ character }: CharacterStatusProps) {
   const { t } = useTranslation()
+
+  const reviveMutation = useMutation({
+    ...trpc.character.revive.mutationOptions(),
+    onSuccess: () => {
+      toast.success(t('inventory.success.revive'))
+      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+    },
+    onError: () => {
+      toast.error(t('inventory.error.revive'))
+    }
+  })
 
   if (!character) return null
 
@@ -107,6 +122,21 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
             {character.data?.diceBank || 0} / {character.maxDice || 10}
           </span>
         </div>
+
+        {currentClass.health <= 0 && (
+          <>
+            <Separator className='bg-sidebar-border my-1 w-auto' />
+            <Button
+              variant='ghost'
+              className='text-muted-foreground hover:text-foreground h-auto w-full justify-start gap-2 px-0 font-normal'
+              onClick={() => reviveMutation.mutate()}
+              disabled={reviveMutation.isPending}
+            >
+              <Heart className='h-4 w-4 text-red-500' />
+              <span className='text-sm font-medium'>{t('inventory.revive')}</span>
+            </Button>
+          </>
+        )}
       </CardContent>
     </Card>
   )

@@ -42,7 +42,7 @@ export default function EnemyCard({ enemy, isTarget, className }: EnemyCardProps
       {/* Enemy Portrait */}
       <div className='shrink-0'>
         <img
-          src={`/assets/enemies/${template.id}.png`}
+          src={`/assets/enemies/${template.imageId}.png`}
           alt={t(template.name)}
           className='h-16 w-16 rounded-lg object-cover'
           onError={(e) => {
