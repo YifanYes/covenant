@@ -1,4 +1,4 @@
-import Button from '@/ui/button.component'
+import LoaderButton from '@/common/loader-button.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Heart } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
@@ -69,15 +69,14 @@ export default function CharacterDeathOverlay() {
           {randomQuote}
         </p>
 
-        <Button
-          variant='destructive'
-          className='gap-2 shadow-xl transition-all hover:scale-105 active:scale-95'
+        <LoaderButton
+          className='bg-destructive/90 text-background hover:bg-destructive gap-2 shadow-xl transition-all hover:scale-105 hover:animate-pulse active:scale-95 disabled:opacity-50'
           onClick={() => reviveMutation.mutate()}
           disabled={reviveMutation.isPending}
-        >
-          <Heart className='h-4 w-4' />
-          <span className='text-sm font-medium'>{t('inventory.revive')}</span>
-        </Button>
+          isLoading={reviveMutation.isPending}
+          label={t('inventory.revive')}
+          icon={<Heart className='h-4 w-4' />}
+        />
       </div>
     </div>
   )
