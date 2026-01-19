@@ -29,7 +29,7 @@ export default function CharacterDeathOverlay() {
       <svg
         viewBox='0 0 24 24'
         fill='currentColor'
-        className='text-destructive h-24 w-24 drop-shadow-[0_0_15px_rgba(220,38,38,0.4)]'
+        className='text-destructive h-24 w-24 drop-shadow-[0_0_4px_rgba(220,38,38,0.4)]'
         xmlns='http://www.w3.org/2000/svg'
         style={{ imageRendering: 'pixelated', shapeRendering: 'crispEdges' }}
       >
