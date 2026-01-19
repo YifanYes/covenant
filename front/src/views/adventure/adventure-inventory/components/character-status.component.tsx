@@ -127,12 +127,11 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
           <>
             <Separator className='bg-sidebar-border my-1 w-auto' />
             <Button
-              variant='ghost'
-              className='text-muted-foreground hover:text-foreground h-auto w-full justify-start gap-2 px-0 font-normal'
+              className='w-fit gap-2 shadow-sm'
               onClick={() => reviveMutation.mutate()}
               disabled={reviveMutation.isPending}
             >
-              <Heart className='h-4 w-4 text-red-500' />
+              <Heart className='h-4 w-4' />
               <span className='text-sm font-medium'>{t('inventory.revive')}</span>
             </Button>
           </>
