@@ -8,22 +8,21 @@ datasource db {
 }
 
 model Character {
-  id           String           @id @default(uuid()) @db.Uuid
-  name         String           @db.VarChar(255)
-  title        String?          @db.VarChar(255)
-  orderName    String?
-  magicNature  String?          @db.VarChar(50)
-  currentClass String           @db.VarChar(50)
-  data         Json?            @default("{\"diceBank\": 0}")
-  createdAt    DateTime         @default(now()) @db.Timestamp(6)
-  updatedAt    DateTime         @updatedAt @db.Timestamp(6)
-  userId       String           @unique @db.Uuid
-  gold         Int              @default(0)
-  inventory    Json?            @default("[]")
-  loadout      Json?            @default("[]")
-  partyId      String?          @db.Uuid
-  classes      CharacterClass[]
-  party        Party?           @relation(fields: [partyId], references: [id])
+  id                     String                  @id @default(uuid()) @db.Uuid
+  name                   String                  @db.VarChar(255)
+  title                  String?                 @db.VarChar(255)
+  orderName              String?
+  currentClass           String                  @db.VarChar(50)
+  data                   Json?                   @default("{\"diceBank\": 0}")
+  createdAt              DateTime                @default(now()) @db.Timestamp(6)
+  updatedAt              DateTime                @updatedAt @db.Timestamp(6)
+  userId                 String                  @unique @db.Uuid
+  gold                   Int                     @default(0)
+  inventory              Json?                   @default("[]")
+  loadout                Json?                   @default("[]")
+  magicNature            String?                 @db.VarChar(50)
+  activityParticipations ActivityParticipation[]
+  classes                CharacterClass[]
 
   @@map("characters")
 }
@@ -32,12 +31,8 @@ model CharacterClass {
   id              String    @id @default(uuid()) @db.Uuid
   characterId     String    @db.Uuid
   className       String    @db.VarChar(50)
-  tier            Int       @default(1)
-  missionProgress Json      @default("{\"1\": 0, \"2\": 0, \"3\": 0, \"4\": 0, \"5\": 0, \"6\": 0, \"7\": 0, \"8\": 0, \"9\": 0, \"10\": 0}")
   health          Int       @default(5)
   mana            Int       @default(5)
-  maxHealth       Int       @default(5)
-  maxMana         Int       @default(5)
   createdAt       DateTime  @default(now()) @db.Timestamp(6)
   updatedAt       DateTime  @updatedAt @db.Timestamp(6)
   magicAtk        Int       @default(5)
@@ -45,41 +40,47 @@ model CharacterClass {
   strengthAtk     Int       @default(4)
   strengthDef     Int       @default(4)
   manaRegen       Int       @default(1)
+  missionProgress Json      @default("{\"1\": 0, \"2\": 0, \"3\": 0, \"4\": 0, \"5\": 0, \"6\": 0, \"7\": 0, \"8\": 0, \"9\": 0, \"10\": 0}")
+  tier            Int       @default(1)
+  maxHealth       Int       @default(5)
+  maxMana         Int       @default(5)
   character       Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@unique([characterId, className])
   @@map("character_classes")
 }
 
-model Party {
-  id               String      @id @default(uuid()) @db.Uuid
-  name             String?     @db.VarChar(255)
-  currentMissionId String?     @db.Uuid
-  createdAt        DateTime    @default(now()) @db.Timestamp(6)
-  updatedAt        DateTime    @updatedAt @db.Timestamp(6)
-  characters       Character[]
-  missions         Mission[]
+model MapActivity {
+  id             String                  @id @default(uuid()) @db.Uuid
+  activityId     String                  @db.VarChar(255)
+  status         String                  @db.VarChar(20)
+  progress       Int                     @default(0)
+  target         Int
+  startedAt      DateTime                @default(now()) @db.Timestamp(6)
+  deadline       DateTime                @db.Timestamp(6)
+  completedAt    DateTime?               @db.Timestamp(6)
+  participations ActivityParticipation[]
 
-  @@map("parties")
+  @@map("map_activities")
 }
 
-model Mission {
-  id           String    @id @default(uuid()) @db.Uuid
-  partyId      String    @db.Uuid
-  name         String    @db.VarChar(255)
-  description  String?
-  requiredTier Int       @default(1)
-  status       String    @db.VarChar(20)
-  currentPhase Int       @default(0)
-  enemyState   Json?
-  combatLog    Json?     @default("[]")
-  rewards      Json?
-  createdAt    DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt    DateTime  @updatedAt @db.Timestamp(6)
-  completedAt  DateTime? @db.Timestamp(6)
-  party        Party     @relation(fields: [partyId], references: [id], onDelete: Cascade)
+model ActivityParticipation {
+  id                    String      @id @default(uuid()) @db.Uuid
+  activityId            String      @db.Uuid
+  characterId           String      @db.Uuid
+  kills                 Int         @default(0)
+  goldEarned            Int         @default(0)
+  joinedAt              DateTime    @default(now()) @db.Timestamp(6)
+  lastCombatAt          DateTime?   @db.Timestamp(6)
+  currentEnemyId        String?     @db.VarChar(255)
+  currentEnemyHealth    Int?        @default(0)
+  currentEnemyMaxHealth Int?        @default(0)
+  combatLog             Json?       @default("[]")
+  activity              MapActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  character             Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
-  @@map("missions")
+  @@unique([activityId, characterId])
+  @@map("activity_participations")
 }
 
 model Objective {

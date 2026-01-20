@@ -26,8 +26,6 @@ export interface EnemyTemplate {
   magicAtk: number
   magicDef: number
   manaRegen: number
-  xpReward: number
-  goldReward: number
 }
 
 export const ENEMIES: Record<string, EnemyTemplate> = {
@@ -45,9 +43,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 5,
     magicAtk: 6,
     magicDef: 6,
-    manaRegen: 0,
-    xpReward: 10,
-    goldReward: 5
+    manaRegen: 0
   },
   bandit_chief: {
     id: 'bandit_chief',
@@ -62,9 +58,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 6,
     magicDef: 5,
-    manaRegen: 0,
-    xpReward: 25,
-    goldReward: 15
+    manaRegen: 0
   },
   bandit_runic: {
     id: 'bandit_runic',
@@ -79,9 +73,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 5,
     magicAtk: 4,
     magicDef: 3,
-    manaRegen: 1,
-    xpReward: 15,
-    goldReward: 10
+    manaRegen: 1
   },
   bandit_stalker: {
     id: 'bandit_stalker',
@@ -96,9 +88,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 6,
     magicDef: 5,
-    manaRegen: 0,
-    xpReward: 15,
-    goldReward: 10
+    manaRegen: 0
   },
   fallen_templar: {
     id: 'fallen_templar',
@@ -113,9 +103,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 5,
     magicDef: 5,
-    manaRegen: 1,
-    xpReward: 15,
-    goldReward: 10
+    manaRegen: 1
   },
   ghost: {
     id: 'ghost',
@@ -130,9 +118,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 6,
     magicAtk: 4,
     magicDef: 4,
-    manaRegen: 1,
-    xpReward: 12,
-    goldReward: 8
+    manaRegen: 1
   },
   giant_spider: {
     id: 'giant_spider',
@@ -147,11 +133,38 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 5,
     magicAtk: 6,
     magicDef: 6,
-    manaRegen: 0,
-    xpReward: 12,
-    goldReward: 8
+    manaRegen: 0
   },
-
+  magma_demon: {
+    id: 'magma_demon',
+    name: 'enemies.magma_demon',
+    imageId: 'elite_demon',
+    tier: 1,
+    type: EnemyType.MINION,
+    health: 8,
+    mana: 4,
+    damageType: DamageType.MAGIC,
+    strengthAtk: 4,
+    strengthDef: 2,
+    magicAtk: 4,
+    magicDef: 5,
+    manaRegen: 1
+  },
+  shadow_demon: {
+    id: 'shadow_demon',
+    name: 'enemies.shadow_demon',
+    imageId: 'minor_demon',
+    tier: 1,
+    type: EnemyType.MINION,
+    health: 6,
+    mana: 5,
+    damageType: DamageType.MAGIC,
+    strengthAtk: 5,
+    strengthDef: 4,
+    magicAtk: 3,
+    magicDef: 3,
+    manaRegen: 2
+  },
   // Tier 2
   fallen_inquisitor: {
     id: 'fallen_inquisitor',
@@ -166,26 +179,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 5,
     magicAtk: 4,
     magicDef: 3,
-    manaRegen: 2,
-    xpReward: 25,
-    goldReward: 15
-  },
-  shadow_demon: {
-    id: 'shadow_demon',
-    name: 'enemies.shadow_demon',
-    imageId: 'minor_demon',
-    tier: 2,
-    type: EnemyType.ELITE,
-    health: 6,
-    mana: 5,
-    damageType: DamageType.MAGIC,
-    strengthAtk: 5,
-    strengthDef: 4,
-    magicAtk: 3,
-    magicDef: 3,
-    manaRegen: 2,
-    xpReward: 40,
-    goldReward: 25
+    manaRegen: 2
   },
   armored_templar: {
     id: 'armored_templar',
@@ -200,9 +194,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 6,
     magicDef: 5,
-    manaRegen: 1,
-    xpReward: 45,
-    goldReward: 30
+    manaRegen: 1
   },
   werewolf: {
     id: 'werewolf',
@@ -217,9 +209,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 6,
     magicDef: 5,
-    manaRegen: 0,
-    xpReward: 30,
-    goldReward: 18
+    manaRegen: 0
   },
   werewolf_alpha: {
     id: 'werewolf_alpha',
@@ -234,9 +224,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 5,
     magicDef: 4,
-    manaRegen: 0,
-    xpReward: 120,
-    goldReward: 60
+    manaRegen: 0
   },
   // Tier 3 Enemies
   elite_armored_templar: {
@@ -252,26 +240,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 5,
     magicDef: 4,
-    manaRegen: 1,
-    xpReward: 180,
-    goldReward: 90
-  },
-  magma_demon: {
-    id: 'magma_demon',
-    name: 'enemies.magma_demon',
-    imageId: 'elite_demon',
-    tier: 3,
-    type: EnemyType.ELITE,
-    health: 8,
-    mana: 4,
-    damageType: DamageType.MAGIC,
-    strengthAtk: 4,
-    strengthDef: 2,
-    magicAtk: 4,
-    magicDef: 5,
-    manaRegen: 1,
-    xpReward: 60,
-    goldReward: 35
+    manaRegen: 1
   },
   shadow_demon_elite: {
     id: 'shadow_demon_elite',
@@ -286,9 +255,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 3,
     magicDef: 3,
-    manaRegen: 2,
-    xpReward: 35,
-    goldReward: 22
+    manaRegen: 2
   },
   minor_demon: {
     id: 'minor_demon',
@@ -303,9 +270,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 5,
     magicAtk: 4,
     magicDef: 4,
-    manaRegen: 1,
-    xpReward: 28,
-    goldReward: 16
+    manaRegen: 1
   },
   elite_demon: {
     id: 'elite_demon',
@@ -320,9 +285,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 3,
     magicDef: 3,
-    manaRegen: 2,
-    xpReward: 70,
-    goldReward: 40
+    manaRegen: 2
   },
   demon_lord: {
     id: 'demon_lord',
@@ -337,9 +300,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 3,
     magicDef: 3,
-    manaRegen: 3,
-    xpReward: 220,
-    goldReward: 110
+    manaRegen: 3
   },
   fallen_inquisitor_boss: {
     id: 'fallen_inquisitor_boss',
@@ -354,9 +315,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 2,
     magicDef: 2,
-    manaRegen: 3,
-    xpReward: 200,
-    goldReward: 100
+    manaRegen: 3
   },
   vampire: {
     id: 'vampire',
@@ -371,9 +330,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 4,
     magicDef: 4,
-    manaRegen: 1,
-    xpReward: 35,
-    goldReward: 22
+    manaRegen: 1
   },
   vampire_count: {
     id: 'vampire_count',
@@ -388,9 +345,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 3,
     magicDef: 3,
-    manaRegen: 3,
-    xpReward: 200,
-    goldReward: 100
+    manaRegen: 3
   },
   nephilim: {
     id: 'nephilim',
@@ -405,9 +360,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 2,
     magicDef: 2,
-    manaRegen: 3,
-    xpReward: 250,
-    goldReward: 120
+    manaRegen: 3
   },
   // Tier 4
   belphegor_avatar: {
@@ -423,9 +376,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 2,
     magicDef: 2,
-    manaRegen: 4,
-    xpReward: 500,
-    goldReward: 200
+    manaRegen: 4
   },
   behemoth: {
     id: 'behemoth',
@@ -440,9 +391,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 1,
     magicAtk: 6,
     magicDef: 4,
-    manaRegen: 0,
-    xpReward: 600,
-    goldReward: 200
+    manaRegen: 0
   },
   fallen_angel: {
     id: 'fallen_angel',
@@ -457,9 +406,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 1,
     magicDef: 1,
-    manaRegen: 5,
-    xpReward: 750,
-    goldReward: 200
+    manaRegen: 5
   }
 }
 

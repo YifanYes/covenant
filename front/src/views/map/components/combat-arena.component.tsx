@@ -1,35 +1,40 @@
+import AlertDialog, {
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog.component'
 import { cn } from '@/lib/cn.lib'
 import ScrollArea from '@/ui/scroll-area.component'
-import DiceResult from '@/views/adventure/mission-detail/components/dice-result.component'
-import DiceRoller from '@/views/adventure/mission-detail/components/dice-roller.component'
-import EnemyCard from '@/views/adventure/mission-detail/components/enemy-card.component'
-import HealthBar from '@/views/adventure/mission-detail/components/health-bar.component'
 import {
   ItemType,
   type CombatLogEntry,
-  type CombatTurnResult,
   type EnemyState,
   type InventoryCharacter
 } from '@shared/types/gamification.types'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import CombatLog from '../../components/combat-log.component'
+import { useNavigate } from 'react-router'
+import CombatLog from './combat-log.component'
+import DiceResult from './dice-result.component'
+import DiceRoller from './dice-roller.component'
+import EnemyCard from './enemy-card.component'
+import HealthBar from './health-bar.component'
 
 interface CombatArenaProps {
   character: InventoryCharacter
   enemies: EnemyState[]
   combatLog: CombatLogEntry[]
   diceBank: number
-  onAttack: ({ attackRolls, defenseRolls }: { attackRolls: number[]; defenseRolls: number[] }) => void
+  onAttack: (rolls: { attackRolls: number[]; defenseRolls: number[] }) => void
   isAttacking: boolean
-  lastTurnResult?: CombatTurnResult | null
-  onNextPhase?: () => void
-  isAdvancing?: boolean
-  nextPhaseLabel?: string
+  lastTurnResult: any
   className?: string
 }
 
-const RESOLVE_DELAY_MS = 500
+const RESOLVE_DELAY_MS = 1500
 
 export default function CombatArena({
   character,
@@ -39,30 +44,38 @@ export default function CombatArena({
   onAttack,
   isAttacking,
   lastTurnResult,
-  onNextPhase,
-  isAdvancing,
-  nextPhaseLabel,
   className
 }: CombatArenaProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const currentClass = character.classes.find((c) => c.className === character.currentClass)
+  const isDead = (currentClass?.health ?? 0) <= 0
+
+  // Local state for rolling animation
   const [pendingAttackRolls, setPendingAttackRolls] = useState<number[] | undefined>()
   const [pendingDefenseRolls, setPendingDefenseRolls] = useState<number[] | undefined>()
+  const isResolvingRef = useRef(false)
   const [submittedAttackRolls, setSubmittedAttackRolls] = useState<number[] | undefined>()
   const [submittedDefenseRolls, setSubmittedDefenseRolls] = useState<number[] | undefined>()
-  const [submittedCost, setSubmittedCost] = useState(0)
-  const isResolvingRef = useRef(false)
 
-  const currentClass = character.classes.find((c) => c.className === character.currentClass)
+  // Clear submitted rolls when we get a result
+  useEffect(() => {
+    if (lastTurnResult) {
+      const timer = setTimeout(() => {
+        setSubmittedAttackRolls(undefined)
+        setSubmittedDefenseRolls(undefined)
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+  }, [lastTurnResult])
 
-  const tempDiceBank = useMemo(() => {
-    if (isAttacking) return Math.max(0, diceBank - (submittedCost || 0))
-
+  // Calculate dice bank available for UI
+  const currentAvailableDice = (() => {
     let usedDice = 0
     if (pendingAttackRolls) usedDice += pendingAttackRolls.length
     if (pendingDefenseRolls) usedDice += pendingDefenseRolls.length
-
     return Math.max(0, diceBank - usedDice)
-  }, [diceBank, isAttacking, submittedCost, pendingAttackRolls, pendingDefenseRolls])
+  })()
 
   // Auto-resolve after defense rolls are set with a delay
   useEffect(() => {
@@ -72,7 +85,6 @@ export default function CombatArena({
         // Transfer pending to submitted (keep them visible while waiting for backend)
         setSubmittedAttackRolls(pendingAttackRolls)
         setSubmittedDefenseRolls(pendingDefenseRolls)
-        setSubmittedCost(pendingAttackRolls.length + pendingDefenseRolls.length)
         onAttack({ attackRolls: pendingAttackRolls, defenseRolls: pendingDefenseRolls })
         setPendingAttackRolls(undefined)
         setPendingDefenseRolls(undefined)
@@ -85,7 +97,7 @@ export default function CombatArena({
     }
   }, [pendingAttackRolls, pendingDefenseRolls, isAttacking, onAttack])
 
-  const showResults = !!(lastTurnResult && !isAttacking && !pendingAttackRolls && !pendingDefenseRolls && !isAdvancing)
+  const showResults = !!(lastTurnResult && !isAttacking && !pendingAttackRolls && !pendingDefenseRolls)
 
   if (!currentClass) return null
 
@@ -94,7 +106,7 @@ export default function CombatArena({
 
   // Find equipped items
   const armor = character?.loadout?.find((item) => item.type === ItemType.ARMOR)
-  const armorDice = armor?.stats?.physDef || armor?.stats?.magicDef || 1
+  const armorDice = armor?.stats?.physicalDefDice || armor?.stats?.magicDefDice || 1
 
   const weapon = character?.loadout?.find(
     (item) =>
@@ -111,7 +123,6 @@ export default function CombatArena({
       // Clear previous turn's submitted rolls when starting a new turn
       setSubmittedAttackRolls(undefined)
       setSubmittedDefenseRolls(undefined)
-      setSubmittedCost(0)
       setPendingAttackRolls(Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1))
     } else {
       const defenseRolls = Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1)
@@ -188,12 +199,9 @@ export default function CombatArena({
         </div>
 
         <DiceRoller
-          diceBank={tempDiceBank}
+          diceBank={currentAvailableDice}
           onRoll={handleRoll}
           isRolling={isWaitingForResolve}
-          onNextPhase={!pendingAttackRolls && !pendingDefenseRolls && !isWaitingForResolve ? onNextPhase : undefined}
-          isAdvancing={isWaitingForResolve || isAdvancing}
-          nextPhaseLabel={nextPhaseLabel}
           customButtonLabel={rollButtonLabel}
           title={isAttacking ? t('combat.to_battle') : undefined}
           diceLimit={diceLimit}
@@ -243,6 +251,20 @@ export default function CombatArena({
 
         <CombatLog entries={combatLog} className='max-h-[350px] min-h-[300px]' />
       </div>
+
+      <AlertDialog open={isDead}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('combat.death_dialog.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('combat.death_dialog.description')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => navigate('/inventory')}>
+              {t('combat.death_dialog.continue')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

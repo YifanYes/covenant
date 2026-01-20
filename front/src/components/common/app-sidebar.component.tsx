@@ -4,20 +4,50 @@ import Sidebar, {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger
 } from '@/ui/sidebar.component'
-import { BookOpen, Dashboard, List, Luggage, Sliders, Trophy } from '@nsmr/pixelart-react'
+import { BookOpen, Dashboard, List, Luggage, Map, Sliders, Store, Trophy } from '@nsmr/pixelart-react'
+import type { ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
+
+interface SidebarItem {
+  title: string
+  url: string
+  icon: ElementType
+}
+
+function SidebarSection({ title, items }: { title?: string; items: SidebarItem[] }) {
+  return (
+    <SidebarGroup>
+      {title && <SidebarGroupLabel>{title}</SidebarGroupLabel>}
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton asChild tooltip={item.title}>
+                <a href={item.url}>
+                  <item.icon />
+                  <span>{item.title}</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  )
+}
 
 export default function AppSidebar() {
   const { t } = useTranslation()
 
   const sidebarItems = {
-    content: [
+    productivity: [
       {
         title: t('sidebar.dashboard'),
         url: '/dashboard',
@@ -37,11 +67,23 @@ export default function AppSidebar() {
         title: t('sidebar.habits'),
         url: '/habits',
         icon: BookOpen
+      }
+    ],
+    rpg: [
+      {
+        title: t('sidebar.inventory'),
+        url: '/inventory',
+        icon: Luggage
       },
       {
-        title: t('sidebar.adventure'),
-        url: '/adventure/inventory',
-        icon: Luggage
+        title: t('sidebar.map'),
+        url: '/map',
+        icon: Map
+      },
+      {
+        title: t('sidebar.shop'),
+        url: '/shop',
+        icon: Store
       }
     ],
     settings: [
@@ -73,39 +115,10 @@ export default function AppSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {sidebarItems.content.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarSection title='Productivity' items={sidebarItems.productivity} />
+        <SidebarSection title={t('sidebar.rpg')} items={sidebarItems.rpg} />
         <Separator />
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {sidebarItems.settings.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarSection items={sidebarItems.settings} />
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>

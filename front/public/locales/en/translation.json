@@ -1,20 +1,49 @@
 {
+  "activities": {
+    "assault_ships": {
+      "description": "A fleet of ships besieges the docks. If they fall, maritime reinforcements will not arrive in time. Destroy them without mercy.",
+      "failure_consequence": "Reinforcements from Trinidad do not arrive. An escape route is lost.",
+      "failure_text": "The sea is full of sharks. The sharks are full of... well, better not to think about it (；￣Д￣)",
+      "name": "Assault on the Ships",
+      "objective": "Destroy pirates",
+      "success_consequence": "Reinforcements from Trinidad arrive. 600 gold bonus to all participants.",
+      "success_text": "The pirates sink with their ships! Let the fish feed on them ♪(´ε` )"
+    },
+    "continue": "Continue activity",
+    "defense_north_gate": {
+      "description": "Let us in! We want to have fun with you! We brought gifts for everyone! ✧｡٩(ˊᗜˋ )و✧*｡",
+      "failure_consequence": "The gate is destroyed. New emergency activity: 'Evacuate the First Level'.",
+      "failure_text": "The gifts were claws. The claws were deadly. The gate no longer exists. What a shame, they don't make doors like that anymore (╯°□°)╯︵ ┻━┻",
+      "name": "Defense of the North Gate",
+      "objective": "Defeat demons",
+      "success_consequence": "Unlocks 'Investigate Catacombs'. 500 gold bonus to all participants.",
+      "success_text": "The demons retreat howling! The gate holds. Santa Cruz still stands... for now (ง'̀-'́)ง"
+    },
+    "defense_south_wall": {
+      "description": "The demons advance relentlessly. The air is impregnated with the smell of gunpowder and blood. We are exhausted. But for our families and for God, we will resist.",
+      "failure_consequence": "Breach in the south wall. New activity: 'Contain the Breach'.",
+      "failure_text": "The wall fell. The demons enter. Should have brought more knights... (눈_눈)",
+      "name": "Defense of the South Wall",
+      "objective": "Defeat demons",
+      "success_consequence": "South flank secured. 400 gold bonus to all participants.",
+      "success_text": "The south is secured! Now it smells like victory... and a bit like sulfur, but mostly victory ᕙ(⇀‸↼‶)ᕗ"
+    },
+    "error": {
+      "start": "An error occurred while starting the activity"
+    },
+    "not_found": "Activity not found",
+    "progress": "Progress",
+    "start": "Join activity",
+    "status": {
+      "active": "Active"
+    },
+    "success": {
+      "complete": "Activity completed successfully!",
+      "start": "Activity started successfully"
+    },
+    "title": "Activities"
+  },
   "adventure": {
-    "active_mission": "Active Mission",
-    "history": {
-      "empty": "No completed missions found.",
-      "log_title": "Combat Log",
-      "select_mission": "Select a mission to view its combat log.",
-      "title": "Mission History"
-    },
-    "no_active_mission": "No active mission",
-    "no_missions": "All missions completed! Well done, adventurer.",
-    "tabs": {
-      "history": "History",
-      "inventory": "Inventory",
-      "missions": "Missions",
-      "store": "Store"
-    },
     "tier_locked": "Requires Tier {{tier}}",
     "title": "Adventure"
   },
@@ -82,21 +111,19 @@
   "combat": {
     "attack_rolls": "Attacks",
     "attack_set": "Attack set: {{count}} dice",
-    "complete_mission": "Complete Mission",
     "criticals": "Criticals",
     "death_dialog": {
       "continue": "Continue",
-      "description": "Your character has fallen in battle. The mission has failed.",
+      "description": "Your character has fallen in battle.",
       "title": "Character Defeated"
     },
     "defense_rolls": "Defense",
     "defense_set": "Defense set: {{count}} dice",
     "dice_to_spend": "Dice to spend",
     "enemies": "Enemies",
+    "enemies_defeated": "Enemies Defeated",
     "error": {
-      "advance": "Failed to advance phase",
-      "attack": "Attack failed",
-      "complete": "Failed to complete mission"
+      "attack": "Attack failed"
     },
     "log": {
       "damage_to_enemy": "{{enemy}} takes {{damage}} damage",
@@ -110,12 +137,8 @@
       "player_defends": "You block {{blocks}}",
       "player_hits": "You score {{hits}} hits"
     },
-    "mission_complete": "Mission Complete!",
-    "next_phase": "Next Phase",
     "no_attacks_yet": "No attacks yet",
     "no_dice": "No dice available",
-    "phase_advanced": "Phase advanced",
-    "phase_complete": "Phase Complete!",
     "resolve_turn": "Resolve Turn",
     "resolving_turn": "Resolving turn...",
     "result_dialog": {
@@ -133,6 +156,7 @@
   },
   "common": {
     "completed": "Completed",
+    "error": "Error loading data",
     "failed": "Failed",
     "loading": "Loading..."
   },
@@ -356,6 +380,7 @@
     },
     "gold": "Gold",
     "health": "Health",
+    "items": "Items",
     "loadout": "Loadout",
     "magic": "Magic",
     "magic_atk": "Magic Atk",
@@ -550,152 +575,10 @@
     ],
     "verifying_title": "Verifying..."
   },
-  "missions": {
-    "abandon": "Abandon Mission",
-    "asalto_frontera": {
-      "description": "A necromancer bandit leads a raid on the village outside the wall. \"Damn it! Cover my flank.\" —the sergeant shouts as he draws his sword against the skeletons.",
-      "failure": "The sergeant survived. You didn't. He doesn't seem too affected, honestly. (눈_눈)",
-      "name": "Frontier Assault",
-      "phase1": "Survive 2 turns",
-      "phase2": "Defeat the Leader",
-      "success": "Nothing like starting the day crushing skeletons. The sergeant almost seems impressed. Almost."
-    },
-    "asedio_avanzadilla": {
-      "description": "Your mountain outpost is being assaulted by demonic forces. Reinforcements are on the way. \"Hold the line! Reinforcements will arrive, we just have to survive!\"",
-      "failure": "The outpost fell. When reinforcements arrived, they found only silence and ashes. (◞‸◟；)",
-      "name": "Outpost Siege",
-      "phase1": "First wave",
-      "phase2": "Second wave",
-      "phase3": "The siege commander",
-      "success": "The war horns sound! The cavalry arrives. You survived. GLORY TO THE ORDER! 🏰"
-    },
-    "asedio_final": {
-      "description": "Belphegor, the Prince of Sloth, assaults the walls of Santa Cruz with his demonic army. The cathedral bells toll as the city burns. This is the decisive moment.",
-      "failure": "Belphegor now has a new city. And you a new form of existence... as ash (҂⌣̀_⌣́)",
-      "name": "Final Siege",
-      "phase1": "Raid Boss: Avatar of Belphegor",
-      "success": "VICTORY! The cathedral bells ring for the heroes who saved the city. ETERNAL GLORY!"
-    },
-    "bestia_despierta": {
-      "description": "An earthquake has awakened an ancient Behemoth that slept beneath the mountains. The creature advances inexorably toward Santa Cruz, crushing everything in its path.",
-      "failure": "Well, at least the city was insured... right? ...Right? (；一_一)",
-      "name": "The Beast Awakens",
-      "phase1": "Break the Shell",
-      "phase2": "Kill the Beast",
-      "success": "The titan falls. The earth trembles one last time. Today you have defeated an ancient evil. (ノಠ益ಠ)ノ彡 🗿"
-    },
-    "caza_luna": {
-      "description": "Farmers report disappearances on full moon nights. Beasts that walk like men. The dense forest limits visibility. Something moves in the shadows.",
-      "failure": "Turns out the wolf was also hungry... and you were the snack ʕ•ᴥ•ʔ",
-      "name": "Hunt Under the Moon",
-      "phase1": "Track the prey",
-      "phase2": "The Lair",
-      "success": "The beast has fallen. Tonight the moon weeps for its lost children. 🌑"
-    },
-    "combat_coming_soon": "Combat (Coming Soon)",
-    "continue": "Continue",
-    "ecos_abismo": {
-      "description": "A rift in reality has opened near the mines. A horde of minor demons crossed through. The miners didn't escape. Now you must close what was opened.",
-      "failure": "The void whispers: 'Welcome home'. What emerges from the rift has no name... ∞_∞",
-      "name": "Echoes of the Abyss",
-      "phase1": "First wave",
-      "phase2": "Second wave",
-      "phase3": "The Threshold Guardian",
-      "success": "The rift closes with a blinding flash. You stared into the abyss and the abyss blinked first. ◉_◉"
-    },
-    "error": {
-      "internal": {
-        "abandon": "An error occurred while abandoning the mission",
-        "start": "An error occurred while starting the mission"
-      }
-    },
-    "has_active_mission": "Complete active mission first",
-    "health_too_low": "Health too low to start mission",
-    "informante": {
-      "description": "An Order spy has been captured. He has vital information about the next demonic move. \"If he talks, we lose the advantage. If he dies, we lose a brother. We can't allow either.\"",
-      "failure": "You arrived too late. You only found a cold body and a note: 'The Order will fall'. (╥﹏╥)",
-      "name": "The Informant",
-      "phase1": "Assault on the tower",
-      "phase2": "Free the informant",
-      "success": "The informant is safe. The information he brings will change the course of the war. (•̀ᴗ•́)و"
-    },
-    "juicio_celestial": {
-      "description": "A Fallen Angel has taken a sacred temple. Its presence darkens the sky and sickens all living things. The temple priests were its first victims, turned to ash by its black fire sword.",
-      "failure": "'Arrogant mortal', were the last words you heard. It was right. (⌐■_■)→☆",
-      "name": "Celestial Judgment",
-      "phase1": "The Ascension",
-      "phase2": "The Duel",
-      "success": "The angel lies defeated. You have proven that hell cannot defeat your faith."
-    },
-    "limpieza_ruinas": {
-      "description": "An old watchtower has been occupied by restless spirits. Purify it to restore the line of sight. The old tower creaks with each gust of wind. Whispers echo from above.",
-      "failure": "In the end, the exorcist was exorcized ¬‿¬",
-      "name": "Ruins Cleansing",
-      "phase1": "Clear the spider nest",
-      "phase2": "The Guardian of the Summit",
-      "success": "Begone spirits of the abyss!"
-    },
-    "mansion_sangrienta": {
-      "description": "A local noble has been accused of vampirism. The order sends you to 'interview' him. The ballroom is empty, but the chandeliers sway without wind.",
-      "failure": "Congratulations, now you're part of the... 'family'. Hope you enjoy eternal night (⊙_⊙)?",
-      "name": "Bloody Mansion",
-      "phase1": "The masquerade",
-      "phase2": "The guests transform",
-      "phase3": "The Count",
-      "success": "The party is over, Count! Your waltz was your last dance"
-    },
-    "narrative": "Narrative",
-    "not_found": "Mission not found",
-    "phase": "Phase",
-    "phases": "Phases",
-    "pozo_maldito": {
-      "description": "The village well has been contaminated by dark magic. Villagers are getting sick from its waters. \"No one has gone down there for generations. They say something lives at the bottom.\"",
-      "failure": "The well swallowed another fool. At least the water now tastes like templar. (︶︹︺)",
-      "name": "The Cursed Well",
-      "phase1": "The well's nest",
-      "phase2": "The Guardian of the Depths awakens",
-      "success": "The crystal glows in your hands. The well is safe again. The villagers look at you like a hero ✧◝(⁰▿⁰)◜✧"
-    },
-    "profundidades_catedral": {
-      "description": "Neighbors complain about strange noises beneath the city. A heretic cult in the catacombs. \"We need to investigate further. Stay alert.\" The air smells of sulfur.",
-      "failure": "The counter reached 6. Something emerges from the altar... and it doesn't seem happy. (╯°□°)╯︵ ┻━┻",
-      "name": "Cathedral Depths",
-      "phase1": "Clear the beast nest",
-      "phase2": "Interrupt the ritual",
-      "success": "The altar crumbles. The chanting ceases. This is how you purge heretics! ᕙ(`▽´)ᕗ"
-    },
-    "puente_suspiros": {
-      "description": "An enemy convoy attempts to cross the river with prisoners. Intercept them. The narrow bridge offers no retreat. Victory or death.",
-      "failure": "The cages crossed the bridge. You hear the prisoners' screams fade into the distance. ┐(´д`)┌",
-      "name": "Bridge of Sighs",
-      "phase1": "Frontal bridge assault",
-      "phase2": "The Jailer",
-      "success": "The prisoners are free. Bards will sing of your feat in taverns. ♫ \\(^_^)/ ♫"
-    },
-    "rewards": "Rewards",
-    "ruta_suministros": {
-      "description": "Your squad escorts a supply cart to the front. The forest is eerily silent. \"Birds don't sing when predators are near.\" \"Eyes open. I don't trust those shadows.\"",
-      "failure": "The supplies burn in the forest. The front will go hungry tonight (；￣Д￣)",
-      "name": "Supply Route",
-      "phase1": "Repel the anti-magic ambush",
-      "phase2": "Clear the blockade",
-      "success": "That was close. The cart has more holes than swiss cheese, but it arrived ._.)/\\(._."
-    },
-    "sabotaje_naval": {
-      "description": "Infiltrate the siege ships during a storm. \"Swimming in this rain is suicide, but it's our only chance.\"",
-      "failure": "You swam to your grave. Literally. At least the fish will have company (≖_≖)",
-      "name": "Naval Sabotage",
-      "phase1": "Upper Deck",
-      "phase2": "Sabotage in the hold",
-      "phase3": "The Captain",
-      "success": "The ship sinks and with it its immortal captain. The sea claims what belongs to it. Mission accomplished! 🌊"
-    },
-    "start": "Start Mission",
-    "success": {
-      "abandon": "Mission abandoned",
-      "start": "Mission started successfully"
-    },
-    "tier": "Tier {{tier}}"
+  "map": {
+    "lore": "The Six Infernal Powers have launched a lightning attack on Santa Cruz, the Silver Seat. The Order of Sacred Knights defends every wall while reinforcements are on the way. If the Silver Seat falls, the leadership of the Faithful falls.",
+    "no_activities": "No active occurrences found.",
+    "title": "World Map"
   },
   "more": "more",
   "objectives": {
@@ -793,16 +676,18 @@
     "title": "Settings"
   },
   "sidebar": {
-    "adventure": "Adventure",
     "calendar": "Calendar",
     "close": "Collapse menu",
     "dashboard": "Dashboard",
     "habits": "Habits",
     "inventory": "Inventory",
+    "map": "World Map",
     "objectives": "Objectives and areas",
     "open": "Expand menu",
     "review": "Review",
+    "rpg": "RPG",
     "settings": "Settings",
+    "shop": "Shop",
     "tasks": "Tasks"
   },
   "sign_up": {

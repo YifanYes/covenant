@@ -6,15 +6,11 @@ import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '../generated/prisma'
 import { CharacterRepository } from '../repositories/character.repository'
-import { PartyRepository } from '../repositories/party.repository'
-
 export class CharacterService {
   private characterRepository: CharacterRepository
-  private partyRepository: PartyRepository
 
   constructor(prisma: PrismaClient) {
     this.characterRepository = new CharacterRepository(prisma)
-    this.partyRepository = new PartyRepository(prisma)
   }
 
   getCharacterProgress(character: CharacterWithClasses): CharacterProgress {
@@ -34,13 +30,14 @@ export class CharacterService {
   }
 
   async createCharacter(userId: string, input: CreateCharacterType) {
-    const randomPartyName = this.createRandomPartyName()
-
-    const party = await this.partyRepository.create(randomPartyName)
-    const character = await this.characterRepository.create(userId, input, party.id)
+    const character = await this.characterRepository.create(userId, input)
     await this.characterRepository.createAreas(userId)
 
     return character
+  }
+
+  async getCharacterById(characterId: string) {
+    return this.characterRepository.findByIdWithClassesOrThrow(characterId)
   }
 
   async getCurrentClass(userId: string) {
@@ -190,76 +187,8 @@ export class CharacterService {
     return { success: true }
   }
 
-  private createRandomPartyName(): string {
-    const adjectives = [
-      'Brave',
-      'Silent',
-      'Iron',
-      'Shadow',
-      'Golden',
-      'Crimson',
-      'Silver',
-      'Storm',
-      'Eternal',
-      'Fierce',
-      'Noble',
-      'Mystic',
-      'Dark',
-      'Blazing',
-      'Frozen',
-      'Thunder',
-      'Ancient',
-      'Wild',
-      'Swift',
-      'Proud',
-      'Vengeful',
-      'Radiant',
-      'Lunar',
-      'Solar',
-      'Scarlet',
-      'Azure',
-      'Emerald',
-      'Onyx',
-      'Ivory',
-      'Dread',
-      'Valiant',
-      'Hollow'
-    ]
-    const nouns = [
-      'Wolves',
-      'Ravens',
-      'Knights',
-      'Seekers',
-      'Guards',
-      'Blades',
-      'Shields',
-      'Hunters',
-      'Dragons',
-      'Sentinels',
-      'Vanguard',
-      'Phoenix',
-      'Falcons',
-      'Lions',
-      'Reapers',
-      'Wardens',
-      'Titans',
-      'Crusaders',
-      'Phantoms',
-      'Legion',
-      'Serpents',
-      'Talons',
-      'Vipers',
-      'Corsairs',
-      'Champions',
-      'Marauders',
-      'Templars',
-      'Stalkers',
-      'Wraiths',
-      'Paladins',
-      'Shadows',
-      'Griffins'
-    ]
-    return `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`
+  async updateHealth(classId: string, health: number, mana: number): Promise<void> {
+    await this.characterRepository.updateHealth(classId, health, mana)
   }
 
   private getSlotType(itemType: string): string {

@@ -410,7 +410,7 @@ export function createInventoryItem(definition: ItemDefinition): InventoryItem {
     type: definition.type,
     tier: definition.tier,
     rarity: definition.rarity,
-    stats: definition.stats,
+    stats: definition.stats as Record<string, number | undefined>,
     obtainedAt: new Date()
   }
 }

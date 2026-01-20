@@ -1,4 +1,4 @@
-import LoaderButton from '@/common/loader-button.component'
+import LoaderButton from '@/components/common/loader-button.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Heart } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'

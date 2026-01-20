@@ -13,8 +13,6 @@ export default function AdventureInventory() {
   const { data: characterData } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
   const character = characterData as InventoryCharacter
 
-  const { data: activeMission } = useSuspenseQuery(trpc.missions.getActive.queryOptions())
-
   const equipMutation = useMutation({
     ...trpc.character.equipItem.mutationOptions(),
     onSuccess: () => {
@@ -38,18 +36,10 @@ export default function AdventureInventory() {
   })
 
   const handleEquipItem = (item: InventoryItem) => {
-    if (activeMission?.mission) {
-      toast.error(t('inventory.error.active_mission'))
-      return
-    }
     equipMutation.mutate({ itemId: item.id })
   }
 
   const handleUnequipItem = (slotType: SlotType) => {
-    if (activeMission?.mission) {
-      toast.error(t('inventory.error.active_mission'))
-      return
-    }
     unequipMutation.mutate({ slotType })
   }
 
