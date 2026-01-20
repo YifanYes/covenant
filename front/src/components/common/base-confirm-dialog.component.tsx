@@ -1,5 +1,4 @@
 import AlertDialog, {
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -10,6 +9,7 @@ import AlertDialog, {
 } from '@/ui/alert-dialog.component'
 import { type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import LoaderButton from './loader-button.component'
 
 interface BaseConfirmDialogProps {
   title: string
@@ -52,7 +52,7 @@ export default function BaseConfirmDialog({
           <AlertDialogCancel className='hover:bg-foreground/10 cursor-pointer'>
             {cancelLabel ? t(cancelLabel) : t('cancel')}
           </AlertDialogCancel>
-          <AlertDialogAction
+          <LoaderButton
             className={
               confirmClassName ||
               (variant === 'destructive'
@@ -61,9 +61,9 @@ export default function BaseConfirmDialog({
             }
             onClick={onConfirm}
             disabled={isLoading}
-          >
-            {confirmLabel ? t(confirmLabel) : t('confirm')}
-          </AlertDialogAction>
+            isLoading={!!isLoading}
+            label={confirmLabel ? t(confirmLabel) : t('confirm')}
+          />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

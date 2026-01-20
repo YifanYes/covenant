@@ -9,7 +9,7 @@ import CartPanel from './components/cart-panel.component'
 import StoreFilters from './components/store-filters.component'
 import StoreItemGrid from './components/store-item-grid.component'
 
-export default function AdventureStore() {
+export default function StoreView() {
   const { t } = useTranslation()
   const { data: store } = useSuspenseQuery(trpc.store.list.queryOptions())
   const [tierFilter, setTierFilter] = useState<string>('all')

@@ -1,7 +1,5 @@
-import { z } from 'zod'
 import type { EnemyTemplate } from '../constants/enemies'
-import type { ItemStats, WeaponDamageType } from '../constants/items'
-import type { MissionTemplate } from '../constants/missions'
+import type { WeaponDamageType } from '../constants/items'
 
 export const ItemType = {
   WEAPON_MELEE: 'WEAPON_MELEE',
@@ -19,79 +17,41 @@ export const ItemRarity = {
 } as const
 export type ItemRarity = (typeof ItemRarity)[keyof typeof ItemRarity]
 
-export interface InventoryItem {
-  id: string
-  definitionId: string
-  name: string
-  description?: string
-  type: ItemType
-  tier: number
-  rarity: ItemRarity
-  stats: ItemStats
-  obtainedAt: Date
-}
-
-export const characterDataSchema = z.object({
-  diceBank: z.number().default(0),
-  lastDiceReset: z.string().optional(),
-  habitStreaks: z.record(z.string(), z.number()).optional(),
-  downedUntil: z.string().optional()
-})
-
-export enum MissionStatus {
-  ACTIVE = 'ACTIVE',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED'
-}
-
+// Slot types for equipment
 export const SlotType = {
   WEAPON: 'WEAPON',
   ARMOR: 'ARMOR',
   ACCESSORY: 'ACCESSORY'
 } as const
 export type SlotType = (typeof SlotType)[keyof typeof SlotType]
-export const slotTypeValues = Object.values(SlotType) as [string, ...string[]]
+export const slotTypeValues = ['WEAPON', 'ARMOR', 'ACCESSORY'] as const
 
-export interface CharacterClassProgress {
+export interface InventoryItem {
   id: string
-  className: string
+  definitionId?: string // Link to base item definition not unique id
+  name: string
+  description?: string
+  type: ItemType
   tier: number
-  missionProgress: Record<string, number>
+  rarity: ItemRarity
+  stats: Record<string, number | undefined>
+  obtainedAt: Date
+}
+
+// Enemy types (for display)
+export type EnemyType = 'MINION' | 'ELITE' | 'BOSS'
+
+export interface Enemy {
+  id: string
+  name: string
+  tier: number
+  type: EnemyType
   health: number
-  mana: number
-  maxHealth: number
-  maxMana: number
-  strengthAtk: number
-  strengthDef: number
-  magicAtk: number
-  magicDef: number
-  manaRegen: number
+  currentHealth: number
+  damage: number
 }
 
-export interface InventoryCharacter {
-  id: string
-  name: string | null
-  title: string | null
-  currentClass: string | null
-  magicNature: string | null
-  tier: number
-  orderName: string | null
-  gold: number
-  maxDice: number | null
-  data: any
-  inventory: InventoryItem[] | any[] | null
-  loadout: InventoryItem[] | any[] | null
-  classes: CharacterClassProgress[]
-}
-
-export const AVAILABLE_TIERS = [1, 2, 3] as const
-
-export interface DiceRollResult {
-  value: number
-  isSuccess: boolean
-  isCritical: boolean
-}
-
+// Enemy state for tracking during combat
 export interface EnemyState {
   id: string
   enemyId: string
@@ -99,23 +59,54 @@ export interface EnemyState {
   maxHealth: number
 }
 
-export enum CombatLogType {
-  PLAYER_ATTACK = 'player_attack',
-  PLAYER_HITS = 'player_hits',
-  ENEMY_DEFENDS = 'enemy_defends',
-  ENEMY_ATTACKS = 'enemy_attacks',
-  PLAYER_DEFENDS = 'player_defends',
-  DAMAGE_TO_ENEMY = 'damage_to_enemy',
-  DAMAGE_TO_PLAYER = 'damage_to_player',
-  ENEMY_DEFEATED = 'enemy_defeated',
-  MANA_REGEN = 'mana_regen',
-  PHASE_COMPLETE = 'phase_complete'
-}
+// Combat log types
+export const CombatLogType = {
+  PLAYER_ATTACK: 'PLAYER_ATTACK',
+  PLAYER_HITS: 'PLAYER_HITS',
+  ENEMY_DEFENDS: 'ENEMY_DEFENDS',
+  ENEMY_ATTACKS: 'ENEMY_ATTACKS',
+  PLAYER_DEFENDS: 'PLAYER_DEFENDS',
+  DAMAGE_TO_ENEMY: 'DAMAGE_TO_ENEMY',
+  DAMAGE_TO_PLAYER: 'DAMAGE_TO_PLAYER',
+  MANA_REGEN: 'MANA_REGEN',
+  ENEMY_DEFEATED: 'ENEMY_DEFEATED',
+  PHASE_COMPLETE: 'PHASE_COMPLETE'
+} as const
+export type CombatLogType = (typeof CombatLogType)[keyof typeof CombatLogType]
 
 export interface CombatLogEntry {
   timestamp: number
   type: CombatLogType
-  data: Record<string, string | number | number[]>
+  data: Record<string, unknown>
+}
+
+export const MissionStatus = {
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+} as const
+export type MissionStatus = (typeof MissionStatus)[keyof typeof MissionStatus]
+
+// Combat types
+export interface DiceRollResult {
+  value: number
+  isSuccess: boolean
+  isCritical: boolean
+}
+
+// Parameters for resolving a combat turn
+export interface ResolveCombatParams {
+  attackRolls: number[]
+  defenseRolls: number[]
+  targetEnemyId: string
+  playerStrengthAtk: number
+  playerStrengthDef: number
+  playerMagicAtk: number
+  playerMagicDef: number
+  playerManaRegen: number
+  weaponDamageType: WeaponDamageType
+  enemy: EnemyTemplate
+  tier: number
 }
 
 export interface CombatTurnResult {
@@ -134,27 +125,36 @@ export interface CombatTurnResult {
   logEntries: CombatLogEntry[]
 }
 
-export interface ResolveCombatParams {
-  attackRolls: number[]
-  defenseRolls: number[]
-  targetEnemyId: string
-  playerStrengthAtk: number
-  playerStrengthDef: number
-  playerMagicAtk: number
-  playerMagicDef: number
-  playerManaRegen: number
-  weaponDamageType: WeaponDamageType
-  enemy: EnemyTemplate
+// Character class info for inventory/adventure views
+export interface InventoryCharacterClass {
+  id: string
+  className: string
   tier: number
+  missionProgress: Record<string, number>
+  health: number
+  mana: number
+  maxHealth: number
+  maxMana: number
+  strengthAtk: number
+  strengthDef: number
+  magicAtk: number
+  magicDef: number
+  manaRegen: number
 }
 
-export type ActiveMissionData = {
-  mission: {
-    id: string
-    name: string
-    currentPhase: number
-    enemyState: unknown
-    combatLog: unknown
-  } | null
-  template: MissionTemplate | undefined
-} | null
+// Character data returned by getCurrentClass endpoint
+export interface InventoryCharacter {
+  id: string
+  name: string
+  title: string | null
+  orderName: string | null
+  magicNature: string | null
+  currentClass: string
+  data: Record<string, unknown>
+  gold: number
+  maxDice: number
+  tier: number
+  inventory: InventoryItem[]
+  loadout: InventoryItem[]
+  classes: InventoryCharacterClass[]
+}

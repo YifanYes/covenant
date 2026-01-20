@@ -7,7 +7,6 @@ import ObjectivesSuspenseFallback from '@/components/suspense-fallbacks/objectiv
 import SettingsSuspenseFallback from '@/components/suspense-fallbacks/settings-suspense-fallback.component'
 import SignUpSuspenseFallback from '@/components/suspense-fallbacks/sign-up-suspense-fallback.component'
 import TasksSuspenseFallback from '@/components/suspense-fallbacks/tasks-suspense-fallback.component'
-import AdventureLayout from '@/layouts/adventure-layout'
 import AppLayout from '@/layouts/app-layout'
 import CenteredLayout from '@/layouts/centered-layout'
 import WorkspaceLayout from '@/layouts/workspace-layout'
@@ -23,11 +22,10 @@ const Onboarding = lazy(() => import('./views/auth/onboarding/onboarding.page'))
 const Settings = lazy(() => import('./views/settings/settings.page'))
 const SignUp = lazy(() => import('./views/auth/sign-up/sign-up.page'))
 const Tasks = lazy(() => import('./views/tasks/tasks.page'))
-const AdventureInventory = lazy(() => import('./views/adventure/adventure-inventory/adventure-inventory.page'))
-const AdventureMissions = lazy(() => import('./views/adventure/adventure-missions/adventure-missions.page'))
-const AdventureHistory = lazy(() => import('./views/adventure/adventure-history/adventure-history.page'))
-const AdventureStore = lazy(() => import('./views/adventure/adventure-store/adventure-store.page'))
-const MissionDetail = lazy(() => import('./views/adventure/mission-detail/mission-detail.page'))
+const Inventory = lazy(() => import('./views/inventory/inventory.page'))
+const Store = lazy(() => import('./views/store/store.page'))
+const WorldMap = lazy(() => import('./views/map/world-map.page'))
+const ActivityDetail = lazy(() => import('./views/map/activity-detail.page'))
 
 export const Router = () => {
   return (
@@ -103,46 +101,35 @@ export const Router = () => {
                   </Suspense>
                 }
               />
-              <Route path='/adventure' element={<AdventureLayout />}>
-                <Route index element={<Navigate to='inventory' replace />} />
-                <Route
-                  path='inventory'
-                  element={
-                    <Suspense fallback={<AdventureSuspenseFallback />}>
-                      <AdventureInventory />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='missions'
-                  element={
-                    <Suspense fallback={<AdventureSuspenseFallback />}>
-                      <AdventureMissions />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='history'
-                  element={
-                    <Suspense fallback={<AdventureSuspenseFallback />}>
-                      <AdventureHistory />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='store'
-                  element={
-                    <Suspense fallback={<AdventureSuspenseFallback />}>
-                      <AdventureStore />
-                    </Suspense>
-                  }
-                />
-              </Route>
               <Route
-                path='/adventure/missions/:missionId'
+                path='/inventory'
                 element={
                   <Suspense fallback={<AdventureSuspenseFallback />}>
-                    <MissionDetail />
+                    <Inventory />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/shop'
+                element={
+                  <Suspense fallback={<AdventureSuspenseFallback />}>
+                    <Store />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/map'
+                element={
+                  <Suspense fallback={<AdventureSuspenseFallback />}>
+                    <WorldMap />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/map/activity/:id'
+                element={
+                  <Suspense fallback={<AdventureSuspenseFallback />}>
+                    <ActivityDetail />
                   </Suspense>
                 }
               />
