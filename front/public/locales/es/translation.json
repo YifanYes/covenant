@@ -1,20 +1,49 @@
 {
+  "activities": {
+    "assault_ships": {
+      "description": "Una flota de navíos asedia los muelles. En caso de caer, los refuerzos marítimos no podrán llegar a tiempo. Destrúyelos sin piedad.",
+      "failure_consequence": "Los refuerzos de Trinidad no llegan. Se pierde una ruta de escape.",
+      "failure_text": "El mar está lleno de tiburones. Los tiburones están llenos de... bueno, mejor no pensarlo (；￣Д￣)",
+      "name": "Asalto a los Navíos",
+      "objective": "Destruir piratas",
+      "success_consequence": "Los refuerzos de Trinidad llegan. Bonus de 600 oro a todos los participantes.",
+      "success_text": "¡Los piratas se hunden con sus barcos! Que les den de comer a los peces ♪(´ε` )"
+    },
+    "continue": "Continuar actividad",
+    "defense_north_gate": {
+      "description": "¡Dejadnos entrar! ¡Queremos divertirnos con vosotros! ¡Hemos traído regalos para todo el mundo! ✧｡٩(ˊᗜˋ )و✧*｡",
+      "failure_consequence": "La puerta es destruida. Nueva actividad de emergencia: 'Evacuar el Primer Nivel'.",
+      "failure_text": "Los regalos eran garras. Las garras eran mortales. La puerta ya no existe. Qué pena, ya no se hacen puertas así (╯°□°)╯︵ ┻━┻",
+      "name": "Defender la Puerta del Norte",
+      "objective": "Derrotar demonios",
+      "success_consequence": "Se desbloquea 'Investigar Catacumbas'. Bonus de 500 oro a todos los participantes.",
+      "success_text": "¡Los demonios se retiran aullando! La puerta aguanta. Santa Cruz sigue en pie... por ahora (ง'̀-'́)ง"
+    },
+    "defense_south_wall": {
+      "description": "Los demonios avanzan sin descanso. El aire se impregna del olor de la pólvora y la sangre. Estamos agotados. Pero por nuestras familias y por Dios, resistiremos.",
+      "failure_consequence": "Brecha en la muralla sur. Nueva actividad: 'Contener la Brecha'.",
+      "failure_text": "La muralla cayó. Los demonios entran. Debieron traer más caballeros... (눈_눈)",
+      "name": "Defender la Muralla Sur",
+      "objective": "Derrotar demonios",
+      "success_consequence": "Flanco sur asegurado. Bonus de 400 oro a todos los participantes.",
+      "success_text": "¡El sur está asegurado! Ahora huele a victoria... y un poco a azufre, pero sobre todo a victoria ᕙ(⇀‸↼‶)ᕗ"
+    },
+    "error": {
+      "start": "Ocurrió un error al iniciar la actividad"
+    },
+    "not_found": "Actividad no encontrada",
+    "progress": "Progreso",
+    "start": "Unirse a actividad",
+    "status": {
+      "active": "Activa"
+    },
+    "success": {
+      "complete": "¡Actividad completada exitosamente!",
+      "start": "Actividad iniciada exitosamente"
+    },
+    "title": "Actividades"
+  },
   "adventure": {
-    "active_mission": "Misión Activa",
-    "history": {
-      "empty": "No se encontraron misiones completadas.",
-      "log_title": "Registro de Combate",
-      "select_mission": "Selecciona una misión para ver su registro de combate.",
-      "title": "Historial de Misiones"
-    },
-    "no_active_mission": "Sin misión activa",
-    "no_missions": "¡Todas las misiones completadas! Bien hecho, aventurero.",
-    "tabs": {
-      "history": "Historial",
-      "inventory": "Inventario",
-      "missions": "Misiones",
-      "store": "Tienda"
-    },
     "tier_locked": "Requiere Tier {{tier}}",
     "title": "Aventura"
   },
@@ -82,21 +111,19 @@
   "combat": {
     "attack_rolls": "Ataques",
     "attack_set": "Ataque preparado: {{count}} dados",
-    "complete_mission": "Completar Misión",
     "criticals": "Críticos",
     "death_dialog": {
       "continue": "Continuar",
-      "description": "Tu personaje ha caído en batalla. La misión ha fallado.",
+      "description": "Tu personaje ha caído en batalla.",
       "title": "Personaje Derrotado"
     },
     "defense_rolls": "Defensas",
     "defense_set": "Defensa preparada: {{count}} dados",
     "dice_to_spend": "Dados a gastar",
     "enemies": "Enemigos",
+    "enemies_defeated": "Enemigos Derrotados",
     "error": {
-      "advance": "Error al avanzar de fase",
-      "attack": "El ataque falló",
-      "complete": "Error al completar la misión"
+      "attack": "El ataque falló"
     },
     "log": {
       "damage_to_enemy": "{{enemy}} recibe {{damage}} de daño",
@@ -110,12 +137,8 @@
       "player_defends": "Bloqueas {{blocks}}",
       "player_hits": "Consigues {{hits}} impactos"
     },
-    "mission_complete": "¡Misión Completada!",
-    "next_phase": "Siguiente Fase",
     "no_attacks_yet": "Sin ataques aún",
     "no_dice": "Sin dados disponibles",
-    "phase_advanced": "Fase avanzada",
-    "phase_complete": "¡Fase Completada!",
     "resolve_turn": "Resolver Turno",
     "resolving_turn": "Resolviendo turno...",
     "result_dialog": {
@@ -133,6 +156,7 @@
   },
   "common": {
     "completed": "Completada",
+    "error": "Error al cargar datos",
     "failed": "Fallida",
     "loading": "Cargando..."
   },
@@ -356,6 +380,7 @@
     },
     "gold": "Oro",
     "health": "Salud",
+    "items": "Objetos",
     "loadout": "Equipamiento",
     "magic": "Magia",
     "magic_atk": "Ataque Mágico",
@@ -550,150 +575,10 @@
     ],
     "verifying_title": "Verificando..."
   },
-  "missions": {
-    "abandon": "Abandonar Misión",
-    "asalto_frontera": {
-      "description": "Un bandido nigromante está liderando un saqueo en la aldea fuera de la muralla de Santa Cruz. Los gritos de los aldeanos resuenan entre las columnas de humo que se elevan desde los tejados. Esqueletos emergen de la tierra seca mientras el nigromante canaliza su magia oscura desde el centro de la plaza. El caos te rodea. \"¡Maldita sea! Cubre mi flanco.\" —te grita el sargento mientras desenvaina su espada contra los esqueletos.",
-      "failure": "El sargento sobrevivió. Tú no. Él no parece muy afectado, la verdad. (눈_눈)",
-      "name": "Asalto en la Frontera",
-      "phase1": "Sobrevivir y derrotar al Líder",
-      "success": "Nada como empezar el día aplastando esqueletos. El sargento casi parece impresionado. Casi."
-    },
-    "asedio_avanzadilla": {
-      "description": "Tu avanzadilla en las montañas está siendo asaltada por fuerzas demoníacas. Los refuerzos están en camino, pero tardarán. Tu misión es simple: no morir. Aguanta hasta que llegue la caballería. \"¡Mantened la línea! ¡Los refuerzos llegarán, solo tenemos que sobrevivir!\"",
-      "failure": "La avanzadilla cayó. Cuando llegaron los refuerzos, solo encontraron silencio y cenizas. (◞‸◟；)",
-      "name": "Asedio a la Avanzadilla",
-      "phase1": "Primera oleada",
-      "phase2": "Segunda oleada",
-      "phase3": "El comandante del asedio",
-      "success": "¡Los cuernos de guerra suenan! La caballería llega. Has sobrevivido. ¡GLORIA A LA ORDEN! 🏰"
-    },
-    "asedio_final": {
-      "description": "Belfegor, el Príncipe de la Pereza convertido en general del infierno, asalta las murallas de Santa Cruz con su ejército demoníaco. Las campanas de la catedral repican mientras la ciudad arde a tu alrededor. Este es el momento decisivo: todo por lo que has luchado culmina aquí. Si caes, la humanidad caerá contigo.",
-      "failure": "Belfegor ahora tiene una nueva ciudad. Y tú una nueva forma de existencia... como ceniza (҂⌣̀_⌣́)",
-      "name": "Asedio Final",
-      "phase1": "Raid Boss: Avatar de Belfegor",
-      "success": "¡VICTORIA! Las campanas de la catedral repican por los héroes que salvaron la ciudad. ¡GLORIA ETERNA!"
-    },
-    "bestia_despierta": {
-      "description": "Un terremoto ha despertado a un Behemot ancestral que dormía bajo las montañas desde antes de que existiera la ciudad. La criatura avanza inexorablemente hacia Santa Cruz, aplastando todo a su paso como una avalancha viviente. Tienes pocas horas antes de que llegue a las murallas exteriores. Nadie ha matado a un Behemot en siglos; hoy tendrás que cambiar esa estadística.",
-      "failure": "Bueno, al menos la ciudad estaba asegurada... ¿verdad? ...¿Verdad? (；一_一)",
-      "name": "La Bestia Despierta",
-      "phase1": "Romper la Coraza",
-      "phase2": "Matar a la Bestia",
-      "success": "El titán cae. La tierra tiembla una última vez. Hoy has derrotado a un mal antiguo. (ノಠ益ಠ)ノ彡 🗿"
-    },
-    "caza_luna": {
-      "description": "Los granjeros reportan desapariciones en las noches de luna llena. Dicen haber visto bestias que caminan como hombres, con ojos que brillan como brasas en la oscuridad. Esta noche la luna está llena otra vez, y los aullidos resuenan demasiado cerca de las granjas. Tu misión es cazar a los cazadores antes de que el amanecer traiga más cuerpos mutilados.",
-      "failure": "Resulta que el lobo también tenía hambre... y tú eras el snack ʕ•ᴥ•ʔ",
-      "name": "Caza Bajo la Luna",
-      "phase1": "Rastrear a la presa",
-      "phase2": "La Guarida",
-      "success": "La bestia ha caído. Esta noche la luna llora por sus hijos perdidos. 🌑"
-    },
-    "combat_coming_soon": "Combate (Próximamente)",
-    "continue": "Continuar",
-    "ecos_abismo": {
-      "description": "Se ha abierto una grieta en la realidad cerca de las minas, un desgarro brillante en el tejido del mundo que pulsa con energía del vacío. Una horda de demonios menores ha cruzado desde el otro lado, y los mineros quedaron atrapados en los túneles. La grieta se está ensanchando cada hora que pasa. Si no la cierras antes del anochecer, lo que venga después no será menor.",
-      "failure": "El vacío susurra: \"Bienvenido a casa\". Lo que emerge de la grieta no tiene nombre... ∞_∞",
-      "name": "Ecos del Abismo",
-      "phase1": "Primera oleada",
-      "phase2": "Segunda oleada",
-      "phase3": "El Guardián del Umbral",
-      "success": "La grieta se cierra con un destello cegador. Has mirado al abismo y el abismo ha parpadeado primero. ◉_◉"
-    },
-    "error": {
-      "internal": {
-        "abandon": "Ocurrió un error al abandonar la misión",
-        "start": "Ocurrió un error al iniciar la misión"
-      }
-    },
-    "has_active_mission": "Completa la misión activa primero",
-    "health_too_low": "Salud insuficiente para iniciar misión",
-    "informante": {
-      "description": "Un espía enviado por la Orden ha sido capturado y está siendo interrogado en una torre de vigilancia hereje. Tiene información vital sobre el próximo movimiento demoníaco. Debes rescatarlo antes de que lo ejecuten al amanecer... o antes de que hable. \"Si habla, perdemos la ventaja. Si muere, perdemos un hermano. No podemos permitir ninguna.\"",
-      "failure": "Llegaste tarde. Solo encontraste un cuerpo frío y una nota: \"La Orden caerá\". (╥﹏╥)",
-      "name": "El Informante",
-      "phase1": "Asalto a la torre",
-      "phase2": "Liberar al informante. El interrogador no se rendirá fácilmente.",
-      "success": "El informante está a salvo. La información que trae cambiará el curso de la guerra. (•̀ᴗ•́)و"
-    },
-    "juicio_celestial": {
-      "description": "Un Ángel Caído ha tomado un templo sagrado en la cima de la montaña, corrompiendo su santidad con cada momento que permanece allí. Su mera presencia oscurece el cielo y una miasma densa se extiende por los valles, enfermando a todo ser vivo que toca. Los sacerdotes del templo fueron sus primeras víctimas, convertidos en ceniza por su espada de fuego negro. Nadie ha desafiado a un ángel y vivido para contarlo.",
-      "failure": "\"Arrogante mortal\", fueron las últimas palabras que escuchaste. Tenía razón. (⌐■_■)→☆",
-      "name": "Juicio Celestial",
-      "phase1": "La Ascensión",
-      "phase2": "El Duelo",
-      "success": "El ángel yace derrotado. Has demostrado que el infierno no puede vencer a tu fe."
-    },
-    "limpieza_ruinas": {
-      "description": "Una antigua torre de vigía en la muralla ha sido ocupada por espíritus inquietos. Los centinelas reportan luces fantasmales y lamentos que hielan la sangre durante las noches sin luna. Nadie ha subido a la cima desde que el último vigía desapareció hace tres semanas. Debes purificarla para restablecer la línea de visión y descubrir qué pasó con él.",
-      "failure": "Al final el exorcista ha sido exorcizado ¬‿¬",
-      "name": "Limpieza de Ruinas",
-      "phase1": "Limpiar el nido de arañas",
-      "phase2": "Purificar la cima",
-      "success": "¡Atrás espíritus del averno!"
-    },
-    "mansion_sangrienta": {
-      "description": "Un noble local ha sido acusado de vampirismo por varios testigos que prefirieron permanecer anónimos. Las invitaciones a sus fiestas nocturnas son codiciadas, pero los invitados nunca parecen recordar qué pasó al día siguiente. La orden te envía a \"entrevistarlo\" en su mansión durante su próxima celebración. Los rumores dicen que nadie ha salido vivo de ese salón de baile después de medianoche.",
-      "failure": "Enhorabuena, ahora formas parte de la... \"familia\". Espero que te guste la noche eterna (⊙_⊙)?",
-      "name": "Mansión Sangrienta",
-      "phase1": "La mascarada",
-      "phase2": "Los invitados se transforman",
-      "phase3": "El Conde",
-      "success": "¡La fiesta ha terminado, Conde! Tu vals fue tu último baile"
-    },
-    "not_found": "Misión no encontrada",
-    "phase": "Fase",
-    "phases": "Fases",
-    "pozo_maldito": {
-      "description": "El pozo de la aldea ha sido contaminado por magia oscura. Los aldeanos enferman bebiendo de sus aguas negras. Los ancianos recuerdan que los fundadores dejaron un Cristal de Purificación en las profundidades, sellado para emergencias como esta. Debes descender al pozo y eliminar a la amenaza. \"Nadie ha bajado ahí desde hace generaciones. Dicen que algo vive en el fondo.\"",
-      "failure": "El pozo se tragó otro incauto. Al menos el agua ahora sabe a templario. (︶︹︺)",
-      "name": "El Pozo Maldito",
-      "phase1": "El nido del pozo",
-      "phase2": "El Guardián del Fondo despierta",
-      "success": "El cristal brilla en tus manos. El pozo vuelve a ser seguro. Los aldeanos te miran como a un héroe ✧◝(⁰▿⁰)◜✧"
-    },
-    "profundidades_catedral": {
-      "description": "Las quejas de los vecinos sobre ruidos extraños bajo la ciudad revelan un culto herético en las catacumbas. Los túneles serpentean bajo la catedral, olvidados desde hace siglos, ahora profanados por rituales oscuros. El aire huele a azufre y a sangre seca. Los cánticos distantes prometen que algo terrible está a punto de despertar. \"Necesitamos investigar un poco más. Mantente alerta.\"",
-      "failure": "El contador llegó a 6. Algo emerge del altar... y no parece contento. (╯°□°)╯︵ ┻━┻",
-      "name": "Profundidades de la Catedral",
-      "phase1": "Despejar el nido de sectarios",
-      "phase2": "Interrumpir el ritual",
-      "success": "El altar se desmorona. Los cánticos cesan. ¡Así es como se purgan los herejes! ᕙ(`▽´)ᕗ"
-    },
-    "puente_suspiros": {
-      "description": "Un convoy enemigo intenta cruzar el río con prisioneros de guerra. Entre ellos hay soldados, exploradores y, según los informes, un capitán con información vital. El puente es angosto y traicionero, con una caída mortal hacia las aguas heladas del desfiladero. Si cruzan al otro lado, los prisioneros estarán perdidos para siempre.",
-      "failure": "Las jaulas cruzaron el puente. Escuchas los gritos de los prisioneros desvanecerse en la distancia. ┐(´д`)┌",
-      "name": "Puente de los Suspiros",
-      "phase1": "Asalto",
-      "phase2": "El Carcelero",
-      "success": "Los prisioneros son libres. Los bardos cantarán tu hazaña en las tabernas. ♫ \\(^_^)/ ♫"
-    },
-    "rewards": "Recompensas",
-    "ruta_suministros": {
-      "description": "Tu escuadrón escolta un carromato con suministros hacia el frente. El camino serpentea entre árboles centenarios cuyas ramas bloquean la luz del sol. El bosque está inquietantemente silencioso; ni un pájaro, ni un insecto. Algo os observa desde las sombras, esperando el momento perfecto para atacar. \"Los pájaros no cantan cuando hay depredadores cerca.\" \"Ojos abiertos. No me fío de esas sombras.\"",
-      "failure": "Los suministros arden en el bosque. El frente pasará hambre esta noche (；￣Д￣)",
-      "name": "Ruta de Suministros",
-      "phase1": "Repeler la emboscada antimagia",
-      "phase2": "Despejar el bloqueo",
-      "success": "Eso ha estado cerca. El carromato tiene más agujeros que un queso, pero llegó ._.)/\\(._."
-    },
-    "sabotaje_naval": {
-      "description": "Los navíos de asedio enemigos se preparan para bombardear el puerto al amanecer. Una tormenta brutal azota la bahía, el único momento donde la vigilancia será mínima. Debes nadar hasta los barcos en la oscuridad y eliminar la amenaza. El capitán de la flota enemiga es un vampiro que nunca duerme. \"Nadar con esta lluvia es un suicidio, pero es nuestra única oportunidad.\"",
-      "failure": "Nadaste hacia tu tumba. Literalmente. Al menos los peces tendrán compañía (≖_≖)",
-      "name": "Sabotaje Naval",
-      "phase1": "Cubierta Superior",
-      "phase2": "Sabotaje en la bodega",
-      "phase3": "El Capitán",
-      "success": "El barco se hunde y con él su capitán inmortal. El mar reclama lo que le pertenece. ¡Misión cumplida! 🌊"
-    },
-    "start": "Iniciar Misión",
-    "success": {
-      "abandon": "Misión abandonada",
-      "start": "Misión iniciada exitosamente"
-    },
-    "tier": "Tier {{tier}}"
+  "map": {
+    "lore": "Los Seis Poderes Infernales han lanzado un ataque relámpago a Santa Cruz, la Sede Plateada. La Orden de los Caballeros Sagrados defiende cada muralla mientras los refuerzos vienen en camino. Si cae la Sede Plateada, cae el liderazgo de los Fieles.",
+    "no_activities": "No se encontraron actividades activas.",
+    "title": "Mapa del Mundo"
   },
   "more": "más",
   "objectives": {
@@ -791,16 +676,18 @@
     "title": "Configuración"
   },
   "sidebar": {
-    "adventure": "Aventura",
     "calendar": "Calendario",
     "close": "Colapsar menú",
     "dashboard": "Panel de control",
     "habits": "Hábitos",
     "inventory": "Inventario",
+    "map": "Mapa del Mundo",
     "objectives": "Objetivos y áreas",
     "open": "Expandir menú",
     "review": "Revisión",
+    "rpg": "RPG",
     "settings": "Configuración",
+    "shop": "Tienda",
     "tasks": "Tareas"
   },
   "sign_up": {

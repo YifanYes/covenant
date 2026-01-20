@@ -1,9 +1,10 @@
+import { activityRouter } from './routers/activity.router'
 import { areasRouter } from './routers/areas.router'
 import { authRouter } from './routers/auth.router'
 import { characterRouter } from './routers/character.router'
 import { dashboardRouter } from './routers/dashboard.router'
 import { habitsRouter } from './routers/habits.router'
-import { missionsRouter } from './routers/missions.router'
+import { mapRouter } from './routers/map.router'
 import { objectivesRouter } from './routers/objectives.router'
 import { storeRouter } from './routers/store.router'
 import { tasksRouter } from './routers/tasks.router'
@@ -22,7 +23,8 @@ export const appRouter = t.router({
   tasks: tasksRouter,
   habits: habitsRouter,
   dashboard: dashboardRouter,
-  missions: missionsRouter,
+  activity: activityRouter,
+  map: mapRouter,
   store: storeRouter
 })
 

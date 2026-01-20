@@ -29,22 +29,11 @@ export interface CharacterType {
   gold: number
   inventory: any
   loadout: any
-  partyId: string | null
-  createdAt: Date
-  updatedAt: Date
-}
-
-export interface PartyType {
-  id: string
-  name: string | null
-  currentMissionId: string | null
   createdAt: Date
   updatedAt: Date
 }
 
 export type CharacterWithClasses = CharacterType & { classes: CharacterClassType[] }
-export type CharacterWithParty = CharacterType & { party: PartyType }
-export type CharacterWithClassesAndParty = CharacterWithClasses & { party: PartyType }
 
 export interface CharacterProgress {
   currentClass: CharacterClassType | undefined

@@ -11,6 +11,10 @@ export const characterRouter = t.router({
     return ctx.services.character.createCharacter(ctx.user.id, input)
   }),
 
+  get: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.services.character.getCurrentClass(ctx.user.id)
+  }),
+
   getCurrentClass: protectedProcedure.query(async ({ ctx }) => {
     return ctx.services.character.getCurrentClass(ctx.user.id)
   }),

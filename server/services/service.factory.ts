@@ -7,7 +7,9 @@ import { CombatService } from './combat.service'
 import { DashboardService } from './dashboard.service'
 import { DiceService } from './dice.service'
 import { HabitService } from './habit.service'
-import { MissionService } from './mission.service'
+
+import { ActivityService } from './activity.service'
+import { MapService } from './map.service'
 import { ObjectiveService } from './objective.service'
 import { StoreService } from './store.services'
 import { TaskService } from './task.service'
@@ -24,10 +26,11 @@ export class ServiceFactory {
   private _dashboardService?: DashboardService
   private _diceService?: DiceService
   private _habitService?: HabitService
-  private _missionService?: MissionService
   private _objectiveService?: ObjectiveService
   private _taskService?: TaskService
   private _storeService?: StoreService
+  private _activityService?: ActivityService
+  private _mapService?: MapService
 
   constructor(
     private prisma: PrismaClient,
@@ -83,13 +86,6 @@ export class ServiceFactory {
     return this._habitService
   }
 
-  get mission(): MissionService {
-    if (!this._missionService) {
-      this._missionService = new MissionService(this.prisma)
-    }
-    return this._missionService
-  }
-
   get objective(): ObjectiveService {
     if (!this._objectiveService) {
       this._objectiveService = new ObjectiveService(this.prisma)
@@ -109,5 +105,19 @@ export class ServiceFactory {
       this._storeService = new StoreService(this.prisma)
     }
     return this._storeService
+  }
+
+  get activity(): ActivityService {
+    if (!this._activityService) {
+      this._activityService = new ActivityService(this.prisma)
+    }
+    return this._activityService
+  }
+
+  get map(): MapService {
+    if (!this._mapService) {
+      this._mapService = new MapService(this.prisma)
+    }
+    return this._mapService
   }
 }

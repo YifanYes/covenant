@@ -1,9 +1,6 @@
 import { DamageType, EnemyType, getEnemy } from '@shared/constants/enemies'
 import { WeaponDamageType } from '@shared/constants/items'
-import { getMission } from '@shared/constants/missions'
-import type { AttackType } from '@shared/schemas/missions.schemas'
-import type { CharacterWithClassesAndParty } from '@shared/types/character.types'
-import type { AttackResult } from '@shared/types/combat.types'
+import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import type {
   CombatLogEntry,
   CombatTurnResult,
@@ -11,13 +8,8 @@ import type {
   EnemyState,
   ResolveCombatParams
 } from '@shared/types/gamification.types'
-import { CombatLogType, ItemType, MissionStatus } from '@shared/types/gamification.types'
-import { TRPCError } from '@trpc/server'
+import { CombatLogType } from '@shared/types/gamification.types'
 import type { PrismaClient } from '../generated/prisma'
-import { CharacterRepository } from '../repositories/character.repository'
-import { CombatRepository } from '../repositories/combat.repository'
-import { MissionRepository } from '../repositories/mission.repository'
-import { PartyRepository } from '../repositories/party.repository'
 
 const ENEMY_DICE_BY_TYPE: Record<EnemyType, { defense: number; attack: number }> = {
   [EnemyType.BOSS]: { defense: 3, attack: 4 },
@@ -25,18 +17,15 @@ const ENEMY_DICE_BY_TYPE: Record<EnemyType, { defense: number; attack: number }>
   [EnemyType.MINION]: { defense: 1, attack: 2 }
 }
 
+/**
+ * CombatService provides combat resolution utilities.
+ * Note: The old executeAttack method that depended on the Party/Mission system
+ * has been removed. Use ActivityService for the new Map Activities combat flow.
+ */
 export class CombatService {
-  private characterRepository: CharacterRepository
-  private missionRepository: MissionRepository
-  private partyRepository: PartyRepository
-  private combatRepository: CombatRepository
-
-  constructor(prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(prisma)
-    this.missionRepository = new MissionRepository(prisma)
-    this.partyRepository = new PartyRepository(prisma)
-    this.combatRepository = new CombatRepository(prisma)
-  }
+  // Constructor kept for service factory pattern compatibility
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(_prisma: PrismaClient) {}
 
   rollDice(count: number): number[] {
     const result: number[] = new Array(count)
@@ -57,11 +46,11 @@ export class CombatService {
     return { results, count }
   }
 
-  initializeEnemyState(missionId: string, phase: number): EnemyState[] {
-    const mission = getMission(missionId)
-    if (!mission || !mission.phases[phase]) return []
-
-    return mission.phases[phase].enemies.map((enemyId, index) => {
+  /**
+   * Initialize enemy state from a list of enemy IDs
+   */
+  initializeEnemyStateFromIds(enemyIds: string[]): EnemyState[] {
+    return enemyIds.map((enemyId, index) => {
       const enemy = getEnemy(enemyId)
       return {
         id: `${enemyId}-${index}`,
@@ -200,113 +189,6 @@ export class CombatService {
     }
   }
 
-  async executeAttack(userId: string, params: AttackType): Promise<AttackResult> {
-    // 1. Load character with party and classes
-    const character = await this.characterRepository.findWithClassesAndPartyOrThrow(userId)
-
-    if (!character.party.currentMissionId) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'No active mission' })
-    }
-
-    // 2. Get mission and current class
-    const mission = await this.missionRepository.findActiveOrThrow(character.party.currentMissionId)
-    const currentClass = this.getCurrentClassOrThrow(character)
-    const { tier, diceBank } = this.getCharacterProgress(character)
-
-    const diceCost = params.attackRolls.length + params.defenseRolls.length
-
-    // 3. Validate dice availability
-    if (diceBank < diceCost) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not enough dice' })
-    }
-
-    // 4. Get enemy state and find target
-    const enemyState = (mission.enemyState as unknown as EnemyState[]) || []
-    const targetEnemy = this.getFirstAliveEnemy(enemyState)
-
-    if (!targetEnemy) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'No enemies to attack' })
-    }
-
-    const enemyTemplate = getEnemy(targetEnemy.enemyId)
-    if (!enemyTemplate) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Enemy template ${targetEnemy.enemyId} not found` })
-    }
-
-    // 5. Determine weapon damage type
-    const loadout = (character.loadout as any[]) || []
-    const weapon = loadout.find((item) => item.type?.startsWith('WEAPON_'))
-    const weaponDamageType: WeaponDamageType =
-      weapon?.type === ItemType.WEAPON_MAGIC ? WeaponDamageType.MAGIC : WeaponDamageType.PHYSICAL
-
-    // 6. Resolve combat turn
-    const result = this.resolveTurn({
-      attackRolls: params.attackRolls,
-      defenseRolls: params.defenseRolls,
-      targetEnemyId: targetEnemy.id,
-      playerStrengthAtk: currentClass.strengthAtk,
-      playerStrengthDef: currentClass.strengthDef,
-      playerMagicAtk: currentClass.magicAtk,
-      playerMagicDef: currentClass.magicDef,
-      playerManaRegen: currentClass.manaRegen,
-      weaponDamageType,
-      enemy: enemyTemplate,
-      tier
-    })
-
-    // 7. Update enemy state
-    const updatedEnemyState = this.updateEnemyHealth(enemyState, targetEnemy.id, result.damageToEnemy)
-
-    // Check if enemy was defeated
-    const updatedTarget = updatedEnemyState.find((e) => e.id === targetEnemy.id)
-    if (updatedTarget && updatedTarget.currentHealth <= 0) {
-      result.logEntries.push({
-        timestamp: Date.now(),
-        type: CombatLogType.ENEMY_DEFEATED,
-        data: { enemy: enemyTemplate.name }
-      })
-    }
-
-    // 8. Update combat log
-    const existingLog = (mission.combatLog as unknown as CombatLogEntry[]) || []
-    const updatedLog = [...result.logEntries.reverse(), ...existingLog]
-
-    // 9. Calculate new values
-    const characterData = (character.data as any) || {}
-    const newDiceBank = Math.max(0, diceBank - diceCost)
-    const newHealth = Math.max(0, currentClass.health - result.damageToPlayer)
-    const newMana = Math.min(currentClass.maxMana, currentClass.mana + result.manaRegenerated)
-    const characterDead = newHealth <= 0
-
-    // 10. Save all updates via Repository
-    await this.combatRepository.saveTurnResults(mission.id, character.id, currentClass.id, {
-      enemyState: updatedEnemyState,
-      combatLog: updatedLog,
-      missionStatus: characterDead ? MissionStatus.FAILED : undefined,
-      missionCompletedAt: characterDead ? new Date() : undefined,
-      characterData,
-      diceBank: newDiceBank,
-      health: newHealth,
-      mana: newMana
-    })
-
-    // 11. Clear party mission if character died
-    if (characterDead) {
-      await this.partyRepository.setCurrentMission(character.party.id, null)
-    }
-
-    // 12. Check if all enemies defeated
-    const allDefeated = updatedEnemyState.every((e) => e.currentHealth <= 0)
-
-    return {
-      ...result,
-      updatedEnemyState,
-      allEnemiesDefeated: allDefeated,
-      newDiceBank,
-      characterDead
-    }
-  }
-
   private getThreshold(damageType: WeaponDamageType | DamageType, physical: number, magic: number): number {
     if (damageType === DamageType.BOTH) {
       return Math.max(physical, magic)
@@ -315,16 +197,16 @@ export class CombatService {
     return damageType === WeaponDamageType.PHYSICAL ? physical : magic
   }
 
-  private getCurrentClassOrThrow(character: CharacterWithClassesAndParty) {
+  getCurrentClassOrThrow(character: CharacterWithClasses): CharacterClassType {
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     if (!currentClass) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Character class ${character.currentClass} not found` })
+      throw new Error(`Character class ${character.currentClass} not found`)
     }
 
     return currentClass
   }
 
-  private getCharacterProgress(character: CharacterWithClassesAndParty) {
+  getCharacterProgress(character: CharacterWithClasses) {
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     const tier = currentClass?.tier || 1
     const diceBank = (character.data as any)?.diceBank || 0

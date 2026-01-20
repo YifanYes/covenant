@@ -154,16 +154,116 @@ Doctrines should be stored in an object in code.
   - **Can still earn dice** by completing tasks/habits during this time.
   - Re-enable adventure access after 24 hours.
 
-### Co-op Preparation (Future Feature)
+### Map Activities System
 
-The system is designed to support party-based gameplay:
+Community Activities are **shared objectives** where all players of a faction contribute to global goals. This replaces the party-based mission system.
 
-- **Party System**: Characters can join parties for missions (2-4 players recommended)
-- **Turn Order**: Round-robin (Player 1 → Enemy → Player 2 → Enemy → ...)
-- **Individual Resources**: Each player has their own dice bank and mana (no sharing/trading)
-- **Revive Mechanic**: Downed allies can only be revived using specific doctrines or rare items (not a default action)
-- **Shared Victory**: All party members receive rewards when mission is completed
-- **Loot Distribution**: Each player rolls separately from the same drop table
+#### Core Concept
+
+- **Map-based**: Activities appear as points on the world map using **SVG with React components**
+- **Faction-bound**: Each activity belongs to a faction; players can only participate in their own faction's activities
+- **Individual Combat**: Players fight 1v1 against enemies, but victories contribute to a shared progress bar
+- **Real-time Deadlines**: Activities expire after a set time (days/weeks); deadlines use **server timezone**
+- **World Impact**: Success/failure changes the map state and unlocks/blocks future activities
+- **Activity Scheduling**: Activities are **manually created through API calls** (no automatic scheduling)
+- **Progress Sync**: Global progress updates via **polling** (every X seconds)
+
+#### Activity Structure
+
+| Field                | Description                                                                |
+| -------------------- | -------------------------------------------------------------------------- |
+| `id`                 | Unique identifier                                                          |
+| `name`               | Activity title                                                             |
+| `mapId`              | ID of the map image to display (e.g., `santa_cruz_siege`)                  |
+| `position`           | Position as `{ x: number, y: number }` — percentages (0-100) from top-left |
+| `factionId`          | Owning faction                                                             |
+| `objective`          | Collective goal (e.g., "Defeat 1000 demons")                               |
+| `progress`           | Current global count                                                       |
+| `target`             | Goal to reach (dynamically scaled)                                         |
+| `deadline`           | Timestamp when activity expires                                            |
+| `difficulty`         | `EASY`, `NORMAL`, or `HARD` — affects objective scaling                    |
+| `rewardPerKill`      | Gold per enemy defeated                                                    |
+| `communityBonus`     | Extra reward if objective is completed                                     |
+| `enemies`            | Array of enemy IDs that spawn in this activity                             |
+| `successConsequence` | What happens on success (unlocks, map changes)                             |
+| `failureConsequence` | What happens on failure (new emergencies, blocked areas)                   |
+
+##### React Implementation for Map Markers
+
+Activity markers use CSS `position: absolute` with percentage-based `left` and `top`:
+
+```tsx
+// components/WorldMap.tsx
+interface MapMarkerProps {
+  activity: ActivityTemplate
+  onClick: () => void
+}
+
+function MapMarker({ activity, onClick }: MapMarkerProps) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        position: 'absolute',
+        left: `${activity.position.x}%`,
+        top: `${activity.position.y}%`,
+        transform: 'translate(-50%, -50%)' // Center the marker on the point
+      }}
+    >
+      {/* marker icon */}
+    </button>
+  )
+}
+
+function WorldMap({ mapId, activities }: WorldMapProps) {
+  const mapSrc = `/assets/maps/${mapId}.png`
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <img src={mapSrc} alt="Map" style={{ width: '100%', height: 'auto' }} />
+      {activities.map(activity => (
+        <MapMarker key={activity.id} activity={activity} onClick={() => ...} />
+      ))}
+    </div>
+  )
+}
+```
+
+> **Why percentages?** Using percentages (0-100) instead of pixels ensures markers stay in the correct position regardless of screen size or container dimensions.
+
+#### Dynamic Objective Scaling
+
+Objectives scale based on active player count:
+
+**Formula**: `Target = BaseTarget + (ActivePlayers × DifficultyFactor)`
+
+| Difficulty | Factor | Example (10 players) | Example (100 players) |
+| ---------- | ------ | -------------------- | --------------------- |
+| Easy       | ×10    | 150 enemies          | 1,050 enemies         |
+| Normal     | ×15    | 200 enemies          | 1,550 enemies         |
+| Hard       | ×25    | 300 enemies          | 2,550 enemies         |
+
+- **Base minimum**: 50 enemies (ensures content for small communities)
+- **Active Player**: User who completed at least 1 combat in the last 7 days
+- Target is fixed at activity start (no mid-event changes unless emergency rebalancing)
+
+#### Player Flow
+
+1. **View Map** — Player opens the world map in sidebar
+2. **Select Activity** — Hover shows description, click opens details
+3. **Read Details** — Objective, current progress, time remaining, join activity button
+4. **Combat** — Fight 1v1 against activity enemies. The UI should should 3 enemies, in case the player has an area damage doctrine.
+5. **Contribute** — Each victory increments global progress
+6. **Earn Rewards** — Gold per enemy + community bonus if successful
+
+#### Map State Updates
+
+When an activity's deadline passes:
+
+1. Evaluate if `progress >= target`
+2. Distribute community bonuses to all participants (if successful)
+3. Apply success/failure consequences to map state
+4. Unlock or spawn new activities based on outcome
 
 ## Database Schema Changes
 
@@ -270,45 +370,91 @@ interface Enemy {
 }
 ```
 
-#### Party
+#### Map Activity (Code Constants + Database State)
 
-We will prepare the database schema for future party and multiplayer features. One party has many characters. A Party is auto-created with a random name when a Character is created.
+Activities are defined as code constants for structure, with database tracking for global progress.
 
-```prisma
-model Party {
-  id                String      @id @default(uuid()) @db.Uuid
-  name              String?     @db.VarChar(255)
-  currentMissionId  String?     @db.Uuid
-  createdAt         DateTime    @default(now()) @db.Timestamp(6)
-  updatedAt         DateTime    @updatedAt @db.Timestamp(6)
-  characters        Character[]
-  missions          Mission[]
+##### Activity Template (Code)
+
+```typescript
+// shared/constants/activities.ts
+export enum ActivityDifficulty {
+  EASY = 'EASY',
+  NORMAL = 'NORMAL',
+  HARD = 'HARD'
+}
+
+interface ActivityTemplate {
+  id: string
+  name: string
+  mapId: string // References map image (e.g., 'santa_cruz_siege')
+  position: { x: number; y: number } // Percentage (0-100) from top-left
+  factionId: string
+  description: string
+  objective: string
+  baseTarget: number // Base enemy count before scaling
+  difficulty: ActivityDifficulty
+  durationDays: number
+  rewardPerKill: number
+  communityBonus: number
+  enemies: string[] // Enemy IDs
+  successConsequence: string // Description of what happens on success
+  failureConsequence: string // Description of what happens on failure
+  successText: string // Message shown to players on success
+  failureText: string // Message shown to players on failure
 }
 ```
 
-We will need to add `partyId` to `Character` model.
-
-#### Mission (Combat State)
-
-State of the current "Mission". The `name` field references the mission constant.
+##### Activity State (Database)
 
 ```prisma
-model Mission {
-  id            String    @id @default(uuid()) @db.Uuid
-  partyId       String    @db.Uuid
-  name          String    @db.VarChar(255)  // Reference to mission constant
-  description   String?
-  requiredTier  Int       @default(1)
-  status        String    @db.VarChar(20)   // ACTIVE, COMPLETED, FAILED
-  currentPhase  Int       @default(0)
-  enemyState    Json?     // Current enemy HP states
-  rewards       Json?     // {xp, gold, items}
-  createdAt     DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt     DateTime  @updatedAt @db.Timestamp(6)
-  completedAt   DateTime? @db.Timestamp(6)
-  party         Party     @relation(fields: [partyId], references: [id], onDelete: Cascade)
+model MapActivity {
+  id              String    @id @default(uuid()) @db.Uuid
+  activityId      String    @db.VarChar(255)  // Reference to ActivityTemplate.id
+  status          String    @db.VarChar(20)   // ACTIVE, COMPLETED, FAILED, LOCKED
+  progress        Int       @default(0)       // Current kill count
+  target          Int                         // Calculated at start (scaled)
+  startedAt       DateTime  @default(now()) @db.Timestamp(6)
+  deadline        DateTime  @db.Timestamp(6)
+  completedAt     DateTime? @db.Timestamp(6)
 
-  @@map("missions")
+  participations  ActivityParticipation[]
+
+  @@map("map_activities")
+}
+
+model ActivityParticipation {
+  id            String      @id @default(uuid()) @db.Uuid
+  activityId    String      @db.Uuid
+  characterId   String      @db.Uuid
+  kills         Int         @default(0)         // Individual contribution
+  goldEarned    Int         @default(0)
+  joinedAt      DateTime    @default(now()) @db.Timestamp(6)
+  lastCombatAt  DateTime?   @db.Timestamp(6)
+
+  activity      MapActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  character     Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([activityId, characterId])
+  @@map("activity_participations")
+}
+```
+
+##### Map State (Database)
+
+Tracks the current world state affected by activity outcomes.
+
+```prisma
+model MapState {
+  id          String    @id @default(uuid()) @db.Uuid
+  zone        String    @db.VarChar(255)  // e.g., 'santa_cruz'
+  area        String    @db.VarChar(255)  // e.g., 'north_gate'
+  status      String    @db.VarChar(50)   // SECURE, CONTESTED, FALLEN, BLOCKED
+  modifiedBy  String?   @db.Uuid          // Activity that caused this state
+  updatedAt   DateTime  @updatedAt @db.Timestamp(6)
+
+  @@unique([zone, area])
+  @@map("map_states")
 }
 ```
 
@@ -328,18 +474,46 @@ This section outlines the frontend modifications required to support the gamific
 
 ### New Views
 
-| View               | Route                     | Description                                                                                                                                                                                                                                             |
-| :----------------- | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Adventure**      | `/adventure`              | Main combat hub. Displays active mission, dice bank, and combat controls. Houses the dice rolling UI and combat resolution animations.                                                                                                                  |
-| **Missions**       | `/adventure/missions`     | Mission selection screen. Lists available missions by tier, shows tier-gating, and mission requirements.                                                                                                                                                |
-| **Mission Detail** | `/adventure/missions/:id` | Detailed view of a specific mission. If the mission hasn't started yet, it shows the details. If it has started, it displays the mission details (reduced or collapsible) on one side and the combat on the other, occupying most or all of the screen. |
-| **Bestiary**       | `/adventure/bestiary`     | Encyclopedia of discovered enemies with stats and lore (optional, lower priority).                                                                                                                                                                      |
+| View                | Route               | Description                                                                                                          |
+| :------------------ | :------------------ | :------------------------------------------------------------------------------------------------------------------- |
+| **World Map**       | `/map`              | Interactive map showing activity points. Sidebar component also displays a mini-map. Main hub for community content. |
+| **Activity Detail** | `/map/activity/:id` | Activity details: objective, progress bar, deadline, enemy list. Contains the combat interface when joined.          |
+
+#### Future Views
+
+| View            | Route                     | Description                                                     |
+| :-------------- | :------------------------ | :-------------------------------------------------------------- |
+| **Leaderboard** | `/map/activity/:id/ranks` | Top contributors for the current activity (kills, gold earned). |
+| **Bestiary**    | `/adventure/bestiary`     | Encyclopedia of discovered enemies with stats and lore.         |
 
 ### Component Modifications
 
 #### `AppSidebar.tsx`
 
-- Add new sidebar item: **Adventure** with an appropriate icon (e.g., `Sword` or `Map`).
+Restructure the sidebar into two sections:
+
+**Productivity Section:**
+| Item | Route | Icon |
+|------|-------|------|
+| Dashboard | `/` | `LayoutDashboard` |
+| Objectives & Areas | `/objectives` | `Target` |
+| Tasks | `/tasks` | `CheckSquare` |
+| Habits | `/habits` | `Repeat` |
+
+**RPG Section:**
+| Item | Route | Icon |
+|------|-------|------|
+| Inventory | `/inventory` | `Backpack` |
+| Shop | `/shop` | `Store` |
+| Map Activities | `/map` | `Map` |
+| Activities Log | `/activities-log` | `Scroll` |
+
+**Configuration Section:**
+| Item | Route | Icon |
+|------|-------|------|
+| Settings | `/settings` | `Settings` |
+
+> **Note:** The previous Adventure view (`/adventure`) is removed. Combat is now accessed through Map Activities.
 
 #### `Inventory.tsx` (View)
 
@@ -353,7 +527,7 @@ This section outlines the frontend modifications required to support the gamific
 
 - **Add dice bank widget**: Small card showing current dice available and max capacity.
 - **Add character status widget**: Show current HP, Mana, downed status, and time until recovery. Should include a direct link to the character status/inventory view.
-- **Add active mission widget**: If in a mission, show mission name and progress. Should include a direct link to the mission URL (`/adventure/missions/:id`).
+- **Add active activity widget**: If participating in an activity, show activity name and global progress. Should include a direct link to the activity URL (`/map/activity/:id`).
 
 ### New Components
 
@@ -371,15 +545,18 @@ This section outlines the frontend modifications required to support the gamific
 | `HealthBar`       | Reusable health bar component with current/max HP display.                                                                     |
 | `ManaBar`         | Reusable mana bar component with current/max mana display.                                                                     |
 
-#### Mission Components
+#### Map & Activity Components
 
-| Component               | Description                                                                                 |
-| :---------------------- | :------------------------------------------------------------------------------------------ |
-| `MissionCard`           | Card displaying mission name, tier, difficulty, rewards preview. Clickable to view details. |
-| `MissionList`           | Filtered/sorted list of available missions with tier tabs.                                  |
-| `MissionPhaseIndicator` | Shows current phase in a multi-phase mission with progress dots.                            |
-| `RewardDisplay`         | Shows potential/earned rewards: XP, Gold, Items.                                            |
-| `TierGate`              | Visual indicator when content is locked due to tier requirements.                           |
+| Component               | Description                                                                             |
+| :---------------------- | :-------------------------------------------------------------------------------------- |
+| `WorldMap`              | Interactive SVG map with clickable activity markers. Shows zone status (secure/fallen). |
+| `ActivityMarker`        | Map pin showing activity location, status, and hover preview.                           |
+| `ActivityCard`          | Card showing activity name, progress, deadline countdown, rewards. Clickable to join.   |
+| `ProgressBar`           | Community progress bar with current/target counts and percentage.                       |
+| `DeadlineCountdown`     | Real-time countdown timer showing days/hours/minutes remaining.                         |
+| `ContributorsList`      | Scrollable list of top contributors with their kill counts.                             |
+| `RewardDisplay`         | Shows gold per kill + community bonus preview.                                          |
+| `ActivityLockedOverlay` | Overlay for activities that require completing another activity first.                  |
 
 #### Inventory/Equipment Components
 
@@ -401,14 +578,14 @@ This section outlines the frontend modifications required to support the gamific
 
 ### New Dialogs
 
-| Dialog                    | Description                                                                                              |
-| :------------------------ | :------------------------------------------------------------------------------------------------------- |
-| `StartMissionDialog`      | Confirmation dialog before starting a mission. Shows requirements, party info, and estimated difficulty. |
-| `MissionCompleteDialog`   | Victory screen displaying earned rewards, XP gained, items dropped.                                      |
-| `MissionFailedDialog`     | Defeat screen. Shows what happened and recovery time if downed.                                          |
-| `EquipItemDialog`         | Confirmation when equipping an item, showing stat comparison.                                            |
-| `DoctrineSelectionDialog` | During combat, select which doctrine to use. Shows mana cost and effect.                                 |
-| `CharacterDownedDialog`   | Alert when character is downed. Explains 24-hour recovery period.                                        |
+| Dialog                    | Description                                                                            |
+| :------------------------ | :------------------------------------------------------------------------------------- |
+| `JoinActivityDialog`      | Confirmation before joining an activity. Shows enemies, rewards, and current progress. |
+| `ActivityCompleteDialog`  | Community victory screen. Shows total progress, personal contribution, bonus earned.   |
+| `ActivityFailedDialog`    | Community failure screen. Shows consequence and what happens next on the map.          |
+| `EquipItemDialog`         | Confirmation when equipping an item, showing stat comparison.                          |
+| `DoctrineSelectionDialog` | During combat, select which doctrine to use. Shows mana cost and effect.               |
+| `CharacterDownedDialog`   | Alert when character is downed. Explains 24-hour recovery period.                      |
 
 ### State Management
 
@@ -416,7 +593,7 @@ We will leverage **TanStack Query** (via TRPC) to manage character, combat, and 
 
 - **Character State**: Fetched via `trpc.character.get.useQuery()`.
 - **Combat Resolution**: Handled via `trpc.combat.resolveTurn.useMutation()`, which will invalidate the character and mission queries to trigger UI updates.
-- **Mission Progress**: Managed via `trpc.mission.getActive.useQuery()`.
+- **Activity Progress**: Managed via `trpc.activity.getActive.useQuery()`.
 - **Local UI State**: Simple components will use local `useState` for UI-only transitions (e.g., dice roll animations before mutation is called).
 
 ### Type Definitions
@@ -582,6 +759,44 @@ Members of the Order typically address one another as **"Brother"** regardless o
 
 - [ ] Technical copy for the landing page.
 - [ ] Map out narrative decision branches.
-- [ ] Expand equipment variety and mission diversity.
+- [ ] Expand equipment variety and activity diversity.
 - [ ] Review game development community feedback.
-- [ ] Evaluate randomized mission delivery (deck-based mechanics).
+- [ ] Implement special rewards (titles, unique items) for top contributors.
+
+---
+
+## Implementation Notes
+
+- **No Party System**: The Party model is no longer needed. Characters participate individually.
+- **Combat Unchanged**: The dice-based reactive combat system remains the same; only the meta-structure around it changes.
+- **Backward Compatibility**: Existing missions in code can be migrated to the ActivityTemplate format.
+- **Cron Job Required**: A scheduled task to evaluate activity deadlines and apply consequences.
+- **Map Assets Needed**: Zone illustrations, activity markers, status indicators.
+  - Current map: `/assets/maps/santa_cruz.png` (source: `front/public/assets/maps/santa_cruz.png`)
+- **No Detailed Stats (for now)**: Only kills are tracked per player; no damage dealt, dice spent, etc.
+
+### Files to Delete (Mission System Removal)
+
+The following mission-related files should be deleted when implementing the new Map Activities system:
+
+**Frontend:**
+
+- `front/src/views/adventure/adventure-missions/` (entire directory)
+- `front/src/views/adventure/mission-detail/` (entire directory)
+- `front/src/views/adventure/components/mission-list.component.tsx`
+- `front/src/views/adventure/components/active-mission-widget.component.tsx`
+- `front/src/views/adventure/components/mission-card.component.tsx`
+
+**Backend:**
+
+- `server/services/mission.service.ts`
+- `server/repositories/mission.repository.ts`
+- `server/routers/missions.router.ts`
+
+**Shared:**
+
+- `shared/schemas/missions.schemas.ts`
+- `shared/types/mission.types.ts`
+- `shared/constants/missions.ts`
+
+> **Note:** Build artifacts in `front/dist/` and `aws/cdk.out/` will be regenerated automatically.

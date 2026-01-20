@@ -1,11 +1,7 @@
 import { CharacterClassName, CLASS_INITIAL_STATS } from '@shared/constants/classes'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
-import type {
-  CharacterWithClasses,
-  CharacterWithClassesAndParty,
-  CharacterWithParty
-} from '@shared/types/character.types'
+import type { CharacterWithClasses } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
 import { type Character, type CharacterClass, type PrismaClient } from '../generated/prisma'
 
@@ -31,6 +27,7 @@ export class CharacterRepository {
       where: { userId },
       include: { classes: true }
     })
+
     return character
   }
 
@@ -42,36 +39,19 @@ export class CharacterRepository {
     return character
   }
 
-  async findWithParty(userId: string): Promise<CharacterWithParty | null> {
+  async findByIdWithClasses(id: string): Promise<CharacterWithClasses | null> {
     const character = await this.prisma.character.findUnique({
-      where: { userId },
-      include: { party: true }
+      where: { id },
+      include: { classes: true }
     })
-    if (!character || !character.party) return null
-    return character as CharacterWithParty
-  }
 
-  async findWithClassesAndParty(userId: string): Promise<CharacterWithClassesAndParty | null> {
-    const character = await this.prisma.character.findUnique({
-      where: { userId },
-      include: { classes: true, party: true }
-    })
-    if (!character || !character.party) return null
-    return character as CharacterWithClassesAndParty
-  }
-
-  async findWithClassesAndPartyOrThrow(userId: string): Promise<CharacterWithClassesAndParty> {
-    const character = await this.findWithClassesAndParty(userId)
-    if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character or party not found' })
-    }
     return character
   }
 
-  async findWithPartyOrThrow(userId: string): Promise<CharacterWithParty> {
-    const character = await this.findWithParty(userId)
+  async findByIdWithClassesOrThrow(id: string): Promise<CharacterWithClasses> {
+    const character = await this.findByIdWithClasses(id)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character or party not found' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${id} not found` })
     }
     return character
   }
@@ -115,7 +95,7 @@ export class CharacterRepository {
     })
   }
 
-  async create(userId: string, input: CreateCharacterType, partyId: string): Promise<Character> {
+  async create(userId: string, input: CreateCharacterType): Promise<Character> {
     return this.prisma.character.create({
       data: {
         userId,
@@ -126,7 +106,6 @@ export class CharacterRepository {
         gold: 0,
         inventory: [],
         loadout: [],
-        partyId,
         classes: {
           create: {
             className: input.className,
