@@ -83,18 +83,6 @@ model ActivityParticipation {
   @@map("activity_participations")
 }
 
-model MapState {
-  id         String   @id @default(uuid()) @db.Uuid
-  zone       String   @db.VarChar(255)
-  area       String   @db.VarChar(255)
-  status     String   @db.VarChar(50)
-  modifiedBy String?  @db.Uuid
-  updatedAt  DateTime @updatedAt @db.Timestamp(6)
-
-  @@unique([zone, area])
-  @@map("map_states")
-}
-
 model Objective {
   id          String    @id @default(uuid()) @db.Uuid
   name        String    @db.VarChar(255)

@@ -440,24 +440,6 @@ model ActivityParticipation {
 }
 ```
 
-##### Map State (Database)
-
-Tracks the current world state affected by activity outcomes.
-
-```prisma
-model MapState {
-  id          String    @id @default(uuid()) @db.Uuid
-  zone        String    @db.VarChar(255)  // e.g., 'santa_cruz'
-  area        String    @db.VarChar(255)  // e.g., 'north_gate'
-  status      String    @db.VarChar(50)   // SECURE, CONTESTED, FALLEN, BLOCKED
-  modifiedBy  String?   @db.Uuid          // Activity that caused this state
-  updatedAt   DateTime  @updatedAt @db.Timestamp(6)
-
-  @@unique([zone, area])
-  @@map("map_states")
-}
-```
-
 ## Equipment System Implementation
 
 Based on `Mecanicas/Equipamiento.md`.

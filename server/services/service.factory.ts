@@ -9,7 +9,6 @@ import { DiceService } from './dice.service'
 import { HabitService } from './habit.service'
 
 import { ActivityService } from './activity.service'
-import { MapService } from './map.service'
 import { ObjectiveService } from './objective.service'
 import { StoreService } from './store.services'
 import { TaskService } from './task.service'
@@ -30,7 +29,6 @@ export class ServiceFactory {
   private _taskService?: TaskService
   private _storeService?: StoreService
   private _activityService?: ActivityService
-  private _mapService?: MapService
 
   constructor(
     private prisma: PrismaClient,
@@ -112,12 +110,5 @@ export class ServiceFactory {
       this._activityService = new ActivityService(this.prisma)
     }
     return this._activityService
-  }
-
-  get map(): MapService {
-    if (!this._mapService) {
-      this._mapService = new MapService(this.prisma)
-    }
-    return this._mapService
   }
 }
