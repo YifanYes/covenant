@@ -34,7 +34,7 @@ export default function CharacterPreview({ character }: CharacterPreviewProps) {
             </span>
             {character.magicNature && <MagicNatureBadge magicNature={character.magicNature} />}
           </div>
-          {character.orderName && <span className='text-muted-foreground text-sm'>{character.orderName}</span>}
+          <span className='text-muted-foreground text-sm'>{t(`factions.${character.factionName}`)}</span>
         </div>
       </CardContent>
     </Card>
