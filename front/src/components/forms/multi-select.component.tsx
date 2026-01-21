@@ -1,5 +1,5 @@
 import { useFormField } from '@/hooks/use-form-field'
-import { cn, truncateText } from '@/lib/cn.lib'
+import { cn } from '@/lib/cn.lib'
 import { Check, ChevronDown } from '@nsmr/pixelart-react'
 import { useEffect, useRef, useState } from 'react'
 import { type Control, Controller } from 'react-hook-form'
@@ -28,7 +28,9 @@ export default function MultiSelect({
   exclusiveValue?: string
 }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [openAbove, setOpenAbove] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   const { fieldId, effectivePlaceholder } = useFormField({
     placeholder,
@@ -46,6 +48,23 @@ export default function MultiSelect({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Calculate if dropdown should open above based on available space
+  const calculateOpenAbove = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      const spaceBelow = window.innerHeight - rect.bottom
+      const dropdownHeight = Math.min(items.length * 32, 240) // max-h-60 = 240px
+      setOpenAbove(spaceBelow < dropdownHeight && rect.top > dropdownHeight)
+    }
+  }
+
+  const handleToggleOpen = () => {
+    if (!isOpen) {
+      calculateOpenAbove()
+    }
+    setIsOpen(!isOpen)
+  }
 
   return (
     <Controller
@@ -77,37 +96,40 @@ export default function MultiSelect({
 
         const displayText =
           value.length > 0
-            ? truncateText(
-                value
-                  .map((id) => items.find((item) => item.id === id)?.label)
-                  .filter(Boolean)
-                  .join(', '),
-                60
-              )
+            ? value
+                .map((id) => items.find((item) => item.id === id)?.label)
+                .filter(Boolean)
+                .join(', ')
             : effectivePlaceholder
 
         return (
           <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
             <div className='relative w-full' ref={containerRef}>
               <button
+                ref={buttonRef}
                 id={fieldId}
                 type='button'
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={handleToggleOpen}
                 className={cn(
-                  'border-input dark:bg-input/30 ring-offset-background placeholder:text-muted-foreground focus:ring-ring hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 flex h-9 w-full items-center justify-between rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-all duration-200 focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
+                  'border-input dark:bg-input/30 ring-offset-background placeholder:text-muted-foreground focus:ring-ring hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 flex w-full items-center gap-2 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-all duration-200 focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
                   value.length === 0 && required && 'text-destructive',
                   errorMessage && 'border-destructive'
                 )}
                 aria-invalid={!!errorMessage}
               >
-                <span className={cn('block truncate', value.length === 0 && 'text-muted-foreground')}>
+                <span className={cn('w-0 flex-1 truncate text-left', value.length === 0 && 'text-muted-foreground')}>
                   {displayText}
                 </span>
-                <ChevronDown className='h-4 w-4 opacity-50' />
+                <ChevronDown className='h-4 w-4 shrink-0 opacity-50' />
               </button>
 
               {isOpen && (
-                <div className='border-input bg-popover text-popover-foreground absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border shadow-md'>
+                <div
+                  className={cn(
+                    'border-input bg-popover text-popover-foreground absolute z-50 max-h-60 w-full overflow-auto rounded-md border shadow-md',
+                    openAbove ? 'bottom-full mb-1' : 'top-full mt-1'
+                  )}
+                >
                   {items.map((item) => {
                     const isSelected = value.includes(item.id)
                     return (
