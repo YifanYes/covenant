@@ -65,7 +65,7 @@ export default function TaskList({ id, group, mutation }: { id: string; group: s
       <header className='mb-2 flex items-center justify-between'>
         <h2 className='text-md font-medium'>{t(`task_status.${id}`).toUpperCase()}</h2>
       </header>
-      <div className='relative min-h-[80px] rounded-md border-2'>
+      <div className='relative isolate min-h-[80px] rounded-md border-2'>
         {values.length === 0 && (
           <div className='text-muted-foreground pointer-events-none absolute inset-0 flex items-center justify-center p-4 text-sm italic'>
             {t(`tasks.empty.${id}` as any, { defaultValue: t('tasks.empty') })}

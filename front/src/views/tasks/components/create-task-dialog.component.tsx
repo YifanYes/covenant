@@ -1,7 +1,7 @@
 import BaseFormDialog from '@/common/base-form-dialog.component'
 import ColorSelector from '@/forms/color-selector.component'
 import DatePicker from '@/forms/date-picker.component'
-import MultiSelect from '@/forms/multi-select.component'
+import ObjectivesSelector from '@/forms/objectives-selector.component'
 import SingleSelect from '@/forms/single-select.component'
 import TextInput from '@/forms/text-input.component'
 import { useCalendarStore } from '@/stores/calendar.store'
@@ -88,8 +88,9 @@ export default function CreateTaskDialog() {
           <span>{t('tasks.add')}</span>
         </Button>
       }
+      className='md:max-w-fit md:min-w-[600px]'
     >
-      <div className='grid gap-4' key={`create-task-form-${open}`}>
+      <div className='grid gap-4'>
         <div className='grid gap-3'>
           <TextInput
             type='text'
@@ -103,7 +104,7 @@ export default function CreateTaskDialog() {
         <div className='grid gap-3'>
           <Textarea
             placeholder={t('create_task_dialog.description_placeholder')}
-            className='min-h-[80px] resize-none'
+            className='h-[80px] resize-none overflow-y-auto'
             {...register('description')}
             {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
           />
@@ -122,11 +123,10 @@ export default function CreateTaskDialog() {
             )}
           />
         </div>
-        <div className='grid gap-3'>
-          <MultiSelect
-            name='objectives'
+        <div className='grid min-w-0 gap-3'>
+          <ObjectivesSelector
             control={control}
-            items={objectivesData?.objectives.map(({ id, name: label }) => ({ id, label })) || []}
+            objectives={objectivesData?.objectives || []}
             placeholder={t('create_task_dialog.objectives_placeholder')}
           />
         </div>
