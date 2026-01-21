@@ -4,6 +4,7 @@ import ScrollArea from '@/ui/scroll-area.component'
 import Separator from '@/ui/separator.component'
 import { Cart, Money } from '@nsmr/pixelart-react'
 import type { ItemDefinition } from '@shared/constants/items'
+import { ItemType } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 import CartItem from './cart-item.component'
 
@@ -12,11 +13,20 @@ interface CartPanelProps {
   total: number
   maxGold: number
   isLoading: boolean
+  consumableQuantities: Record<string, number>
   onRemove: (itemId: string) => void
   onBuy: () => void
 }
 
-export default function CartPanel({ items, total, maxGold, isLoading, onRemove, onBuy }: CartPanelProps) {
+export default function CartPanel({
+  items,
+  total,
+  maxGold,
+  isLoading,
+  consumableQuantities,
+  onRemove,
+  onBuy
+}: CartPanelProps) {
   const { t } = useTranslation()
   const isEmpty = items.length === 0
   const canBuy = !isEmpty && total <= maxGold
@@ -36,9 +46,10 @@ export default function CartPanel({ items, total, maxGold, isLoading, onRemove, 
           ) : (
             <ScrollArea className='h-full w-full'>
               <div className='space-y-3 pt-2 pr-5 pb-3'>
-                {items.map((item) => (
-                  <CartItem key={item.id} item={item} onRemove={() => onRemove(item.id)} />
-                ))}
+                {items.map((item) => {
+                  const quantity = item.type === ItemType.CONSUMABLE ? consumableQuantities[item.id] || 1 : undefined
+                  return <CartItem key={item.id} item={item} quantity={quantity} onRemove={() => onRemove(item.id)} />
+                })}
               </div>
             </ScrollArea>
           )}

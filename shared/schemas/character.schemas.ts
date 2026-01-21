@@ -24,3 +24,8 @@ export const unequipItemSchema = z.object({
   slotType: z.enum(slotTypeValues)
 })
 export type UnequipItemType = z.infer<typeof unequipItemSchema>
+
+export const useConsumableSchema = z.object({
+  consumableId: z.string().min(1)
+})
+export type UseConsumableType = z.infer<typeof useConsumableSchema>

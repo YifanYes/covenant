@@ -6,17 +6,22 @@ import AlertDialog, {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog.component'
+import Button from '@/components/ui/button.component'
 import { useCombatTurn } from '@/hooks/use-combat-turn.hook'
 import { cn } from '@/lib/cn.lib'
 import ScrollArea from '@/ui/scroll-area.component'
+import { queryClient, trpc } from '@/utils/trpc.utils'
+import { getConsumableById } from '@shared/constants/items'
 import {
   ItemType,
   type CombatLogEntry,
   type EnemyState,
   type InventoryCharacter
 } from '@shared/types/gamification.types'
+import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
+import { toast } from 'sonner'
 import CombatLog from './combat-log.component'
 import DiceResult from './dice-result.component'
 import DiceRoller from './dice-roller.component'
@@ -81,6 +86,37 @@ export default function CombatArena({
     onAttack,
     lastTurnResult
   })
+
+  const useConsumableMutation = useMutation({
+    ...trpc.character.useConsumable.mutationOptions(),
+    onSuccess: (data) => {
+      if (data.healthRestored) {
+        toast.success(t('consumables.health_restored', { amount: data.healthRestored }))
+      }
+      if (data.manaRestored) {
+        toast.success(t('consumables.mana_restored', { amount: data.manaRestored }))
+      }
+      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+    },
+    onError: () => {
+      toast.error(t('consumables.error'))
+    }
+  })
+
+  const inventoryConsumables = character.inventory.filter((item) => item.type === ItemType.CONSUMABLE)
+
+  // Group consumables by definitionId and count
+  const groupedConsumables = inventoryConsumables.reduce(
+    (acc, item) => {
+      const key = item.definitionId || item.id
+      if (!acc[key]) {
+        acc[key] = { item, count: 0 }
+      }
+      acc[key].count++
+      return acc
+    },
+    {} as Record<string, { item: (typeof inventoryConsumables)[0]; count: number }>
+  )
 
   // Helper to render dice groups
   const renderDice = (
@@ -201,6 +237,33 @@ export default function CombatArena({
             </div>
           )}
         </div>
+
+        {/* Consumables Section */}
+        {Object.keys(groupedConsumables).length > 0 && (
+          <div className='rounded-lg border p-4'>
+            <div className='mb-2 text-sm font-medium tracking-wider text-green-500/80 uppercase'>
+              {t('consumables.title')}
+            </div>
+            <div className='flex flex-wrap gap-2'>
+              {Object.entries(groupedConsumables).map(([defId, { item, count }]) => {
+                const definition = getConsumableById(defId)
+                return (
+                  <Button
+                    key={defId}
+                    variant='outline'
+                    size='sm'
+                    disabled={useConsumableMutation.isPending}
+                    onClick={() => useConsumableMutation.mutate({ consumableId: defId })}
+                    className='flex items-center gap-2'
+                  >
+                    <span>{t(definition?.nameKey || item.nameKey)}</span>
+                    <span className='text-muted-foreground'>×{count}</span>
+                  </Button>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Center: Enemies + Combat Log */}
