@@ -1,5 +1,5 @@
 import BaseFormDialog from '@/common/base-form-dialog.component'
-import MultiSelect from '@/forms/multi-select.component'
+import ObjectivesSelector from '@/forms/objectives-selector.component'
 import SingleSelect from '@/forms/single-select.component'
 import TextInput from '@/forms/text-input.component'
 import type { Habit } from '@/types/models.types'
@@ -19,7 +19,6 @@ import HabitCard from './habit-card.component'
 export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-
   const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
 
   const updateMutation = useMutation(
@@ -109,7 +108,7 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
         <div className='grid gap-3'>
           <Textarea
             placeholder={t('create_habit_dialog.description_placeholder')}
-            className='min-h-[80px] resize-none'
+            className='h-[80px] resize-none overflow-y-auto'
             {...register('description')}
             {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
           />
@@ -142,11 +141,10 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
             )}
           />
         </div>
-        <div className='grid gap-3'>
-          <MultiSelect
-            name='objectives'
+        <div className='grid min-w-0 gap-3'>
+          <ObjectivesSelector
             control={control}
-            items={objectivesData?.objectives.map((o) => ({ id: o.id, label: o.name })) || []}
+            objectives={objectivesData?.objectives || []}
             placeholder={t('create_habit_dialog.objectives_placeholder')}
             label={t('create_habit_dialog.objectives_placeholder')}
           />
