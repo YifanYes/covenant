@@ -80,12 +80,12 @@ export interface CombatLogEntry {
   data: Record<string, unknown>
 }
 
-export const MissionStatus = {
+export const ActivityStatus = {
   ACTIVE: 'ACTIVE',
   COMPLETED: 'COMPLETED',
   FAILED: 'FAILED'
 } as const
-export type MissionStatus = (typeof MissionStatus)[keyof typeof MissionStatus]
+export type ActivityStatus = (typeof ActivityStatus)[keyof typeof ActivityStatus]
 
 // Combat types
 export interface DiceRollResult {
@@ -125,12 +125,12 @@ export interface CombatTurnResult {
   logEntries: CombatLogEntry[]
 }
 
-// Character class info for inventory/adventure views
+// Character class info for inventory view
 export interface InventoryCharacterClass {
   id: string
   className: string
   tier: number
-  missionProgress: Record<string, number>
+
   health: number
   mana: number
   maxHealth: number

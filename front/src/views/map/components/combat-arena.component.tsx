@@ -6,6 +6,7 @@ import AlertDialog, {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog.component'
+import { useCombatTurn } from '@/hooks/use-combat-turn.hook'
 import { cn } from '@/lib/cn.lib'
 import ScrollArea from '@/ui/scroll-area.component'
 import {
@@ -14,7 +15,6 @@ import {
   type EnemyState,
   type InventoryCharacter
 } from '@shared/types/gamification.types'
-import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import CombatLog from './combat-log.component'
@@ -34,8 +34,6 @@ interface CombatArenaProps {
   className?: string
 }
 
-const RESOLVE_DELAY_MS = 1500
-
 export default function CombatArena({
   character,
   enemies,
@@ -51,60 +49,7 @@ export default function CombatArena({
   const currentClass = character.classes.find((c) => c.className === character.currentClass)
   const isDead = (currentClass?.health ?? 0) <= 0
 
-  // Local state for rolling animation
-  const [pendingAttackRolls, setPendingAttackRolls] = useState<number[] | undefined>()
-  const [pendingDefenseRolls, setPendingDefenseRolls] = useState<number[] | undefined>()
-  const isResolvingRef = useRef(false)
-  const [submittedAttackRolls, setSubmittedAttackRolls] = useState<number[] | undefined>()
-  const [submittedDefenseRolls, setSubmittedDefenseRolls] = useState<number[] | undefined>()
-
-  // Clear submitted rolls when we get a result
-  useEffect(() => {
-    if (lastTurnResult) {
-      const timer = setTimeout(() => {
-        setSubmittedAttackRolls(undefined)
-        setSubmittedDefenseRolls(undefined)
-      }, 0)
-      return () => clearTimeout(timer)
-    }
-  }, [lastTurnResult])
-
-  // Calculate dice bank available for UI
-  const currentAvailableDice = (() => {
-    let usedDice = 0
-    if (pendingAttackRolls) usedDice += pendingAttackRolls.length
-    if (pendingDefenseRolls) usedDice += pendingDefenseRolls.length
-    return Math.max(0, diceBank - usedDice)
-  })()
-
-  // Auto-resolve after defense rolls are set with a delay
-  useEffect(() => {
-    if (pendingAttackRolls && pendingDefenseRolls && !isResolvingRef.current && !isAttacking) {
-      isResolvingRef.current = true
-      const timer = setTimeout(() => {
-        // Transfer pending to submitted (keep them visible while waiting for backend)
-        setSubmittedAttackRolls(pendingAttackRolls)
-        setSubmittedDefenseRolls(pendingDefenseRolls)
-        onAttack({ attackRolls: pendingAttackRolls, defenseRolls: pendingDefenseRolls })
-        setPendingAttackRolls(undefined)
-        setPendingDefenseRolls(undefined)
-        isResolvingRef.current = false
-      }, RESOLVE_DELAY_MS)
-      return () => {
-        clearTimeout(timer)
-        isResolvingRef.current = false
-      }
-    }
-  }, [pendingAttackRolls, pendingDefenseRolls, isAttacking, onAttack])
-
-  const showResults = !!(lastTurnResult && !isAttacking && !pendingAttackRolls && !pendingDefenseRolls)
-
-  if (!currentClass) return null
-
-  const rollButtonLabel = pendingAttackRolls ? t('combat.roll_defense') : t('combat.roll_attack')
-  const isWaitingForResolve = !!(pendingAttackRolls && pendingDefenseRolls) || isAttacking
-
-  // Find equipped items
+  // Item stats
   const armor = character?.loadout?.find((item) => item.type === ItemType.ARMOR)
   const armorDice = armor?.stats?.physicalDefDice || armor?.stats?.magicDefDice || 1
 
@@ -114,42 +59,62 @@ export default function CombatArena({
   )
   const weaponDice = weapon?.stats?.attackDice || 1
 
-  const diceLimit = Math.min(diceBank, !pendingAttackRolls ? weaponDice : armorDice)
-
   const targetEnemy = enemies.find((e) => e.currentHealth > 0)
 
-  const handleRoll = (count: number) => {
-    if (!pendingAttackRolls) {
-      // Clear previous turn's submitted rolls when starting a new turn
-      setSubmittedAttackRolls(undefined)
-      setSubmittedDefenseRolls(undefined)
-      setPendingAttackRolls(Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1))
-    } else {
-      const defenseRolls = Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1)
-      setPendingDefenseRolls(defenseRolls)
-    }
-  }
+  // Use custom hook for combat logic
+  const {
+    pendingAttackRolls,
+    pendingDefenseRolls,
+    submittedAttackRolls,
+    submittedDefenseRolls,
+    currentAvailableDice,
+    diceLimit,
+    isAttackPhase,
+    isWaitingForResolve,
+    showResults,
+    handleRoll
+  } = useCombatTurn({
+    isAttacking,
+    diceBank,
+    weaponDice,
+    armorDice,
+    onAttack,
+    lastTurnResult
+  })
 
+  // Helper to render dice groups
   const renderDice = (
-    pending?: number[],
-    submitted?: number[],
-    resolved?: { value: number; isSuccess: boolean; isCritical: boolean }[],
-    prefix: string = 'dice'
+    pending: number[] | undefined,
+    submitted: number[] | undefined,
+    resolved: { value: number; isSuccess: boolean; isCritical: boolean }[] | undefined,
+    prefix: string
   ) => {
+    // 1. Pending (User just rolled, local only)
     if (pending) {
       return pending.map((v, i) => (
         <DiceResult key={`${prefix}-p-${i}`} value={v} isSuccess={false} isCritical={false} isRolling />
       ))
     }
+    // 2. Submitted (Waiting for backend)
     if (isAttacking && submitted) {
       return submitted.map((v, i) => (
-        <DiceResult key={`${prefix}-s-${i}`} value={v} isSuccess={false} isCritical={false} isRolling />
+        <DiceResult
+          key={`${prefix}-s-${i}`}
+          value={v}
+          isSuccess={false}
+          isCritical={false}
+          className='animate-pulse opacity-70'
+        />
       ))
     }
+    // 3. Resolved (Backend result)
     return resolved?.map((r, i) => (
       <DiceResult key={`${prefix}-${i}`} value={r.value} isSuccess={r.isSuccess} isCritical={r.isCritical} />
     ))
   }
+
+  if (!currentClass) return null
+  const rollButtonLabel = isAttackPhase ? t('combat.roll_attack') : t('combat.roll_defense')
 
   return (
     <div className={cn('grid gap-4 lg:grid-cols-[1fr_3fr]', className)}>
@@ -208,27 +173,29 @@ export default function CombatArena({
         />
 
         <div className='space-y-4 text-center'>
-          {/* Show attack dice block - pending (rolling locally) OR submitted (waiting for backend) OR resolved */}
+          {/* Attack Dice Section */}
           {(pendingAttackRolls ||
-            (isAttacking && submittedAttackRolls) ||
+            submittedAttackRolls ||
             (showResults && !!lastTurnResult?.playerAttackRolls?.length)) && (
-            <div className='rounded-lg border p-4'>
-              <div className='mb-2 text-sm font-medium'>{t('combat.attack_rolls')}</div>
+            <div className='rounded-lg border p-4 transition-all duration-300'>
+              <div className='mb-2 text-sm font-medium tracking-wider text-orange-500/80 uppercase'>
+                {t('combat.attack_rolls')}
+              </div>
               <div className='flex flex-wrap justify-center gap-2'>
-                {/* Priority: pending > submitted > resolved */}
                 {renderDice(pendingAttackRolls, submittedAttackRolls, lastTurnResult?.playerAttackRolls, 'atk')}
               </div>
             </div>
           )}
 
-          {/* Show defense dice block - pending (rolling locally) OR submitted (waiting for backend) OR resolved */}
+          {/* Defense Dice Section */}
           {(pendingDefenseRolls ||
-            (isAttacking && submittedDefenseRolls) ||
+            submittedDefenseRolls ||
             (showResults && !!lastTurnResult?.playerDefenseRolls?.length)) && (
-            <div className='rounded-lg border p-4'>
-              <div className='mb-2 text-sm font-medium'>{t('combat.defense_rolls')}</div>
+            <div className='rounded-lg border p-4 transition-all duration-300'>
+              <div className='mb-2 text-sm font-medium tracking-wider text-blue-500/80 uppercase'>
+                {t('combat.defense_rolls')}
+              </div>
               <div className='flex flex-wrap justify-center gap-2'>
-                {/* Priority: pending > submitted > resolved */}
                 {renderDice(pendingDefenseRolls, submittedDefenseRolls, lastTurnResult?.playerDefenseRolls, 'def')}
               </div>
             </div>
