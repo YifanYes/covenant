@@ -16,6 +16,10 @@ We will implement different mechanics for character progression to ensure users 
 - Gating & Preparation
   - Level Gating: Must be Tier X to enter Tier X missions.
   - Loop: Complete tasks/habits -> Get dice -> Enter Adventure -> Defeat enemies -> Level up/Get Gear.
+- Tier Promotion
+  - Tracking: The system tracks `enemiesKilled` by type (minion, elite, boss).
+  - Tier 2 Requirement: Defeat 50 total enemies.
+  - Tier 3 Requirement: Defeat 100 total enemies.
 
 ## Core Loop
 

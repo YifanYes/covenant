@@ -41,6 +41,11 @@
       "complete": "¡Actividad completada exitosamente!",
       "start": "Actividad iniciada exitosamente"
     },
+    "switch_dialog": {
+      "confirm": "Cambiar actividad",
+      "description": "Ya estás participando en otra actividad. Tu progreso se guardará, pero cambiarás a esta nueva actividad.",
+      "title": "¿Cambiar de actividad?"
+    },
     "title": "Actividades"
   },
   "adventure": {
@@ -155,6 +160,7 @@
     "your_hits": "Tus Impactos"
   },
   "common": {
+    "cancel": "Cancelar",
     "completed": "Completada",
     "error": "Error al cargar datos",
     "failed": "Fallida",

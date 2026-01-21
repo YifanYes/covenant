@@ -36,26 +36,23 @@
   - [x] UI de lanzamiento de dados animado y resolver de combate (Ataque/Defensa simultánea).
   - [x] Arena de combate, visualización de enemigos y log de eventos.
 - **Gamificación - Fase 5: Cierre del Bucle y Pulido**
-  - [ ] Sistema de Mana, Doctrinas, recompensas (XP/Oro/Loot) y estados de derrota.
   - [x] Tienda para comprar equipamiento con oro.
+  - [x] Sección de mapa con actividades comunitarias que sustituye al sistema de misiones.
+  - [ ] Sistema de doctrinas.
+  - [ ] Sistema de inversiones.
   - [ ] Renderizar el personaje con los items equipados.
-  - [ ] Sección de mapa en la aventura para ver el estado del mundo.
   - [ ] Definir accesorios
   - [ ] Definir decisiones de la historia
+  - [ ] Onboarding con driver.js
+  - [ ] Landing page
 
 ## 🔮 Fase 3: Características Avanzadas (Futuro)
 
 - [ ] Módulo de journaling
 - [ ] **Sistema PvP**: Duelos entre jugadores usando el sistema de dados
 - [ ] **Leaderboards**: Tablas de clasificación para competencia entre usuarios
-- - [ ] **Misiones Estacionales**: Contenido basado en momentos de la historia
-- [ ] **Sistema Co-op**: Juego cooperativo con sistema de party (2-4 jugadores)
-  - [ ] Orden de turnos round-robin
-  - [ ] Mecánicas de revivir con doctrinas/objetos raros
-  - [ ] Sistema de loot individual
-- [ ] **Escalado Dinámico de Enemigos**: Dificultad de enemigos basada en el banco de dados del jugador (previene acumulación excesiva)
 
 ## 📝 Notas
 
-- **Tier 3 = Demo Completo**: Después de implementar Tier 3, se planificarán los próximos pasos de la aplicación
-- **No Trading de Dados**: Los dados no se pueden intercambiar entre jugadores
+- **Tier 2 = Lanzamiento Beta cerrada**: Después de implementar Tier 2, se planificarán los próximos pasos de la aplicación en base al feedback obtenido.
+- **No Trading de Dados**: Los dados no se pueden intercambiar entre jugadores, ni se podrán comprar con dinero. Solo se obtienen por ser productivo.

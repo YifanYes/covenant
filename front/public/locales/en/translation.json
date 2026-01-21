@@ -41,6 +41,11 @@
       "complete": "Activity completed successfully!",
       "start": "Activity started successfully"
     },
+    "switch_dialog": {
+      "confirm": "Switch activity",
+      "description": "You are already participating in another activity. Your progress will be saved, but you will switch to this new activity.",
+      "title": "Switch activity?"
+    },
     "title": "Activities"
   },
   "adventure": {
@@ -155,6 +160,7 @@
     "your_hits": "Your Hits"
   },
   "common": {
+    "cancel": "Cancel",
     "completed": "Completed",
     "error": "Error loading data",
     "failed": "Failed",

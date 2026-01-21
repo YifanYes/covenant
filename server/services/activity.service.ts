@@ -21,34 +21,41 @@ export class ActivityService {
   }
 
   async getActivities(characterId?: string) {
-    // Merge static config with dynamic DB state
-    const dbActivities = await this.activityRepository.getActiveActivities()
+    const activities = await this.activityRepository.getActiveActivities()
 
-    return ACTIVITIES.map((config) => {
-      const dbState = dbActivities.find((a) => a.activityId === config.id)
-      const participation = characterId ? dbState?.participations.find((p) => p.characterId === characterId) : undefined
+    let activeActivityId: string | undefined
+    if (characterId) {
+      const character = await this.characterService.getCharacterById(characterId)
+      activeActivityId = (character.data as any)?.activeActivityId
+    }
 
-      return {
-        ...config,
-        progress: dbState?.progress || 0,
-        target: dbState?.target || config.baseTarget * 10, // Default scaling
-        status: dbState?.status || 'Active', // Default to active for now
-        deadline: dbState?.deadline || new Date(Date.now() + config.durationDays * 86400000),
-        isParticipating: !!participation,
-        participation: participation
-          ? {
-              id: participation.id,
-              kills: participation.kills,
-              goldEarned: participation.goldEarned,
-              joinedAt: participation.joinedAt,
-              currentEnemyId: participation.currentEnemyId,
-              currentEnemyHealth: participation.currentEnemyHealth,
-              currentEnemyMaxHealth: participation.currentEnemyMaxHealth,
-              combatLog: participation.combatLog as unknown as CombatLogEntry[]
-            }
+    return activities
+      .map((activity) => {
+        const config = ACTIVITIES.find((a) => a.id === activity.activityId)
+        if (!config) return null
+
+        const rawParticipation = characterId
+          ? activity.participations.find((p) => p.characterId === characterId)
           : undefined
-      }
-    })
+
+        const isParticipating = !!rawParticipation && (!activeActivityId || activeActivityId === activity.id)
+
+        return {
+          ...config,
+          ...activity,
+          // Ensure we use the template ID so frontend links work
+          id: activity.activityId,
+          isParticipating,
+          participation:
+            isParticipating && rawParticipation
+              ? {
+                  ...rawParticipation,
+                  combatLog: rawParticipation.combatLog as unknown as CombatLogEntry[]
+                }
+              : undefined
+        }
+      })
+      .filter((a): a is NonNullable<typeof a> => a !== null)
   }
 
   async joinActivity(activityId: string, characterId: string) {
@@ -75,6 +82,14 @@ export class ActivityService {
         currentEnemyMaxHealth: enemyTemplate?.health ?? 10
       })
     }
+
+    // Update active activity
+    const character = await this.characterService.getCharacterById(characterId)
+    const currentData = (character.data as any) || {}
+    await this.characterService.updateData(characterId, {
+      ...currentData,
+      activeActivityId: activityRecord.id
+    })
 
     return {
       success: true,
@@ -105,10 +120,10 @@ export class ActivityService {
 
     const currentClass = this.combatService.getCurrentClassOrThrow(character)
 
-    const activityRecord = await this.activityRepository.getActivityByTemplateId(config.id)
-    if (!activityRecord) throw new TRPCError({ code: 'NOT_FOUND', message: `Activity ${activityId} not started` })
+    const activityRecordId = await this.activityRepository.getActivityIdByTemplateId(config.id)
+    if (!activityRecordId) throw new TRPCError({ code: 'NOT_FOUND', message: `Activity ${activityId} not started` })
 
-    const participation = await this.activityRepository.getParticipation(activityRecord.id, characterId)
+    const participation = await this.activityRepository.getParticipation(activityRecordId, characterId)
     if (!participation) throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
 
     // Load persisted enemy state or fallback to default
@@ -198,7 +213,26 @@ export class ActivityService {
 
     let isActivityCompleted = false
     if (enemyDefeated) {
-      await this.activityRepository.updateProgress(activityRecord.id, 1)
+      // 1. Update Enemy Tracking & Tier Promotion
+      const enemiesKilled = currentClass.enemiesKilled || { minion: 0, elite: 0, boss: 0 }
+      const enemyTypeKey = enemyTemplate.type.toLowerCase() as keyof typeof enemiesKilled // minion, elite, boss
+      enemiesKilled[enemyTypeKey] = (enemiesKilled[enemyTypeKey] || 0) + 1
+
+      const totalKills = (enemiesKilled.minion || 0) + (enemiesKilled.elite || 0) + (enemiesKilled.boss || 0)
+
+      let newTier = currentClass.tier
+      if (newTier === 1 && totalKills >= 50) {
+        newTier = 2
+        logs.push(`🎉 PROMOTION! You have reached Tier 2!`)
+      } else if (newTier === 2 && totalKills >= 100) {
+        newTier = 3
+        logs.push(`🎉 PROMOTION! You have reached Tier 3!`)
+      }
+
+      await this.characterService.updateProgress(currentClass.id, enemiesKilled, newTier)
+
+      // 2. Update Activity Progress
+      await this.activityRepository.updateProgress(activityRecordId, 1)
 
       // Get updated progress to check if activity is complete
       const updatedActivity = await this.activityRepository.getActivityByTemplateId(config.id)
@@ -218,7 +252,7 @@ export class ActivityService {
         updateData.currentEnemyHealth = 0
         updateData.currentEnemyMaxHealth = 0
 
-        await this.activityRepository.completeActivity(activityRecord.id)
+        await this.activityRepository.completeActivity(activityRecordId)
       }
 
       logs.push(`💀 Enemy defeated! +${config.rewardPerKill} gold`)
