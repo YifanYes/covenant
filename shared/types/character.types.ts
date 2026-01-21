@@ -27,7 +27,7 @@ export interface CharacterType {
   id: string
   name: string
   title: string | null
-  orderName: string | null
+  factionName: string
   magicNature: string | null
   currentClass: string
   data: any

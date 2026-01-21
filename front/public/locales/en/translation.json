@@ -314,6 +314,14 @@
     "password_mismatch": "Passwords do not match",
     "required_field": "Required field"
   },
+  "factions": {
+    "ALCHEMISTS_LEAGUE": "Alchemists League",
+    "BLOOD_PACT": "Blood Pact",
+    "CRIMSON_INQUISITION": "Crimson Inquisition",
+    "DEATH_MARCH": "Death March",
+    "HOLY_KNIGHTS": "Holy Knights",
+    "LEGION": "The Legion"
+  },
   "habits": {
     "add": "Add Habit",
     "empty": "You don't have any habits yet. Create one to get started!",

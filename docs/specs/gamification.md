@@ -138,6 +138,38 @@ Attributes determine **Success Thresholds** for dice rolls (matching board game 
 
 - **Critical Hits**: Rolling a 6 always hits and can only be blocked by another 6
 
+### Initiative System
+
+The **Initiative System** uses weapon and enemy `speed` to determine attack order:
+
+- **Speed Comparison**: At turn start, compare player weapon speed vs enemy speed
+- **Higher Speed Attacks First**: The combatant with higher speed resolves their attack first
+- **Tie-Breaker**: On equal speed, the player attacks first
+- **Skipped Counter-Attack**: If the player wins initiative AND kills the enemy, no counter-attack occurs
+
+| Weapon Type                    | Speed | Initiative Advantage |
+| ------------------------------ | ----- | -------------------- |
+| Light weapons (sword, pistol)  | 2     | ✅ Attack first      |
+| Heavy weapons (hammer, musket) | 1     | ❌ Attack second     |
+
+> **Design Rationale**: This compensates for light weapons having fewer attack dice by allowing them to potentially kill enemies before taking damage.
+
+### Expanded Criticals (Fast Weapons)
+
+Fast weapons have an expanded critical range:
+
+| Weapon Speed   | Critical Range | Effect                         |
+| -------------- | -------------- | ------------------------------ |
+| Speed 2 (fast) | 5 and 6        | Both values count as criticals |
+| Speed 1 (slow) | 6 only         | Standard critical behavior     |
+
+**Critical Effects**:
+
+- Criticals always hit regardless of the success threshold
+- Criticals can only be blocked by other criticals (6s)
+
+> **Design Rationale**: This gives light weapons ~33% critical chance vs ~17% for heavy weapons, partially compensating for fewer dice.
+
 ### Doctrines & Mana System
 
 Doctrines should be stored in an object in code.

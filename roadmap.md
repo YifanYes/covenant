@@ -40,9 +40,11 @@
   - [x] Sección de mapa con actividades comunitarias que sustituye al sistema de misiones.
   - [ ] Sistema de doctrinas.
   - [ ] Sistema de inversiones.
+  - [ ] Foro por facción.
   - [ ] Renderizar el personaje con los items equipados.
   - [ ] Definir accesorios
   - [ ] Definir decisiones de la historia
+  - [ ] Añadir tests
   - [ ] Onboarding con driver.js
   - [ ] Landing page
 

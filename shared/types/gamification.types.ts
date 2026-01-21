@@ -105,6 +105,7 @@ export interface ResolveCombatParams {
   playerMagicDef: number
   playerManaRegen: number
   weaponDamageType: WeaponDamageType
+  weaponSpeed: number
   enemy: EnemyTemplate
   tier: number
 }
@@ -123,6 +124,8 @@ export interface CombatTurnResult {
   manaRegenerated: number
   targetEnemyId: string
   logEntries: CombatLogEntry[]
+  playerWonInitiative: boolean
+  criticalThreshold: number
 }
 
 // Character class info for inventory view
@@ -147,7 +150,7 @@ export interface InventoryCharacter {
   id: string
   name: string
   title: string | null
-  orderName: string | null
+  factionName: string
   magicNature: string | null
   currentClass: string
   data: Record<string, unknown>

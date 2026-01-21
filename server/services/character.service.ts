@@ -48,7 +48,7 @@ export class CharacterService {
       id: character.id,
       name: character.name,
       title: character.title,
-      orderName: character.orderName,
+      factionName: character.factionName,
       magicNature: character.magicNature,
       currentClass: character.currentClass,
       data: character.data as any,

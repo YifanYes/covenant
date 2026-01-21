@@ -24,10 +24,15 @@ export class CombatService {
     attackRolls: number[],
     weaponDamageType: WeaponDamageType,
     strengthAtk: number,
-    magicAtk: number
+    magicAtk: number,
+    criticalThreshold: number
   ) {
     const threshold = this.getThreshold(weaponDamageType, strengthAtk, magicAtk)
-    const { results: playerAttackRolls, count: playerHits } = this.calculateHitsWithCount(attackRolls, threshold)
+    const { results: playerAttackRolls, count: playerHits } = this.calculateHitsWithCount(
+      attackRolls,
+      threshold,
+      criticalThreshold
+    )
     return { playerHits, playerAttackRolls }
   }
 
@@ -73,10 +78,22 @@ export class CombatService {
     return result
   }
 
-  calculateHitsWithCount(rolls: number[], threshold: number): { results: DiceRollResult[]; count: number } {
+  /**
+   * Calculate hits from dice rolls.
+   * @param rolls The dice rolls to evaluate
+   * @param threshold The success threshold (e.g., 4+ means values >= 4 succeed)
+   * @param criticalThreshold The critical hit threshold (5 for fast weapons, 6 for slow)
+   *        - Criticals always hit regardless of threshold
+   *        - Criticals can only be blocked by other criticals (6s)
+   */
+  calculateHitsWithCount(
+    rolls: number[],
+    threshold: number,
+    criticalThreshold: number = 6
+  ): { results: DiceRollResult[]; count: number } {
     let count = 0
     const results = rolls.map((value) => {
-      const isCritical = value === 6
+      const isCritical = value >= criticalThreshold
       const isSuccess = isCritical || value >= threshold
       if (isSuccess) count++
       return { value, isSuccess, isCritical }
@@ -117,11 +134,16 @@ export class CombatService {
       playerMagicDef,
       playerManaRegen,
       weaponDamageType,
+      weaponSpeed,
       enemy
     } = params
 
     const timestamp = Date.now()
     const logEntries: CombatLogEntry[] = []
+
+    // Calculate initiative and critical threshold based on weapon speed
+    const playerWonInitiative = weaponSpeed >= (enemy.speed || 1)
+    const criticalThreshold = weaponSpeed >= 2 ? 5 : 6
 
     // 1. Initial Logging
     logEntries.push({
@@ -130,12 +152,13 @@ export class CombatService {
       data: { dice: attackRolls.length, rolls: attackRolls }
     })
 
-    // 2. Resolve Player Attack
+    // 2. Resolve Player Attack (with expanded criticals for fast weapons)
     const { playerHits, playerAttackRolls } = this._resolvePlayerAttack(
       attackRolls,
       weaponDamageType,
       playerStrengthAtk,
-      playerMagicAtk
+      playerMagicAtk,
+      criticalThreshold
     )
     logEntries.push({
       timestamp: timestamp + 1,
@@ -151,30 +174,42 @@ export class CombatService {
       data: { blocks: enemyBlocks }
     })
 
-    // 4. Resolve Enemy Attack
-    const { enemyHits, enemyAttackRolls } = this._resolveEnemyAttack(enemy)
-    logEntries.push({
-      timestamp: timestamp + 3,
-      type: CombatLogType.ENEMY_ATTACKS,
-      data: { hits: enemyHits }
-    })
+    // Calculate damage to enemy first (for initiative check)
+    const damageToEnemy = Math.max(0, playerHits - enemyBlocks)
+    const enemyKilledBeforeActing = playerWonInitiative && damageToEnemy >= (enemy as any).currentHealth
 
-    // 5. Resolve Player Defense
-    const { playerBlocks, playerDefenseRolls } = this._resolvePlayerDefense(
-      defenseRolls,
-      enemy,
-      playerStrengthDef,
-      playerMagicDef
-    )
-    logEntries.push({
-      timestamp: timestamp + 4,
-      type: CombatLogType.PLAYER_DEFENDS,
-      data: { blocks: playerBlocks, rolls: defenseRolls }
-    })
+    // 4. Resolve Enemy Attack (skipped if player won initiative AND killed enemy)
+    let enemyHits = 0
+    let enemyAttackRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] = []
+
+    if (!enemyKilledBeforeActing) {
+      const enemyAttackResult = this._resolveEnemyAttack(enemy)
+      enemyHits = enemyAttackResult.enemyHits
+      enemyAttackRolls = enemyAttackResult.enemyAttackRolls
+      logEntries.push({
+        timestamp: timestamp + 3,
+        type: CombatLogType.ENEMY_ATTACKS,
+        data: { hits: enemyHits }
+      })
+    }
+
+    // 5. Resolve Player Defense (skipped if enemy didn't attack)
+    let playerBlocks = 0
+    let playerDefenseRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] = []
+
+    if (!enemyKilledBeforeActing && enemyHits > 0) {
+      const playerDefenseResult = this._resolvePlayerDefense(defenseRolls, enemy, playerStrengthDef, playerMagicDef)
+      playerBlocks = playerDefenseResult.playerBlocks
+      playerDefenseRolls = playerDefenseResult.playerDefenseRolls
+      logEntries.push({
+        timestamp: timestamp + 4,
+        type: CombatLogType.PLAYER_DEFENDS,
+        data: { blocks: playerBlocks, rolls: defenseRolls }
+      })
+    }
 
     // 6. Calculate Final Damage
-    const damageToEnemy = Math.max(0, playerHits - enemyBlocks)
-    const damageToPlayer = Math.max(0, enemyHits - playerBlocks)
+    const damageToPlayer = enemyKilledBeforeActing ? 0 : Math.max(0, enemyHits - playerBlocks)
 
     logEntries.push({
       timestamp: timestamp + 5,
@@ -209,7 +244,9 @@ export class CombatService {
       damageToPlayer,
       manaRegenerated: playerManaRegen,
       targetEnemyId,
-      logEntries
+      logEntries,
+      playerWonInitiative,
+      criticalThreshold
     }
   }
 

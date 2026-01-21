@@ -314,6 +314,14 @@
     "password_mismatch": "Las contraseñas no coinciden",
     "required_field": "Campo requerido"
   },
+  "factions": {
+    "ALCHEMISTS_LEAGUE": "Liga de Alquimistas",
+    "BLOOD_PACT": "Pacto de Sangre",
+    "CRIMSON_INQUISITION": "Inquisición Carmesí",
+    "DEATH_MARCH": "La Muerte Errante",
+    "HOLY_KNIGHTS": "Caballeros Sagrados",
+    "LEGION": "La Legión"
+  },
   "habits": {
     "add": "Añadir hábito",
     "empty": "Todavía no tienes hábitos. ¡Crea uno para empezar!",
