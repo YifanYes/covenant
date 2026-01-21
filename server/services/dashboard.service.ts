@@ -58,7 +58,38 @@ export class DashboardService {
       { completedToday: 0, totalDaily: 0 }
     )
 
-    return { completedToday, totalDaily, meanHabitRate: totalDaily > 0 ? (completedToday / totalDaily) * 100 : 0 }
+    const daysToCheck = 8
+    const dailyRates: number[] = []
+
+    for (let i = 0; i < daysToCheck; i++) {
+      const checkDate = now.subtract(i, 'day')
+      let completedOnDay = 0
+      let expectedOnDay = 0
+
+      habits.forEach((habit) => {
+        const dailyTarget = habit.recurrence / habitsTimespanExpectedModifiers[habit.timespan]
+        const expectedCompletedPerDay = Math.floor(dailyTarget)
+
+        if (expectedCompletedPerDay > 0) {
+          expectedOnDay++
+          const completedCount =
+            habit.completions?.filter((completion) => dayjs(completion?.completedAt).isSame(checkDate, 'day'))
+              ?.length || 0
+          if (completedCount >= expectedCompletedPerDay) {
+            completedOnDay++
+          }
+        }
+      })
+
+      if (expectedOnDay > 0) {
+        dailyRates.push((completedOnDay / expectedOnDay) * 100)
+      }
+    }
+
+    const meanHabitRate =
+      dailyRates.length > 0 ? Math.min(100, dailyRates.reduce((sum, rate) => sum + rate, 0) / dailyRates.length) : 0
+
+    return { completedToday, totalDaily, meanHabitRate }
   }
 
   private getEfficiencyMetrics(
