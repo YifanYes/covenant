@@ -16,14 +16,12 @@ export class CharacterService {
   getCharacterProgress(character: CharacterWithClasses): CharacterProgress {
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     const tier = currentClass?.tier || 1
-    const missionProgress = (currentClass?.missionProgress as Record<string, number>) || {}
     const maxDice = getMaxDiceForTier(tier)
     const diceBank = (character.data as any)?.diceBank || 0
 
     return {
       currentClass: currentClass as unknown as CharacterClassType | undefined,
       tier,
-      missionProgress,
       maxDice,
       diceBank
     }
@@ -63,7 +61,6 @@ export class CharacterService {
         id: c.id,
         className: c.className,
         tier: c.tier,
-        missionProgress: c.missionProgress as Record<string, number>,
         health: c.health,
         mana: c.mana,
         maxHealth: c.maxHealth,
@@ -72,7 +69,8 @@ export class CharacterService {
         strengthDef: c.strengthDef,
         magicAtk: c.magicAtk,
         magicDef: c.magicDef,
-        manaRegen: c.manaRegen
+        manaRegen: c.manaRegen,
+        enemiesKilled: c.enemiesKilled
       }))
     }
   }
@@ -189,6 +187,14 @@ export class CharacterService {
 
   async updateHealth(classId: string, health: number, mana: number): Promise<void> {
     await this.characterRepository.updateHealth(classId, health, mana)
+  }
+
+  async updateProgress(classId: string, enemiesKilled: any, tier: number): Promise<void> {
+    await this.characterRepository.updateProgress(classId, enemiesKilled, tier)
+  }
+
+  async updateData(characterId: string, data: any): Promise<void> {
+    await this.characterRepository.updateCharacterData(characterId, data)
   }
 
   private getSlotType(itemType: string): string {

@@ -1,9 +1,9 @@
 import { CharacterClassName, CLASS_INITIAL_STATS } from '@shared/constants/classes'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
-import type { CharacterWithClasses } from '@shared/types/character.types'
+import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
-import { type Character, type CharacterClass, type PrismaClient } from '../generated/prisma'
+import { type Character, type PrismaClient } from '../generated/prisma'
 
 export class CharacterRepository {
   constructor(private prisma: PrismaClient) {}
@@ -28,7 +28,7 @@ export class CharacterRepository {
       include: { classes: true }
     })
 
-    return character
+    return character as unknown as CharacterWithClasses | null
   }
 
   async findWithClassesOrThrow(userId: string): Promise<CharacterWithClasses> {
@@ -45,7 +45,7 @@ export class CharacterRepository {
       include: { classes: true }
     })
 
-    return character
+    return character as unknown as CharacterWithClasses | null
   }
 
   async findByIdWithClassesOrThrow(id: string): Promise<CharacterWithClasses> {
@@ -69,6 +69,13 @@ export class CharacterRepository {
     await this.prisma.characterClass.update({
       where: { id: classId },
       data: { health, mana }
+    })
+  }
+
+  async updateProgress(classId: string, enemiesKilled: any, tier: number): Promise<void> {
+    await this.prisma.characterClass.update({
+      where: { id: classId },
+      data: { enemiesKilled, tier }
     })
   }
 
@@ -142,14 +149,15 @@ export class CharacterRepository {
     })
   }
 
-  async createClass(characterId: string, className: string): Promise<CharacterClass> {
-    return this.prisma.characterClass.create({
+  async createClass(characterId: string, className: string): Promise<CharacterClassType> {
+    const result = await this.prisma.characterClass.create({
       data: {
         characterId,
         className,
         ...CLASS_INITIAL_STATS[className as CharacterClassName]
       }
     })
+    return result as unknown as CharacterClassType
   }
 
   async updateCurrentClass(characterId: string, className: string): Promise<Character> {
