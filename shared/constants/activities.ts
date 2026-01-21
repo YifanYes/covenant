@@ -33,8 +33,8 @@ export interface ActivityTemplate {
   failureText: string
 }
 
-export const ACTIVITIES: ActivityTemplate[] = [
-  {
+export const ACTIVITIES: Record<string, ActivityTemplate> = {
+  defense_north_gate: {
     id: 'defense_north_gate',
     name: 'activities.defense_north_gate.name',
     mapId: 'santa_cruz',
@@ -53,7 +53,7 @@ export const ACTIVITIES: ActivityTemplate[] = [
     successText: 'activities.defense_north_gate.success_text',
     failureText: 'activities.defense_north_gate.failure_text'
   },
-  {
+  assault_ships: {
     id: 'assault_ships',
     name: 'activities.assault_ships.name',
     mapId: 'santa_cruz',
@@ -72,7 +72,7 @@ export const ACTIVITIES: ActivityTemplate[] = [
     successText: 'activities.assault_ships.success_text',
     failureText: 'activities.assault_ships.failure_text'
   },
-  {
+  defense_south_wall: {
     id: 'defense_south_wall',
     name: 'activities.defense_south_wall.name',
     mapId: 'santa_cruz',
@@ -91,4 +91,9 @@ export const ACTIVITIES: ActivityTemplate[] = [
     successText: 'activities.defense_south_wall.success_text',
     failureText: 'activities.defense_south_wall.failure_text'
   }
-]
+}
+
+// Helper function for lookups
+export function getActivityById(id: string): ActivityTemplate | undefined {
+  return ACTIVITIES[id]
+}
