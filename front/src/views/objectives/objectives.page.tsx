@@ -15,7 +15,7 @@ export default function Objectives() {
     <div className='flex w-full flex-col gap-y-16 p-6'>
       <section className='flex flex-col gap-y-6'>
         <div className='flex items-center justify-between'>
-          <h2 className='text-foreground text-xl font-semibold'>{t('areas.title')}</h2>
+          <h1 className='text-2xl font-semibold'>{t('areas.title')}</h1>
           <CreateAreaDialog />
         </div>
         <div className='flex flex-wrap gap-2'>
@@ -26,7 +26,7 @@ export default function Objectives() {
       </section>
       <section className='flex flex-col gap-y-6'>
         <div className='flex items-center justify-between'>
-          <h2 className='text-foreground text-xl font-semibold'>{t('objectives.title')}</h2>
+          <h1 className='text-2xl font-semibold'>{t('objectives.title')}</h1>
           <CreateObjectiveDialog />
         </div>
         <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>

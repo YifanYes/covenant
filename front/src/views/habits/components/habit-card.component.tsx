@@ -62,31 +62,29 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
     }
 
     return (
-      <div ref={ref} {...props} className='cursor-pointer rounded-lg border p-3'>
+      <div ref={ref} {...props} className='flex cursor-pointer flex-col rounded-lg border p-3'>
         <div className='flex items-center justify-between gap-3'>
-          <div className='flex flex-1 items-center gap-2'>
+          <div className='flex min-w-0 flex-1 items-center gap-2'>
             <div className='bg-primary/10 text-primary rounded-md p-1.5'>
               <Code className='h-4 w-4' />
             </div>
             <div className='min-w-0 flex-1'>
-              <div className='flex items-center gap-3'>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <h3 className='truncate text-base font-semibold'>{name}</h3>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      arrow={false}
-                      className='bg-background border-primary/50 text-card-foreground rounded-md border shadow-none'
-                    >
-                      <div className='flex max-w-[200px] flex-col gap-1'>
-                        <p className='font-semibold'>{name}</p>
-                        {description && <p className='text-muted-foreground text-xs'>{description}</p>}
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <h3 className='max-w-full truncate text-base font-semibold'>{name}</h3>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    arrow={false}
+                    className='bg-background border-primary/50 text-card-foreground rounded-md border shadow-none'
+                  >
+                    <div className='flex max-w-[200px] flex-col gap-1'>
+                      <p className='font-semibold'>{name}</p>
+                      {description && <p className='text-muted-foreground text-xs'>{description}</p>}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
           <Button
@@ -106,8 +104,8 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
           </Button>
         </div>
 
-        <div className='mt-4'>
-          <div className='grid grid-cols-9 gap-1'>
+        <div className='mt-4 flex flex-1 flex-col'>
+          <div className='grid flex-1 grid-cols-[repeat(9,1fr)] grid-rows-[repeat(4,1fr)] gap-1'>
             {calendarDays.map(({ date, count, background, style }, index) => (
               <div
                 key={index}

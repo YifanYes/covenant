@@ -115,7 +115,7 @@ export default function AppSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarSection title='Productivity' items={sidebarItems.productivity} />
+        <SidebarSection title={t('sidebar.productivity')} items={sidebarItems.productivity} />
         <SidebarSection title={t('sidebar.rpg')} items={sidebarItems.rpg} />
         <Separator />
         <SidebarSection items={sidebarItems.settings} />
