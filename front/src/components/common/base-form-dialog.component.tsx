@@ -41,7 +41,7 @@ export default function BaseFormDialog({
   open,
   onOpenChange,
   extraFooterActions,
-  className = 'sm:max-w-[425px]'
+  className
 }: BaseFormDialogProps) {
   const { t } = useTranslation()
 

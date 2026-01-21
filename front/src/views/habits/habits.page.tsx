@@ -19,7 +19,7 @@ export default function Habits() {
           <p className='text-muted-foreground text-sm italic'>{t('habits.empty')}</p>
         </div>
       ) : (
-        <div className='grid grid-cols-1 gap-4 py-2 md:grid-cols-2 lg:grid-cols-3'>
+        <div className='3xl:grid-cols-6 grid grid-cols-1 gap-4 py-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5'>
           {data?.habits?.map((habit) => (
             <UpdateHabitDialog key={habit.id} habit={habit} />
           ))}

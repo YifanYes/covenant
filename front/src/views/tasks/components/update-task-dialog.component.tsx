@@ -2,7 +2,7 @@ import BaseFormDialog from '@/common/base-form-dialog.component'
 import LoaderButton from '@/common/loader-button.component'
 import ColorSelector from '@/forms/color-selector.component'
 import DatePicker from '@/forms/date-picker.component'
-import MultiSelect from '@/forms/multi-select.component'
+import ObjectivesSelector from '@/forms/objectives-selector.component'
 import SingleSelect from '@/forms/single-select.component'
 import TextInput from '@/forms/text-input.component'
 import { useCalendarStore } from '@/stores/calendar.store'
@@ -126,9 +126,9 @@ export default function UpdateTaskDialog() {
       submitLabel='update'
       isLoading={updateMutation.isPending}
       isSubmitDisabled={!isValid || !isDirty || updateMutation.isPending}
-      className='sm:max-w-[425px] md:max-w-fit'
+      className='md:max-w-fit md:min-w-[600px]'
       extraFooterActions={
-        <div className='flex gap-2'>
+        <div className='mr-auto flex gap-2'>
           <LoaderButton
             className='text-destructive border-destructive hover:text-background hover:bg-destructive cursor-pointer border bg-transparent'
             isLoading={deleteMutation.isPending}
@@ -160,7 +160,7 @@ export default function UpdateTaskDialog() {
         <div className='grid gap-3'>
           <Textarea
             placeholder={t('update_task_dialog.description_placeholder')}
-            className='min-h-[80px] resize-none'
+            className='h-[80px] resize-none overflow-y-auto'
             {...register('description')}
             {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
           />
@@ -193,11 +193,10 @@ export default function UpdateTaskDialog() {
             )}
           />
         </div>
-        <div className='grid gap-3'>
-          <MultiSelect
-            name='objectives'
+        <div className='grid min-w-0 gap-3'>
+          <ObjectivesSelector
             control={control}
-            items={objectivesData?.objectives.map(({ id, name: label }) => ({ id, label })) || []}
+            objectives={objectivesData?.objectives || []}
             placeholder={t('update_task_dialog.objectives_placeholder')}
           />
         </div>
