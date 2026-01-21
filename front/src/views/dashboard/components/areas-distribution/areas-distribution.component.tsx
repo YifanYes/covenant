@@ -1,9 +1,10 @@
-import ChartContainer, { ChartTooltip, ChartTooltipContent } from '@/ui/chart.component'
+import ChartContainer, { ChartTooltip } from '@/ui/chart.component'
 import { TrackChanges } from '@nsmr/pixelart-react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from 'recharts'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper.component'
+import AreasDistributionTooltip from './areas-distribution-tooltip.component'
 import type { AreasDistributionDataItem } from './areas-distribution.model'
 import { getAreasDistributionData } from './areas-distribution.utils'
 import CustomAngleTickComponent from './custom-angle-tick.component'
@@ -26,7 +27,7 @@ export default function AreasDistribution({ areas }: AreasDistributionProps) {
       {localizedData.length > 0 ? (
         <ChartContainer config={config} className='min-h-[220px] w-full'>
           <RadarChart data={localizedData}>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <ChartTooltip cursor={false} content={<AreasDistributionTooltip />} />
             <PolarGrid stroke='var(--muted-foreground)' opacity={0.2} />
             <PolarAngleAxis
               dataKey='name'

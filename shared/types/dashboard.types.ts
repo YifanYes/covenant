@@ -50,8 +50,10 @@ export interface AreaMetric {
   name: string
   color: string | null
   icon: string | null
-  thisMonth: number
-  lastMonth: number
+  tasksThisMonth: number
+  tasksLastMonth: number
+  habitsThisMonth: number
+  habitsLastMonth: number
   lastCompletion: string | null
 }
 

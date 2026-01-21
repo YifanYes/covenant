@@ -222,6 +222,7 @@
   },
   "dashboard": {
     "areas_distribution": {
+      "habits": "Habits",
       "last_month": "Last month",
       "no_data": "No tasks available",
       "tasks": "Tasks",
