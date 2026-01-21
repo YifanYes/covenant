@@ -1,5 +1,5 @@
 import BaseFormDialog from '@/common/base-form-dialog.component'
-import MultiSelect from '@/forms/multi-select.component'
+import ObjectivesSelector from '@/forms/objectives-selector.component'
 import SingleSelect from '@/forms/single-select.component'
 import TextInput from '@/forms/text-input.component'
 import Button from '@/ui/button.component'
@@ -17,7 +17,6 @@ import { toast } from 'sonner'
 export default function CreateHabitDialog() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-
   const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
 
   const mutation = useMutation(
@@ -126,11 +125,10 @@ export default function CreateHabitDialog() {
             )}
           />
         </div>
-        <div className='grid gap-3'>
-          <MultiSelect
-            name='objectives'
+        <div className='grid min-w-0 gap-3'>
+          <ObjectivesSelector
             control={control}
-            items={objectivesData?.objectives.map((o) => ({ id: o.id, label: o.name })) || []}
+            objectives={objectivesData?.objectives || []}
             placeholder={t('create_habit_dialog.objectives_placeholder')}
           />
         </div>
