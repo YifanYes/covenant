@@ -1,9 +1,8 @@
 import { cn } from '@/lib/cn.lib'
 import Button from '@/ui/button.component'
-import { Cart, Money } from '@nsmr/pixelart-react'
+import { Cart, Minus, Money, Plus } from '@nsmr/pixelart-react'
 import type { ItemDefinition } from '@shared/constants/items'
 import { ItemRarity, ItemType } from '@shared/types/gamification.types'
-import { Minus, Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import StoreItemTooltip from './store-item-tooltip.component'
 
