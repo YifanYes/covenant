@@ -1,5 +1,14 @@
 import LoaderButton from '@/components/common/loader-button.component'
 import TierBadge from '@/components/common/tier-badge.component'
+import AlertDialog, {
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog.component'
 import { Badge } from '@/components/ui/badge.component'
 import Button from '@/components/ui/button.component'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
@@ -32,6 +41,7 @@ export default function ActivityDetailPage() {
   const combatLog = (participation?.combatLog as CombatLogEntry[]) || []
 
   const [hasJoined, setHasJoined] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   let initialEnemyState: EnemyState | null = null
 
@@ -137,6 +147,18 @@ export default function ActivityDetailPage() {
   }
 
   const handleJoin = () => {
+    // Check if user is participating in any other activity
+    const activeActivity = activities.find((a) => a.isParticipating && a.id !== activity.id)
+    if (activeActivity) {
+      setShowConfirmModal(true)
+      return
+    }
+
+    joinMutation.mutate({ activityId: activity.id, characterId: character.id })
+  }
+
+  const confirmJoin = () => {
+    setShowConfirmModal(false)
     joinMutation.mutate({ activityId: activity.id, characterId: character.id })
   }
 
@@ -202,6 +224,19 @@ export default function ActivityDetailPage() {
               label={!canJoin ? t('adventure.tier_locked', { tier: activityTier }) : t('activities.start')}
             />
           </div>
+
+          <AlertDialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t('activities.switch_dialog.title')}</AlertDialogTitle>
+                <AlertDialogDescription>{t('activities.switch_dialog.description')}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmJoin}>{t('activities.switch_dialog.confirm')}</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     )

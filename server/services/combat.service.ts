@@ -1,4 +1,4 @@
-import { DamageType, EnemyType, getEnemy } from '@shared/constants/enemies'
+import { DamageType, type EnemyTemplate, EnemyType, getEnemy } from '@shared/constants/enemies'
 import { WeaponDamageType } from '@shared/constants/items'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import type {
@@ -17,15 +17,53 @@ const ENEMY_DICE_BY_TYPE: Record<EnemyType, { defense: number; attack: number }>
   [EnemyType.MINION]: { defense: 1, attack: 2 }
 }
 
-/**
- * CombatService provides combat resolution utilities.
- * Note: The old executeAttack method that depended on the Party/Mission system
- * has been removed. Use ActivityService for the new Map Activities combat flow.
- */
 export class CombatService {
-  // Constructor kept for service factory pattern compatibility
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(_prisma: PrismaClient) {}
+
+  private _resolvePlayerAttack(
+    attackRolls: number[],
+    weaponDamageType: WeaponDamageType,
+    strengthAtk: number,
+    magicAtk: number
+  ) {
+    const threshold = this.getThreshold(weaponDamageType, strengthAtk, magicAtk)
+    const { results: playerAttackRolls, count: playerHits } = this.calculateHitsWithCount(attackRolls, threshold)
+    return { playerHits, playerAttackRolls }
+  }
+
+  private _resolveEnemyDefense(enemy: EnemyTemplate, weaponDamageType: WeaponDamageType) {
+    const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type] ?? { defense: 1, attack: 2 }
+    const threshold = this.getThreshold(weaponDamageType, enemy.strengthDef, enemy.magicDef)
+
+    const enemyDefenseValues = this.rollDice(enemyDice.defense)
+    const { results: enemyDefenseRolls, count: enemyBlocks } = this.calculateHitsWithCount(
+      enemyDefenseValues,
+      threshold
+    )
+    return { enemyBlocks, enemyDefenseRolls }
+  }
+
+  private _resolveEnemyAttack(enemy: EnemyTemplate) {
+    const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type] ?? { defense: 1, attack: 2 }
+    const threshold = this.getThreshold(enemy.damageType, enemy.strengthAtk, enemy.magicAtk)
+
+    const enemyAttackValues = this.rollDice(enemyDice.attack)
+    const { results: enemyAttackRolls, count: enemyHits } = this.calculateHitsWithCount(enemyAttackValues, threshold)
+    return { enemyHits, enemyAttackRolls }
+  }
+
+  private _resolvePlayerDefense(defenseRolls: number[], enemy: EnemyTemplate, strengthDef: number, magicDef: number) {
+    const threshold = this.getThreshold(enemy.damageType, strengthDef, magicDef)
+    const { results: playerDefenseRolls, count: playerBlocks } = this.calculateHitsWithCount(defenseRolls, threshold)
+    return { playerBlocks, playerDefenseRolls }
+  }
+
+  private getThreshold(damageType: WeaponDamageType | DamageType, physical: number, magic: number): number {
+    if (damageType === DamageType.BOTH) {
+      return Math.max(physical, magic)
+    }
+    return damageType === WeaponDamageType.PHYSICAL ? physical : magic
+  }
 
   rollDice(count: number): number[] {
     const result: number[] = new Array(count)
@@ -46,9 +84,6 @@ export class CombatService {
     return { results, count }
   }
 
-  /**
-   * Initialize enemy state from a list of enemy IDs
-   */
   initializeEnemyStateFromIds(enemyIds: string[]): EnemyState[] {
     return enemyIds.map((enemyId, index) => {
       const enemy = getEnemy(enemyId)
@@ -85,70 +120,59 @@ export class CombatService {
       enemy
     } = params
 
-    const logEntries: CombatLogEntry[] = []
     const timestamp = Date.now()
+    const logEntries: CombatLogEntry[] = []
 
-    const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type] ?? { defense: 1, attack: 2 }
-    const actualDice = attackRolls.length
-
-    // 1. Player attack phase
-    const playerThreshold = this.getThreshold(weaponDamageType, playerStrengthAtk, playerMagicAtk)
-    const { results: playerAttackRolls, count: playerHits } = this.calculateHitsWithCount(attackRolls, playerThreshold)
-
+    // 1. Initial Logging
     logEntries.push({
       timestamp,
       type: CombatLogType.PLAYER_ATTACK,
-      data: { dice: actualDice, rolls: attackRolls }
+      data: { dice: attackRolls.length, rolls: attackRolls }
     })
 
+    // 2. Resolve Player Attack
+    const { playerHits, playerAttackRolls } = this._resolvePlayerAttack(
+      attackRolls,
+      weaponDamageType,
+      playerStrengthAtk,
+      playerMagicAtk
+    )
     logEntries.push({
       timestamp: timestamp + 1,
       type: CombatLogType.PLAYER_HITS,
       data: { hits: playerHits }
     })
 
-    // 2. Enemy defense
-    const enemyDefThreshold = this.getThreshold(weaponDamageType, enemy.strengthDef, enemy.magicDef)
-    const enemyDefenseValues = this.rollDice(enemyDice.defense)
-    const { results: enemyDefenseRolls, count: enemyBlocks } = this.calculateHitsWithCount(
-      enemyDefenseValues,
-      enemyDefThreshold
-    )
-
+    // 3. Resolve Enemy Defense
+    const { enemyBlocks, enemyDefenseRolls } = this._resolveEnemyDefense(enemy, weaponDamageType)
     logEntries.push({
       timestamp: timestamp + 2,
       type: CombatLogType.ENEMY_DEFENDS,
       data: { blocks: enemyBlocks }
     })
 
-    // 3. Enemy counter-attack
-    const enemyAtkThreshold = this.getThreshold(enemy.damageType, enemy.strengthAtk, enemy.magicAtk)
-    const enemyAttackValues = this.rollDice(enemyDice.attack)
-    const { results: enemyAttackRolls, count: enemyHits } = this.calculateHitsWithCount(
-      enemyAttackValues,
-      enemyAtkThreshold
-    )
-
+    // 4. Resolve Enemy Attack
+    const { enemyHits, enemyAttackRolls } = this._resolveEnemyAttack(enemy)
     logEntries.push({
       timestamp: timestamp + 3,
       type: CombatLogType.ENEMY_ATTACKS,
       data: { hits: enemyHits }
     })
 
-    // 4. Player defense
-    const playerDefThreshold = this.getThreshold(enemy.damageType, playerStrengthDef, playerMagicDef)
-    const { results: playerDefenseRolls, count: playerBlocks } = this.calculateHitsWithCount(
+    // 5. Resolve Player Defense
+    const { playerBlocks, playerDefenseRolls } = this._resolvePlayerDefense(
       defenseRolls,
-      playerDefThreshold
+      enemy,
+      playerStrengthDef,
+      playerMagicDef
     )
-
     logEntries.push({
       timestamp: timestamp + 4,
       type: CombatLogType.PLAYER_DEFENDS,
       data: { blocks: playerBlocks, rolls: defenseRolls }
     })
 
-    // 5. Calculate final damage
+    // 6. Calculate Final Damage
     const damageToEnemy = Math.max(0, playerHits - enemyBlocks)
     const damageToPlayer = Math.max(0, enemyHits - playerBlocks)
 
@@ -189,20 +213,11 @@ export class CombatService {
     }
   }
 
-  private getThreshold(damageType: WeaponDamageType | DamageType, physical: number, magic: number): number {
-    if (damageType === DamageType.BOTH) {
-      return Math.max(physical, magic)
-    }
-
-    return damageType === WeaponDamageType.PHYSICAL ? physical : magic
-  }
-
   getCurrentClassOrThrow(character: CharacterWithClasses): CharacterClassType {
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     if (!currentClass) {
       throw new Error(`Character class ${character.currentClass} not found`)
     }
-
     return currentClass
   }
 
@@ -210,7 +225,6 @@ export class CombatService {
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     const tier = currentClass?.tier || 1
     const diceBank = (character.data as any)?.diceBank || 0
-
     return { tier, diceBank }
   }
 }

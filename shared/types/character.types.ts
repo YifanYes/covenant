@@ -1,9 +1,14 @@
+export interface EnemyKillTracking {
+  minion: number
+  elite: number
+  boss: number
+}
+
 export interface CharacterClassType {
   id: string
   characterId: string
   className: string
   tier: number
-  missionProgress: any
   health: number
   mana: number
   maxHealth: number
@@ -13,6 +18,7 @@ export interface CharacterClassType {
   magicAtk: number
   magicDef: number
   manaRegen: number
+  enemiesKilled: EnemyKillTracking
   createdAt: Date
   updatedAt: Date
 }
@@ -38,7 +44,6 @@ export type CharacterWithClasses = CharacterType & { classes: CharacterClassType
 export interface CharacterProgress {
   currentClass: CharacterClassType | undefined
   tier: number
-  missionProgress: Record<string, number>
   maxDice: number
   diceBank: number
 }

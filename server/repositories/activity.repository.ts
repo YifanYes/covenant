@@ -1,4 +1,4 @@
-import { MissionStatus } from '@shared/types/gamification.types'
+import { ActivityStatus } from '@shared/types/gamification.types'
 import { type PrismaClient } from '../generated/prisma'
 
 export class ActivityRepository {
@@ -7,7 +7,7 @@ export class ActivityRepository {
   async getActiveActivities() {
     return this.prisma.mapActivity.findMany({
       where: {
-        status: MissionStatus.ACTIVE
+        status: ActivityStatus.ACTIVE
       },
       include: {
         participations: true
@@ -32,12 +32,25 @@ export class ActivityRepository {
     return this.prisma.mapActivity.findFirst({
       where: {
         activityId,
-        status: MissionStatus.ACTIVE
+        status: ActivityStatus.ACTIVE
       },
       include: {
         participations: true
       }
     })
+  }
+
+  async getActivityIdByTemplateId(activityId: string) {
+    const activity = await this.prisma.mapActivity.findFirst({
+      where: {
+        activityId,
+        status: ActivityStatus.ACTIVE
+      },
+      select: {
+        id: true
+      }
+    })
+    return activity?.id
   }
 
   async createActivity(activityId: string, target: number, durationDays: number) {
@@ -47,7 +60,7 @@ export class ActivityRepository {
     return this.prisma.mapActivity.create({
       data: {
         activityId,
-        status: MissionStatus.ACTIVE,
+        status: ActivityStatus.ACTIVE,
         target,
         deadline
       },
@@ -135,7 +148,7 @@ export class ActivityRepository {
     return this.prisma.mapActivity.update({
       where: { id: activityId },
       data: {
-        status: MissionStatus.COMPLETED,
+        status: ActivityStatus.COMPLETED,
         completedAt: new Date()
       }
     })
