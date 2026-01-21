@@ -138,11 +138,12 @@ export class ActivityService {
       currentHealth: participation.currentEnemyHealth !== null ? participation.currentEnemyHealth : enemyTemplate.health
     }
 
-    // Get weapon damage type from loadout
+    // Get weapon damage type and speed from loadout
     const loadout = (character.loadout as unknown as InventoryItem[]) || []
     const equippedWeapon = loadout.find((item) => item.type.startsWith('WEAPON_'))
     const weaponDefinition = equippedWeapon?.definitionId ? getItemById(equippedWeapon.definitionId) : undefined
     const weaponDamageType = weaponDefinition?.stats?.damageType || WeaponDamageType.PHYSICAL
+    const weaponSpeed = weaponDefinition?.stats?.speed || 1
 
     // Verify dice spent matches attack rolls
     if (attackRolls.length !== diceSpent) {
@@ -163,6 +164,7 @@ export class ActivityService {
       playerMagicDef: currentClass.magicDef,
       playerManaRegen: currentClass.manaRegen,
       weaponDamageType,
+      weaponSpeed,
       enemy: currentEnemy,
       tier: currentClass.tier
     })

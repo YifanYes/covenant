@@ -11,7 +11,7 @@ model Character {
   id                     String                  @id @default(uuid()) @db.Uuid
   name                   String                  @db.VarChar(255)
   title                  String?                 @db.VarChar(255)
-  orderName              String?
+  factionName            String                  @default("HOLY_KNIGHTS")
   currentClass           String                  @db.VarChar(50)
   data                   Json?                   @default("{\"diceBank\": 0}")
   createdAt              DateTime                @default(now()) @db.Timestamp(6)

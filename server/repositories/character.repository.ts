@@ -1,3 +1,4 @@
+import { Faction } from '@shared/constants/activities'
 import { CharacterClassName, CLASS_INITIAL_STATS } from '@shared/constants/classes'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
@@ -107,6 +108,7 @@ export class CharacterRepository {
       data: {
         userId,
         name: input.name,
+        factionName: Faction.HOLY_KNIGHTS,
         currentClass: input.className,
         magicNature: input.magicNature,
         data: { diceBank: 0 },
