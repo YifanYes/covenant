@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import type { TooltipProps } from 'recharts'
+import type { Payload } from 'recharts/types/component/DefaultTooltipContent'
 
 interface AreasTooltipPayload {
   name: string
@@ -9,7 +9,12 @@ interface AreasTooltipPayload {
   habitsLastMonth: number
 }
 
-export default function AreasDistributionTooltip({ active, payload }: TooltipProps<number, string>) {
+interface AreasDistributionTooltipProps {
+  active?: boolean
+  payload?: Payload<number, string>[]
+}
+
+export default function AreasDistributionTooltip({ active, payload }: AreasDistributionTooltipProps) {
   const { t } = useTranslation()
 
   if (!active || !payload?.length) return null
