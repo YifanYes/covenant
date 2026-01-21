@@ -2,7 +2,8 @@ import {
   createCharacterSchema,
   equipItemSchema,
   switchClassSchema,
-  unequipItemSchema
+  unequipItemSchema,
+  useConsumableSchema
 } from '@shared/schemas/character.schemas'
 import { protectedProcedure, t } from '../trpc'
 
@@ -38,5 +39,9 @@ export const characterRouter = t.router({
 
   revive: protectedProcedure.mutation(async ({ ctx }) => {
     return ctx.services.character.revive(ctx.user.id)
+  }),
+
+  useConsumable: protectedProcedure.input(useConsumableSchema).mutation(async ({ ctx, input }) => {
+    return ctx.services.combat.useConsumable(ctx.user.id, input.consumableId)
   })
 })

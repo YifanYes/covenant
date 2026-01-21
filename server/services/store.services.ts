@@ -1,5 +1,5 @@
-import { ALL_ITEMS, createInventoryItem, getItemById } from '@shared/constants/items'
-import type { InventoryItem } from '@shared/types/gamification.types'
+import { ALL_ITEMS, CONSUMABLES, createInventoryItem, getConsumableById, getItemById } from '@shared/constants/items'
+import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import type { PurchaseResult, StoreListResult } from '@shared/types/store.types'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '../generated/prisma'
@@ -26,11 +26,14 @@ export class StoreService {
     const inventory = (character.inventory as unknown as InventoryItem[]) || []
     const ownedItemIds = new Set(inventory.map((item) => item.definitionId))
 
-    // Filter items: must have price > 0 and not already owned
-    const availableItems = ALL_ITEMS.filter((item) => item.price > 0 && !ownedItemIds.has(item.id))
+    // Filter equipment items: must have price > 0 and not already owned
+    const availableEquipment = Object.values(ALL_ITEMS).filter((item) => item.price > 0 && !ownedItemIds.has(item.id))
+
+    // Include all consumables (they are stackable, so always available)
+    const availableConsumables = Object.values(CONSUMABLES)
 
     return {
-      items: availableItems,
+      items: [...availableEquipment, ...availableConsumables],
       gold: character.gold,
       characterTier: tier
     }
@@ -47,6 +50,11 @@ export class StoreService {
 
     // Get item definitions and calculate total cost
     const itemsToBuy = itemIds.map((id) => {
+      const consumable = getConsumableById(id)
+      if (consumable) {
+        return consumable
+      }
+
       const item = getItemById(id)
       if (!item) {
         throw new TRPCError({ code: 'NOT_FOUND', message: `Item ${id} not found` })
@@ -55,7 +63,7 @@ export class StoreService {
         throw new TRPCError({ code: 'BAD_REQUEST', message: `Item ${id} is not purchasable` })
       }
       if (item.tier > characterTier) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: `Item ${item.name} requires Tier ${item.tier}` })
+        throw new TRPCError({ code: 'BAD_REQUEST', message: `Item ${item.id} requires Tier ${item.tier}` })
       }
       return item
     })
@@ -66,13 +74,16 @@ export class StoreService {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not enough gold' })
     }
 
-    // Check if any items are already owned
+    // Check if any non-consumable items are already owned
     const inventory = (character.inventory as unknown as InventoryItem[]) || []
     const ownedItemIds = new Set(inventory.map((item) => item.definitionId))
 
     for (const item of itemsToBuy) {
+      // Skip ownership check for consumables (they're stackable)
+      if (item.type === ItemType.CONSUMABLE) continue
+
       if (ownedItemIds.has(item.id)) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: `Item ${item.name} already owned` })
+        throw new TRPCError({ code: 'BAD_REQUEST', message: `Item ${item.id} already owned` })
       }
     }
 

@@ -101,7 +101,7 @@ export class CharacterService {
     if (itemIndex !== -1) {
       itemToEquip = inventory[itemIndex]
     } else {
-      const tier1Definition = TIER_1_ITEMS.find((def) => def.id === itemId)
+      const tier1Definition = TIER_1_ITEMS[itemId]
       if (tier1Definition) {
         itemToEquip = {
           ...createInventoryItem(tier1Definition),
@@ -129,7 +129,7 @@ export class CharacterService {
     const newLoadout = [...loadout]
     if (existingItemIndex !== -1) {
       const existingItem = newLoadout[existingItemIndex]
-      const isTier1 = TIER_1_ITEMS.some((def) => def.id === existingItem.definitionId)
+      const isTier1 = existingItem.definitionId ? !!TIER_1_ITEMS[existingItem.definitionId] : false
       if (!isTier1) {
         newInventory.push(existingItem)
       }
@@ -159,7 +159,7 @@ export class CharacterService {
     const newLoadout = [...loadout]
     newLoadout.splice(itemIndex, 1)
 
-    const isTier1 = TIER_1_ITEMS.some((def) => def.id === itemToUnequip.definitionId)
+    const isTier1 = itemToUnequip.definitionId ? !!TIER_1_ITEMS[itemToUnequip.definitionId] : false
     const newInventory = isTier1 ? [...inventory] : [...inventory, itemToUnequip]
 
     await this.characterRepository.updateInventoryAndLoadout(character.id, newInventory, newLoadout)

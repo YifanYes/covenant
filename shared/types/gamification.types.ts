@@ -6,7 +6,8 @@ export const ItemType = {
   WEAPON_RANGED: 'WEAPON_RANGED',
   WEAPON_MAGIC: 'WEAPON_MAGIC',
   ARMOR: 'ARMOR',
-  ACCESSORY: 'ACCESSORY'
+  ACCESSORY: 'ACCESSORY',
+  CONSUMABLE: 'CONSUMABLE'
 } as const
 export type ItemType = (typeof ItemType)[keyof typeof ItemType]
 
@@ -29,8 +30,8 @@ export const slotTypeValues = ['WEAPON', 'ARMOR', 'ACCESSORY'] as const
 export interface InventoryItem {
   id: string
   definitionId?: string // Link to base item definition not unique id
-  name: string
-  description?: string
+  nameKey: string
+  descriptionKey?: string
   type: ItemType
   tier: number
   rarity: ItemRarity

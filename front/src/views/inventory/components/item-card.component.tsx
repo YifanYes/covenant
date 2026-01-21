@@ -23,7 +23,7 @@ const rarityGlowColors = {
 
 export default function ItemCard({ item, isSelected, onClick }: ItemCardProps) {
   const { t } = useTranslation()
-  const itemName = t(`items.${item.definitionId}.name`, { defaultValue: item.name })
+  const itemName = t(item.nameKey)
   const itemImagePath = `/assets/items/${item.definitionId}.png`
 
   return (

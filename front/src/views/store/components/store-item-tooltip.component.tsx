@@ -18,8 +18,8 @@ export default function StoreItemTooltip({
 }: StoreItemTooltipProps) {
   const { t } = useTranslation()
 
-  const itemName = t(`items.${item.id}.name`, { defaultValue: item.name })
-  const itemDescription = t(`items.${item.id}.description`, { defaultValue: item.description })
+  const itemName = t(item.nameKey)
+  const itemDescription = t(item.descriptionKey)
   const itemImagePath = `/assets/items/${item.id}.png`
 
   const rarityColor =
