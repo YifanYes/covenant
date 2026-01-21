@@ -233,6 +233,8 @@
       "all_objectives_covered": "¡Todos los objetivos están cubiertos!",
       "areas": "Áreas",
       "days": "días",
+      "no_blindspots_line1": "Todas las áreas y objetivos están en marcha",
+      "no_blindspots_line2": "¡Buen trabajo, sigue así!",
       "objectives": "Objetivos",
       "title": "El punto ciego",
       "without_activity": "+2 semanas sin actividad"
@@ -251,7 +253,8 @@
       "completion": "Progreso",
       "no_habits": "Sin hábitos",
       "none": "Ninguno",
-      "remaining": "Pendiente"
+      "remaining": "Pendiente",
+      "title": "Hábitos diarios"
     },
     "task_status": {
       "DOING": "En proceso",
