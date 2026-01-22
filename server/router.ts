@@ -4,6 +4,7 @@ import { authRouter } from './routers/auth.router'
 import { characterRouter } from './routers/character.router'
 import { dashboardRouter } from './routers/dashboard.router'
 import { habitsRouter } from './routers/habits.router'
+import { investmentRouter } from './routers/investment.router'
 import { objectivesRouter } from './routers/objectives.router'
 import { storeRouter } from './routers/store.router'
 import { tasksRouter } from './routers/tasks.router'
@@ -23,7 +24,7 @@ export const appRouter = t.router({
   habits: habitsRouter,
   dashboard: dashboardRouter,
   activity: activityRouter,
-
+  investment: investmentRouter,
   store: storeRouter
 })
 

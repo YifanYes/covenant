@@ -8,6 +8,7 @@ import { CombatService } from './combat.service'
 import { DashboardService } from './dashboard.service'
 import { DiceService } from './dice.service'
 import { HabitService } from './habit.service'
+import { InvestmentService } from './investment.service'
 import { ObjectiveService } from './objective.service'
 import { StoreService } from './store.services'
 import { TaskService } from './task.service'
@@ -28,6 +29,7 @@ export class ServiceFactory {
   private _taskService?: TaskService
   private _storeService?: StoreService
   private _activityService?: ActivityService
+  private _investmentService?: InvestmentService
 
   constructor(
     private prisma: PrismaClient,
@@ -109,5 +111,12 @@ export class ServiceFactory {
       this._activityService = new ActivityService(this.prisma)
     }
     return this._activityService
+  }
+
+  get investment(): InvestmentService {
+    if (!this._investmentService) {
+      this._investmentService = new InvestmentService(this.prisma)
+    }
+    return this._investmentService
   }
 }

@@ -820,6 +820,82 @@ Members of the Order typically address one another as **"Brother"** regardless o
 
 ---
 
+## Investment System
+
+The Investment System allows players to collectively fund world-altering projects using gold. This creates a gold sink and encourages community cooperation toward shared goals.
+
+### Core Concept
+
+- **Faction-bound**: Each investment belongs to a faction; players can only contribute to their own faction's investments
+- **Free contribution**: Players can contribute any amount of gold (minimum 1)
+- **No refunds**: Contributions are permanent regardless of outcome
+- **Real-time progress**: Players see current funding progress toward the goal
+- **Strict deadlines**: Investments expire after a set time (configurable per investment)
+- **World impact**: Success/failure changes the game world state
+
+### Investment Structure
+
+| Field           | Description                        |
+| --------------- | ---------------------------------- |
+| `id`            | Unique database identifier         |
+| `investmentId`  | Reference to InvestmentTemplate.id |
+| `factionName`   | Owning faction                     |
+| `status`        | ACTIVE, COMPLETED, or FAILED       |
+| `currentAmount` | Current gold contributed           |
+| `targetAmount`  | Goal to reach (dynamically scaled) |
+| `deadline`      | Timestamp when investment expires  |
+| `contributions` | Array of individual contributions  |
+
+### Dynamic Goal Scaling
+
+Target amounts scale based on active player count:
+
+**Formula**: `Target = BaseTarget + (ActivePlayers × ScaleFactor)`
+
+| Investment              | Base  | Factor | Example (60 players) |
+| ----------------------- | ----- | ------ | -------------------- |
+| Anti-Demon Barrier      | 1,000 | ×80    | 5,800 gold           |
+| Providence Purification | 2,000 | ×100   | 8,000 gold           |
+| Dark Heart Operation    | 2,500 | ×125   | 10,000 gold          |
+| Gen 2 Armament Program  | 1,500 | ×90    | 6,900 gold           |
+
+### Database Schema
+
+```prisma
+model Investment {
+  id            String                   @id @default(uuid()) @db.Uuid
+  investmentId  String                   @db.VarChar(255)
+  factionName   String                   @db.VarChar(100)
+  status        String                   @db.VarChar(20)
+  currentAmount Int                      @default(0)
+  targetAmount  Int
+  startedAt     DateTime                 @default(now())
+  deadline      DateTime
+  completedAt   DateTime?
+  contributions InvestmentContribution[]
+
+  @@map("investments")
+}
+
+model InvestmentContribution {
+  id            String     @id @default(uuid()) @db.Uuid
+  investmentId  String     @db.Uuid
+  characterId   String     @db.Uuid
+  amount        Int
+  contributedAt DateTime   @default(now())
+  investment    Investment @relation(...)
+  character     Character  @relation(...)
+
+  @@map("investment_contributions")
+}
+```
+
+### Frontend Route
+
+- **Investments Page**: `/investments` — Grid of active investments with contribution modal
+
+---
+
 ## Implementation Notes
 
 - **No Party System**: The Party model is no longer needed. Characters participate individually.

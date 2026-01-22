@@ -8,21 +8,22 @@ datasource db {
 }
 
 model Character {
-  id                     String                  @id @default(uuid()) @db.Uuid
-  name                   String                  @db.VarChar(255)
-  title                  String?                 @db.VarChar(255)
-  factionName            String                  @default("HOLY_KNIGHTS")
-  currentClass           String                  @db.VarChar(50)
-  data                   Json?                   @default("{\"diceBank\": 0}")
-  createdAt              DateTime                @default(now()) @db.Timestamp(6)
-  updatedAt              DateTime                @updatedAt @db.Timestamp(6)
-  userId                 String                  @unique @db.Uuid
-  gold                   Int                     @default(0)
-  inventory              Json?                   @default("[]")
-  loadout                Json?                   @default("[]")
-  magicNature            String?                 @db.VarChar(50)
-  activityParticipations ActivityParticipation[]
-  classes                CharacterClass[]
+  id                      String                   @id @default(uuid()) @db.Uuid
+  name                    String                   @db.VarChar(255)
+  title                   String?                  @db.VarChar(255)
+  factionName             String                   @default("HOLY_KNIGHTS")
+  currentClass            String                   @db.VarChar(50)
+  data                    Json?                    @default("{\"diceBank\": 0}")
+  createdAt               DateTime                 @default(now()) @db.Timestamp(6)
+  updatedAt               DateTime                 @updatedAt @db.Timestamp(6)
+  userId                  String                   @unique @db.Uuid
+  gold                    Int                      @default(0)
+  inventory               Json?                    @default("[]")
+  loadout                 Json?                    @default("[]")
+  magicNature             String?                  @db.VarChar(50)
+  activityParticipations  ActivityParticipation[]
+  classes                 CharacterClass[]
+  investmentContributions InvestmentContribution[]
 
   @@map("characters")
 }
@@ -176,4 +177,31 @@ model HabitCompletion {
   habit       Habit    @relation(fields: [habitId], references: [id])
 
   @@map("habit_completions")
+}
+
+model Investment {
+  id            String                   @id @default(uuid()) @db.Uuid
+  investmentId  String                   @db.VarChar(255)
+  factionName   String                   @db.VarChar(100)
+  status        String                   @db.VarChar(20)
+  currentAmount Int                      @default(0)
+  targetAmount  Int
+  startedAt     DateTime                 @default(now()) @db.Timestamp(6)
+  deadline      DateTime                 @db.Timestamp(6)
+  completedAt   DateTime?                @db.Timestamp(6)
+  contributions InvestmentContribution[]
+
+  @@map("investments")
+}
+
+model InvestmentContribution {
+  id            String     @id @default(uuid()) @db.Uuid
+  investmentId  String     @db.Uuid
+  characterId   String     @db.Uuid
+  amount        Int
+  contributedAt DateTime   @default(now()) @db.Timestamp(6)
+  investment    Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+  character     Character  @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("investment_contributions")
 }

@@ -15,16 +15,16 @@ _Fundamentos técnicos sólidos para una experiencia sin interrupciones._
 
 _El ciclo de juego debe estar cerrado y ser gratificante._
 
-- [ ] **Ciclo cerrado:** `Tarea/Hábito` → `Acción/Aventura` → `Recompensa` → `Progresión`.
-- [ ] **Tiers 1–3:** Implementación completa de extremo a extremo para los primeros tres rangos.
-- [ ] **Economía balanceada:** Costes, recompensas y consecuencias aplicadas según diseño.
+- [x] **Ciclo cerrado:** `Tarea/Hábito` → `Acción/Aventura` → `Recompensa` → `Progresión`.
+- [x] **Tiers 1–3:** Implementación completa de extremo a extremo para los primeros tres rangos.
+- [x] **Economía balanceada:** Costes, recompensas y consecuencias aplicadas según diseño.
 
 ## Gamificación Mínima Consistente
 
 _Sistemas de juego base operativos y claros._
 
-- [ ] **Progresión:** Sistema de tiers funcionando correctamente.
-- [ ] **Feedback:** Recompensas claras (stats, desbloqueos, recursos) al instante.
+- [x] **Progresión:** Sistema de tiers funcionando correctamente.
+- [x] **Feedback:** Recompensas claras (stats, desbloqueos, recursos) al instante.
 - [ ] **Orden vs Caos:** Penalizaciones y fricción alineadas con la filosofía del juego.
 
 ## Identidad Mecánica Clara
@@ -32,7 +32,7 @@ _Sistemas de juego base operativos y claros._
 _Diferenciación real del producto frente a otras apps de productividad._
 
 - [ ] **Afinidad dinámica:** Impacto real de la dualidad Orden/Caos desde el primer momento.
-- [ ] **Consecuencias reales:** Las decisiones mecánicas deben afectar el gameplay, no solo ser cosméticas.
+- [x] **Consecuencias reales:** Las decisiones mecánicas deben afectar el gameplay, no solo ser cosméticas.
 - [ ] **Progreso dual:** Diferenciación nítida entre disciplina (progreso) y entropía (corrupción).
 
 ## Gestión de Productividad Sólida
