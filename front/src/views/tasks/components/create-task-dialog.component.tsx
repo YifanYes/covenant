@@ -41,6 +41,7 @@ export default function CreateTaskDialog() {
           })
         })
         await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
+        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getFiltered.queryKey() })
         setOpen(false)
       },
       onError: (error) => toast.error(t('tasks.error.internal.create'), { description: error.message })

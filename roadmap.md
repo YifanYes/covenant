@@ -38,7 +38,8 @@
 - **Gamificación - Fase 5: Cierre del Bucle y Pulido**
   - [x] Tienda para comprar equipamiento con oro.
   - [x] Sección de mapa con actividades comunitarias que sustituye al sistema de misiones.
-  - [ ] Sistema de doctrinas.
+  - [x] Sistema de consumibles.
+  - [x] Sistema de doctrinas.
   - [ ] Sistema de inversiones.
   - [ ] Foro por facción.
   - [ ] Renderizar el personaje con los items equipados.

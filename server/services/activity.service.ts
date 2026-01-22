@@ -1,4 +1,5 @@
 import { getEnemy } from '@shared/constants/enemies'
+import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import { getItemById, WeaponDamageType } from '@shared/constants/items'
 import type { CombatLogEntry, InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
@@ -6,16 +7,19 @@ import { ActivityDifficulty, getActivityById } from '../../shared/constants/acti
 import type { CharacterWithClasses } from '../../shared/types/character.types'
 import type { PrismaClient } from '../generated/prisma'
 import { ActivityRepository } from '../repositories/activity.repository'
+import { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import { CharacterService } from './character.service'
 import { CombatService } from './combat.service'
 
 export class ActivityService {
   private activityRepository: ActivityRepository
+  private combatEnemyRepository: CombatEnemyRepository
   private characterService: CharacterService
   private combatService: CombatService
 
   constructor(prisma: PrismaClient) {
     this.activityRepository = new ActivityRepository(prisma)
+    this.combatEnemyRepository = new CombatEnemyRepository(prisma)
     this.characterService = new CharacterService(prisma)
     this.combatService = new CombatService(prisma)
   }
@@ -40,17 +44,33 @@ export class ActivityService {
 
         const isParticipating = !!rawParticipation && (!activeActivityId || activeActivityId === activity.id)
 
+        // Get active enemy from participation
+        const activeEnemy = rawParticipation?.enemies?.[0]
+
         return {
           ...config,
           ...activity,
-          // Ensure we use the template ID so frontend links work
           id: activity.activityId,
           isParticipating,
           participation:
             isParticipating && rawParticipation
               ? {
-                  ...rawParticipation,
-                  combatLog: rawParticipation.combatLog as unknown as CombatLogEntry[]
+                  id: rawParticipation.id,
+                  kills: rawParticipation.kills,
+                  goldEarned: rawParticipation.goldEarned,
+                  joinedAt: rawParticipation.joinedAt,
+                  lastCombatAt: rawParticipation.lastCombatAt,
+                  activeEnemy: activeEnemy
+                    ? {
+                        id: activeEnemy.id,
+                        templateId: activeEnemy.templateId,
+                        currentHealth: activeEnemy.currentHealth,
+                        maxHealth: activeEnemy.maxHealth,
+                        namePrefix: activeEnemy.namePrefix,
+                        nameSuffix: activeEnemy.nameSuffix,
+                        combatLog: (activeEnemy.combatLog as unknown as CombatLogEntry[]) || []
+                      }
+                    : undefined
                 }
               : undefined
         }
@@ -72,14 +92,24 @@ export class ActivityService {
 
     let participation = await this.activityRepository.getParticipation(activityRecord.id, characterId)
     if (!participation) {
-      // Initialize with first enemy
+      participation = await this.activityRepository.createParticipation(activityRecord.id, characterId)
+    }
+
+    // Check if there's an active enemy, if not spawn one
+    let activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participation.id)
+    if (!activeEnemy) {
       const enemyId = config.enemies[0]
       const enemyTemplate = getEnemy(enemyId)
+      if (!enemyTemplate) throw new TRPCError({ code: 'NOT_FOUND', message: `Enemy ${enemyId} not found` })
 
-      participation = await this.activityRepository.createParticipation(activityRecord.id, characterId, {
-        currentEnemyId: enemyId,
-        currentEnemyHealth: enemyTemplate?.health ?? 10,
-        currentEnemyMaxHealth: enemyTemplate?.health ?? 10
+      const nameKeys = generateEnemyNameKeys(enemyTemplate.type)
+      activeEnemy = await this.combatEnemyRepository.createEnemy({
+        participationId: participation.id,
+        templateId: enemyId,
+        namePrefix: nameKeys.prefix,
+        nameSuffix: nameKeys.suffix,
+        maxHealth: enemyTemplate.health,
+        currentHealth: enemyTemplate.health
       })
     }
 
@@ -99,10 +129,15 @@ export class ActivityService {
         kills: participation.kills,
         goldEarned: participation.goldEarned,
         joinedAt: participation.joinedAt,
-        currentEnemyId: participation.currentEnemyId,
-        currentEnemyHealth: participation.currentEnemyHealth,
-        currentEnemyMaxHealth: participation.currentEnemyMaxHealth,
-        combatLog: participation.combatLog as unknown as CombatLogEntry[]
+        activeEnemy: {
+          id: activeEnemy.id,
+          templateId: activeEnemy.templateId,
+          currentHealth: activeEnemy.currentHealth,
+          maxHealth: activeEnemy.maxHealth,
+          namePrefix: activeEnemy.namePrefix,
+          nameSuffix: activeEnemy.nameSuffix,
+          combatLog: (activeEnemy.combatLog as unknown as CombatLogEntry[]) || []
+        }
       }
     }
   }
@@ -126,16 +161,18 @@ export class ActivityService {
     const participation = await this.activityRepository.getParticipation(activityRecordId, characterId)
     if (!participation) throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
 
-    // Load persisted enemy state or fallback to default
-    const enemyId = participation.currentEnemyId || config.enemies[0]
-    const enemyTemplate = getEnemy(enemyId)
-    if (!enemyTemplate) throw new TRPCError({ code: 'NOT_FOUND', message: `Enemy ${enemyId} not found` })
+    // Get active enemy from CombatEnemy table
+    const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participation.id)
+    if (!activeEnemy) throw new TRPCError({ code: 'NOT_FOUND', message: 'No active enemy found' })
+
+    const enemyTemplate = getEnemy(activeEnemy.templateId)
+    if (!enemyTemplate) throw new TRPCError({ code: 'NOT_FOUND', message: `Enemy ${activeEnemy.templateId} not found` })
 
     // Construct enemy state with persisted health
     const currentEnemy = {
       ...enemyTemplate,
-      health: participation.currentEnemyMaxHealth || enemyTemplate.health,
-      currentHealth: participation.currentEnemyHealth !== null ? participation.currentEnemyHealth : enemyTemplate.health
+      health: activeEnemy.maxHealth,
+      currentHealth: activeEnemy.currentHealth
     }
 
     // Get weapon damage type and speed from loadout
@@ -154,10 +191,10 @@ export class ActivityService {
     }
 
     // Resolve combat against currentEnemy
-    const result = this.combatService.resolveTurn({
+    const result = await this.combatService.resolveTurn({
       attackRolls,
       defenseRolls,
-      targetEnemyId: enemyId,
+      targetEnemyId: activeEnemy.templateId,
       playerStrengthAtk: currentClass.strengthAtk,
       playerStrengthDef: currentClass.strengthDef,
       playerMagicAtk: currentClass.magicAtk,
@@ -166,12 +203,13 @@ export class ActivityService {
       weaponDamageType,
       weaponSpeed,
       enemy: currentEnemy,
-      tier: currentClass.tier
+      participationId: participation.id
     })
 
     // Update player health and mana if changed
-    if (result.damageToPlayer > 0 || result.manaRegenerated > 0) {
-      const newPlayerHealth = Math.max(0, currentClass.health - result.damageToPlayer)
+    if (result.damageToPlayer > 0 || result.manaRegenerated > 0 || result.healthRestored > 0) {
+      const healthChange = result.healthRestored - result.damageToPlayer
+      const newPlayerHealth = Math.max(0, Math.min(currentClass.maxHealth, currentClass.health + healthChange))
       const newPlayerMana = Math.min(currentClass.maxMana, currentClass.mana + result.manaRegenerated)
 
       await this.characterService.updateHealth(currentClass.id, newPlayerHealth, newPlayerMana)
@@ -181,9 +219,8 @@ export class ActivityService {
     const newEnemyHealth = Math.max(0, currentEnemy.currentHealth - result.damageToEnemy)
     const enemyDefeated = newEnemyHealth <= 0
 
-    const updateData: any = {
-      currentEnemyHealth: newEnemyHealth
-    }
+    // Count criticals from result
+    const criticalHits = result.playerAttackRolls.filter((r) => r.isCritical).length
 
     // Build logs from logEntries
     const logs = result.logEntries.map((entry) => {
@@ -213,84 +250,94 @@ export class ActivityService {
       }
     })
 
+    // Update enemy stats
+    await this.combatEnemyRepository.updateEnemy(activeEnemy.id, {
+      currentHealth: newEnemyHealth,
+      turnsElapsed: 1,
+      damageDealt: result.damageToEnemy,
+      damageTaken: result.damageToPlayer,
+      criticalHits
+    })
+
+    // Update combat log on enemy
+    const existingLog = (activeEnemy.combatLog as unknown as CombatLogEntry[]) || []
+    const newEntries = result.logEntries.map((e) => ({
+      ...e,
+      timestamp: e.timestamp || Date.now()
+    }))
+    const MAX_LOG_ENTRIES = 50
+    const updatedCombatLog = [...newEntries, ...existingLog].slice(0, MAX_LOG_ENTRIES)
+    await this.combatEnemyRepository.updateEnemy(activeEnemy.id, { combatLog: updatedCombatLog })
+
     let isActivityCompleted = false
+    let nextEnemyState:
+      | {
+          id: string
+          templateId: string
+          currentHealth: number
+          maxHealth: number
+          namePrefix: string
+          nameSuffix: string
+        }
+      | undefined
+
     if (enemyDefeated) {
-      // 1. Update Enemy Tracking & Tier Promotion
-      const enemiesKilled = currentClass.enemiesKilled || { minion: 0, elite: 0, boss: 0 }
-      const enemyTypeKey = enemyTemplate.type.toLowerCase() as keyof typeof enemiesKilled // minion, elite, boss
-      enemiesKilled[enemyTypeKey] = (enemiesKilled[enemyTypeKey] || 0) + 1
+      // Mark enemy as defeated
+      await this.combatEnemyRepository.defeatEnemy(activeEnemy.id)
 
-      const totalKills = (enemiesKilled.minion || 0) + (enemiesKilled.elite || 0) + (enemiesKilled.boss || 0)
+      // Update kills on participation
+      await this.activityRepository.updateParticipation(participation.id, 1, config.rewardPerKill)
 
-      let newTier = currentClass.tier
-      if (newTier === 1 && totalKills >= 50) {
-        newTier = 2
-        logs.push(`🎉 PROMOTION! You have reached Tier 2!`)
-      } else if (newTier === 2 && totalKills >= 100) {
-        newTier = 3
-        logs.push(`🎉 PROMOTION! You have reached Tier 3!`)
-      }
-
-      await this.characterService.updateProgress(currentClass.id, enemiesKilled, newTier)
-
-      // 2. Update Activity Progress
+      // Update Activity Progress
       await this.activityRepository.updateProgress(activityRecordId, 1)
 
-      // Get updated progress to check if activity is complete
+      // Check if activity is complete
       const updatedActivity = await this.activityRepository.getActivityByTemplateId(config.id)
       isActivityCompleted = !!(updatedActivity && updatedActivity.progress >= updatedActivity.target)
 
       if (!isActivityCompleted) {
-        // Respawn same enemy (or next in list if implemented)
+        // Spawn next enemy
         const nextEnemyId = config.enemies[0]
         const nextEnemyTemplate = getEnemy(nextEnemyId)
 
-        updateData.currentEnemyId = nextEnemyId
-        updateData.currentEnemyHealth = nextEnemyTemplate?.health
-        updateData.currentEnemyMaxHealth = nextEnemyTemplate?.health
-      } else {
-        // Clear enemy state
-        updateData.currentEnemyId = null
-        updateData.currentEnemyHealth = 0
-        updateData.currentEnemyMaxHealth = 0
+        if (nextEnemyTemplate) {
+          const nameKeys = generateEnemyNameKeys(nextEnemyTemplate.type)
+          const newEnemy = await this.combatEnemyRepository.createEnemy({
+            participationId: participation.id,
+            templateId: nextEnemyId,
+            namePrefix: nameKeys.prefix,
+            nameSuffix: nameKeys.suffix,
+            maxHealth: nextEnemyTemplate.health,
+            currentHealth: nextEnemyTemplate.health
+          })
 
+          nextEnemyState = {
+            id: newEnemy.id,
+            templateId: newEnemy.templateId,
+            currentHealth: newEnemy.currentHealth,
+            maxHealth: newEnemy.maxHealth,
+            namePrefix: newEnemy.namePrefix,
+            nameSuffix: newEnemy.nameSuffix
+          }
+        }
+      } else {
         await this.activityRepository.completeActivity(activityRecordId)
       }
 
       logs.push(`💀 Enemy defeated! +${config.rewardPerKill} gold`)
     }
 
-    // Prepare log update (Prepend newest logs)
-    const existingLogs = (participation.combatLog as unknown as CombatLogEntry[]) || []
-    const newEntries = result.logEntries.map((e) => ({
-      ...e,
-      timestamp: e.timestamp || Date.now()
-    }))
-
-    const updatedCombatLog = [...newEntries, ...existingLogs]
-
-    await this.activityRepository.updateParticipationState(
-      participation.id,
-      updateData,
-      enemyDefeated ? config.rewardPerKill : 0,
-      updatedCombatLog
-    )
-
     return {
       ...result,
       logs,
       enemyDefeated,
-      nextEnemyState:
-        enemyDefeated && updateData.currentEnemyId
-          ? {
-              id: `enemy-${Date.now()}`,
-              enemyId: updateData.currentEnemyId,
-              currentHealth: updateData.currentEnemyHealth,
-              maxHealth: updateData.currentEnemyMaxHealth
-            }
-          : undefined,
+      nextEnemyState,
       updatedCombatLog,
-      isActivityCompleted
+      isActivityCompleted,
+      currentEnemy: {
+        namePrefix: activeEnemy.namePrefix,
+        nameSuffix: activeEnemy.nameSuffix
+      }
     }
   }
 }

@@ -17,7 +17,7 @@ We will implement different mechanics for character progression to ensure users 
   - Level Gating: Must be Tier X to enter Tier X missions.
   - Loop: Complete tasks/habits -> Get dice -> Enter Adventure -> Defeat enemies -> Level up/Get Gear.
 - Tier Promotion
-  - Tracking: The system tracks `enemiesKilled` by type (minion, elite, boss).
+  - Tracking: The system tracks enemy defeats via the `CombatEnemy` model, not on `CharacterClass`.
   - Tier 2 Requirement: Defeat 50 total enemies.
   - Tier 3 Requirement: Defeat 100 total enemies.
 
@@ -467,14 +467,51 @@ model ActivityParticipation {
   goldEarned    Int         @default(0)
   joinedAt      DateTime    @default(now()) @db.Timestamp(6)
   lastCombatAt  DateTime?   @db.Timestamp(6)
+  combatStats   Json?       // Aggregated stats across all enemies
 
   activity      MapActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
   character     Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  enemies       CombatEnemy[]
 
   @@unique([activityId, characterId])
   @@map("activity_participations")
 }
+
+model CombatEnemy {
+  id              String    @id @default(uuid()) @db.Uuid
+  participationId String    @db.Uuid
+  templateId      String    @db.VarChar(255)  // Reference to enemy template
+  namePrefix      String    @db.VarChar(100)  // Translation key for procedural name prefix
+  nameSuffix      String    @db.VarChar(100)  // Translation key for procedural name suffix
+  maxHealth       Int
+  currentHealth   Int
+  status          String    @default("ACTIVE") @db.VarChar(20)  // ACTIVE, DEFEATED
+  spawnedAt       DateTime  @default(now()) @db.Timestamp(6)
+  defeatedAt      DateTime? @db.Timestamp(6)
+  turnsElapsed    Int       @default(0)
+  damageDealt     Int       @default(0)  // Damage dealt TO this enemy
+  damageTaken     Int       @default(0)  // Damage taken FROM this enemy
+  criticalHits    Int       @default(0)
+  combatLog       Json      @default("[]")  // Per-enemy combat log (capped at 50 entries)
+
+  participation   ActivityParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
+
+  @@index([participationId, status])
+  @@map("combat_enemies")
+}
 ```
+
+#### Procedural Enemy Naming
+
+Enemies now have procedural names generated using translation keys. This makes repeated enemy encounters feel unique:
+
+- **Name Structure**: `[Prefix] [Enemy Type Name] [Suffix]`
+  - Example: "Vorath the Hollow Skeleton" or "Velefor Dreadlord Demon"
+- **Translation Keys**:
+  - Prefixes: `enemyNames.{type}.prefix.{index}` (e.g., `enemyNames.minion.prefix.0`)
+  - Suffixes: `enemyNames.{type}.suffix.{index}` (e.g., `enemyNames.elite.suffix.2`)
+- **Enemy Types**: Different name pools for MINION, ELITE, and BOSS enemies
+- **Storage**: `namePrefix` and `nameSuffix` fields on `CombatEnemy` store the translation keys
 
 ## Equipment System Implementation
 
@@ -791,7 +828,11 @@ Members of the Order typically address one another as **"Brother"** regardless o
 - **Cron Job Required**: A scheduled task to evaluate activity deadlines and apply consequences.
 - **Map Assets Needed**: Zone illustrations, activity markers, status indicators.
   - Current map: `/assets/maps/santa_cruz.png` (source: `front/public/assets/maps/santa_cruz.png`)
-- **No Detailed Stats (for now)**: Only kills are tracked per player; no damage dealt, dice spent, etc.
+- **CombatEnemy Model**: Per-enemy combat tracking with:
+  - Procedural names via translation keys (`namePrefix`, `nameSuffix`)
+  - Individual combat logs (capped at 50 entries per enemy)
+  - Detailed statistics: `turnsElapsed`, `damageDealt`, `damageTaken`, `criticalHits`
+  - Status tracking: `ACTIVE` or `DEFEATED`
 
 ### Files to Delete (Mission System Removal)
 

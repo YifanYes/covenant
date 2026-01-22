@@ -73,10 +73,10 @@ export class CharacterRepository {
     })
   }
 
-  async updateProgress(classId: string, enemiesKilled: any, tier: number): Promise<void> {
+  async updateProgress(classId: string, tier: number): Promise<void> {
     await this.prisma.characterClass.update({
       where: { id: classId },
-      data: { enemiesKilled, tier }
+      data: { tier }
     })
   }
 
@@ -173,6 +173,17 @@ export class CharacterRepository {
   async deleteManyByUserId(userId: string): Promise<void> {
     await this.prisma.character.deleteMany({
       where: { userId }
+    })
+  }
+
+  async getCharacterWithClasses(userId: string): Promise<CharacterWithClasses | null> {
+    return this.findWithClasses(userId)
+  }
+
+  async updateCharacterClass(classId: string, data: { equippedDoctrines?: string[] }): Promise<void> {
+    await this.prisma.characterClass.update({
+      where: { id: classId },
+      data
     })
   }
 }

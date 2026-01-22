@@ -15,8 +15,8 @@ _Fundamentos técnicos sólidos para una experiencia sin interrupciones._
 
 _El ciclo de juego debe estar cerrado y ser gratificante._
 
-- [x] **Ciclo cerrado:** `Tarea/Hábito` → `Acción/Aventura` → `Recompensa` → `Progresión`.
-- [x] **Tiers 1–3:** Implementación completa de extremo a extremo para los primeros tres rangos.
+- [ ] **Ciclo cerrado:** `Tarea/Hábito` → `Acción/Aventura` → `Recompensa` → `Progresión`.
+- [ ] **Tiers 1–3:** Implementación completa de extremo a extremo para los primeros tres rangos.
 - [ ] **Economía balanceada:** Costes, recompensas y consecuencias aplicadas según diseño.
 
 ## Gamificación Mínima Consistente
