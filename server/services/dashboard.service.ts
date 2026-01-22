@@ -41,18 +41,18 @@ export class DashboardService {
       MONTHLY: 30
     }
 
-    const { completedToday, totalDaily } = habits.reduce(
+    const dailyHabits = habits.filter((habit) => habit.timespan === 'DAILY')
+
+    const { completedToday, totalDaily } = dailyHabits.reduce(
       (acc, habit) => {
-        const dailyTarget = habit.recurrence / habitsTimespanExpectedModifiers[habit.timespan]
-        const expectedCompletedPerDay = Math.floor(dailyTarget)
-        const completedToday = habit.completions?.filter((completion) =>
+        const completedTodayCount = habit.completions?.filter((completion) =>
           dayjs(completion?.completedAt).isSame(now, 'day')
         )?.length
-        const isCompletedToday = completedToday >= expectedCompletedPerDay ? 1 : 0
+        const isCompletedToday = completedTodayCount >= habit.recurrence ? 1 : 0
 
         return {
           completedToday: acc.completedToday + isCompletedToday,
-          totalDaily: acc.totalDaily + (expectedCompletedPerDay > 0 ? 1 : 0)
+          totalDaily: acc.totalDaily + 1
         }
       },
       { completedToday: 0, totalDaily: 0 }

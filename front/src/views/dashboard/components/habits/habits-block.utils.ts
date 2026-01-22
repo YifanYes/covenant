@@ -2,7 +2,7 @@ import { parseTranslationKey } from '@/utils/locale.utils'
 import { defaultHabitConfig } from './habits-block.config'
 
 export const getHabitStats = ({ completedToday, totalDaily }: { completedToday: number; totalDaily: number }) => ({
-  completionRate: `${totalDaily > 0 ? Math.round((completedToday / totalDaily) * 100) : 0}%`,
+  completionRate: `${totalDaily > 0 ? Math.min(100, Math.round((completedToday / totalDaily) * 100)) : 0}%`,
   chartData: [
     {
       name: parseTranslationKey(defaultHabitConfig.completed.label),
