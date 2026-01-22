@@ -13,6 +13,7 @@ interface StoreItemCardProps {
   isTierRestricted: boolean
   characterTier: number
   quantity?: number
+  maxQuantity?: number
   onToggle: () => void
   onQuantityChange?: (quantity: number) => void
 }
@@ -30,6 +31,7 @@ export default function StoreItemCard({
   isTierRestricted,
   characterTier,
   quantity = 1,
+  maxQuantity,
   onToggle,
   onQuantityChange
 }: StoreItemCardProps) {
@@ -43,8 +45,13 @@ export default function StoreItemCard({
 
   const handleQuantityChange = (delta: number) => {
     if (!onQuantityChange) return
-    const newQuantity = Math.max(1, quantity + delta)
-    onQuantityChange(newQuantity)
+    const newQuantity = quantity + delta
+
+    // Check max limit if defined
+    if (maxQuantity && newQuantity > maxQuantity) return
+
+    const validQuantity = Math.max(1, newQuantity)
+    onQuantityChange(validQuantity)
   }
 
   return (
@@ -105,7 +112,7 @@ export default function StoreItemCard({
                     e.stopPropagation()
                     handleQuantityChange(1)
                   }}
-                  disabled={!canAfford}
+                  disabled={!canAfford || (maxQuantity !== undefined && quantity >= maxQuantity)}
                 >
                   <Plus className='h-3 w-3' />
                 </Button>
