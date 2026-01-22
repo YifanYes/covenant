@@ -243,8 +243,8 @@ export default function ActivityDetailPage() {
   }
 
   return (
-    <div className='flex h-full w-full flex-col gap-4 overflow-auto p-4'>
-      <div className='mx-auto w-full max-w-5xl space-y-4'>
+    <div className='flex h-full w-full flex-col gap-4 overflow-auto px-2 py-4'>
+      <div className='w-full space-y-4'>
         <div className='flex items-center gap-4'>
           <Button variant='ghost' size='icon' asChild>
             <Link to='/map'>

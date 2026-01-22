@@ -144,6 +144,7 @@ export interface InventoryCharacterClass {
   magicAtk: number
   magicDef: number
   manaRegen: number
+  equippedDoctrines: string[]
 }
 
 // Character data returned by getCurrentClass endpoint

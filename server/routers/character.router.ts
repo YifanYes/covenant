@@ -1,7 +1,9 @@
 import {
   createCharacterSchema,
+  equipDoctrineSchema,
   equipItemSchema,
   switchClassSchema,
+  unequipDoctrineSchema,
   unequipItemSchema,
   useConsumableSchema
 } from '@shared/schemas/character.schemas'
@@ -43,5 +45,21 @@ export const characterRouter = t.router({
 
   useConsumable: protectedProcedure.input(useConsumableSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.combat.useConsumable(ctx.user.id, input.consumableId)
+  }),
+
+  getAvailableDoctrines: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.services.character.getAvailableDoctrinesForCharacter(ctx.user.id)
+  }),
+
+  equippedDoctrines: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.services.character.getEquippedDoctrines(ctx.user.id)
+  }),
+
+  equipDoctrine: protectedProcedure.input(equipDoctrineSchema).mutation(async ({ ctx, input }) => {
+    return ctx.services.character.equipDoctrine(ctx.user.id, input.doctrineId)
+  }),
+
+  unequipDoctrine: protectedProcedure.input(unequipDoctrineSchema).mutation(async ({ ctx, input }) => {
+    return ctx.services.character.unequipDoctrine(ctx.user.id, input.doctrineId)
   })
 })

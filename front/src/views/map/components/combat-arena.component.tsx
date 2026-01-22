@@ -1,3 +1,4 @@
+import DoctrinePanel from '@/components/doctrine-panel.component'
 import AlertDialog, {
   AlertDialogAction,
   AlertDialogContent,
@@ -153,12 +154,12 @@ export default function CombatArena({
   const rollButtonLabel = isAttackPhase ? t('combat.roll_attack') : t('combat.roll_defense')
 
   return (
-    <div className={cn('grid gap-4 lg:grid-cols-[1fr_3fr]', className)}>
-      {/* Left: Character Status + Dice Roller */}
+    <div className={cn('grid gap-4 lg:grid-cols-[minmax(240px,280px)_minmax(200px,260px)_1fr]', className)}>
+      {/* Left: Character Status + Consumables + Doctrines */}
       <div className='flex flex-col gap-4'>
         <div className='rounded-lg border p-4'>
           <div className='flex h-full gap-4'>
-            <div className='bg-muted/50 relative flex h-full w-24 shrink-0 items-center justify-center rounded-md border p-2'>
+            <div className='bg-muted/50 relative flex h-full w-16 shrink-0 items-center justify-center rounded-md border p-2'>
               <img
                 src={`/assets/classes/${character.currentClass!}.png`}
                 alt={character.currentClass!}
@@ -167,9 +168,9 @@ export default function CombatArena({
               />
             </div>
             <div className='flex flex-1 flex-col justify-center'>
-              <h3 className='mb-3 font-semibold'>{character.name}</h3>
+              <h3 className='mb-2 text-sm font-semibold'>{character.name}</h3>
 
-              <div className='space-y-3'>
+              <div className='space-y-2'>
                 <div>
                   <div className='text-muted-foreground mb-1 flex justify-between text-xs'>
                     <span>{t('inventory.health')}</span>
@@ -187,7 +188,7 @@ export default function CombatArena({
                       {currentClass.mana}/{currentClass.maxMana}
                     </span>
                   </div>
-                  <div className='bg-muted relative h-2.5 overflow-hidden rounded-full'>
+                  <div className='bg-muted relative h-2 overflow-hidden rounded-full'>
                     <div
                       className='absolute inset-y-0 left-0 bg-blue-500 transition-all duration-300'
                       style={{ width: `${(currentClass.mana / currentClass.maxMana) * 100}%` }}
@@ -199,52 +200,13 @@ export default function CombatArena({
           </div>
         </div>
 
-        <DiceRoller
-          diceBank={currentAvailableDice}
-          onRoll={handleRoll}
-          isRolling={isWaitingForResolve}
-          customButtonLabel={rollButtonLabel}
-          title={isAttacking ? t('combat.to_battle') : undefined}
-          diceLimit={diceLimit}
-        />
-
-        <div className='space-y-4 text-center'>
-          {/* Attack Dice Section */}
-          {(pendingAttackRolls ||
-            submittedAttackRolls ||
-            (showResults && !!lastTurnResult?.playerAttackRolls?.length)) && (
-            <div className='rounded-lg border p-4 transition-all duration-300'>
-              <div className='mb-2 text-sm font-medium tracking-wider text-orange-500/80 uppercase'>
-                {t('combat.attack_rolls')}
-              </div>
-              <div className='flex flex-wrap justify-center gap-2'>
-                {renderDice(pendingAttackRolls, submittedAttackRolls, lastTurnResult?.playerAttackRolls, 'atk')}
-              </div>
-            </div>
-          )}
-
-          {/* Defense Dice Section */}
-          {(pendingDefenseRolls ||
-            submittedDefenseRolls ||
-            (showResults && !!lastTurnResult?.playerDefenseRolls?.length)) && (
-            <div className='rounded-lg border p-4 transition-all duration-300'>
-              <div className='mb-2 text-sm font-medium tracking-wider text-blue-500/80 uppercase'>
-                {t('combat.defense_rolls')}
-              </div>
-              <div className='flex flex-wrap justify-center gap-2'>
-                {renderDice(pendingDefenseRolls, submittedDefenseRolls, lastTurnResult?.playerDefenseRolls, 'def')}
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* Consumables Section */}
         {Object.keys(groupedConsumables).length > 0 && (
-          <div className='rounded-lg border p-4'>
-            <div className='mb-2 text-sm font-medium tracking-wider text-green-500/80 uppercase'>
+          <div className='rounded-lg border p-3'>
+            <div className='mb-2 text-xs font-medium tracking-wider text-green-500/80 uppercase'>
               {t('consumables.title')}
             </div>
-            <div className='flex flex-wrap gap-2'>
+            <div className='flex flex-wrap gap-1.5'>
               {Object.entries(groupedConsumables).map(([defId, { item, count }]) => {
                 const definition = getConsumableById(defId)
                 return (
@@ -254,7 +216,7 @@ export default function CombatArena({
                     size='sm'
                     disabled={useConsumableMutation.isPending}
                     onClick={() => useConsumableMutation.mutate({ consumableId: defId })}
-                    className='flex items-center gap-2'
+                    className='flex items-center gap-1.5 text-xs'
                   >
                     <span>{t(definition?.nameKey || item.nameKey)}</span>
                     <span className='text-muted-foreground'>×{count}</span>
@@ -264,14 +226,24 @@ export default function CombatArena({
             </div>
           </div>
         )}
+
+        {/* Doctrines Section */}
+        <DoctrinePanel
+          showUseControls
+          currentMana={currentClass?.mana ?? 0}
+          onUseDoctrine={(doctrine) => {
+            // TODO: Implement doctrine usage in combat
+            toast.info(`Using ${doctrine.id} - Combat integration coming soon`)
+          }}
+        />
       </div>
 
-      {/* Center: Enemies + Combat Log */}
+      {/* Center: Enemies + Dice Roller */}
       <div className='flex flex-col gap-4'>
-        <div className='rounded-lg border p-4'>
-          <h3 className='mb-3 font-semibold'>{t('combat.enemies')}</h3>
-          <ScrollArea className='h-full max-h-[264px]'>
-            <div className='grid gap-3 pr-4 sm:grid-cols-2 lg:grid-cols-3'>
+        <div className='rounded-lg border p-3'>
+          <h3 className='mb-2 text-sm font-semibold'>{t('combat.enemies')}</h3>
+          <ScrollArea className='max-h-[200px]'>
+            <div className='flex flex-col gap-2 pr-2'>
               {enemies.map((enemy) => (
                 <EnemyCard key={enemy.id} enemy={enemy} isTarget={targetEnemy?.id === enemy.id} />
               ))}
@@ -279,8 +251,47 @@ export default function CombatArena({
           </ScrollArea>
         </div>
 
-        <CombatLog entries={combatLog} className='max-h-[350px] min-h-[300px]' />
+        <DiceRoller
+          diceBank={currentAvailableDice}
+          onRoll={handleRoll}
+          isRolling={isWaitingForResolve}
+          customButtonLabel={rollButtonLabel}
+          title={isAttacking ? t('combat.to_battle') : undefined}
+          diceLimit={diceLimit}
+        />
+
+        {/* Attack/Defense Dice Results */}
+        <div className='space-y-3'>
+          {(pendingAttackRolls ||
+            submittedAttackRolls ||
+            (showResults && !!lastTurnResult?.playerAttackRolls?.length)) && (
+            <div className='rounded-lg border p-3 transition-all duration-300'>
+              <div className='mb-2 text-xs font-medium tracking-wider text-orange-500/80 uppercase'>
+                {t('combat.attack_rolls')}
+              </div>
+              <div className='flex flex-wrap justify-center gap-1.5'>
+                {renderDice(pendingAttackRolls, submittedAttackRolls, lastTurnResult?.playerAttackRolls, 'atk')}
+              </div>
+            </div>
+          )}
+
+          {(pendingDefenseRolls ||
+            submittedDefenseRolls ||
+            (showResults && !!lastTurnResult?.playerDefenseRolls?.length)) && (
+            <div className='rounded-lg border p-3 transition-all duration-300'>
+              <div className='mb-2 text-xs font-medium tracking-wider text-blue-500/80 uppercase'>
+                {t('combat.defense_rolls')}
+              </div>
+              <div className='flex flex-wrap justify-center gap-1.5'>
+                {renderDice(pendingDefenseRolls, submittedDefenseRolls, lastTurnResult?.playerDefenseRolls, 'def')}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Right: Combat Log */}
+      <CombatLog entries={combatLog} className='max-h-[calc(100vh-200px)] overflow-y-auto' />
 
       <AlertDialog open={isDead}>
         <AlertDialogContent>

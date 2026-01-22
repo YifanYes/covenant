@@ -32,10 +32,9 @@ export default function EnemyCard({ enemy, isTarget, className }: EnemyCardProps
   return (
     <div
       className={cn(
-        'flex gap-3 rounded-lg border-2 p-3 transition-all',
-        isTarget && !isDead && 'border-primary ring-primary/30 ring-2',
+        'border-border flex gap-3 rounded-lg border p-3 transition-all',
+        isTarget && !isDead && 'ring-1 ring-emerald-500/30',
         isDead && 'opacity-40 grayscale',
-        !isTarget && !isDead && 'border-border',
         className
       )}
     >

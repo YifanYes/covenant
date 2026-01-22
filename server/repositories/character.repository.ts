@@ -175,4 +175,15 @@ export class CharacterRepository {
       where: { userId }
     })
   }
+
+  async getCharacterWithClasses(userId: string): Promise<CharacterWithClasses | null> {
+    return this.findWithClasses(userId)
+  }
+
+  async updateCharacterClass(classId: string, data: { equippedDoctrines?: string[] }): Promise<void> {
+    await this.prisma.characterClass.update({
+      where: { id: classId },
+      data
+    })
+  }
 }

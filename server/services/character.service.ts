@@ -1,11 +1,15 @@
+import type { CharacterClassName, MagicNature } from '@shared/constants/classes'
 import { getMaxDiceForTier } from '@shared/constants/dice.constants'
+import { getAvailableDoctrines, getDoctrineById, MAX_EQUIPPED_DOCTRINES } from '@shared/constants/doctrines'
 import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import type { CharacterClassType, CharacterProgress, CharacterWithClasses } from '@shared/types/character.types'
+import type { DoctrineDefinition } from '@shared/types/doctrine.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '../generated/prisma'
 import { CharacterRepository } from '../repositories/character.repository'
+
 export class CharacterService {
   private characterRepository: CharacterRepository
 
@@ -70,7 +74,7 @@ export class CharacterService {
         magicAtk: c.magicAtk,
         magicDef: c.magicDef,
         manaRegen: c.manaRegen,
-        enemiesKilled: c.enemiesKilled
+        equippedDoctrines: (c as any).equippedDoctrines || []
       }))
     }
   }
@@ -201,5 +205,113 @@ export class CharacterService {
     if (itemType.startsWith('WEAPON_')) return 'WEAPON'
     if (itemType === ItemType.ARMOR) return ItemType.ARMOR
     return ItemType.ACCESSORY
+  }
+
+  async getAvailableDoctrinesForCharacter(userId: string): Promise<DoctrineDefinition[]> {
+    const character = await this.characterRepository.getCharacterWithClasses(userId)
+    if (!character) {
+      throw new Error('Character not found')
+    }
+
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) {
+      throw new Error('Current class not found')
+    }
+
+    return getAvailableDoctrines(
+      currentClass.className as CharacterClassName,
+      currentClass.tier,
+      character.magicNature as MagicNature | undefined
+    )
+  }
+
+  async getEquippedDoctrines(userId: string): Promise<DoctrineDefinition[]> {
+    const character = await this.characterRepository.getCharacterWithClasses(userId)
+    if (!character) {
+      throw new Error('Character not found')
+    }
+
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) {
+      throw new Error('Current class not found')
+    }
+
+    const equippedIds = (currentClass as unknown as { equippedDoctrines: string[] }).equippedDoctrines || []
+    return equippedIds.map((id) => getDoctrineById(id)).filter((d): d is DoctrineDefinition => d !== undefined)
+  }
+
+  async equipDoctrine(userId: string, doctrineId: string): Promise<{ success: boolean; equippedDoctrines: string[] }> {
+    const character = await this.characterRepository.getCharacterWithClasses(userId)
+    if (!character) {
+      throw new Error('Character not found')
+    }
+
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) {
+      throw new Error('Current class not found')
+    }
+
+    // Validate doctrine exists
+    const doctrine = getDoctrineById(doctrineId)
+    if (!doctrine) {
+      throw new Error('Doctrine not found')
+    }
+
+    // Validate doctrine is for this class
+    if (doctrine.className !== currentClass.className) {
+      throw new Error('Doctrine not available for this class')
+    }
+
+    // Validate tier requirement
+    if (doctrine.tier > currentClass.tier) {
+      throw new Error('Tier requirement not met')
+    }
+
+    // Check max equipped doctrines
+    const equippedDoctrines = (currentClass as unknown as { equippedDoctrines: string[] }).equippedDoctrines || []
+    if (equippedDoctrines.length >= MAX_EQUIPPED_DOCTRINES) {
+      throw new Error('Maximum equipped doctrines reached')
+    }
+
+    // Check if already equipped
+    if (equippedDoctrines.includes(doctrineId)) {
+      throw new Error('Doctrine already equipped')
+    }
+
+    // Equip the doctrine
+    const newEquippedDoctrines = [...equippedDoctrines, doctrineId]
+    await this.characterRepository.updateCharacterClass(currentClass.id, {
+      equippedDoctrines: newEquippedDoctrines
+    })
+
+    return { success: true, equippedDoctrines: newEquippedDoctrines }
+  }
+
+  async unequipDoctrine(
+    userId: string,
+    doctrineId: string
+  ): Promise<{ success: boolean; equippedDoctrines: string[] }> {
+    const character = await this.characterRepository.getCharacterWithClasses(userId)
+    if (!character) {
+      throw new Error('Character not found')
+    }
+
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) {
+      throw new Error('Current class not found')
+    }
+
+    const equippedDoctrines = (currentClass as unknown as { equippedDoctrines: string[] }).equippedDoctrines || []
+    if (!equippedDoctrines.includes(doctrineId)) {
+      throw new Error('Doctrine not equipped')
+    }
+
+    // Remove the doctrine
+    const newEquippedDoctrines = equippedDoctrines.filter((id) => id !== doctrineId)
+    await this.characterRepository.updateCharacterClass(currentClass.id, {
+      equippedDoctrines: newEquippedDoctrines
+    })
+
+    return { success: true, equippedDoctrines: newEquippedDoctrines }
   }
 }

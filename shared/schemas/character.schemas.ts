@@ -29,3 +29,13 @@ export const useConsumableSchema = z.object({
   consumableId: z.string().min(1)
 })
 export type UseConsumableType = z.infer<typeof useConsumableSchema>
+
+export const equipDoctrineSchema = z.object({
+  doctrineId: z.string().min(1)
+})
+export type EquipDoctrineType = z.infer<typeof equipDoctrineSchema>
+
+export const unequipDoctrineSchema = z.object({
+  doctrineId: z.string().min(1)
+})
+export type UnequipDoctrineType = z.infer<typeof unequipDoctrineSchema>

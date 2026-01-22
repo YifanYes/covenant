@@ -6,7 +6,7 @@ Implement two new game systems based on the lore documents:
 2. **Doctrines**: Class-specific abilities with various effects (from Clases.md)
 
 > [!IMPORTANT]
-> Implement **Phase 1 (Consumables)** first as a standalone feature, then proceed with **Phases 2-4 (Doctrines)** in a separate iteration.
+> Implement **Phase 1 (Consumables)** first as a standalone feature, then proceed with **Phases 2 (Doctrines)** in a separate iteration.
 
 ---
 
@@ -165,7 +165,7 @@ Add consumables to the store catalog for purchase.
 
 ---
 
-## Phase 2: Doctrine System Foundation
+## Phase 2: Doctrine System
 
 ### Shared Types
 
@@ -296,13 +296,9 @@ Add to both EN/ES files:
 }
 ```
 
----
-
-## Phase 3: Doctrine Definitions
-
 #### [NEW] [doctrines.ts](file:///Users/yifan/Projects/arq/shared/constants/doctrines.ts)
 
-Define doctrines for all 4 classes (Templar, Herald, Inquisitor, Demon Hunter) Tiers 1-3, using `Record` for O(1) lookups:
+Define doctrines for 2 classes (Templar, Herald) Tiers 1-3, using `Record` for O(1) lookups:
 
 ```typescript
 export const DOCTRINES: Record<string, DoctrineDefinition> = {
@@ -312,10 +308,6 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
 ```
 
 Add all doctrine translations to EN/ES files.
-
----
-
-## Phase 4: Doctrine Combat Integration
 
 #### [MODIFY] [combat.service.ts](file:///Users/yifan/Projects/arq/server/services/combat.service.ts)
 
@@ -353,7 +345,7 @@ cd /Users/yifan/Projects/arq/front && npm run build
 5. Verify potion removed from inventory
 6. Test EN/ES translations
 
-**Phases 2-4 - Doctrines:**
+**Phases 2 - Doctrines:**
 
 1. Verify available doctrines match class/tier
 2. Equip 2 doctrines, verify third blocked

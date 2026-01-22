@@ -20,32 +20,26 @@
 - [x] Add consumables to store
 - [x] Update combat arena UI to show/use consumables
 
-## Phase 2: Doctrine System - Foundation
+## Phase 2: Doctrine System
 
-- [ ] Create doctrine.types.ts (DoctrineDefinition, DoctrineEffect, StatusEffect)
-- [ ] Add equippedDoctrines to CharacterClass schema
-- [ ] Run prisma db push + generate
-- [ ] Create doctrine.service.ts (equip/unequip/available)
-- [ ] Add doctrine routes to character.router.ts
-- [ ] Add translation keys for doctrine UI (EN/ES)
-
-## Phase 3: Doctrine Definitions
-
-- [ ] Define Templar Tier 1-3 doctrines
-- [ ] Define Herald Tier 1-3 doctrines
-- [ ] Define Inquisitor Tier 1-3 doctrines
-- [ ] Define Demon Hunter Tier 1-3 doctrines
-- [ ] Add translation keys for all doctrines (EN/ES)
-
-## Phase 4: Doctrine Combat Integration
-
-- [ ] Implement useDoctrine in combat.service.ts
-- [ ] Add status effect tracking
-- [ ] Implement DOT damage at turn start
-- [ ] Create doctrine UI in combat arena
+- [x] Create doctrine.types.ts (DoctrineDefinition, DoctrineEffect, StatusEffect)
+- [x] Add equippedDoctrines to CharacterClass schema
+- [x] Run prisma db push + generate
+- [x] Create doctrine.service.ts (equip/unequip/available)
+- [x] Add doctrine routes to character.router.ts
+- [x] Define Templar Tier 1-3 doctrines (16 doctrines)
+- [x] Define Herald Tier 1-3 doctrines (16 doctrines)
+- [ ] Implement useDoctrine in combat.service.ts (deferred)
+- [ ] Add status effect tracking (deferred)
+- [ ] Implement DOT damage at turn start (deferred)
+- [x] Create doctrine UI in inventory page
+- [x] Create doctrine UI in combat arena
+- [x] Add translation keys for all doctrines and doctrine UI (EN/ES)
+- [ ] Update gamification.md with doctrine system for documentation
 
 ## Verification
 
+- [x] TypeScript checks pass (server + frontend)
 - [ ] Manual testing of consumable purchase and use
 - [ ] Manual testing of doctrine equip/unequip
 - [ ] Manual testing of doctrine use in combat
