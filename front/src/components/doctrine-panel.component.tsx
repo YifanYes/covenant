@@ -1,9 +1,9 @@
 import Button from '@/components/ui/button.component'
 import { cn } from '@/lib/cn.lib'
 import { queryClient, trpc } from '@/utils/trpc.utils'
+import { Loader, Trophy, Zap } from '@nsmr/pixelart-react'
 import type { DoctrineDefinition } from '@shared/types/doctrine.types'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Sparkles, Zap } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -16,6 +16,8 @@ interface DoctrinePanelProps {
   currentMana?: number
   // Callback when doctrine is used in combat
   onUseDoctrine?: (doctrine: DoctrineDefinition) => void
+  // Pending state for use action
+  isUsingDoctrine?: boolean
   className?: string
 }
 
@@ -24,6 +26,7 @@ export default function DoctrinePanel({
   showUseControls = false,
   currentMana = 0,
   onUseDoctrine,
+  isUsingDoctrine = false,
   className
 }: DoctrinePanelProps) {
   const { t } = useTranslation()
@@ -95,7 +98,7 @@ export default function DoctrinePanel({
         <div className='flex items-start justify-between gap-2'>
           <div className='flex-1'>
             <div className='flex items-center gap-2'>
-              {doctrine.isUltimate && <Sparkles className='h-4 w-4 text-amber-500' />}
+              {doctrine.isUltimate && <Trophy className='h-4 w-4 text-amber-500' />}
               <span className='font-medium'>{t(doctrine.nameKey)}</span>
             </div>
             <p className='text-muted-foreground mt-1 text-xs'>{t(doctrine.descriptionKey)}</p>
@@ -135,10 +138,10 @@ export default function DoctrinePanel({
                 variant='secondary'
                 size='sm'
                 onClick={() => handleUse(doctrine)}
-                disabled={!canUse}
-                className={cn(!canUse && 'opacity-50')}
+                disabled={!canUse || isUsingDoctrine}
+                className={cn((!canUse || isUsingDoctrine) && 'opacity-50')}
               >
-                {t('doctrines.use')}
+                {isUsingDoctrine ? <Loader className='h-3 w-3 animate-spin' /> : t('doctrines.use')}
               </Button>
             )}
           </div>

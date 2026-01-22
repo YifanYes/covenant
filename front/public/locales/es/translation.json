@@ -133,6 +133,8 @@
     "log": {
       "damage_to_enemy": "{{enemy}} recibe {{damage}} de daño",
       "damage_to_player": "Recibes {{damage}} de daño",
+      "doctrine_active": "Doctrina activa: {{effect}}",
+      "doctrine_effect": "Doctrina: {{doctrine}} aplica {{effect}}",
       "empty": "Sin eventos de combate aún",
       "enemy_attacks": "El enemigo ataca con {{hits}} impactos",
       "enemy_defeated": "¡{{enemy}} ha sido derrotado!",
@@ -140,7 +142,9 @@
       "mana_regen": "+{{mana}} maná regenerado",
       "player_attack": "Atacas con {{dice}} dados",
       "player_defends": "Bloqueas {{blocks}}",
-      "player_hits": "Consigues {{hits}} impactos"
+      "player_hits": "Consigues {{hits}} impactos",
+      "status_effect": "Efecto: {{effect}} sobre {{target}}",
+      "status_expired": "Efecto expirado: {{effect}}"
     },
     "no_attacks_yet": "Sin ataques aún",
     "no_dice": "Sin dados disponibles",
@@ -282,6 +286,277 @@
     }
   },
   "delete": "Eliminar",
+  "doctrines": {
+    "arcane_push": {
+      "description": "Anula el próximo ataque que recibas este turno.",
+      "flavor": "Necesito concentrarme, aléjate.",
+      "name": "Empuje Arcano"
+    },
+    "audacity": {
+      "description": "+2 dados de Potencia. Tu defensa se reduce a 0.",
+      "flavor": "Solo los que están dispuestos a morir merecen la victoria.",
+      "name": "Osadía"
+    },
+    "available": "Doctrinas Disponibles",
+    "battle_fervor": {
+      "description": "Recuperas 1 Herida por cada Impacto causado (máx 3).",
+      "flavor": "Tu dolor es mi fuerza.",
+      "name": "Fervor de Batalla"
+    },
+    "bite": {
+      "description": "Suma +1 Impacto garantizado si el ataque tiene éxito.",
+      "flavor": "El acero también sabe morder.",
+      "name": "Dentellada"
+    },
+    "black_hole": {
+      "description": "Ultimate. Todos los enemigos quedan Aturdidos y sufren 2 Heridas.",
+      "flavor": "Todo vuelve al origen, incluso tú.",
+      "name": "Agujero Negro"
+    },
+    "blinding_faith": {
+      "description": "Todos los enemigos pierden -2 dados de Potencia.",
+      "flavor": "Ante la luz absoluta, el mal no puede encontrar su objetivo.",
+      "name": "Fe Cegadora"
+    },
+    "blink": {
+      "description": "Evitas todo el daño de un ataque este turno.",
+      "flavor": "Estar aquí es solo una sugerencia.",
+      "name": "Parpadeo"
+    },
+    "bulwark": {
+      "description": "+1 dado de Defensa hasta tu próximo turno.",
+      "flavor": "Aquí trazamos la línea.",
+      "name": "Baluarte"
+    },
+    "challenge": {
+      "description": "El enemigo sufre -2 dados si ataca a otros.",
+      "flavor": "¡Enfréntate a mí, cobarde!",
+      "name": "Desafío"
+    },
+    "combustion": {
+      "description": "Aplica Quemadura al objetivo (1 daño al inicio de su turno).",
+      "flavor": "El fuego interior siempre acaba saliendo.",
+      "name": "Combustión"
+    },
+    "disintegration_ray": {
+      "description": "+5 Potencia. Si mata al objetivo, recuperas el maná.",
+      "flavor": "Solo queda ceniza donde hubo vida.",
+      "name": "Rayo Desintegrador"
+    },
+    "disruption_storm": {
+      "description": "Ultimate. Lanza 4 dados de Potencia contra hasta 2 enemigos.",
+      "flavor": "Un torbellino de acero y determinación.",
+      "name": "Tormenta de Disrupción"
+    },
+    "empty_equipped": "No tienes doctrinas equipadas",
+    "equip": "Equipar",
+    "equipped": "Doctrinas Equipadas",
+    "error": {
+      "equip": "Error al equipar doctrina",
+      "failed": "Error al usar la doctrina",
+      "not_enough_mana": "Maná insuficiente",
+      "unequip": "Error al desequipar doctrina",
+      "use": "Error al usar doctrina"
+    },
+    "fan_cut": {
+      "description": "Ataca a hasta 2 enemigos con tu fuerza actual.",
+      "flavor": "Rodeado es solo otra forma de decir objetivo rico.",
+      "name": "Corte en Abanico"
+    },
+    "fireball": {
+      "description": "Ataca a todos los enemigos y aplica Quemadura.",
+      "flavor": "Clásico, simple y devastador.",
+      "name": "Bola de Fuego"
+    },
+    "flaming_apotheosis": {
+      "description": "Si recibes daño, el atacante sufre 2 Heridas y Quemadura.",
+      "flavor": "Acércate y conoce el infierno.",
+      "name": "Apoteosis Llameante"
+    },
+    "fractal_invocation": {
+      "description": "50% de probabilidad de no recibir daño.",
+      "flavor": "La realidad es solo un patrón que se repite.",
+      "name": "Invocación de Fractales"
+    },
+    "fragility_curse": {
+      "description": "El objetivo reduce sus dados de Defensa en -2 por 2 turnos.",
+      "flavor": "Tu acero se vuelve cristal.",
+      "name": "Maldición de Fragilidad"
+    },
+    "glory_banner": {
+      "description": "+2 dados de Defensa durante 2 turnos.",
+      "flavor": "Bajo este símbolo, somos invencibles.",
+      "name": "Estandarte de Gloria"
+    },
+    "ice_lance": {
+      "description": "Si impacta, el objetivo queda Inmovilizado.",
+      "flavor": "El tiempo se detiene bajo el frío absoluto.",
+      "name": "Lanza de Hielo"
+    },
+    "igneous_cut": {
+      "description": "El ataque aplica Quemadura (1 daño por 2 turnos).",
+      "flavor": "Una herida que el alma no puede cerrar.",
+      "name": "Corte Ígneo"
+    },
+    "inspiration": {
+      "description": "Copia el valor de Ataque o Defensa del enemigo.",
+      "flavor": "Tu fuerza es mi mejor maestra.",
+      "name": "Inspiración"
+    },
+    "iron_bastion": {
+      "description": "Ultimate. Anula todos los Impactos recibidos este turno.",
+      "flavor": "Soy la muralla contra la que rompe el mar.",
+      "name": "Bastión de Hierro"
+    },
+    "judgment_aurora": {
+      "description": "Ultimate. Todos los éxitos cuentan como Críticos.",
+      "flavor": "La luz no deja sombras donde esconderse.",
+      "name": "Aurora del Juicio"
+    },
+    "karmic_retribution": {
+      "description": "El próximo ataque recibido se refleja al enemigo.",
+      "flavor": "Ojo por ojo, diente por diente.",
+      "name": "Retribución Kármica"
+    },
+    "kings_sword": {
+      "description": "Ultimate. Reduce el Umbral de Ataque a 2+ este turno.",
+      "flavor": "Por la gloria de los que nos precedieron.",
+      "name": "Espada del Rey"
+    },
+    "law_hammer": {
+      "description": "+2 Potencia. Si causa daño, el objetivo queda Aturdido.",
+      "flavor": "La justicia golpea una sola vez.",
+      "name": "Martillo de la Ley"
+    },
+    "light_shield": {
+      "description": "Reduce el Umbral de Defensa en 1 hasta el siguiente turno.",
+      "flavor": "La fe es el escudo más resistente.",
+      "name": "Escudo de Luz"
+    },
+    "lightning_burst": {
+      "description": "+2 dados de Potencia al siguiente ataque.",
+      "flavor": "El cielo no es el único que puede castigar.",
+      "name": "Estallido de Relámpagos"
+    },
+    "magic_nature": {
+      "chaos": "Caos",
+      "order": "Orden"
+    },
+    "mana_barrier": {
+      "description": "Anula el primer Impacto mágico recibido.",
+      "flavor": "La voluntad es un tejido impenetrable.",
+      "name": "Barrera de Maná"
+    },
+    "mana_cost": "Coste: {{cost}} Maná",
+    "max_equipped": "Solo puedes equipar 2 doctrinas",
+    "miraculous_protection": {
+      "description": "Anula 1 Impacto recibido en el turno actual.",
+      "flavor": "Nadie cae mientras yo siga en pie.",
+      "name": "Protección Milagrosa"
+    },
+    "no_doctrines": "No hay doctrinas disponibles",
+    "nullify": {
+      "description": "Elimina todos los efectos de estado perjudiciales.",
+      "flavor": "La lógica disipa el caos.",
+      "name": "Anular"
+    },
+    "oracle_eye": {
+      "description": "Reduce el Umbral de Magia en 1 para tu siguiente doctrina.",
+      "flavor": "Veo el fin antes de que empiece.",
+      "name": "Ojo del Oráculo"
+    },
+    "plasma_missile": {
+      "description": "Suma +4 dados de Potencia. Los 1 naturales te hieren.",
+      "flavor": "Poder puro, difícil de contener.",
+      "name": "Misil de Plasma"
+    },
+    "precise_strike": {
+      "description": "Los resultados de 5 y 6 cuentan como Críticos.",
+      "flavor": "Busca la grieta, no el golpe fuerte.",
+      "name": "Golpe Preciso"
+    },
+    "reckless_strike": {
+      "description": "Suma +2 dados de Potencia, pero tu Defensa se reduce a 0.",
+      "flavor": "Atacar sin miedo es la única forma de vencer.",
+      "name": "Golpe Temerario"
+    },
+    "righteous_charge": {
+      "description": "+2 dados de Potencia. Si impactas, el enemigo queda Aturdido.",
+      "flavor": "Abran paso a la sentencia del Rey.",
+      "name": "Carga Justiciera"
+    },
+    "shadow_step": {
+      "description": "Tu próximo ataque ignora la Defensa del enemigo.",
+      "flavor": "Estoy aquí, ahora estoy allá.",
+      "name": "Paso Sombrío"
+    },
+    "shield_bash": {
+      "description": "El enemigo sufre -1 dado de Defensa hasta su próximo turno.",
+      "flavor": "Atrás, bestia inmunda.",
+      "name": "Golpe de Escudo"
+    },
+    "shoulder_charge": {
+      "description": "+1 dado de Potencia. Si impactas, el enemigo queda Aturdido.",
+      "flavor": "Quítate de mi camino.",
+      "name": "Carga de Hombro"
+    },
+    "silence_vortex": {
+      "description": "El objetivo queda Aturdido.",
+      "flavor": "Tus palabras se pierden en el vacío.",
+      "name": "Vórtice de Silencio"
+    },
+    "stellar_collapse": {
+      "description": "Ultimate. Lanza 10 dados de Potencia. Los 6 generan impactos extra.",
+      "flavor": "El peso de una estrella muerta sobre tus hombros.",
+      "name": "Colapso Estelar"
+    },
+    "success": {
+      "equip": "¡Doctrina equipada!",
+      "unequip": "Doctrina desequipada",
+      "use": "¡Doctrina usada!",
+      "used": "¡Doctrina activada!"
+    },
+    "summary_execution": {
+      "description": "Mata instantáneamente a un enemigo con 4 Heridas o menos.",
+      "flavor": "Tu sentencia ha sido dictada.",
+      "name": "Ejecución Sumaria"
+    },
+    "temporal_prison": {
+      "description": "Ultimate. El objetivo queda Aturdido.",
+      "flavor": "Un momento eterno de nada absoluta.",
+      "name": "Prisión Temporal"
+    },
+    "tier_required": "Requiere Tier {{tier}}",
+    "title": "Doctrinas",
+    "transfusion": {
+      "description": "Sacrifica 2 Heridas para recuperar 6 de Maná.",
+      "flavor": "La magia fluye mejor cuando se mezcla con sangre.",
+      "name": "Transfusión"
+    },
+    "truth_blade": {
+      "description": "El siguiente ataque suma +1 dados de Potencia.",
+      "flavor": "La mentira se deshace ante el acero bendito.",
+      "name": "Filo de la Verdad"
+    },
+    "ultimate": "Ultimate",
+    "unbreakable_formation": {
+      "description": "Durante 2 turnos, reduces el daño recibido en 1 Herida.",
+      "flavor": "Ni un paso más. Este suelo es sagrado.",
+      "name": "Formación Inquebrantable"
+    },
+    "unequip": "Desequipar",
+    "unerring_dart": {
+      "description": "Causa 1 Herida automática ignorando defensa.",
+      "flavor": "No puedes esquivar lo inevitable.",
+      "name": "Dardo Infalible"
+    },
+    "use": "Usar",
+    "wrath_avatar": {
+      "description": "Ultimate. Todos los ataques son Críticos automáticos.",
+      "flavor": "Ya no soy un hombre, soy la tempestad.",
+      "name": "Avatar de la Ira"
+    }
+  },
   "enemies": {
     "alpha_werewolf": "Hombre Lobo Alfa",
     "armored_templar": "Templario Acorazado",
@@ -739,6 +1014,13 @@
     "success_title": "¡Cuenta creada!",
     "title": "Crear una cuenta en ARQ"
   },
+  "status_effects": {
+    "burning": "Quemadura",
+    "damage_negation": "Negación de Daño",
+    "doctrine_active": "Doctrina Activa",
+    "immobilized": "Inmovilizado",
+    "stunned": "Aturdido"
+  },
   "store": {
     "buy": "Comprar",
     "buying": "Comprando...",
@@ -863,274 +1145,5 @@
     "status_placeholder": "Estado de la tarea",
     "title": "Actualizar tarea",
     "title_placeholder": "Título de la tarea"
-  },
-  "doctrines": {
-    "title": "Doctrinas",
-    "available": "Doctrinas Disponibles",
-    "equipped": "Doctrinas Equipadas",
-    "max_equipped": "Solo puedes equipar 2 doctrinas",
-    "tier_required": "Requiere Tier {{tier}}",
-    "equip": "Equipar",
-    "unequip": "Desequipar",
-    "mana_cost": "Coste: {{cost}} Maná",
-    "ultimate": "Ultimate",
-    "no_doctrines": "No hay doctrinas disponibles",
-    "empty_equipped": "No tienes doctrinas equipadas",
-    "use": "Usar",
-    "error": {
-      "equip": "Error al equipar doctrina",
-      "unequip": "Error al desequipar doctrina",
-      "use": "Error al usar doctrina",
-      "not_enough_mana": "Maná insuficiente"
-    },
-    "success": {
-      "equip": "¡Doctrina equipada!",
-      "unequip": "Doctrina desequipada",
-      "use": "¡Doctrina usada!"
-    },
-    "magic_nature": {
-      "order": "Orden",
-      "chaos": "Caos"
-    },
-    "truth_blade": {
-      "name": "Filo de la Verdad",
-      "description": "El siguiente ataque suma +1 dados de Potencia.",
-      "flavor": "La mentira se deshace ante el acero bendito."
-    },
-    "miraculous_protection": {
-      "name": "Protección Milagrosa",
-      "description": "Anula 1 Impacto recibido en el turno actual.",
-      "flavor": "Nadie cae mientras yo siga en pie."
-    },
-    "shield_bash": {
-      "name": "Golpe de Escudo",
-      "description": "El enemigo sufre -1 dado de Defensa hasta su próximo turno.",
-      "flavor": "Atrás, bestia inmunda."
-    },
-    "challenge": {
-      "name": "Desafío",
-      "description": "El enemigo sufre -2 dados si ataca a otros.",
-      "flavor": "¡Enfréntate a mí, cobarde!"
-    },
-    "igneous_cut": {
-      "name": "Corte Ígneo",
-      "description": "El ataque aplica Quemadura (1 daño por 2 turnos).",
-      "flavor": "Una herida que el alma no puede cerrar."
-    },
-    "reckless_strike": {
-      "name": "Golpe Temerario",
-      "description": "Suma +2 dados de Potencia, pero tu Defensa se reduce a 0.",
-      "flavor": "Atacar sin miedo es la única forma de vencer."
-    },
-    "bite": {
-      "name": "Dentellada",
-      "description": "Suma +1 Impacto garantizado si el ataque tiene éxito.",
-      "flavor": "El acero también sabe morder."
-    },
-    "shoulder_charge": {
-      "name": "Carga de Hombro",
-      "description": "+1 dado de Potencia. Si impactas, el enemigo queda Aturdido.",
-      "flavor": "Quítate de mi camino."
-    },
-    "light_shield": {
-      "name": "Escudo de Luz",
-      "description": "Reduce el Umbral de Defensa en 1 hasta el siguiente turno.",
-      "flavor": "La fe es el escudo más resistente."
-    },
-    "righteous_charge": {
-      "name": "Carga Justiciera",
-      "description": "+2 dados de Potencia. Si impactas, el enemigo queda Aturdido.",
-      "flavor": "Abran paso a la sentencia del Rey."
-    },
-    "unbreakable_formation": {
-      "name": "Formación Inquebrantable",
-      "description": "Durante 2 turnos, reduces el daño recibido en 1 Herida.",
-      "flavor": "Ni un paso más. Este suelo es sagrado."
-    },
-    "bulwark": {
-      "name": "Baluarte",
-      "description": "+1 dado de Defensa hasta tu próximo turno.",
-      "flavor": "Aquí trazamos la línea."
-    },
-    "precise_strike": {
-      "name": "Golpe Preciso",
-      "description": "Los resultados de 5 y 6 cuentan como Críticos.",
-      "flavor": "Busca la grieta, no el golpe fuerte."
-    },
-    "battle_fervor": {
-      "name": "Fervor de Batalla",
-      "description": "Recuperas 1 Herida por cada Impacto causado (máx 3).",
-      "flavor": "Tu dolor es mi fuerza."
-    },
-    "audacity": {
-      "name": "Osadía",
-      "description": "+2 dados de Potencia. Tu defensa se reduce a 0.",
-      "flavor": "Solo los que están dispuestos a morir merecen la victoria."
-    },
-    "fan_cut": {
-      "name": "Corte en Abanico",
-      "description": "Ataca a hasta 2 enemigos con tu fuerza actual.",
-      "flavor": "Rodeado es solo otra forma de decir objetivo rico."
-    },
-    "iron_bastion": {
-      "name": "Bastión de Hierro",
-      "description": "Ultimate. Anula todos los Impactos recibidos este turno.",
-      "flavor": "Soy la muralla contra la que rompe el mar."
-    },
-    "kings_sword": {
-      "name": "Espada del Rey",
-      "description": "Ultimate. Reduce el Umbral de Ataque a 2+ este turno.",
-      "flavor": "Por la gloria de los que nos precedieron."
-    },
-    "law_hammer": {
-      "name": "Martillo de la Ley",
-      "description": "+2 Potencia. Si causa daño, el objetivo queda Aturdido.",
-      "flavor": "La justicia golpea una sola vez."
-    },
-    "glory_banner": {
-      "name": "Estandarte de Gloria",
-      "description": "+2 dados de Defensa durante 2 turnos.",
-      "flavor": "Bajo este símbolo, somos invencibles."
-    },
-    "disruption_storm": {
-      "name": "Tormenta de Disrupción",
-      "description": "Ultimate. Lanza 4 dados de Potencia contra hasta 2 enemigos.",
-      "flavor": "Un torbellino de acero y determinación."
-    },
-    "wrath_avatar": {
-      "name": "Avatar de la Ira",
-      "description": "Ultimate. Todos los ataques son Críticos automáticos.",
-      "flavor": "Ya no soy un hombre, soy la tempestad."
-    },
-    "karmic_retribution": {
-      "name": "Retribución Kármica",
-      "description": "El próximo ataque recibido se refleja al enemigo.",
-      "flavor": "Ojo por ojo, diente por diente."
-    },
-    "summary_execution": {
-      "name": "Ejecución Sumaria",
-      "description": "Mata instantáneamente a un enemigo con 4 Heridas o menos.",
-      "flavor": "Tu sentencia ha sido dictada."
-    },
-    "ice_lance": {
-      "name": "Lanza de Hielo",
-      "description": "Si impacta, el objetivo queda Inmovilizado.",
-      "flavor": "El tiempo se detiene bajo el frío absoluto."
-    },
-    "mana_barrier": {
-      "name": "Barrera de Maná",
-      "description": "Anula el primer Impacto mágico recibido.",
-      "flavor": "La voluntad es un tejido impenetrable."
-    },
-    "arcane_push": {
-      "name": "Empuje Arcano",
-      "description": "Anula el próximo ataque que recibas este turno.",
-      "flavor": "Necesito concentrarme, aléjate."
-    },
-    "unerring_dart": {
-      "name": "Dardo Infalible",
-      "description": "Causa 1 Herida automática ignorando defensa.",
-      "flavor": "No puedes esquivar lo inevitable."
-    },
-    "combustion": {
-      "name": "Combustión",
-      "description": "Aplica Quemadura al objetivo (1 daño al inicio de su turno).",
-      "flavor": "El fuego interior siempre acaba saliendo."
-    },
-    "plasma_missile": {
-      "name": "Misil de Plasma",
-      "description": "Suma +4 dados de Potencia. Los 1 naturales te hieren.",
-      "flavor": "Poder puro, difícil de contener."
-    },
-    "lightning_burst": {
-      "name": "Estallido de Relámpagos",
-      "description": "+2 dados de Potencia al siguiente ataque.",
-      "flavor": "El cielo no es el único que puede castigar."
-    },
-    "shadow_step": {
-      "name": "Paso Sombrío",
-      "description": "Tu próximo ataque ignora la Defensa del enemigo.",
-      "flavor": "Estoy aquí, ahora estoy allá."
-    },
-    "oracle_eye": {
-      "name": "Ojo del Oráculo",
-      "description": "Reduce el Umbral de Magia en 1 para tu siguiente doctrina.",
-      "flavor": "Veo el fin antes de que empiece."
-    },
-    "blink": {
-      "name": "Parpadeo",
-      "description": "Evitas todo el daño de un ataque este turno.",
-      "flavor": "Estar aquí es solo una sugerencia."
-    },
-    "nullify": {
-      "name": "Anular",
-      "description": "Elimina todos los efectos de estado perjudiciales.",
-      "flavor": "La lógica disipa el caos."
-    },
-    "fractal_invocation": {
-      "name": "Invocación de Fractales",
-      "description": "50% de probabilidad de no recibir daño.",
-      "flavor": "La realidad es solo un patrón que se repite."
-    },
-    "silence_vortex": {
-      "name": "Vórtice de Silencio",
-      "description": "El objetivo queda Aturdido.",
-      "flavor": "Tus palabras se pierden en el vacío."
-    },
-    "transfusion": {
-      "name": "Transfusión",
-      "description": "Sacrifica 2 Heridas para recuperar 6 de Maná.",
-      "flavor": "La magia fluye mejor cuando se mezcla con sangre."
-    },
-    "fireball": {
-      "name": "Bola de Fuego",
-      "description": "Ataca a todos los enemigos y aplica Quemadura.",
-      "flavor": "Clásico, simple y devastador."
-    },
-    "fragility_curse": {
-      "name": "Maldición de Fragilidad",
-      "description": "El objetivo reduce sus dados de Defensa en -2 por 2 turnos.",
-      "flavor": "Tu acero se vuelve cristal."
-    },
-    "judgment_aurora": {
-      "name": "Aurora del Juicio",
-      "description": "Ultimate. Todos los éxitos cuentan como Críticos.",
-      "flavor": "La luz no deja sombras donde esconderse."
-    },
-    "temporal_prison": {
-      "name": "Prisión Temporal",
-      "description": "Ultimate. El objetivo queda Aturdido.",
-      "flavor": "Un momento eterno de nada absoluta."
-    },
-    "blinding_faith": {
-      "name": "Fe Cegadora",
-      "description": "Todos los enemigos pierden -2 dados de Potencia.",
-      "flavor": "Ante la luz absoluta, el mal no puede encontrar su objetivo."
-    },
-    "inspiration": {
-      "name": "Inspiración",
-      "description": "Copia el valor de Ataque o Defensa del enemigo.",
-      "flavor": "Tu fuerza es mi mejor maestra."
-    },
-    "stellar_collapse": {
-      "name": "Colapso Estelar",
-      "description": "Ultimate. Lanza 10 dados de Potencia. Los 6 generan impactos extra.",
-      "flavor": "El peso de una estrella muerta sobre tus hombros."
-    },
-    "black_hole": {
-      "name": "Agujero Negro",
-      "description": "Ultimate. Todos los enemigos quedan Aturdidos y sufren 2 Heridas.",
-      "flavor": "Todo vuelve al origen, incluso tú."
-    },
-    "flaming_apotheosis": {
-      "name": "Apoteosis Llameante",
-      "description": "Si recibes daño, el atacante sufre 2 Heridas y Quemadura.",
-      "flavor": "Acércate y conoce el infierno."
-    },
-    "disintegration_ray": {
-      "name": "Rayo Desintegrador",
-      "description": "+5 Potencia. Si mata al objetivo, recuperas el maná.",
-      "flavor": "Solo queda ceniza donde hubo vida."
-    }
   }
 }

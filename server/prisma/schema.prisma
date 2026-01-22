@@ -77,6 +77,8 @@ model ActivityParticipation {
   currentEnemyHealth    Int?        @default(0)
   currentEnemyMaxHealth Int?        @default(0)
   combatLog             Json?       @default("[]")
+  activeDoctrines       Json?       @default("{}")
+  enemyActiveDoctrines  Json?       @default("{}")
   activity              MapActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
   character             Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
 

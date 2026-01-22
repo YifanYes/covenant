@@ -12,6 +12,7 @@ import { useCombatTurn } from '@/hooks/use-combat-turn.hook'
 import { cn } from '@/lib/cn.lib'
 import ScrollArea from '@/ui/scroll-area.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
+import { Zap } from '@nsmr/pixelart-react'
 import { getConsumableById } from '@shared/constants/items'
 import {
   ItemType,
@@ -38,6 +39,8 @@ interface CombatArenaProps {
   isAttacking: boolean
   lastTurnResult: any
   className?: string
+  participationId?: string
+  activeDoctrines?: Record<string, any>
 }
 
 export default function CombatArena({
@@ -48,7 +51,9 @@ export default function CombatArena({
   onAttack,
   isAttacking,
   lastTurnResult,
-  className
+  className,
+  participationId,
+  activeDoctrines
 }: CombatArenaProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -98,9 +103,22 @@ export default function CombatArena({
         toast.success(t('consumables.mana_restored', { amount: data.manaRestored }))
       }
       queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpc.activity.list.queryKey() })
     },
     onError: () => {
       toast.error(t('consumables.error'))
+    }
+  })
+
+  const useDoctrineMutation = useMutation({
+    ...trpc.character.useDoctrine.mutationOptions(),
+    onSuccess: () => {
+      toast.success(t('doctrines.success.used'))
+      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpc.activity.list.queryKey() })
+    },
+    onError: (error) => {
+      toast.error(t('doctrines.error.failed'), { description: error.message })
     }
   })
 
@@ -195,6 +213,22 @@ export default function CombatArena({
                     />
                   </div>
                 </div>
+
+                {/* Active Status Effects */}
+                {activeDoctrines && Object.values(activeDoctrines).length > 0 && (
+                  <div className='flex flex-wrap gap-1 pt-1'>
+                    {Object.values(activeDoctrines).map((effect: any, i) => (
+                      <div
+                        key={i}
+                        className='flex items-center gap-1 rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-500'
+                      >
+                        <Zap className='h-3 w-3' />
+                        <span>{effect.effect}</span>
+                        <span className='opacity-70'>({effect.remainingTurns}t)</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -232,9 +266,14 @@ export default function CombatArena({
           showUseControls
           currentMana={currentClass?.mana ?? 0}
           onUseDoctrine={(doctrine) => {
-            // TODO: Implement doctrine usage in combat
-            toast.info(`Using ${doctrine.id} - Combat integration coming soon`)
+            if (!participationId) {
+              toast.error(t('combat.error.no_participation'))
+              return
+            }
+
+            useDoctrineMutation.mutate({ doctrineId: doctrine.id, participationId })
           }}
+          isUsingDoctrine={useDoctrineMutation.isPending}
         />
       </div>
 

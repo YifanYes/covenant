@@ -133,6 +133,8 @@
     "log": {
       "damage_to_enemy": "{{enemy}} takes {{damage}} damage",
       "damage_to_player": "You take {{damage}} damage",
+      "doctrine_active": "Doctrine active: {{effect}}",
+      "doctrine_effect": "Doctrine: {{doctrine}} applies {{effect}}",
       "empty": "No combat events yet",
       "enemy_attacks": "Enemy attacks with {{hits}} hits",
       "enemy_defeated": "{{enemy}} is defeated!",
@@ -140,7 +142,9 @@
       "mana_regen": "+{{mana}} mana regenerated",
       "player_attack": "You attack with {{dice}} dice",
       "player_defends": "You block {{blocks}}",
-      "player_hits": "You score {{hits}} hits"
+      "player_hits": "You score {{hits}} hits",
+      "status_effect": "Effect: {{effect}} on {{target}}",
+      "status_expired": "Effect expired: {{effect}}"
     },
     "no_attacks_yet": "No attacks yet",
     "no_dice": "No dice available",
@@ -282,6 +286,277 @@
     }
   },
   "delete": "Delete",
+  "doctrines": {
+    "arcane_push": {
+      "description": "Negate the next attack you receive this turn.",
+      "flavor": "I need to concentrate, step back.",
+      "name": "Arcane Push"
+    },
+    "audacity": {
+      "description": "+2 Power dice. Your defense becomes 0.",
+      "flavor": "Only those willing to die deserve victory.",
+      "name": "Audacity"
+    },
+    "available": "Available Doctrines",
+    "battle_fervor": {
+      "description": "Recover 1 Wound per hit caused (max 3).",
+      "flavor": "Your pain is my strength.",
+      "name": "Battle Fervor"
+    },
+    "bite": {
+      "description": "Adds +1 guaranteed hit if the attack succeeds.",
+      "flavor": "Steel also knows how to bite.",
+      "name": "Bite"
+    },
+    "black_hole": {
+      "description": "Ultimate. All enemies are Stunned and take 2 Wounds.",
+      "flavor": "Everything returns to the origin, even you.",
+      "name": "Black Hole"
+    },
+    "blinding_faith": {
+      "description": "All enemies lose -2 Power dice.",
+      "flavor": "Before absolute light, evil cannot find its target.",
+      "name": "Blinding Faith"
+    },
+    "blink": {
+      "description": "Avoid all damage from one attack this turn.",
+      "flavor": "Being here is just a suggestion.",
+      "name": "Blink"
+    },
+    "bulwark": {
+      "description": "+1 Defense die until your next turn.",
+      "flavor": "Here we draw the line.",
+      "name": "Bulwark"
+    },
+    "challenge": {
+      "description": "Enemy suffers -2 dice if attacking others.",
+      "flavor": "Face me, coward!",
+      "name": "Challenge"
+    },
+    "combustion": {
+      "description": "Apply Burning to target (1 damage at turn start).",
+      "flavor": "The inner fire always comes out.",
+      "name": "Combustion"
+    },
+    "disintegration_ray": {
+      "description": "+5 Power. If it kills target, refund mana.",
+      "flavor": "Only ash remains where there was life.",
+      "name": "Disintegration Ray"
+    },
+    "disruption_storm": {
+      "description": "Ultimate. Roll 4 Power dice against up to 2 enemies.",
+      "flavor": "A whirlwind of steel and determination.",
+      "name": "Disruption Storm"
+    },
+    "empty_equipped": "No doctrines equipped",
+    "equip": "Equip",
+    "equipped": "Equipped Doctrines",
+    "error": {
+      "equip": "Failed to equip doctrine",
+      "failed": "Failed to use doctrine",
+      "not_enough_mana": "Not enough mana",
+      "unequip": "Failed to unequip doctrine",
+      "use": "Failed to use doctrine"
+    },
+    "fan_cut": {
+      "description": "Attack up to 2 enemies with your current strength.",
+      "flavor": "Surrounded is just another way of saying target-rich.",
+      "name": "Fan Cut"
+    },
+    "fireball": {
+      "description": "Attack all enemies and apply Burning.",
+      "flavor": "Classic, simple, and devastating.",
+      "name": "Fireball"
+    },
+    "flaming_apotheosis": {
+      "description": "If you take damage, attacker takes 2 Wounds and Burning.",
+      "flavor": "Come closer and know hell.",
+      "name": "Flaming Apotheosis"
+    },
+    "fractal_invocation": {
+      "description": "50% chance to receive no damage.",
+      "flavor": "Reality is just a repeating pattern.",
+      "name": "Fractal Invocation"
+    },
+    "fragility_curse": {
+      "description": "Target reduces Defense dice by -2 for 2 turns.",
+      "flavor": "Your steel becomes glass.",
+      "name": "Fragility Curse"
+    },
+    "glory_banner": {
+      "description": "+2 Defense dice for 2 turns.",
+      "flavor": "Under this symbol, we are invincible.",
+      "name": "Glory Banner"
+    },
+    "ice_lance": {
+      "description": "If it hits, target is Immobilized.",
+      "flavor": "Time stops under absolute cold.",
+      "name": "Ice Lance"
+    },
+    "igneous_cut": {
+      "description": "Attack applies Burning (1 damage for 2 turns).",
+      "flavor": "A wound the soul cannot close.",
+      "name": "Igneous Cut"
+    },
+    "inspiration": {
+      "description": "Copy the enemy's Attack or Defense value.",
+      "flavor": "Your strength is my best teacher.",
+      "name": "Inspiration"
+    },
+    "iron_bastion": {
+      "description": "Ultimate. Negate all hits received this turn.",
+      "flavor": "I am the wall against which the sea breaks.",
+      "name": "Iron Bastion"
+    },
+    "judgment_aurora": {
+      "description": "Ultimate. All successes count as Criticals.",
+      "flavor": "Light leaves no shadows to hide in.",
+      "name": "Judgment Aurora"
+    },
+    "karmic_retribution": {
+      "description": "The next attack received is reflected to the enemy.",
+      "flavor": "An eye for an eye, a tooth for a tooth.",
+      "name": "Karmic Retribution"
+    },
+    "kings_sword": {
+      "description": "Ultimate. Reduce Attack Threshold to 2+ this turn.",
+      "flavor": "For the glory of those who came before.",
+      "name": "King's Sword"
+    },
+    "law_hammer": {
+      "description": "+2 Power. If it causes damage, target is Stunned.",
+      "flavor": "Justice strikes but once.",
+      "name": "Law Hammer"
+    },
+    "light_shield": {
+      "description": "Reduce Defense Threshold by 1 until next turn.",
+      "flavor": "Faith is the most resistant shield.",
+      "name": "Light Shield"
+    },
+    "lightning_burst": {
+      "description": "+2 Power dice to next attack.",
+      "flavor": "The sky is not the only one that can punish.",
+      "name": "Lightning Burst"
+    },
+    "magic_nature": {
+      "chaos": "Chaos",
+      "order": "Order"
+    },
+    "mana_barrier": {
+      "description": "Negate the first magic hit received.",
+      "flavor": "Will is an impenetrable weave.",
+      "name": "Mana Barrier"
+    },
+    "mana_cost": "Cost: {{cost}} Mana",
+    "max_equipped": "You can only equip 2 doctrines",
+    "miraculous_protection": {
+      "description": "Negate 1 hit received this turn.",
+      "flavor": "No one falls while I still stand.",
+      "name": "Miraculous Protection"
+    },
+    "no_doctrines": "No doctrines available",
+    "nullify": {
+      "description": "Remove all negative status effects.",
+      "flavor": "Logic dispels chaos.",
+      "name": "Nullify"
+    },
+    "oracle_eye": {
+      "description": "Reduce Magic Threshold by 1 for your next doctrine.",
+      "flavor": "I see the end before it begins.",
+      "name": "Oracle's Eye"
+    },
+    "plasma_missile": {
+      "description": "Gain +4 Power dice. Natural 1s hurt you.",
+      "flavor": "Pure power, hard to contain.",
+      "name": "Plasma Missile"
+    },
+    "precise_strike": {
+      "description": "Results of 5 and 6 count as Criticals.",
+      "flavor": "Look for the crack, not the heavy blow.",
+      "name": "Precise Strike"
+    },
+    "reckless_strike": {
+      "description": "Gain +2 Power dice, but your Defense becomes 0.",
+      "flavor": "Attacking without fear is the only way to win.",
+      "name": "Reckless Strike"
+    },
+    "righteous_charge": {
+      "description": "+2 Power dice. If you hit, enemy is Stunned.",
+      "flavor": "Make way for the King's sentence.",
+      "name": "Righteous Charge"
+    },
+    "shadow_step": {
+      "description": "Your next attack ignores enemy Defense.",
+      "flavor": "I'm here, now I'm there.",
+      "name": "Shadow Step"
+    },
+    "shield_bash": {
+      "description": "Enemy suffers -1 Defense die until their next turn.",
+      "flavor": "Back, foul beast.",
+      "name": "Shield Bash"
+    },
+    "shoulder_charge": {
+      "description": "+1 Power die. If you hit, enemy is Stunned.",
+      "flavor": "Get out of my way.",
+      "name": "Shoulder Charge"
+    },
+    "silence_vortex": {
+      "description": "Target is Stunned.",
+      "flavor": "Your words are lost in the void.",
+      "name": "Silence Vortex"
+    },
+    "stellar_collapse": {
+      "description": "Ultimate. Roll 10 Power dice. 6s generate extra hits.",
+      "flavor": "The weight of a dead star on your shoulders.",
+      "name": "Stellar Collapse"
+    },
+    "success": {
+      "equip": "Doctrine equipped!",
+      "unequip": "Doctrine unequipped",
+      "use": "Doctrine used!",
+      "used": "Doctrine activated!"
+    },
+    "summary_execution": {
+      "description": "Instantly kill an enemy with 4 Wounds or less.",
+      "flavor": "Your sentence has been passed.",
+      "name": "Summary Execution"
+    },
+    "temporal_prison": {
+      "description": "Ultimate. Target is Stunned.",
+      "flavor": "An eternal moment of absolute nothing.",
+      "name": "Temporal Prison"
+    },
+    "tier_required": "Requires Tier {{tier}}",
+    "title": "Doctrines",
+    "transfusion": {
+      "description": "Sacrifice 2 Wounds to restore 6 Mana.",
+      "flavor": "Magic flows better when mixed with blood.",
+      "name": "Transfusion"
+    },
+    "truth_blade": {
+      "description": "Your next attack gains +1 Power dice.",
+      "flavor": "Lies crumble before blessed steel.",
+      "name": "Truth Blade"
+    },
+    "ultimate": "Ultimate",
+    "unbreakable_formation": {
+      "description": "For 2 turns, reduce damage received by 1 Wound.",
+      "flavor": "Not one step more. This ground is sacred.",
+      "name": "Unbreakable Formation"
+    },
+    "unequip": "Unequip",
+    "unerring_dart": {
+      "description": "Cause 1 automatic Wound ignoring defense.",
+      "flavor": "You cannot dodge the inevitable.",
+      "name": "Unerring Dart"
+    },
+    "use": "Use",
+    "wrath_avatar": {
+      "description": "Ultimate. All attacks are automatic Criticals.",
+      "flavor": "I am no longer a man, I am the tempest.",
+      "name": "Avatar of Wrath"
+    }
+  },
   "enemies": {
     "alpha_werewolf": "Alpha Werewolf",
     "armored_templar": "Armored Templar",
@@ -739,6 +1014,13 @@
     "success_title": "Account created!",
     "title": "Create an ARQ account"
   },
+  "status_effects": {
+    "burning": "Burning",
+    "damage_negation": "Damage Negation",
+    "doctrine_active": "Doctrine Active",
+    "immobilized": "Immobilized",
+    "stunned": "Stunned"
+  },
   "store": {
     "buy": "Buy",
     "buying": "Buying...",
@@ -863,274 +1145,5 @@
     "status_placeholder": "Task status",
     "title": "Update task",
     "title_placeholder": "Task title"
-  },
-  "doctrines": {
-    "title": "Doctrines",
-    "available": "Available Doctrines",
-    "equipped": "Equipped Doctrines",
-    "max_equipped": "You can only equip 2 doctrines",
-    "tier_required": "Requires Tier {{tier}}",
-    "equip": "Equip",
-    "unequip": "Unequip",
-    "mana_cost": "Cost: {{cost}} Mana",
-    "ultimate": "Ultimate",
-    "no_doctrines": "No doctrines available",
-    "empty_equipped": "No doctrines equipped",
-    "use": "Use",
-    "error": {
-      "equip": "Failed to equip doctrine",
-      "unequip": "Failed to unequip doctrine",
-      "use": "Failed to use doctrine",
-      "not_enough_mana": "Not enough mana"
-    },
-    "success": {
-      "equip": "Doctrine equipped!",
-      "unequip": "Doctrine unequipped",
-      "use": "Doctrine used!"
-    },
-    "magic_nature": {
-      "order": "Order",
-      "chaos": "Chaos"
-    },
-    "truth_blade": {
-      "name": "Truth Blade",
-      "description": "Your next attack gains +1 Power dice.",
-      "flavor": "Lies crumble before blessed steel."
-    },
-    "miraculous_protection": {
-      "name": "Miraculous Protection",
-      "description": "Negate 1 hit received this turn.",
-      "flavor": "No one falls while I still stand."
-    },
-    "shield_bash": {
-      "name": "Shield Bash",
-      "description": "Enemy suffers -1 Defense die until their next turn.",
-      "flavor": "Back, foul beast."
-    },
-    "challenge": {
-      "name": "Challenge",
-      "description": "Enemy suffers -2 dice if attacking others.",
-      "flavor": "Face me, coward!"
-    },
-    "igneous_cut": {
-      "name": "Igneous Cut",
-      "description": "Attack applies Burning (1 damage for 2 turns).",
-      "flavor": "A wound the soul cannot close."
-    },
-    "reckless_strike": {
-      "name": "Reckless Strike",
-      "description": "Gain +2 Power dice, but your Defense becomes 0.",
-      "flavor": "Attacking without fear is the only way to win."
-    },
-    "bite": {
-      "name": "Bite",
-      "description": "Adds +1 guaranteed hit if the attack succeeds.",
-      "flavor": "Steel also knows how to bite."
-    },
-    "shoulder_charge": {
-      "name": "Shoulder Charge",
-      "description": "+1 Power die. If you hit, enemy is Stunned.",
-      "flavor": "Get out of my way."
-    },
-    "light_shield": {
-      "name": "Light Shield",
-      "description": "Reduce Defense Threshold by 1 until next turn.",
-      "flavor": "Faith is the most resistant shield."
-    },
-    "righteous_charge": {
-      "name": "Righteous Charge",
-      "description": "+2 Power dice. If you hit, enemy is Stunned.",
-      "flavor": "Make way for the King's sentence."
-    },
-    "unbreakable_formation": {
-      "name": "Unbreakable Formation",
-      "description": "For 2 turns, reduce damage received by 1 Wound.",
-      "flavor": "Not one step more. This ground is sacred."
-    },
-    "bulwark": {
-      "name": "Bulwark",
-      "description": "+1 Defense die until your next turn.",
-      "flavor": "Here we draw the line."
-    },
-    "precise_strike": {
-      "name": "Precise Strike",
-      "description": "Results of 5 and 6 count as Criticals.",
-      "flavor": "Look for the crack, not the heavy blow."
-    },
-    "battle_fervor": {
-      "name": "Battle Fervor",
-      "description": "Recover 1 Wound per hit caused (max 3).",
-      "flavor": "Your pain is my strength."
-    },
-    "audacity": {
-      "name": "Audacity",
-      "description": "+2 Power dice. Your defense becomes 0.",
-      "flavor": "Only those willing to die deserve victory."
-    },
-    "fan_cut": {
-      "name": "Fan Cut",
-      "description": "Attack up to 2 enemies with your current strength.",
-      "flavor": "Surrounded is just another way of saying target-rich."
-    },
-    "iron_bastion": {
-      "name": "Iron Bastion",
-      "description": "Ultimate. Negate all hits received this turn.",
-      "flavor": "I am the wall against which the sea breaks."
-    },
-    "kings_sword": {
-      "name": "King's Sword",
-      "description": "Ultimate. Reduce Attack Threshold to 2+ this turn.",
-      "flavor": "For the glory of those who came before."
-    },
-    "law_hammer": {
-      "name": "Law Hammer",
-      "description": "+2 Power. If it causes damage, target is Stunned.",
-      "flavor": "Justice strikes but once."
-    },
-    "glory_banner": {
-      "name": "Glory Banner",
-      "description": "+2 Defense dice for 2 turns.",
-      "flavor": "Under this symbol, we are invincible."
-    },
-    "disruption_storm": {
-      "name": "Disruption Storm",
-      "description": "Ultimate. Roll 4 Power dice against up to 2 enemies.",
-      "flavor": "A whirlwind of steel and determination."
-    },
-    "wrath_avatar": {
-      "name": "Avatar of Wrath",
-      "description": "Ultimate. All attacks are automatic Criticals.",
-      "flavor": "I am no longer a man, I am the tempest."
-    },
-    "karmic_retribution": {
-      "name": "Karmic Retribution",
-      "description": "The next attack received is reflected to the enemy.",
-      "flavor": "An eye for an eye, a tooth for a tooth."
-    },
-    "summary_execution": {
-      "name": "Summary Execution",
-      "description": "Instantly kill an enemy with 4 Wounds or less.",
-      "flavor": "Your sentence has been passed."
-    },
-    "ice_lance": {
-      "name": "Ice Lance",
-      "description": "If it hits, target is Immobilized.",
-      "flavor": "Time stops under absolute cold."
-    },
-    "mana_barrier": {
-      "name": "Mana Barrier",
-      "description": "Negate the first magic hit received.",
-      "flavor": "Will is an impenetrable weave."
-    },
-    "arcane_push": {
-      "name": "Arcane Push",
-      "description": "Negate the next attack you receive this turn.",
-      "flavor": "I need to concentrate, step back."
-    },
-    "unerring_dart": {
-      "name": "Unerring Dart",
-      "description": "Cause 1 automatic Wound ignoring defense.",
-      "flavor": "You cannot dodge the inevitable."
-    },
-    "combustion": {
-      "name": "Combustion",
-      "description": "Apply Burning to target (1 damage at turn start).",
-      "flavor": "The inner fire always comes out."
-    },
-    "plasma_missile": {
-      "name": "Plasma Missile",
-      "description": "Gain +4 Power dice. Natural 1s hurt you.",
-      "flavor": "Pure power, hard to contain."
-    },
-    "lightning_burst": {
-      "name": "Lightning Burst",
-      "description": "+2 Power dice to next attack.",
-      "flavor": "The sky is not the only one that can punish."
-    },
-    "shadow_step": {
-      "name": "Shadow Step",
-      "description": "Your next attack ignores enemy Defense.",
-      "flavor": "I'm here, now I'm there."
-    },
-    "oracle_eye": {
-      "name": "Oracle's Eye",
-      "description": "Reduce Magic Threshold by 1 for your next doctrine.",
-      "flavor": "I see the end before it begins."
-    },
-    "blink": {
-      "name": "Blink",
-      "description": "Avoid all damage from one attack this turn.",
-      "flavor": "Being here is just a suggestion."
-    },
-    "nullify": {
-      "name": "Nullify",
-      "description": "Remove all negative status effects.",
-      "flavor": "Logic dispels chaos."
-    },
-    "fractal_invocation": {
-      "name": "Fractal Invocation",
-      "description": "50% chance to receive no damage.",
-      "flavor": "Reality is just a repeating pattern."
-    },
-    "silence_vortex": {
-      "name": "Silence Vortex",
-      "description": "Target is Stunned.",
-      "flavor": "Your words are lost in the void."
-    },
-    "transfusion": {
-      "name": "Transfusion",
-      "description": "Sacrifice 2 Wounds to restore 6 Mana.",
-      "flavor": "Magic flows better when mixed with blood."
-    },
-    "fireball": {
-      "name": "Fireball",
-      "description": "Attack all enemies and apply Burning.",
-      "flavor": "Classic, simple, and devastating."
-    },
-    "fragility_curse": {
-      "name": "Fragility Curse",
-      "description": "Target reduces Defense dice by -2 for 2 turns.",
-      "flavor": "Your steel becomes glass."
-    },
-    "judgment_aurora": {
-      "name": "Judgment Aurora",
-      "description": "Ultimate. All successes count as Criticals.",
-      "flavor": "Light leaves no shadows to hide in."
-    },
-    "temporal_prison": {
-      "name": "Temporal Prison",
-      "description": "Ultimate. Target is Stunned.",
-      "flavor": "An eternal moment of absolute nothing."
-    },
-    "blinding_faith": {
-      "name": "Blinding Faith",
-      "description": "All enemies lose -2 Power dice.",
-      "flavor": "Before absolute light, evil cannot find its target."
-    },
-    "inspiration": {
-      "name": "Inspiration",
-      "description": "Copy the enemy's Attack or Defense value.",
-      "flavor": "Your strength is my best teacher."
-    },
-    "stellar_collapse": {
-      "name": "Stellar Collapse",
-      "description": "Ultimate. Roll 10 Power dice. 6s generate extra hits.",
-      "flavor": "The weight of a dead star on your shoulders."
-    },
-    "black_hole": {
-      "name": "Black Hole",
-      "description": "Ultimate. All enemies are Stunned and take 2 Wounds.",
-      "flavor": "Everything returns to the origin, even you."
-    },
-    "flaming_apotheosis": {
-      "name": "Flaming Apotheosis",
-      "description": "If you take damage, attacker takes 2 Wounds and Burning.",
-      "flavor": "Come closer and know hell."
-    },
-    "disintegration_ray": {
-      "name": "Disintegration Ray",
-      "description": "+5 Power. If it kills target, refund mana.",
-      "flavor": "Only ash remains where there was life."
-    }
   }
 }

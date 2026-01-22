@@ -28,7 +28,9 @@ export const StatusEffect = {
   // Target takes 1 holy damage at start of turn (affects demons)
   PURIFIED: 'PURIFIED',
   // Target takes 2 damage at start of turn
-  POISONED: 'POISONED'
+  POISONED: 'POISONED',
+  // Placeholder for active doctrines with immediate effects
+  DOCTRINE_ACTIVE: 'DOCTRINE_ACTIVE'
 } as const
 export type StatusEffect = (typeof StatusEffect)[keyof typeof StatusEffect]
 
@@ -71,11 +73,11 @@ export interface ActiveStatusEffect {
 
 export interface CombatDoctrineState {
   equippedDoctrines: string[]
-  activeEffects: ActiveStatusEffect[]
+  activeEffects: Record<string, ActiveStatusEffect>
   doctrinesUsedThisTurn: string[]
 }
 
 export interface EnemyStatusState {
   enemyId: string
-  activeEffects: ActiveStatusEffect[]
+  activeEffects: Record<string, ActiveStatusEffect>
 }

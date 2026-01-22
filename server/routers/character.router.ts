@@ -5,7 +5,8 @@ import {
   switchClassSchema,
   unequipDoctrineSchema,
   unequipItemSchema,
-  useConsumableSchema
+  useConsumableSchema,
+  useDoctrineSchema
 } from '@shared/schemas/character.schemas'
 import { protectedProcedure, t } from '../trpc'
 
@@ -61,5 +62,9 @@ export const characterRouter = t.router({
 
   unequipDoctrine: protectedProcedure.input(unequipDoctrineSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.character.unequipDoctrine(ctx.user.id, input.doctrineId)
+  }),
+
+  useDoctrine: protectedProcedure.input(useDoctrineSchema).mutation(async ({ ctx, input }) => {
+    return ctx.services.combat.useDoctrine(ctx.user.id, input.doctrineId, input.participationId)
   })
 })

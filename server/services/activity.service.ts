@@ -154,7 +154,7 @@ export class ActivityService {
     }
 
     // Resolve combat against currentEnemy
-    const result = this.combatService.resolveTurn({
+    const result = await this.combatService.resolveTurn({
       attackRolls,
       defenseRolls,
       targetEnemyId: enemyId,
@@ -166,12 +166,14 @@ export class ActivityService {
       weaponDamageType,
       weaponSpeed,
       enemy: currentEnemy,
-      tier: currentClass.tier
+      participationId: participation.id
     })
 
     // Update player health and mana if changed
-    if (result.damageToPlayer > 0 || result.manaRegenerated > 0) {
-      const newPlayerHealth = Math.max(0, currentClass.health - result.damageToPlayer)
+    if (result.damageToPlayer > 0 || result.manaRegenerated > 0 || result.healthRestored > 0) {
+      // Calculate net health change: healing - damage
+      const healthChange = result.healthRestored - result.damageToPlayer
+      const newPlayerHealth = Math.max(0, Math.min(currentClass.maxHealth, currentClass.health + healthChange))
       const newPlayerMana = Math.min(currentClass.maxMana, currentClass.mana + result.manaRegenerated)
 
       await this.characterService.updateHealth(currentClass.id, newPlayerHealth, newPlayerMana)

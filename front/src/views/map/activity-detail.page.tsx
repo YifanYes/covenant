@@ -274,6 +274,8 @@ export default function ActivityDetailPage() {
             onAttack={handleAttack}
             isAttacking={resolveTurnMutation.isPending}
             lastTurnResult={lastTurnResult}
+            participationId={participation?.id}
+            activeDoctrines={participation?.activeDoctrines as Record<string, any>}
           />
         )}
       </div>
