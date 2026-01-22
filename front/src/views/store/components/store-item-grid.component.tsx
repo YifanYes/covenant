@@ -8,7 +8,9 @@ interface StoreItemGridProps {
   selectedIds: Set<string>
   availableGold: number
   characterTier: number
+  consumableQuantities: Record<string, number>
   onToggle: (itemId: string) => void
+  onQuantityChange: (itemId: string, quantity: number) => void
 }
 
 export default function StoreItemGrid({
@@ -16,13 +18,18 @@ export default function StoreItemGrid({
   selectedIds,
   availableGold,
   characterTier,
-  onToggle
+  consumableQuantities,
+  onToggle,
+  onQuantityChange
 }: StoreItemGridProps) {
   const { t } = useTranslation()
   const sortedTiers = Object.entries(itemsByTier).sort(([a], [b]) => parseInt(a) - parseInt(b))
   const isEmpty = sortedTiers.length === 0
 
-  const canAfford = (price: number) => availableGold >= price
+  const canAfford = (itemId: string, price: number) => {
+    const currentQuantity = consumableQuantities[itemId] || 1
+    return availableGold >= price || (selectedIds.has(itemId) && availableGold + price * currentQuantity >= price)
+  }
 
   return (
     <ScrollArea className='h-full pr-4 pb-2 pl-6'>
@@ -38,10 +45,12 @@ export default function StoreItemGrid({
                   key={item.id}
                   item={item}
                   isSelected={selectedIds.has(item.id)}
-                  canAfford={canAfford(item.price)}
+                  canAfford={canAfford(item.id, item.price)}
                   isTierRestricted={item.tier > characterTier}
                   characterTier={characterTier}
+                  quantity={consumableQuantities[item.id] || 1}
                   onToggle={() => onToggle(item.id)}
+                  onQuantityChange={(q) => onQuantityChange(item.id, q)}
                 />
               ))}
             </div>

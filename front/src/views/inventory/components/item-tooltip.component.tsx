@@ -10,8 +10,8 @@ interface ItemTooltipProps {
 export default function ItemTooltip({ item, children }: ItemTooltipProps) {
   const { t } = useTranslation()
 
-  const itemName = t(`items.${item.definitionId}.name`, { defaultValue: item.name })
-  const itemDescription = t(`items.${item.definitionId}.description`, { defaultValue: item.description || '' })
+  const itemName = t(item.nameKey)
+  const itemDescription = item.descriptionKey ? t(item.descriptionKey) : ''
   const itemImagePath = `/assets/items/${item.definitionId}.png`
 
   return (

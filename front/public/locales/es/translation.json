@@ -182,6 +182,14 @@
     "description": "Esta acción es irreversible. Esto eliminará permanentemente el hábito.",
     "title": "¿Estás seguro de que quieres eliminar el hábito?"
   },
+  "consumables": {
+    "error": "Error al usar el consumible",
+    "health_restored": "+{{amount}} Vidas restauradas",
+    "mana_restored": "+{{amount}} Maná restaurado",
+    "success": "¡Consumible usado!",
+    "title": "Consumibles",
+    "use": "Usar"
+  },
   "copy_suffix": "(Copia)",
   "create": "Crear",
   "create_area_dialog": {
@@ -502,6 +510,10 @@
       "description": "Arma brutal. Los éxitos críticos (6 natural) ignoran 1 dado de defensa del enemigo.",
       "name": "Gran Hacha de Guerra"
     },
+    "health_potion": {
+      "description": "Restaura 3 Vidas.",
+      "name": "Poción de Salud"
+    },
     "infantry_sword": {
       "description": "Acero funcional. Sencillo, brillante y letal.",
       "name": "Espada de Infantería"
@@ -509,6 +521,10 @@
     "lucerne_hammer": {
       "description": "Arma de dos manos diseñada para destrozar huesos y penetrar armaduras.",
       "name": "Martillo de Lucerna"
+    },
+    "mana_potion": {
+      "description": "Restaura 3 de Maná.",
+      "name": "Poción de Maná"
     },
     "marksman_musket": {
       "description": "Cañón estriado de alta precisión para distancias extremas.",

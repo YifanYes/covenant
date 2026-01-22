@@ -21,10 +21,12 @@ export default function InventoryGrid({ character, selectedItemId, onItemClick }
     const equippedDefinitionIds = new Set(character?.loadout?.map((item) => item.definitionId) || [])
 
     // Create inventory items from tier 1 definitions (these use definitionId as id for stable keys)
-    const tier1Items = TIER_1_ITEMS.map((def) => ({
-      ...createInventoryItem(def),
-      id: def.id
-    })).filter((item) => !equippedDefinitionIds.has(item.definitionId))
+    const tier1Items = Object.values(TIER_1_ITEMS)
+      .map((def) => ({
+        ...createInventoryItem(def),
+        id: def.id
+      }))
+      .filter((item) => !equippedDefinitionIds.has(item.definitionId))
 
     // Add purchased items from character inventory (excluding equipped)
     const purchasedItems = (character?.inventory || []).filter((item) => !equippedDefinitionIds.has(item.definitionId))

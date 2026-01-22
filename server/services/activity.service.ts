@@ -2,7 +2,7 @@ import { getEnemy } from '@shared/constants/enemies'
 import { getItemById, WeaponDamageType } from '@shared/constants/items'
 import type { CombatLogEntry, InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
-import { ACTIVITIES, ActivityDifficulty } from '../../shared/constants/activities'
+import { ActivityDifficulty, getActivityById } from '../../shared/constants/activities'
 import type { CharacterWithClasses } from '../../shared/types/character.types'
 import type { PrismaClient } from '../generated/prisma'
 import { ActivityRepository } from '../repositories/activity.repository'
@@ -31,7 +31,7 @@ export class ActivityService {
 
     return activities
       .map((activity) => {
-        const config = ACTIVITIES.find((a) => a.id === activity.activityId)
+        const config = getActivityById(activity.activityId)
         if (!config) return null
 
         const rawParticipation = characterId
@@ -59,7 +59,7 @@ export class ActivityService {
   }
 
   async joinActivity(activityId: string, characterId: string) {
-    const config = ACTIVITIES.find((a) => a.id === activityId)
+    const config = getActivityById(activityId)
     if (!config) throw new TRPCError({ code: 'NOT_FOUND', message: `Activity ${activityId} not found` })
 
     // Calculate target based on difficulty scaling
@@ -115,7 +115,7 @@ export class ActivityService {
     defenseRolls: number[],
     character: CharacterWithClasses
   ) {
-    const config = ACTIVITIES.find((a) => a.id === activityId)
+    const config = getActivityById(activityId)
     if (!config) throw new TRPCError({ code: 'NOT_FOUND', message: `Activity ${activityId} not found` })
 
     const currentClass = this.combatService.getCurrentClassOrThrow(character)

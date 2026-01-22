@@ -1,10 +1,12 @@
 import { Close, Money } from '@nsmr/pixelart-react'
 import type { ItemDefinition } from '@shared/constants/items'
 import { ItemRarity } from '@shared/types/gamification.types'
+import { useTranslation } from 'react-i18next'
 import StoreItemTooltip from './store-item-tooltip.component'
 
 interface CartItemProps {
   item: ItemDefinition
+  quantity?: number
   onRemove: () => void
 }
 
@@ -14,7 +16,12 @@ const rarityStyles: Record<ItemRarity, string> = {
   [ItemRarity.COMMON]: 'border-rarity-common/50'
 }
 
-export default function CartItem({ item, onRemove }: CartItemProps) {
+export default function CartItem({ item, quantity, onRemove }: CartItemProps) {
+  const { t } = useTranslation()
+  const displayName = t(item.nameKey)
+  const displayQuantity = quantity || 1
+  const totalPrice = item.price * displayQuantity
+
   return (
     <StoreItemTooltip item={item}>
       <div
@@ -26,12 +33,15 @@ export default function CartItem({ item, onRemove }: CartItemProps) {
         >
           <Close className='text-destructive h-3 w-3' />
         </button>
-        <img src={`/assets/items/${item.id}.png`} alt={item.name} className='h-8 w-8 shrink-0 object-contain' />
+        <img src={`/assets/items/${item.id}.png`} alt={displayName} className='h-8 w-8 shrink-0 object-contain' />
         <div className='w-0 flex-1'>
-          <div className='truncate text-sm font-medium'>{item.name}</div>
+          <div className='truncate text-sm font-medium'>
+            {displayName}
+            {displayQuantity > 1 && <span className='text-muted-foreground ml-1'>×{displayQuantity}</span>}
+          </div>
           <div className='text-muted-foreground flex items-center gap-1 text-xs'>
             <Money className='h-3 w-3 text-yellow-500' />
-            {item.price}
+            {totalPrice}
           </div>
         </div>
       </div>

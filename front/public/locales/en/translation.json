@@ -182,6 +182,14 @@
     "description": "This action is irreversible. This will permanently delete the habit.",
     "title": "Are you sure you want to delete the habit?"
   },
+  "consumables": {
+    "error": "Failed to use consumable",
+    "health_restored": "+{{amount}} Health restored",
+    "mana_restored": "+{{amount}} Mana restored",
+    "success": "Consumable used!",
+    "title": "Consumables",
+    "use": "Use"
+  },
   "copy_suffix": "(Copy)",
   "create": "Create",
   "create_area_dialog": {
@@ -502,6 +510,10 @@
       "description": "Brutal weapon. Critical successes (natural 6) ignore 1 enemy defense die.",
       "name": "Great War Axe"
     },
+    "health_potion": {
+      "description": "Restores 3 Health.",
+      "name": "Health Potion"
+    },
     "infantry_sword": {
       "description": "Functional steel. Simple, shiny, and lethal.",
       "name": "Infantry Sword"
@@ -509,6 +521,10 @@
     "lucerne_hammer": {
       "description": "Two-handed weapon designed to crush bones and pierce armor.",
       "name": "Lucerne Hammer"
+    },
+    "mana_potion": {
+      "description": "Restores 3 Mana.",
+      "name": "Mana Potion"
     },
     "marksman_musket": {
       "description": "Rifled high-precision barrel for extreme distances.",

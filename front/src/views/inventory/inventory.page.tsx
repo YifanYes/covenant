@@ -1,3 +1,4 @@
+import OnboardingRedirect from '@/components/shared/onboarding-redirect'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { SlotType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -11,7 +12,6 @@ import LoadoutPanel from './components/loadout-panel.component'
 export default function AdventureInventory() {
   const { t } = useTranslation()
   const { data: characterData } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
-  const character = characterData as InventoryCharacter
 
   const equipMutation = useMutation({
     ...trpc.character.equipItem.mutationOptions(),
@@ -34,6 +34,12 @@ export default function AdventureInventory() {
       toast.error(t('inventory.error.unequip'))
     }
   })
+
+  if (!characterData) {
+    return <OnboardingRedirect />
+  }
+
+  const character = characterData as InventoryCharacter
 
   const handleEquipItem = (item: InventoryItem) => {
     equipMutation.mutate({ itemId: item.id })

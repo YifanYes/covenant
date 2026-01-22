@@ -1,6 +1,8 @@
+import OnboardingRedirect from '@/components/shared/onboarding-redirect'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import type { ItemDefinition } from '@shared/constants/items'
+import { ItemType } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -9,12 +11,14 @@ import CartPanel from './components/cart-panel.component'
 import StoreFilters from './components/store-filters.component'
 import StoreItemGrid from './components/store-item-grid.component'
 
-export default function StoreView() {
+function StoreContent() {
   const { t } = useTranslation()
   const { data: store } = useSuspenseQuery(trpc.store.list.queryOptions())
+
   const [tierFilter, setTierFilter] = useState<string>('all')
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [consumableQuantities, setConsumableQuantities] = useState<Record<string, number>>({})
 
   const storePurchaseMutation = useMutation({
     ...trpc.store.buy.mutationOptions(),
@@ -23,6 +27,7 @@ export default function StoreView() {
         description: `${result.purchasedItems.length} ${t('store.items_purchased')}`
       })
       setSelectedIds(new Set())
+      setConsumableQuantities({})
       queryClient.invalidateQueries({ queryKey: trpc.store.list.queryKey() })
       queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
     },
@@ -52,17 +57,38 @@ export default function StoreView() {
     () => store.items.filter((item) => selectedIds.has(item.id)),
     [store.items, selectedIds]
   )
-  const cartTotal = useMemo(() => selectedItems.reduce((sum, item) => sum + item.price, 0), [selectedItems])
+
+  const cartTotal = useMemo(() => {
+    return selectedItems.reduce((sum, item) => {
+      const quantity = item.type === ItemType.CONSUMABLE ? consumableQuantities[item.id] || 1 : 1
+      return sum + item.price * quantity
+    }, 0)
+  }, [selectedItems, consumableQuantities])
 
   const availableGold = store.gold - cartTotal
 
-  // Handlers
   const toggleItem = (itemId: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev)
-      next.has(itemId) ? next.delete(itemId) : next.add(itemId)
+      if (next.has(itemId)) {
+        next.delete(itemId)
+        setConsumableQuantities((q) => {
+          const newQ = { ...q }
+          delete newQ[itemId]
+          return newQ
+        })
+      } else {
+        next.add(itemId)
+      }
       return next
     })
+  }
+
+  const handleQuantityChange = (itemId: string, quantity: number) => {
+    setConsumableQuantities((prev) => ({
+      ...prev,
+      [itemId]: quantity
+    }))
   }
 
   const removeFromCart = (itemId: string) => {
@@ -71,11 +97,28 @@ export default function StoreView() {
       next.delete(itemId)
       return next
     })
+    setConsumableQuantities((q) => {
+      const newQ = { ...q }
+      delete newQ[itemId]
+      return newQ
+    })
   }
 
   const handleBuy = () => {
     if (selectedIds.size === 0) return
-    storePurchaseMutation.mutate({ itemIds: Array.from(selectedIds) })
+
+    // Expand consumable quantities into repeated item IDs
+    const itemIds: string[] = []
+    for (const itemId of selectedIds) {
+      const item = store.items.find((i) => i.id === itemId)
+      const quantity = item?.type === ItemType.CONSUMABLE ? consumableQuantities[itemId] || 1 : 1
+
+      for (let i = 0; i < quantity; i++) {
+        itemIds.push(itemId)
+      }
+    }
+
+    storePurchaseMutation.mutate({ itemIds })
   }
 
   return (
@@ -99,7 +142,9 @@ export default function StoreView() {
             selectedIds={selectedIds}
             availableGold={availableGold}
             characterTier={store.characterTier}
+            consumableQuantities={consumableQuantities}
             onToggle={toggleItem}
+            onQuantityChange={handleQuantityChange}
           />
         </CardContent>
       </Card>
@@ -110,9 +155,20 @@ export default function StoreView() {
         total={cartTotal}
         maxGold={store.gold}
         isLoading={storePurchaseMutation.isPending}
+        consumableQuantities={consumableQuantities}
         onRemove={removeFromCart}
         onBuy={handleBuy}
       />
     </div>
   )
+}
+
+export default function StoreView() {
+  const { data: characterData } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
+
+  if (!characterData) {
+    return <OnboardingRedirect />
+  }
+
+  return <StoreContent />
 }

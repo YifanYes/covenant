@@ -1,15 +1,18 @@
 import { DamageType, type EnemyTemplate, EnemyType, getEnemy } from '@shared/constants/enemies'
-import { WeaponDamageType } from '@shared/constants/items'
+import { getConsumableById, WeaponDamageType } from '@shared/constants/items'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import type {
   CombatLogEntry,
   CombatTurnResult,
   DiceRollResult,
   EnemyState,
+  InventoryItem,
   ResolveCombatParams
 } from '@shared/types/gamification.types'
-import { CombatLogType } from '@shared/types/gamification.types'
+import { CombatLogType, ItemType } from '@shared/types/gamification.types'
+import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '../generated/prisma'
+import { CharacterRepository } from '../repositories/character.repository'
 
 const ENEMY_DICE_BY_TYPE: Record<EnemyType, { defense: number; attack: number }> = {
   [EnemyType.BOSS]: { defense: 3, attack: 4 },
@@ -18,7 +21,11 @@ const ENEMY_DICE_BY_TYPE: Record<EnemyType, { defense: number; attack: number }>
 }
 
 export class CombatService {
-  constructor(_prisma: PrismaClient) {}
+  private characterRepository: CharacterRepository
+
+  constructor(prisma: PrismaClient) {
+    this.characterRepository = new CharacterRepository(prisma)
+  }
 
   private _resolvePlayerAttack(
     attackRolls: number[],
@@ -263,5 +270,56 @@ export class CombatService {
     const tier = currentClass?.tier || 1
     const diceBank = (character.data as any)?.diceBank || 0
     return { tier, diceBank }
+  }
+
+  async useConsumable(
+    userId: string,
+    consumableId: string
+  ): Promise<{ success: boolean; healthRestored?: number; manaRestored?: number }> {
+    const consumable = getConsumableById(consumableId)
+    if (!consumable) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Consumable ${consumableId} not found` })
+    }
+
+    const character = await this.characterRepository.findWithClassesOrThrow(userId)
+    const inventory = (character.inventory as unknown as InventoryItem[]) || []
+
+    const itemIndex = inventory.findIndex(
+      (item) => item.type === ItemType.CONSUMABLE && item.definitionId === consumableId
+    )
+    if (itemIndex === -1) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Consumable ${consumableId} not in inventory` })
+    }
+
+    const currentClass = this.getCurrentClassOrThrow(character)
+
+    let healthRestored = 0
+    let manaRestored = 0
+
+    if (consumable.effect.healHealth) {
+      healthRestored = Math.min(consumable.effect.healHealth, currentClass.maxHealth - currentClass.health)
+    }
+    if (consumable.effect.healMana) {
+      manaRestored = Math.min(consumable.effect.healMana, currentClass.maxMana - currentClass.mana)
+    }
+
+    const newHealth = currentClass.health + healthRestored
+    const newMana = currentClass.mana + manaRestored
+
+    await this.characterRepository.updateHealth(currentClass.id, newHealth, newMana)
+
+    const newInventory = [...inventory]
+    newInventory.splice(itemIndex, 1)
+    await this.characterRepository.updateInventoryAndLoadout(
+      character.id,
+      newInventory,
+      character.loadout as unknown as InventoryItem[]
+    )
+
+    return {
+      success: true,
+      healthRestored: healthRestored > 0 ? healthRestored : undefined,
+      manaRestored: manaRestored > 0 ? manaRestored : undefined
+    }
   }
 }
