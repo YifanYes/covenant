@@ -19,10 +19,10 @@ export default function UpcomingTasksComponent({ tasks }: UpcomingTasksComponent
       icon={CalendarMonth}
       iconColorClass='text-purple-500'
       className='lg:col-span-2'
-      contentClassName='grid gap-2 sm:grid-cols-1 rounded-md border p-4 pr-3 mx-6 h-[250px]'
+      contentClassName='grid gap-2 sm:grid-cols-1 rounded-md border p-4 pr-3 mx-6 h-[220px]'
     >
       {tasks && tasks.length > 0 ? (
-        <div className='scrollbar-thin scrollbar-thumb-muted h-[250px] space-y-2 overflow-y-auto pr-4'>
+        <div className='scrollbar-thin scrollbar-thumb-muted h-[220px] space-y-2 overflow-y-auto pr-4'>
           {[...tasks, ...tasks, ...tasks, ...tasks, ...tasks, ...tasks].map((task, index) => {
             const colorClass = task.color
               ? getColorClasses(task.color, { bg: 'bg-muted', text: 'text-muted-foreground' }).bg
