@@ -1,5 +1,6 @@
 import type { EnemyTemplate } from '../constants/enemies'
 import type { WeaponDamageType } from '../constants/items'
+import type { ActiveStatusEffect } from './doctrine.types'
 
 export const ItemType = {
   WEAPON_MELEE: 'WEAPON_MELEE',
@@ -55,9 +56,11 @@ export interface Enemy {
 // Enemy state for tracking during combat
 export interface EnemyState {
   id: string
-  enemyId: string
+  templateId: string
   currentHealth: number
   maxHealth: number
+  namePrefix?: string
+  nameSuffix?: string
 }
 
 // Combat log types
@@ -71,7 +74,10 @@ export const CombatLogType = {
   DAMAGE_TO_PLAYER: 'DAMAGE_TO_PLAYER',
   MANA_REGEN: 'MANA_REGEN',
   ENEMY_DEFEATED: 'ENEMY_DEFEATED',
-  PHASE_COMPLETE: 'PHASE_COMPLETE'
+  PHASE_COMPLETE: 'PHASE_COMPLETE',
+  STATUS_EFFECT: 'STATUS_EFFECT',
+  DOCTRINE_EFFECT: 'DOCTRINE_EFFECT',
+  STATUS_EXPIRED: 'STATUS_EXPIRED'
 } as const
 export type CombatLogType = (typeof CombatLogType)[keyof typeof CombatLogType]
 
@@ -108,7 +114,7 @@ export interface ResolveCombatParams {
   weaponDamageType: WeaponDamageType
   weaponSpeed: number
   enemy: EnemyTemplate
-  tier: number
+  participationId: string
 }
 
 export interface CombatTurnResult {
@@ -123,10 +129,16 @@ export interface CombatTurnResult {
   damageToEnemy: number
   damageToPlayer: number
   manaRegenerated: number
+  healthRestored: number
+  burningDamageToPlayer: number
+  burningDamageToEnemy: number
+  directDamageToEnemy: number
   targetEnemyId: string
   logEntries: CombatLogEntry[]
   playerWonInitiative: boolean
   criticalThreshold: number
+  updatedActiveDoctrines: Record<string, ActiveStatusEffect>
+  updatedEnemyActiveDoctrines: Record<string, ActiveStatusEffect>
 }
 
 // Character class info for inventory view
@@ -144,6 +156,7 @@ export interface InventoryCharacterClass {
   magicAtk: number
   magicDef: number
   manaRegen: number
+  equippedDoctrines: string[]
 }
 
 // Character data returned by getCurrentClass endpoint
@@ -162,3 +175,9 @@ export interface InventoryCharacter {
   loadout: InventoryItem[]
   classes: InventoryCharacterClass[]
 }
+
+export const CombatEnemyStatus = {
+  ACTIVE: 'ACTIVE',
+  DEFEATED: 'DEFEATED'
+} as const
+export type CombatEnemyStatus = (typeof CombatEnemyStatus)[keyof typeof CombatEnemyStatus]

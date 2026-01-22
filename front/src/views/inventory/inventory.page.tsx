@@ -1,3 +1,4 @@
+import DoctrinePanel from '@/components/doctrine-panel.component'
 import OnboardingRedirect from '@/components/shared/onboarding-redirect'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { SlotType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
@@ -56,7 +57,10 @@ export default function AdventureInventory() {
         <LoadoutPanel character={character} onUnequip={handleUnequipItem} />
         <CharacterStatus character={character} />
       </div>
-      <InventoryGrid character={character} onItemClick={handleEquipItem} />
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        <InventoryGrid character={character} onItemClick={handleEquipItem} />
+        <DoctrinePanel showEquipControls />
+      </div>
     </div>
   )
 }

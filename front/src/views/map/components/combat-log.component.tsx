@@ -33,6 +33,11 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
         return Battery
       case CombatLogType.PHASE_COMPLETE:
         return Flag
+      case CombatLogType.STATUS_EFFECT:
+      case CombatLogType.DOCTRINE_EFFECT:
+        return Zap
+      case CombatLogType.STATUS_EXPIRED:
+        return Shield
       default:
         return Zap
     }
@@ -58,6 +63,12 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
         return 'text-purple-500'
       case CombatLogType.PHASE_COMPLETE:
         return 'text-yellow-500'
+      case CombatLogType.STATUS_EFFECT:
+        return 'text-amber-500'
+      case CombatLogType.DOCTRINE_EFFECT:
+        return 'text-purple-500'
+      case CombatLogType.STATUS_EXPIRED:
+        return 'text-slate-400'
       default:
         return 'text-muted-foreground'
     }
@@ -86,6 +97,35 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
         return t('combat.log.mana_regen', { mana: data.mana })
       case CombatLogType.PHASE_COMPLETE:
         return t('combat.phase_complete')
+      case CombatLogType.STATUS_EFFECT: {
+        const effectKey = (data.effect as string).toLowerCase()
+        const targetKey = data.target === 'player' ? 'ti' : (data.target as string)
+
+        if (effectKey === 'doctrine_active') {
+          return t('combat.log.doctrine_active', {
+            effect: t(`status_effects.${effectKey}`, { defaultValue: effectKey })
+          })
+        }
+
+        return t('combat.log.status_effect', {
+          effect: t(`status_effects.${effectKey}`, { defaultValue: effectKey }),
+          target: targetKey === 'ti' ? 'ti' : t(targetKey)
+        })
+      }
+      case CombatLogType.DOCTRINE_EFFECT: {
+        const doctrineId = (data.doctrine as string)?.toLowerCase()
+        const effectName = (data.effect as string)?.toLowerCase()
+        return t('combat.log.doctrine_effect', {
+          doctrine: t(`doctrines.${doctrineId}.name`, { defaultValue: doctrineId }),
+          effect: t(`status_effects.${effectName}`, { defaultValue: effectName })
+        })
+      }
+      case CombatLogType.STATUS_EXPIRED: {
+        const effectKey = (data.effect as string).toLowerCase()
+        return t('combat.log.status_expired', {
+          effect: t(`status_effects.${effectKey}`, { defaultValue: effectKey })
+        })
+      }
       default:
         return JSON.stringify(data)
     }
