@@ -7,6 +7,8 @@ export type AreasDistributionDataItem = {
   name: string
   icon: string | null
   color: string | null
-  thisMonth: number
-  lastMonth: number
+  tasksThisMonth: number
+  tasksLastMonth: number
+  habitsThisMonth: number
+  habitsLastMonth: number
 }

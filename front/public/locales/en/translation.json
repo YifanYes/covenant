@@ -230,6 +230,7 @@
   },
   "dashboard": {
     "areas_distribution": {
+      "habits": "Habits",
       "last_month": "Last month",
       "no_data": "No tasks available",
       "tasks": "Tasks",
@@ -241,6 +242,8 @@
       "all_objectives_covered": "All objectives are covered!",
       "areas": "Areas",
       "days": "days",
+      "no_blindspots_line1": "All areas and objectives are on track",
+      "no_blindspots_line2": "Good job, keep it up!",
       "objectives": "Objectives",
       "title": "The Blindspot",
       "without_activity": "+2 weeks w/o activity"
@@ -259,7 +262,8 @@
       "completion": "Completion",
       "no_habits": "No habits",
       "none": "None",
-      "remaining": "Remaining"
+      "remaining": "Remaining",
+      "title": "Daily Habits"
     },
     "task_status": {
       "DOING": "Doing",

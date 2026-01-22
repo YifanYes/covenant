@@ -142,6 +142,22 @@ export class HabitRepository {
     })
   }
 
+  async findCompletionsWithAreas(userId: string, after: Date): Promise<Habit[]> {
+    return this.prisma.habit.findMany({
+      where: { userId, deletedAt: null },
+      include: {
+        objectives: {
+          include: {
+            areas: true
+          }
+        },
+        completions: {
+          where: { completedAt: { gte: after } }
+        }
+      }
+    })
+  }
+
   async findCompletionById(id: string): Promise<HabitCompletion | null> {
     return this.prisma.habitCompletion.findUnique({
       where: { id }

@@ -41,24 +41,55 @@ export class DashboardService {
       MONTHLY: 30
     }
 
-    const { completedToday, totalDaily } = habits.reduce(
+    const dailyHabits = habits.filter((habit) => habit.timespan === 'DAILY')
+
+    const { completedToday, totalDaily } = dailyHabits.reduce(
       (acc, habit) => {
-        const dailyTarget = habit.recurrence / habitsTimespanExpectedModifiers[habit.timespan]
-        const expectedCompletedPerDay = Math.floor(dailyTarget)
-        const completedToday = habit.completions?.filter((completion) =>
+        const completedTodayCount = habit.completions?.filter((completion) =>
           dayjs(completion?.completedAt).isSame(now, 'day')
         )?.length
-        const isCompletedToday = completedToday >= expectedCompletedPerDay ? 1 : 0
+        const isCompletedToday = completedTodayCount >= habit.recurrence ? 1 : 0
 
         return {
           completedToday: acc.completedToday + isCompletedToday,
-          totalDaily: acc.totalDaily + (expectedCompletedPerDay > 0 ? 1 : 0)
+          totalDaily: acc.totalDaily + 1
         }
       },
       { completedToday: 0, totalDaily: 0 }
     )
 
-    return { completedToday, totalDaily, meanHabitRate: totalDaily > 0 ? (completedToday / totalDaily) * 100 : 0 }
+    const daysToCheck = 8
+    const dailyRates: number[] = []
+
+    for (let i = 0; i < daysToCheck; i++) {
+      const checkDate = now.subtract(i, 'day')
+      let completedOnDay = 0
+      let expectedOnDay = 0
+
+      habits.forEach((habit) => {
+        const dailyTarget = habit.recurrence / habitsTimespanExpectedModifiers[habit.timespan]
+        const expectedCompletedPerDay = Math.floor(dailyTarget)
+
+        if (expectedCompletedPerDay > 0) {
+          expectedOnDay++
+          const completedCount =
+            habit.completions?.filter((completion) => dayjs(completion?.completedAt).isSame(checkDate, 'day'))
+              ?.length || 0
+          if (completedCount >= expectedCompletedPerDay) {
+            completedOnDay++
+          }
+        }
+      })
+
+      if (expectedOnDay > 0) {
+        dailyRates.push((completedOnDay / expectedOnDay) * 100)
+      }
+    }
+
+    const meanHabitRate =
+      dailyRates.length > 0 ? Math.min(100, dailyRates.reduce((sum, rate) => sum + rate, 0) / dailyRates.length) : 0
+
+    return { completedToday, totalDaily, meanHabitRate }
   }
 
   private getEfficiencyMetrics(
@@ -96,71 +127,91 @@ export class DashboardService {
 
   private getActiveAreasAndObjectives(
     allAreas: (Area & { objectives: (Objective & { tasks: Task[] })[] })[],
+    habitsWithAreas: { objectives: { areas: { id: string }[] }[]; completions: { completedAt: Date }[] }[],
     now: dayjs.Dayjs
   ) {
-    const areas: Record<
-      string,
-      {
-        name: string
-        color: string | null
-        icon: string | null
-        thisMonth: number
-        lastMonth: number
-        lastCompletion: string | null
-      }
-    > = {}
-
-    const objectives: Record<string, { name: string; lastCompletion: string | null }> = {}
-
-    allAreas.forEach((area) => {
-      if (!areas[area.id]) {
-        areas[area.id] = {
-          name: area.name,
-          color: area.color,
-          icon: area.icon,
-          thisMonth: 0,
-          lastMonth: 0,
-          lastCompletion: null
-        }
-      }
-
-      area.objectives.forEach((objective) => {
-        if (!objectives[objective.id]) {
-          objectives[objective.id] = {
-            name: objective.name,
-            lastCompletion: null
-          }
-        }
-
-        objective.tasks.forEach((task) => {
-          if (task.status !== TaskStatus.DONE) return
-
-          const date = dayjs(task.updatedAt)
-          const isCurr = date.isSame(now, 'month')
-          const isPrev = date.isSame(now.subtract(1, 'month'), 'month')
-
-          if (isCurr) areas[area.id].thisMonth++
-          if (isPrev) areas[area.id].lastMonth++
-
-          const currentAreaLast = areas[area.id].lastCompletion ? dayjs(areas[area.id].lastCompletion) : null
-          if (!currentAreaLast || date.isAfter(currentAreaLast)) {
-            areas[area.id].lastCompletion = date.toISOString()
-          }
-
-          const currentObjLast = objectives[objective.id].lastCompletion
-            ? dayjs(objectives[objective.id].lastCompletion)
-            : null
-          if (!currentObjLast || date.isAfter(currentObjLast)) {
-            objectives[objective.id].lastCompletion = date.toISOString()
-          }
-        })
-      })
+    const prevMonth = now.subtract(1, 'month')
+    const getMonthPeriod = (date: dayjs.Dayjs) => ({
+      isCurr: date.isSame(now, 'month'),
+      isPrev: date.isSame(prevMonth, 'month')
     })
 
-    return {
-      areas: Object.values(areas),
-      objectives: Object.values(objectives)
+    type AreaData = {
+      name: string
+      color: string | null
+      icon: string | null
+      tasksThisMonth: number
+      tasksLastMonth: number
+      habitsThisMonth: number
+      habitsLastMonth: number
+      lastCompletion: string | null
     }
+
+    const areas: Record<string, AreaData> = {}
+    const objectives: Record<string, { name: string; lastCompletion: string | null }> = {}
+    const countedTasksPerArea: Record<string, Set<string>> = {}
+
+    // Initialize areas and process tasks
+    for (const area of allAreas) {
+      areas[area.id] ??= {
+        name: area.name,
+        color: area.color,
+        icon: area.icon,
+        tasksThisMonth: 0,
+        tasksLastMonth: 0,
+        habitsThisMonth: 0,
+        habitsLastMonth: 0,
+        lastCompletion: null
+      }
+      countedTasksPerArea[area.id] ??= new Set()
+
+      for (const objective of area.objectives) {
+        objectives[objective.id] ??= { name: objective.name, lastCompletion: null }
+
+        const doneTasks = objective.tasks.filter((t) => t.status === TaskStatus.DONE)
+        for (const task of doneTasks) {
+          const date = dayjs(task.updatedAt)
+          const { isCurr, isPrev } = getMonthPeriod(date)
+
+          if (isCurr && !countedTasksPerArea[area.id].has(task.id)) {
+            areas[area.id].tasksThisMonth++
+            countedTasksPerArea[area.id].add(task.id)
+          }
+          if (isPrev && !countedTasksPerArea[area.id].has(`${task.id}-prev`)) {
+            areas[area.id].tasksLastMonth++
+            countedTasksPerArea[area.id].add(`${task.id}-prev`)
+          }
+
+          if (!areas[area.id].lastCompletion || date.isAfter(areas[area.id].lastCompletion)) {
+            areas[area.id].lastCompletion = date.toISOString()
+          }
+          if (!objectives[objective.id].lastCompletion || date.isAfter(objectives[objective.id].lastCompletion)) {
+            objectives[objective.id].lastCompletion = date.toISOString()
+          }
+        }
+      }
+    }
+
+    // Process habits (count unique habits per area, not completions)
+    for (const habit of habitsWithAreas) {
+      const completionMonths = habit.completions.reduce(
+        (acc, c) => {
+          const { isCurr, isPrev } = getMonthPeriod(dayjs(c.completedAt))
+          return { curr: acc.curr || isCurr, prev: acc.prev || isPrev }
+        },
+        { curr: false, prev: false }
+      )
+
+      const uniqueAreaIds = new Set(habit.objectives.flatMap((o) => o.areas.map((a) => a.id)))
+
+      for (const areaId of uniqueAreaIds) {
+        if (!areas[areaId]) continue
+        if (completionMonths.curr) areas[areaId].habitsThisMonth++
+        if (completionMonths.prev) areas[areaId].habitsLastMonth++
+      }
+    }
+
+    return { areas: Object.values(areas), objectives: Object.values(objectives) }
   }
 
   private parseUpcomingTasks(tasks: Task[]): DashboardData['upcomingTasks'] {
@@ -174,23 +225,32 @@ export class DashboardService {
 
   async getDashboardData(userId: string): Promise<DashboardData> {
     const now = dayjs()
+    const today = now.toDate()
+    const previousTwoMonths = now.subtract(2, 'month').toDate()
+    const lastWeek = now.subtract(1, 'week').toDate()
+    const comingTwoDays = now.startOf('day').add(2, 'day').toDate()
 
-    const [overdueCount, doingCount, doneCount, todoCount, upcomingTasks, habits, metricsTasks, allAreas, character] =
-      await Promise.all([
-        this.taskRepository.countOverdue(userId, now.subtract(1, 'month').toDate(), now.toDate()),
-        this.taskRepository.countDoing(userId, now.subtract(1, 'month').toDate(), now.toDate()),
-        this.taskRepository.countDone(
-          userId,
-          now.subtract(1, 'month').toDate(),
-          now.startOf('day').add(1, 'day').toDate()
-        ),
-        this.taskRepository.countTodo(userId, now.subtract(1, 'month').toDate(), now.toDate()),
-        this.taskRepository.findUpcoming(userId, 10, now.startOf('day').add(2, 'day').toDate()),
-        this.habitRepository.findCompletionsByDate(userId, now.subtract(8, 'day').toDate()),
-        this.taskRepository.findRecentWithObjectives(userId, now.subtract(2, 'month').toDate()),
-        this.areaRepository.findWithHierarchy(userId),
-        this.characterRepository.findWithClasses(userId)
-      ])
+    const [
+      overdueCount,
+      doingCount,
+      todoCount,
+      upcomingTasks,
+      habits,
+      habitsWithAreas,
+      metricsTasks,
+      allAreas,
+      character
+    ] = await Promise.all([
+      this.taskRepository.countByStatus(userId, [TaskStatus.TODO, TaskStatus.DOING], today),
+      this.taskRepository.countByStatus(userId, TaskStatus.DOING, today, 'gte', true),
+      this.taskRepository.countByStatus(userId, TaskStatus.TODO, today, 'gte', true),
+      this.taskRepository.findUpcoming(userId, 10, comingTwoDays),
+      this.habitRepository.findCompletionsByDate(userId, lastWeek),
+      this.habitRepository.findCompletionsWithAreas(userId, previousTwoMonths),
+      this.taskRepository.findRecentWithObjectives(userId, previousTwoMonths),
+      this.areaRepository.findWithHierarchy(userId),
+      this.characterRepository.findWithClasses(userId)
+    ])
 
     const { currentClass, maxDice, diceBank } = character
       ? this.characterService.getCharacterProgress(character)
@@ -199,7 +259,7 @@ export class DashboardService {
     const { completedToday, totalDaily, meanHabitRate } = this.getHabitMetrics(habits as any, now)
     const { mostCommonType, mostFocusedArea, mostFocusedObjective } = this.getEfficiencyMetrics(metricsTasks as any)
     const parsedUpcomingTasks = this.parseUpcomingTasks(upcomingTasks)
-    const { areas, objectives } = this.getActiveAreasAndObjectives(allAreas as any, now)
+    const { areas, objectives } = this.getActiveAreasAndObjectives(allAreas as any, habitsWithAreas as any, now)
 
     return {
       characterName: character?.name || null,
@@ -216,7 +276,6 @@ export class DashboardService {
       statusStats: {
         TODO: todoCount,
         DOING: doingCount,
-        DONE: doneCount,
         OVERDUE: overdueCount
       },
       habitsMetrics: { completedToday, totalDaily },
