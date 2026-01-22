@@ -177,76 +177,31 @@ export class TaskRepository {
     })
   }
 
-  async countByStatus(userId: string, status: string | string[], after: Date, before?: Date | null): Promise<number> {
-    const query: any = {
+  async countByStatus(
+    userId: string,
+    status: TaskStatus | TaskStatus[],
+    dueDate?: Date,
+    dueDateComparison: 'lt' | 'gte' = 'lt',
+    includeNoDueDate = false
+  ): Promise<number> {
+    const baseWhere = {
       userId,
-      createdAt: { gte: after }
+      status: Array.isArray(status) ? { in: status } : status
     }
 
-    if (Array.isArray(status)) {
-      query.status = { in: status }
-    } else {
-      query.status = status
+    if (dueDate && includeNoDueDate) {
+      return this.prisma.task.count({
+        where: {
+          ...baseWhere,
+          OR: [{ dueDate: { [dueDateComparison]: dueDate } }, { dueDate: null }]
+        }
+      })
     }
 
-    if (before) {
-      query.dueDate = { lt: before }
-    } else if (before === null) {
-      // Intentionally checking for null to mimic dueDate < now logic for overdue
-    } else {
-      // For 'upcoming' logic where strict date needed
-      if (status === TaskStatus.DONE && before !== undefined) {
-        query.dueDate = { lte: before }
-      } else if (status === TaskStatus.TODO && before !== undefined) {
-        query.dueDate = { gte: before }
-      } else if (status === TaskStatus.DOING && before !== undefined) {
-        query.dueDate = { gte: before }
-      }
-    }
-
-    return this.prisma.task.count({ where: query })
-  }
-
-  async countOverdue(userId: string, after: Date, now: Date): Promise<number> {
     return this.prisma.task.count({
       where: {
-        userId,
-        status: { in: [TaskStatus.TODO, TaskStatus.DOING] },
-        createdAt: { gte: after },
-        dueDate: { lt: now }
-      }
-    })
-  }
-
-  async countDone(userId: string, after: Date, before: Date): Promise<number> {
-    return this.prisma.task.count({
-      where: {
-        userId,
-        status: TaskStatus.DONE,
-        createdAt: { gte: after },
-        dueDate: { lte: before }
-      }
-    })
-  }
-
-  async countDoing(userId: string, after: Date, now: Date): Promise<number> {
-    return this.prisma.task.count({
-      where: {
-        userId,
-        status: TaskStatus.DOING,
-        createdAt: { gte: after },
-        dueDate: { gte: now }
-      }
-    })
-  }
-
-  async countTodo(userId: string, after: Date, now: Date): Promise<number> {
-    return this.prisma.task.count({
-      where: {
-        userId,
-        status: TaskStatus.TODO,
-        createdAt: { gte: after },
-        dueDate: { gte: now }
+        ...baseWhere,
+        ...(dueDate && { dueDate: { [dueDateComparison]: dueDate } })
       }
     })
   }

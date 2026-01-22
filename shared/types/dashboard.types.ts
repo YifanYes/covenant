@@ -11,7 +11,6 @@ export interface DashboardData {
   statusStats: {
     TODO: number
     DOING: number
-    DONE: number
     OVERDUE: number
   }
   habitsMetrics: {

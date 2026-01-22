@@ -225,11 +225,14 @@ export class DashboardService {
 
   async getDashboardData(userId: string): Promise<DashboardData> {
     const now = dayjs()
+    const today = now.toDate()
+    const previousTwoMonths = now.subtract(2, 'month').toDate()
+    const lastWeek = now.subtract(1, 'week').toDate()
+    const comingTwoDays = now.startOf('day').add(2, 'day').toDate()
 
     const [
       overdueCount,
       doingCount,
-      doneCount,
       todoCount,
       upcomingTasks,
       habits,
@@ -238,18 +241,13 @@ export class DashboardService {
       allAreas,
       character
     ] = await Promise.all([
-      this.taskRepository.countOverdue(userId, now.subtract(1, 'month').toDate(), now.toDate()),
-      this.taskRepository.countDoing(userId, now.subtract(1, 'month').toDate(), now.toDate()),
-      this.taskRepository.countDone(
-        userId,
-        now.subtract(1, 'month').toDate(),
-        now.startOf('day').add(1, 'day').toDate()
-      ),
-      this.taskRepository.countTodo(userId, now.subtract(1, 'month').toDate(), now.toDate()),
-      this.taskRepository.findUpcoming(userId, 10, now.startOf('day').add(2, 'day').toDate()),
-      this.habitRepository.findCompletionsByDate(userId, now.subtract(8, 'day').toDate()),
-      this.habitRepository.findCompletionsWithAreas(userId, now.subtract(2, 'month').toDate()),
-      this.taskRepository.findRecentWithObjectives(userId, now.subtract(2, 'month').toDate()),
+      this.taskRepository.countByStatus(userId, [TaskStatus.TODO, TaskStatus.DOING], today),
+      this.taskRepository.countByStatus(userId, TaskStatus.DOING, today, 'gte', true),
+      this.taskRepository.countByStatus(userId, TaskStatus.TODO, today, 'gte', true),
+      this.taskRepository.findUpcoming(userId, 10, comingTwoDays),
+      this.habitRepository.findCompletionsByDate(userId, lastWeek),
+      this.habitRepository.findCompletionsWithAreas(userId, previousTwoMonths),
+      this.taskRepository.findRecentWithObjectives(userId, previousTwoMonths),
       this.areaRepository.findWithHierarchy(userId),
       this.characterRepository.findWithClasses(userId)
     ])
@@ -278,7 +276,6 @@ export class DashboardService {
       statusStats: {
         TODO: todoCount,
         DOING: doingCount,
-        DONE: doneCount,
         OVERDUE: overdueCount
       },
       habitsMetrics: { completedToday, totalDaily },
