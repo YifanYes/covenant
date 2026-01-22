@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next'
 
 interface ItemTooltipProps {
   item: InventoryItem
+  quantity?: number
   children: React.ReactNode
 }
 
-export default function ItemTooltip({ item, children }: ItemTooltipProps) {
+export default function ItemTooltip({ item, quantity = 1, children }: ItemTooltipProps) {
   const { t } = useTranslation()
 
   const itemName = t(item.nameKey)
@@ -21,7 +22,10 @@ export default function ItemTooltip({ item, children }: ItemTooltipProps) {
         <div className='flex flex-col gap-2'>
           <div className='flex items-center gap-2'>
             <img src={itemImagePath} alt={itemName} className='h-8 w-8 object-contain' />
-            <span className='font-semibold text-zinc-100'>{itemName}</span>
+            <div className='flex flex-col'>
+              <span className='font-semibold text-zinc-100'>{itemName}</span>
+              {quantity > 1 && <span className='text-[10px] text-zinc-400'>Quantity: {quantity}</span>}
+            </div>
           </div>
           {itemDescription && <p className='text-xs text-zinc-400'>{itemDescription}</p>}
           <div className='border-t border-zinc-700 pt-2'>

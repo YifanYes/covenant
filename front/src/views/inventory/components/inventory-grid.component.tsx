@@ -17,7 +17,7 @@ export default function InventoryGrid({ character, selectedItemId, onItemClick }
 
   // Combine tier 1 items (always available) with character's inventory
   // Exclude items that are currently equipped in the loadout
-  const availableItems = useMemo(() => {
+  const groupedItems = useMemo(() => {
     const equippedDefinitionIds = new Set(character?.loadout?.map((item) => item.definitionId) || [])
 
     // Create inventory items from tier 1 definitions (these use definitionId as id for stable keys)
@@ -31,7 +31,26 @@ export default function InventoryGrid({ character, selectedItemId, onItemClick }
     // Add purchased items from character inventory (excluding equipped)
     const purchasedItems = (character?.inventory || []).filter((item) => !equippedDefinitionIds.has(item.definitionId))
 
-    return [...tier1Items, ...purchasedItems]
+    const allItems = [...tier1Items, ...purchasedItems]
+
+    // Group items: consumables are stacked by definitionId, others are individual
+    // Maintain order by using an array to track first appearances
+    const groups: Record<string, { item: InventoryItem; quantity: number }> = {}
+    const orderedKeys: string[] = []
+
+    allItems.forEach((item) => {
+      const isStackable = item.type === 'CONSUMABLE' && item.definitionId
+      const groupKey = isStackable ? `group_${item.definitionId}` : item.id
+
+      if (groups[groupKey]) {
+        groups[groupKey].quantity += 1
+      } else {
+        groups[groupKey] = { item, quantity: 1 }
+        orderedKeys.push(groupKey)
+      }
+    })
+
+    return orderedKeys.map((key) => groups[key])
   }, [character?.inventory, character?.loadout])
 
   return (
@@ -43,16 +62,17 @@ export default function InventoryGrid({ character, selectedItemId, onItemClick }
         </CardTitle>
       </CardHeader>
       <CardContent className='flex-1 overflow-y-auto'>
-        {availableItems.length === 0 ? (
+        {groupedItems.length === 0 ? (
           <div className='flex h-full flex-col items-center justify-center gap-2'>
             <span className='text-muted-foreground text-sm'>{t('inventory.empty')}</span>
           </div>
         ) : (
           <div className='flex flex-wrap gap-2 py-1'>
-            {availableItems.map((item) => (
+            {groupedItems.map(({ item, quantity }) => (
               <ItemCard
                 key={item.id}
                 item={item}
+                quantity={quantity}
                 isSelected={item.id === selectedItemId}
                 onClick={() => onItemClick?.(item)}
               />
