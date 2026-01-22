@@ -11,7 +11,6 @@ export interface DashboardData {
   statusStats: {
     TODO: number
     DOING: number
-    DONE: number
     OVERDUE: number
   }
   habitsMetrics: {
@@ -50,8 +49,10 @@ export interface AreaMetric {
   name: string
   color: string | null
   icon: string | null
-  thisMonth: number
-  lastMonth: number
+  tasksThisMonth: number
+  tasksLastMonth: number
+  habitsThisMonth: number
+  habitsLastMonth: number
   lastCompletion: string | null
 }
 

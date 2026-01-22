@@ -17,7 +17,7 @@ export default function HabitsBlockComponent({ metrics }: HabitsBlockComponentPr
 
   return (
     <DashboardSectionWrapperComponent
-      title='sidebar.habits'
+      title='dashboard.habits.title'
       icon={Checklist}
       iconColorClass='text-lime-500'
       contentClassName='px-0'

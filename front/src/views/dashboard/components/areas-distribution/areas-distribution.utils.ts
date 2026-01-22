@@ -5,7 +5,12 @@ import type { AreasDistributionData, AreasDistributionDataItem } from './areas-d
 export const getAreasDistributionData = (
   data: AreasDistributionDataItem[]
 ): { localizedData: AreasDistributionDataItem[]; config: AreasDistributionData } => ({
-  localizedData: data.map((d) => ({ ...d, name: parseTranslationKey(d.name) })),
+  localizedData: data.map((d) => ({
+    ...d,
+    name: parseTranslationKey(d.name),
+    thisMonth: d.tasksThisMonth + (d.habitsThisMonth || 0),
+    lastMonth: d.tasksLastMonth + (d.habitsLastMonth || 0)
+  })),
   config: {
     thisMonth: {
       ...areasDistributionConfig.thisMonth,
