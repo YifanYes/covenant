@@ -11,7 +11,7 @@ import Sidebar, {
   SidebarMenuItem,
   SidebarTrigger
 } from '@/ui/sidebar.component'
-import { BookOpen, Dashboard, List, Luggage, Map, Sliders, Store, Trophy } from '@nsmr/pixelart-react'
+import { BookOpen, Coin, Dashboard, List, Luggage, Map, Sliders, Store, Trophy } from '@nsmr/pixelart-react'
 import type { ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -79,6 +79,11 @@ export default function AppSidebar() {
         title: t('sidebar.map'),
         url: '/map',
         icon: Map
+      },
+      {
+        title: t('sidebar.investments'),
+        url: '/investments',
+        icon: Coin
       },
       {
         title: t('sidebar.shop'),

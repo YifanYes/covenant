@@ -780,6 +780,46 @@
     "tier": "Tier",
     "title": "Inventory"
   },
+  "investments": {
+    "amount": "Amount",
+    "anti_demon_barrier": {
+      "description": "The alchemists of Asuncion have developed a prototype sacred barrier capable of purifying lesser demons. They just need funds for materials... and maybe life insurance.",
+      "failure": "The alchemists ran out of funds mid-ritual. The 'barrier' turned out to be a curtain with glitter. The demons are laughing. Literally. (╥﹏╥)",
+      "name": "Anti-Demon Barrier",
+      "success": "The barrier rises! Lesser demons disintegrate on contact. The alchemists are as surprised as we are that it worked (・∀・)"
+    },
+    "completed": "Completed!",
+    "contribute": "Contribute",
+    "contribute_to": "Contribute to {{name}}",
+    "dark_heart_operation": {
+      "description": "While the Six Powers attack Santa Cruz, Sodom and Gomorrah are unprotected. A surgical strike could destroy their forges and disrupt their supply lines. Suicidal? Maybe. Epic? Definitely.",
+      "failure": "The squad was captured. Last transmissions spoke of 'demonic hospitality'. We don't want to know the details (゜-゜)",
+      "name": "Operation Dark Heart",
+      "success": "BOOM! The Infernal Forge burns... with its own fire. Ironic, isn't it? The Antichrist is fuming. More than usual ᕦ(ò_óˇ)ᕤ"
+    },
+    "days_remaining": "days remaining",
+    "error_contribute": "Error making contribution",
+    "gen2_armament_program": {
+      "description": "The Alchemists League offers to share their secrets of magical percussion and sealed cartridges... for a price. Capitalism survives even the apocalypse.",
+      "failure": "The League took the money and disappeared. Who could have imagined. Contracts now include 'no demons' as a valid excuse for non-payment ┐(´д`)┌",
+      "name": "Gen 2 Armament Program",
+      "success": "The League keeps their word! The new weapons fire without fail. The demons discover that 'magic-proof' doesn't mean 'bullet-proof' (☞゚ヮ゚)☞"
+    },
+    "gold": "gold",
+    "max": "Max",
+    "my_contribution": "My contribution",
+    "no_investments": "No active investments",
+    "providence_purification": {
+      "description": "The monks of Asuncion believe they can purify the ruins of Providence and create a secondary front. 'Believe' is the key word here.",
+      "failure": "The monks arrived at the ruins full of faith. They returned... well, they didn't return. The ruins now glow with a very unholy red (；一_一)",
+      "name": "Providence Purification Ritual",
+      "success": "Providence rises from the ashes! The monks sing victory... well, they sing hymns, but with great emotion ♪(´ε` )"
+    },
+    "subtitle": "Contribute gold to change the fate of the world",
+    "success_contribute": "Contribution successful!",
+    "title": "Investments",
+    "your_gold": "Your gold"
+  },
   "item_categories": {
     "rarity": {
       "common": "Common",
@@ -1045,6 +1085,7 @@
     "dashboard": "Dashboard",
     "habits": "Habits",
     "inventory": "Inventory",
+    "investments": "Investments",
     "map": "World Map",
     "objectives": "Objectives and areas",
     "open": "Expand menu",

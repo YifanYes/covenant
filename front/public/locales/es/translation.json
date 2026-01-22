@@ -780,6 +780,46 @@
     "tier": "Tier",
     "title": "Inventario"
   },
+  "investments": {
+    "amount": "Cantidad",
+    "anti_demon_barrier": {
+      "description": "Los alquimistas de Asunción han desarrollado un prototipo de barrera sagrada capaz de purificar demonios menores. Solo necesitan fondos para los materiales... y quizás un seguro de vida.",
+      "failure": "Los alquimistas se quedaron sin fondos a mitad del ritual. La 'barrera' resultó ser una cortina con purpurina. Los demonios están riéndose. Literalmente. (╥﹏╥)",
+      "name": "Barrera Anti-Demonios",
+      "success": "¡La barrera se alza! Los demonios menores se desintegran al tocarla. Los alquimistas están tan sorprendidos como nosotros de que funcionara (・∀・)"
+    },
+    "completed": "¡Completado!",
+    "contribute": "Contribuir",
+    "contribute_to": "Contribuir a {{name}}",
+    "dark_heart_operation": {
+      "description": "Mientras los Seis Poderes atacan Santa Cruz, Sodoma y Gomorra están desprotegidas. Un golpe quirúrgico podría destruir sus fundiciones y desbaratar sus líneas de suministro. ¿Suicida? Quizás. ¿Épico? Definitivamente.",
+      "failure": "El escuadrón fue capturado. Las últimas transmisiones hablaban de 'hospitalidad demoníaca'. No queremos saber los detalles (゜-゜)",
+      "name": "Operación Corazón Oscuro",
+      "success": "¡BOOM! La Forja Infernal arde... con su propio fuego. Irónico, ¿no? El Anticristo está que echa humo. Más humo del habitual ᕦ(ò_óˇ)ᕤ"
+    },
+    "days_remaining": "días restantes",
+    "error_contribute": "Error al realizar la contribución",
+    "gen2_armament_program": {
+      "description": "La Liga de los Alquimistas ofrece compartir sus secretos de percusión mágica y cartuchos sellados... por un precio. El capitalismo sobrevive incluso al apocalipsis.",
+      "failure": "La Liga se quedó con el dinero y desapareció. Quién lo hubiera imaginado. Los contratos ahora incluyen 'sin demonios' como excusa válida de impago ┐(´д`)┌",
+      "name": "Programa de Armamento Gen 2",
+      "success": "¡La Liga cumple su palabra! Las nuevas armas disparan sin fallar. Los demonios descubren que 'a prueba de magia' no significa 'a prueba de balas' (☞゚ヮ゚)☞"
+    },
+    "gold": "oro",
+    "max": "Máximo",
+    "my_contribution": "Mi contribución",
+    "no_investments": "No hay inversiones activas",
+    "providence_purification": {
+      "description": "Los monjes de Asunción creen que pueden purificar las ruinas de Providencia y crear un frente secundario. 'Creemos' es la palabra clave aquí.",
+      "failure": "Los monjes llegaron a las ruinas llenos de fe. Volvieron... bueno, no volvieron. Las ruinas ahora brillan con un rojo muy poco sagrado (；一_一)",
+      "name": "Ritual de Purificación de Providencia",
+      "success": "¡Providencia renace de las cenizas! Los monjes cantan victoria... bueno, cantan himnos, pero con mucha emoción ♪(´ε` )"
+    },
+    "subtitle": "Contribuye oro para cambiar el destino del mundo",
+    "success_contribute": "¡Contribución realizada con éxito!",
+    "title": "Inversiones",
+    "your_gold": "Tu oro"
+  },
   "item_categories": {
     "rarity": {
       "common": "Común",
@@ -1045,6 +1085,7 @@
     "dashboard": "Panel de control",
     "habits": "Hábitos",
     "inventory": "Inventario",
+    "investments": "Inversiones",
     "map": "Mapa del Mundo",
     "objectives": "Objetivos y áreas",
     "open": "Expandir menú",
