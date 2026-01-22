@@ -73,10 +73,10 @@ export class CharacterRepository {
     })
   }
 
-  async updateProgress(classId: string, enemiesKilled: any, tier: number): Promise<void> {
+  async updateProgress(classId: string, tier: number): Promise<void> {
     await this.prisma.characterClass.update({
       where: { id: classId },
-      data: { enemiesKilled, tier }
+      data: { tier }
     })
   }
 

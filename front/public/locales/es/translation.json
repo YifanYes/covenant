@@ -595,6 +595,61 @@
     "werewolf_alpha": "Hombre Lobo Alfa",
     "young_werewolf": "Hombre Lobo Joven"
   },
+  "enemyNames": {
+    "boss": {
+      "prefix": {
+        "0": "Azatheros",
+        "1": "Malachar",
+        "2": "Nethrazul",
+        "3": "Xandros",
+        "4": "Belzaroth"
+      },
+      "suffix": {
+        "0": "Destructor de Mundos",
+        "1": "el Eterno",
+        "2": "Soberano del Vacío",
+        "3": "el Inmortal",
+        "4": "Perdición Encarnada"
+      }
+    },
+    "elite": {
+      "prefix": {
+        "0": "Velefor",
+        "1": "Garadoth",
+        "2": "Xerion",
+        "3": "Morvain",
+        "4": "Zarathos",
+        "5": "Nethros"
+      },
+      "suffix": {
+        "0": "Duque Infernal",
+        "1": "el Corruptor",
+        "2": "Señor del Terror",
+        "3": "el Despiadado",
+        "4": "Segador de Almas"
+      }
+    },
+    "minion": {
+      "prefix": {
+        "0": "Vorath",
+        "1": "Krix",
+        "2": "Malgor",
+        "3": "Theron",
+        "4": "Grixus",
+        "5": "Vex",
+        "6": "Morag",
+        "7": "Drix"
+      },
+      "suffix": {
+        "0": "el Hueco",
+        "1": "de las Sombras",
+        "2": "el Feral",
+        "3": "el Putrefacto",
+        "4": "Rompehuesos",
+        "5": "el Maldito"
+      }
+    }
+  },
   "errors": {
     "invalid_email": "Correo electrónico no valido",
     "invalid_password_length": "La contraseña debe tener al menos 6 caracteres",
@@ -1016,10 +1071,19 @@
   },
   "status_effects": {
     "burning": "Quemadura",
+    "critical_threshold": "Umbral Crítico",
     "damage_negation": "Negación de Daño",
+    "direct_damage": "Daño Directo",
     "doctrine_active": "Doctrina Activa",
+    "enemy_power_reduction": "Reducción de Potencia Enemiga",
+    "guaranteed_critical": "Crítico Garantizado",
+    "heal": "Curación",
     "immobilized": "Inmovilizado",
-    "stunned": "Aturdido"
+    "poisoned": "Envenenado",
+    "power_boost": "Aumento de Potencia",
+    "purified": "Purificado",
+    "stunned": "Aturdido",
+    "threshold_reduction": "Reducción de Umbral"
   },
   "store": {
     "buy": "Comprar",

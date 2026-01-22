@@ -172,12 +172,12 @@ export default function CombatArena({
   const rollButtonLabel = isAttackPhase ? t('combat.roll_attack') : t('combat.roll_defense')
 
   return (
-    <div className={cn('grid gap-4 lg:grid-cols-[minmax(240px,280px)_minmax(200px,260px)_1fr]', className)}>
+    <div className={cn('grid gap-4 lg:grid-cols-[1fr_1fr_350px]', className)}>
       {/* Left: Character Status + Consumables + Doctrines */}
       <div className='flex flex-col gap-4'>
         <div className='rounded-lg border p-4'>
           <div className='flex h-full gap-4'>
-            <div className='bg-muted/50 relative flex h-full w-16 shrink-0 items-center justify-center rounded-md border p-2'>
+            <div className='bg-muted/50 relative flex aspect-square w-24 shrink-0 items-center justify-center rounded-md border p-2'>
               <img
                 src={`/assets/classes/${character.currentClass!}.png`}
                 alt={character.currentClass!}
@@ -189,7 +189,7 @@ export default function CombatArena({
               <h3 className='mb-2 text-sm font-semibold'>{character.name}</h3>
 
               <div className='space-y-2'>
-                <div>
+                <div style={{ width: `${currentClass.maxHealth * 20}px` }} className='max-w-[240px] min-w-[80px]'>
                   <div className='text-muted-foreground mb-1 flex justify-between text-xs'>
                     <span>{t('inventory.health')}</span>
                     <span>
@@ -199,7 +199,7 @@ export default function CombatArena({
                   <HealthBar current={currentClass.health} max={currentClass.maxHealth} showLabel={false} />
                 </div>
 
-                <div>
+                <div style={{ width: `${currentClass.maxMana * 15}px` }} className='max-w-[240px] min-w-[80px]'>
                   <div className='text-muted-foreground mb-1 flex justify-between text-xs'>
                     <span>{t('inventory.mana')}</span>
                     <span>

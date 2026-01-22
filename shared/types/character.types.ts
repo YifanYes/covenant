@@ -1,9 +1,3 @@
-export interface EnemyKillTracking {
-  minion: number
-  elite: number
-  boss: number
-}
-
 export interface CharacterClassType {
   id: string
   characterId: string
@@ -18,7 +12,6 @@ export interface CharacterClassType {
   magicAtk: number
   magicDef: number
   manaRegen: number
-  enemiesKilled: EnemyKillTracking
   equippedDoctrines: string[] // Array of doctrine IDs, max 2
   createdAt: Date
   updatedAt: Date

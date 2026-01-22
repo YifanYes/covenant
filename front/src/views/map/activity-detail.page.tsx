@@ -38,47 +38,36 @@ export default function ActivityDetailPage() {
 
   const participation = (activity as any)?.participation
   const [lastTurnResult, setLastTurnResult] = useState<any>(null)
-  const combatLog = (participation?.combatLog as CombatLogEntry[]) || []
+
+  // Get combat log from active enemy
+  const activeEnemy = participation?.activeEnemy
+  const combatLog = (activeEnemy?.combatLog as CombatLogEntry[]) || []
 
   const [hasJoined, setHasJoined] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
+  // Build initial enemy state from new API structure
   let initialEnemyState: EnemyState | null = null
 
-  if (participation) {
-    if (participation.currentEnemyId) {
-      const template = getEnemy(participation.currentEnemyId)
-      if (template) {
-        initialEnemyState = {
-          id: 'enemy-active',
-          enemyId: template.id,
-          currentHealth: participation.currentEnemyHealth ?? template.health,
-          maxHealth: participation.currentEnemyMaxHealth ?? template.health
-        }
-      }
-    } else if (activity?.status === 'Active' || activity?.status === undefined) {
-      // Participation exists but no active enemy
-      // If activity is active, show the first enemy as a fresh start
-      const defaultEnemyId = activity?.enemies?.[0]
-      const template = defaultEnemyId ? getEnemy(defaultEnemyId) : null
-      if (template) {
-        initialEnemyState = {
-          id: 'enemy-fresh',
-          enemyId: template.id,
-          currentHealth: template.health,
-          maxHealth: template.health
-        }
-      }
+  if (participation?.activeEnemy) {
+    const ae = participation.activeEnemy
+    initialEnemyState = {
+      id: ae.id,
+      templateId: ae.templateId,
+      currentHealth: ae.currentHealth,
+      maxHealth: ae.maxHealth,
+      namePrefix: ae.namePrefix,
+      nameSuffix: ae.nameSuffix
     }
-  } else {
+  } else if (!participation && activity?.enemies?.length) {
     // No participation yet, show preview of first enemy
-    const defaultEnemyId = activity?.enemies?.[0]
-    const template = defaultEnemyId ? getEnemy(defaultEnemyId) : null
+    const defaultEnemyId = activity.enemies[0]
+    const template = getEnemy(defaultEnemyId)
 
     if (template) {
       initialEnemyState = {
         id: 'enemy-preview',
-        enemyId: template.id,
+        templateId: template.id,
         currentHealth: template.health,
         maxHealth: template.health
       }
@@ -89,10 +78,23 @@ export default function ActivityDetailPage() {
 
   const joinMutation = useMutation({
     ...trpc.activity.join.mutationOptions(),
-    onSuccess: () => {
+    onSuccess: (result: any) => {
       toast.success(t('activities.success.start'))
       queryClient.invalidateQueries({ queryKey: trpc.activity.list.queryKey() })
       setHasJoined(true)
+
+      // Set enemy from join response
+      if (result.participation?.activeEnemy) {
+        const ae = result.participation.activeEnemy
+        setCurrentEnemy({
+          id: ae.id,
+          templateId: ae.templateId,
+          currentHealth: ae.currentHealth,
+          maxHealth: ae.maxHealth,
+          namePrefix: ae.namePrefix,
+          nameSuffix: ae.nameSuffix
+        })
+      }
     },
     onError: (error) => toast.error(t('activities.error.start'), { description: error.message })
   })
@@ -111,15 +113,14 @@ export default function ActivityDetailPage() {
         })
 
         if (result.nextEnemyState) {
-          const nextTemplate = getEnemy(result.nextEnemyState.enemyId)
-          if (nextTemplate) {
-            setCurrentEnemy({
-              id: result.nextEnemyState.id,
-              enemyId: nextTemplate.id,
-              currentHealth: result.nextEnemyState.currentHealth,
-              maxHealth: result.nextEnemyState.maxHealth
-            })
-          }
+          setCurrentEnemy({
+            id: result.nextEnemyState.id,
+            templateId: result.nextEnemyState.templateId,
+            currentHealth: result.nextEnemyState.currentHealth,
+            maxHealth: result.nextEnemyState.maxHealth,
+            namePrefix: result.nextEnemyState.namePrefix,
+            nameSuffix: result.nextEnemyState.nameSuffix
+          })
         } else {
           setCurrentEnemy(null)
         }
@@ -244,7 +245,7 @@ export default function ActivityDetailPage() {
 
   return (
     <div className='flex h-full w-full flex-col gap-4 overflow-auto px-2 py-4'>
-      <div className='w-full space-y-4'>
+      <div className='mx-auto w-full max-w-7xl space-y-4'>
         <div className='flex items-center gap-4'>
           <Button variant='ghost' size='icon' asChild>
             <Link to='/map'>

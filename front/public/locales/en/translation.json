@@ -595,6 +595,61 @@
     "werewolf_alpha": "Alpha Werewolf",
     "young_werewolf": "Young Werewolf"
   },
+  "enemyNames": {
+    "boss": {
+      "prefix": {
+        "0": "Azatheros",
+        "1": "Malachar",
+        "2": "Nethrazul",
+        "3": "Xandros",
+        "4": "Belzaroth"
+      },
+      "suffix": {
+        "0": "World-Ender",
+        "1": "the Eternal",
+        "2": "Void Sovereign",
+        "3": "the Undying",
+        "4": "Doom Incarnate"
+      }
+    },
+    "elite": {
+      "prefix": {
+        "0": "Velefor",
+        "1": "Garadoth",
+        "2": "Xerion",
+        "3": "Morvain",
+        "4": "Zarathos",
+        "5": "Nethros"
+      },
+      "suffix": {
+        "0": "Infernal Duke",
+        "1": "the Corruptor",
+        "2": "Dreadlord",
+        "3": "the Merciless",
+        "4": "Soulreaver"
+      }
+    },
+    "minion": {
+      "prefix": {
+        "0": "Vorath",
+        "1": "Krix",
+        "2": "Malgor",
+        "3": "Theron",
+        "4": "Grixus",
+        "5": "Vex",
+        "6": "Morag",
+        "7": "Drix"
+      },
+      "suffix": {
+        "0": "the Hollow",
+        "1": "of the Shadows",
+        "2": "the Feral",
+        "3": "the Rotting",
+        "4": "Bonecrusher",
+        "5": "the Wretched"
+      }
+    }
+  },
   "errors": {
     "invalid_email": "Invalid email",
     "invalid_password_length": "Password must have at least 6 characters",
@@ -1016,10 +1071,19 @@
   },
   "status_effects": {
     "burning": "Burning",
+    "critical_threshold": "Critical Threshold",
     "damage_negation": "Damage Negation",
+    "direct_damage": "Direct Damage",
     "doctrine_active": "Doctrine Active",
+    "enemy_power_reduction": "Enemy Power Reduction",
+    "guaranteed_critical": "Guaranteed Critical",
+    "heal": "Healing",
     "immobilized": "Immobilized",
-    "stunned": "Stunned"
+    "poisoned": "Poisoned",
+    "power_boost": "Power Boost",
+    "purified": "Purified",
+    "stunned": "Stunned",
+    "threshold_reduction": "Threshold Reduction"
   },
   "store": {
     "buy": "Buy",

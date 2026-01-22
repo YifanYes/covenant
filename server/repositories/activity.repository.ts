@@ -1,4 +1,4 @@
-import { ActivityStatus } from '@shared/types/gamification.types'
+import { ActivityStatus, CombatEnemyStatus } from '@shared/types/gamification.types'
 import { type PrismaClient } from '../generated/prisma'
 
 export class ActivityRepository {
@@ -10,7 +10,14 @@ export class ActivityRepository {
         status: ActivityStatus.ACTIVE
       },
       include: {
-        participations: true
+        participations: {
+          include: {
+            enemies: {
+              where: { status: CombatEnemyStatus.ACTIVE },
+              take: 1
+            }
+          }
+        }
       }
     })
   }
@@ -23,7 +30,11 @@ export class ActivityRepository {
     return this.prisma.mapActivity.findUnique({
       where: { id },
       include: {
-        participations: true
+        participations: {
+          include: {
+            enemies: true
+          }
+        }
       }
     })
   }
@@ -35,7 +46,11 @@ export class ActivityRepository {
         status: ActivityStatus.ACTIVE
       },
       include: {
-        participations: true
+        participations: {
+          include: {
+            enemies: true
+          }
+        }
       }
     })
   }
@@ -65,7 +80,11 @@ export class ActivityRepository {
         deadline
       },
       include: {
-        participations: true
+        participations: {
+          include: {
+            enemies: true
+          }
+        }
       }
     })
   }
@@ -83,22 +102,40 @@ export class ActivityRepository {
           activityId,
           characterId
         }
+      },
+      include: {
+        enemies: {
+          where: { status: CombatEnemyStatus.ACTIVE },
+          take: 1
+        }
       }
     })
   }
 
-  async createParticipation(
-    activityId: string,
-    characterId: string,
-    initialState?: { currentEnemyId: string; currentEnemyHealth: number; currentEnemyMaxHealth: number }
-  ) {
+  async getParticipationWithAllEnemies(activityId: string, characterId: string) {
+    return this.prisma.activityParticipation.findUnique({
+      where: {
+        activityId_characterId: {
+          activityId,
+          characterId
+        }
+      },
+      include: {
+        enemies: {
+          orderBy: { spawnedAt: 'desc' }
+        }
+      }
+    })
+  }
+
+  async createParticipation(activityId: string, characterId: string) {
     return this.prisma.activityParticipation.create({
       data: {
         activityId,
-        characterId,
-        currentEnemyId: initialState?.currentEnemyId,
-        currentEnemyHealth: initialState?.currentEnemyHealth,
-        currentEnemyMaxHealth: initialState?.currentEnemyMaxHealth
+        characterId
+      },
+      include: {
+        enemies: true
       }
     })
   }
@@ -125,21 +162,17 @@ export class ActivityRepository {
     })
   }
 
-  async updateParticipationState(
+  async updateParticipationStats(
     participationId: string,
-    state: { currentEnemyId?: string | null; currentEnemyHealth?: number; currentEnemyMaxHealth?: number },
     goldReward: number = 0,
-    combatLog?: any[]
+    combatStats?: Record<string, number>
   ) {
     return this.prisma.activityParticipation.update({
       where: { id: participationId },
       data: {
-        currentEnemyId: state.currentEnemyId,
-        currentEnemyHealth: state.currentEnemyHealth,
-        currentEnemyMaxHealth: state.currentEnemyMaxHealth,
         goldEarned: { increment: goldReward },
         lastCombatAt: new Date(),
-        combatLog: combatLog || undefined
+        combatStats: combatStats || undefined
       }
     })
   }

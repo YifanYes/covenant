@@ -56,9 +56,11 @@ export interface Enemy {
 // Enemy state for tracking during combat
 export interface EnemyState {
   id: string
-  enemyId: string
+  templateId: string
   currentHealth: number
   maxHealth: number
+  namePrefix?: string
+  nameSuffix?: string
 }
 
 // Combat log types
@@ -173,3 +175,9 @@ export interface InventoryCharacter {
   loadout: InventoryItem[]
   classes: InventoryCharacterClass[]
 }
+
+export const CombatEnemyStatus = {
+  ACTIVE: 'ACTIVE',
+  DEFEATED: 'DEFEATED'
+} as const
+export type CombatEnemyStatus = (typeof CombatEnemyStatus)[keyof typeof CombatEnemyStatus]

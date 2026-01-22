@@ -329,7 +329,7 @@ export class CombatService {
       const enemy = getEnemy(enemyId)
       return {
         id: `${enemyId}-${index}`,
-        enemyId,
+        templateId: enemyId,
         currentHealth: enemy?.health || 3,
         maxHealth: enemy?.health || 3
       }
@@ -367,7 +367,7 @@ export class CombatService {
 
     const participation = await (this.characterRepository as any).prisma.activityParticipation.findUnique({
       where: { id: participationId },
-      select: { activeDoctrines: true, enemyActiveDoctrines: true, currentEnemyHealth: true }
+      select: { activeDoctrines: true, enemyActiveDoctrines: true }
     })
 
     const activeDoctrines = (participation?.activeDoctrines as unknown as Record<string, ActiveStatusEffect>) || {}

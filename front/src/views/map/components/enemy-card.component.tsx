@@ -12,7 +12,7 @@ interface EnemyCardProps {
 
 export default function EnemyCard({ enemy, isTarget, className }: EnemyCardProps) {
   const { t } = useTranslation()
-  const template = getEnemy(enemy.enemyId)
+  const template = getEnemy(enemy.templateId)
 
   if (!template) return null
 
@@ -29,10 +29,19 @@ export default function EnemyCard({ enemy, isTarget, className }: EnemyCardProps
     }
   }
 
+  const getEnemyName = () => {
+    if (enemy.namePrefix && enemy.nameSuffix) {
+      const prefix = t(enemy.namePrefix)
+      const suffix = t(enemy.nameSuffix)
+      return `${prefix} ${suffix}`
+    }
+    return t(template.name)
+  }
+
   return (
     <div
       className={cn(
-        'border-border flex gap-3 rounded-lg border p-3 transition-all',
+        'border-border flex gap-3 overflow-hidden rounded-lg border p-3 transition-all',
         isTarget && !isDead && 'ring-1 ring-emerald-500/30',
         isDead && 'opacity-40 grayscale',
         className
@@ -52,20 +61,22 @@ export default function EnemyCard({ enemy, isTarget, className }: EnemyCardProps
       </div>
 
       {/* Enemy Info */}
-      <div className='flex flex-1 flex-col gap-2'>
+      <div className='flex min-w-0 flex-1 flex-col gap-2'>
         <div className='flex items-center justify-between gap-2'>
-          <span className={cn('text-sm font-medium', isDead && 'line-through')}>{t(template.name)}</span>
-          <span className={cn('rounded px-1.5 py-0.5 text-[10px] font-medium', getTypeBadgeColor())}>
+          <span className={cn('truncate text-sm font-medium', isDead && 'line-through')}>{getEnemyName()}</span>
+          <span className={cn('shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium', getTypeBadgeColor())}>
             {template.type}
           </span>
         </div>
 
         <HealthBar current={enemy.currentHealth} max={enemy.maxHealth} />
 
-        <div className='text-muted-foreground flex gap-2 text-[10px]'>
-          <span>{t(`inventory.damage_type.${template.damageType}`)}</span>
+        <div className='text-muted-foreground flex gap-2 truncate text-[10px]'>
+          <span className='truncate'>{t(`inventory.damage_type.${template.damageType}`)}</span>
           <span>•</span>
-          <span>ATK: {template.type === EnemyType.BOSS ? 4 : template.type === EnemyType.ELITE ? 3 : 2}d</span>
+          <span className='shrink-0'>
+            ATK: {template.type === EnemyType.BOSS ? 4 : template.type === EnemyType.ELITE ? 3 : 2}d
+          </span>
         </div>
       </div>
     </div>
