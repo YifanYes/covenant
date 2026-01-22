@@ -1,5 +1,6 @@
 import ScrollArea from '@/ui/scroll-area.component'
 import type { ItemDefinition } from '@shared/constants/items'
+import { ItemType } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 import StoreItemCard from './store-item-card.component'
 
@@ -49,6 +50,7 @@ export default function StoreItemGrid({
                   isTierRestricted={item.tier > characterTier}
                   characterTier={characterTier}
                   quantity={consumableQuantities[item.id] || 1}
+                  maxQuantity={item.type === ItemType.CONSUMABLE ? characterTier + 2 : undefined}
                   onToggle={() => onToggle(item.id)}
                   onQuantityChange={(q) => onQuantityChange(item.id, q)}
                 />
