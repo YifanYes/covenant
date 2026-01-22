@@ -1,5 +1,5 @@
 import { DOCTRINES } from '@shared/constants/doctrines'
-import { DamageType, EnemyType, getEnemy, type EnemyTemplate } from '@shared/constants/enemies'
+import { DamageType, EnemyType, getEnemy } from '@shared/constants/enemies'
 import { getConsumableById, WeaponDamageType } from '@shared/constants/items'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
@@ -86,7 +86,7 @@ const STATUS_EFFECT_HANDLERS: Record<StatusEffect, (mods: CombatModifiers, isPla
       else mods.burningDamageToEnemy += 2
       return { damage: 2 }
     },
-    [StatusEffect.DOCTRINE_ACTIVE]: (mods, isPlayer) => {
+    [StatusEffect.DOCTRINE_ACTIVE]: (_mods, _isPlayer) => {
       // Placeholder for active doctrines with immediate effects - no ongoing effect
       return {}
     }
@@ -99,6 +99,7 @@ export class CombatService {
     this.characterRepository = new CharacterRepository(prisma)
   }
 
+  // @ts-ignore: unused for now, will be used in future
   private _resolvePlayerAttack(
     attackRolls: number[],
     weaponDamageType: WeaponDamageType,
@@ -116,8 +117,9 @@ export class CombatService {
   }
 
   // TODO: for future implementation
+  // @ts-ignore: unused for now, will be used in future
   private _resolveEnemyDefense(enemy: EnemyTemplate, weaponDamageType: WeaponDamageType) {
-    const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type] ?? { defense: 1, attack: 2 }
+    const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type as EnemyType] ?? { defense: 1, attack: 2 }
     const threshold = this.getThreshold(weaponDamageType, enemy.strengthDef, enemy.magicDef)
 
     const enemyDefenseValues = this.rollDice(enemyDice.defense)
@@ -128,8 +130,9 @@ export class CombatService {
     return { enemyBlocks, enemyDefenseRolls }
   }
 
+  // @ts-ignore: unused for now, will be used in future
   private _resolveEnemyAttack(enemy: EnemyTemplate) {
-    const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type] ?? { defense: 1, attack: 2 }
+    const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type as EnemyType] ?? { defense: 1, attack: 2 }
     const threshold = this.getThreshold(enemy.damageType, enemy.strengthAtk, enemy.magicAtk)
 
     const enemyAttackValues = this.rollDice(enemyDice.attack)
@@ -137,6 +140,7 @@ export class CombatService {
     return { enemyHits, enemyAttackRolls }
   }
 
+  // @ts-ignore: unused for now, will be used in future
   private _resolvePlayerDefense(defenseRolls: number[], enemy: EnemyTemplate, strengthDef: number, magicDef: number) {
     const threshold = this.getThreshold(enemy.damageType, strengthDef, magicDef)
     const { results: playerDefenseRolls, count: playerBlocks } = this.calculateHitsWithCount(defenseRolls, threshold)
