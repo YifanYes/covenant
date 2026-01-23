@@ -59,9 +59,9 @@ export default function ActivityDetailPage() {
       namePrefix: ae.namePrefix,
       nameSuffix: ae.nameSuffix
     }
-  } else if (!participation && activity?.enemies?.length) {
-    // No participation yet, show preview of first enemy
-    const defaultEnemyId = activity.enemies[0]
+  } else if (!participation && activity?.enemySpawnWeights) {
+    // No participation yet, show preview of first enemy from spawn weights
+    const defaultEnemyId = Object.keys(activity.enemySpawnWeights)[0]
     const template = getEnemy(defaultEnemyId)
 
     if (template) {
@@ -108,9 +108,7 @@ export default function ActivityDetailPage() {
         toast.success(t('activities.success.complete'))
         setTimeout(() => navigate('/map'), 1500)
       } else if (result.enemyDefeated) {
-        toast.success(t('combat.result_dialog.success_title'), {
-          description: `+${activity?.rewardPerKill} ${t('inventory.gold')}`
-        })
+        toast.success(t('combat.result_dialog.success_title'))
 
         if (result.nextEnemyState) {
           setCurrentEnemy({

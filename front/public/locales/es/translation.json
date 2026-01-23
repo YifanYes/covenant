@@ -734,6 +734,16 @@
       "revive": "Error al revivir el personaje",
       "unequip": "Error al desequipar el objeto"
     },
+    "filter": {
+      "accessory": "Accesorios",
+      "all_tiers": "Todos los tiers",
+      "all_types": "Todos los tipos",
+      "armor": "Armadura",
+      "clear": "Limpiar filtros",
+      "consumable": "Consumibles",
+      "tier": "Tier {{tier}}",
+      "weapon": "Armas"
+    },
     "gold": "Oro",
     "health": "Salud",
     "items": "Objetos",
@@ -776,6 +786,11 @@
       "equip": "Objeto equipado correctamente",
       "revive": "¡Personaje revivido!",
       "unequip": "Objeto desequipado correctamente"
+    },
+    "tabs": {
+      "armory": "Armería y Equipamiento",
+      "character": "Personaje",
+      "doctrines": "Doctrinas"
     },
     "tier": "Tier",
     "title": "Inventario"
@@ -1148,6 +1163,7 @@
     },
     "items_purchased": "objetos comprados",
     "no_items": "No hay objetos disponibles",
+    "random_rarity": "Rareza aleatoria",
     "success": {
       "buy": "¡Compra exitosa!"
     },

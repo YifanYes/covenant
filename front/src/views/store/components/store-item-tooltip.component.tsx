@@ -1,6 +1,6 @@
 import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import type { ItemDefinition } from '@shared/constants/items'
-import { ItemRarity } from '@shared/types/gamification.types'
+import { ItemRarity, ItemType } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 
 interface StoreItemTooltipProps {
@@ -22,12 +22,15 @@ export default function StoreItemTooltip({
   const itemDescription = t(item.descriptionKey)
   const itemImagePath = `/assets/items/${item.id}.png`
 
-  const rarityColor =
-    item.rarity === ItemRarity.LEGENDARY
+  const isConsumable = item.type === ItemType.CONSUMABLE
+
+  const rarityColor = isConsumable
+    ? item.rarity === ItemRarity.LEGENDARY
       ? 'text-yellow-400'
       : item.rarity === ItemRarity.RARE
         ? 'text-purple-400'
         : 'text-zinc-400'
+    : 'text-zinc-500 italic'
 
   return (
     <Tooltip delayDuration={500}>
@@ -77,7 +80,7 @@ export default function StoreItemTooltip({
           <div className='flex items-center justify-between text-xs'>
             <span className='text-zinc-400'>Tier {item.tier}</span>
             <span className={`font-medium ${rarityColor}`}>
-              {t(`item_categories.rarity.${item.rarity.toLowerCase()}`)}
+              {isConsumable ? t(`item_categories.rarity.${item.rarity.toLowerCase()}`) : t('store.random_rarity')}
             </span>
           </div>
         </div>

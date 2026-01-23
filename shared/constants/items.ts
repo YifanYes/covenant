@@ -356,3 +356,69 @@ export function createInventoryItem(definition: ItemDefinition): InventoryItem {
     obtainedAt: new Date()
   }
 }
+
+// Rarity System
+export const RARITY_WEIGHTS = {
+  [ItemRarity.COMMON]: 50,
+  [ItemRarity.RARE]: 30,
+  [ItemRarity.LEGENDARY]: 20
+} as const
+
+export const RARITY_STAT_MULTIPLIERS = {
+  [ItemRarity.COMMON]: 1.0,
+  [ItemRarity.RARE]: 1.1,
+  [ItemRarity.LEGENDARY]: 1.2
+} as const
+
+export function rollItemRarity(): ItemRarity {
+  const entries = Object.entries(RARITY_WEIGHTS) as [ItemRarity, number][]
+  const totalWeight = entries.reduce((sum, [, weight]) => sum + weight, 0)
+  let random = Math.random() * totalWeight
+
+  for (const [rarity, weight] of entries) {
+    random -= weight
+
+    if (random <= 0) {
+      return rarity
+    }
+  }
+
+  return ItemRarity.COMMON
+}
+
+export function applyRarityToStats(stats: ItemStats, rarity: ItemRarity): ItemStats {
+  const multiplier = RARITY_STAT_MULTIPLIERS[rarity]
+  const newStats: ItemStats = { ...stats }
+
+  // Apply multiplier only to dice-based stats
+  if (stats.attackDice !== undefined) {
+    newStats.attackDice = Math.floor(stats.attackDice * multiplier)
+  }
+
+  if (stats.physicalDefDice !== undefined) {
+    newStats.physicalDefDice = Math.floor(stats.physicalDefDice * multiplier)
+  }
+
+  if (stats.magicDefDice !== undefined) {
+    newStats.magicDefDice = Math.floor(stats.magicDefDice * multiplier)
+  }
+
+  return newStats
+}
+
+export function createInventoryItemWithRandomRarity(definition: ItemDefinition): InventoryItem {
+  const rarity = rollItemRarity()
+  const adjustedStats = applyRarityToStats(definition.stats, rarity)
+
+  return {
+    id: crypto.randomUUID(),
+    definitionId: definition.id,
+    nameKey: definition.nameKey,
+    descriptionKey: definition.descriptionKey,
+    type: definition.type,
+    tier: definition.tier,
+    rarity,
+    stats: adjustedStats as Record<string, number | undefined>,
+    obtainedAt: new Date()
+  }
+}
