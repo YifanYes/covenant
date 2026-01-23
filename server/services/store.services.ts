@@ -31,7 +31,11 @@ export class StoreService {
 
     const { tier } = this.characterService.getCharacterProgress(character)
     const inventory = (character.inventory as unknown as InventoryItem[]) || []
-    const ownedItemIds = new Set(inventory.map((item) => item.definitionId))
+    const loadout = (character.loadout as unknown as InventoryItem[]) || []
+    const ownedItemIds = new Set([
+      ...inventory.map((item) => item.definitionId),
+      ...loadout.map((item) => item.definitionId)
+    ])
 
     // Filter equipment items: must have price > 0 and not already owned
     const availableEquipment = Object.values(ALL_ITEMS).filter((item) => item.price > 0 && !ownedItemIds.has(item.id))
@@ -83,7 +87,11 @@ export class StoreService {
 
     // Check if any non-consumable items are already owned
     const inventory = (character.inventory as unknown as InventoryItem[]) || []
-    const ownedItemIds = new Set(inventory.map((item) => item.definitionId))
+    const loadout = (character.loadout as unknown as InventoryItem[]) || []
+    const ownedItemIds = new Set([
+      ...inventory.map((item) => item.definitionId),
+      ...loadout.map((item) => item.definitionId)
+    ])
 
     for (const item of itemsToBuy) {
       // Skip ownership check for consumables (they're stackable)
