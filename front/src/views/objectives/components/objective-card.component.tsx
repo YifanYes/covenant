@@ -52,7 +52,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
     formState: { errors, isValid, isDirty }
   } = useForm<UpdateObjectiveBodyType>({
     resolver: standardSchemaResolver(updateObjectiveSchema),
-    mode: 'onTouched',
+    mode: 'onSubmit',
     defaultValues: {
       id: objective.id,
       name: objective.name,

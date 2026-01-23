@@ -56,7 +56,7 @@ export default function CreateTaskDialog() {
     formState: { errors, isValid, isDirty }
   } = useForm<CreateTaskType>({
     resolver: standardSchemaResolver(createTaskSchema),
-    mode: 'onTouched',
+    mode: 'onSubmit',
     defaultValues: {
       title: '',
       description: '',

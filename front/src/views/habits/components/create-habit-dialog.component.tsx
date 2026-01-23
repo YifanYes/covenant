@@ -38,7 +38,7 @@ export default function CreateHabitDialog() {
     formState: { errors, isValid, isDirty }
   } = useForm<CreateHabitType>({
     resolver: standardSchemaResolver(createHabitSchema),
-    mode: 'onTouched',
+    mode: 'onSubmit',
     defaultValues: {
       name: '',
       description: '',

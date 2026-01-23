@@ -1,7 +1,7 @@
 import LoaderButton from '@/common/loader-button.component'
 import TextInput from '@/forms/text-input.component'
-import Label from '@/ui/label.component'
 import { cn } from '@/lib/cn.lib'
+import Label from '@/ui/label.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Check, ChevronLeft, ChevronRight } from '@nsmr/pixelart-react'
@@ -54,7 +54,7 @@ export default function Onboarding() {
       magicNature: MagicNature.ORDER
     },
     resolver: standardSchemaResolver(createCharacterSchema),
-    mode: 'onTouched'
+    mode: 'onSubmit'
   })
 
   const handleAnswer = (questionId: number, answer: MagicNature) => {

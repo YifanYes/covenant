@@ -34,7 +34,7 @@ export default function CreateAreaDialog() {
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<CreateAreaBodyType>({ resolver: standardSchemaResolver(createAreaSchema), mode: 'onTouched' })
+  } = useForm<CreateAreaBodyType>({ resolver: standardSchemaResolver(createAreaSchema), mode: 'onSubmit' })
 
   const onSubmit = (data: CreateAreaBodyType) => mutation.mutate(data)
 
