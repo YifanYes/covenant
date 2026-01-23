@@ -44,3 +44,9 @@ A gamified productivity platform combining task management, habit tracking, and 
 - Zod schemas in `shared/` (source of truth)
 - Backend: Router → Service → Repository
 - Frontend: Views in `views/`, shared components in `components/`
+
+### Testing
+
+- Vitest for unit/integration tests
+- Mock external dependencies
+- Tests co-located or in `__tests__`

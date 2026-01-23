@@ -302,6 +302,24 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## 10. Testing
 
-- Place tests adjacent to source files or in `__tests__/` folders
-- Use descriptive test names
-- Test business logic in services, not routers
+### Location
+
+- Frontend: `__tests__` or adjacent to components (e.g., `foo.test.tsx`)
+- Backend: `server/__tests__/services/`, `server/__tests__/routers/`
+
+### Frameworks
+
+- Frontend: Vitest + React Testing Library
+- Backend: Vitest
+
+### Backend Guidelines
+
+- **Unit Tests**: Focus on Services. Mock Repositories.
+- **Integration Tests**: Focus on Routers validating inputs and calling services.
+- **Mocking**: Use `server/__tests__/mocks/prisma.mock.ts` to mock Prisma.
+- **Coverage**: Run `bun run test:coverage` in `server/`. Aim for high coverage on critical logic (Combat, Payment).
+
+### Frontend Guidelines
+
+- Test user interactions (clicks, form submissions).
+- Mock API calls using Vitest mocks.

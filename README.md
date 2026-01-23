@@ -114,3 +114,25 @@ cd front && bun run build
 # Build the server
 cd server && npx tsc
 ```
+
+## Testing
+
+The server uses [Vitest](https://vitest.dev/) for unit and integration testing.
+
+### Running Tests
+
+To run the test suite for the server:
+
+```bash
+cd server
+bun run test
+```
+
+### Coverage
+
+To generate a coverage report:
+
+```bash
+cd server
+bun run test:coverage
+```
