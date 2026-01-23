@@ -4,21 +4,31 @@ import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/t
 import { getRewardText } from '@/utils/text.utils'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Check, Code, Loader } from '@nsmr/pixelart-react'
+import { HabitTimespan } from '@shared/schemas/habits.schemas'
 import { useMutation } from '@tanstack/react-query'
+import type { OpUnitType } from 'dayjs'
 import dayjs from 'dayjs'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
+const timespanUnits: Record<HabitTimespan, OpUnitType> = {
+  [HabitTimespan.DAILY]: 'day',
+  [HabitTimespan.WEEKLY]: 'week',
+  [HabitTimespan.MONTHLY]: 'month'
+}
+
 // forwarding ref and event handlers so the trigger can attach to root div
 const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttributes<HTMLDivElement>>(
-  ({ habit: { completions = [], recurrence = 1, id, name, description }, ...props }, ref) => {
+  ({ habit: { completions = [], recurrence = 1, id, name, description, timespan }, ...props }, ref) => {
     const { t } = useTranslation()
+    const timespanUnit = timespanUnits[timespan as HabitTimespan]
 
     const createCompletion = useMutation(
       trpc.habits.createCompletion.mutationOptions({
         onSuccess: async (data) => {
-          const currentCount = completions.filter(({ completedAt }) => dayjs().isSame(completedAt, 'day')).length + 1
+          const currentCount =
+            completions.filter(({ completedAt }) => dayjs().isSame(completedAt, timespanUnit)).length + 1
           toast.success(
             t(currentCount >= recurrence ? 'habits.success.target_met' : 'habits.success.progress', {
               diceReward: getRewardText(data.diceEarned)
@@ -51,10 +61,13 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
       })
     }, [completions, recurrence])
 
-    const { completionsToday, isTodayCompleted } = useMemo(() => {
-      const todayCompletions = completions.filter((c) => dayjs(c.completedAt).isSame(dayjs(), 'day'))
-      return { completionsToday: todayCompletions.length, isTodayCompleted: todayCompletions.length >= recurrence }
-    }, [completions, recurrence])
+    const { periodCompletions, isPeriodCompleted } = useMemo(() => {
+      const completionsInPeriod = completions.filter((c) => dayjs(c.completedAt).isSame(dayjs(), timespanUnit))
+      return {
+        periodCompletions: completionsInPeriod.length,
+        isPeriodCompleted: completionsInPeriod.length >= recurrence
+      }
+    }, [completions, recurrence, timespanUnit])
 
     const handleMarkComplete = (e: React.MouseEvent) => {
       e.stopPropagation()
@@ -89,14 +102,14 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
           </div>
           <Button
             size='icon'
-            variant={isTodayCompleted ? 'default' : 'outline'}
+            variant={isPeriodCompleted ? 'default' : 'outline'}
             onClick={handleMarkComplete}
-            disabled={createCompletion.isPending || completionsToday >= recurrence}
+            disabled={createCompletion.isPending || periodCompletions >= recurrence}
             className='h-8 w-8 shrink-0'
           >
             {createCompletion.isPending ? (
               <Loader className='h-3.5 w-3.5 animate-spin' />
-            ) : recurrence > 1 && completionsToday + 1 < recurrence ? (
+            ) : recurrence > 1 && periodCompletions + 1 < recurrence ? (
               <span className='text-xs font-bold'>+1</span>
             ) : (
               <Check className='h-3.5 w-3.5' />
