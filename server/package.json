@@ -7,7 +7,9 @@
     "dev": "bun --watch server.ts",
     "db:generate": "prisma migrate dev",
     "db:migrate": "prisma migrate deploy",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
@@ -22,6 +24,9 @@
   "devDependencies": {
     "@types/node": "^22.19.3",
     "@types/pg": "^8.16.0",
-    "typescript": "^5.9.3"
+    "@vitest/coverage-v8": "^4.0.18",
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^6.0.4",
+    "vitest": "^4.0.18"
   }
 }

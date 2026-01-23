@@ -154,6 +154,13 @@ cd front && bun run dev
 - Review the CI workflow in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
 - The workflow runs on push to `main` branch and deploys to AWS
 
+### Backend Testing
+
+- Tests are located in `server/__tests__/`
+- Use Vitest as the testing framework
+- Run tests with `bun run test` (in server dir)
+- Mock database calls using `prisma.mock.ts` (do not access real DB in tests)
+
 ### Running Lint
 
 ```bash
