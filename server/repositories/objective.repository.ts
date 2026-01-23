@@ -32,7 +32,11 @@ export class ObjectiveRepository {
       },
       include: {
         areas: true,
-        tasks: true
+        tasks: true,
+        habits: {
+          where: { deletedAt: null },
+          include: { completions: true }
+        }
       }
     })
   }

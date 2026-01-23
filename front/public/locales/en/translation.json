@@ -1000,8 +1000,14 @@
       "success": "Objective successfully deleted",
       "title": "Delete objective"
     },
+    "habits_count_one": "{{count}} habit",
+    "habits_count_other": "{{count}} habits",
     "no_date": "No date",
+    "no_habits": "No linked habits",
     "no_tasks": "No linked tasks",
+    "no_tasks_or_habits": "No linked tasks or habits",
+    "tasks_count_one": "{{count}} task",
+    "tasks_count_other": "{{count}} tasks",
     "title": "Objectives",
     "update": {
       "error": "An error occurred while updating the objective",
