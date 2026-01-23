@@ -23,7 +23,7 @@ export default function UpcomingTasksComponent({ tasks }: UpcomingTasksComponent
     >
       {tasks && tasks.length > 0 ? (
         <div className='scrollbar-thin scrollbar-thumb-muted h-[220px] space-y-2 overflow-y-auto pr-4'>
-          {[...tasks, ...tasks, ...tasks, ...tasks, ...tasks, ...tasks].map((task, index) => {
+          {tasks.map((task, index) => {
             const colorClass = task.color
               ? getColorClasses(task.color, { bg: 'bg-muted', text: 'text-muted-foreground' }).bg
               : 'bg-muted'
