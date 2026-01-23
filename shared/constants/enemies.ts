@@ -77,7 +77,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
   bandit_runic: {
     id: 'bandit_runic',
     name: 'enemies.bandit_runic',
-    imageId: 'bandit_chief',
+    imageId: 'bandit_runic',
     tier: 1,
     type: EnemyType.MINION,
     health: 4,
@@ -96,7 +96,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
   bandit_stalker: {
     id: 'bandit_stalker',
     name: 'enemies.bandit_stalker',
-    imageId: 'bandit_chief',
+    imageId: 'bandit_stalker',
     tier: 1,
     type: EnemyType.MINION,
     health: 4,
@@ -172,7 +172,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
   magma_demon: {
     id: 'magma_demon',
     name: 'enemies.magma_demon',
-    imageId: 'elite_demon',
+    imageId: 'magma_demon',
     tier: 1,
     type: EnemyType.MINION,
     health: 8,
@@ -191,7 +191,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
   shadow_demon: {
     id: 'shadow_demon',
     name: 'enemies.shadow_demon',
-    imageId: 'minor_demon',
+    imageId: 'shadow_demon',
     tier: 1,
     type: EnemyType.MINION,
     health: 6,
@@ -307,7 +307,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
   shadow_demon_elite: {
     id: 'shadow_demon_elite',
     name: 'enemies.shadow_demon_elite',
-    imageId: 'minor_demon',
+    imageId: 'shadow_demon',
     tier: 3,
     type: EnemyType.MINION,
     health: 5,
@@ -326,7 +326,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
   minor_demon: {
     id: 'minor_demon',
     name: 'enemies.minor_demon',
-    imageId: 'minor_demon',
+    imageId: 'shadow_demon',
     tier: 3,
     type: EnemyType.MINION,
     health: 4,
