@@ -74,9 +74,9 @@ export default function EnemyCard({ enemy, isTarget, className }: EnemyCardProps
         <div className='text-muted-foreground flex gap-2 truncate text-[10px]'>
           <span className='truncate'>{t(`inventory.damage_type.${template.damageType}`)}</span>
           <span>•</span>
-          <span className='shrink-0'>
-            ATK: {template.type === EnemyType.BOSS ? 4 : template.type === EnemyType.ELITE ? 3 : 2}d
-          </span>
+          <span className='shrink-0'>ATK: {template.attackDice}d</span>
+          <span>•</span>
+          <span className='shrink-0'>DEF: {template.defenseDice}d</span>
         </div>
       </div>
     </div>
