@@ -1,7 +1,12 @@
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { Group } from '@nsmr/pixelart-react'
 import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
-import type { InventoryCharacter, InventoryItem } from '@shared/types/gamification.types'
+import {
+  EquipmentTypeFilter,
+  ItemType,
+  type InventoryCharacter,
+  type InventoryItem
+} from '@shared/types/gamification.types'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import ItemCard from './item-card.component'
@@ -10,9 +15,36 @@ interface InventoryGridProps {
   character: InventoryCharacter
   selectedItemId?: string
   onItemClick?: (item: InventoryItem) => void
+  tierFilter?: number | null
+  typeFilter?: EquipmentTypeFilter | null
 }
 
-export default function InventoryGrid({ character, selectedItemId, onItemClick }: InventoryGridProps) {
+function matchesTypeFilter(itemType: ItemType, filter: EquipmentTypeFilter | null): boolean {
+  if (!filter) return true
+
+  switch (filter) {
+    case 'weapon':
+      return (
+        itemType === ItemType.WEAPON_MELEE || itemType === ItemType.WEAPON_RANGED || itemType === ItemType.WEAPON_MAGIC
+      )
+    case 'armor':
+      return itemType === ItemType.ARMOR
+    case 'accessory':
+      return itemType === ItemType.ACCESSORY
+    case 'consumable':
+      return itemType === ItemType.CONSUMABLE
+    default:
+      return true
+  }
+}
+
+export default function InventoryGrid({
+  character,
+  selectedItemId,
+  onItemClick,
+  tierFilter,
+  typeFilter
+}: InventoryGridProps) {
   const { t } = useTranslation()
 
   // Combine tier 1 items (always available) with character's inventory
@@ -31,7 +63,17 @@ export default function InventoryGrid({ character, selectedItemId, onItemClick }
     // Add purchased items from character inventory (excluding equipped)
     const purchasedItems = (character?.inventory || []).filter((item) => !equippedDefinitionIds.has(item.definitionId))
 
-    const allItems = [...tier1Items, ...purchasedItems]
+    let allItems = [...tier1Items, ...purchasedItems]
+
+    // Apply tier filter
+    if (tierFilter !== null && tierFilter !== undefined) {
+      allItems = allItems.filter((item) => item.tier === tierFilter)
+    }
+
+    // Apply type filter
+    if (typeFilter) {
+      allItems = allItems.filter((item) => matchesTypeFilter(item.type, typeFilter))
+    }
 
     // Group items: consumables are stacked by definitionId, others are individual
     // Maintain order by using an array to track first appearances
@@ -51,7 +93,7 @@ export default function InventoryGrid({ character, selectedItemId, onItemClick }
     })
 
     return orderedKeys.map((key) => groups[key])
-  }, [character?.inventory, character?.loadout])
+  }, [character?.inventory, character?.loadout, tierFilter, typeFilter])
 
   return (
     <Card className='flex h-fit w-full flex-1 flex-col gap-0'>

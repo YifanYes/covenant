@@ -206,23 +206,22 @@ Community Activities are **shared objectives** where all players of a faction co
 
 #### Activity Structure
 
-| Field                | Description                                                                |
-| -------------------- | -------------------------------------------------------------------------- |
-| `id`                 | Unique identifier                                                          |
-| `name`               | Activity title                                                             |
-| `mapId`              | ID of the map image to display (e.g., `santa_cruz_siege`)                  |
-| `position`           | Position as `{ x: number, y: number }` — percentages (0-100) from top-left |
-| `factionId`          | Owning faction                                                             |
-| `objective`          | Collective goal (e.g., "Defeat 1000 demons")                               |
-| `progress`           | Current global count                                                       |
-| `target`             | Goal to reach (dynamically scaled)                                         |
-| `deadline`           | Timestamp when activity expires                                            |
-| `difficulty`         | `EASY`, `NORMAL`, or `HARD` — affects objective scaling                    |
-| `rewardPerKill`      | Gold per enemy defeated                                                    |
-| `communityBonus`     | Extra reward if objective is completed                                     |
-| `enemies`            | Array of enemy IDs that spawn in this activity                             |
-| `successConsequence` | What happens on success (unlocks, map changes)                             |
-| `failureConsequence` | What happens on failure (new emergencies, blocked areas)                   |
+| Field                | Description                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| `id`                 | Unique identifier                                                                          |
+| `name`               | Activity title                                                                             |
+| `mapId`              | ID of the map image to display (e.g., `santa_cruz_siege`)                                  |
+| `position`           | Position as `{ x: number, y: number }` — percentages (0-100) from top-left                 |
+| `factionId`          | Owning faction                                                                             |
+| `objective`          | Collective goal (e.g., "Defeat 1000 demons")                                               |
+| `progress`           | Current global count                                                                       |
+| `target`             | Goal to reach (dynamically scaled)                                                         |
+| `deadline`           | Timestamp when activity expires                                                            |
+| `difficulty`         | `EASY`, `NORMAL`, or `HARD` — affects objective scaling                                    |
+| `communityBonus`     | Extra reward if objective is completed                                                     |
+| `enemySpawnWeights`  | Weighted probability table for enemy spawns (e.g., `{ magma_demon: 80, elite_demon: 20 }`) |
+| `successConsequence` | What happens on success (unlocks, map changes)                                             |
+| `failureConsequence` | What happens on failure (new emergencies, blocked areas)                                   |
 
 ##### React Implementation for Map Markers
 
@@ -399,9 +398,12 @@ interface Enemy {
   magicDef: number // Magic defense threshold
   manaRegen: number
 
-  // Rewards
-  xpReward: number
-  goldReward: number
+  // Combat dice (replaces ENEMY_DICE_BY_TYPE lookup)
+  attackDice: number
+  defenseDice: number
+
+  // Rewards - randomized within range on defeat
+  goldReward: { min: number; max: number }
   dropTable?: DropTable
 }
 ```
@@ -431,9 +433,8 @@ interface ActivityTemplate {
   baseTarget: number // Base enemy count before scaling
   difficulty: ActivityDifficulty
   durationDays: number
-  rewardPerKill: number
   communityBonus: number
-  enemies: string[] // Enemy IDs
+  enemySpawnWeights: Record<string, number> // Enemy ID -> spawn weight
   successConsequence: string // Description of what happens on success
   failureConsequence: string // Description of what happens on failure
   successText: string // Message shown to players on success

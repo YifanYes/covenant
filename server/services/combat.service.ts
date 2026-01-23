@@ -1,5 +1,5 @@
 import { DOCTRINES } from '@shared/constants/doctrines'
-import { DamageType, EnemyType, getEnemy } from '@shared/constants/enemies'
+import { DamageType, getEnemy, type EnemyTemplate } from '@shared/constants/enemies'
 import { getConsumableById, WeaponDamageType } from '@shared/constants/items'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
@@ -15,12 +15,6 @@ import { CombatLogType, ItemType } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '../generated/prisma'
 import { CharacterRepository } from '../repositories/character.repository'
-
-const ENEMY_DICE_BY_TYPE: Record<EnemyType, { defense: number; attack: number }> = {
-  [EnemyType.BOSS]: { defense: 3, attack: 4 },
-  [EnemyType.ELITE]: { defense: 2, attack: 3 },
-  [EnemyType.MINION]: { defense: 1, attack: 2 }
-}
 
 // Combat modifiers accumulated from active doctrines and status effects
 interface CombatModifiers {
@@ -119,10 +113,9 @@ export class CombatService {
   // TODO: for future implementation
   // @ts-ignore: unused for now, will be used in future
   private _resolveEnemyDefense(enemy: EnemyTemplate, weaponDamageType: WeaponDamageType) {
-    const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type as EnemyType] ?? { defense: 1, attack: 2 }
     const threshold = this.getThreshold(weaponDamageType, enemy.strengthDef, enemy.magicDef)
 
-    const enemyDefenseValues = this.rollDice(enemyDice.defense)
+    const enemyDefenseValues = this.rollDice(enemy.defenseDice)
     const { results: enemyDefenseRolls, count: enemyBlocks } = this.calculateHitsWithCount(
       enemyDefenseValues,
       threshold
@@ -132,10 +125,9 @@ export class CombatService {
 
   // @ts-ignore: unused for now, will be used in future
   private _resolveEnemyAttack(enemy: EnemyTemplate) {
-    const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type as EnemyType] ?? { defense: 1, attack: 2 }
     const threshold = this.getThreshold(enemy.damageType, enemy.strengthAtk, enemy.magicAtk)
 
-    const enemyAttackValues = this.rollDice(enemyDice.attack)
+    const enemyAttackValues = this.rollDice(enemy.attackDice)
     const { results: enemyAttackRolls, count: enemyHits } = this.calculateHitsWithCount(enemyAttackValues, threshold)
     return { enemyHits, enemyAttackRolls }
   }
@@ -462,8 +454,7 @@ export class CombatService {
     })
 
     // 5. Resolve Enemy Defense with modifiers
-    const enemyDice = ENEMY_DICE_BY_TYPE[enemy.type] ?? { defense: 1, attack: 2 }
-    const enemyDefenseDiceCount = Math.max(0, enemyDice.defense + enemyDefenseBonusDice)
+    const enemyDefenseDiceCount = Math.max(0, enemy.defenseDice + enemyDefenseBonusDice)
     const enemyDefenseValues = this.rollDice(enemyDefenseDiceCount)
 
     const enemyDefenseThreshold = this.getThreshold(weaponDamageType, enemy.strengthDef, enemy.magicDef)
@@ -488,7 +479,7 @@ export class CombatService {
     let enemyAttackRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] = []
 
     if (!enemyKilledBeforeActing) {
-      const enemyAttackDiceCount = Math.max(0, enemyDice.attack + enemyAttackBonusDice)
+      const enemyAttackDiceCount = Math.max(0, enemy.attackDice + enemyAttackBonusDice)
 
       if (enemyAttackDiceCount > 0) {
         const enemyAttackValues = this.rollDice(enemyAttackDiceCount)

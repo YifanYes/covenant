@@ -734,6 +734,16 @@
       "revive": "Failed to revive character",
       "unequip": "Failed to unequip item"
     },
+    "filter": {
+      "accessory": "Accessories",
+      "all_tiers": "All Tiers",
+      "all_types": "All Types",
+      "armor": "Armor",
+      "clear": "Clear filters",
+      "consumable": "Consumables",
+      "tier": "Tier {{tier}}",
+      "weapon": "Weapons"
+    },
     "gold": "Gold",
     "health": "Health",
     "items": "Items",
@@ -776,6 +786,11 @@
       "equip": "Item equipped successfully",
       "revive": "Character revived!",
       "unequip": "Item unequipped successfully"
+    },
+    "tabs": {
+      "armory": "Armory & Loadout",
+      "character": "Character",
+      "doctrines": "Doctrines"
     },
     "tier": "Tier",
     "title": "Inventory"
@@ -1148,6 +1163,7 @@
     },
     "items_purchased": "items purchased",
     "no_items": "No items available",
+    "random_rarity": "Random rarity",
     "success": {
       "buy": "Purchase successful!"
     },

@@ -72,8 +72,11 @@ arq/
 │   ├── services/   # Business logic layer
 │   └── repositories/ # Data access layer (Prisma)
 ├── shared/         # Shared code (Zod schemas, types)
-├── .context/       # Coding standards and AI context
-├── .antigravity/   # Agent rules and directives
+├── docs/           # Documentation and specifications
+│   └── specs/      # Technical specifications (SDD)
+├── .ai/            # AI agent context (universal)
+│   ├── AGENTS.md   # Main AI instructions
+│   └── CODING_STANDARDS.md
 ├── mission.md      # Project mission and pillars
 └── roadmap.md      # Project timeline and phases
 ```

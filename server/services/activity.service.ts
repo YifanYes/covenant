@@ -1,9 +1,9 @@
-import { getEnemy } from '@shared/constants/enemies'
+import { calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import { getItemById, WeaponDamageType } from '@shared/constants/items'
 import type { CombatLogEntry, InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
-import { ActivityDifficulty, getActivityById } from '../../shared/constants/activities'
+import { ActivityDifficulty, getActivityById, selectRandomEnemy } from '../../shared/constants/activities'
 import type { CharacterWithClasses } from '../../shared/types/character.types'
 import type { PrismaClient } from '../generated/prisma'
 import { ActivityRepository } from '../repositories/activity.repository'
@@ -98,7 +98,7 @@ export class ActivityService {
     // Check if there's an active enemy, if not spawn one
     let activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participation.id)
     if (!activeEnemy) {
-      const enemyId = config.enemies[0]
+      const enemyId = selectRandomEnemy(config.enemySpawnWeights)
       const enemyTemplate = getEnemy(enemyId)
       if (!enemyTemplate) throw new TRPCError({ code: 'NOT_FOUND', message: `Enemy ${enemyId} not found` })
 
@@ -285,8 +285,11 @@ export class ActivityService {
       // Mark enemy as defeated
       await this.combatEnemyRepository.defeatEnemy(activeEnemy.id)
 
+      // Calculate gold reward from enemy's reward range
+      const goldReward = calculateGoldReward(enemyTemplate)
+
       // Update kills on participation
-      await this.activityRepository.updateParticipation(participation.id, 1, config.rewardPerKill)
+      await this.activityRepository.updateParticipation(participation.id, 1, goldReward)
 
       // Update Activity Progress
       await this.activityRepository.updateProgress(activityRecordId, 1)
@@ -296,8 +299,8 @@ export class ActivityService {
       isActivityCompleted = !!(updatedActivity && updatedActivity.progress >= updatedActivity.target)
 
       if (!isActivityCompleted) {
-        // Spawn next enemy
-        const nextEnemyId = config.enemies[0]
+        // Spawn next enemy using weighted random selection
+        const nextEnemyId = selectRandomEnemy(config.enemySpawnWeights)
         const nextEnemyTemplate = getEnemy(nextEnemyId)
 
         if (nextEnemyTemplate) {
@@ -324,7 +327,7 @@ export class ActivityService {
         await this.activityRepository.completeActivity(activityRecordId)
       }
 
-      logs.push(`💀 Enemy defeated! +${config.rewardPerKill} gold`)
+      logs.push(`💀 Enemy defeated! +${goldReward} gold`)
     }
 
     return {

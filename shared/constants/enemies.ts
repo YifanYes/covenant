@@ -27,6 +27,11 @@ export interface EnemyTemplate {
   magicAtk: number
   magicDef: number
   manaRegen: number
+  // Combat dice
+  attackDice: number
+  defenseDice: number
+  // Gold reward range on defeat
+  goldReward: { min: number; max: number }
 }
 
 export const ENEMIES: Record<string, EnemyTemplate> = {
@@ -45,7 +50,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 5,
     magicAtk: 6,
     magicDef: 6,
-    manaRegen: 0
+    manaRegen: 0,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 8, max: 12 }
   },
   bandit_chief: {
     id: 'bandit_chief',
@@ -61,7 +69,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 6,
     magicDef: 5,
-    manaRegen: 0
+    manaRegen: 0,
+    attackDice: 3,
+    defenseDice: 2,
+    goldReward: { min: 15, max: 25 }
   },
   bandit_runic: {
     id: 'bandit_runic',
@@ -77,7 +88,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 5,
     magicAtk: 4,
     magicDef: 3,
-    manaRegen: 1
+    manaRegen: 1,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 10, max: 15 }
   },
   bandit_stalker: {
     id: 'bandit_stalker',
@@ -93,7 +107,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 6,
     magicDef: 5,
-    manaRegen: 0
+    manaRegen: 0,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 10, max: 14 }
   },
   fallen_templar: {
     id: 'fallen_templar',
@@ -109,7 +126,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 5,
     magicDef: 5,
-    manaRegen: 1
+    manaRegen: 1,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 10, max: 15 }
   },
   ghost: {
     id: 'ghost',
@@ -125,7 +145,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 6,
     magicAtk: 4,
     magicDef: 4,
-    manaRegen: 1
+    manaRegen: 1,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 8, max: 12 }
   },
   giant_spider: {
     id: 'giant_spider',
@@ -141,7 +164,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 5,
     magicAtk: 6,
     magicDef: 6,
-    manaRegen: 0
+    manaRegen: 0,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 10, max: 14 }
   },
   magma_demon: {
     id: 'magma_demon',
@@ -157,7 +183,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 4,
     magicDef: 5,
-    manaRegen: 1
+    manaRegen: 1,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 12, max: 18 }
   },
   shadow_demon: {
     id: 'shadow_demon',
@@ -173,7 +202,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 3,
     magicDef: 3,
-    manaRegen: 2
+    manaRegen: 2,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 12, max: 18 }
   },
   // Tier 2
   fallen_inquisitor: {
@@ -190,7 +222,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 5,
     magicAtk: 4,
     magicDef: 3,
-    manaRegen: 2
+    manaRegen: 2,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 15, max: 22 }
   },
   armored_templar: {
     id: 'armored_templar',
@@ -206,7 +241,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 6,
     magicDef: 5,
-    manaRegen: 1
+    manaRegen: 1,
+    attackDice: 3,
+    defenseDice: 2,
+    goldReward: { min: 20, max: 30 }
   },
   werewolf: {
     id: 'werewolf',
@@ -222,7 +260,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 6,
     magicDef: 5,
-    manaRegen: 0
+    manaRegen: 0,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 15, max: 22 }
   },
   werewolf_alpha: {
     id: 'werewolf_alpha',
@@ -238,7 +279,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 5,
     magicDef: 4,
-    manaRegen: 0
+    manaRegen: 0,
+    attackDice: 4,
+    defenseDice: 3,
+    goldReward: { min: 35, max: 50 }
   },
   // Tier 3 Enemies
   elite_armored_templar: {
@@ -255,7 +299,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 5,
     magicDef: 4,
-    manaRegen: 1
+    manaRegen: 1,
+    attackDice: 4,
+    defenseDice: 3,
+    goldReward: { min: 40, max: 60 }
   },
   shadow_demon_elite: {
     id: 'shadow_demon_elite',
@@ -271,7 +318,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 3,
     magicDef: 3,
-    manaRegen: 2
+    manaRegen: 2,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 18, max: 28 }
   },
   minor_demon: {
     id: 'minor_demon',
@@ -287,7 +337,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 5,
     magicAtk: 4,
     magicDef: 4,
-    manaRegen: 1
+    manaRegen: 1,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 18, max: 25 }
   },
   elite_demon: {
     id: 'elite_demon',
@@ -303,7 +356,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 3,
     magicDef: 3,
-    manaRegen: 2
+    manaRegen: 2,
+    attackDice: 3,
+    defenseDice: 2,
+    goldReward: { min: 25, max: 40 }
   },
   demon_lord: {
     id: 'demon_lord',
@@ -319,7 +375,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 3,
     magicDef: 3,
-    manaRegen: 3
+    manaRegen: 3,
+    attackDice: 4,
+    defenseDice: 3,
+    goldReward: { min: 45, max: 70 }
   },
   fallen_inquisitor_boss: {
     id: 'fallen_inquisitor_boss',
@@ -335,7 +394,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 2,
     magicDef: 2,
-    manaRegen: 3
+    manaRegen: 3,
+    attackDice: 4,
+    defenseDice: 3,
+    goldReward: { min: 40, max: 60 }
   },
   vampire: {
     id: 'vampire',
@@ -351,7 +413,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 4,
     magicAtk: 4,
     magicDef: 4,
-    manaRegen: 1
+    manaRegen: 1,
+    attackDice: 2,
+    defenseDice: 1,
+    goldReward: { min: 20, max: 30 }
   },
   vampire_count: {
     id: 'vampire_count',
@@ -367,7 +432,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 3,
     magicDef: 3,
-    manaRegen: 3
+    manaRegen: 3,
+    attackDice: 4,
+    defenseDice: 3,
+    goldReward: { min: 45, max: 70 }
   },
   nephilim: {
     id: 'nephilim',
@@ -383,7 +451,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 3,
     magicAtk: 2,
     magicDef: 2,
-    manaRegen: 3
+    manaRegen: 3,
+    attackDice: 4,
+    defenseDice: 3,
+    goldReward: { min: 50, max: 80 }
   },
   // Tier 4
   belphegor_avatar: {
@@ -400,7 +471,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 2,
     magicDef: 2,
-    manaRegen: 4
+    manaRegen: 4,
+    attackDice: 5,
+    defenseDice: 4,
+    goldReward: { min: 80, max: 120 }
   },
   behemoth: {
     id: 'behemoth',
@@ -416,7 +490,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 1,
     magicAtk: 6,
     magicDef: 4,
-    manaRegen: 0
+    manaRegen: 0,
+    attackDice: 5,
+    defenseDice: 4,
+    goldReward: { min: 100, max: 150 }
   },
   fallen_angel: {
     id: 'fallen_angel',
@@ -432,7 +509,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     strengthDef: 2,
     magicAtk: 1,
     magicDef: 1,
-    manaRegen: 5
+    manaRegen: 5,
+    attackDice: 5,
+    defenseDice: 4,
+    goldReward: { min: 90, max: 140 }
   }
 }
 
@@ -442,4 +522,12 @@ export const getEnemy = (id: string): EnemyTemplate | undefined => {
 
 export const getEnemiesByTier = (tier: number): EnemyTemplate[] => {
   return Object.values(ENEMIES).filter((e) => e.tier <= tier)
+}
+
+/**
+ * Calculate a random gold reward from an enemy's reward range
+ */
+export function calculateGoldReward(enemy: EnemyTemplate): number {
+  const { min, max } = enemy.goldReward
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }

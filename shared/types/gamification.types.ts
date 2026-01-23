@@ -28,6 +28,15 @@ export const SlotType = {
 export type SlotType = (typeof SlotType)[keyof typeof SlotType]
 export const slotTypeValues = ['WEAPON', 'ARMOR', 'ACCESSORY'] as const
 
+export const EquipmentTypeFilter = {
+  ALL: 'all',
+  WEAPON: 'weapon',
+  ARMOR: 'armor',
+  ACCESSORY: 'accessory',
+  CONSUMABLE: 'consumable'
+} as const
+export type EquipmentTypeFilter = (typeof EquipmentTypeFilter)[keyof typeof EquipmentTypeFilter]
+
 export interface InventoryItem {
   id: string
   definitionId?: string // Link to base item definition not unique id
