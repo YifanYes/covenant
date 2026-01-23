@@ -1,4 +1,11 @@
-import { ALL_ITEMS, CONSUMABLES, createInventoryItem, getConsumableById, getItemById } from '@shared/constants/items'
+import {
+  ALL_ITEMS,
+  CONSUMABLES,
+  createInventoryItem,
+  createInventoryItemWithRandomRarity,
+  getConsumableById,
+  getItemById
+} from '@shared/constants/items'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import type { PurchaseResult, StoreListResult } from '@shared/types/store.types'
 import { TRPCError } from '@trpc/server'
@@ -88,7 +95,15 @@ export class StoreService {
     }
 
     // Create inventory items and update character
-    const newItems = itemsToBuy.map((def) => createInventoryItem(def))
+    // Use randomized rarity for equipment, fixed rarity for consumables
+    const newItems = itemsToBuy.map((def) => {
+      if (def.type === ItemType.CONSUMABLE) {
+        return createInventoryItem(def)
+      }
+
+      return createInventoryItemWithRandomRarity(def)
+    })
+
     const newInventory: any = [...inventory, ...newItems]
     const newGold = character.gold - totalCost
 

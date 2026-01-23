@@ -1,16 +1,15 @@
 import DoctrinePanel from '@/components/doctrine-panel.component'
 import OnboardingRedirect from '@/components/shared/onboarding-redirect'
+import Tabs, { TabsContent, TabsList, TabsTrigger } from '@/ui/tabs.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { SlotType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import CharacterPreview from './components/character-preview.component'
-import CharacterStatus from './components/character-status.component'
-import InventoryGrid from './components/inventory-grid.component'
-import LoadoutPanel from './components/loadout-panel.component'
+import ArmoryTab from './components/armory-tab.component'
+import CharacterTab from './components/character-tab.component'
 
-export default function AdventureInventory() {
+export default function Inventory() {
   const { t } = useTranslation()
   const { data: characterData } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
 
@@ -51,16 +50,32 @@ export default function AdventureInventory() {
   }
 
   return (
-    <div className='flex h-full w-full flex-col gap-6 overflow-auto pr-4'>
-      <div className='grid shrink-0 grid-cols-1 gap-6 lg:grid-cols-[2fr_2fr_2fr]'>
-        <CharacterPreview character={character} />
-        <LoadoutPanel character={character} onUnequip={handleUnequipItem} />
-        <CharacterStatus character={character} />
+    <div className='flex h-full w-full flex-col gap-4 overflow-hidden p-4'>
+      {/* Header */}
+      <div className='shrink-0'>
+        <h1 className='text-2xl font-bold text-white'>{t('inventory.title')}</h1>
       </div>
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-        <InventoryGrid character={character} onItemClick={handleEquipItem} />
-        <DoctrinePanel showEquipControls />
-      </div>
+
+      {/* Tabs */}
+      <Tabs defaultValue='character' className='flex min-h-0 flex-1 flex-col'>
+        <TabsList className='shrink-0'>
+          <TabsTrigger value='character'>{t('inventory.tabs.character')}</TabsTrigger>
+          <TabsTrigger value='armory'>{t('inventory.tabs.armory')}</TabsTrigger>
+          <TabsTrigger value='doctrines'>{t('inventory.tabs.doctrines')}</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value='character' className='mt-4 flex-1 overflow-auto'>
+          <CharacterTab character={character} />
+        </TabsContent>
+
+        <TabsContent value='armory' className='mt-4 flex-1 overflow-auto'>
+          <ArmoryTab character={character} onEquipItem={handleEquipItem} onUnequipItem={handleUnequipItem} />
+        </TabsContent>
+
+        <TabsContent value='doctrines' className='mt-4 flex-1 overflow-auto'>
+          <DoctrinePanel showEquipControls />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

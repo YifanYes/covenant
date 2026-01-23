@@ -24,6 +24,15 @@ const rarityBorderColors: Record<ItemRarity, string> = {
   [ItemRarity.LEGENDARY]: 'border-rarity-legendary/50 bg-rarity-legendary/5'
 }
 
+// Equipment items have randomized rarity on purchase, so don't show rarity styling
+function getRarityBorder(item: ItemDefinition): string {
+  if (item.type !== ItemType.CONSUMABLE) {
+    return 'border-border'
+  }
+
+  return rarityBorderColors[item.rarity] || 'border-border'
+}
+
 export default function StoreItemCard({
   item,
   isSelected,
@@ -59,7 +68,7 @@ export default function StoreItemCard({
       <div
         className={cn(
           'relative flex items-center gap-3 rounded-md border-2 p-3 text-left transition-all',
-          rarityBorderColors[item.rarity] || 'border-border',
+          getRarityBorder(item),
           isSelected && 'border-primary',
           isDisabled && 'cursor-not-allowed opacity-40',
           !isDisabled && !isSelected && 'hover:bg-primary/20 hover:border-primary/20'
@@ -85,9 +94,13 @@ export default function StoreItemCard({
             <div className='text-muted-foreground line-clamp-1 text-xs'>{displayDescription}</div>
           </button>
           <div className='mt-1 flex items-center justify-between'>
-            <span className='text-muted-foreground text-xs'>
-              {t(`item_categories.rarity.${item.rarity.toLowerCase()}`)}
-            </span>
+            {isConsumable ? (
+              <span className='text-muted-foreground text-xs'>
+                {t(`item_categories.rarity.${item.rarity.toLowerCase()}`)}
+              </span>
+            ) : (
+              <span className='text-muted-foreground text-xs italic'>{t('store.random_rarity')}</span>
+            )}
 
             {isConsumable && isSelected ? (
               <div className='flex items-center gap-1'>

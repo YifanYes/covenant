@@ -24,9 +24,8 @@ export interface ActivityTemplate {
   baseTarget: number
   difficulty: ActivityDifficulty
   durationDays: number
-  rewardPerKill: number
   communityBonus: number
-  enemies: string[]
+  enemySpawnWeights: Record<string, number> // Enemy spawn weights: enemyId -> probability weight (sum doesn't need to be 100)
   successConsequence: string
   failureConsequence: string
   successText: string
@@ -45,9 +44,11 @@ export const ACTIVITIES: Record<string, ActivityTemplate> = {
     baseTarget: 50,
     difficulty: ActivityDifficulty.EASY,
     durationDays: 30,
-    rewardPerKill: 15,
     communityBonus: 500,
-    enemies: ['shadow_demon', 'elite_demon'],
+    enemySpawnWeights: {
+      shadow_demon: 70,
+      elite_demon: 30
+    },
     successConsequence: 'activities.defense_north_gate.success_consequence',
     failureConsequence: 'activities.defense_north_gate.failure_consequence',
     successText: 'activities.defense_north_gate.success_text',
@@ -64,9 +65,11 @@ export const ACTIVITIES: Record<string, ActivityTemplate> = {
     baseTarget: 50,
     difficulty: ActivityDifficulty.EASY,
     durationDays: 14,
-    rewardPerKill: 15,
     communityBonus: 600,
-    enemies: ['bandit_stalker', 'bandit_chief'],
+    enemySpawnWeights: {
+      bandit_stalker: 60,
+      bandit_chief: 40
+    },
     successConsequence: 'activities.assault_ships.success_consequence',
     failureConsequence: 'activities.assault_ships.failure_consequence',
     successText: 'activities.assault_ships.success_text',
@@ -83,9 +86,11 @@ export const ACTIVITIES: Record<string, ActivityTemplate> = {
     baseTarget: 50,
     difficulty: ActivityDifficulty.EASY,
     durationDays: 21,
-    rewardPerKill: 12,
     communityBonus: 400,
-    enemies: ['magma_demon', 'elite_demon'],
+    enemySpawnWeights: {
+      magma_demon: 80,
+      elite_demon: 20
+    },
     successConsequence: 'activities.defense_south_wall.success_consequence',
     failureConsequence: 'activities.defense_south_wall.failure_consequence',
     successText: 'activities.defense_south_wall.success_text',
@@ -93,7 +98,22 @@ export const ACTIVITIES: Record<string, ActivityTemplate> = {
   }
 }
 
-// Helper function for lookups
 export function getActivityById(id: string): ActivityTemplate | undefined {
   return ACTIVITIES[id]
+}
+
+export function selectRandomEnemy(weights: Record<string, number>): string {
+  const entries = Object.entries(weights)
+  const totalWeight = entries.reduce((sum, [, weight]) => sum + weight, 0)
+  let random = Math.random() * totalWeight
+
+  for (const [enemyId, weight] of entries) {
+    random -= weight
+
+    if (random <= 0) {
+      return enemyId
+    }
+  }
+
+  return entries[0][0]
 }
