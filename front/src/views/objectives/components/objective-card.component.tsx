@@ -2,7 +2,6 @@ import LoaderButton from '@/common/loader-button.component'
 import DatePicker from '@/forms/date-picker.component'
 import MultiSelect from '@/forms/multi-select.component'
 import TextInput from '@/forms/text-input.component'
-import TaskSummaryList from '@/tasks/task-summary-list.component'
 import { areaSimpleStyles } from '@/types/colors.types'
 import { allIcons } from '@/types/icons.types'
 import type { Objective } from '@/types/models.types'
@@ -19,7 +18,6 @@ import Textarea from '@/ui/textarea.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
-import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
@@ -28,6 +26,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import ConfirmCompleteObjectiveDialog from './confirm-complete-objective-dialog.component'
 import ConfirmDeleteObjectiveDialog from './confirm-delete-objective-dialog.component'
+import ObjectiveSummaryList from './objective-summary-list.component'
 
 export default function ObjectiveCard({ objective }: { objective: Objective }) {
   const { t } = useTranslation()
@@ -53,7 +52,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
     formState: { errors, isValid, isDirty }
   } = useForm<UpdateObjectiveBodyType>({
     resolver: standardSchemaResolver(updateObjectiveSchema),
-    mode: 'onTouched',
+    mode: 'onSubmit',
     defaultValues: {
       id: objective.id,
       name: objective.name,
@@ -115,27 +114,17 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
           {objective.description && (
             <p className='text-muted-foreground mt-4 line-clamp-2 text-sm leading-relaxed'>{objective.description}</p>
           )}
-          {objective.tasks && objective.tasks.length > 0 ? (
-            <div className='mt-4 flex flex-col gap-2 border-t pt-4'>
-              <div className='flex flex-col gap-1'>
-                {objective.tasks.slice(0, 2).map((task) => (
-                  <div key={task.id} className='flex items-center gap-2'>
-                    <div
-                      className={`size-1.5 rounded-full ${task.status === TaskStatus.DONE ? 'bg-muted-foreground/30' : 'bg-primary'}`}
-                    />
-                    <span
-                      className={`text-xs ${task.status === TaskStatus.DONE ? 'text-muted-foreground line-through' : 'text-foreground'}`}
-                    >
-                      {task.title}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <TaskSummaryList title={objective.name} tasks={objective.tasks} />
+          {(objective.tasks && objective.tasks.length > 0) || (objective.habits && objective.habits.length > 0) ? (
+            <div className='mt-4 border-t pt-4'>
+              <ObjectiveSummaryList
+                title={objective.name}
+                tasks={objective.tasks || []}
+                habits={objective.habits || []}
+              />
             </div>
           ) : (
-            <div className='mt-4 flex flex-1 items-center justify-center border-t py-6'>
-              <p className='text-muted-foreground text-center text-xs italic'>{t('objectives.no_tasks')}</p>
+            <div className='mt-4 flex flex-1 items-center justify-center border-t pt-6 pb-4'>
+              <p className='text-muted-foreground text-center text-xs italic'>{t('objectives.no_tasks_or_habits')}</p>
             </div>
           )}
         </div>

@@ -74,7 +74,7 @@ export default function Login() {
   } = useForm<LoginType>({
     defaultValues: { email: '' },
     resolver: standardSchemaResolver(loginSchema),
-    mode: 'onTouched'
+    mode: 'onSubmit'
   })
 
   // Clean up URL if there was an error in the hash

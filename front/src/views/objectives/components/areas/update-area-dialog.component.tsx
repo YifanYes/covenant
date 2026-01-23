@@ -40,7 +40,7 @@ export default function UpdateAreaDialog({ area }: { area: Area }) {
     formState: { errors, isValid, isDirty }
   } = useForm<UpdateAreaBodyType>({
     resolver: standardSchemaResolver(updateAreaSchema),
-    mode: 'onTouched',
+    mode: 'onSubmit',
     defaultValues: {
       id: area.id,
       name: area.name,

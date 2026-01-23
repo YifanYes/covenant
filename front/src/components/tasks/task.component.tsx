@@ -12,11 +12,13 @@ import { useTranslation } from 'react-i18next'
 export default function Task({
   task,
   setSelectedTask,
-  hideHandle = false
+  hideHandle = false,
+  hideHover = false
 }: {
   task: TaskType
   setSelectedTask?: (task?: TaskType) => void
   hideHandle?: boolean
+  hideHover?: boolean
 }) {
   const { t } = useTranslation()
 
@@ -31,7 +33,10 @@ export default function Task({
   return (
     <li
       onClick={() => setSelectedTask?.(task)}
-      className='group border-input flex cursor-pointer items-center gap-6 border-b px-2 py-4 transition-all last:border-b-0 hover:rounded-md hover:border-transparent hover:bg-gray-50/10'
+      className={cn(
+        'group border-input flex cursor-pointer items-center gap-6 border-b px-2 py-4 transition-all last:border-b-0',
+        !hideHover && 'hover:rounded-md hover:border-transparent hover:bg-gray-50/10'
+      )}
     >
       {!hideHandle && <DragAndDrop className='drag-handle cursor-grab' />}
       <div

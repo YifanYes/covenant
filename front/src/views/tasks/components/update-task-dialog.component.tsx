@@ -91,7 +91,7 @@ export default function UpdateTaskDialog() {
     formState: { errors, isValid, isDirty }
   } = useForm<UpdateTaskType>({
     resolver: standardSchemaResolver(updateTaskSchema),
-    mode: 'onTouched'
+    mode: 'onSubmit'
   })
 
   const onDelete = () => !isUndefined(selectedTask) && deleteMutation.mutate({ id: selectedTask.id })

@@ -1000,8 +1000,14 @@
       "success": "Objetivo eliminado exitosamente",
       "title": "Eliminar objetivo"
     },
+    "habits_count_one": "{{count}} hábito",
+    "habits_count_other": "{{count}} hábitos",
     "no_date": "Sin fecha",
+    "no_habits": "No hay hábitos vinculados",
     "no_tasks": "No hay tareas vinculadas",
+    "no_tasks_or_habits": "No hay tareas ni hábitos vinculados",
+    "tasks_count_one": "{{count}} tarea",
+    "tasks_count_other": "{{count}} tareas",
     "title": "Objetivos",
     "update": {
       "error": "Ha ocurrido un error al actualizar el objetivo",
