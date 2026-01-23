@@ -29,7 +29,7 @@ export default function Objectives() {
           <h1 className='text-2xl font-semibold'>{t('objectives.title')}</h1>
           <CreateObjectiveDialog />
         </div>
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+        <div className='3xl:grid-cols-6 grid grid-cols-1 gap-4 py-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5'>
           {objectivesData.objectives?.map((objective) => (
             <ObjectiveCard key={objective.id} objective={objective} />
           ))}

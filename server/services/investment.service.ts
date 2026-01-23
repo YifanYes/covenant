@@ -1,5 +1,6 @@
 import { getInvestmentById } from '@shared/constants/investments'
-import { ContributeResult, InvestmentStatus, InvestmentWithProgress } from '@shared/types/investment.types'
+import type { ContributeResult, InvestmentWithProgress } from '@shared/types/investment.types'
+import { InvestmentStatus } from '@shared/types/investment.types'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '../generated/prisma'
 

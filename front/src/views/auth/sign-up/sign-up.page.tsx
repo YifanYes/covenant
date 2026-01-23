@@ -28,7 +28,7 @@ export default function SignUp() {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty }
-  } = useForm<SignUpType>({ resolver: standardSchemaResolver(signUpSchema), mode: 'onTouched' })
+  } = useForm<SignUpType>({ resolver: standardSchemaResolver(signUpSchema), mode: 'onSubmit' })
 
   const onSubmit = (data: SignUpType) => signUpMutation.mutate(data)
 

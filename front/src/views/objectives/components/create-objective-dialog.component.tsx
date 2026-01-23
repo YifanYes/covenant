@@ -42,7 +42,7 @@ export default function CreateObjectiveDialog() {
     formState: { errors, isValid, isDirty }
   } = useForm<CreateObjectiveBodyType>({
     resolver: standardSchemaResolver(createObjectiveSchema),
-    mode: 'onTouched',
+    mode: 'onSubmit',
     defaultValues: {
       name: '',
       description: '',

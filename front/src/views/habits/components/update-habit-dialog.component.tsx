@@ -40,7 +40,7 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
     formState: { errors, isValid, isDirty }
   } = useForm<UpdateHabitType>({
     resolver: standardSchemaResolver(updateHabitSchema),
-    mode: 'onTouched',
+    mode: 'onSubmit',
     defaultValues: {
       id: habit.id,
       name: habit.name,
