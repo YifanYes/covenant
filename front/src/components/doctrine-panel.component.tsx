@@ -95,7 +95,15 @@ export default function DoctrinePanel({
         key={doctrine.id}
         className={cn('rounded-lg border p-3 transition-all', doctrine.isUltimate && 'border-amber-500/50')}
       >
-        <div className='flex items-start justify-between gap-2'>
+        <div className='flex items-start justify-between gap-3'>
+          <div className='bg-muted/50 relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded border p-1'>
+            <img
+              src={`/assets/doctrines/${doctrine.id}.png`}
+              alt={t(doctrine.nameKey)}
+              className='h-full w-full object-contain'
+              style={{ imageRendering: 'pixelated' }}
+            />
+          </div>
           <div className='flex-1'>
             <div className='flex items-center gap-2'>
               {doctrine.isUltimate && <Trophy className='h-4 w-4 text-amber-500' />}
