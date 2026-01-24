@@ -314,4 +314,9 @@ export class CharacterService {
 
     return { success: true, equippedDoctrines: newEquippedDoctrines }
   }
+
+  async updateFaction(userId: string, faction: string) {
+    const character = await this.characterRepository.findByUserIdOrThrow(userId)
+    return this.characterRepository.updateFaction(character.id, faction)
+  }
 }
