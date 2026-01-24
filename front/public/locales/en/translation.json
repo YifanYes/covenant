@@ -658,11 +658,46 @@
   },
   "factions": {
     "ALCHEMISTS_LEAGUE": "Alchemists League",
+    "ALCHEMISTS_LEAGUE_description": "Scholars and engineers operating from floating cities and bunkers. They see Mana as a natural resource, not a miracle.",
     "BLOOD_PACT": "Blood Pact",
+    "BLOOD_PACT_description": "Warriors who absorb demonic essence to fight fire with fire. They sacrifice their humanity to be the weapons the world needs.",
     "CRIMSON_INQUISITION": "Crimson Inquisition",
+    "CRIMSON_INQUISITION_description": "Radical splinter group seeking absolute purity. They hunt both demons and faithful they consider lukewarm or corrupt.",
     "DEATH_MARCH": "Death March",
+    "DEATH_MARCH_description": "A silent host of corpses reanimated by Hell's hunger. A force of absolute annihilation that consumes everything in its path.",
     "HOLY_KNIGHTS": "Holy Knights",
-    "LEGION": "The Legion"
+    "HOLY_KNIGHTS_description": "Defenders of humanity under the divine banner. Their goal is to protect the innocent and prepare the way for the Messiah's return.",
+    "LEGION": "The Legion",
+    "LEGION_description": "Those who serve the Beast for power, ambition, or despair. An army of demons, fallen angels, and surrendered humans."
+  },
+  "forum": {
+    "already_in_faction": "You are currently a member of {{faction}}.",
+    "back": "Back to forum",
+    "comments": "Comments",
+    "create_post": "Create Post",
+    "create_post_description": "Create a new post in the faction forum",
+    "delete_comment_confirm": "Are you sure you want to delete this comment?",
+    "delete_post_confirm": "Are you sure you want to delete this post?",
+    "description_placeholder": "Post description",
+    "error": {
+      "create_post": "Failed to create post"
+    },
+    "factions_title": "Factions",
+    "go_to_forum": "Go to forum",
+    "go_to_your_forum": "Go to your forum",
+    "join_faction": "Join Faction",
+    "leave_faction": "Leave Faction",
+    "no_comments": "No comments yet.",
+    "no_posts": "No posts yet. Be the first to post!",
+    "posted_by": "Posted by",
+    "posts_description": "Discuss with your faction members",
+    "reply": "Reply",
+    "success": {
+      "create_post": "Post created successfully",
+      "leave_faction": "You have left the faction"
+    },
+    "title": "Forum",
+    "write_comment": "Write a comment..."
   },
   "habits": {
     "add": "Add Habit",
@@ -1104,6 +1139,7 @@
     "calendar": "Calendar",
     "close": "Collapse menu",
     "dashboard": "Dashboard",
+    "forum": "Forum",
     "habits": "Habits",
     "inventory": "Inventory",
     "investments": "Investments",

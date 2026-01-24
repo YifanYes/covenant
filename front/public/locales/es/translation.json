@@ -658,11 +658,46 @@
   },
   "factions": {
     "ALCHEMISTS_LEAGUE": "Liga de Alquimistas",
+    "ALCHEMISTS_LEAGUE_description": "Eruditos e ingenieros que operan desde ciudades flotantes y búnkeres. Ven el Maná como un recurso natural, no un milagro.",
     "BLOOD_PACT": "Pacto de Sangre",
+    "BLOOD_PACT_description": "Guerreros que absorben esencia demoníaca para combatir fuego con fuego. Sacrifican su humanidad para ser las armas que el mundo necesita.",
     "CRIMSON_INQUISITION": "Inquisición Carmesí",
+    "CRIMSON_INQUISITION_description": "Escisión radical que busca la pureza absoluta. Cazan tanto a demonios como a fieles que consideran tibios o corruptos.",
     "DEATH_MARCH": "La Muerte Errante",
+    "DEATH_MARCH_description": "Una hueste silenciosa de cadáveres reanimados por el hambre del Infierno. Una fuerza de aniquilación absoluta que consume todo a su paso.",
     "HOLY_KNIGHTS": "Caballeros Sagrados",
-    "LEGION": "La Legión"
+    "HOLY_KNIGHTS_description": "Defensores de la humanidad bajo el estandarte divino. Su objetivo es proteger a los inocentes y preparar el camino para el retorno del Mesías.",
+    "LEGION": "La Legión",
+    "LEGION_description": "Aquellos que sirven a la Bestia por poder, ambición o desesperación. Un ejército de demonios, ángeles caídos y humanos rendidos."
+  },
+  "forum": {
+    "already_in_faction": "Actualmente eres miembro de {{faction}}.",
+    "back": "Volver al foro",
+    "comments": "Comentarios",
+    "create_post": "Crear publicación",
+    "create_post_description": "Crea una nueva publicación en el foro de la facción",
+    "delete_comment_confirm": "¿Estás seguro de que quieres borrar este comentario?",
+    "delete_post_confirm": "¿Estás seguro de que quieres borrar esta publicación?",
+    "description_placeholder": "Descripción de la publicación",
+    "error": {
+      "create_post": "Error al crear la publicación"
+    },
+    "factions_title": "Facciones",
+    "go_to_forum": "Ir al foro",
+    "go_to_your_forum": "Ir a tu foro",
+    "join_faction": "Unirse a la facción",
+    "leave_faction": "Abandonar facción",
+    "no_comments": "No hay comentarios aún.",
+    "no_posts": "No hay publicaciones aún. ¡Sé el primero en publicar!",
+    "posted_by": "Publicado por",
+    "posts_description": "Habla con los miembros de tu facción",
+    "reply": "Responder",
+    "success": {
+      "create_post": "Publicación creada con éxito",
+      "leave_faction": "Has abandonado la facción"
+    },
+    "title": "Foro",
+    "write_comment": "Escribe un comentario..."
   },
   "habits": {
     "add": "Añadir hábito",
@@ -1104,6 +1139,7 @@
     "calendar": "Calendario",
     "close": "Colapsar menú",
     "dashboard": "Panel de control",
+    "forum": "Foro",
     "habits": "Hábitos",
     "inventory": "Inventario",
     "investments": "Inversiones",
