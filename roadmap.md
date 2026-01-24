@@ -41,7 +41,7 @@
   - [x] Sistema de consumibles.
   - [x] Sistema de doctrinas.
   - [x] Sistema de inversiones.
-  - [ ] Foro por facción.
+  - [x] Foro por facción.
   - [ ] Renderizar el personaje con los items equipados.
   - [ ] Definir accesorios
   - [ ] Definir decisiones de la historia
