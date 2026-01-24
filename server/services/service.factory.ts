@@ -7,6 +7,7 @@ import { CharacterService } from './character.service'
 import { CombatService } from './combat.service'
 import { DashboardService } from './dashboard.service'
 import { DiceService } from './dice.service'
+import { ForumService } from './forum.service'
 import { HabitService } from './habit.service'
 import { InvestmentService } from './investment.service'
 import { ObjectiveService } from './objective.service'
@@ -118,5 +119,13 @@ export class ServiceFactory {
       this._investmentService = new InvestmentService(this.prisma)
     }
     return this._investmentService
+  }
+
+  private _forumService?: ForumService
+  get forum(): ForumService {
+    if (!this._forumService) {
+      this._forumService = new ForumService(this.prisma)
+    }
+    return this._forumService
   }
 }
