@@ -1,12 +1,14 @@
+import LoaderButton from '@/common/loader-button.component'
 import Button from '@/ui/button.component'
 import Card, { CardDescription, CardHeader, CardTitle } from '@/ui/card.component'
-import { trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc } from '@/utils/trpc.utils'
 import { ChevronLeft, Plus } from '@nsmr/pixelart-react'
 import { Faction } from '@shared/schemas/forum.schemas'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router'
+import { toast } from 'sonner'
 import CreatePostDialog from './components/create-post-dialog.component'
 
 export default function ForumList() {
@@ -15,7 +17,20 @@ export default function ForumList() {
   const { faction } = useParams<{ faction: string }>()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
+  const { data: character } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
   const { data: posts } = useSuspenseQuery(trpc.forum.getPosts.queryOptions({ faction: faction as Faction }))
+
+  const leaveMutation = useMutation(
+    trpc.forum.leaveFaction.mutationOptions({
+      onSuccess: () => {
+        toast.success(t('forum.success.leave_faction'))
+        queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+        navigate('/forum')
+      }
+    })
+  )
+
+  const isCurrentFaction = character?.factionName === faction
 
   return (
     <div className='flex flex-col gap-6 p-6'>
@@ -31,10 +46,20 @@ export default function ForumList() {
             <p className='text-muted-foreground'>{t('forum.posts_description')}</p>
           </div>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className='mr-2 h-4 w-4' />
-          {t('forum.create_post')}
-        </Button>
+        <div className='flex items-center gap-2'>
+          {isCurrentFaction && (
+            <LoaderButton
+              className='text-destructive border-destructive hover:text-background hover:bg-destructive cursor-pointer border bg-transparent px-4'
+              onClick={() => leaveMutation.mutate({})}
+              isLoading={leaveMutation.isPending}
+              label={t('forum.leave_faction')}
+            />
+          )}
+          <Button onClick={() => setIsCreateDialogOpen(true)}>
+            <Plus className='mr-2 h-4 w-4' />
+            {t('forum.create_post')}
+          </Button>
+        </div>
       </div>
 
       <div className='grid gap-4'>

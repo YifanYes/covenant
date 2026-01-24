@@ -7,7 +7,6 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
-import { toast } from 'sonner'
 
 export default function ForumFactions() {
   const { t } = useTranslation()
@@ -26,15 +25,6 @@ export default function ForumFactions() {
 
   const currentFaction = character?.factionName
 
-  const leaveMutation = useMutation(
-    trpc.forum.leaveFaction.mutationOptions({
-      onSuccess: () => {
-        toast.success(t('forum.success.leave_faction'))
-        queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
-      }
-    })
-  )
-
   useEffect(() => {
     if (currentFaction && currentFaction !== '') {
       navigate(`/forum/${currentFaction}`, { replace: true })
@@ -52,14 +42,6 @@ export default function ForumFactions() {
             </p>
           )}
         </div>
-        {currentFaction && currentFaction !== '' && (
-          <LoaderButton
-            className='text-destructive border-destructive hover:text-background hover:bg-destructive cursor-pointer border bg-transparent'
-            onClick={() => leaveMutation.mutate({})}
-            isLoading={leaveMutation.isPending}
-            label={t('forum.leave_faction')}
-          />
-        )}
       </div>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
         {factions.map((faction) => (
