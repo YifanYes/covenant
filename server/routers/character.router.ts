@@ -8,6 +8,7 @@ import {
   useConsumableSchema,
   useDoctrineSchema
 } from '@shared/schemas/character.schemas'
+import { joinFactionSchema } from '@shared/schemas/forum.schemas'
 import { protectedProcedure, t } from '../trpc'
 
 export const characterRouter = t.router({
@@ -66,5 +67,9 @@ export const characterRouter = t.router({
 
   useDoctrine: protectedProcedure.input(useDoctrineSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.combat.useDoctrine(ctx.user.id, input.doctrineId, input.participationId)
+  }),
+
+  updateFaction: protectedProcedure.input(joinFactionSchema).mutation(async ({ ctx, input }) => {
+    return ctx.services.character.updateFaction(ctx.user.id, input.faction)
   })
 })
