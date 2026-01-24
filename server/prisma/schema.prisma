@@ -24,6 +24,8 @@ model Character {
   activityParticipations  ActivityParticipation[]
   classes                 CharacterClass[]
   investmentContributions InvestmentContribution[]
+  posts                   Post[]
+  comments                Comment[]
 
   @@map("characters")
 }
@@ -205,3 +207,36 @@ model InvestmentContribution {
 
   @@map("investment_contributions")
 }
+
+model Post {
+  id          String    @id @default(uuid()) @db.Uuid
+  title       String    @db.VarChar(255)
+  description String?   @db.Text
+  faction     String    @db.VarChar(100)
+  authorId    String    @db.Uuid
+  author      Character @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @db.Timestamp(6)
+  comments    Comment[]
+
+  @@index([authorId])
+  @@index([faction])
+  @@map("posts")
+}
+
+model Comment {
+  id        String    @id @default(uuid()) @db.Uuid
+  content   String    @db.Text
+  postId    String    @db.Uuid
+  authorId  String    @db.Uuid
+  author    Character @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt DateTime  @updatedAt @db.Timestamp(6)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([authorId])
+  @@map("comments")
+}
+
+
