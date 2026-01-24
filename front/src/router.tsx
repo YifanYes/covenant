@@ -27,6 +27,9 @@ const Store = lazy(() => import('./views/store/store.page'))
 const WorldMap = lazy(() => import('./views/map/world-map.page'))
 const ActivityDetail = lazy(() => import('./views/map/activity-detail.page'))
 const Investments = lazy(() => import('./views/investments/investments.page'))
+const ForumFactions = lazy(() => import('./views/forum/forum-factions.page'))
+const ForumList = lazy(() => import('./views/forum/forum-list.page'))
+const ForumPost = lazy(() => import('./views/forum/forum-post.page'))
 
 export const Router = () => {
   return (
@@ -139,6 +142,30 @@ export const Router = () => {
                 element={
                   <Suspense fallback={<AdventureSuspenseFallback />}>
                     <Investments />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/forum'
+                element={
+                  <Suspense fallback={<AdventureSuspenseFallback />}>
+                    <ForumFactions />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/forum/:faction'
+                element={
+                  <Suspense fallback={<AdventureSuspenseFallback />}>
+                    <ForumList />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/forum/:faction/:id'
+                element={
+                  <Suspense fallback={<AdventureSuspenseFallback />}>
+                    <ForumPost />
                   </Suspense>
                 }
               />
