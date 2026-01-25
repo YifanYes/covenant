@@ -45,8 +45,7 @@
   - [ ] Renderizar el personaje con los items equipados.
   - [ ] Definir accesorios
   - [ ] Definir decisiones de la historia
-  - [ ] Añadir tests
-  - [ ] Onboarding con driver.js
+  - [x] Añadir tests
   - [ ] Landing page
 
 ## 🔮 Fase 3: Características Avanzadas (Futuro)
