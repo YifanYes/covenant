@@ -66,7 +66,10 @@ cd front && bun run dev
 
 ```
 arq/
-├── front/          # React frontend (Vite + TypeScript)
+├── front/          # Next.js frontend (App Router + TypeScript)
+│   ├── app/        # Next.js App Router pages
+│   ├── components/ # Shared/reusable components
+│   └── middleware.ts # Next.js middleware
 ├── server/         # Backend server (tRPC + Fastify)
 │   ├── routers/    # tRPC router definitions
 │   ├── services/   # Business logic layer
@@ -100,7 +103,7 @@ This project follows **Spec-Driven Development** principles to ensure architectu
 
 ## Tech Stack
 
-- **Frontend**: React 19, TypeScript, Vite, TailwindCSS v4, React Query, Zustand
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript, TailwindCSS v4, TanStack Query, Zustand
 - **Backend**: Bun, tRPC, Prisma, PostgreSQL
 - **Validation**: Zod
 - **Internationalization**: i18next
@@ -108,8 +111,11 @@ This project follows **Spec-Driven Development** principles to ensure architectu
 ## Building for Production
 
 ```bash
-# Build the frontend
+# Build the frontend (Next.js)
 cd front && bun run build
+
+# Start the frontend in production
+cd front && bun run start
 
 # Build the server
 cd server && npx tsc
