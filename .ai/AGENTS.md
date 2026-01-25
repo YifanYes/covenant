@@ -20,7 +20,7 @@
 
 ### Tech Stack
 
-- **Frontend**: React 19, TypeScript, Vite, TailwindCSS v4, React Query, Zustand
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript, TailwindCSS v4, TanStack Query, Zustand
 - **Backend**: Bun, tRPC, Fastify, Prisma, PostgreSQL (Supabase)
 - **Validation**: Zod (shared schemas for end-to-end type safety)
 - **i18n**: i18next (English and Spanish)
@@ -59,7 +59,13 @@ For complex features, follow this lifecycle:
 
 ```
 arq/
-├── front/          # React frontend (Vite + TypeScript)
+├── front/          # Next.js frontend (App Router + TypeScript)
+│   ├── app/        # Next.js App Router pages
+│   ├── components/ # Shared/reusable components
+│   ├── hooks/      # Custom React hooks
+│   ├── stores/     # Zustand state stores
+│   ├── lib/        # Library configurations
+│   └── utils/      # Utility functions
 ├── server/         # Backend (tRPC + Fastify + Prisma)
 │   ├── routers/    # tRPC router definitions (thin layer)
 │   ├── services/   # Business logic (class-based)
@@ -82,9 +88,12 @@ Request → Router (validation) → Service (business logic) → Repository (dat
 
 ### 3.3 Frontend Architecture
 
-- **Views**: Page components in `front/src/views/`
-- **Components**: Reusable UI in `front/src/components/`
+- **App Router**: Next.js pages in `front/app/` (Server Components by default)
+- **Route Groups**: `(auth)` for authentication, `(workspace)` for main app
+- **Pages**: Page components at `app/[route]/page.tsx`
+- **Components**: Page-specific in `app/[route]/_components/`, shared in `components/`
 - **State**: Server state via TanStack Query, client state via Zustand
+- **Middleware**: Auth and routing logic in `middleware.ts`
 
 ---
 
@@ -141,7 +150,7 @@ npx prisma generate   # Regenerate client
 # Terminal 1: Backend
 cd server && bun run dev
 
-# Terminal 2: Frontend
+# Terminal 2: Frontend (Next.js dev server)
 cd front && bun run dev
 ```
 

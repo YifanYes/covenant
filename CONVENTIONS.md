@@ -17,7 +17,7 @@ A gamified productivity platform combining task management, habit tracking, and 
 
 ## Tech Stack
 
-- **Frontend**: React 19, TypeScript, Vite, TailwindCSS v4
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript, TailwindCSS v4
 - **Backend**: Bun, tRPC, Fastify, Prisma, PostgreSQL
 - **Validation**: Zod (shared schemas)
 - **i18n**: i18next
@@ -43,7 +43,7 @@ A gamified productivity platform combining task management, habit tracking, and 
 
 - Zod schemas in `shared/` (source of truth)
 - Backend: Router → Service → Repository
-- Frontend: Views in `views/`, shared components in `components/`
+- Frontend: Next.js App Router with pages in `app/`, shared components in `components/`
 
 ### Testing
 
