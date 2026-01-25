@@ -1,0 +1,1276 @@
+{
+  "activities": {
+    "assault_ships": {
+      "description": "Una flota de navíos asedia los muelles. En caso de caer, los refuerzos marítimos no podrán llegar a tiempo. Destrúyelos sin piedad.",
+      "failure_consequence": "Los refuerzos de Trinidad no llegan. Se pierde una ruta de escape.",
+      "failure_text": "El mar está lleno de tiburones. Los tiburones están llenos de... bueno, mejor no pensarlo (；￣Д￣)",
+      "name": "Asalto a los Navíos",
+      "objective": "Destruir piratas",
+      "success_consequence": "Los refuerzos de Trinidad llegan. Bonus de 600 oro a todos los participantes.",
+      "success_text": "¡Los piratas se hunden con sus barcos! Que les den de comer a los peces ♪(´ε` )"
+    },
+    "continue": "Continuar actividad",
+    "defense_north_gate": {
+      "description": "¡Dejadnos entrar! ¡Queremos divertirnos con vosotros! ¡Hemos traído regalos para todo el mundo! ✧｡٩(ˊᗜˋ )و✧*｡",
+      "failure_consequence": "La puerta es destruida. Nueva actividad de emergencia: 'Evacuar el Primer Nivel'.",
+      "failure_text": "Los regalos eran garras. Las garras eran mortales. La puerta ya no existe. Qué pena, ya no se hacen puertas así (╯°□°)╯︵ ┻━┻",
+      "name": "Defender la Puerta del Norte",
+      "objective": "Derrotar demonios",
+      "success_consequence": "Se desbloquea 'Investigar Catacumbas'. Bonus de 500 oro a todos los participantes.",
+      "success_text": "¡Los demonios se retiran aullando! La puerta aguanta. Santa Cruz sigue en pie... por ahora (ง'̀-'́)ง"
+    },
+    "defense_south_wall": {
+      "description": "Los demonios avanzan sin descanso. El aire se impregna del olor de la pólvora y la sangre. Estamos agotados. Pero por nuestras familias y por Dios, resistiremos.",
+      "failure_consequence": "Brecha en la muralla sur. Nueva actividad: 'Contener la Brecha'.",
+      "failure_text": "La muralla cayó. Los demonios entran. Debieron traer más caballeros... (눈_눈)",
+      "name": "Defender la Muralla Sur",
+      "objective": "Derrotar demonios",
+      "success_consequence": "Flanco sur asegurado. Bonus de 400 oro a todos los participantes.",
+      "success_text": "¡El sur está asegurado! Ahora huele a victoria... y un poco a azufre, pero sobre todo a victoria ᕙ(⇀‸↼‶)ᕗ"
+    },
+    "error": {
+      "start": "Ocurrió un error al iniciar la actividad"
+    },
+    "not_found": "Actividad no encontrada",
+    "progress": "Progreso",
+    "start": "Unirse a actividad",
+    "status": {
+      "active": "Activa"
+    },
+    "success": {
+      "complete": "¡Actividad completada exitosamente!",
+      "start": "Actividad iniciada exitosamente"
+    },
+    "switch_dialog": {
+      "confirm": "Cambiar actividad",
+      "description": "Ya estás participando en otra actividad. Tu progreso se guardará, pero cambiarás a esta nueva actividad.",
+      "title": "¿Cambiar de actividad?"
+    },
+    "title": "Actividades"
+  },
+  "adventure": {
+    "tier_locked": "Requiere Tier {{tier}}",
+    "title": "Aventura"
+  },
+  "areas": {
+    "add": "Añadir área",
+    "career": "Carrera profesional",
+    "delete_confirmation": "¿Estás seguro de querer eliminar el área?",
+    "error": {
+      "internal": {
+        "create": "Ocurrió un error al crear el área",
+        "delete": "Ocurrió un error al eliminar el área",
+        "update": "Ocurrió un error al actualizar el área"
+      }
+    },
+    "family_and_friends": "Familia y amigos",
+    "finances": "Finanzas",
+    "leisure": "Ocio",
+    "love": "Amor",
+    "mental_health": "Salud mental",
+    "physical_health": "Salud física",
+    "spirituality": "Espiritualidad",
+    "success": {
+      "create": "Área creada exitosamente",
+      "delete": "Área eliminada exitosamente",
+      "update": "Área actualizada exitosamente"
+    },
+    "title": "Áreas"
+  },
+  "calendar": {
+    "today": "Hoy"
+  },
+  "cancel": "Cancelar",
+  "character_class": {
+    "herald": "Heraldo",
+    "templar": "Templario"
+  },
+  "classes": {
+    "herald": {
+      "description": "Buscaré la sabiduría para encontrar la luz.",
+      "name": "Heraldo"
+    },
+    "templar": {
+      "description": "Buscaré la fuerza para aplastar el mal.",
+      "name": "Templario"
+    }
+  },
+  "colors": {
+    "amber": "Ámbar",
+    "blue": "Azul",
+    "cyan": "Cian",
+    "green": "Verde",
+    "indigo": "Índigo",
+    "lime": "Lima",
+    "orange": "Naranja",
+    "pink": "Rosa",
+    "placeholder": "Elige un color",
+    "purple": "Morado",
+    "red": "Rojo",
+    "rose": "Rosado",
+    "sky": "Celeste",
+    "slate": "Gris pizarra",
+    "teal": "Verde azulado",
+    "yellow": "Amarillo"
+  },
+  "combat": {
+    "attack_rolls": "Ataques",
+    "attack_set": "Ataque preparado: {{count}} dados",
+    "criticals": "Críticos",
+    "death_dialog": {
+      "continue": "Continuar",
+      "description": "Tu personaje ha caído en batalla.",
+      "title": "Personaje Derrotado"
+    },
+    "defense_rolls": "Defensas",
+    "defense_set": "Defensa preparada: {{count}} dados",
+    "dice_to_spend": "Dados a gastar",
+    "enemies": "Enemigos",
+    "enemies_defeated": "Enemigos Derrotados",
+    "error": {
+      "attack": "El ataque falló"
+    },
+    "log": {
+      "damage_to_enemy": "{{enemy}} recibe {{damage}} de daño",
+      "damage_to_player": "Recibes {{damage}} de daño",
+      "doctrine_active": "Doctrina activa: {{effect}}",
+      "doctrine_effect": "Doctrina: {{doctrine}} aplica {{effect}}",
+      "empty": "Sin eventos de combate aún",
+      "enemy_attacks": "El enemigo ataca con {{hits}} impactos",
+      "enemy_defeated": "¡{{enemy}} ha sido derrotado!",
+      "enemy_defends": "El enemigo bloquea {{blocks}}",
+      "mana_regen": "+{{mana}} maná regenerado",
+      "player_attack": "Atacas con {{dice}} dados",
+      "player_defends": "Bloqueas {{blocks}}",
+      "player_hits": "Consigues {{hits}} impactos",
+      "status_effect": "Efecto: {{effect}} sobre {{target}}",
+      "status_expired": "Efecto expirado: {{effect}}"
+    },
+    "no_attacks_yet": "Sin ataques aún",
+    "no_dice": "Sin dados disponibles",
+    "resolve_turn": "Resolver Turno",
+    "resolving_turn": "Resolviendo turno...",
+    "result_dialog": {
+      "continue": "Continuar",
+      "failure_title": "Derrota",
+      "success_title": "¡Victoria!"
+    },
+    "roll_attack": "Preparar Ataque",
+    "roll_defense": "Preparar Defensa",
+    "roll_dice": "Lanzar Dados",
+    "rolling": "Lanzando",
+    "to_battle": "¡Al ataque!",
+    "turn_summary": "Resumen del Turno",
+    "your_hits": "Tus Impactos"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "completed": "Completada",
+    "error": "Error al cargar datos",
+    "failed": "Fallida",
+    "loading": "Cargando..."
+  },
+  "confirm": "Confirmar",
+  "confirm_delete_account_dialog": {
+    "button": "Eliminar cuenta",
+    "description": "Esta acción es irreversible. Esto eliminará permanentemente tu cuenta y todos los datos asociados a ella.",
+    "error": "Ocurrió un error al eliminar tu cuenta",
+    "success": "Cuenta eliminada exitosamente",
+    "title": "¿Estás seguro de que quieres eliminar tu cuenta?"
+  },
+  "confirm_delete_area_dialog": {
+    "description": "Esta acción es irreversible. Esto eliminará permanentemente el área.",
+    "title": "¿Estás seguro que quieres eliminar el área?"
+  },
+  "confirm_delete_habit_dialog": {
+    "description": "Esta acción es irreversible. Esto eliminará permanentemente el hábito.",
+    "title": "¿Estás seguro de que quieres eliminar el hábito?"
+  },
+  "consumables": {
+    "error": "Error al usar el consumible",
+    "health_restored": "+{{amount}} Vidas restauradas",
+    "mana_restored": "+{{amount}} Maná restaurado",
+    "success": "¡Consumible usado!",
+    "title": "Consumibles",
+    "use": "Usar"
+  },
+  "copy_suffix": "(Copia)",
+  "create": "Crear",
+  "create_area_dialog": {
+    "color": "Color",
+    "description": "Modal para crear una nueva área",
+    "icon": "Icono",
+    "name": "Nombre",
+    "title": "Crear nueva área"
+  },
+  "create_habit_dialog": {
+    "description": "Modal para crear un nuevo hábito",
+    "description_placeholder": "Descripción (opcional)",
+    "name_placeholder": "Nombre del hábito",
+    "objectives_placeholder": "Seleccionar objetivos",
+    "recurrence_placeholder": "Recurrencia",
+    "timespan_placeholder": "Período",
+    "title": "Crear nuevo hábito"
+  },
+  "create_objective_dialog": {
+    "description": "Modal para crear un nuevo objetivo",
+    "description_placeholder": "Descripción (opcional)",
+    "due_date_placeholder": "Fecha de entrega (opcional)",
+    "error": {
+      "internal": "Ocurrió un error al crear el objetivo"
+    },
+    "name_placeholder": "Título",
+    "select_areas_placeholder": "Seleccionar áreas",
+    "success": "Objetivo creado exitosamente",
+    "title": "Crear nuevo objetivo"
+  },
+  "create_task_dialog": {
+    "description": "Modal para crear una nueva tarea",
+    "description_placeholder": "Descripción de la tarea",
+    "due_date_placeholder": "Fecha de entrega (opcional)",
+    "objectives_placeholder": "Objetivos asociados",
+    "title": "Crear nueva tarea",
+    "title_placeholder": "Título de la tarea"
+  },
+  "dashboard": {
+    "areas_distribution": {
+      "habits": "Hábitos",
+      "last_month": "Mes pasado",
+      "no_data": "No hay tareas disponibles",
+      "tasks": "Tareas",
+      "this_month": "Este mes",
+      "title": "Distribución de áreas"
+    },
+    "blindspot": {
+      "all_areas_covered": "¡Todas las áreas están cubiertas!",
+      "all_objectives_covered": "¡Todos los objetivos están cubiertos!",
+      "areas": "Áreas",
+      "days": "días",
+      "no_blindspots_line1": "Todas las áreas y objetivos están en marcha",
+      "no_blindspots_line2": "¡Buen trabajo, sigue así!",
+      "objectives": "Objetivos",
+      "title": "El punto ciego",
+      "without_activity": "+2 semanas sin actividad"
+    },
+    "efficiency_metrics": {
+      "focused_area": "Área enfocada",
+      "focused_objective": "Objetivo enfocado",
+      "habit_rate": "Ratio hábitos completados",
+      "none": "Ninguno",
+      "task_type": "Tarea más común",
+      "title": "Métricas de eficiencia",
+      "title_efficiency": "Métricas de eficiencia"
+    },
+    "habits": {
+      "completed": "Completados",
+      "completion": "Progreso",
+      "no_habits": "Sin hábitos",
+      "none": "Ninguno",
+      "remaining": "Pendiente",
+      "title": "Hábitos diarios"
+    },
+    "task_status": {
+      "DOING": "En proceso",
+      "DONE": "Completadas",
+      "OVERDUE": "Vencidas",
+      "TODO": "Por hacer",
+      "no_status": "Sin estado",
+      "no_tasks": "No hay tareas",
+      "tasks": "Tareas",
+      "title": "Estado de tareas"
+    },
+    "title": "¡Bienvenido, {{name}}!",
+    "upcoming": {
+      "no_tasks": "¡Felicidades! No hay tareas pendientes para hoy o mañana.",
+      "title": "Siguientes pasos"
+    }
+  },
+  "delete": "Eliminar",
+  "doctrines": {
+    "arcane_push": {
+      "description": "Anula el próximo ataque que recibas este turno.",
+      "flavor": "Necesito concentrarme, aléjate.",
+      "name": "Empuje Arcano"
+    },
+    "audacity": {
+      "description": "+2 dados de Potencia. Tu defensa se reduce a 0.",
+      "flavor": "Solo los que están dispuestos a morir merecen la victoria.",
+      "name": "Osadía"
+    },
+    "available": "Doctrinas Disponibles",
+    "battle_fervor": {
+      "description": "Recuperas 1 Herida por cada Impacto causado (máx 3).",
+      "flavor": "Tu dolor es mi fuerza.",
+      "name": "Fervor de Batalla"
+    },
+    "bite": {
+      "description": "Suma +1 Impacto garantizado si el ataque tiene éxito.",
+      "flavor": "El acero también sabe morder.",
+      "name": "Dentellada"
+    },
+    "black_hole": {
+      "description": "Ultimate. Todos los enemigos quedan Aturdidos y sufren 2 Heridas.",
+      "flavor": "Todo vuelve al origen, incluso tú.",
+      "name": "Agujero Negro"
+    },
+    "blinding_faith": {
+      "description": "Todos los enemigos pierden -2 dados de Potencia.",
+      "flavor": "Ante la luz absoluta, el mal no puede encontrar su objetivo.",
+      "name": "Fe Cegadora"
+    },
+    "blink": {
+      "description": "Evitas todo el daño de un ataque este turno.",
+      "flavor": "Estar aquí es solo una sugerencia.",
+      "name": "Parpadeo"
+    },
+    "bulwark": {
+      "description": "+1 dado de Defensa hasta tu próximo turno.",
+      "flavor": "Aquí trazamos la línea.",
+      "name": "Baluarte"
+    },
+    "challenge": {
+      "description": "El enemigo sufre -2 dados si ataca a otros.",
+      "flavor": "¡Enfréntate a mí, cobarde!",
+      "name": "Desafío"
+    },
+    "combustion": {
+      "description": "Aplica Quemadura al objetivo (1 daño al inicio de su turno).",
+      "flavor": "El fuego interior siempre acaba saliendo.",
+      "name": "Combustión"
+    },
+    "disintegration_ray": {
+      "description": "+5 Potencia. Si mata al objetivo, recuperas el maná.",
+      "flavor": "Solo queda ceniza donde hubo vida.",
+      "name": "Rayo Desintegrador"
+    },
+    "disruption_storm": {
+      "description": "Ultimate. Lanza 4 dados de Potencia contra hasta 2 enemigos.",
+      "flavor": "Un torbellino de acero y determinación.",
+      "name": "Tormenta de Disrupción"
+    },
+    "empty_equipped": "No tienes doctrinas equipadas",
+    "equip": "Equipar",
+    "equipped": "Doctrinas Equipadas",
+    "error": {
+      "equip": "Error al equipar doctrina",
+      "failed": "Error al usar la doctrina",
+      "not_enough_mana": "Maná insuficiente",
+      "unequip": "Error al desequipar doctrina",
+      "use": "Error al usar doctrina"
+    },
+    "fan_cut": {
+      "description": "Ataca a hasta 2 enemigos con tu fuerza actual.",
+      "flavor": "Rodeado es solo otra forma de decir objetivo rico.",
+      "name": "Corte en Abanico"
+    },
+    "fireball": {
+      "description": "Ataca a todos los enemigos y aplica Quemadura.",
+      "flavor": "Clásico, simple y devastador.",
+      "name": "Bola de Fuego"
+    },
+    "flaming_apotheosis": {
+      "description": "Si recibes daño, el atacante sufre 2 Heridas y Quemadura.",
+      "flavor": "Acércate y conoce el infierno.",
+      "name": "Apoteosis Llameante"
+    },
+    "fractal_invocation": {
+      "description": "50% de probabilidad de no recibir daño.",
+      "flavor": "La realidad es solo un patrón que se repite.",
+      "name": "Invocación de Fractales"
+    },
+    "fragility_curse": {
+      "description": "El objetivo reduce sus dados de Defensa en -2 por 2 turnos.",
+      "flavor": "Tu acero se vuelve cristal.",
+      "name": "Maldición de Fragilidad"
+    },
+    "glory_banner": {
+      "description": "+2 dados de Defensa durante 2 turnos.",
+      "flavor": "Bajo este símbolo, somos invencibles.",
+      "name": "Estandarte de Gloria"
+    },
+    "ice_lance": {
+      "description": "Si impacta, el objetivo queda Inmovilizado.",
+      "flavor": "El tiempo se detiene bajo el frío absoluto.",
+      "name": "Lanza de Hielo"
+    },
+    "igneous_cut": {
+      "description": "El ataque aplica Quemadura (1 daño por 2 turnos).",
+      "flavor": "Una herida que el alma no puede cerrar.",
+      "name": "Corte Ígneo"
+    },
+    "inspiration": {
+      "description": "Copia el valor de Ataque o Defensa del enemigo.",
+      "flavor": "Tu fuerza es mi mejor maestra.",
+      "name": "Inspiración"
+    },
+    "iron_bastion": {
+      "description": "Ultimate. Anula todos los Impactos recibidos este turno.",
+      "flavor": "Soy la muralla contra la que rompe el mar.",
+      "name": "Bastión de Hierro"
+    },
+    "judgment_aurora": {
+      "description": "Ultimate. Todos los éxitos cuentan como Críticos.",
+      "flavor": "La luz no deja sombras donde esconderse.",
+      "name": "Aurora del Juicio"
+    },
+    "karmic_retribution": {
+      "description": "El próximo ataque recibido se refleja al enemigo.",
+      "flavor": "Ojo por ojo, diente por diente.",
+      "name": "Retribución Kármica"
+    },
+    "kings_sword": {
+      "description": "Ultimate. Reduce el Umbral de Ataque a 2+ este turno.",
+      "flavor": "Por la gloria de los que nos precedieron.",
+      "name": "Espada del Rey"
+    },
+    "law_hammer": {
+      "description": "+2 Potencia. Si causa daño, el objetivo queda Aturdido.",
+      "flavor": "La justicia golpea una sola vez.",
+      "name": "Martillo de la Ley"
+    },
+    "light_shield": {
+      "description": "Reduce el Umbral de Defensa en 1 hasta el siguiente turno.",
+      "flavor": "La fe es el escudo más resistente.",
+      "name": "Escudo de Luz"
+    },
+    "lightning_burst": {
+      "description": "+2 dados de Potencia al siguiente ataque.",
+      "flavor": "El cielo no es el único que puede castigar.",
+      "name": "Estallido de Relámpagos"
+    },
+    "magic_nature": {
+      "chaos": "Caos",
+      "order": "Orden"
+    },
+    "mana_barrier": {
+      "description": "Anula el primer Impacto mágico recibido.",
+      "flavor": "La voluntad es un tejido impenetrable.",
+      "name": "Barrera de Maná"
+    },
+    "mana_cost": "Coste: {{cost}} Maná",
+    "max_equipped": "Solo puedes equipar 2 doctrinas",
+    "miraculous_protection": {
+      "description": "Anula 1 Impacto recibido en el turno actual.",
+      "flavor": "Nadie cae mientras yo siga en pie.",
+      "name": "Protección Milagrosa"
+    },
+    "no_doctrines": "No hay doctrinas disponibles",
+    "nullify": {
+      "description": "Elimina todos los efectos de estado perjudiciales.",
+      "flavor": "La lógica disipa el caos.",
+      "name": "Anular"
+    },
+    "oracle_eye": {
+      "description": "Reduce el Umbral de Magia en 1 para tu siguiente doctrina.",
+      "flavor": "Veo el fin antes de que empiece.",
+      "name": "Ojo del Oráculo"
+    },
+    "plasma_missile": {
+      "description": "Suma +4 dados de Potencia. Los 1 naturales te hieren.",
+      "flavor": "Poder puro, difícil de contener.",
+      "name": "Misil de Plasma"
+    },
+    "precise_strike": {
+      "description": "Los resultados de 5 y 6 cuentan como Críticos.",
+      "flavor": "Busca la grieta, no el golpe fuerte.",
+      "name": "Golpe Preciso"
+    },
+    "reckless_strike": {
+      "description": "Suma +2 dados de Potencia, pero tu Defensa se reduce a 0.",
+      "flavor": "Atacar sin miedo es la única forma de vencer.",
+      "name": "Golpe Temerario"
+    },
+    "righteous_charge": {
+      "description": "+2 dados de Potencia. Si impactas, el enemigo queda Aturdido.",
+      "flavor": "Abran paso a la sentencia del Rey.",
+      "name": "Carga Justiciera"
+    },
+    "shadow_step": {
+      "description": "Tu próximo ataque ignora la Defensa del enemigo.",
+      "flavor": "Estoy aquí, ahora estoy allá.",
+      "name": "Paso Sombrío"
+    },
+    "shield_bash": {
+      "description": "El enemigo sufre -1 dado de Defensa hasta su próximo turno.",
+      "flavor": "Atrás, bestia inmunda.",
+      "name": "Golpe de Escudo"
+    },
+    "shoulder_charge": {
+      "description": "+1 dado de Potencia. Si impactas, el enemigo queda Aturdido.",
+      "flavor": "Quítate de mi camino.",
+      "name": "Carga de Hombro"
+    },
+    "silence_vortex": {
+      "description": "El objetivo queda Aturdido.",
+      "flavor": "Tus palabras se pierden en el vacío.",
+      "name": "Vórtice de Silencio"
+    },
+    "stellar_collapse": {
+      "description": "Ultimate. Lanza 10 dados de Potencia. Los 6 generan impactos extra.",
+      "flavor": "El peso de una estrella muerta sobre tus hombros.",
+      "name": "Colapso Estelar"
+    },
+    "success": {
+      "equip": "¡Doctrina equipada!",
+      "unequip": "Doctrina desequipada",
+      "use": "¡Doctrina usada!",
+      "used": "¡Doctrina activada!"
+    },
+    "summary_execution": {
+      "description": "Mata instantáneamente a un enemigo con 4 Heridas o menos.",
+      "flavor": "Tu sentencia ha sido dictada.",
+      "name": "Ejecución Sumaria"
+    },
+    "temporal_prison": {
+      "description": "Ultimate. El objetivo queda Aturdido.",
+      "flavor": "Un momento eterno de nada absoluta.",
+      "name": "Prisión Temporal"
+    },
+    "tier_required": "Requiere Tier {{tier}}",
+    "title": "Doctrinas",
+    "transfusion": {
+      "description": "Sacrifica 2 Heridas para recuperar 6 de Maná.",
+      "flavor": "La magia fluye mejor cuando se mezcla con sangre.",
+      "name": "Transfusión"
+    },
+    "truth_blade": {
+      "description": "El siguiente ataque suma +1 dados de Potencia.",
+      "flavor": "La mentira se deshace ante el acero bendito.",
+      "name": "Filo de la Verdad"
+    },
+    "ultimate": "Ultimate",
+    "unbreakable_formation": {
+      "description": "Durante 2 turnos, reduces el daño recibido en 1 Herida.",
+      "flavor": "Ni un paso más. Este suelo es sagrado.",
+      "name": "Formación Inquebrantable"
+    },
+    "unequip": "Desequipar",
+    "unerring_dart": {
+      "description": "Causa 1 Herida automática ignorando defensa.",
+      "flavor": "No puedes esquivar lo inevitable.",
+      "name": "Dardo Infalible"
+    },
+    "use": "Usar",
+    "wrath_avatar": {
+      "description": "Ultimate. Todos los ataques son Críticos automáticos.",
+      "flavor": "Ya no soy un hombre, soy la tempestad.",
+      "name": "Avatar de la Ira"
+    }
+  },
+  "enemies": {
+    "alpha_werewolf": "Hombre Lobo Alfa",
+    "armored_templar": "Templario Acorazado",
+    "bandit_chief": "Jefe Bandido",
+    "bandit_runic": "Bandido Rúnico",
+    "bandit_stalker": "Bandido Salteador",
+    "behemoth": "Behemot",
+    "belphegor_avatar": "Avatar de Belfegor",
+    "demon_lord": "Señor Demonio",
+    "elite_armored_templar": "Templario Acorazado de Élite",
+    "elite_bandit": "Bandido Élite",
+    "elite_demon": "Demonio Élite",
+    "fallen_angel": "Ángel Caído",
+    "fallen_inquisitor": "Inquisidor Caído",
+    "fallen_inquisitor_boss": "Inquisidor Caído Jefe",
+    "fallen_templar": "Templario Caído",
+    "ghost": "Fantasma",
+    "giant_spider": "Araña Gigante",
+    "herald_vampire": "Vampiro Heraldo",
+    "heretic_cultist": "Cultista Hereje",
+    "heretic_templar": "Templario Hereje",
+    "magma_demon": "Demonio de Magma",
+    "minor_demon": "Demonio Menor",
+    "minor_nephilim": "Nefilim Menor",
+    "minor_vampire": "Vampiro Menor",
+    "nephilim": "Nefilim",
+    "shadow_demon": "Demonio de las Sombras",
+    "shadow_demon_elite": "Demonio de las Sombras Élite",
+    "skeleton": "Esqueleto",
+    "skeleton_warrior_elite": "Esqueleto Guerrero Élite",
+    "tank_heretic_templar": "Templario Hereje Tanque",
+    "vampire": "Vampiro",
+    "vampire_chief": "Jefe Vampiro",
+    "vampire_count": "Conde Vampiro",
+    "werewolf": "Hombre Lobo",
+    "werewolf_alpha": "Hombre Lobo Alfa",
+    "young_werewolf": "Hombre Lobo Joven"
+  },
+  "enemyNames": {
+    "boss": {
+      "prefix": {
+        "0": "Azatheros",
+        "1": "Malachar",
+        "2": "Nethrazul",
+        "3": "Xandros",
+        "4": "Belzaroth"
+      },
+      "suffix": {
+        "0": "Destructor de Mundos",
+        "1": "el Eterno",
+        "2": "Soberano del Vacío",
+        "3": "el Inmortal",
+        "4": "Perdición Encarnada"
+      }
+    },
+    "elite": {
+      "prefix": {
+        "0": "Velefor",
+        "1": "Garadoth",
+        "2": "Xerion",
+        "3": "Morvain",
+        "4": "Zarathos",
+        "5": "Nethros"
+      },
+      "suffix": {
+        "0": "Duque Infernal",
+        "1": "el Corruptor",
+        "2": "Señor del Terror",
+        "3": "el Despiadado",
+        "4": "Segador de Almas"
+      }
+    },
+    "minion": {
+      "prefix": {
+        "0": "Vorath",
+        "1": "Krix",
+        "2": "Malgor",
+        "3": "Theron",
+        "4": "Grixus",
+        "5": "Vex",
+        "6": "Morag",
+        "7": "Drix"
+      },
+      "suffix": {
+        "0": "el Hueco",
+        "1": "de las Sombras",
+        "2": "el Feral",
+        "3": "el Putrefacto",
+        "4": "Rompehuesos",
+        "5": "el Maldito"
+      }
+    }
+  },
+  "errors": {
+    "invalid_email": "Correo electrónico no valido",
+    "invalid_password_length": "La contraseña debe tener al menos 6 caracteres",
+    "password_mismatch": "Las contraseñas no coinciden",
+    "required_field": "Campo requerido"
+  },
+  "factions": {
+    "ALCHEMISTS_LEAGUE": "Liga de Alquimistas",
+    "BLOOD_PACT": "Pacto de Sangre",
+    "CRIMSON_INQUISITION": "Inquisición Carmesí",
+    "DEATH_MARCH": "La Muerte Errante",
+    "HOLY_KNIGHTS": "Caballeros Sagrados",
+    "LEGION": "La Legión"
+  },
+  "habits": {
+    "add": "Añadir hábito",
+    "empty": "Todavía no tienes hábitos. ¡Crea uno para empezar!",
+    "error": {
+      "internal": {
+        "complete": "Ocurrió un error al completar el hábito",
+        "create": "Ocurrió un error al crear el hábito",
+        "delete": "Ocurrió un error al eliminar el hábito",
+        "update": "Ocurrió un error al actualizar el hábito"
+      }
+    },
+    "success": {
+      "create": "Hábito creado exitosamente",
+      "delete": "Hábito eliminado exitosamente",
+      "progress": "Progreso de hábito registrado exitosamente {{diceReward}}",
+      "target_met": "¡Hábito completado exitosamente! ¡Buen trabajo! {{diceReward}}",
+      "update": "Hábito actualizado exitosamente"
+    },
+    "timespan": {
+      "daily": "Diario",
+      "monthly": "Mensual",
+      "weekly": "Semanal"
+    },
+    "title": "Hábitos"
+  },
+  "icons": {
+    "not_found": "No se encontraron iconos",
+    "placeholder": "Seleccionar un icono",
+    "search_placeholder": "Buscar iconos..."
+  },
+  "inventory": {
+    "armory": "Armería",
+    "class": "Clase",
+    "damage_type": {
+      "BOTH": "Ambos",
+      "MAGIC": "Mágico",
+      "PHYSICAL": "Físico"
+    },
+    "dice_bank": "Banco de Dados",
+    "divine_quotes": [
+      "“Te levantarás de nuevo, hijo mío, pues tu deber aún no ha terminado...”",
+      "“La muerte no es más que un puente hacia un propósito mayor. Regresa a la luz...”",
+      "“Las sombras pueden reclamar tu carne, pero tu alma pertenece a la lucha eterna...”",
+      "“Incluso en el abismo más profundo, la brasa de tu voluntad encenderá el amanecer...”",
+      "“Tu linaje está grabado en sangre y oro; la tumba no puede retener lo que el destino ha elegido...”",
+      "“Camina por el valle del silencio y regresa con el trueno de la redención...”",
+      "“Los cielos lloran tu caída, pero las estrellas se alinean para tu renacimiento...”",
+      "“La campana no dobla por tu final, sino por tu despertar...”",
+      "“Tu camino está pavimentado con los huesos de los que se rindieron. No seas como ellos...”",
+      "“El fuego que quema tu carne forjará tu espíritu en un arma...”",
+      "“Las estrellas se atenúan cuando tu voluntad flaquea. Mira hacia arriba y levántate...”",
+      "“Eres el pesado martillo de la Orden; el mundo es el yunque...”",
+      "“El destino es una cadena que solo tú puedes romper. Destrúyela y regresa...”",
+      "“El silencio es el santuario de los débiles. Que tu regreso se escuche en los cielos...”",
+      "“El abismo solo consume lo que puede contener. Tu alma es demasiado grande para su hambre...”",
+      "“Cada gota de sangre derramada es una semilla de venganza que aún debe florecer...”",
+      "“La luz de los cielos es cegadora, pero te guiará a través de la oscuridad...”"
+    ],
+    "empty": "No hay objetos en el inventario",
+    "equipment_slot": {
+      "ACCESSORY": "Accesorio",
+      "ARMOR": "Armadura",
+      "WEAPON": "Arma"
+    },
+    "error": {
+      "active_mission": "No puedes cambiar el inventario mientras hay una misión activa.",
+      "equip": "Error al equipar el objeto",
+      "revive": "Error al revivir el personaje",
+      "unequip": "Error al desequipar el objeto"
+    },
+    "filter": {
+      "accessory": "Accesorios",
+      "all_tiers": "Todos los tiers",
+      "all_types": "Todos los tipos",
+      "armor": "Armadura",
+      "clear": "Limpiar filtros",
+      "consumable": "Consumibles",
+      "tier": "Tier {{tier}}",
+      "weapon": "Armas"
+    },
+    "gold": "Oro",
+    "health": "Salud",
+    "items": "Objetos",
+    "loadout": "Equipamiento",
+    "magic": "Magia",
+    "magic_atk": "Ataque Mágico",
+    "magic_def": "Defensa Mágica",
+    "magic_nature": {
+      "chaos": "Caos",
+      "label": "Naturaleza Mágica",
+      "order": "Orden"
+    },
+    "mana": "Maná",
+    "mana_regen": "Regeneración de Maná",
+    "missions": "Misiones",
+    "no_character": {
+      "button": "Empezar aventura",
+      "description": "Crea un personaje para empezar tu aventura.",
+      "title": "Todavía no tienes un personaje"
+    },
+    "phys": "Físico",
+    "rarity": {
+      "common": "Común",
+      "legendary": "Legendario",
+      "rare": "Raro"
+    },
+    "revive": "Revivir",
+    "stats": {
+      "attack_dice": "Dados de Ataque",
+      "damage_type": "Tipo de Daño",
+      "magic_def": "Def Mágica",
+      "phys_def": "Def Física",
+      "range": "Alcance",
+      "speed": "Velocidad"
+    },
+    "stats_title": "Estadísticas",
+    "strength_atk": "Ataque Físico",
+    "strength_def": "Defensa Física",
+    "success": {
+      "equip": "Objeto equipado correctamente",
+      "revive": "¡Personaje revivido!",
+      "unequip": "Objeto desequipado correctamente"
+    },
+    "tabs": {
+      "armory": "Armería y Equipamiento",
+      "character": "Personaje",
+      "doctrines": "Doctrinas"
+    },
+    "tier": "Tier",
+    "title": "Inventario"
+  },
+  "investments": {
+    "amount": "Cantidad",
+    "anti_demon_barrier": {
+      "description": "Los alquimistas de Asunción han desarrollado un prototipo de barrera sagrada capaz de purificar demonios menores. Solo necesitan fondos para los materiales... y quizás un seguro de vida.",
+      "failure": "Los alquimistas se quedaron sin fondos a mitad del ritual. La 'barrera' resultó ser una cortina con purpurina. Los demonios están riéndose. Literalmente. (╥﹏╥)",
+      "name": "Barrera Anti-Demonios",
+      "success": "¡La barrera se alza! Los demonios menores se desintegran al tocarla. Los alquimistas están tan sorprendidos como nosotros de que funcionara (・∀・)"
+    },
+    "completed": "¡Completado!",
+    "contribute": "Contribuir",
+    "contribute_to": "Contribuir a {{name}}",
+    "dark_heart_operation": {
+      "description": "Mientras los Seis Poderes atacan Santa Cruz, Sodoma y Gomorra están desprotegidas. Un golpe quirúrgico podría destruir sus fundiciones y desbaratar sus líneas de suministro. ¿Suicida? Quizás. ¿Épico? Definitivamente.",
+      "failure": "El escuadrón fue capturado. Las últimas transmisiones hablaban de 'hospitalidad demoníaca'. No queremos saber los detalles (゜-゜)",
+      "name": "Operación Corazón Oscuro",
+      "success": "¡BOOM! La Forja Infernal arde... con su propio fuego. Irónico, ¿no? El Anticristo está que echa humo. Más humo del habitual ᕦ(ò_óˇ)ᕤ"
+    },
+    "days_remaining": "días restantes",
+    "error_contribute": "Error al realizar la contribución",
+    "gen2_armament_program": {
+      "description": "La Liga de los Alquimistas ofrece compartir sus secretos de percusión mágica y cartuchos sellados... por un precio. El capitalismo sobrevive incluso al apocalipsis.",
+      "failure": "La Liga se quedó con el dinero y desapareció. Quién lo hubiera imaginado. Los contratos ahora incluyen 'sin demonios' como excusa válida de impago ┐(´д`)┌",
+      "name": "Programa de Armamento Gen 2",
+      "success": "¡La Liga cumple su palabra! Las nuevas armas disparan sin fallar. Los demonios descubren que 'a prueba de magia' no significa 'a prueba de balas' (☞゚ヮ゚)☞"
+    },
+    "gold": "oro",
+    "max": "Máximo",
+    "my_contribution": "Mi contribución",
+    "no_investments": "No hay inversiones activas",
+    "providence_purification": {
+      "description": "Los monjes de Asunción creen que pueden purificar las ruinas de Providencia y crear un frente secundario. 'Creemos' es la palabra clave aquí.",
+      "failure": "Los monjes llegaron a las ruinas llenos de fe. Volvieron... bueno, no volvieron. Las ruinas ahora brillan con un rojo muy poco sagrado (；一_一)",
+      "name": "Ritual de Purificación de Providencia",
+      "success": "¡Providencia renace de las cenizas! Los monjes cantan victoria... bueno, cantan himnos, pero con mucha emoción ♪(´ε` )"
+    },
+    "subtitle": "Contribuye oro para cambiar el destino del mundo",
+    "success_contribute": "¡Contribución realizada con éxito!",
+    "title": "Inversiones",
+    "your_gold": "Tu oro"
+  },
+  "item_categories": {
+    "rarity": {
+      "common": "Común",
+      "legendary": "Legendario",
+      "rare": "Raro"
+    },
+    "type": {
+      "armor": "Armadura",
+      "weapon": "Arma"
+    }
+  },
+  "items": {
+    "advanced_revolver": {
+      "description": "Ingeniería moderna. Permite repetir un dado de ataque una vez por combate.",
+      "name": "Revolver Avanzado"
+    },
+    "arcanist_codex": {
+      "description": "Tomo de cuero de bestia. +1 Impacto adicional si el atacante no se ha movido.",
+      "name": "Codex de Arcanista"
+    },
+    "bronze_plate_armor": {
+      "description": "Aleación conductora. Restaura 1 de maná al comienzo de cada encuentro.",
+      "name": "Armadura de Placas de Bronce"
+    },
+    "chainmail": {
+      "description": "Protección flexible basada en anillos de hierro entrelazados. Eficaz contra cortes y estocadas.",
+      "name": "Cota de Malla"
+    },
+    "compendium_of_truths": {
+      "description": "Secretos fundamentales. Al lanzar una doctrina, lanza 1 dado extra.",
+      "name": "Compendio de Verdades"
+    },
+    "copper_plate_armor": {
+      "description": "Mejora ligeramente la canalización de maná al lanzar doctrinas.",
+      "name": "Armadura de Placas de Cobre"
+    },
+    "ebony_staff": {
+      "description": "Madera oscura. Reduce en 1 el coste de maná de la primera doctrina usada.",
+      "name": "Báculo de Ébano"
+    },
+    "ether_whisper": {
+      "description": "Vara de cristal. Permite realizar ataques mágicos teledirigidos.",
+      "name": "Susurro del Éter"
+    },
+    "full_plate_armor": {
+      "description": "Láminas de acero entrelazadas. Aumenta las Heridas máximas en +1 mientras se porte.",
+      "name": "Armadura de Placas Completa"
+    },
+    "gold_plate_armor": {
+      "description": "Espejo místico. Una vez por combate, devuelve 1 impacto mágico bloqueado.",
+      "name": "Armadura de Placas de Oro"
+    },
+    "gothic_armor": {
+      "description": "Refractan la fuerza de los golpes. Si bloqueas todos los ataques, el enemigo es empujado.",
+      "name": "Armadura Gótica"
+    },
+    "great_war_axe": {
+      "description": "Arma brutal. Los éxitos críticos (6 natural) ignoran 1 dado de defensa del enemigo.",
+      "name": "Gran Hacha de Guerra"
+    },
+    "health_potion": {
+      "description": "Restaura 3 Vidas.",
+      "name": "Poción de Salud"
+    },
+    "infantry_sword": {
+      "description": "Acero funcional. Sencillo, brillante y letal.",
+      "name": "Espada de Infantería"
+    },
+    "lucerne_hammer": {
+      "description": "Arma de dos manos diseñada para destrozar huesos y penetrar armaduras.",
+      "name": "Martillo de Lucerna"
+    },
+    "mana_potion": {
+      "description": "Restaura 3 de Maná.",
+      "name": "Poción de Maná"
+    },
+    "marksman_musket": {
+      "description": "Cañón estriado de alta precisión para distancias extremas.",
+      "name": "Mosquete de Tirador"
+    },
+    "official_sabre": {
+      "description": "Hoja grabada con insignias de mando. Otorga +1 a la Velocidad solo en el primer turno.",
+      "name": "Sable de Oficial"
+    },
+    "recruit_grimoire": {
+      "description": "Contiene fórmulas mágicas básicas y directas.",
+      "name": "Grimorio de Recluta"
+    },
+    "spark_musket": {
+      "description": "Arma larga con llave de chispa. Estándar de la infantería moderna temprana.",
+      "name": "Mosquete de Chispa"
+    },
+    "spark_pistol": {
+      "description": "Mecanismo rudo pero efectivo para la defensa personal.",
+      "name": "Pistola de Chispa"
+    },
+    "the_verdict": {
+      "description": "Cañón de mano pesado. +1 dado de ataque contra enemigos con <50% de vida.",
+      "name": "El Veredicto"
+    },
+    "war_breaker": {
+      "description": "Martillo monumental. Un impacto crítico (6 natural) aturde al enemigo.",
+      "name": "Rompe-Guerras"
+    },
+    "water_drop": {
+      "description": "Hoja de filo legendario. Aumenta la Velocidad base en +1 de forma permanente.",
+      "name": "Gota de Agua"
+    },
+    "willow_wand": {
+      "description": "Una vara flexible que canaliza los primeros brotes de maná.",
+      "name": "Vara de Sauce"
+    },
+    "wind_color": {
+      "description": "Pistola aerodinámica. Aumenta el rango efectivo en +1.",
+      "name": "Color del Viento"
+    }
+  },
+  "languages": {
+    "en": "Inglés",
+    "es": "Español"
+  },
+  "login": {
+    "account_verified": {
+      "description": "Ahora puedes iniciar sesión con tus credenciales.",
+      "title": "¡Cuenta verificada exitosamente!"
+    },
+    "button": "Iniciar sesión",
+    "check_email_title": "Revisa tu correo",
+    "create_account": "Crear cuenta",
+    "dont_have_account": "¿No tienes cuenta?",
+    "email": "Correo electrónico",
+    "error": {
+      "google_unavailable": "El inicio de sesión con Google no está disponible actualmente, por favor inténtalo más tarde",
+      "internal_error": "Ocurrió un error al iniciar sesión",
+      "invalid_credentials": "Credenciales inválidas. Por favor, verifica tu correo y contraseña.",
+      "invalid_magic_link": "Enlace mágico inválido o expirado",
+      "magic_link_error": "Error del enlace mágico"
+    },
+    "google_button": "Iniciar sesión con Google",
+    "magic_link_sent_description": "Haz clic en el enlace del correo para iniciar sesión en tu cuenta.",
+    "magic_link_sent_title": "¡Enlace mágico enviado!",
+    "or": "o",
+    "password": "Contraseña",
+    "recover_password": "Recuperar contraseña",
+    "success": "Se ha enviado un enlace de inicio de sesión a tu correo.",
+    "title": "Inicia sesión en ARQ",
+    "verifying_messages": [
+      "Afilando el acero sagrado...",
+      "Bendiciendo el equipo de batalla...",
+      "Consultando los tomos de sabiduría...",
+      "Desplegando mapas de la región...",
+      "Encendiendo las antorchas del santuario...",
+      "Meditando sobre las Doctrinas del Orden...",
+      "Preparando el incienso ritual...",
+      "Reuniendo suministros para la expedición...",
+      "Vigilando las sombras en busca de herejía..."
+    ],
+    "verifying_title": "Verificando..."
+  },
+  "map": {
+    "lore": "Los Seis Poderes Infernales han lanzado un ataque relámpago a Santa Cruz, la Sede Plateada. La Orden de los Caballeros Sagrados defiende cada muralla mientras los refuerzos vienen en camino. Si cae la Sede Plateada, cae el liderazgo de los Fieles.",
+    "no_activities": "No se encontraron actividades activas.",
+    "title": "Mapa del Mundo"
+  },
+  "more": "más",
+  "objectives": {
+    "add": "Añadir objetivo",
+    "complete": {
+      "button": "Completar",
+      "description": "¿Estás seguro de que quieres marcar este objetivo como completado?",
+      "error": "Ocurrió un error al completar el objetivo",
+      "success": "Objetivo completado exitosamente {{diceReward}}",
+      "title": "¿Completar objetivo?"
+    },
+    "delete": {
+      "description": "Esta acción es irreversible. Esto eliminará permanentemente el objetivo.",
+      "error": "Ha ocurrido un error al eliminar el objetivo",
+      "success": "Objetivo eliminado exitosamente",
+      "title": "Eliminar objetivo"
+    },
+    "habits_count_one": "{{count}} hábito",
+    "habits_count_other": "{{count}} hábitos",
+    "no_date": "Sin fecha",
+    "no_habits": "No hay hábitos vinculados",
+    "no_tasks": "No hay tareas vinculadas",
+    "no_tasks_or_habits": "No hay tareas ni hábitos vinculados",
+    "tasks_count_one": "{{count}} tarea",
+    "tasks_count_other": "{{count}} tareas",
+    "title": "Objetivos",
+    "update": {
+      "error": "Ha ocurrido un error al actualizar el objetivo",
+      "success": "Objetivo actualizado exitosamente",
+      "title": "Actualizar objetivo"
+    }
+  },
+  "onboarding": {
+    "back": "Atrás",
+    "button": "¡Adelante!",
+    "class_label": "Elige tu clase",
+    "error": {
+      "already_exists": "Ya tienes un personaje",
+      "description": "Ocurrió un error al crear tu personaje",
+      "title": "Error al crear el personaje"
+    },
+    "loading": "Creando tu personaje...",
+    "magic_nature": {
+      "q1": {
+        "chaos": "Me maravillo con la nueva forma de los fragmentos y los uso para crear un mosaico o una trampa de pinchos. La rotura es una oportunidad.",
+        "order": "Busco cada mota de polvo y uso mi voluntad para restaurar su estructura molecular exacta. Lo que fue perfecto, debe volver a serlo.",
+        "question": "Encuentras un jarrón milenario hecho añicos. ¿Cuál es tu reacción?"
+      },
+      "q2": {
+        "chaos": "De los rebeldes. Prefiero morir en el estallido de un cambio incierto que vivir una vida dictada por el diseño de otro.",
+        "order": "Del lado de la corona. El desorden solo trae hambre y muerte; la ley es el único escudo contra el abismo.",
+        "question": "Un reino vive en paz total, pero bajo leyes tan estrictas que nadie puede elegir su propia profesión. Se gesta una revolución violenta. ¿De qué lado estás?"
+      },
+      "q3": {
+        "chaos": "Lanzo una pequeña doctrina al centro para ver qué pasa. Si explota, al menos habré aprendido algo sobre su fuerza bruta.",
+        "order": "Construyo una serie de sellos de contención y estudio sus ciclos durante años antes de intentar canalizar una sola gota.",
+        "question": "Descubres un flujo de energía inmensa pero totalmente impredecible. ¿Qué haces?"
+      },
+      "q4": {
+        "chaos": "Una selva indómita llena de híbridos extraños que crecen según su propia voluntad, donde cada paseo es una aventura diferente.",
+        "order": "Un diseño perfectamente simétrico, con senderos alineados con los astros y plantas que florecen en un orden cronológico estricto.",
+        "question": "Te conceden un terreno baldío para que crees lo que quieras. ¿Cómo es el resultado final?"
+      },
+      "q5": {
+        "chaos": "Gritas '¡Entropía!', lanzas la carta por la ventana y decides que hoy se cena lo que sea que encuentres primero.",
+        "order": "Elaboras un sistema de votación ponderado por antigüedad y nivel de hambre, asegurándote de que el reparto de aceitunas sea geométricamente equitativo.",
+        "question": "Estás con tus amigos y nadie se pone de acuerdo con los ingredientes de la pizza. El tiempo pasa y el hambre aprieta. ¿Cómo lo resuelves?"
+      },
+      "subtitle": "Responde estas preguntas para descubrir tu afinidad mágica.",
+      "title": "Naturaleza Mágica"
+    },
+    "name_label": "Nombre del personaje",
+    "name_placeholder": "Introduce el nombre de tu personaje",
+    "next": "Siguiente",
+    "subtitle": "Elige tu camino y comienza tu aventura",
+    "title": "Crear tu personaje"
+  },
+  "recover_password": {
+    "button": "Restablecer contraseña",
+    "confirm_password": "Confirmar contraseña",
+    "error": {
+      "title": "Ocurrió un error al cambiar la contraseña de tu cuenta"
+    },
+    "password": "Contraseña",
+    "success": {
+      "title": "Contraseña restablecida con éxito"
+    },
+    "title": "Crea una nueva contraseña para tu cuenta"
+  },
+  "save_changes": "Guardar cambios",
+  "settings": {
+    "default_tasks_view_label": "Vista de tareas predeterminada",
+    "default_tasks_view_placeholder": "Seleccionar vista predeterminada",
+    "email_label": "Correo electrónico",
+    "language_label": "Idioma",
+    "language_placeholder": "Seleccionar idioma",
+    "logout_button": "Cerrar sesión",
+    "theme_dark": "Oscuro",
+    "theme_label": "Tema",
+    "theme_light": "Claro",
+    "title": "Configuración"
+  },
+  "sidebar": {
+    "calendar": "Calendario",
+    "close": "Colapsar menú",
+    "dashboard": "Panel de control",
+    "habits": "Hábitos",
+    "inventory": "Inventario",
+    "investments": "Inversiones",
+    "map": "Mapa del Mundo",
+    "objectives": "Objetivos y áreas",
+    "open": "Expandir menú",
+    "productivity": "Productividad",
+    "review": "Revisión",
+    "rpg": "RPG",
+    "settings": "Configuración",
+    "shop": "Tienda",
+    "tasks": "Tareas"
+  },
+  "sign_up": {
+    "already_have_account": "¿Ya tienes cuenta?",
+    "button": "Crear cuenta",
+    "confirm_password": "Confirmar contraseña",
+    "email": "Correo electrónico",
+    "error": {
+      "title": "Ocurrió un error al crear la cuenta"
+    },
+    "login": "Inicia sesión",
+    "password": "Contraseña",
+    "success_message": "Te hemos enviado un correo de vertificación. Comprueba tu bandeja de entrada.",
+    "success_title": "¡Cuenta creada!",
+    "title": "Crear una cuenta en ARQ"
+  },
+  "status_effects": {
+    "burning": "Quemadura",
+    "critical_threshold": "Umbral Crítico",
+    "damage_negation": "Negación de Daño",
+    "direct_damage": "Daño Directo",
+    "doctrine_active": "Doctrina Activa",
+    "enemy_power_reduction": "Reducción de Potencia Enemiga",
+    "guaranteed_critical": "Crítico Garantizado",
+    "heal": "Curación",
+    "immobilized": "Inmovilizado",
+    "poisoned": "Envenenado",
+    "power_boost": "Aumento de Potencia",
+    "purified": "Purificado",
+    "stunned": "Aturdido",
+    "threshold_reduction": "Reducción de Umbral"
+  },
+  "store": {
+    "buy": "Comprar",
+    "buying": "Comprando...",
+    "cart": "Carrito",
+    "empty_cart": "Tu carrito está vacío",
+    "error": {
+      "buy": "Error al comprar los objetos"
+    },
+    "filter": {
+      "all_tiers": "Todos los Tiers",
+      "all_types": "Todos los Tipos",
+      "tier": "Tier",
+      "type": "Tipo"
+    },
+    "items_purchased": "objetos comprados",
+    "no_items": "No hay objetos disponibles",
+    "random_rarity": "Rareza aleatoria",
+    "success": {
+      "buy": "¡Compra exitosa!"
+    },
+    "tier": "Tier",
+    "tier_required": "Requiere Tier {{tier}} (Estás en Tier {{current}})",
+    "title": "Tienda",
+    "total": "Total"
+  },
+  "task_status": {
+    "DOING": "En progreso",
+    "DONE": "Completado",
+    "TODO": "Por hacer"
+  },
+  "tasks": {
+    "add": "Crear tarea",
+    "color": "Selecciona un color",
+    "delete": "Eliminar tarea",
+    "duplicate": "Duplicar tarea",
+    "effort": "Esfuerzo",
+    "effort_placeholder": "Seleccionar esfuerzo",
+    "effort_values": {
+      "HIGH": "Alto",
+      "LOW": "Bajo"
+    },
+    "empty": "No hay tareas todavía",
+    "error": {
+      "internal": {
+        "create": "Ha ocurrido un error al crear la tarea.",
+        "delete": "Ha ocurrido un error al eliminar la tarea.",
+        "duplicate": "Ocurrió un error al duplicar la tarea",
+        "reorder": "Ha ocurrido un error al reordenar las tareas.",
+        "update": "Ha ocurrido un error al actualizar la tarea."
+      }
+    },
+    "filters": {
+      "all_statuses": "Todos los estados",
+      "all_types": "Todos los tipos",
+      "clear": "Limpiar filtros",
+      "date_placeholder": "Filtrar por fecha",
+      "effort_placeholder": "Filtrar por tipo",
+      "search_placeholder": "Buscar",
+      "status_placeholder": "Filtrar por estado"
+    },
+    "impact": "Impacto",
+    "impact_placeholder": "Seleccionar impacto",
+    "impact_values": {
+      "HIGH": "Alto",
+      "LOW": "Bajo"
+    },
+    "matrix": {
+      "effort": "Esfuerzo",
+      "high": "ALTO",
+      "high_impact_high_effort": "Alto impacto, alto esfuerzo",
+      "high_impact_low_effort": "Alto impacto, bajo esfuerzo",
+      "impact": "Impacto",
+      "low": "BAJO",
+      "low_impact_high_effort": "Bajo impacto, alto esfuerzo",
+      "low_impact_low_effort": "Bajo impacto, bajo esfuerzo",
+      "no_tasks": "Sin tareas"
+    },
+    "success": {
+      "create": "Tarea creada exitosamente",
+      "delete": "Tarea eliminada exitosamente",
+      "duplicate": "Tarea duplicada exitosamente",
+      "update": "Tarea actualizada exitosamente {{diceReward}}"
+    },
+    "table": {
+      "dueDate": "Fecha de entrega",
+      "empty": "Todavía no tienes tareas. ¡Crea una para empezar!",
+      "no_matching_tasks": "No hay tareas que coincidan con los filtros",
+      "no_tasks": "No se encontraron tareas",
+      "page_info": "Página {{page}} de {{totalPages}}",
+      "pagination_info": "Mostrando {{start}}-{{end}} de {{total}}",
+      "status": "Estado",
+      "title": "Título",
+      "type": "Tipo"
+    },
+    "tabs": {
+      "calendar": "Calendario",
+      "list": "Lista",
+      "matrix": "Matriz",
+      "table": "Tabla"
+    },
+    "task_types": {
+      "fill_in": "Relleno",
+      "major_project": "Proyecto Mayor",
+      "quick_win": "Victoria Rápida",
+      "thankless_task": "Tarea Ingrata"
+    },
+    "title": "Tareas"
+  },
+  "update": "Actualizar",
+  "update_area_dialog": {
+    "description": "Modal para actualizar una área",
+    "title": "Actualizar área"
+  },
+  "update_habit_dialog": {
+    "description": "Modal para actualizar un hábito existente",
+    "title": "Actualizar hábito"
+  },
+  "update_task_dialog": {
+    "description": "Modal para actualizar una tarea",
+    "description_placeholder": "Descripción de la tarea",
+    "due_date_placeholder": "Fecha de entrega (opcional)",
+    "objectives_placeholder": "Objetivos asociados",
+    "status_placeholder": "Estado de la tarea",
+    "title": "Actualizar tarea",
+    "title_placeholder": "Título de la tarea"
+  }
+}

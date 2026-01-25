@@ -1,0 +1,10 @@
+import { defaultTaskConfig } from './task-status.config'
+
+export const getTaskStatusStats = (stats: Record<string, number>) => ({
+  taskStats: [
+    { name: defaultTaskConfig.TODO.label, data: stats.TODO || 0, fill: defaultTaskConfig.TODO.color },
+    { name: defaultTaskConfig.DOING.label, data: stats.DOING || 0, fill: defaultTaskConfig.DOING.color },
+    { name: defaultTaskConfig.OVERDUE.label, data: stats.OVERDUE || 0, fill: defaultTaskConfig.OVERDUE.color }
+  ],
+  totalTasks: (stats.TODO || 0) + (stats.DOING || 0) + (stats.OVERDUE || 0)
+})

@@ -19,7 +19,22 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/components/*": ["./components/*"],
+      "@/ui/*": ["./components/ui/*"],
+      "@/common/*": ["./components/common/*"],
+      "@/forms/*": ["./components/forms/*"],
+      "@/auth/*": ["./components/auth/*"],
+      "@/tasks/*": ["./components/tasks/*"],
+      "@/calendars/*": ["./components/calendars/*"],
+      "@/layouts/*": ["./app/_layouts/*"],
+      "@/stores/*": ["./stores/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/utils/*": ["./utils/*"],
+      "@/hooks/*": ["./hooks/*"],
+      "@/types/*": ["./types/*"],
+      "@/styles/*": ["./styles/*"],
+      "@shared/*": ["../shared/*"]
     }
   },
   "include": [
