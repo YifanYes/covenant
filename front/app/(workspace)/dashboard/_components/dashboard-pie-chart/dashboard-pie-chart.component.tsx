@@ -25,28 +25,28 @@ export default function DashboardPieChartComponent({
   const parsedData = useMemo(() => parseDashboardPieChartConfig(data), [data])
 
   return (
-    <div className='flex w-full flex-1 items-center justify-center'>
+    <div className="flex w-full flex-1 items-center justify-center">
       {collectionLength > 0 ? (
-        <ChartContainer config={config} className='mx-auto aspect-square h-full max-h-[160px] w-full min-w-0'>
+        <ChartContainer config={config} className="mx-auto aspect-square max-h-40 w-full">
           <PieChart responsive>
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             <Pie
               data={parsedData}
-              dataKey='data'
-              nameKey='name'
-              innerRadius='80%'
-              outerRadius='100%'
-              cornerRadius='50%'
+              dataKey="data"
+              nameKey="name"
+              innerRadius="80%"
+              outerRadius="100%"
+              cornerRadius="50%"
               paddingAngle={10}
             >
               <Label
                 content={({ viewBox }) =>
                   viewBox && 'cx' in viewBox && 'cy' in viewBox ? (
-                    <text className='-mt-10' textAnchor='middle'>
-                      <tspan x={viewBox.cx} y={viewBox.cy} className='fill-foreground text-xl font-bold'>
+                    <text className="-mt-10" textAnchor="middle">
+                      <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-xl font-bold">
                         {parseTranslationKey(labelValue)}
                       </tspan>
-                      <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 20} className='fill-muted-foreground text-xs'>
+                      <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 20} className="fill-muted-foreground text-xs">
                         {parseTranslationKey(chartLabel)}
                       </tspan>
                     </text>
@@ -57,8 +57,8 @@ export default function DashboardPieChartComponent({
           </PieChart>
         </ChartContainer>
       ) : (
-        <div className='text-muted-foreground flex flex-col items-center gap-2 text-center'>
-          <p className='text-xs'>{parseTranslationKey(emptyLabel)}</p>
+        <div className="text-muted-foreground flex flex-col items-center gap-2 text-center">
+          <p className="text-xs">{parseTranslationKey(emptyLabel)}</p>
         </div>
       )}
     </div>

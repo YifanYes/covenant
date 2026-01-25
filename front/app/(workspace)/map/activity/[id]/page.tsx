@@ -22,7 +22,8 @@ import { type CombatLogEntry, type EnemyState, type InventoryCharacter } from '@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import CombatArena from '../../_components/combat-arena.component'
 
@@ -183,7 +184,7 @@ export default function ActivityDetailPage() {
         <div className='mx-auto w-full max-w-5xl space-y-6'>
           <div className='flex items-center gap-4'>
             <Button variant='ghost' size='icon' asChild>
-              <Link to='/map'>
+              <Link href='/map'>
                 <ChevronLeft className='h-5 w-5' />
               </Link>
             </Button>
@@ -247,7 +248,7 @@ export default function ActivityDetailPage() {
       <div className='mx-auto w-full max-w-7xl space-y-4'>
         <div className='flex items-center gap-4'>
           <Button variant='ghost' size='icon' asChild>
-            <Link to='/map'>
+            <Link href='/map'>
               <ChevronLeft className='h-5 w-5' />
             </Link>
           </Button>

@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  let supabaseResponse = NextResponse.next({ request })
 
   // Create Supabase client for middleware
   const supabase = createServerClient(
@@ -15,8 +16,8 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
-            request.cookies.set(name, value)
+          cookiesToSet.forEach(({ name, value, options }) => {
+            supabaseResponse.cookies.set(name, value, options)
           })
         },
       },
@@ -26,8 +27,8 @@ export async function middleware(request: NextRequest) {
   // Check auth session
   const { data: { session } } = await supabase.auth.getSession()
 
-  // Public routes (login, sign-up)
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/sign-up')
+  // Public routes (login, sign-up, auth callback)
+  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/sign-up') || pathname.startsWith('/auth/callback')
 
   // Protected routes
   const isProtectedRoute = !isAuthRoute && pathname !== '/'
@@ -43,7 +44,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  return NextResponse.next()
+  return supabaseResponse
 }
 
 export const config = {

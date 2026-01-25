@@ -3,7 +3,7 @@ import Button from '@/ui/button.component'
 import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/card.component'
 import { parseTranslationKey } from '@/utils/locale.utils'
 import { type ReactNode } from 'react'
-import { Link } from 'next/navigation'
+import Link from 'next/link'
 
 interface DashboardSectionWrapperComponentProps {
   title: string
@@ -40,7 +40,7 @@ export default function DashboardSectionWrapperComponent({
         </div>
         {linkTo && linkText && (
           <Button variant='ghost' size='sm' className='h-8 text-xs' asChild>
-            <Link to={linkTo}>{linkText}</Link>
+            <Link href={linkTo}>{linkText}</Link>
           </Button>
         )}
       </CardHeader>

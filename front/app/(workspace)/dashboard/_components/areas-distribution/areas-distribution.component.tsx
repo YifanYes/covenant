@@ -22,16 +22,16 @@ export default function AreasDistribution({ areas }: AreasDistributionProps) {
     <DashboardSectionWrapperComponent
       title={t('dashboard.areas_distribution.title')}
       icon={TrackChanges}
-      iconColorClass='text-orange-500'
-      className='gap-0'
+      iconColorClass="text-orange-500"
+      className="gap-0"
     >
       {localizedData.length > 0 ? (
-        <ChartContainer config={config} className='min-h-[220px] w-full'>
+        <ChartContainer config={config} className="h-full min-h-55 w-full">
           <RadarChart data={localizedData}>
             <ChartTooltip cursor={false} content={<AreasDistributionTooltip />} />
-            <PolarGrid stroke='var(--muted-foreground)' opacity={0.2} />
+            <PolarGrid stroke="var(--muted-foreground)" opacity={0.2} />
             <PolarAngleAxis
-              dataKey='name'
+              dataKey="name"
               tick={(props) => <CustomAngleTickComponent {...props} data={localizedData} />}
             />
             <PolarRadiusAxis axisLine={false} tick={false} domain={['dataMin', 'dataMax']} />
@@ -40,8 +40,8 @@ export default function AreasDistribution({ areas }: AreasDistributionProps) {
           </RadarChart>
         </ChartContainer>
       ) : (
-        <div className='text-muted-foreground flex h-full min-h-[220px] w-full flex-col items-center justify-center gap-2 p-4 text-center'>
-          <p className='text-xs'>{t('dashboard.areas_distribution.no_data')}</p>
+        <div className="text-muted-foreground flex h-full min-h-55 w-full flex-col items-center justify-center gap-2 p-4 text-center">
+          <p className="text-xs">{t('dashboard.areas_distribution.no_data')}</p>
         </div>
       )}
     </DashboardSectionWrapperComponent>

@@ -4,6 +4,7 @@ import "./globals.css";
 import ThemeProvider from "@/components/common/theme-provider.component";
 import Toaster from "@/components/ui/toaster.component";
 import { TRPCProvider } from "./providers/trpc-provider";
+import { I18nProvider } from "./providers/i18n-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +31,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TRPCProvider>
-          <ThemeProvider>
-            <Toaster />
-            {children}
-          </ThemeProvider>
-        </TRPCProvider>
+        <I18nProvider>
+          <TRPCProvider>
+            <ThemeProvider>
+              <Toaster />
+              {children}
+            </ThemeProvider>
+          </TRPCProvider>
+        </I18nProvider>
       </body>
     </html>
   );

@@ -1,10 +1,13 @@
 'use client'
 import useTheme from '@/hooks/use-theme'
 import { getAreaStylesAndIcon } from '@/utils/areas.utils'
-import type { TickItemTextProps } from 'recharts/types/polar/PolarAngleAxis'
 import type { AreasDistributionDataItem } from './areas-distribution.model'
 
-interface CustomAngleTickComponentProps extends TickItemTextProps {
+interface CustomAngleTickComponentProps {
+  payload: { value: string; index: number }
+  x: number | string
+  y: number | string
+  textAnchor?: 'start' | 'middle' | 'end' | 'inherit'
   data: AreasDistributionDataItem[]
 }
 

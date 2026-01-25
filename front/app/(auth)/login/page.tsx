@@ -11,7 +11,6 @@ import GoogleLoginButton from '../_components/google-login-button.component'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Alert, Check, Loader, Mail } from '@nsmr/pixelart-react'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
-import { useMutation } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -22,7 +21,7 @@ export default function Login() {
   const { t } = useTranslation()
   const updateUserInfo = useAuthStore((state) => state.updateUserInfo)
   const router = useRouter()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const searchParams = useSearchParams()
   const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [isVerifyingOTP, setIsVerifyingOTP] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -52,15 +51,13 @@ export default function Login() {
     }
   }, [])
 
-  const loginMutation = useMutation(
-    trpc.auth.login.mutationOptions({
-      onSuccess: () => {
-        setMagicLinkSent(true)
-        toast.success(t('login.success'))
-      },
-      onError: (error) => toast.error(t('login.error.title'), { description: error.message })
-    })
-  )
+  const loginMutation = trpc.auth.login.useMutation({
+    onSuccess: () => {
+      setMagicLinkSent(true)
+      toast.success(t('login.success'))
+    },
+    onError: (error) => toast.error(t('login.error.title'), { description: error.message })
+  })
 
   const onSubmit = useCallback(
     (data: LoginType) => {
@@ -95,20 +92,14 @@ export default function Login() {
     const isVerified = verified === 'true' || type === 'signup' || urlState.hashType === 'signup'
 
     if (isVerified) {
-      const newSearchParams = new URLSearchParams(searchParams)
-      newSearchParams.delete('verified')
-      newSearchParams.delete('type')
-      newSearchParams.delete('redirect_to')
-      setSearchParams(newSearchParams, { replace: true })
-
       if (window.location.hash) {
         window.history.replaceState(null, '', window.location.pathname + window.location.search)
       }
 
       const destination = redirectTo ? new URL(redirectTo).pathname : '/onboarding'
-      router.push(destination)
+      router.replace(destination)
     }
-  }, [searchParams, setSearchParams, navigate, urlState.hashType])
+  }, [searchParams, router, urlState.hashType])
 
   // Listen to Supabase auth state changes
   useEffect(() => {
@@ -145,7 +136,7 @@ export default function Login() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [updateUserInfo, navigate, searchParams])
+  }, [updateUserInfo, router, searchParams])
 
   const isAccountVerified = useMemo(
     () =>
