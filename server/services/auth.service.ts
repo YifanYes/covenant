@@ -1,7 +1,4 @@
 import type { LoginType, SignUpType } from '@shared/schemas/auth.schemas'
-import { SupabaseClient } from '@supabase/supabase-js'
-import { TRPCError } from '@trpc/server'
-import { env } from '../config'
 import type { PrismaClient } from '../generated/prisma'
 import { AreaRepository } from '../repositories/area.repository'
 import { CharacterRepository } from '../repositories/character.repository'
@@ -16,10 +13,7 @@ export class AuthService {
   private objectiveRepository: ObjectiveRepository
   private areaRepository: AreaRepository
 
-  constructor(
-    prisma: PrismaClient,
-    private supabase: SupabaseClient
-  ) {
+  constructor(private prisma: PrismaClient) {
     this.characterRepository = new CharacterRepository(prisma)
     this.habitRepository = new HabitRepository(prisma)
     this.taskRepository = new TaskRepository(prisma)
@@ -27,85 +21,32 @@ export class AuthService {
     this.areaRepository = new AreaRepository(prisma)
   }
 
-  async signUp(input: SignUpType) {
-    const { error } = await this.supabase.auth.signInWithOtp({
-      email: input.email,
-      options: {
-        emailRedirectTo: `${env.FRONT_URL}/onboarding`,
-        shouldCreateUser: true
-      }
-    })
-
-    if (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message
-      })
-    }
-
-    return { message: 'Magic link sent to your email' }
+  async signUp(_input: SignUpType) {
+    // Magic link is now handled client-side via Better Auth
+    return { message: 'Use client-side magic link' }
   }
 
-  async login(input: LoginType) {
-    const { error } = await this.supabase.auth.signInWithOtp({
-      email: input.email,
-      options: {
-        emailRedirectTo: `${env.FRONT_URL}/login`,
-        shouldCreateUser: true
-      }
-    })
-
-    if (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message
-      })
-    }
-
-    return { message: 'Magic link sent to your email' }
+  async login(_input: LoginType) {
+    // Magic link is now handled client-side via Better Auth
+    return { message: 'Use client-side magic link' }
   }
 
   async loginWithGoogle() {
-    const { data, error } = await this.supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${env.FRONT_URL}/auth/callback`,
-        skipBrowserRedirect: false,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        }
-      }
-    })
-
-    if (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message
-      })
-    }
-
-    return { url: data.url }
+    // OAuth is now handled client-side via Better Auth
+    return { message: 'Use client-side Google sign-in' }
   }
 
   async deleteAccount(userId: string) {
-    // Delete character first
+    // Delete user data first
     await this.characterRepository.deleteManyByUserId(userId)
-
     await this.habitRepository.deleteCompletionsByUserId(userId)
     await this.taskRepository.deleteManyByUserId(userId)
     await this.habitRepository.deleteManyByUserId(userId)
     await this.objectiveRepository.deleteManyByUserId(userId)
     await this.areaRepository.deleteManyByUserId(userId)
 
-    const { error: supabaseError } = await this.supabase.auth.admin.deleteUser(userId)
-
-    if (supabaseError) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: `Failed to delete account ${userId}`
-      })
-    }
+    // Delete user (cascades to sessions and accounts via Prisma relations)
+    await this.prisma.user.delete({ where: { id: userId } })
 
     return { message: 'Account deleted successfully' }
   }

@@ -1,25 +1,21 @@
 'use client'
 
 import { env } from '@/lib/config.lib'
-import { createClient } from '@/lib/supabase.lib'
 import { QueryClient } from '@tanstack/react-query'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { createTRPCReact } from '@trpc/react-query'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
 import type { AppRouter } from '../../server/router'
 
-// Shared link configuration
+// Shared link configuration - uses cookies for Better Auth sessions
 const trpcLink = httpBatchLink({
-  url: env.NEXT_PUBLIC_API_URL,
-  async headers() {
-    const supabase = createClient()
-    const { data } = await supabase.auth.getSession()
-    const token = data.session?.access_token
-
-    return {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    }
-  },
+  url: `${env.NEXT_PUBLIC_API_URL}/trpc`,
+  fetch(url, options) {
+    return fetch(url, {
+      ...options,
+      credentials: 'include'
+    })
+  }
 })
 
 export const queryClient = new QueryClient({

@@ -1,7 +1,7 @@
 'use client'
 import Button from '@/ui/button.component'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
+import Link from 'next/link'
 
 export default function OnboardingRedirect() {
   const { t } = useTranslation()
@@ -13,7 +13,7 @@ export default function OnboardingRedirect() {
         <p className='mt-2 text-zinc-400'>{t('inventory.no_character.description')}</p>
       </div>
       <Button asChild variant='default' size='sm'>
-        <Link to='/onboarding'>{t('inventory.no_character.button')}</Link>
+        <Link href='/onboarding'>{t('inventory.no_character.button')}</Link>
       </Button>
     </div>
   )

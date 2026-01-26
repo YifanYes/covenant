@@ -23,7 +23,7 @@ import {
 } from '@shared/types/gamification.types'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import CombatLog from './combat-log.component'
 import DiceResult from './dice-result.component'
@@ -57,7 +57,7 @@ export default function CombatArena({
   activeDoctrines
 }: CombatArenaProps) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const router = useRouter()
   const currentClass = character.classes.find((c) => c.className === character.currentClass)
   const isDead = (currentClass?.health ?? 0) <= 0
 
@@ -340,7 +340,7 @@ export default function CombatArena({
             <AlertDialogDescription>{t('combat.death_dialog.description')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => navigate('/inventory')}>
+            <AlertDialogAction onClick={() => router.push('/inventory')}>
               {t('combat.death_dialog.continue')}
             </AlertDialogAction>
           </AlertDialogFooter>

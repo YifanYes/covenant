@@ -13,9 +13,13 @@ const envSchema = z.object({
     }),
   DATABASE_URL: z.string().min(1),
   DIRECT_URL: z.string().min(1),
-  SUPABASE_URL: z.url(),
-  SUPABASE_SERVICE_KEY: z.string().min(1),
-  FRONT_URL: z.url().min(1)
+  FRONT_URL: z.url().min(1),
+  APP_URL: z.string().url(),
+  JWT_SECRET: z.string().min(32),
+  RESEND_API_KEY: z.string().min(1),
+  FROM_EMAIL: z.string().email(),
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_SECRET: z.string().min(1)
 })
 
 const _env = envSchema.safeParse(process.env)
