@@ -14,7 +14,6 @@ export const isAuthed = t.middleware(({ ctx, next }) => {
   return next({
     ctx: {
       user: ctx.user,
-      supabase: ctx.supabase,
       prisma: ctx.prisma
     }
   })

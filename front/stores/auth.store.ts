@@ -1,6 +1,6 @@
 'use client'
 
-import { createClient } from '@/lib/supabase.lib'
+import { signOut } from '@/lib/auth.lib'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -24,8 +24,7 @@ export const useAuthStore = create<AuthStore>()(
       resetUserInfo: () => set({ email: '', userId: '' }),
       setLoading: (loading: boolean) => set({ isLoading: loading }),
       signOut: async () => {
-        const supabase = createClient()
-        await supabase.auth.signOut()
+        await signOut()
         set({ email: '', userId: '' })
       }
     }),

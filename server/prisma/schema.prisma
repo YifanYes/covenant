@@ -7,6 +7,67 @@ datasource db {
   provider = "postgresql"
 }
 
+// Better Auth Models
+model User {
+  id            String    @id
+  name          String?
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  character     Character?
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id                    String    @id
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
+}
+
 model Character {
   id                      String                   @id @default(uuid()) @db.Uuid
   name                    String                   @db.VarChar(255)
@@ -16,11 +77,12 @@ model Character {
   data                    Json?                    @default("{\"diceBank\": 0}")
   createdAt               DateTime                 @default(now()) @db.Timestamp(6)
   updatedAt               DateTime                 @updatedAt @db.Timestamp(6)
-  userId                  String                   @unique @db.Uuid
+  userId                  String                   @unique
   gold                    Int                      @default(0)
   inventory               Json?                    @default("[]")
   loadout                 Json?                    @default("[]")
   magicNature             String?                  @db.VarChar(50)
+  user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   activityParticipations  ActivityParticipation[]
   classes                 CharacterClass[]
   investmentContributions InvestmentContribution[]
@@ -109,7 +171,7 @@ model Objective {
   id          String    @id @default(uuid()) @db.Uuid
   name        String    @db.VarChar(255)
   description String?
-  userId      String    @db.Uuid
+  userId      String
   createdAt   DateTime  @default(now()) @db.Timestamp(6)
   updatedAt   DateTime  @updatedAt @db.Timestamp(6)
   dueDate     DateTime? @db.Timestamp(6)
@@ -128,7 +190,7 @@ model Area {
   icon       String?     @db.VarChar(255)
   createdAt  DateTime    @default(now()) @db.Timestamp(6)
   updatedAt  DateTime    @updatedAt @db.Timestamp(6)
-  userId     String      @db.Uuid
+  userId     String
   objectives Objective[] @relation("AreaToObjective")
 
   @@map("areas")
@@ -141,7 +203,7 @@ model Task {
   status      String      @db.VarChar(255)
   order       Int         @default(0)
   dueDate     DateTime?   @db.Timestamp(6)
-  userId      String      @db.Uuid
+  userId      String
   createdAt   DateTime    @default(now()) @db.Timestamp(6)
   updatedAt   DateTime    @updatedAt @db.Timestamp(6)
   color       String?     @db.VarChar(255)
@@ -159,7 +221,7 @@ model Habit {
   description String?
   recurrence  Int               @default(1)
   timespan    String            @db.VarChar(255)
-  userId      String            @db.Uuid
+  userId      String
   createdAt   DateTime          @default(now()) @db.Timestamp(6)
   updatedAt   DateTime          @updatedAt @db.Timestamp(6)
   deletedAt   DateTime?         @db.Timestamp(6)
@@ -172,7 +234,7 @@ model Habit {
 model HabitCompletion {
   id          String   @id @default(uuid()) @db.Uuid
   habitId     String   @db.Uuid
-  userId      String   @db.Uuid
+  userId      String
   completedAt DateTime @default(now()) @db.Timestamp(6)
   habit       Habit    @relation(fields: [habitId], references: [id])
 
