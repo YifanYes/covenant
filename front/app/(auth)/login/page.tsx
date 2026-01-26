@@ -2,8 +2,7 @@
 import Link from '@/common/link.component'
 import LoaderButton from '@/common/loader-button.component'
 import TextInput from '@/forms/text-input.component'
-import { createClient } from '@/lib/supabase.lib'
-const supabase = createClient()
+import { authClient, useSession } from '@/lib/auth.lib'
 import { useAuthStore } from '@/stores/auth.store'
 import AlertComponent, { AlertDescription, AlertTitle } from '@/ui/alert.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
@@ -23,48 +22,69 @@ export default function Login() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [magicLinkSent, setMagicLinkSent] = useState(false)
-  const [isVerifyingOTP, setIsVerifyingOTP] = useState(() => {
-    if (typeof window === 'undefined') return false
-    const hash = window.location.hash.substring(1)
-    const params = new URLSearchParams(hash)
-    return params.has('access_token') && !params.has('error')
-  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
-  // Compute derived state from URL
-  const urlState = useMemo(() => {
-    const hash = typeof window !== 'undefined' ? window.location.hash.substring(1) : ''
-    const hashParams = new URLSearchParams(hash)
+  const { data: session, isPending: isSessionPending } = useSession()
 
-    const error = hashParams.get('error')
-    const errorDescription = hashParams.get('error_description')
-    const hashType = hashParams.get('type')
+  // Handle session changes - redirect when logged in
+  useEffect(() => {
+    if (session?.user && !isRedirecting) {
+      setIsRedirecting(true)
 
-    const magicLinkError = error && errorDescription ? errorDescription.replace(/\+/g, ' ') : null
-    const hasError = Boolean(error && errorDescription)
+      updateUserInfo({
+        email: session.user.email || '',
+        userId: session.user.id
+      })
 
-    return {
-      error,
-      errorDescription,
-      hashType,
-      magicLinkError,
-      hasError
+      const redirectTo = searchParams.get('redirect_to')
+
+      if (redirectTo) {
+        router.push(redirectTo)
+      } else {
+        queryClient.fetchQuery(trpc.character.hasCharacter.queryOptions())
+          .then(({ hasCharacter }) => {
+            router.push(hasCharacter ? '/dashboard' : '/onboarding')
+          })
+          .catch(() => {
+            router.push('/dashboard')
+          })
+      }
     }
-  }, [])
+  }, [session, updateUserInfo, router, searchParams, isRedirecting])
 
-  const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: () => {
+  // Check for error in URL params (from magic link failure)
+  const urlError = useMemo(() => {
+    const error = searchParams.get('error')
+    const errorDescription = searchParams.get('error_description')
+    return error && errorDescription ? errorDescription.replace(/\+/g, ' ') : null
+  }, [searchParams])
+
+  // Clean up URL if there was an error
+  useEffect(() => {
+    if (urlError) {
+      window.history.replaceState(null, '', window.location.pathname)
+    }
+  }, [urlError])
+
+  const onSubmit = useCallback(async (data: LoginType) => {
+    setIsLoading(true)
+    try {
+      const redirectTo = searchParams.get('redirect_to') || '/login'
+      await authClient.signIn.magicLink({
+        email: data.email,
+        callbackURL: `${window.location.origin}${redirectTo}`
+      })
       setMagicLinkSent(true)
       toast.success(t('login.success'))
-    },
-    onError: (error) => toast.error(t('login.error.title'), { description: error.message })
-  })
-
-  const onSubmit = useCallback(
-    (data: LoginType) => {
-      loginMutation.mutate(data)
-    },
-    [loginMutation]
-  )
+    } catch (error) {
+      toast.error(t('login.error.title'), {
+        description: error instanceof Error ? error.message : 'Unknown error'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }, [searchParams, t])
 
   const {
     register,
@@ -76,74 +96,9 @@ export default function Login() {
     mode: 'onSubmit'
   })
 
-  // Clean up URL if there was an error in the hash
-  useEffect(() => {
-    if (urlState.hasError) {
-      window.history.replaceState(null, '', window.location.pathname)
-    }
-  }, [urlState.hasError])
-
-  // Handle verification redirect on mount
-  useEffect(() => {
-    const verified = searchParams.get('verified')
-    const type = searchParams.get('type')
-    const redirectTo = searchParams.get('redirect_to')
-
-    const isVerified = verified === 'true' || type === 'signup' || urlState.hashType === 'signup'
-
-    if (isVerified) {
-      if (window.location.hash) {
-        window.history.replaceState(null, '', window.location.pathname + window.location.search)
-      }
-
-      const destination = redirectTo ? new URL(redirectTo).pathname : '/onboarding'
-      router.replace(destination)
-    }
-  }, [searchParams, router, urlState.hashType])
-
-  // Listen to Supabase auth state changes
-  useEffect(() => {
-    const {
-      data: { subscription }
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const isSignInEvent = event === 'SIGNED_IN' || event === 'INITIAL_SESSION'
-      if (isSignInEvent && session) {
-        setIsVerifyingOTP(true)
-
-        updateUserInfo({
-          email: session.user.email || '',
-          userId: session.user.id
-        })
-
-        window.history.replaceState(null, '', window.location.pathname)
-
-        const redirectTo = searchParams.get('redirect_to')
-
-        if (redirectTo) {
-          router.push(redirectTo)
-        } else {
-          try {
-            const { hasCharacter } = await queryClient.fetchQuery(trpc.character.hasCharacter.queryOptions())
-            router.push(hasCharacter ? '/dashboard' : '/onboarding')
-          } catch (error) {
-            console.error('Failed to check character status:', error)
-            router.push('/dashboard')
-          }
-        }
-      }
-    })
-
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [updateUserInfo, router, searchParams])
-
   const isAccountVerified = useMemo(
-    () =>
-      searchParams.get('verified') === 'true' ||
-      searchParams.get('type') === 'signup' ||
-      urlState.hashType === 'signup',
-    [searchParams, urlState.hashType]
+    () => searchParams.get('verified') === 'true' || searchParams.get('type') === 'signup',
+    [searchParams]
   )
 
   const [randomQuoteIndex] = useState(() => Math.random())
@@ -156,7 +111,8 @@ export default function Login() {
     return t('login.verifying_title')
   }, [t, randomQuoteIndex])
 
-  if (isVerifyingOTP) {
+  // Show loading while checking session or redirecting
+  if (isSessionPending || isRedirecting) {
     return (
       <div className='flex w-md flex-col items-center justify-center gap-6 py-8'>
         <Loader className='h-10 w-10 animate-spin' />
@@ -191,14 +147,14 @@ export default function Login() {
           <AlertDescription>{t('login.account_verified.description')}</AlertDescription>
         </AlertComponent>
       )}
-      {urlState.magicLinkError && (
+      {urlError && (
         <AlertComponent variant='destructive'>
           <Alert />
           <AlertTitle>{t('login.error.magic_link_error')}</AlertTitle>
           <AlertDescription>
-            {urlState.magicLinkError === 'Email link is invalid or has expired'
+            {urlError === 'Email link is invalid or has expired'
               ? t('login.error.invalid_magic_link')
-              : urlState.magicLinkError}
+              : urlError}
           </AlertDescription>
         </AlertComponent>
       )}
@@ -211,7 +167,7 @@ export default function Login() {
       />
       <LoaderButton
         disabled={!isValid || !isDirty}
-        isLoading={loginMutation.isPending}
+        isLoading={isLoading}
         label={t('login.button')}
         onClick={handleSubmit(onSubmit)}
       />

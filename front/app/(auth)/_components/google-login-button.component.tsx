@@ -1,6 +1,6 @@
 'use client'
 import LoaderButton from '@/common/loader-button.component'
-import { createClient } from '@/lib/supabase.lib'
+import { signIn } from '@/lib/auth.lib'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -12,23 +12,10 @@ export default function GoogleLoginButton() {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true)
-      const supabase = createClient()
-
-      const { error } = await supabase.auth.signInWithOAuth({
+      await signIn.social({
         provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent'
-          }
-        }
+        callbackURL: `${window.location.origin}/login`
       })
-
-      if (error) {
-        toast.error(t('login.error.title'), { description: t('login.error.google_unavailable') })
-        setIsLoading(false)
-      }
     } catch (error) {
       console.error(error)
       toast.error(t('login.error.title'), { description: t('login.error.google_unavailable') })

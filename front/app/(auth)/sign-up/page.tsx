@@ -2,13 +2,12 @@
 import Link from '@/common/link.component'
 import LoaderButton from '@/common/loader-button.component'
 import TextInput from '@/forms/text-input.component'
-import { trpc } from '@/utils/trpc.utils'
+import { authClient } from '@/lib/auth.lib'
 import GoogleLoginButton from '../_components/google-login-button.component'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { MailCheck } from '@nsmr/pixelart-react'
 import { signUpSchema, type SignUpType } from '@shared/schemas/auth.schemas'
-import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -17,13 +16,7 @@ export default function SignUp() {
   const { t } = useTranslation()
 
   const [isSigned, setIsSigned] = useState(false)
-
-  const signUpMutation = useMutation(
-    trpc.auth.signUp.mutationOptions({
-      onSuccess: () => setIsSigned(true),
-      onError: (error) => toast.error(t('sign_up.error.title'), { description: error.message })
-    })
-  )
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
@@ -31,7 +24,22 @@ export default function SignUp() {
     formState: { errors, isValid, isDirty }
   } = useForm<SignUpType>({ resolver: standardSchemaResolver(signUpSchema), mode: 'onSubmit' })
 
-  const onSubmit = (data: SignUpType) => signUpMutation.mutate(data)
+  const onSubmit = useCallback(async (data: SignUpType) => {
+    setIsLoading(true)
+    try {
+      await authClient.signIn.magicLink({
+        email: data.email,
+        callbackURL: `${window.location.origin}/onboarding`
+      })
+      setIsSigned(true)
+    } catch (error) {
+      toast.error(t('sign_up.error.title'), {
+        description: error instanceof Error ? error.message : 'Unknown error'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }, [t])
 
   return (
     <div className='flex w-md flex-col gap-2.5'>
@@ -63,7 +71,7 @@ export default function SignUp() {
           />
           <LoaderButton
             disabled={!isValid || !isDirty}
-            isLoading={signUpMutation.isPending}
+            isLoading={isLoading}
             label={t('sign_up.button')}
             onClick={handleSubmit(onSubmit)}
           />

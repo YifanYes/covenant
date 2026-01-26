@@ -1,4 +1,3 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PrismaClient } from '../generated/prisma'
 import { ActivityService } from './activity.service'
 import { AreaService } from './area.service'
@@ -31,10 +30,7 @@ export class ServiceFactory {
   private _activityService?: ActivityService
   private _investmentService?: InvestmentService
 
-  constructor(
-    private prisma: PrismaClient,
-    private supabase: SupabaseClient
-  ) {}
+  constructor(private prisma: PrismaClient) {}
 
   get area(): AreaService {
     if (!this._areaService) {
@@ -45,7 +41,7 @@ export class ServiceFactory {
 
   get auth(): AuthService {
     if (!this._authService) {
-      this._authService = new AuthService(this.prisma, this.supabase)
+      this._authService = new AuthService(this.prisma)
     }
     return this._authService
   }
