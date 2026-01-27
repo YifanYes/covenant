@@ -1,5 +1,6 @@
 'use client'
 import BaseFormDialog from '@/common/base-form-dialog.component'
+import AreasSelector from '@/forms/areas-selector.component'
 import ObjectivesSelector from '@/forms/objectives-selector.component'
 import SingleSelect from '@/forms/single-select.component'
 import TextInput from '@/forms/text-input.component'
@@ -19,6 +20,7 @@ export default function CreateHabitDialog() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
 
   const mutation = useMutation(
     trpc.habits.create.mutationOptions({
@@ -45,7 +47,8 @@ export default function CreateHabitDialog() {
       description: '',
       recurrence: 1,
       timespan: HabitTimespan.DAILY,
-      objectives: []
+      objectives: [],
+      areas: []
     }
   })
 
@@ -131,6 +134,13 @@ export default function CreateHabitDialog() {
             control={control}
             objectives={objectivesData?.objectives || []}
             placeholder={t('create_habit_dialog.objectives_placeholder')}
+          />
+        </div>
+        <div className='grid min-w-0 gap-3'>
+          <AreasSelector
+            control={control}
+            areas={areasData?.areas || []}
+            placeholder={t('create_habit_dialog.areas_placeholder')}
           />
         </div>
       </div>

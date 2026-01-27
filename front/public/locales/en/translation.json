@@ -56,6 +56,9 @@
     "add": "Add Area",
     "career": "Professional career",
     "delete_confirmation": "Are you sure you want to delete the area?",
+    "selector": {
+      "placeholder": "Select areas"
+    },
     "error": {
       "internal": {
         "create": "An error ocurred while creating the area",
@@ -204,6 +207,7 @@
     "title": "Create new area"
   },
   "create_habit_dialog": {
+    "areas_placeholder": "Associated areas",
     "description": "Dialog to create a new habit",
     "description_placeholder": "Description (optional)",
     "name_placeholder": "Habit name",
@@ -225,6 +229,7 @@
     "title": "Create new objective"
   },
   "create_task_dialog": {
+    "areas_placeholder": "Associated areas",
     "description": "Modal to create a new task",
     "description_placeholder": "Task description",
     "due_date_placeholder": "Due date (optional)",
@@ -1265,6 +1270,7 @@
     "title": "Update habit"
   },
   "update_task_dialog": {
+    "areas_placeholder": "Associated areas",
     "description": "Modal to update a task",
     "description_placeholder": "Task description",
     "due_date_placeholder": "Due date (optional)",

@@ -35,6 +35,7 @@ export type Task = {
   createdAt?: string
   updatedAt?: string
   objectives?: Objective[]
+  areas?: Area[]
 }
 
 export type HabitCompletion = {
@@ -57,4 +58,5 @@ export type Habit = {
   deletedAt?: string | null
   completions?: HabitCompletion[]
   objectives?: Objective[]
+  areas?: Area[]
 }
