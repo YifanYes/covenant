@@ -6,7 +6,8 @@ import { Prisma, type PrismaClient, type Task } from '../generated/prisma'
 const TASK_INCLUDE = {
   objectives: {
     include: { areas: true }
-  }
+  },
+  areas: true
 }
 
 export class TaskRepository {
@@ -26,6 +27,9 @@ export class TaskRepository {
         userId,
         objectives: {
           connect: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
+        },
+        areas: {
+          connect: input.areas?.map((areaId) => ({ id: areaId })) || []
         }
       },
       include: TASK_INCLUDE
@@ -135,6 +139,9 @@ export class TaskRepository {
         ...(isCompleting && { completedAt: new Date() }),
         objectives: {
           set: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
+        },
+        areas: {
+          set: input.areas?.map((areaId) => ({ id: areaId })) || []
         }
       },
       include: TASK_INCLUDE

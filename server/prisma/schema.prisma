@@ -192,6 +192,8 @@ model Area {
   updatedAt  DateTime    @updatedAt @db.Timestamp(6)
   userId     String
   objectives Objective[] @relation("AreaToObjective")
+  tasks      Task[]      @relation("AreaToTask")
+  habits     Habit[]     @relation("AreaToHabit")
 
   @@map("areas")
 }
@@ -211,6 +213,7 @@ model Task {
   impact      String?     @db.VarChar(50)
   completedAt DateTime?   @db.Timestamp(6)
   objectives  Objective[] @relation("ObjectiveToTask")
+  areas       Area[]      @relation("AreaToTask")
 
   @@map("tasks")
 }
@@ -227,6 +230,7 @@ model Habit {
   deletedAt   DateTime?         @db.Timestamp(6)
   completions HabitCompletion[]
   objectives  Objective[]       @relation("HabitToObjective")
+  areas       Area[]            @relation("AreaToHabit")
 
   @@map("habits")
 }

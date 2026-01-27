@@ -1,5 +1,6 @@
 'use client'
 import BaseFormDialog from '@/common/base-form-dialog.component'
+import AreasSelector from '@/forms/areas-selector.component'
 import ColorSelector from '@/forms/color-selector.component'
 import DatePicker from '@/forms/date-picker.component'
 import ObjectivesSelector from '@/forms/objectives-selector.component'
@@ -30,6 +31,7 @@ export default function CreateTaskDialog() {
   const [open, setOpen] = useState(false)
   const { monthIndex } = useCalendarStore()
   const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
 
   const mutation = useMutation(
     trpc.tasks.create.mutationOptions({
@@ -63,7 +65,8 @@ export default function CreateTaskDialog() {
       description: '',
       status: TaskStatus.TODO,
       dueDate: undefined,
-      objectives: []
+      objectives: [],
+      areas: []
     }
   })
 
@@ -130,6 +133,13 @@ export default function CreateTaskDialog() {
             control={control}
             objectives={objectivesData?.objectives || []}
             placeholder={t('create_task_dialog.objectives_placeholder')}
+          />
+        </div>
+        <div className='grid min-w-0 gap-3'>
+          <AreasSelector
+            control={control}
+            areas={areasData?.areas || []}
+            placeholder={t('create_task_dialog.areas_placeholder')}
           />
         </div>
         <div className='grid gap-3'>

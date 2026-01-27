@@ -1,6 +1,7 @@
 'use client'
 import BaseFormDialog from '@/common/base-form-dialog.component'
 import LoaderButton from '@/common/loader-button.component'
+import AreasSelector from '@/forms/areas-selector.component'
 import ColorSelector from '@/forms/color-selector.component'
 import DatePicker from '@/forms/date-picker.component'
 import ObjectivesSelector from '@/forms/objectives-selector.component'
@@ -32,6 +33,7 @@ export default function UpdateTaskDialog() {
   const { monthIndex } = useCalendarStore()
   const { selectedTask, setSelectedTask } = useTasksStore()
   const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
 
   const updateMutation = useMutation(
     trpc.tasks.update.mutationOptions({
@@ -111,6 +113,7 @@ export default function UpdateTaskDialog() {
       reset({
         ...selectedTask,
         objectives: map(selectedTask?.objectives, (objective) => objective.id),
+        areas: map(selectedTask?.areas, (area) => area.id),
         dueDate: !isNil(selectedTask?.dueDate) ? new Date(selectedTask.dueDate) : undefined,
         effort: selectedTask?.effort as TaskEffort | undefined,
         impact: selectedTask?.impact as TaskImpact | undefined
@@ -199,6 +202,13 @@ export default function UpdateTaskDialog() {
             control={control}
             objectives={objectivesData?.objectives || []}
             placeholder={t('update_task_dialog.objectives_placeholder')}
+          />
+        </div>
+        <div className='grid min-w-0 gap-3'>
+          <AreasSelector
+            control={control}
+            areas={areasData?.areas || []}
+            placeholder={t('update_task_dialog.areas_placeholder')}
           />
         </div>
         <div className='grid gap-3'>

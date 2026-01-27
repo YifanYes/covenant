@@ -41,6 +41,10 @@
   - [x] Sistema de consumibles.
   - [x] Sistema de doctrinas.
   - [x] Sistema de inversiones.
+  - [x] Relacionar áreas con tareas y hábitos.
+  - [ ] Usar dependency injection en los servicios del backend.
+  - [ ] Añadir más variantes de nombres a los enemigos.
+  - [ ] Cron job para caducar las actividades y las inversiones.
   - [ ] Foro por facción.
   - [ ] Renderizar el personaje con los items equipados.
   - [ ] Definir accesorios
