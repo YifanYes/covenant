@@ -1,6 +1,7 @@
 'use client'
 import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import type { ItemDefinition } from '@shared/constants/items'
+import Image from 'next/image'
 import { ItemRarity, ItemType } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 
@@ -39,7 +40,7 @@ export default function StoreItemTooltip({
       <TooltipContent className='max-w-xs border-zinc-700 bg-zinc-800 p-3'>
         <div className='flex flex-col gap-2'>
           <div className='flex items-center gap-2'>
-            <img src={itemImagePath} alt={itemName} className='h-8 w-8 object-contain' />
+            <Image src={itemImagePath} alt={itemName} width={32} height={32} className='h-8 w-8 object-contain' />
             <span className='font-semibold text-zinc-100'>{itemName}</span>
           </div>
           {itemDescription && <p className='text-xs text-zinc-400'>{itemDescription}</p>}

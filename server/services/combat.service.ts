@@ -13,8 +13,8 @@ import type {
 } from '@shared/types/gamification.types'
 import { CombatLogType, ItemType } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
-import type { PrismaClient } from '../generated/prisma'
-import { CharacterRepository } from '../repositories/character.repository'
+import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
+import type { CharacterRepository } from '../repositories/character.repository'
 
 // Combat modifiers accumulated from active doctrines and status effects
 interface CombatModifiers {
@@ -87,11 +87,10 @@ const STATUS_EFFECT_HANDLERS: Record<StatusEffect, (mods: CombatModifiers, isPla
   }
 
 export class CombatService {
-  private characterRepository: CharacterRepository
-
-  constructor(prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(prisma)
-  }
+  constructor(
+    private characterRepository: CharacterRepository,
+    private activityParticipationRepository: ActivityParticipationRepository
+  ) {}
 
   // @ts-ignore: unused for now, will be used in future
   private _resolvePlayerAttack(
@@ -361,14 +360,10 @@ export class CombatService {
     const timestamp = Date.now()
     const logEntries: CombatLogEntry[] = []
 
-    const participation = await (this.characterRepository as any).prisma.activityParticipation.findUnique({
-      where: { id: participationId },
-      select: { activeDoctrines: true, enemyActiveDoctrines: true }
-    })
+    const participation = await this.activityParticipationRepository.findByIdWithDoctrines(participationId)
 
-    const activeDoctrines = (participation?.activeDoctrines as unknown as Record<string, ActiveStatusEffect>) || {}
-    const enemyActiveDoctrines =
-      (participation?.enemyActiveDoctrines as unknown as Record<string, ActiveStatusEffect>) || {}
+    const activeDoctrines = participation?.activeDoctrines || {}
+    const enemyActiveDoctrines = participation?.enemyActiveDoctrines || {}
 
     // Calculate initiative and critical threshold based on weapon speed
     let playerWonInitiative = weaponSpeed >= (enemy.speed || 1)
@@ -569,13 +564,11 @@ export class CombatService {
     })
 
     // 10. Update database
-    await (this.characterRepository as any).prisma.activityParticipation.update({
-      where: { id: participationId },
-      data: {
-        activeDoctrines: updatedActiveDoctrines as any,
-        enemyActiveDoctrines: updatedEnemyActiveDoctrines as any
-      }
-    })
+    await this.activityParticipationRepository.updateDoctrines(
+      participationId,
+      updatedActiveDoctrines,
+      updatedEnemyActiveDoctrines
+    )
 
     return {
       playerAttackRolls,
@@ -701,15 +694,13 @@ export class CombatService {
     )
 
     // Update activity participation state
-    const participation = await (this.characterRepository as any).prisma.activityParticipation.findUnique({
-      where: { id: participationId }
-    })
+    const participation = await this.activityParticipationRepository.findByIdWithDoctrines(participationId)
 
     if (!participation) {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Activity participation not found' })
     }
 
-    const activeDoctrines = (participation.activeDoctrines as unknown as Record<string, ActiveStatusEffect>) || {}
+    const activeDoctrines = participation.activeDoctrines || {}
 
     // Apply first effect as status (for status-applying doctrines) or as immediate effect
     const primaryEffect = doctrine.effects[0]
@@ -733,10 +724,7 @@ export class CombatService {
 
     activeDoctrines[doctrineId] = newStatusEffect
 
-    await (this.characterRepository as any).prisma.activityParticipation.update({
-      where: { id: participationId },
-      data: { activeDoctrines: activeDoctrines as any }
-    })
+    await this.activityParticipationRepository.updateActiveDoctrines(participationId, activeDoctrines)
 
     return { success: true, effect: newStatusEffect }
   }

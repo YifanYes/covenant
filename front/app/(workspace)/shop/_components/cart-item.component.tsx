@@ -1,6 +1,7 @@
 'use client'
 import { Close, Money } from '@nsmr/pixelart-react'
 import type { ItemDefinition } from '@shared/constants/items'
+import Image from 'next/image'
 import { ItemRarity } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 import StoreItemTooltip from './store-item-tooltip.component'
@@ -34,7 +35,7 @@ export default function CartItem({ item, quantity, onRemove }: CartItemProps) {
         >
           <Close className='text-destructive h-3 w-3' />
         </button>
-        <img src={`/assets/items/${item.id}.png`} alt={displayName} className='h-8 w-8 shrink-0 object-contain' />
+        <Image src={`/assets/items/${item.id}.png`} alt={displayName} width={32} height={32} className='h-8 w-8 shrink-0 object-contain' />
         <div className='w-0 flex-1'>
           <div className='truncate text-sm font-medium'>
             {displayName}

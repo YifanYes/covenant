@@ -1,17 +1,13 @@
 import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { TRPCError } from '@trpc/server'
-import type { PrismaClient } from '../generated/prisma'
-import { HabitRepository } from '../repositories/habit.repository'
-import { DiceService } from './dice.service'
+import type { HabitRepository } from '../repositories/habit.repository'
+import type { DiceService } from './dice.service'
 
 export class HabitService {
-  private diceService: DiceService
-  private habitRepository: HabitRepository
-
-  constructor(prisma: PrismaClient) {
-    this.diceService = new DiceService(prisma)
-    this.habitRepository = new HabitRepository(prisma)
-  }
+  constructor(
+    private habitRepository: HabitRepository,
+    private diceService: DiceService
+  ) {}
 
   async create(userId: string, input: CreateHabitType) {
     const habit = await this.habitRepository.create(userId, input)

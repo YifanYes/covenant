@@ -607,14 +607,28 @@
         "1": "Malachar",
         "2": "Nethrazul",
         "3": "Xandros",
-        "4": "Belzaroth"
+        "4": "Belzaroth",
+        "5": "Voidwalker",
+        "6": "Abaddon",
+        "7": "Morthax",
+        "8": "Drakonis",
+        "9": "Zephyron",
+        "10": "Thalgor",
+        "11": "Sargorath"
       },
       "suffix": {
         "0": "Destructor de Mundos",
         "1": "el Eterno",
         "2": "Soberano del Vacío",
         "3": "el Inmortal",
-        "4": "Perdición Encarnada"
+        "4": "Perdición Encarnada",
+        "5": "el Aniquilador",
+        "6": "Señor de la Ruina",
+        "7": "el Apocalipsis",
+        "8": "Portador del Caos",
+        "9": "el Temido",
+        "10": "Devorador de Almas",
+        "11": "el Heraldo"
       }
     },
     "elite": {
@@ -624,14 +638,27 @@
         "2": "Xerion",
         "3": "Morvain",
         "4": "Zarathos",
-        "5": "Nethros"
+        "5": "Nethros",
+        "6": "Kargul",
+        "7": "Draven",
+        "8": "Mordecai",
+        "9": "Vulkros",
+        "10": "Sethrak",
+        "11": "Ashborn"
       },
       "suffix": {
         "0": "Duque Infernal",
         "1": "el Corruptor",
         "2": "Señor del Terror",
         "3": "el Despiadado",
-        "4": "Segador de Almas"
+        "4": "Segador de Almas",
+        "5": "Azote de la Luz",
+        "6": "el Profanador",
+        "7": "Portador de Guerra",
+        "8": "el Maldecido",
+        "9": "Maestro de Sombras",
+        "10": "el Tirano",
+        "11": "Desgarrador de Carne"
       }
     },
     "minion": {
@@ -643,7 +670,11 @@
         "4": "Grixus",
         "5": "Vex",
         "6": "Morag",
-        "7": "Drix"
+        "7": "Drix",
+        "8": "Skarn",
+        "9": "Rotgut",
+        "10": "Blight",
+        "11": "Gnash"
       },
       "suffix": {
         "0": "el Hueco",
@@ -651,7 +682,13 @@
         "2": "el Feral",
         "3": "el Putrefacto",
         "4": "Rompehuesos",
-        "5": "el Maldito"
+        "5": "el Maldito",
+        "6": "el Acechador",
+        "7": "Portador de Plagas",
+        "8": "el Retorcido",
+        "9": "Reptador Nocturno",
+        "10": "el Vil",
+        "11": "Portador de Muerte"
       }
     }
   },
