@@ -3,6 +3,7 @@ import { areasRouter } from './routers/areas.router'
 import { authRouter } from './routers/auth.router'
 import { characterRouter } from './routers/character.router'
 import { dashboardRouter } from './routers/dashboard.router'
+import { deadlineRouter } from './routers/deadline.router'
 import { habitsRouter } from './routers/habits.router'
 import { investmentRouter } from './routers/investment.router'
 import { objectivesRouter } from './routers/objectives.router'
@@ -25,7 +26,8 @@ export const appRouter = t.router({
   dashboard: dashboardRouter,
   activity: activityRouter,
   investment: investmentRouter,
-  store: storeRouter
+  store: storeRouter,
+  deadline: deadlineRouter
 })
 
 export type AppRouter = typeof appRouter
