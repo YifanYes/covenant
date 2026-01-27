@@ -2,30 +2,6 @@ import { ALL_ITEMS, CONSUMABLES } from '@shared/constants/items'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { StoreService } from '../../services/store.services'
 import { mockCharacter, mockInventoryItem } from '../fixtures/character.fixtures'
-import { createMockPrisma } from '../mocks/prisma.mock'
-
-// Mock dependencies
-const mockPrisma = createMockPrisma()
-
-// Mock repos
-// We need to mock the repositories internally used by StoreService
-// Since StoreService instantiates repositories in its constructor, we need to mock the repository classes
-vi.mock('../../repositories/character.repository', () => ({
-  CharacterRepository: vi.fn(function () {
-    return {
-      findWithClasses: vi.fn(),
-      updateInventoryAndGold: vi.fn()
-    }
-  })
-}))
-
-vi.mock('../../services/character.service', () => ({
-  CharacterService: vi.fn(function () {
-    return {
-      getCharacterProgress: vi.fn().mockReturnValue({ tier: 1 })
-    }
-  })
-}))
 
 describe('StoreService', () => {
   let storeService: StoreService
@@ -34,11 +10,20 @@ describe('StoreService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    storeService = new StoreService(mockPrisma as any)
 
-    // Access the mocked instances
-    mockCharacterRepo = (storeService as any).characterRepository
-    mockCharacterService = (storeService as any).characterService
+    // Create mock repository with mocked methods
+    mockCharacterRepo = {
+      findWithClasses: vi.fn(),
+      updateInventoryAndGold: vi.fn()
+    }
+
+    // Create mock character service
+    mockCharacterService = {
+      getCharacterProgress: vi.fn().mockReturnValue({ tier: 1 })
+    }
+
+    // Inject the mock dependencies directly
+    storeService = new StoreService(mockCharacterRepo, mockCharacterService)
   })
 
   describe('purchaseItems', () => {

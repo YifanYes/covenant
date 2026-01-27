@@ -2,29 +2,32 @@ import { WeaponDamageType } from '@shared/constants/items'
 import { StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CombatService } from '../../services/combat.service'
-import { createMockPrisma } from '../mocks/prisma.mock'
-
-// Mock dependencies
-const mockPrisma = createMockPrisma()
-
-vi.mock('../../repositories/character.repository', () => ({
-  CharacterRepository: vi.fn(function () {
-    return {
-      // Add methods used by CombatService
-      findWithClasses: vi.fn()
-    }
-  })
-}))
 
 describe('CombatService', () => {
   let combatService: CombatService
   let mockCharacterRepo: any
+  let mockActivityParticipationRepo: any
 
   beforeEach(() => {
     vi.clearAllMocks()
-    combatService = new CombatService(mockPrisma as any)
-    // Access the mocked instances if needed
-    mockCharacterRepo = (combatService as any).characterRepository
+
+    // Create mock repositories with mocked methods
+    mockCharacterRepo = {
+      findWithClasses: vi.fn(),
+      findWithClassesOrThrow: vi.fn(),
+      updateHealth: vi.fn(),
+      updateInventoryAndLoadout: vi.fn()
+    }
+
+    mockActivityParticipationRepo = {
+      findById: vi.fn(),
+      findByIdWithDoctrines: vi.fn(),
+      updateDoctrines: vi.fn(),
+      updateActiveDoctrines: vi.fn()
+    }
+
+    // Inject the mock repositories directly
+    combatService = new CombatService(mockCharacterRepo, mockActivityParticipationRepo)
   })
 
   describe('dice mechanics', () => {

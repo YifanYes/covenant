@@ -11,6 +11,7 @@ import AlertDialog, {
 import Button from '@/components/ui/button.component'
 import { useCombatTurn } from '@/hooks/use-combat-turn.hook'
 import { cn } from '@/lib/cn.lib'
+import Image from 'next/image'
 import ScrollArea from '@/ui/scroll-area.component'
 import { queryClient, trpc } from '@/utils/trpc.utils'
 import { Zap } from '@nsmr/pixelart-react'
@@ -179,9 +180,11 @@ export default function CombatArena({
         <div className='rounded-lg border p-4'>
           <div className='flex h-full gap-4'>
             <div className='bg-muted/50 relative flex aspect-square w-24 shrink-0 items-center justify-center rounded-md border p-2'>
-              <img
+              <Image
                 src={`/assets/classes/${character.currentClass!}.png`}
                 alt={character.currentClass!}
+                width={96}
+                height={96}
                 className='h-full w-full object-contain'
                 style={{ imageRendering: 'pixelated' }}
               />

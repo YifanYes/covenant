@@ -1,6 +1,7 @@
 'use client'
 import Card, { CardContent } from '@/ui/card.component'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import MagicNatureBadge from './magic-nature-badge.component'
 
@@ -15,9 +16,11 @@ export default function CharacterPreview({ character }: CharacterPreviewProps) {
     <Card className='flex min-h-0 w-full flex-1 flex-col gap-0'>
       <CardContent className='flex h-full flex-col items-center justify-center p-6'>
         <div className='relative flex h-56 w-56 items-center justify-center'>
-          <img
+          <Image
             src={`/assets/classes/${character.currentClass!}.png`}
             alt={character.currentClass!}
+            width={224}
+            height={224}
             className='pixelated h-full w-full object-contain'
             style={{ imageRendering: 'pixelated' }}
           />

@@ -1,16 +1,12 @@
 import type { CreateObjectiveBodyType, UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
-import type { PrismaClient } from '../generated/prisma'
-import { ObjectiveRepository } from '../repositories/objective.repository'
-import { DiceService } from './dice.service'
+import type { ObjectiveRepository } from '../repositories/objective.repository'
+import type { DiceService } from './dice.service'
 
 export class ObjectiveService {
-  private diceService: DiceService
-  private objectiveRepository: ObjectiveRepository
-
-  constructor(prisma: PrismaClient) {
-    this.diceService = new DiceService(prisma)
-    this.objectiveRepository = new ObjectiveRepository(prisma)
-  }
+  constructor(
+    private objectiveRepository: ObjectiveRepository,
+    private diceService: DiceService
+  ) {}
 
   async create(userId: string, input: CreateObjectiveBodyType) {
     const objective = await this.objectiveRepository.create(userId, input)

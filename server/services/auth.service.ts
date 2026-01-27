@@ -1,25 +1,20 @@
 import type { LoginType, SignUpType } from '@shared/schemas/auth.schemas'
-import type { PrismaClient } from '../generated/prisma'
-import { AreaRepository } from '../repositories/area.repository'
-import { CharacterRepository } from '../repositories/character.repository'
-import { HabitRepository } from '../repositories/habit.repository'
-import { ObjectiveRepository } from '../repositories/objective.repository'
-import { TaskRepository } from '../repositories/task.repository'
+import type { AreaRepository } from '../repositories/area.repository'
+import type { CharacterRepository } from '../repositories/character.repository'
+import type { HabitRepository } from '../repositories/habit.repository'
+import type { ObjectiveRepository } from '../repositories/objective.repository'
+import type { TaskRepository } from '../repositories/task.repository'
+import type { UserRepository } from '../repositories/user.repository'
 
 export class AuthService {
-  private characterRepository: CharacterRepository
-  private habitRepository: HabitRepository
-  private taskRepository: TaskRepository
-  private objectiveRepository: ObjectiveRepository
-  private areaRepository: AreaRepository
-
-  constructor(private prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(prisma)
-    this.habitRepository = new HabitRepository(prisma)
-    this.taskRepository = new TaskRepository(prisma)
-    this.objectiveRepository = new ObjectiveRepository(prisma)
-    this.areaRepository = new AreaRepository(prisma)
-  }
+  constructor(
+    private userRepository: UserRepository,
+    private characterRepository: CharacterRepository,
+    private habitRepository: HabitRepository,
+    private taskRepository: TaskRepository,
+    private objectiveRepository: ObjectiveRepository,
+    private areaRepository: AreaRepository
+  ) {}
 
   async signUp(_input: SignUpType) {
     // Magic link is now handled client-side via Better Auth
@@ -46,7 +41,7 @@ export class AuthService {
     await this.areaRepository.deleteManyByUserId(userId)
 
     // Delete user (cascades to sessions and accounts via Prisma relations)
-    await this.prisma.user.delete({ where: { id: userId } })
+    await this.userRepository.delete(userId)
 
     return { message: 'Account deleted successfully' }
   }

@@ -3,6 +3,7 @@ import { cn } from '@/lib/cn.lib'
 import Button from '@/ui/button.component'
 import { Cart, Minus, Money, Plus } from '@nsmr/pixelart-react'
 import type { ItemDefinition } from '@shared/constants/items'
+import Image from 'next/image'
 import { ItemRarity, ItemType } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 import StoreItemTooltip from './store-item-tooltip.component'
@@ -86,7 +87,7 @@ export default function StoreItemCard({
           disabled={isDisabled}
           className='flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center'
         >
-          <img src={itemImagePath} alt={displayName} className='h-10 w-10 object-contain' />
+          <Image src={itemImagePath} alt={displayName} width={40} height={40} className='h-10 w-10 object-contain' />
         </button>
 
         <div className='min-w-0 flex-1'>

@@ -2,32 +2,6 @@ import { DICE_REWARDS } from '@shared/constants/dice.constants'
 import { TaskEffort, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { TaskService } from '../../services/task.service'
-import { createMockPrisma } from '../mocks/prisma.mock'
-
-// Mock dependencies
-const mockPrisma = createMockPrisma()
-
-vi.mock('../../repositories/task.repository', () => ({
-  TaskRepository: vi.fn(function () {
-    return {
-      create: vi.fn(),
-      findAll: vi.fn(),
-      findByIdOrThrow: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      findFiltered: vi.fn(),
-      bulkUpdate: vi.fn()
-    }
-  })
-}))
-
-vi.mock('../../services/dice.service', () => ({
-  DiceService: vi.fn(function () {
-    return {
-      addDiceToBank: vi.fn().mockResolvedValue({ earned: 5, success: true })
-    }
-  })
-}))
 
 describe('TaskService', () => {
   let taskService: TaskService
@@ -36,9 +10,25 @@ describe('TaskService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    taskService = new TaskService(mockPrisma as any)
-    mockTaskRepo = (taskService as any).taskRepository
-    mockDiceService = (taskService as any).diceService
+
+    // Create mock repository with mocked methods
+    mockTaskRepo = {
+      create: vi.fn(),
+      findAll: vi.fn(),
+      findByIdOrThrow: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      findFiltered: vi.fn(),
+      bulkUpdate: vi.fn()
+    }
+
+    // Create mock dice service
+    mockDiceService = {
+      addDiceToBank: vi.fn().mockResolvedValue({ earned: 5, success: true })
+    }
+
+    // Inject the mock dependencies directly
+    taskService = new TaskService(mockTaskRepo, mockDiceService)
   })
 
   describe('create', () => {

@@ -3,13 +3,16 @@ import { ALL_ITEMS } from '@shared/constants/items'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CharacterService } from '../../services/character.service'
 import { mockCharacter, mockInventoryItem } from '../fixtures/character.fixtures'
-import { createMockPrisma } from '../mocks/prisma.mock'
 
-const mockPrisma = createMockPrisma()
+describe('CharacterService', () => {
+  let characterService: CharacterService
+  let mockCharacterRepo: any
 
-vi.mock('../../repositories/character.repository', () => ({
-  CharacterRepository: vi.fn(function () {
-    return {
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    // Create mock repository with mocked methods
+    mockCharacterRepo = {
       findWithClasses: vi.fn(),
       findByUserIdOrThrow: vi.fn(),
       getCharacterWithClasses: vi.fn(),
@@ -20,17 +23,9 @@ vi.mock('../../repositories/character.repository', () => ({
       unequipItem: vi.fn(),
       updateDoctrines: vi.fn()
     }
-  })
-}))
 
-describe('CharacterService', () => {
-  let characterService: CharacterService
-  let mockCharacterRepo: any
-
-  beforeEach(() => {
-    vi.clearAllMocks()
-    characterService = new CharacterService(mockPrisma as any)
-    mockCharacterRepo = (characterService as any).characterRepository
+    // Inject the mock repository directly
+    characterService = new CharacterService(mockCharacterRepo)
   })
 
   describe('item management', () => {

@@ -7,15 +7,10 @@ import type { CharacterClassType, CharacterProgress, CharacterWithClasses } from
 import type { DoctrineDefinition } from '@shared/types/doctrine.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
-import type { PrismaClient } from '../generated/prisma'
-import { CharacterRepository } from '../repositories/character.repository'
+import type { CharacterRepository } from '../repositories/character.repository'
 
 export class CharacterService {
-  private characterRepository: CharacterRepository
-
-  constructor(prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(prisma)
-  }
+  constructor(private characterRepository: CharacterRepository) {}
 
   getCharacterProgress(character: CharacterWithClasses): CharacterProgress {
     const currentClass = character.classes.find((c) => c.className === character.currentClass)

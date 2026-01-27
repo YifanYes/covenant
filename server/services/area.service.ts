@@ -1,13 +1,8 @@
 import type { CreateAreaBodyType, UpdateAreaBodyType } from '@shared/schemas/areas.schemas'
-import type { PrismaClient } from '../generated/prisma'
-import { AreaRepository } from '../repositories/area.repository'
+import type { AreaRepository } from '../repositories/area.repository'
 
 export class AreaService {
-  private areaRepository: AreaRepository
-
-  constructor(prisma: PrismaClient) {
-    this.areaRepository = new AreaRepository(prisma)
-  }
+  constructor(private areaRepository: AreaRepository) {}
 
   async create(userId: string, input: CreateAreaBodyType) {
     const area = await this.areaRepository.create(userId, input)

@@ -1,6 +1,7 @@
 'use client'
 import { cn } from '@/lib/cn.lib'
 import { ItemRarity, type InventoryItem } from '@shared/types/gamification.types'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import ItemTooltip from './item-tooltip.component'
 
@@ -39,7 +40,7 @@ export default function ItemCard({ item, quantity = 1, isSelected, onClick }: It
           item.rarity !== ItemRarity.COMMON && `shadow-lg ${rarityGlowColors[item.rarity]}`
         )}
       >
-        <img src={itemImagePath} alt={itemName} className='h-12 w-12 object-contain' />
+        <Image src={itemImagePath} alt={itemName} width={48} height={48} className='h-12 w-12 object-contain' />
         <span className='mt-0.5 max-w-full truncate text-[10px]'>{itemName}</span>
         {quantity > 1 && (
           <div className='absolute top-1 right-1 z-20 flex h-5 min-w-5 items-center justify-center rounded-full border border-white/10 bg-[#3b3a36] px-1 text-[10px] font-bold text-zinc-300 shadow-sm'>

@@ -2,19 +2,6 @@ import { getMaxDiceForTier } from '@shared/constants/dice.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DiceService } from '../../services/dice.service'
 import { mockCharacter } from '../fixtures/character.fixtures'
-import { createMockPrisma } from '../mocks/prisma.mock'
-
-// Mock dependencies
-const mockPrisma = createMockPrisma()
-
-vi.mock('../../repositories/character.repository', () => ({
-  CharacterRepository: vi.fn(function () {
-    return {
-      findWithClasses: vi.fn(),
-      updateCharacterData: vi.fn()
-    }
-  })
-}))
 
 describe('DiceService', () => {
   let diceService: DiceService
@@ -22,8 +9,15 @@ describe('DiceService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    diceService = new DiceService(mockPrisma as any)
-    mockCharacterRepo = (diceService as any).characterRepository
+
+    // Create mock repository with mocked methods
+    mockCharacterRepo = {
+      findWithClasses: vi.fn(),
+      updateCharacterData: vi.fn()
+    }
+
+    // Inject the mock repository directly
+    diceService = new DiceService(mockCharacterRepo)
   })
 
   describe('addDiceToBank', () => {

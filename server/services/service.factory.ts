@@ -1,4 +1,14 @@
 import type { PrismaClient } from '../generated/prisma'
+import { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
+import { ActivityRepository } from '../repositories/activity.repository'
+import { AreaRepository } from '../repositories/area.repository'
+import { CharacterRepository } from '../repositories/character.repository'
+import { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
+import { HabitRepository } from '../repositories/habit.repository'
+import { InvestmentRepository } from '../repositories/investment.repository'
+import { ObjectiveRepository } from '../repositories/objective.repository'
+import { TaskRepository } from '../repositories/task.repository'
+import { UserRepository } from '../repositories/user.repository'
 import { ActivityService } from './activity.service'
 import { AreaService } from './area.service'
 import { AuthService } from './auth.service'
@@ -13,10 +23,25 @@ import { StoreService } from './store.services'
 import { TaskService } from './task.service'
 
 /**
- * ServiceFactory creates lazily-initialized service instances.
- * Each service is created only once per request context.
+ * ServiceFactory creates lazily-initialized service instances with proper dependency injection.
+ * Repositories are created first, then services are wired with their dependencies.
+ * Each instance is created only once per request context.
  */
 export class ServiceFactory {
+  // Repositories (private, lazy-initialized)
+  private _activityParticipationRepository?: ActivityParticipationRepository
+  private _activityRepository?: ActivityRepository
+  private _areaRepository?: AreaRepository
+  private _characterRepository?: CharacterRepository
+  private _combatEnemyRepository?: CombatEnemyRepository
+  private _habitRepository?: HabitRepository
+  private _investmentRepository?: InvestmentRepository
+  private _objectiveRepository?: ObjectiveRepository
+  private _taskRepository?: TaskRepository
+  private _userRepository?: UserRepository
+
+  // Services (private, lazy-initialized)
+  private _activityService?: ActivityService
   private _areaService?: AreaService
   private _authService?: AuthService
   private _characterService?: CharacterService
@@ -24,95 +49,123 @@ export class ServiceFactory {
   private _dashboardService?: DashboardService
   private _diceService?: DiceService
   private _habitService?: HabitService
-  private _objectiveService?: ObjectiveService
-  private _taskService?: TaskService
-  private _storeService?: StoreService
-  private _activityService?: ActivityService
   private _investmentService?: InvestmentService
+  private _objectiveService?: ObjectiveService
+  private _storeService?: StoreService
+  private _taskService?: TaskService
 
   constructor(private prisma: PrismaClient) {}
 
-  get area(): AreaService {
-    if (!this._areaService) {
-      this._areaService = new AreaService(this.prisma)
-    }
-    return this._areaService
+  // ============== Repository Getters (private) ==============
+
+  private get activityParticipationRepository(): ActivityParticipationRepository {
+    return (this._activityParticipationRepository ??= new ActivityParticipationRepository(this.prisma))
   }
 
-  get auth(): AuthService {
-    if (!this._authService) {
-      this._authService = new AuthService(this.prisma)
-    }
-    return this._authService
+  private get activityRepository(): ActivityRepository {
+    return (this._activityRepository ??= new ActivityRepository(this.prisma))
+  }
+
+  private get areaRepository(): AreaRepository {
+    return (this._areaRepository ??= new AreaRepository(this.prisma))
+  }
+
+  private get characterRepository(): CharacterRepository {
+    return (this._characterRepository ??= new CharacterRepository(this.prisma))
+  }
+
+  private get combatEnemyRepository(): CombatEnemyRepository {
+    return (this._combatEnemyRepository ??= new CombatEnemyRepository(this.prisma))
+  }
+
+  private get habitRepository(): HabitRepository {
+    return (this._habitRepository ??= new HabitRepository(this.prisma))
+  }
+
+  private get investmentRepository(): InvestmentRepository {
+    return (this._investmentRepository ??= new InvestmentRepository(this.prisma))
+  }
+
+  private get objectiveRepository(): ObjectiveRepository {
+    return (this._objectiveRepository ??= new ObjectiveRepository(this.prisma))
+  }
+
+  private get taskRepository(): TaskRepository {
+    return (this._taskRepository ??= new TaskRepository(this.prisma))
+  }
+
+  private get userRepository(): UserRepository {
+    return (this._userRepository ??= new UserRepository(this.prisma))
+  }
+
+  // ============== Service Getters (public) ==============
+
+  // Layer 1: Repository-only dependencies
+  get area(): AreaService {
+    return (this._areaService ??= new AreaService(this.areaRepository))
   }
 
   get character(): CharacterService {
-    if (!this._characterService) {
-      this._characterService = new CharacterService(this.prisma)
-    }
-    return this._characterService
-  }
-
-  get combat(): CombatService {
-    if (!this._combatService) {
-      this._combatService = new CombatService(this.prisma)
-    }
-    return this._combatService
-  }
-
-  get dashboard(): DashboardService {
-    if (!this._dashboardService) {
-      this._dashboardService = new DashboardService(this.prisma)
-    }
-    return this._dashboardService
+    return (this._characterService ??= new CharacterService(this.characterRepository))
   }
 
   get dice(): DiceService {
-    if (!this._diceService) {
-      this._diceService = new DiceService(this.prisma)
-    }
-    return this._diceService
+    return (this._diceService ??= new DiceService(this.characterRepository))
+  }
+
+  // Layer 2: Repository + Layer 1 service dependencies
+  get combat(): CombatService {
+    return (this._combatService ??= new CombatService(this.characterRepository, this.activityParticipationRepository))
   }
 
   get habit(): HabitService {
-    if (!this._habitService) {
-      this._habitService = new HabitService(this.prisma)
-    }
-    return this._habitService
+    return (this._habitService ??= new HabitService(this.habitRepository, this.dice))
   }
 
   get objective(): ObjectiveService {
-    if (!this._objectiveService) {
-      this._objectiveService = new ObjectiveService(this.prisma)
-    }
-    return this._objectiveService
+    return (this._objectiveService ??= new ObjectiveService(this.objectiveRepository, this.dice))
   }
 
   get task(): TaskService {
-    if (!this._taskService) {
-      this._taskService = new TaskService(this.prisma)
-    }
-    return this._taskService
+    return (this._taskService ??= new TaskService(this.taskRepository, this.dice))
   }
 
-  get store(): StoreService {
-    if (!this._storeService) {
-      this._storeService = new StoreService(this.prisma)
-    }
-    return this._storeService
-  }
-
+  // Layer 3: Repository + Layer 2 service dependencies
   get activity(): ActivityService {
-    if (!this._activityService) {
-      this._activityService = new ActivityService(this.prisma)
-    }
-    return this._activityService
+    return (this._activityService ??= new ActivityService(
+      this.activityRepository,
+      this.combatEnemyRepository,
+      this.character,
+      this.combat
+    ))
+  }
+
+  get auth(): AuthService {
+    return (this._authService ??= new AuthService(
+      this.userRepository,
+      this.characterRepository,
+      this.habitRepository,
+      this.taskRepository,
+      this.objectiveRepository,
+      this.areaRepository
+    ))
+  }
+
+  get dashboard(): DashboardService {
+    return (this._dashboardService ??= new DashboardService(
+      this.character,
+      this.taskRepository,
+      this.habitRepository,
+      this.areaRepository,
+      this.characterRepository
+    ))
   }
 
   get investment(): InvestmentService {
-    if (!this._investmentService) {
-      this._investmentService = new InvestmentService(this.prisma)
-    }
-    return this._investmentService
+    return (this._investmentService ??= new InvestmentService(this.investmentRepository, this.characterRepository))
+  }
+
+  get store(): StoreService {
+    return (this._storeService ??= new StoreService(this.characterRepository, this.character))
   }
 }
