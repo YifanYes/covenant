@@ -607,14 +607,28 @@
         "1": "Malachar",
         "2": "Nethrazul",
         "3": "Xandros",
-        "4": "Belzaroth"
+        "4": "Belzaroth",
+        "5": "Voidwalker",
+        "6": "Abaddon",
+        "7": "Morthax",
+        "8": "Drakonis",
+        "9": "Zephyron",
+        "10": "Thalgor",
+        "11": "Sargorath"
       },
       "suffix": {
         "0": "World-Ender",
         "1": "the Eternal",
         "2": "Void Sovereign",
         "3": "the Undying",
-        "4": "Doom Incarnate"
+        "4": "Doom Incarnate",
+        "5": "the Annihilator",
+        "6": "Lord of Ruin",
+        "7": "the Apocalypse",
+        "8": "Bringer of Chaos",
+        "9": "the Dreaded One",
+        "10": "Soul Devourer",
+        "11": "the Harbinger"
       }
     },
     "elite": {
@@ -624,14 +638,27 @@
         "2": "Xerion",
         "3": "Morvain",
         "4": "Zarathos",
-        "5": "Nethros"
+        "5": "Nethros",
+        "6": "Kargul",
+        "7": "Draven",
+        "8": "Mordecai",
+        "9": "Vulkros",
+        "10": "Sethrak",
+        "11": "Ashborn"
       },
       "suffix": {
         "0": "Infernal Duke",
         "1": "the Corruptor",
         "2": "Dreadlord",
         "3": "the Merciless",
-        "4": "Soulreaver"
+        "4": "Soulreaver",
+        "5": "Bane of Light",
+        "6": "the Defiler",
+        "7": "Warbringer",
+        "8": "the Cursed",
+        "9": "Shadowmaster",
+        "10": "the Tyrant",
+        "11": "Fleshrender"
       }
     },
     "minion": {
@@ -643,7 +670,11 @@
         "4": "Grixus",
         "5": "Vex",
         "6": "Morag",
-        "7": "Drix"
+        "7": "Drix",
+        "8": "Skarn",
+        "9": "Rotgut",
+        "10": "Blight",
+        "11": "Gnash"
       },
       "suffix": {
         "0": "the Hollow",
@@ -651,7 +682,13 @@
         "2": "the Feral",
         "3": "the Rotting",
         "4": "Bonecrusher",
-        "5": "the Wretched"
+        "5": "the Wretched",
+        "6": "the Lurker",
+        "7": "Plaguebearer",
+        "8": "the Twisted",
+        "9": "Nightcrawler",
+        "10": "the Vile",
+        "11": "Deathbringer"
       }
     }
   },
