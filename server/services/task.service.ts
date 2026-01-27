@@ -5,18 +5,14 @@ import type {
   GetTasksFilteredInput,
   UpdateTaskType
 } from '@shared/schemas/tasks.schemas'
-import type { PrismaClient } from '../generated/prisma'
-import { TaskRepository } from '../repositories/task.repository'
-import { DiceService } from './dice.service'
+import type { TaskRepository } from '../repositories/task.repository'
+import type { DiceService } from './dice.service'
 
 export class TaskService {
-  private diceService: DiceService
-  private taskRepository: TaskRepository
-
-  constructor(prisma: PrismaClient) {
-    this.diceService = new DiceService(prisma)
-    this.taskRepository = new TaskRepository(prisma)
-  }
+  constructor(
+    private taskRepository: TaskRepository,
+    private diceService: DiceService
+  ) {}
 
   async create(userId: string, input: CreateTaskType) {
     const task = await this.taskRepository.create(userId, input)

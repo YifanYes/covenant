@@ -9,18 +9,14 @@ import {
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import type { PurchaseResult, StoreListResult } from '@shared/types/store.types'
 import { TRPCError } from '@trpc/server'
-import type { PrismaClient } from '../generated/prisma'
-import { CharacterRepository } from '../repositories/character.repository'
-import { CharacterService } from './character.service'
+import type { CharacterRepository } from '../repositories/character.repository'
+import type { CharacterService } from './character.service'
 
 export class StoreService {
-  private characterRepository: CharacterRepository
-  private characterService: CharacterService
-
-  constructor(prisma: PrismaClient) {
-    this.characterRepository = new CharacterRepository(prisma)
-    this.characterService = new CharacterService(prisma)
-  }
+  constructor(
+    private characterRepository: CharacterRepository,
+    private characterService: CharacterService
+  ) {}
 
   async listAvailableItems(userId: string): Promise<StoreListResult> {
     const character = await this.characterRepository.findWithClasses(userId)

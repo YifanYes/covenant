@@ -5,24 +5,18 @@ import type { CombatLogEntry, InventoryItem } from '@shared/types/gamification.t
 import { TRPCError } from '@trpc/server'
 import { ActivityDifficulty, getActivityById, selectRandomEnemy } from '../../shared/constants/activities'
 import type { CharacterWithClasses } from '../../shared/types/character.types'
-import type { PrismaClient } from '../generated/prisma'
-import { ActivityRepository } from '../repositories/activity.repository'
-import { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
-import { CharacterService } from './character.service'
-import { CombatService } from './combat.service'
+import type { ActivityRepository } from '../repositories/activity.repository'
+import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
+import type { CharacterService } from './character.service'
+import type { CombatService } from './combat.service'
 
 export class ActivityService {
-  private activityRepository: ActivityRepository
-  private combatEnemyRepository: CombatEnemyRepository
-  private characterService: CharacterService
-  private combatService: CombatService
-
-  constructor(prisma: PrismaClient) {
-    this.activityRepository = new ActivityRepository(prisma)
-    this.combatEnemyRepository = new CombatEnemyRepository(prisma)
-    this.characterService = new CharacterService(prisma)
-    this.combatService = new CombatService(prisma)
-  }
+  constructor(
+    private activityRepository: ActivityRepository,
+    private combatEnemyRepository: CombatEnemyRepository,
+    private characterService: CharacterService,
+    private combatService: CombatService
+  ) {}
 
   async getActivities(characterId?: string) {
     const activities = await this.activityRepository.getActiveActivities()

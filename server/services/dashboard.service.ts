@@ -1,27 +1,21 @@
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import type { DashboardData } from '@shared/types/dashboard.types'
 import dayjs from 'dayjs'
-import type { Area, HabitCompletion, Objective, PrismaClient, Task } from '../generated/prisma'
-import { AreaRepository } from '../repositories/area.repository'
-import { CharacterRepository } from '../repositories/character.repository'
-import { HabitRepository } from '../repositories/habit.repository'
-import { TaskRepository } from '../repositories/task.repository'
-import { CharacterService } from './character.service'
+import type { Area, HabitCompletion, Objective, Task } from '../generated/prisma'
+import type { AreaRepository } from '../repositories/area.repository'
+import type { CharacterRepository } from '../repositories/character.repository'
+import type { HabitRepository } from '../repositories/habit.repository'
+import type { TaskRepository } from '../repositories/task.repository'
+import type { CharacterService } from './character.service'
 
 export class DashboardService {
-  private characterService: CharacterService
-  private taskRepository: TaskRepository
-  private habitRepository: HabitRepository
-  private areaRepository: AreaRepository
-  private characterRepository: CharacterRepository
-
-  constructor(prisma: PrismaClient) {
-    this.characterService = new CharacterService(prisma)
-    this.taskRepository = new TaskRepository(prisma)
-    this.habitRepository = new HabitRepository(prisma)
-    this.areaRepository = new AreaRepository(prisma)
-    this.characterRepository = new CharacterRepository(prisma)
-  }
+  constructor(
+    private characterService: CharacterService,
+    private taskRepository: TaskRepository,
+    private habitRepository: HabitRepository,
+    private areaRepository: AreaRepository,
+    private characterRepository: CharacterRepository
+  ) {}
 
   private getMax(record: Record<string, number>) {
     return Object.entries(record).sort((a, b) => b[1] - a[1])[0]?.[0] || null

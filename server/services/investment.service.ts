@@ -2,15 +2,17 @@ import { getInvestmentById } from '@shared/constants/investments'
 import type { ContributeResult, InvestmentWithProgress } from '@shared/types/investment.types'
 import { InvestmentStatus } from '@shared/types/investment.types'
 import { TRPCError } from '@trpc/server'
-import type { PrismaClient } from '../generated/prisma'
+import type { CharacterRepository } from '../repositories/character.repository'
+import type { InvestmentRepository } from '../repositories/investment.repository'
 
 export class InvestmentService {
-  constructor(private prisma: PrismaClient) {}
+  constructor(
+    private investmentRepository: InvestmentRepository,
+    private characterRepository: CharacterRepository
+  ) {}
 
   async getInvestments(characterId: string): Promise<InvestmentWithProgress[]> {
-    const character = await this.prisma.character.findUnique({
-      where: { id: characterId }
-    })
+    const character = await this.characterRepository.findByIdWithClasses(characterId)
     if (!character) {
       throw new TRPCError({
         code: 'NOT_FOUND',
@@ -18,10 +20,7 @@ export class InvestmentService {
       })
     }
 
-    const contributions = await this.prisma.investmentContribution.findMany({
-      where: { characterId },
-      select: { investmentId: true, amount: true }
-    })
+    const contributions = await this.investmentRepository.getContributionsByCharacter(characterId)
 
     const characterContributions = contributions.reduce(
       (acc, c) => {
@@ -31,9 +30,7 @@ export class InvestmentService {
       {} as Record<string, number>
     )
 
-    const investments = await this.prisma.investment.findMany({
-      where: { factionName: character.factionName }
-    })
+    const investments = await this.investmentRepository.findByFaction(character.factionName)
 
     return investments.map((inv) => {
       const template = getInvestmentById(inv.investmentId)
@@ -54,9 +51,7 @@ export class InvestmentService {
   }
 
   async contribute(investmentId: string, characterId: string, amount: number): Promise<ContributeResult> {
-    const character = await this.prisma.character.findUnique({
-      where: { id: characterId }
-    })
+    const character = await this.characterRepository.findByIdWithClasses(characterId)
     if (!character) {
       throw new TRPCError({
         code: 'NOT_FOUND',
@@ -71,9 +66,7 @@ export class InvestmentService {
       })
     }
 
-    const investment = await this.prisma.investment.findUnique({
-      where: { id: investmentId }
-    })
+    const investment = await this.investmentRepository.findById(investmentId)
     if (!investment) {
       throw new TRPCError({
         code: 'NOT_FOUND',
@@ -95,43 +88,12 @@ export class InvestmentService {
       })
     }
 
-    const result = await this.prisma.$transaction(async (tx) => {
-      await tx.character.update({
-        where: { id: characterId },
-        data: { gold: { decrement: amount } }
-      })
-
-      await tx.investmentContribution.create({
-        data: {
-          investmentId,
-          characterId,
-          amount
-        }
-      })
-
-      const updatedInvestment = await tx.investment.update({
-        where: { id: investmentId },
-        data: { currentAmount: { increment: amount } }
-      })
-
-      const isCompleted = updatedInvestment.currentAmount >= updatedInvestment.targetAmount
-
-      if (isCompleted) {
-        await tx.investment.update({
-          where: { id: investmentId },
-          data: {
-            status: InvestmentStatus.COMPLETED,
-            completedAt: new Date()
-          }
-        })
-      }
-
-      return {
-        newTotal: updatedInvestment.currentAmount,
-        characterGold: character.gold - amount,
-        investmentCompleted: isCompleted
-      }
-    })
+    const result = await this.investmentRepository.contribute(
+      investmentId,
+      characterId,
+      amount,
+      character.gold
+    )
 
     return {
       success: true,
@@ -148,7 +110,7 @@ export class InvestmentService {
       })
     }
 
-    const totalCharacters = await this.prisma.character.count()
+    const totalCharacters = await this.investmentRepository.countCharacters()
     const playerCount = Math.max(1, totalCharacters)
     return template.baseTarget + playerCount * template.scaleFactor
   }
