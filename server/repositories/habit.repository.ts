@@ -3,11 +3,13 @@ import { TRPCError } from '@trpc/server'
 import type { Habit, HabitCompletion, PrismaClient } from '../generated/prisma'
 
 const HABIT_INCLUDE = {
-  objectives: true
+  objectives: true,
+  areas: true
 }
 
 const HABIT_WITH_COMPLETIONS_INCLUDE = {
   objectives: true,
+  areas: true,
   completions: {
     orderBy: { completedAt: 'desc' as const }
   }
@@ -26,6 +28,9 @@ export class HabitRepository {
         userId,
         objectives: {
           connect: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
+        },
+        areas: {
+          connect: input.areas?.map((areaId) => ({ id: areaId })) || []
         }
       },
       include: HABIT_INCLUDE
@@ -63,6 +68,7 @@ export class HabitRepository {
       },
       include: {
         objectives: true,
+        areas: true,
         completions: {
           orderBy: { completedAt: 'desc' },
           take: 20
@@ -81,6 +87,9 @@ export class HabitRepository {
         ...(input.timespan && { timespan: input.timespan }),
         objectives: {
           set: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
+        },
+        areas: {
+          set: input.areas?.map((areaId) => ({ id: areaId })) || []
         }
       },
       include: HABIT_INCLUDE

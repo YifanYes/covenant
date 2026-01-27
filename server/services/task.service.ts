@@ -114,7 +114,8 @@ export class TaskService {
       effort: original.effort as any,
       impact: original.impact as any,
       dueDate: original.dueDate || undefined,
-      objectives: original.objectives.map((o: any) => o.id)
+      objectives: original.objectives.map((o: any) => o.id),
+      areas: (original as any).areas?.map((a: any) => a.id) || []
     }
 
     const task = await this.taskRepository.create(userId, newTaskInput)

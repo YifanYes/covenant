@@ -56,6 +56,9 @@
     "add": "Añadir área",
     "career": "Carrera profesional",
     "delete_confirmation": "¿Estás seguro de querer eliminar el área?",
+    "selector": {
+      "placeholder": "Seleccionar áreas"
+    },
     "error": {
       "internal": {
         "create": "Ocurrió un error al crear el área",
@@ -204,6 +207,7 @@
     "title": "Crear nueva área"
   },
   "create_habit_dialog": {
+    "areas_placeholder": "Áreas asociadas",
     "description": "Modal para crear un nuevo hábito",
     "description_placeholder": "Descripción (opcional)",
     "name_placeholder": "Nombre del hábito",
@@ -225,6 +229,7 @@
     "title": "Crear nuevo objetivo"
   },
   "create_task_dialog": {
+    "areas_placeholder": "Áreas asociadas",
     "description": "Modal para crear una nueva tarea",
     "description_placeholder": "Descripción de la tarea",
     "due_date_placeholder": "Fecha de entrega (opcional)",
@@ -1265,6 +1270,7 @@
     "title": "Actualizar hábito"
   },
   "update_task_dialog": {
+    "areas_placeholder": "Áreas asociadas",
     "description": "Modal para actualizar una tarea",
     "description_placeholder": "Descripción de la tarea",
     "due_date_placeholder": "Fecha de entrega (opcional)",

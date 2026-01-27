@@ -1,5 +1,6 @@
 'use client'
 import BaseFormDialog from '@/common/base-form-dialog.component'
+import AreasSelector from '@/forms/areas-selector.component'
 import ObjectivesSelector from '@/forms/objectives-selector.component'
 import SingleSelect from '@/forms/single-select.component'
 import TextInput from '@/forms/text-input.component'
@@ -21,6 +22,7 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
 
   const updateMutation = useMutation(
     trpc.habits.update.mutationOptions({
@@ -48,7 +50,8 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
       description: habit.description || '',
       recurrence: habit.recurrence,
       timespan: habit.timespan as HabitTimespan,
-      objectives: []
+      objectives: [],
+      areas: []
     }
   })
 
@@ -61,7 +64,8 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
         description: habit.description || '',
         recurrence: habit.recurrence,
         timespan: habit.timespan as HabitTimespan,
-        objectives: map(habit.objectives || [], (objective) => objective.id)
+        objectives: map(habit.objectives || [], (objective) => objective.id),
+        areas: map(habit.areas || [], (area) => area.id)
       })
     }
   }, [open, habit, reset])
@@ -148,6 +152,14 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
             objectives={objectivesData?.objectives || []}
             placeholder={t('create_habit_dialog.objectives_placeholder')}
             label={t('create_habit_dialog.objectives_placeholder')}
+          />
+        </div>
+        <div className='grid min-w-0 gap-3'>
+          <AreasSelector
+            control={control}
+            areas={areasData?.areas || []}
+            placeholder={t('create_habit_dialog.areas_placeholder')}
+            label={t('create_habit_dialog.areas_placeholder')}
           />
         </div>
       </div>

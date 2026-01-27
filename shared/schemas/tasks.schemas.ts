@@ -28,7 +28,8 @@ export const createTaskSchema = z.object({
     .date()
     .nullish()
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
-  objectives: z.array(z.uuid()).optional()
+  objectives: z.array(z.uuid()).optional(),
+  areas: z.array(z.uuid()).optional()
 })
 export type CreateTaskType = z.input<typeof createTaskSchema>
 
@@ -45,7 +46,8 @@ export const updateTaskSchema = z.object({
     .date()
     .nullish()
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
-  objectives: z.array(z.uuid()).optional()
+  objectives: z.array(z.uuid()).optional(),
+  areas: z.array(z.uuid()).optional()
 })
 export type UpdateTaskType = z.input<typeof updateTaskSchema>
 
