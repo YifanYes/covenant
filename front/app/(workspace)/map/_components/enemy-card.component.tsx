@@ -2,6 +2,7 @@
 import { cn } from '@/lib/cn.lib'
 import { EnemyType, getEnemy } from '@shared/constants/enemies'
 import type { EnemyState } from '@shared/types/gamification.types'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import HealthBar from './health-bar.component'
 
@@ -50,9 +51,11 @@ export default function EnemyCard({ enemy, isTarget, className }: EnemyCardProps
     >
       {/* Enemy Portrait */}
       <div className='shrink-0'>
-        <img
+        <Image
           src={`/assets/enemies/${template.imageId}.png`}
           alt={t(template.name)}
+          width={64}
+          height={64}
           className='h-16 w-16 rounded-lg object-cover'
           onError={(e) => {
             // Hide the image if it fails to load

@@ -1,6 +1,7 @@
 'use client'
 import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import { ItemRarity, type InventoryItem } from '@shared/types/gamification.types'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
 interface ItemTooltipProps {
@@ -22,7 +23,7 @@ export default function ItemTooltip({ item, quantity = 1, children }: ItemToolti
       <TooltipContent className='max-w-xs border-zinc-700 bg-zinc-800 p-3'>
         <div className='flex flex-col gap-2'>
           <div className='flex items-center gap-2'>
-            <img src={itemImagePath} alt={itemName} className='h-8 w-8 object-contain' />
+            <Image src={itemImagePath} alt={itemName} width={32} height={32} className='h-8 w-8 object-contain' />
             <div className='flex flex-col'>
               <span className='font-semibold text-zinc-100'>{itemName}</span>
               {quantity > 1 && <span className='text-[10px] text-zinc-400'>Quantity: {quantity}</span>}
