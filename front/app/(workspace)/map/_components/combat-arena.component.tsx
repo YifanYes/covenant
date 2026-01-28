@@ -193,7 +193,7 @@ export default function CombatArena({
               <h3 className='mb-2 text-sm font-semibold'>{character.name}</h3>
 
               <div className='space-y-2'>
-                <div style={{ width: `${currentClass.maxHealth * 20}px` }} className='max-w-[240px] min-w-[80px]'>
+                <div style={{ width: `${currentClass.maxHealth * 20}px` }} className='max-w-60 min-w-20'>
                   <div className='text-muted-foreground mb-1 flex justify-between text-xs'>
                     <span>{t('inventory.health')}</span>
                     <span>
@@ -203,7 +203,7 @@ export default function CombatArena({
                   <HealthBar current={currentClass.health} max={currentClass.maxHealth} showLabel={false} />
                 </div>
 
-                <div style={{ width: `${currentClass.maxMana * 15}px` }} className='max-w-[240px] min-w-[80px]'>
+                <div style={{ width: `${currentClass.maxMana * 15}px` }} className='max-w-60 min-w-20'>
                   <div className='text-muted-foreground mb-1 flex justify-between text-xs'>
                     <span>{t('inventory.mana')}</span>
                     <span>
@@ -285,7 +285,7 @@ export default function CombatArena({
       <div className='flex flex-col gap-4'>
         <div className='rounded-lg border p-3'>
           <h3 className='mb-2 text-sm font-semibold'>{t('combat.enemies')}</h3>
-          <ScrollArea className='max-h-[200px]'>
+          <ScrollArea className='max-h-50'>
             <div className='flex flex-col gap-2 pr-2'>
               {enemies.map((enemy) => (
                 <EnemyCard key={enemy.id} enemy={enemy} isTarget={targetEnemy?.id === enemy.id} />
