@@ -113,7 +113,7 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
         <div className='grid gap-3'>
           <Textarea
             placeholder={t('create_habit_dialog.description_placeholder')}
-            className='h-[80px] resize-none overflow-y-auto'
+            className='h-20 resize-none overflow-y-auto'
             {...register('description')}
             {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
           />

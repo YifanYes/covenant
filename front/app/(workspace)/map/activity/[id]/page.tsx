@@ -1,4 +1,5 @@
 'use client'
+import dynamic from 'next/dynamic'
 import LoaderButton from '@/common/loader-button.component'
 import TierBadge from '@/common/tier-badge.component'
 import AlertDialog, {
@@ -25,7 +26,12 @@ import { useTranslation } from 'react-i18next'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import CombatArena from '../../_components/combat-arena.component'
+
+// Dynamic import for tactical combat (SSR-safe due to Phaser)
+const TacticalCombatArena = dynamic(
+  () => import('@/components/tactical/tactical-combat-arena.component'),
+  { ssr: false }
+)
 
 export default function ActivityDetailPage() {
   const { id } = useParams()
@@ -244,8 +250,9 @@ export default function ActivityDetailPage() {
   }
 
   return (
-    <div className='flex h-full w-full flex-col gap-4 overflow-auto px-2 py-4'>
-      <div className='mx-auto w-full max-w-7xl space-y-4'>
+    <div className='flex h-full w-full flex-col overflow-hidden'>
+      {/* Header */}
+      <div className='bg-card flex-none border-b px-4 py-2'>
         <div className='flex items-center gap-4'>
           <Button variant='ghost' size='icon' asChild>
             <Link href='/map'>
@@ -265,21 +272,23 @@ export default function ActivityDetailPage() {
             </div>
           </div>
         </div>
-
-        {currentEnemy && (
-          <CombatArena
-            character={character}
-            enemies={[currentEnemy]}
-            combatLog={combatLog}
-            diceBank={(character.data as any)?.diceBank ?? 0}
-            onAttack={handleAttack}
-            isAttacking={resolveTurnMutation.isPending}
-            lastTurnResult={lastTurnResult}
-            participationId={participation?.id}
-            activeDoctrines={participation?.activeDoctrines as Record<string, any>}
-          />
-        )}
       </div>
+
+      {/* Tactical Combat Area */}
+      {currentEnemy && (
+        <TacticalCombatArena
+          character={character}
+          enemies={[currentEnemy]}
+          combatLog={combatLog}
+          diceBank={(character.data as any)?.diceBank ?? 0}
+          onAttack={handleAttack}
+          isAttacking={resolveTurnMutation.isPending}
+          lastTurnResult={lastTurnResult}
+          participationId={participation?.id}
+          activeDoctrines={participation?.activeDoctrines as Record<string, any>}
+          className='min-h-0 flex-1'
+        />
+      )}
     </div>
   )
 }

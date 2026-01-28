@@ -130,7 +130,7 @@ export default function UpdateTaskDialog() {
       submitLabel='update'
       isLoading={updateMutation.isPending}
       isSubmitDisabled={!isValid || !isDirty || updateMutation.isPending}
-      className='md:max-w-fit md:min-w-[600px]'
+      className='md:max-w-fit md:min-w-150'
       extraFooterActions={
         <div className='mr-auto flex gap-2'>
           <LoaderButton
@@ -164,7 +164,7 @@ export default function UpdateTaskDialog() {
         <div className='grid gap-3'>
           <Textarea
             placeholder={t('update_task_dialog.description_placeholder')}
-            className='h-[80px] resize-none overflow-y-auto'
+            className='h-20 resize-none overflow-y-auto'
             {...register('description')}
             {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
           />

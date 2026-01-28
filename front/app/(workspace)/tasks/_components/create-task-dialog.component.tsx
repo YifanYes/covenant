@@ -93,7 +93,7 @@ export default function CreateTaskDialog() {
           <span>{t('tasks.add')}</span>
         </Button>
       }
-      className='md:max-w-fit md:min-w-[600px]'
+      className='md:max-w-fit md:min-w-150'
     >
       <div className='grid gap-4'>
         <div className='grid gap-3'>
@@ -109,7 +109,7 @@ export default function CreateTaskDialog() {
         <div className='grid gap-3'>
           <Textarea
             placeholder={t('create_task_dialog.description_placeholder')}
-            className='h-[80px] resize-none overflow-y-auto'
+            className='h-20 resize-none overflow-y-auto'
             {...register('description')}
             {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
           />

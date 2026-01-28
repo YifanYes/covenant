@@ -1,0 +1,205 @@
+'use client'
+
+import { useTranslation } from 'react-i18next'
+import { Heart, SpeedFast, Zap } from '@nsmr/pixelart-react'
+
+import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
+import type { TacticalUnit, TacticalPhase } from '@shared/types/tactical-combat.types'
+import Button from '@/components/ui/button.component'
+import { cn } from '@/lib/cn.lib'
+
+interface ActionMenuProps {
+  activeUnit: TacticalUnit
+  phase: TacticalPhase
+}
+
+export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
+  const { t } = useTranslation()
+  const { selectAction, cancelAction, confirmAction, pendingAction } =
+    useTacticalCombatStore()
+
+  const canMove = !activeUnit.hasMoved
+  const canAttack = !activeUnit.hasActed
+
+  // Render action selection
+  if (phase === 'select_action') {
+    return (
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold mb-3">{activeUnit.name}</h3>
+
+        <div className="space-y-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn('w-full justify-start', !canMove && 'opacity-50')}
+            disabled={!canMove}
+            onClick={() => selectAction({ type: 'move' })}
+          >
+            <MoveIcon className="w-4 h-4 mr-2" />
+            Move
+            <span className="ml-auto text-xs text-muted-foreground">
+              {activeUnit.movementRange} tiles
+            </span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn('w-full justify-start', !canAttack && 'opacity-50')}
+            disabled={!canAttack}
+            onClick={() => selectAction({ type: 'attack' })}
+          >
+            <AttackIcon className="w-4 h-4 mr-2" />
+            Attack
+            <span className="ml-auto text-xs text-muted-foreground">
+              {activeUnit.attackRange} range
+            </span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full justify-start"
+            onClick={() => selectAction({ type: 'wait' })}
+          >
+            <WaitIcon className="w-4 h-4 mr-2" />
+            Wait
+          </Button>
+        </div>
+
+        {/* Unit stats */}
+        <div className="mt-4 pt-4 border-t text-xs space-y-1 text-muted-foreground">
+          <div className="flex justify-between">
+            <span className="flex items-center gap-1">
+              <Heart className="h-3 w-3 text-emerald-500" />
+              {t('inventory.health')}
+            </span>
+            <span className="text-foreground">
+              {activeUnit.currentHealth}/{activeUnit.maxHealth}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="flex items-center gap-1">
+              <Zap className="h-3 w-3 text-blue-400" />
+              {t('inventory.mana')}
+            </span>
+            <span className="text-foreground">
+              {activeUnit.currentMana}/{activeUnit.maxMana}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="flex items-center gap-1">
+              <SpeedFast className="h-3 w-3 text-amber-400" />
+              {t('inventory.stats.speed')}
+            </span>
+            <span className="text-foreground">{activeUnit.speed}</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Render move/target selection
+  if (phase === 'select_move' || phase === 'select_target') {
+    return (
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold mb-3">
+          {phase === 'select_move' ? 'Select Destination' : 'Select Target'}
+        </h3>
+
+        <p className="text-xs text-muted-foreground mb-4">
+          {phase === 'select_move'
+            ? 'Click a highlighted tile to move'
+            : 'Click an enemy to attack'}
+        </p>
+
+        {pendingAction && (
+          <div className="space-y-2">
+            <Button
+              variant="default"
+              size="sm"
+              className="w-full"
+              disabled={
+                (phase === 'select_move' && !pendingAction.path?.length) ||
+                (phase === 'select_target' && !pendingAction.targetUnitIds?.length)
+              }
+              onClick={() => confirmAction()}
+            >
+              Confirm
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={cancelAction}
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return null
+}
+
+// Simple icon components
+function MoveIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M5 9l4-4 4 4" />
+      <path d="M9 5v12" />
+      <path d="M19 15l-4 4-4-4" />
+      <path d="M15 19V7" />
+    </svg>
+  )
+}
+
+function AttackIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M14.5 12.5l-5-5" />
+      <path d="M16 8l4-4" />
+      <path d="M21 3l-1 1" />
+      <path d="M4 21l5-5" />
+      <path d="M8.5 15.5l-4 4" />
+    </svg>
+  )
+}
+
+function WaitIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  )
+}

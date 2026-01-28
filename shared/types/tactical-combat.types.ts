@@ -1,0 +1,146 @@
+import type { ActiveStatusEffect } from './doctrine.types'
+
+// Grid position
+export interface GridPosition {
+  x: number
+  y: number
+}
+
+// Terrain types
+export const TerrainType = {
+  GRASS: 'GRASS',
+  STONE: 'STONE',
+  WATER: 'WATER',
+  LAVA: 'LAVA',
+  OBSTACLE: 'OBSTACLE'
+} as const
+export type TerrainType = (typeof TerrainType)[keyof typeof TerrainType]
+
+// Tile highlight types for visual feedback
+export const TileHighlightType = {
+  MOVEMENT: 'MOVEMENT',
+  ATTACK: 'ATTACK',
+  DOCTRINE: 'DOCTRINE',
+  SELECTED: 'SELECTED',
+  HOVER: 'HOVER',
+  PATH: 'PATH'
+} as const
+export type TileHighlightType = (typeof TileHighlightType)[keyof typeof TileHighlightType]
+
+// Highlighted tile with position and type
+export interface HighlightedTile {
+  position: GridPosition
+  type: TileHighlightType
+}
+
+// Tactical unit representing player or enemy on the grid
+export interface TacticalUnit {
+  id: string
+  templateId: string // Enemy template ID or 'player'
+  name: string
+  position: GridPosition
+  isPlayer: boolean
+  spriteUrl?: string // URL to the sprite image for Phaser rendering
+
+  // Stats (from character/enemy)
+  currentHealth: number
+  maxHealth: number
+  currentMana: number
+  maxMana: number
+
+  // Tactical stats
+  movementRange: number // Tiles can move
+  attackRange: number // From weapon
+  speed: number // For turn order (higher = earlier)
+
+  // Turn state
+  hasMoved: boolean
+  hasActed: boolean
+
+  // Status
+  activeEffects: ActiveStatusEffect[]
+}
+
+// Tile state for the grid
+export interface TileState {
+  position: GridPosition
+  terrain: TerrainType
+  occupantId: string | null
+  isWalkable: boolean
+}
+
+// Combat phases
+export const TacticalPhase = {
+  SELECT_ACTION: 'select_action',
+  SELECT_MOVE: 'select_move',
+  SELECT_TARGET: 'select_target',
+  ANIMATING: 'animating',
+  ENEMY_TURN: 'enemy_turn'
+} as const
+export type TacticalPhase = (typeof TacticalPhase)[keyof typeof TacticalPhase]
+
+// Action types
+export const TacticalActionType = {
+  MOVE: 'move',
+  ATTACK: 'attack',
+  DOCTRINE: 'doctrine',
+  ITEM: 'item',
+  WAIT: 'wait'
+} as const
+export type TacticalActionType = (typeof TacticalActionType)[keyof typeof TacticalActionType]
+
+// Tactical action
+export interface TacticalAction {
+  type: TacticalActionType
+  path?: GridPosition[] // For movement
+  targetPosition?: GridPosition // For attacks/doctrines
+  targetUnitIds?: string[] // Affected units
+  doctrineId?: string
+  itemId?: string
+}
+
+// Full tactical combat state
+export interface TacticalCombatState {
+  // Grid
+  gridWidth: number
+  gridHeight: number
+  tiles: TileState[][]
+
+  // Units
+  playerUnits: TacticalUnit[]
+  enemyUnits: TacticalUnit[]
+
+  // Turn management
+  turnQueue: TacticalUnit[]
+  currentTurnIndex: number
+  activeUnitId: string | null
+  turnNumber: number
+
+  // UI state
+  phase: TacticalPhase
+  selectedTile: GridPosition | null
+  highlightedTiles: HighlightedTile[]
+  pendingAction: TacticalAction | null
+}
+
+// Map template for predefined combat arenas
+export interface MapTemplate {
+  id: string
+  name: string
+  width: number
+  height: number
+  tiles: TerrainType[][]
+  playerSpawn: GridPosition
+  enemySpawns: GridPosition[]
+}
+
+// Initialization data for tactical combat
+export interface TacticalInitData {
+  mapTemplateId: string
+  gridWidth: number
+  gridHeight: number
+  tiles: TileState[][]
+  playerUnits: TacticalUnit[]
+  enemyUnits: TacticalUnit[]
+  turnQueue: TacticalUnit[]
+}
