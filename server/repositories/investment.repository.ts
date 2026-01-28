@@ -71,4 +71,23 @@ export class InvestmentRepository {
   async countCharacters(): Promise<number> {
     return this.prisma.character.count()
   }
+
+  async findExpiredInvestments(before: Date): Promise<Investment[]> {
+    return this.prisma.investment.findMany({
+      where: {
+        status: InvestmentStatus.ACTIVE,
+        deadline: { lt: before }
+      }
+    })
+  }
+
+  async failInvestment(investmentId: string): Promise<Investment> {
+    return this.prisma.investment.update({
+      where: { id: investmentId },
+      data: {
+        status: InvestmentStatus.FAILED,
+        completedAt: new Date()
+      }
+    })
+  }
 }

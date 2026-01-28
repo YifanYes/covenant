@@ -6,21 +6,23 @@
       "name": "server",
       "dependencies": {
         "@fastify/cors": "^11.2.0",
-        "@prisma/adapter-pg": "^7.2.0",
-        "@prisma/client": "^7.2.0",
+        "@prisma/adapter-pg": "^7.3.0",
+        "@prisma/client": "^7.3.0",
         "better-auth": "^1.4.17",
         "dotenv": "^17.2.3",
-        "fastify": "^5.6.2",
-        "pg": "^8.16.3",
-        "prisma": "^7.2.0",
+        "fastify": "^5.7.2",
+        "node-cron": "^4.2.1",
+        "pg": "^8.17.2",
+        "prisma": "^7.3.0",
         "resend": "^6.8.0",
       },
       "devDependencies": {
-        "@types/node": "^22.19.3",
+        "@types/node": "^22.19.7",
+        "@types/node-cron": "^3.0.11",
         "@types/pg": "^8.16.0",
         "@vitest/coverage-v8": "^4.0.18",
         "typescript": "^5.9.3",
-        "vite-tsconfig-paths": "^6.0.4",
+        "vite-tsconfig-paths": "^6.0.5",
         "vitest": "^4.0.18",
       },
     },
@@ -228,6 +230,8 @@
 
     "@types/node": ["@types/node@22.19.7", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-MciR4AKGHWl7xwxkBa6xUGxQJ4VBOmPTF7sL+iGzuahOFaO0jHCsuEfS80pan1ef4gWId1oWOweIhrDEYLuaOw=="],
 
+    "@types/node-cron": ["@types/node-cron@3.0.11", "", {}, "sha512-0ikrnug3/IyneSHqCBeslAhlK2aBfYek1fGo4bP4QnZPmiqSGRK+Oy7ZMisLWkesffJvQ1cqAcBnJC+8+nxIAg=="],
+
     "@types/pg": ["@types/pg@8.16.0", "", { "dependencies": { "@types/node": "*", "pg-protocol": "*", "pg-types": "^2.2.0" } }, "sha512-RmhMd/wD+CF8Dfo+cVIy3RR5cl8CyfXQ0tGgW6XBL8L4LM/UTEbNXYRbLwU6w+CgrKBNbrQWt4FUtTfaU5jSYQ=="],
 
     "@types/react": ["@types/react@19.2.9", "", { "dependencies": { "csstype": "^3.2.2" } }, "sha512-Lpo8kgb/igvMIPeNV2rsYKTgaORYdO1XGVZ4Qz3akwOj0ySGYMPlQWa8BaLn0G63D1aSaAQ5ldR06wCpChQCjA=="],
@@ -417,6 +421,8 @@
     "nanoid": ["nanoid@3.3.11", "", { "bin": { "nanoid": "bin/nanoid.cjs" } }, "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w=="],
 
     "nanostores": ["nanostores@1.1.0", "", {}, "sha512-yJBmDJr18xy47dbNVlHcgdPrulSn1nhSE6Ns9vTG+Nx9VPT6iV1MD6aQFp/t52zpf82FhLLTXAXr30NuCnxvwA=="],
+
+    "node-cron": ["node-cron@4.2.1", "", {}, "sha512-lgimEHPE/QDgFlywTd8yTR61ptugX3Qer29efeyWw2rv259HtGBNn1vZVmp8lB9uo9wC0t/AT4iGqXxia+CJFg=="],
 
     "node-fetch-native": ["node-fetch-native@1.6.7", "", {}, "sha512-g9yhqoedzIUm0nTnTqAQvueMPVOuIY16bqgAJJC8XOOubYFNwz6IER9qs0Gq2Xd0+CecCKFjtdDTMA4u4xG06Q=="],
 

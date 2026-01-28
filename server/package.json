@@ -18,12 +18,14 @@
     "better-auth": "^1.4.17",
     "dotenv": "^17.2.3",
     "fastify": "^5.7.2",
+    "node-cron": "^4.2.1",
     "pg": "^8.17.2",
     "prisma": "^7.3.0",
     "resend": "^6.8.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.7",
+    "@types/node-cron": "^3.0.11",
     "@types/pg": "^8.16.0",
     "@vitest/coverage-v8": "^4.0.18",
     "typescript": "^5.9.3",
