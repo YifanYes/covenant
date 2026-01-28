@@ -1,12 +1,12 @@
 import Phaser from 'phaser'
 import { GridSystem } from '../systems/grid-system'
+import { Unit } from '../entities/unit'
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
   CAMERA_ZOOM_MIN,
   CAMERA_ZOOM_MAX,
-  CAMERA_ZOOM_DEFAULT,
-  DEPTH_LAYERS
+  CAMERA_ZOOM_DEFAULT
 } from '../config'
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
 import type {
@@ -17,7 +17,7 @@ import type {
 
 export class CombatScene extends Phaser.Scene {
   private gridSystem!: GridSystem
-  private units: Map<string, Phaser.GameObjects.Image> = new Map()
+  private units: Map<string, Unit> = new Map()
   private loadingTextures: Set<string> = new Set()
   private unsubscribe?: () => void
 
@@ -201,17 +201,20 @@ export class CombatScene extends Phaser.Scene {
   }
 
   private syncUnits(units: TacticalUnit[]): void {
+    const state = useTacticalCombatStore.getState()
+    const { activeUnitId, selectedTile, phase } = state
+
     // Track which units are still present
     const presentIds = new Set<string>()
 
     for (const unitData of units) {
       presentIds.add(unitData.id)
 
-      let sprite = this.units.get(unitData.id)
+      let unit = this.units.get(unitData.id)
 
-      if (!sprite) {
-        // Create new unit sprite
-        sprite = this.spawnUnit(unitData)
+      if (!unit) {
+        // Create new unit
+        unit = this.spawnUnit(unitData)
       }
 
       // Update unit position
@@ -219,84 +222,75 @@ export class CombatScene extends Phaser.Scene {
         unitData.position.x,
         unitData.position.y
       )
-      sprite.setPosition(screenPos.x, screenPos.y - 8) // Offset up to sit on tile
+      unit.updateGridPosition(screenPos, unitData.position)
 
-      // Update depth for proper sorting
-      sprite.setDepth(
-        DEPTH_LAYERS.UNIT + (unitData.position.x + unitData.position.y) * 0.01
-      )
+      // Update unit state from store data
+      unit.updateFromState(unitData)
 
-      // Visual feedback for active unit
-      const activeUnitId = useTacticalCombatStore.getState().activeUnitId
+      // Determine visual state based on game state
       if (unitData.id === activeUnitId) {
-        sprite.setTint(0xffff00) // Yellow tint for active unit
+        unit.setVisualState('active')
+      } else if (
+        selectedTile &&
+        unitData.position.x === selectedTile.x &&
+        unitData.position.y === selectedTile.y
+      ) {
+        unit.setVisualState('selected')
+      } else if (
+        phase === 'select_target' &&
+        !unitData.isPlayer
+      ) {
+        // In attack targeting phase, show enemies as targetable
+        unit.setVisualState('targetable')
       } else {
-        sprite.clearTint()
+        unit.setVisualState('idle')
       }
     }
 
     // Remove units that are no longer present
-    for (const [id, sprite] of this.units) {
+    for (const [id, unit] of this.units) {
       if (!presentIds.has(id)) {
-        sprite.destroy()
+        unit.destroy()
         this.units.delete(id)
       }
     }
   }
 
-  private spawnUnit(unitData: TacticalUnit): Phaser.GameObjects.Image {
+  private spawnUnit(unitData: TacticalUnit): Unit {
     const screenPos = this.gridSystem.gridToScreen(
       unitData.position.x,
       unitData.position.y
     )
 
-    // Generate a unique texture key for this unit's sprite
-    const customTextureKey = `unit_sprite_${unitData.templateId}`
-    const fallbackTextureKey = unitData.isPlayer ? 'unit_player' : 'unit_enemy'
+    // Create new Unit instance
+    const unit = new Unit(this, unitData, screenPos)
 
-    // Check if we need to load a custom sprite
-    const hasCustomSprite = unitData.spriteUrl && !this.loadingTextures.has(customTextureKey)
-    const textureExists = this.textures.exists(customTextureKey)
+    this.units.set(unitData.id, unit)
 
-    // Use existing texture or fallback
-    const textureKey = textureExists ? customTextureKey : fallbackTextureKey
+    // Handle custom sprite loading if available
+    if (unitData.spriteUrl) {
+      const customTextureKey = `unit_sprite_${unitData.templateId}`
+      const hasTexture = this.textures.exists(customTextureKey)
+      const isLoading = this.loadingTextures.has(customTextureKey)
 
-    const sprite = this.add.image(
-      screenPos.x,
-      screenPos.y - 8, // Offset up to sit on tile
-      textureKey
-    )
-
-    // Scale sprite to fit tile (32x32 target size)
-    sprite.setDisplaySize(32, 32)
-
-    sprite.setDepth(
-      DEPTH_LAYERS.UNIT + (unitData.position.x + unitData.position.y) * 0.01
-    )
-    sprite.setInteractive()
-
-    // Store unit data reference
-    sprite.setData('unitId', unitData.id)
-
-    this.units.set(unitData.id, sprite)
-
-    // Load custom sprite if available and not yet loaded
-    if (hasCustomSprite && !textureExists && unitData.spriteUrl) {
-      this.loadingTextures.add(customTextureKey)
-      this.load.image(customTextureKey, unitData.spriteUrl)
-      this.load.once('complete', () => {
-        this.loadingTextures.delete(customTextureKey)
-        // Update sprite texture once loaded
-        const existingSprite = this.units.get(unitData.id)
-        if (existingSprite && this.textures.exists(customTextureKey)) {
-          existingSprite.setTexture(customTextureKey)
-          existingSprite.setDisplaySize(32, 32)
-        }
-      })
-      this.load.start()
+      if (!hasTexture && !isLoading) {
+        this.loadingTextures.add(customTextureKey)
+        this.load.image(customTextureKey, unitData.spriteUrl)
+        this.load.once('complete', () => {
+          this.loadingTextures.delete(customTextureKey)
+          // Update sprite texture once loaded
+          const existingUnit = this.units.get(unitData.id)
+          if (existingUnit && this.textures.exists(customTextureKey)) {
+            existingUnit.setCustomSprite(customTextureKey)
+          }
+        })
+        this.load.start()
+      } else if (hasTexture) {
+        unit.setCustomSprite(customTextureKey)
+      }
     }
 
-    return sprite
+    return unit
   }
 
   // Public method to get grid position from screen coordinates
@@ -315,10 +309,25 @@ export class CombatScene extends Phaser.Scene {
     this.gridSystem.destroy()
 
     // Cleanup units
-    for (const sprite of this.units.values()) {
-      sprite.destroy()
+    for (const unit of this.units.values()) {
+      unit.destroy()
     }
     this.units.clear()
     this.loadingTextures.clear()
+  }
+
+  // Get unit at a specific grid position
+  getUnitAtPosition(gridPos: GridPosition): Unit | null {
+    for (const unit of this.units.values()) {
+      if (unit.isAtPosition(gridPos)) {
+        return unit
+      }
+    }
+    return null
+  }
+
+  // Get all units
+  getAllUnits(): Unit[] {
+    return Array.from(this.units.values())
   }
 }

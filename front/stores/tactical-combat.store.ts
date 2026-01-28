@@ -12,6 +12,12 @@ import type {
   TacticalInitData,
   TerrainType
 } from '@shared/types/tactical-combat.types'
+import {
+  calculateMovementRange as calcMoveRange,
+  calculateAttackRange as calcAttackRange,
+  calculatePath,
+  getPathCost
+} from '@/lib/phaser/systems/pathfinding'
 
 interface TacticalCombatStore extends TacticalCombatState {
   // UI state (not in base TacticalCombatState)
@@ -194,7 +200,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   },
 
   selectTile: (position: GridPosition) => {
-    const { phase, playerUnits, enemyUnits, tiles } = get()
+    const { phase, playerUnits, enemyUnits, tiles, activeUnitId, highlightedTiles } = get()
 
     // Get the tile and its occupant
     const tile = tiles[position.y]?.[position.x]
@@ -204,41 +210,83 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     const allUnits = [...playerUnits, ...enemyUnits]
     const occupant = allUnits.find((u) => u.id === tile.occupantId)
 
+    // Find active unit
+    const activeUnit = allUnits.find((u) => u.id === activeUnitId)
+
     // Handle based on current phase
     switch (phase) {
       case 'select_action':
-        // Select the tile
+        // Select the tile for info display
         set({ selectedTile: position })
-
-        // If clicking on active unit, could show action menu (handled by React)
-        // If clicking on enemy, could highlight as potential target
         break
 
       case 'select_move':
-        // Validate movement destination
-        // For now, just select the tile - validation will be in Phase 3
-        set({
-          selectedTile: position,
-          pendingAction: {
-            type: 'move',
-            path: [position]
+        // Check if clicked tile is in movement range
+        const isInMoveRange = highlightedTiles.some(
+          (h) => h.type === 'MOVEMENT' && h.position.x === position.x && h.position.y === position.y
+        )
+
+        if (isInMoveRange && activeUnit) {
+          // Calculate path to destination
+          const path = calculatePath(
+            activeUnit.position,
+            position,
+            tiles,
+            allUnits,
+            activeUnit.isPlayer
+          )
+
+          if (path.length > 0) {
+            // Validate path cost is within movement range
+            const pathCost = getPathCost(path, tiles)
+            if (pathCost <= activeUnit.movementRange) {
+              // Update highlights to show the path
+              const movementHighlights = highlightedTiles.filter((h) => h.type === 'MOVEMENT')
+              const pathHighlights: HighlightedTile[] = path.slice(1).map((pos) => ({
+                position: pos,
+                type: 'PATH' as const
+              }))
+
+              set({
+                selectedTile: position,
+                pendingAction: {
+                  type: 'move',
+                  path: path
+                },
+                highlightedTiles: [...movementHighlights, ...pathHighlights]
+              })
+            }
           }
-        })
+        } else if (!isInMoveRange) {
+          // Clicked outside movement range - could cancel or just ignore
+          // For now, just update selected tile for info display
+          set({ selectedTile: position })
+        }
         break
 
       case 'select_target':
-        // Select attack/doctrine target
+        // Check if clicked tile has a valid target
         if (occupant && !occupant.isPlayer) {
-          const currentAction = get().pendingAction
-          set({
-            selectedTile: position,
-            pendingAction: {
-              type: currentAction?.type ?? 'attack',
-              ...currentAction,
-              targetPosition: position,
-              targetUnitIds: [occupant.id]
-            }
-          })
+          // Check if target is in attack range
+          const isInAttackRange = highlightedTiles.some(
+            (h) => h.type === 'ATTACK' && h.position.x === position.x && h.position.y === position.y
+          )
+
+          if (isInAttackRange) {
+            const currentAction = get().pendingAction
+            set({
+              selectedTile: position,
+              pendingAction: {
+                type: currentAction?.type ?? 'attack',
+                ...currentAction,
+                targetPosition: position,
+                targetUnitIds: [occupant.id]
+              }
+            })
+          }
+        } else {
+          // Clicked on non-enemy tile - update selected for info
+          set({ selectedTile: position })
         }
         break
 
@@ -253,20 +301,23 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   },
 
   selectAction: (action: TacticalAction) => {
-    const { activeUnitId, playerUnits } = get()
+    const { activeUnitId, playerUnits, enemyUnits, tiles, gridWidth, gridHeight } = get()
 
     // Find the active unit
     const activeUnit = playerUnits.find((u) => u.id === activeUnitId)
     if (!activeUnit) return
 
+    const allUnits = [...playerUnits, ...enemyUnits]
+
     switch (action.type) {
       case 'move':
-        // Calculate and highlight movement range (simplified for Phase 1)
-        const movementTiles = calculateMovementRange(
+        // Calculate movement range using Dijkstra's algorithm with terrain costs
+        const movementTiles = calcMoveRange(
           activeUnit.position,
           activeUnit.movementRange,
-          get().gridWidth,
-          get().gridHeight
+          tiles,
+          allUnits,
+          activeUnit.isPlayer
         )
         set({
           phase: 'select_move',
@@ -279,20 +330,35 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
         break
 
       case 'attack':
-        // Highlight attack range
-        const attackTiles = calculateAttackRange(
+        // Calculate attack range (simple Manhattan distance, no terrain blocking)
+        const attackTiles = calcAttackRange(
           activeUnit.position,
           activeUnit.attackRange,
-          get().gridWidth,
-          get().gridHeight
+          gridWidth,
+          gridHeight
         )
+        // Filter to only highlight tiles with enemies
+        const tilesWithEnemies = attackTiles.filter((pos) => {
+          const enemy = enemyUnits.find(
+            (u) => u.position.x === pos.x && u.position.y === pos.y
+          )
+          return enemy !== undefined
+        })
         set({
           phase: 'select_target',
           pendingAction: action,
-          highlightedTiles: attackTiles.map((pos) => ({
-            position: pos,
-            type: 'ATTACK'
-          }))
+          highlightedTiles: [
+            // Show full attack range in lighter color
+            ...attackTiles.map((pos) => ({
+              position: pos,
+              type: 'ATTACK' as const
+            })),
+            // Highlight targetable enemies distinctly
+            ...tilesWithEnemies.map((pos) => ({
+              position: pos,
+              type: 'SELECTED' as const
+            }))
+          ]
         })
         break
 
@@ -308,16 +374,55 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   },
 
   confirmAction: async () => {
-    const { pendingAction, activeUnitId, playerUnits } = get()
+    const { pendingAction, activeUnitId, playerUnits, enemyUnits, tiles } = get()
     if (!pendingAction || !activeUnitId) return
 
-    // For Phase 1, just mark the action as done and advance turn
-    // Real backend integration will happen in Phase 3+
+    // Find the active unit
+    const activeUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === activeUnitId)
+    if (!activeUnit) return
 
+    // Clone tiles for mutation
+    const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
+
+    let newPosition = activeUnit.position
+
+    // Handle move action - update position
+    if (pendingAction.type === 'move' && pendingAction.path && pendingAction.path.length > 0) {
+      const destination = pendingAction.path[pendingAction.path.length - 1]
+
+      // Clear old tile occupant
+      const oldTile = updatedTiles[activeUnit.position.y]?.[activeUnit.position.x]
+      if (oldTile) {
+        oldTile.occupantId = null
+      }
+
+      // Set new tile occupant
+      const newTile = updatedTiles[destination.y]?.[destination.x]
+      if (newTile) {
+        newTile.occupantId = activeUnitId
+      }
+
+      newPosition = destination
+    }
+
+    // Update units
     const updatedPlayerUnits = playerUnits.map((unit) => {
       if (unit.id === activeUnitId) {
         return {
           ...unit,
+          position: newPosition,
+          hasMoved: pendingAction.type === 'move' ? true : unit.hasMoved,
+          hasActed: pendingAction.type === 'attack' ? true : unit.hasActed
+        }
+      }
+      return unit
+    })
+
+    const updatedEnemyUnits = enemyUnits.map((unit) => {
+      if (unit.id === activeUnitId) {
+        return {
+          ...unit,
+          position: newPosition,
           hasMoved: pendingAction.type === 'move' ? true : unit.hasMoved,
           hasActed: pendingAction.type === 'attack' ? true : unit.hasActed
         }
@@ -326,7 +431,9 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     })
 
     set({
+      tiles: updatedTiles,
       playerUnits: updatedPlayerUnits,
+      enemyUnits: updatedEnemyUnits,
       pendingAction: null,
       highlightedTiles: [],
       phase: 'select_action'
@@ -427,52 +534,3 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   }
 }))
 
-// Helper: Calculate movement range (simplified - no pathfinding yet)
-function calculateMovementRange(
-  center: GridPosition,
-  range: number,
-  gridWidth: number,
-  gridHeight: number
-): GridPosition[] {
-  const tiles: GridPosition[] = []
-
-  for (let dx = -range; dx <= range; dx++) {
-    for (let dy = -range; dy <= range; dy++) {
-      // Use Manhattan distance
-      if (Math.abs(dx) + Math.abs(dy) <= range && (dx !== 0 || dy !== 0)) {
-        const x = center.x + dx
-        const y = center.y + dy
-        if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
-          tiles.push({ x, y })
-        }
-      }
-    }
-  }
-
-  return tiles
-}
-
-// Helper: Calculate attack range
-function calculateAttackRange(
-  center: GridPosition,
-  range: number,
-  gridWidth: number,
-  gridHeight: number
-): GridPosition[] {
-  const tiles: GridPosition[] = []
-
-  for (let dx = -range; dx <= range; dx++) {
-    for (let dy = -range; dy <= range; dy++) {
-      // Use Manhattan distance
-      if (Math.abs(dx) + Math.abs(dy) <= range) {
-        const x = center.x + dx
-        const y = center.y + dy
-        if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
-          tiles.push({ x, y })
-        }
-      }
-    }
-  }
-
-  return tiles
-}
