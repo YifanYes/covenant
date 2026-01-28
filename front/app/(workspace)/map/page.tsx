@@ -33,7 +33,7 @@ export default function WorldMapView() {
 
       {/* Map Container */}
       <div className='relative h-full w-full overflow-auto rounded-lg border border-slate-700 bg-black'>
-        <div className='relative w-full min-w-[800px]'>
+        <div className='relative w-full min-w-200'>
           {/* Placeholder Map Image - w-full h-auto makes it resize with width, maintaining aspect ratio */}
           <Image src='/assets/maps/santa_cruz.png' alt='World Map' width={1600} height={900} className='h-auto w-full opacity-50' />
 
