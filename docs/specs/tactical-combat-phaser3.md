@@ -83,15 +83,15 @@ This specification outlines the integration of Phaser 3 into Arq to transform th
 
 ### Key Decisions
 
-| Decision          | Choice           | Rationale                                       |
-| ----------------- | ---------------- | ----------------------------------------------- |
-| State management  | Zustand (shared) | Already used in project, Phaser can subscribe   |
-| Dice rolling UI   | Keep in React    | Preserves existing components, modal-style UI   |
-| Combat resolution | Backend          | Prevents cheating, preserves integrity          |
-| Grid rendering    | Phaser           | Optimized for game graphics and animations      |
-| UI overlays       | React            | Easier styling with Tailwind, consistent design |
-| Inventory/Shop    | React (separate) | Management screens, no real-time rendering      |
-| In-combat inventory | Phaser overlay (future) | Maintains immersion during battle      |
+| Decision            | Choice                  | Rationale                                       |
+| ------------------- | ----------------------- | ----------------------------------------------- |
+| State management    | Zustand (shared)        | Already used in project, Phaser can subscribe   |
+| Dice rolling UI     | Keep in React           | Preserves existing components, modal-style UI   |
+| Combat resolution   | Backend                 | Prevents cheating, preserves integrity          |
+| Grid rendering      | Phaser                  | Optimized for game graphics and animations      |
+| UI overlays         | React                   | Easier styling with Tailwind, consistent design |
+| Inventory/Shop      | React (separate)        | Management screens, no real-time rendering      |
+| In-combat inventory | Phaser overlay (future) | Maintains immersion during battle               |
 
 ---
 
@@ -167,7 +167,7 @@ function nextTurn(order: TurnOrder): TacticalUnit {
 **Speed Values (from weapons):**
 
 | Weapon Type | Speed | Turn Priority |
-|-------------|-------|---------------|
+| ----------- | ----- | ------------- |
 | Dagger      | 3     | Fastest       |
 | Sword       | 2     | Medium        |
 | Hammer      | 1     | Slowest       |
@@ -203,6 +203,7 @@ interface MovementConfig {
    - Used for movement animation path
 
 **Movement considerations:**
+
 - Terrain movement costs (grass=1, water=2, lava=2)
 - Diagonal movement allowed (cost 1.4)
 - Allies can be passed through, enemies block movement
@@ -211,13 +212,13 @@ interface MovementConfig {
 
 Using existing `range` stat from weapons. Range is calculated using Manhattan distance (no diagonal shortcuts).
 
-| Weapon Type           | Range | Notes                |
-| --------------------- | ----- | -------------------- |
-| Melee (sword, hammer) | 1     | Adjacent tiles only  |
-| Ranged (pistol)       | 2-3   | Medium range         |
-| Ranged (musket)       | 3-5   | Long range           |
-| Magic (wand)          | 2     | Medium range         |
-| Magic (grimoire)      | 3     | Medium-long range    |
+| Weapon Type           | Range | Notes               |
+| --------------------- | ----- | ------------------- |
+| Melee (sword, hammer) | 1     | Adjacent tiles only |
+| Ranged (pistol)       | 2-3   | Medium range        |
+| Ranged (musket)       | 3-5   | Long range          |
+| Magic (wand)          | 2     | Medium range        |
+| Magic (grimoire)      | 3     | Medium-long range   |
 
 **Range Calculation:**
 
@@ -452,7 +453,7 @@ shared/
 
 ## Implementation Phases
 
-### Phase 1: Foundation
+### [x] Phase 1: Foundation
 
 **Goal:** Phaser 3 integrated with basic grid rendering
 
@@ -467,7 +468,7 @@ shared/
 
 **Deliverable:** Isometric grid renders in React, camera controls work
 
-### Phase 2: Units & Selection
+### [ ] Phase 2: Units & Selection
 
 **Goal:** Units on grid, selection working
 
@@ -482,7 +483,7 @@ shared/
 
 **Deliverable:** Units spawn, clicking selects, movement range highlights
 
-### Phase 3: Movement
+### [ ] Phase 3: Movement
 
 **Goal:** Units can move on the grid
 
@@ -496,7 +497,7 @@ shared/
 
 **Deliverable:** Full movement system with path preview
 
-### Phase 4: Combat Integration
+### [ ] Phase 4: Combat Integration
 
 **Goal:** Existing dice combat works with positioning
 
@@ -510,7 +511,7 @@ shared/
 
 **Deliverable:** Ranged attacks work, dice rolling preserved
 
-### Phase 5: Doctrine AoE
+### [ ] Phase 5: Doctrine AoE
 
 **Goal:** Doctrines have spatial effects
 
@@ -524,7 +525,7 @@ shared/
 
 **Deliverable:** AoE doctrines target multiple enemies
 
-### Phase 6: Enemy AI
+### [ ] Phase 6: Enemy AI
 
 **Goal:** Enemies take intelligent turns
 
@@ -537,7 +538,7 @@ shared/
 
 **Deliverable:** Autonomous enemy turns
 
-### Phase 7: Polish
+### [ ] Phase 7: Polish
 
 **Goal:** Visual quality and performance
 
@@ -808,6 +809,7 @@ Each unit needs sprite sheet with 4 directions (N, S, E, W). Use horizontal flip
 - Enemies: All from `enemies.ts` (skeleton, bandit, demon, etc.)
 
 **Sprite Sheet Layout (per unit):**
+
 ```
 Directions: 4 (N, S, E - flip E for W)
 States: 6
@@ -848,11 +850,7 @@ initializeTacticalCombat: protectedProcedure
     })
   )
   .mutation(async ({ ctx, input }) => {
-    return ctx.services.combat.initializeTactical(
-      input.activityId,
-      ctx.character.id,
-      input.mapTemplateId
-    )
+    return ctx.services.combat.initializeTactical(input.activityId, ctx.character.id, input.mapTemplateId)
   })
 
 // Execute movement
@@ -865,11 +863,7 @@ executeTacticalMove: protectedProcedure
     })
   )
   .mutation(async ({ ctx, input }) => {
-    return ctx.services.combat.executeTacticalMove(
-      input.participationId,
-      input.unitId,
-      input.path
-    )
+    return ctx.services.combat.executeTacticalMove(input.participationId, input.unitId, input.path)
   })
 
 // Resolve tactical attack (extends existing resolveTurn)
@@ -911,11 +905,7 @@ useTacticalDoctrine: protectedProcedure
     })
   )
   .mutation(async ({ ctx, input }) => {
-    return ctx.services.combat.useTacticalDoctrine(
-      input.participationId,
-      input.doctrineId,
-      input.targetPosition
-    )
+    return ctx.services.combat.useTacticalDoctrine(input.participationId, input.doctrineId, input.targetPosition)
   })
 ```
 
@@ -998,7 +988,11 @@ const MAP_TEMPLATES: Record<string, MapTemplate> = {
       ['stone', 'stone', 'stone', 'stone', 'stone', 'stone', 'stone', 'stone']
     ],
     playerSpawn: { x: 1, y: 3 },
-    enemySpawns: [{ x: 6, y: 2 }, { x: 6, y: 3 }, { x: 6, y: 4 }]
+    enemySpawns: [
+      { x: 6, y: 2 },
+      { x: 6, y: 3 },
+      { x: 6, y: 4 }
+    ]
   },
 
   dungeon_corridor: {
@@ -1006,9 +1000,14 @@ const MAP_TEMPLATES: Record<string, MapTemplate> = {
     name: 'Dungeon Corridor',
     width: 12,
     height: 6,
-    tiles: [/* narrow corridor with obstacles */],
+    tiles: [
+      /* narrow corridor with obstacles */
+    ],
     playerSpawn: { x: 1, y: 3 },
-    enemySpawns: [{ x: 10, y: 2 }, { x: 10, y: 4 }]
+    enemySpawns: [
+      { x: 10, y: 2 },
+      { x: 10, y: 4 }
+    ]
   },
 
   boss_chamber: {
@@ -1016,7 +1015,9 @@ const MAP_TEMPLATES: Record<string, MapTemplate> = {
     name: 'Boss Chamber',
     width: 10,
     height: 10,
-    tiles: [/* open room with hazards */],
+    tiles: [
+      /* open room with hazards */
+    ],
     playerSpawn: { x: 1, y: 5 },
     enemySpawns: [{ x: 8, y: 5 }] // Single boss
   }
@@ -1025,10 +1026,10 @@ const MAP_TEMPLATES: Record<string, MapTemplate> = {
 // Map selection based on activity
 function selectMap(activityType: string, difficulty: string): MapTemplate {
   const mappings: Record<string, string> = {
-    'siege_EASY': 'arena_small',
-    'siege_NORMAL': 'dungeon_corridor',
-    'siege_HARD': 'boss_chamber',
-    'dungeon_EASY': 'arena_small',
+    siege_EASY: 'arena_small',
+    siege_NORMAL: 'dungeon_corridor',
+    siege_HARD: 'boss_chamber',
+    dungeon_EASY: 'arena_small'
     // ... etc
   }
   return MAP_TEMPLATES[mappings[`${activityType}_${difficulty}`] ?? 'arena_small']

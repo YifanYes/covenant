@@ -40,6 +40,7 @@ export interface TacticalUnit {
   name: string
   position: GridPosition
   isPlayer: boolean
+  spriteUrl?: string // URL to the sprite image for Phaser rendering
 
   // Stats (from character/enemy)
   currentHealth: number

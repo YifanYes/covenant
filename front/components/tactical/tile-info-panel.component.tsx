@@ -1,11 +1,10 @@
 'use client'
 
-import type {
-  GridPosition,
-  TileState,
-  TacticalUnit
-} from '@shared/types/tactical-combat.types'
+import { Heart, SpeedFast, Zap } from '@nsmr/pixelart-react'
+import { useTranslation } from 'react-i18next'
+
 import { TERRAIN_CONFIG } from '@shared/constants/terrain'
+import type { GridPosition, TacticalUnit, TileState } from '@shared/types/tactical-combat.types'
 
 interface TileInfoPanelProps {
   hoveredTile: GridPosition | null
@@ -20,12 +19,10 @@ export default function TileInfoPanel({
   hoveredUnit,
   selectedTile
 }: TileInfoPanelProps) {
+  const { t } = useTranslation()
+
   if (!hoveredTile || !hoveredTileState) {
-    return (
-      <div className="text-sm text-muted-foreground text-center py-4">
-        Hover over a tile to see info
-      </div>
-    )
+    return <div className="text-sm text-muted-foreground text-center py-4">Hover over a tile to see info</div>
   }
 
   const terrainConfig = TERRAIN_CONFIG[hoveredTileState.terrain]
@@ -34,9 +31,7 @@ export default function TileInfoPanel({
     <div className="space-y-4">
       {/* Tile info */}
       <div>
-        <h4 className="text-xs font-semibold text-muted-foreground mb-2">
-          TILE
-        </h4>
+        <h4 className="text-xs font-semibold text-muted-foreground mb-2">TILE</h4>
         <div className="space-y-1 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Position</span>
@@ -46,17 +41,11 @@ export default function TileInfoPanel({
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Terrain</span>
-            <span className="capitalize">
-              {hoveredTileState.terrain.toLowerCase()}
-            </span>
+            <span className="capitalize">{hoveredTileState.terrain.toLowerCase()}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Move Cost</span>
-            <span>
-              {terrainConfig.movementCost === Infinity
-                ? 'Blocked'
-                : terrainConfig.movementCost}
-            </span>
+            <span>{terrainConfig.movementCost === Infinity ? 'Blocked' : terrainConfig.movementCost}</span>
           </div>
           {terrainConfig.damagePerTurn > 0 && (
             <div className="flex justify-between text-red-500">
@@ -84,9 +73,7 @@ export default function TileInfoPanel({
             <div className="flex items-center gap-2">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                  hoveredUnit.isPlayer
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-red-500 text-white'
+                  hoveredUnit.isPlayer ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                 }`}
               >
                 {hoveredUnit.name.charAt(0)}
@@ -96,8 +83,11 @@ export default function TileInfoPanel({
 
             {/* Health bar */}
             <div className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">HP</span>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground flex items-center gap-1">
+                  <Heart className="h-4 w-4 text-emerald-500" />
+                  {t('inventory.health')}
+                </span>
                 <span>
                   {hoveredUnit.currentHealth}/{hoveredUnit.maxHealth}
                 </span>
@@ -121,8 +111,11 @@ export default function TileInfoPanel({
             {/* Mana bar (if has mana) */}
             {hoveredUnit.maxMana > 0 && (
               <div className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">MP</span>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <Zap className="h-4 w-4 text-blue-400" />
+                    {t('inventory.mana')}
+                  </span>
                   <span>
                     {hoveredUnit.currentMana}/{hoveredUnit.maxMana}
                   </span>
@@ -139,7 +132,7 @@ export default function TileInfoPanel({
             )}
 
             {/* Stats */}
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs mt-2">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Move</span>
                 <span>{hoveredUnit.movementRange}</span>
@@ -149,7 +142,10 @@ export default function TileInfoPanel({
                 <span>{hoveredUnit.attackRange}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Speed</span>
+                <span className="text-muted-foreground flex items-center gap-1">
+                  <SpeedFast className="h-4 w-4 text-amber-400" />
+                  {t('inventory.stats.speed')}
+                </span>
                 <span>{hoveredUnit.speed}</span>
               </div>
             </div>
@@ -160,10 +156,7 @@ export default function TileInfoPanel({
                 <span className="text-xs text-muted-foreground">Effects:</span>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {hoveredUnit.activeEffects.map((effect, i) => (
-                    <span
-                      key={i}
-                      className="text-xs px-1.5 py-0.5 bg-muted rounded"
-                    >
+                    <span key={i} className="text-xs px-1.5 py-0.5 bg-muted rounded">
                       {effect.effect}
                     </span>
                   ))}

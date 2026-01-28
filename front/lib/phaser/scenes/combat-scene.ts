@@ -5,6 +5,7 @@ import {
   CANVAS_HEIGHT,
   CAMERA_ZOOM_MIN,
   CAMERA_ZOOM_MAX,
+  CAMERA_ZOOM_DEFAULT,
   DEPTH_LAYERS
 } from '../config'
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
@@ -17,14 +18,17 @@ import type {
 export class CombatScene extends Phaser.Scene {
   private gridSystem!: GridSystem
   private units: Map<string, Phaser.GameObjects.Image> = new Map()
+  private loadingTextures: Set<string> = new Set()
   private unsubscribe?: () => void
 
   // Camera drag state
   private isDragging = false
+  private hasDragged = false // True if pointer moved enough to count as drag
   private dragStartX = 0
   private dragStartY = 0
   private cameraStartX = 0
   private cameraStartY = 0
+  private readonly DRAG_THRESHOLD = 5 // Pixels before drag is recognized
 
   constructor() {
     super({ key: 'CombatScene' })
@@ -54,29 +58,35 @@ export class CombatScene extends Phaser.Scene {
   }
 
   private setupInputHandlers(): void {
-    // Tile click detection
+    // Start drag on any pointer down
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      // Ignore right click (used for camera drag)
-      if (pointer.rightButtonDown()) {
-        this.startCameraDrag(pointer)
-        return
-      }
-
-      // Convert screen to grid position
-      const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y)
-      const gridPos = this.gridSystem.screenToGrid(worldPoint.x, worldPoint.y)
-
-      if (gridPos) {
-        useTacticalCombatStore.getState().selectTile(gridPos)
-      }
+      this.startCameraDrag(pointer)
     })
 
-    // Tile hover detection
+    // Handle pointer move for drag and hover
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      // Handle camera drag
-      if (this.isDragging && pointer.rightButtonDown()) {
-        this.updateCameraDrag(pointer)
-        return
+      // Check if any button is held (left=1, right=2, middle=4)
+      const isAnyButtonHeld = pointer.buttons !== 0
+
+      if (this.isDragging && isAnyButtonHeld) {
+        // Check if we've moved enough to count as a drag
+        const dx = Math.abs(pointer.x - this.dragStartX)
+        const dy = Math.abs(pointer.y - this.dragStartY)
+
+        if (dx > this.DRAG_THRESHOLD || dy > this.DRAG_THRESHOLD) {
+          this.hasDragged = true
+        }
+
+        if (this.hasDragged) {
+          this.updateCameraDrag(pointer)
+          return
+        }
+      }
+
+      // End drag if buttons released
+      if (this.isDragging && !isAnyButtonHeld) {
+        this.isDragging = false
+        this.hasDragged = false
       }
 
       // Handle hover highlight
@@ -92,11 +102,20 @@ export class CombatScene extends Phaser.Scene {
       }
     })
 
-    // End camera drag
+    // Handle pointer up - select tile if it was a click (not a drag)
     this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.rightButtonReleased()) {
-        this.isDragging = false
+      if (this.isDragging && !this.hasDragged && pointer.leftButtonReleased()) {
+        // This was a click, not a drag - select the tile
+        const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y)
+        const gridPos = this.gridSystem.screenToGrid(worldPoint.x, worldPoint.y)
+
+        if (gridPos) {
+          useTacticalCombatStore.getState().selectTile(gridPos)
+        }
       }
+
+      this.isDragging = false
+      this.hasDragged = false
     })
 
     // Mouse wheel zoom
@@ -139,7 +158,7 @@ export class CombatScene extends Phaser.Scene {
     const camera = this.cameras.main
 
     // Set initial zoom
-    camera.setZoom(1)
+    camera.setZoom(CAMERA_ZOOM_DEFAULT)
 
     // Calculate bounds for the isometric grid
     const boundsWidth = CANVAS_WIDTH * 2
@@ -231,12 +250,25 @@ export class CombatScene extends Phaser.Scene {
       unitData.position.y
     )
 
-    const textureKey = unitData.isPlayer ? 'unit_player' : 'unit_enemy'
+    // Generate a unique texture key for this unit's sprite
+    const customTextureKey = `unit_sprite_${unitData.templateId}`
+    const fallbackTextureKey = unitData.isPlayer ? 'unit_player' : 'unit_enemy'
+
+    // Check if we need to load a custom sprite
+    const hasCustomSprite = unitData.spriteUrl && !this.loadingTextures.has(customTextureKey)
+    const textureExists = this.textures.exists(customTextureKey)
+
+    // Use existing texture or fallback
+    const textureKey = textureExists ? customTextureKey : fallbackTextureKey
+
     const sprite = this.add.image(
       screenPos.x,
       screenPos.y - 8, // Offset up to sit on tile
       textureKey
     )
+
+    // Scale sprite to fit tile (32x32 target size)
+    sprite.setDisplaySize(32, 32)
 
     sprite.setDepth(
       DEPTH_LAYERS.UNIT + (unitData.position.x + unitData.position.y) * 0.01
@@ -247,6 +279,22 @@ export class CombatScene extends Phaser.Scene {
     sprite.setData('unitId', unitData.id)
 
     this.units.set(unitData.id, sprite)
+
+    // Load custom sprite if available and not yet loaded
+    if (hasCustomSprite && !textureExists && unitData.spriteUrl) {
+      this.loadingTextures.add(customTextureKey)
+      this.load.image(customTextureKey, unitData.spriteUrl)
+      this.load.once('complete', () => {
+        this.loadingTextures.delete(customTextureKey)
+        // Update sprite texture once loaded
+        const existingSprite = this.units.get(unitData.id)
+        if (existingSprite && this.textures.exists(customTextureKey)) {
+          existingSprite.setTexture(customTextureKey)
+          existingSprite.setDisplaySize(32, 32)
+        }
+      })
+      this.load.start()
+    }
 
     return sprite
   }
@@ -271,5 +319,6 @@ export class CombatScene extends Phaser.Scene {
       sprite.destroy()
     }
     this.units.clear()
+    this.loadingTextures.clear()
   }
 }

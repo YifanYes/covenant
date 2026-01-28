@@ -1,5 +1,8 @@
 'use client'
 
+import { useTranslation } from 'react-i18next'
+import { Heart, SpeedFast, Zap } from '@nsmr/pixelart-react'
+
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
 import type { TacticalUnit, TacticalPhase } from '@shared/types/tactical-combat.types'
 import Button from '@/components/ui/button.component'
@@ -11,6 +14,7 @@ interface ActionMenuProps {
 }
 
 export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
+  const { t } = useTranslation()
   const { selectAction, cancelAction, confirmAction, pendingAction } =
     useTacticalCombatStore()
 
@@ -66,19 +70,28 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
         {/* Unit stats */}
         <div className="mt-4 pt-4 border-t text-xs space-y-1 text-muted-foreground">
           <div className="flex justify-between">
-            <span>HP</span>
+            <span className="flex items-center gap-1">
+              <Heart className="h-3 w-3 text-emerald-500" />
+              {t('inventory.health')}
+            </span>
             <span className="text-foreground">
               {activeUnit.currentHealth}/{activeUnit.maxHealth}
             </span>
           </div>
           <div className="flex justify-between">
-            <span>MP</span>
+            <span className="flex items-center gap-1">
+              <Zap className="h-3 w-3 text-blue-400" />
+              {t('inventory.mana')}
+            </span>
             <span className="text-foreground">
               {activeUnit.currentMana}/{activeUnit.maxMana}
             </span>
           </div>
           <div className="flex justify-between">
-            <span>Speed</span>
+            <span className="flex items-center gap-1">
+              <SpeedFast className="h-3 w-3 text-amber-400" />
+              {t('inventory.stats.speed')}
+            </span>
             <span className="text-foreground">{activeUnit.speed}</span>
           </div>
         </div>

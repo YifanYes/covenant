@@ -15,11 +15,12 @@ export const CANVAS_HEIGHT = 720
 // Camera settings
 export const CAMERA_ZOOM_MIN = 0.5
 export const CAMERA_ZOOM_MAX = 2
+export const CAMERA_ZOOM_DEFAULT = 2.8
 export const CAMERA_ZOOM_STEP = 0.1
 
 // Grid offset to center the isometric grid
 export const GRID_OFFSET_X = CANVAS_WIDTH / 2
-export const GRID_OFFSET_Y = 100
+export const GRID_OFFSET_Y = 250
 
 // Animation durations (ms)
 export const ANIMATION_DURATION = {

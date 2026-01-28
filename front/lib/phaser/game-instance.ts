@@ -27,7 +27,7 @@ export async function createGame(parent: HTMLElement): Promise<Phaser.Game> {
     scene: [BootScene, CombatScene],
     scale: {
       mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH
+      autoCenter: Phaser.Scale.CENTER_HORIZONTALLY
     },
     render: {
       antialias: false,
