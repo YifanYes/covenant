@@ -15,6 +15,7 @@ import { AuthService } from './auth.service'
 import { CharacterService } from './character.service'
 import { CombatService } from './combat.service'
 import { DashboardService } from './dashboard.service'
+import { DeadlineService } from './deadline.service'
 import { DiceService } from './dice.service'
 import { HabitService } from './habit.service'
 import { InvestmentService } from './investment.service'
@@ -47,6 +48,7 @@ export class ServiceFactory {
   private _characterService?: CharacterService
   private _combatService?: CombatService
   private _dashboardService?: DashboardService
+  private _deadlineService?: DeadlineService
   private _diceService?: DiceService
   private _habitService?: HabitService
   private _investmentService?: InvestmentService
@@ -167,5 +169,10 @@ export class ServiceFactory {
 
   get store(): StoreService {
     return (this._storeService ??= new StoreService(this.characterRepository, this.character))
+  }
+
+  // Layer 1: Repository-only dependencies (utilities)
+  get deadline(): DeadlineService {
+    return (this._deadlineService ??= new DeadlineService(this.activityRepository, this.investmentRepository))
   }
 }

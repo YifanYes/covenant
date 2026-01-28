@@ -1,9 +1,9 @@
-import type { FastifyRequest } from 'fastify'
+import type { CreateFastifyContextOptions } from '@trpc/server/adapters/fastify'
 import { prisma } from './lib/prisma'
 import { auth } from './lib/auth'
 import { ServiceFactory } from './services/service.factory'
 
-export async function createContext({ req }: { req: FastifyRequest }) {
+export async function createContext({ req }: CreateFastifyContextOptions) {
   let user = null
 
   try {

@@ -1,10 +1,13 @@
 import cors from '@fastify/cors'
-import { fastifyTRPCPlugin, FastifyTRPCPluginOptions } from '@trpc/server/adapters/fastify'
+import { fastifyTRPCPlugin, type FastifyTRPCPluginOptions } from '@trpc/server/adapters/fastify'
 import fastify from 'fastify'
+import cron from 'node-cron'
 import { env } from './config'
 import { createContext } from './context'
+import { prisma } from './lib/prisma'
 import { appRouter, type AppRouter } from './router'
 import { auth } from './lib/auth'
+import { ServiceFactory } from './services/service.factory'
 
 const server = fastify({
   routerOptions: {
@@ -56,7 +59,8 @@ async function startServer() {
       }
     })
 
-    server.register(fastifyTRPCPlugin, {
+    // Type assertion needed due to fastify version mismatch between root and server node_modules
+    server.register(fastifyTRPCPlugin as Parameters<typeof server.register>[0], {
       prefix: '/trpc',
       trpcOptions: {
         router: appRouter,
@@ -69,6 +73,19 @@ async function startServer() {
 
     await server.listen({ port: env.PORT })
     console.log(`Server is running at port ${env.PORT}`)
+
+    // Schedule deadline validation cron job to run daily at 00:00
+    cron.schedule('0 0 * * *', async () => {
+      console.log('[Cron] Running deadline validation...')
+      try {
+        const services = new ServiceFactory(prisma)
+        const result = await services.deadline.validateDeadlines()
+        console.log('[Cron] Deadline validation completed:', result)
+      } catch (error) {
+        console.error('[Cron] Deadline validation failed:', error)
+      }
+    })
+    console.log('[Cron] Deadline validation scheduled for 00:00 daily')
   } catch (err) {
     console.error('Failed to start server:', err)
     server.log.error(err)

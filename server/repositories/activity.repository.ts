@@ -186,4 +186,26 @@ export class ActivityRepository {
       }
     })
   }
+
+  async findExpiredActivities(before: Date) {
+    return this.prisma.mapActivity.findMany({
+      where: {
+        status: ActivityStatus.ACTIVE,
+        deadline: { lt: before }
+      },
+      include: {
+        participations: true
+      }
+    })
+  }
+
+  async failActivity(activityId: string) {
+    return this.prisma.mapActivity.update({
+      where: { id: activityId },
+      data: {
+        status: ActivityStatus.FAILED,
+        completedAt: new Date()
+      }
+    })
+  }
 }
