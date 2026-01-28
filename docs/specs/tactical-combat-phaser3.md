@@ -188,11 +188,24 @@ interface MovementConfig {
 }
 ```
 
-**Pathfinding:** A\* algorithm considering:
+**Pathfinding:** Hybrid approach using two algorithms:
 
-- Terrain movement costs
-- Occupied tiles (cannot pass through enemies)
+1. **Dijkstra's Algorithm** - For calculating movement range
+   - Explores all reachable tiles within movement budget
+   - Respects terrain movement costs
+   - Used when unit is selected to highlight reachable tiles
+   - Obstacles can be pre-filtered or ignored (impassable tiles excluded from result)
+
+2. **A\* Algorithm** - For path calculation to selected destination
+   - Finds optimal path once player clicks a destination tile
+   - Uses Manhattan distance heuristic for grid-based movement
+   - Considers occupied tiles (cannot pass through enemies)
+   - Used for movement animation path
+
+**Movement considerations:**
+- Terrain movement costs (grass=1, water=2, lava=2)
 - Diagonal movement allowed (cost 1.4)
+- Allies can be passed through, enemies block movement
 
 ### Range Mechanics
 
