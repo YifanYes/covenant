@@ -1,35 +1,37 @@
 'use client'
 
+import { FactionThemeContext, useFactionThemeProvider } from '@/hooks/use-faction-theme'
 import { ThemeContext } from '@/hooks/use-theme'
-import { useLayoutEffect, useState, useEffect } from 'react'
+import { Faction } from '@shared/constants/activities'
+import { useLayoutEffect, useState } from 'react'
 
-type Theme = 'light' | 'dark'
+export type Theme = 'light' | 'dark'
 
-export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light')
-  const [mounted, setMounted] = useState(false)
-
-  // Hydration safety - prevent flash on mount
-  useEffect(() => {
-    setMounted(true)
-    const initialTheme =
-      localStorage.theme === 'dark' ||
-      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-        ? 'dark'
-        : 'light'
-    setTheme(initialTheme)
-  }, [])
+export default function ThemeProvider({
+  children,
+  initialTheme,
+  initialFaction
+}: {
+  children: React.ReactNode
+  initialTheme: Theme
+  initialFaction: Faction
+}) {
+  const [theme, setTheme] = useState<Theme>(initialTheme)
+  const factionTheme = useFactionThemeProvider({ initialFaction })
 
   useLayoutEffect(() => {
-    if (!mounted) return
-
-    const root = window.document.documentElement
+    const root = document.documentElement
     root.classList.remove(theme === 'dark' ? 'light' : 'dark')
     root.classList.add(theme)
     localStorage.theme = theme
-  }, [theme, mounted])
+    document.cookie = `theme=${theme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+  }, [theme])
 
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
 
-  return <ThemeContext value={{ theme, toggleTheme }}>{children}</ThemeContext>
+  return (
+    <ThemeContext value={{ theme, toggleTheme }}>
+      <FactionThemeContext value={factionTheme}>{children}</FactionThemeContext>
+    </ThemeContext>
+  )
 }

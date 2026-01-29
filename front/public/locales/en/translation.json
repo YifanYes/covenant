@@ -1155,8 +1155,9 @@
     "language_placeholder": "Select language",
     "logout_button": "Logout",
     "theme_dark": "Dark",
-    "theme_label": "Theme",
+    "mode_label": "Mode",
     "theme_light": "Light",
+    "faction_theme_label": "Faction Theme",
     "title": "Settings"
   },
   "sidebar": {

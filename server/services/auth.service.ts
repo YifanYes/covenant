@@ -1,4 +1,4 @@
-import type { LoginType, SignUpType } from '@shared/schemas/auth.schemas'
+import type { LoginType, SignUpType, UpdateThemeType } from '@shared/schemas/auth.schemas'
 import type { AreaRepository } from '../repositories/area.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { HabitRepository } from '../repositories/habit.repository'
@@ -44,5 +44,14 @@ export class AuthService {
     await this.userRepository.delete(userId)
 
     return { message: 'Account deleted successfully' }
+  }
+
+  async updateTheme(userId: string, input: UpdateThemeType) {
+    await this.userRepository.update(userId, { theme: input.theme })
+    return { message: 'Theme updated successfully' }
+  }
+
+  async getProfile(userId: string) {
+    return this.userRepository.findById(userId)
   }
 }
