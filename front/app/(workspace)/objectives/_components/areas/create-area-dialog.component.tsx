@@ -4,7 +4,7 @@ import ColorSelector from '@/forms/color-selector.component'
 import IconPicker from '@/forms/icon-picker.component'
 import TextInput from '@/forms/text-input.component'
 import Button from '@/ui/button.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
 import { createAreaSchema, type CreateAreaBodyType } from '@shared/schemas/areas.schemas'
@@ -19,7 +19,7 @@ export default function CreateAreaDialog() {
   const [open, setOpen] = useState(false)
 
   const mutation = useMutation(
-    trpc.areas.create.mutationOptions({
+    trpcOptions.areas.create.mutationOptions({
       onSuccess: () => {
         toast.success(t('areas.success.create'))
         queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })

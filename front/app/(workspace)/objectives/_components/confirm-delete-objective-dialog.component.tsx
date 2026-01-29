@@ -2,7 +2,7 @@
 import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
 import type { Objective } from '@/types/models.types'
 import Button from '@/ui/button.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { Trash } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -19,7 +19,7 @@ export default function ConfirmDeleteObjectiveDialog({ objective, onDeleteSucces
   const [open, setOpen] = useState(false)
 
   const deleteMutation = useMutation(
-    trpc.objectives.delete.mutationOptions({
+    trpcOptions.objectives.delete.mutationOptions({
       onSuccess: () => {
         toast.success(t('objectives.delete.success'))
         queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })

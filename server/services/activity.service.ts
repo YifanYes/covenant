@@ -55,7 +55,11 @@ export class ActivityService {
    */
   private createInitialTacticalState(
     playerUnitId: string,
-    enemyUnitId: string
+    playerName: string,
+    playerHealth: { current: number; max: number },
+    enemyUnitId: string,
+    enemyName: string,
+    enemyHealth: { current: number; max: number }
   ): TacticalStateData {
     const tiles = this.createDefaultGrid()
     const gridWidth = 8
@@ -70,19 +74,25 @@ export class ActivityService {
     tiles[playerPosition.y][playerPosition.x].occupantId = playerUnitId
     tiles[enemyPosition.y][enemyPosition.x].occupantId = enemyUnitId
 
-    // Create unit state entries
+    // Create unit state entries with health values
     const units = [
       {
         id: playerUnitId,
+        name: playerName,
         position: playerPosition,
         hasMoved: false,
-        hasActed: false
+        hasActed: false,
+        currentHealth: playerHealth.current,
+        maxHealth: playerHealth.max
       },
       {
         id: enemyUnitId,
+        name: enemyName,
         position: enemyPosition,
         hasMoved: false,
-        hasActed: false
+        hasActed: false,
+        currentHealth: enemyHealth.current,
+        maxHealth: enemyHealth.max
       }
     ]
 
@@ -192,17 +202,29 @@ export class ActivityService {
       shouldInitializeTacticalState = true
     }
 
+    // Update active activity
+    const character = await this.characterService.getCharacterById(characterId)
+
     // Initialize tactical state if needed (new enemy spawned)
     if (shouldInitializeTacticalState) {
+      // Get player health from current class
+      const currentClass = character.classes.find((c) => c.className === character.currentClass)
+      if (!currentClass) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
+      }
+
+      // Build enemy name from prefix + suffix (stored as translation keys)
+      const enemyName = `${activeEnemy.namePrefix}|${activeEnemy.nameSuffix}`
       const tacticalState = this.createInitialTacticalState(
         'player-1', // Player unit ID
-        activeEnemy.id // Use enemy's DB ID as unit ID
+        character.name, // Player name
+        { current: currentClass.health, max: currentClass.maxHealth },
+        activeEnemy.id, // Use enemy's DB ID as unit ID
+        enemyName,
+        { current: activeEnemy.currentHealth, max: activeEnemy.maxHealth }
       )
       await this.activityParticipationRepository.updateTacticalState(participation.id, tacticalState)
     }
-
-    // Update active activity
-    const character = await this.characterService.getCharacterById(characterId)
     const currentData = (character.data as any) || {}
     await this.characterService.updateData(characterId, {
       ...currentData,
@@ -412,7 +434,15 @@ export class ActivityService {
           }
 
           // Reinitialize tactical state for the new enemy
-          const tacticalState = this.createInitialTacticalState('player-1', newEnemy.id)
+          const newEnemyName = `${newEnemy.namePrefix}|${newEnemy.nameSuffix}`
+          const tacticalState = this.createInitialTacticalState(
+            'player-1',
+            character.name,
+            { current: currentClass.health, max: currentClass.maxHealth },
+            newEnemy.id,
+            newEnemyName,
+            { current: newEnemy.currentHealth, max: newEnemy.maxHealth }
+          )
           await this.activityParticipationRepository.updateTacticalState(participation.id, tacticalState)
         }
       } else {

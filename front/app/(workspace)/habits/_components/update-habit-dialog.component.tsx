@@ -6,7 +6,7 @@ import SingleSelect from '@/forms/single-select.component'
 import TextInput from '@/forms/text-input.component'
 import type { Habit } from '@/types/models.types'
 import Textarea from '@/ui/textarea.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { HabitTimespan, updateHabitSchema, type UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -21,11 +21,11 @@ import HabitCard from './habit-card.component'
 export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
-  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
+  const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
   const updateMutation = useMutation(
-    trpc.habits.update.mutationOptions({
+    trpcOptions.habits.update.mutationOptions({
       onSuccess: async () => {
         toast.success(t('habits.success.update'))
         await queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })

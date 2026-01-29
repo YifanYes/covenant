@@ -122,7 +122,12 @@ export class ServiceFactory {
 
   // Layer 2: Repository + Layer 1 service dependencies
   get combat(): CombatService {
-    return (this._combatService ??= new CombatService(this.characterRepository, this.activityParticipationRepository))
+    return (this._combatService ??= new CombatService(
+      this.characterRepository,
+      this.activityParticipationRepository,
+      this.combatEnemyRepository,
+      this.activityRepository
+    ))
   }
 
   get habit(): HabitService {

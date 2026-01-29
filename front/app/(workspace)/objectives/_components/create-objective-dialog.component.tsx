@@ -5,7 +5,7 @@ import MultiSelect from '@/forms/multi-select.component'
 import TextInput from '@/forms/text-input.component'
 import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
 import { createObjectiveSchema, type CreateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
@@ -19,10 +19,10 @@ export default function CreateObjectiveDialog() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
-  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
   const mutation = useMutation(
-    trpc.objectives.create.mutationOptions({
+    trpcOptions.objectives.create.mutationOptions({
       onSuccess: () => {
         toast.success(t('create_objective_dialog.success'))
         queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })

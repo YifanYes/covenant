@@ -1,4 +1,5 @@
 import type { ActiveStatusEffect } from './doctrine.types'
+import type { CombatLogEntry } from './gamification.types'
 
 // Grid position
 export interface GridPosition {
@@ -145,18 +146,24 @@ export interface TacticalInitData {
   turnQueue: TacticalUnit[]
 }
 
+// Unit state stored in tactical state (database JSON)
+export interface TacticalUnitState {
+  id: string
+  name: string
+  position: GridPosition
+  hasMoved: boolean
+  hasActed: boolean
+  currentHealth: number
+  maxHealth: number
+}
+
 // Tactical state stored in database (JSON field)
 export interface TacticalStateData {
   mapTemplateId: string
   gridWidth: number
   gridHeight: number
   tiles: TileState[][]
-  units: {
-    id: string
-    position: GridPosition
-    hasMoved: boolean
-    hasActed: boolean
-  }[]
+  units: TacticalUnitState[]
   turnOrder: string[] // Unit IDs in turn order
   currentTurnIndex: number
   turnNumber: number
@@ -174,4 +181,66 @@ export interface MovementExecutionResult {
   success: boolean
   newPosition: GridPosition
   updatedState: TacticalStateData
+}
+
+// Attack validation result
+export interface AttackValidationResult {
+  valid: boolean
+  reason?: string
+  distance?: number
+}
+
+// Tactical attack result (extends base combat result)
+export interface TacticalAttackResult {
+  success: boolean
+  attackerId: string
+  targetId: string
+  damageDealt: number
+  targetKilled: boolean
+  damageToAttacker: number
+  attackerKilled: boolean
+  updatedState: TacticalStateData
+  // Dice roll results for UI display
+  attackerRolls: { value: number; isSuccess: boolean; isCritical: boolean }[]
+  defenderRolls: { value: number; isSuccess: boolean; isCritical: boolean }[]
+  counterAttackRolls?: { value: number; isSuccess: boolean; isCritical: boolean }[]
+  counterDefenseRolls?: { value: number; isSuccess: boolean; isCritical: boolean }[]
+  // Combat log entries generated from this attack
+  logEntries: CombatLogEntry[]
+  // Gold reward if enemy was defeated
+  goldReward?: number
+  // Next enemy data if a new enemy was spawned
+  nextEnemy?: {
+    id: string
+    templateId: string
+    name: string
+    currentHealth: number
+    maxHealth: number
+  }
+}
+
+// Enemy AI turn result
+export interface EnemyTurnResult {
+  success: boolean
+  enemyId: string
+  action: 'move' | 'attack' | 'move_and_attack' | 'wait'
+
+  // Movement data (if moved)
+  moved: boolean
+  path?: GridPosition[]
+  newPosition?: GridPosition
+
+  // Attack data (if attacked)
+  attacked: boolean
+  targetId?: string
+  damageDealt?: number
+  targetKilled?: boolean
+  attackerRolls?: { value: number; isSuccess: boolean; isCritical: boolean }[]
+  defenderRolls?: { value: number; isSuccess: boolean; isCritical: boolean }[]
+
+  // Updated state
+  updatedState: TacticalStateData
+
+  // Combat log entries
+  logEntries?: CombatLogEntry[]
 }

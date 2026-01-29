@@ -2,7 +2,7 @@
 import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
 import type { Habit } from '@/types/models.types'
 import Button from '@/ui/button.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { Trash } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -20,7 +20,7 @@ export default function ConfirmDeleteHabitDialog({
   const [open, setOpen] = useState(false)
 
   const deleteMutation = useMutation(
-    trpc.habits.delete.mutationOptions({
+    trpcOptions.habits.delete.mutationOptions({
       onSuccess: () => {
         toast.success(t('habits.success.delete'))
         queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })

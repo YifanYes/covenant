@@ -1,7 +1,7 @@
 'use client'
 import OnboardingRedirect from '@/components/shared/onboarding-redirect'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import type { ItemDefinition } from '@shared/constants/items'
 import { ItemType } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -14,7 +14,7 @@ import StoreItemGrid from './_components/store-item-grid.component'
 
 function StoreContent() {
   const { t } = useTranslation()
-  const { data: store } = useSuspenseQuery(trpc.store.list.queryOptions())
+  const { data: store } = useSuspenseQuery(trpcOptions.store.list.queryOptions())
 
   const [tierFilter, setTierFilter] = useState<string>('all')
   const [typeFilter, setTypeFilter] = useState<string>('all')
@@ -22,7 +22,7 @@ function StoreContent() {
   const [consumableQuantities, setConsumableQuantities] = useState<Record<string, number>>({})
 
   const storePurchaseMutation = useMutation({
-    ...trpc.store.buy.mutationOptions(),
+    ...trpcOptions.store.buy.mutationOptions(),
     onSuccess: (result) => {
       toast.success(t('store.success.buy'), {
         description: `${result.purchasedItems.length} ${t('store.items_purchased')}`
@@ -165,7 +165,7 @@ function StoreContent() {
 }
 
 export default function StoreView() {
-  const { data: characterData } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
+  const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
 
   if (!characterData) {
     return <OnboardingRedirect />

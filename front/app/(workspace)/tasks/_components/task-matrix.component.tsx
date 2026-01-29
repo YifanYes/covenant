@@ -2,7 +2,7 @@
 import { useTasksStore } from '@/stores/tasks.store'
 import type { Task } from '@/types/models.types'
 import { getPriorityStyles, getPriorityTextColors } from '@/utils/theme.utils'
-import { trpc } from '@/utils/trpc.utils'
+import { trpcOptions } from '@/utils/trpc.utils'
 import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useQuery } from '@tanstack/react-query'
 import { flatten, values as getValues, isUndefined, filter as lodashFilter } from 'es-toolkit/compat'
@@ -12,7 +12,7 @@ import TaskMatrixQuadrantCard, { type Quadrant } from './task-matrix-quadrant-ca
 
 export default function TaskMatrix() {
   const { t } = useTranslation()
-  const { data } = useQuery(trpc.tasks.getAll.queryOptions())
+  const { data } = useQuery(trpcOptions.tasks.getAll.queryOptions())
   const { tasks, setTasks, setSelectedTask } = useTasksStore()
 
   useEffect(() => {

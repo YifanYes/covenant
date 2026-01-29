@@ -4,6 +4,12 @@ import { Prisma, type PrismaClient } from '../generated/prisma'
 export class CombatEnemyRepository {
   constructor(private prisma: PrismaClient) {}
 
+  async findById(id: string) {
+    return this.prisma.combatEnemy.findUnique({
+      where: { id }
+    })
+  }
+
   async getActiveEnemy(participationId: string) {
     return this.prisma.combatEnemy.findFirst({
       where: {

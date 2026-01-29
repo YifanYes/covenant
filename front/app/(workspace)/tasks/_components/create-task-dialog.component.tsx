@@ -9,7 +9,7 @@ import TextInput from '@/forms/text-input.component'
 import { useCalendarStore } from '@/stores/calendar.store'
 import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
 import {
@@ -30,11 +30,11 @@ export default function CreateTaskDialog() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { monthIndex } = useCalendarStore()
-  const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
-  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
+  const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
   const mutation = useMutation(
-    trpc.tasks.create.mutationOptions({
+    trpcOptions.tasks.create.mutationOptions({
       onSuccess: async () => {
         toast.success(t('tasks.success.create'))
         queryClient.invalidateQueries({

@@ -1,5 +1,5 @@
 'use client'
-import { trpc } from '@/utils/trpc.utils'
+import { trpcOptions } from '@/utils/trpc.utils'
 import CreateAreaDialog from './_components/areas/create-area-dialog.component'
 import UpdateAreaDialog from './_components/areas/update-area-dialog.component'
 import CreateObjectiveDialog from './_components/create-objective-dialog.component'
@@ -9,8 +9,8 @@ import { useTranslation } from 'react-i18next'
 
 export default function Objectives() {
   const { t } = useTranslation()
-  const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
-  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
+  const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
   return (
     <div className='flex w-full flex-col gap-y-16 p-6'>

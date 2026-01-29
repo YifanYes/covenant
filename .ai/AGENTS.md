@@ -94,6 +94,7 @@ Request → Router (validation) → Service (business logic) → Repository (dat
 - **Components**: Page-specific in `app/[route]/_components/`, shared in `components/`
 - **State**: Server state via TanStack Query, client state via Zustand
 - **Middleware**: Auth and routing logic in `middleware.ts`
+- **tRPC**: Use `trpcOptions` for `queryOptions()`/`mutationOptions()`, use `trpc` for `queryKey()` (see CODING_STANDARDS.md)
 
 ---
 

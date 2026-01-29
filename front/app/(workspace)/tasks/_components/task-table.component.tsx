@@ -11,7 +11,7 @@ import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Table, { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table.component'
 import { getRewardText } from '@/utils/text.utils'
 import { getPriorityStyles } from '@/utils/theme.utils'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { ChevronLeft, ChevronRight, Close } from '@nsmr/pixelart-react'
 import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -161,10 +161,10 @@ export default function TaskTable() {
     [debouncedSearch, statusFilter, effortImpactFilter, dateFilter, page]
   )
 
-  const { data, isLoading } = useQuery(trpc.tasks.getFiltered.queryOptions(queryParams))
+  const { data, isLoading } = useQuery(trpcOptions.tasks.getFiltered.queryOptions(queryParams))
 
   const updateTaskMutation = useMutation(
-    trpc.tasks.update.mutationOptions({
+    trpcOptions.tasks.update.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.tasks.getFiltered.queryKey(queryParams) })
         queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })

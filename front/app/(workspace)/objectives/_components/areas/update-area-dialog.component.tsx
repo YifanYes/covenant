@@ -6,7 +6,7 @@ import TextInput from '@/forms/text-input.component'
 import { areaStyles } from '@/types/colors.types'
 import { allIcons } from '@/types/icons.types'
 import type { Area } from '@/types/models.types'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { defaultAreas, updateAreaSchema, type UpdateAreaBodyType } from '@shared/schemas/areas.schemas'
 import { useMutation } from '@tanstack/react-query'
@@ -24,7 +24,7 @@ export default function UpdateAreaDialog({ area }: { area: Area }) {
   const currentIcon = allIcons.find((icon) => icon.name === area.icon)
 
   const updateMutation = useMutation(
-    trpc.areas.update.mutationOptions({
+    trpcOptions.areas.update.mutationOptions({
       onSuccess: () => {
         toast.success(t('areas.success.create'))
         queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })
