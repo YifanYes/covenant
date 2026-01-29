@@ -36,5 +36,6 @@ export const DEPTH_LAYERS = {
   UNIT_SHADOW: 2,
   UNIT: 3,
   UNIT_SELECTED: 4,
-  UI: 5
+  EFFECTS: 5,
+  UI: 6
 }

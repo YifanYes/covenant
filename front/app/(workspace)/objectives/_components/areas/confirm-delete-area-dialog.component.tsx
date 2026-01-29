@@ -22,7 +22,7 @@ export default function ConfirmDeleteAreaDialog({ area, onDeleteSuccess }: Props
     trpcOptions.areas.delete.mutationOptions({
       onSuccess: () => {
         toast.success(t('areas.success.delete'))
-        queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.areas.getAll.queryKey() })
         setOpen(false)
         onDeleteSuccess()
       },

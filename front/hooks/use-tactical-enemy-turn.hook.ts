@@ -49,7 +49,14 @@ export function useTacticalEnemyTurn() {
 
       const activeEnemy = enemyUnits.find((u) => u.id === activeUnitId)
       if (!activeEnemy) {
-        console.warn('[EnemyTurn] Active enemy not found')
+        console.warn('[EnemyTurn] Active enemy not found in store, skipping turn')
+        nextTurn()
+        return
+      }
+
+      // Check if enemy is actually alive
+      if (activeEnemy.currentHealth <= 0) {
+        console.warn('[EnemyTurn] Active enemy is dead, skipping turn')
         nextTurn()
         return
       }

@@ -28,7 +28,7 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
     trpcOptions.habits.update.mutationOptions({
       onSuccess: async () => {
         toast.success(t('habits.success.update'))
-        await queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })
         setOpen(false)
       },
       onError: (error) => toast.error(t('habits.error.internal.update'), { description: error.message })

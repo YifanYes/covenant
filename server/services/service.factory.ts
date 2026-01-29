@@ -148,7 +148,6 @@ export class ServiceFactory {
       this.activityRepository,
       this.combatEnemyRepository,
       this.character,
-      this.combat,
       this.activityParticipationRepository
     ))
   }

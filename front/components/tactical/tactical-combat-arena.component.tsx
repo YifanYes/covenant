@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -31,6 +31,8 @@ import TurnOrderDisplay from './turn-order-display.component'
 import ActionMenu from './action-menu.component'
 import TileInfoPanel from './tile-info-panel.component'
 
+import { DOCTRINES } from '@shared/constants/doctrines'
+import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
 import { useTacticalAttack } from '@/hooks/use-tactical-attack.hook'
 
 import HealthBar from '@/app/(workspace)/map/_components/health-bar.component'
@@ -57,11 +59,9 @@ interface TacticalCombatArenaProps {
   enemies: EnemyState[]
   combatLog: CombatLogEntry[]
   diceBank: number
-  onAttack: (rolls: { attackRolls: number[]; defenseRolls: number[] }) => void
-  isAttacking: boolean
   lastTurnResult: any
   className?: string
-  participationId?: string
+  participationId: string
   activeDoctrines?: Record<string, any>
 }
 
@@ -70,8 +70,6 @@ export default function TacticalCombatArena({
   enemies,
   combatLog,
   diceBank,
-  onAttack,
-  isAttacking,
   lastTurnResult,
   className,
   participationId,
@@ -93,7 +91,8 @@ export default function TacticalCombatArena({
     enemyUnits,
     tiles,
     initializeCombat,
-    hydrateFromState
+    hydrateFromState,
+    updateUnit
   } = useTacticalCombatStore()
 
   // Fetch persisted tactical state if participationId is provided
@@ -105,6 +104,7 @@ export default function TacticalCombatArena({
   // Get active unit and hovered info for panels
   const allUnits = [...playerUnits, ...enemyUnits]
   const activeUnit = allUnits.find((u) => u.id === activeUnitId)
+  const playerUnit = playerUnits[0]
   const hoveredTileState = hoveredTile && tiles[hoveredTile.y]?.[hoveredTile.x]
   const hoveredUnit = hoveredTileState?.occupantId
     ? allUnits.find((u) => u.id === hoveredTileState.occupantId)
@@ -118,7 +118,7 @@ export default function TacticalCombatArena({
 
   // Character data
   const currentClass = character.classes.find((c) => c.className === character.currentClass)
-  const isDead = (currentClass?.health ?? 0) <= 0
+  const isDead = (playerUnit?.currentHealth ?? currentClass?.health ?? 0) <= 0
 
   // Item stats for dice rolling
   const armor = character?.loadout?.find((item) => item.type === ItemType.ARMOR)
@@ -128,7 +128,39 @@ export default function TacticalCombatArena({
     (item) =>
       item.type === ItemType.WEAPON_MELEE || item.type === ItemType.WEAPON_RANGED || item.type === ItemType.WEAPON_MAGIC
   )
-  const weaponDice = weapon?.stats?.attackDice || 1
+  const baseWeaponDice = weapon?.stats?.attackDice || 1
+
+  // Get bonus dice from active self-buff doctrines (like Stellar Collapse)
+  const { clearActiveUnitDoctrines } = useTacticalCombatStore()
+
+  // Calculate bonus dice from active effects (memoized to avoid infinite loops)
+  const { doctrineBonusDice, sixesGenerateExtraHits } = useMemo(() => {
+    const activeUnit = playerUnits.find((u) => u.id === activeUnitId)
+    if (!activeUnit) return { doctrineBonusDice: 0, sixesGenerateExtraHits: false }
+
+    let bonusDice = 0
+    let hasExtraHits = false
+
+    for (const effect of activeUnit.activeEffects) {
+      if (effect.remainingTurns <= 0) continue
+      const doctrine = DOCTRINES[effect.sourceDoctrineId]
+      if (!doctrine) continue
+
+      for (const doctrineEffect of doctrine.effects) {
+        if (doctrineEffect.type === DoctrineEffectType.POWER_MODIFIER &&
+            doctrineEffect.target === DoctrineTarget.SELF) {
+          bonusDice += doctrineEffect.value || 0
+          if (effect.sourceDoctrineId === 'stellar_collapse') {
+            hasExtraHits = true
+          }
+        }
+      }
+    }
+
+    return { doctrineBonusDice: bonusDice, sixesGenerateExtraHits: hasExtraHits }
+  }, [activeUnitId, playerUnits])
+
+  const weaponDice = baseWeaponDice + doctrineBonusDice
 
   const targetEnemy = enemies.find((e) => e.currentHealth > 0)
 
@@ -138,22 +170,22 @@ export default function TacticalCombatArena({
   // Enemy AI turn hook - automatically executes when it's an enemy's turn
   const { isExecuting: isEnemyTurnExecuting } = useTacticalEnemyTurn()
 
-  // Handler for when dice rolling completes - routes to tactical or legacy combat
+  // Handler for when dice rolling completes - executes tactical combat
   const handleTacticalAttack = useCallback(async (rolls: { attackRolls: number[]; defenseRolls: number[] }) => {
-    // Check if we have a pending tactical attack
     const attackInfo = getPendingAttackInfo()
 
-    if (attackInfo && participationId) {
-      // Use tactical attack flow
+    if (attackInfo) {
       await confirmAttack({
         attackRolls: rolls.attackRolls,
         defenseRolls: rolls.defenseRolls
       })
-    } else {
-      // Fall back to legacy onAttack for non-tactical combat
-      onAttack(rolls)
+
+      // Clear consumed doctrine buffs after attack
+      if (doctrineBonusDice > 0) {
+        clearActiveUnitDoctrines()
+      }
     }
-  }, [confirmAttack, getPendingAttackInfo, participationId, onAttack])
+  }, [confirmAttack, getPendingAttackInfo, doctrineBonusDice, clearActiveUnitDoctrines])
 
   // Combat turn hook for dice rolling
   const {
@@ -168,7 +200,7 @@ export default function TacticalCombatArena({
     showResults,
     handleRoll
   } = useCombatTurn({
-    isAttacking: isAttacking || isTacticalAttackLoading,
+    isAttacking: isTacticalAttackLoading,
     diceBank,
     weaponDice,
     armorDice,
@@ -185,6 +217,13 @@ export default function TacticalCombatArena({
       }
       if (data.manaRestored) {
         toast.success(t('consumables.mana_restored', { amount: data.manaRestored }))
+      }
+      // Update the tactical store's player unit so the UI reflects the change
+      if (playerUnit && (data.healthRestored || data.manaRestored)) {
+        updateUnit(playerUnit.id, {
+          currentHealth: playerUnit.currentHealth + (data.healthRestored ?? 0),
+          currentMana: playerUnit.currentMana + (data.manaRestored ?? 0)
+        })
       }
       queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
       queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
@@ -341,7 +380,7 @@ export default function TacticalCombatArena({
         <DiceResult key={`${prefix}-p-${i}`} value={v} isSuccess={false} isCritical={false} isRolling />
       ))
     }
-    if (isAttacking && submitted) {
+    if (isTacticalAttackLoading && submitted) {
       return submitted.map((v, i) => (
         <DiceResult
           key={`${prefix}-s-${i}`}
@@ -391,22 +430,22 @@ export default function TacticalCombatArena({
                     <div className='text-muted-foreground mb-0.5 flex justify-between text-[10px]'>
                       <span>{t('inventory.health')}</span>
                       <span>
-                        {currentClass.health}/{currentClass.maxHealth}
+                        {playerUnit?.currentHealth ?? currentClass.health}/{playerUnit?.maxHealth ?? currentClass.maxHealth}
                       </span>
                     </div>
-                    <HealthBar current={currentClass.health} max={currentClass.maxHealth} showLabel={false} />
+                    <HealthBar current={playerUnit?.currentHealth ?? currentClass.health} max={playerUnit?.maxHealth ?? currentClass.maxHealth} showLabel={false} />
                   </div>
                   <div className='max-w-40'>
                     <div className='text-muted-foreground mb-0.5 flex justify-between text-[10px]'>
                       <span>{t('inventory.mana')}</span>
                       <span>
-                        {currentClass.mana}/{currentClass.maxMana}
+                        {playerUnit?.currentMana ?? currentClass.mana}/{playerUnit?.maxMana ?? currentClass.maxMana}
                       </span>
                     </div>
                     <div className='bg-muted relative h-1.5 overflow-hidden rounded-full'>
                       <div
                         className='absolute inset-y-0 left-0 bg-blue-500 transition-all duration-300'
-                        style={{ width: `${(currentClass.mana / currentClass.maxMana) * 100}%` }}
+                        style={{ width: `${((playerUnit?.currentMana ?? currentClass.mana) / (playerUnit?.maxMana ?? currentClass.maxMana)) * 100}%` }}
                       />
                     </div>
                   </div>
@@ -434,7 +473,11 @@ export default function TacticalCombatArena({
           {/* Action Menu (when it's player's turn) */}
           {activeUnit?.isPlayer && phase !== 'enemy_turn' && (
             <div className='rounded-lg border p-3'>
-              <ActionMenu activeUnit={activeUnit} phase={phase} />
+              <ActionMenu
+                activeUnit={activeUnit}
+                phase={phase}
+                equippedDoctrines={currentClass?.equippedDoctrines ?? []}
+              />
             </div>
           )}
           {(phase === 'enemy_turn' || isEnemyTurnExecuting) && (
@@ -535,7 +578,7 @@ export default function TacticalCombatArena({
                 onRoll={handleRoll}
                 isRolling={isWaitingForResolve}
                 customButtonLabel={rollButtonLabel}
-                title={isAttacking ? t('combat.to_battle') : undefined}
+                title={isAttackPhase ? t('combat.to_battle') : undefined}
                 diceLimit={diceLimit}
               />
 

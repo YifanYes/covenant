@@ -27,7 +27,7 @@ export default function UpdateAreaDialog({ area }: { area: Area }) {
     trpcOptions.areas.update.mutationOptions({
       onSuccess: () => {
         toast.success(t('areas.success.create'))
-        queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.areas.getAll.queryKey() })
         setOpen(false)
       },
       onError: (error) => toast.error(t('areas.error.internal.update'), { description: error.message })

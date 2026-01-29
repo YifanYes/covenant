@@ -155,6 +155,10 @@ export interface TacticalUnitState {
   hasActed: boolean
   currentHealth: number
   maxHealth: number
+  // Active doctrine buffs (for self-buff doctrines like Stellar Collapse)
+  activeDoctrines?: Record<string, ActiveStatusEffect>
+  // Active status effects (burning, stunned, etc.)
+  activeEffects?: ActiveStatusEffect[]
 }
 
 // Tactical state stored in database (JSON field)
@@ -217,6 +221,8 @@ export interface TacticalAttackResult {
     currentHealth: number
     maxHealth: number
   }
+  // Self-damage from rolling 1s (plasma_missile, audacity)
+  selfDamageFromOnes?: number
 }
 
 // Enemy AI turn result
@@ -243,4 +249,33 @@ export interface EnemyTurnResult {
 
   // Combat log entries
   logEntries?: CombatLogEntry[]
+}
+
+// Tactical doctrine execution result
+export interface TacticalDoctrineResult {
+  success: boolean
+  casterId: string
+  doctrineId: string
+  targetPosition: GridPosition
+  affectedTiles: GridPosition[]
+  affectedUnitIds: string[]
+  // Effect results per unit
+  effects: {
+    unitId: string
+    damageDealt?: number
+    healthRestored?: number
+    statusApplied?: string
+    killed?: boolean
+    bonusDice?: number // For inspiration doctrine (scales with enemy tier)
+  }[]
+  // Mana spent
+  manaCost: number
+  // Updated state
+  updatedState: TacticalStateData
+  // Combat log entries
+  logEntries: CombatLogEntry[]
+  // Mana restored (for doctrines like transfusion, disintegration_ray on kill)
+  manaRestored?: number
+  // Self-damage dealt (for doctrines like transfusion that sacrifice health)
+  selfDamage?: number
 }

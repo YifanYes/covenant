@@ -38,13 +38,13 @@ export default function CreateTaskDialog() {
       onSuccess: async () => {
         toast.success(t('tasks.success.create'))
         queryClient.invalidateQueries({
-          queryKey: trpc.tasks.getByDate.queryKey({
+          queryKey: trpcOptions.tasks.getByDate.queryKey({
             monthIndex: monthIndex.toString(),
             year: dayjs().year().toString()
           })
         })
-        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
-        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getFiltered.queryKey() })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getFiltered.queryKey() })
         setOpen(false)
       },
       onError: (error) => toast.error(t('tasks.error.internal.create'), { description: error.message })

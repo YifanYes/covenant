@@ -23,7 +23,7 @@ export default function ConfirmCompleteObjectiveDialog({ objective, onCompleteSu
     trpcOptions.objectives.complete.mutationOptions({
       onSuccess: (data) => {
         toast.success(t('objectives.complete.success', { diceReward: getRewardText(data.diceEarned) }))
-        queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() })
         setOpen(false)
         onCompleteSuccess()
       },

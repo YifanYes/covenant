@@ -18,7 +18,7 @@ export default function Inventory() {
     ...trpcOptions.character.equipItem.mutationOptions(),
     onSuccess: () => {
       toast.success(t('inventory.success.equip'))
-      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
     },
     onError: () => {
       toast.error(t('inventory.error.equip'))
@@ -29,7 +29,7 @@ export default function Inventory() {
     ...trpcOptions.character.unequipItem.mutationOptions(),
     onSuccess: () => {
       toast.success(t('inventory.success.unequip'))
-      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
     },
     onError: () => {
       toast.error(t('inventory.error.unequip'))
