@@ -1,5 +1,5 @@
 'use client'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { Coin } from '@nsmr/pixelart-react'
 import type { InvestmentWithProgress } from '@shared/types/investment.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -13,13 +13,13 @@ export default function InvestmentsPage() {
   const { t } = useTranslation()
   const [selectedInvestment, setSelectedInvestment] = useState<InvestmentWithProgress | null>(null)
 
-  const { data: character } = useSuspenseQuery(trpc.character.get.queryOptions())
+  const { data: character } = useSuspenseQuery(trpcOptions.character.get.queryOptions())
   const { data: investments } = useSuspenseQuery(
-    trpc.investment.list.queryOptions({ characterId: character?.id ?? '' }, { enabled: !!character?.id })
+    trpcOptions.investment.list.queryOptions({ characterId: character?.id ?? '' }, { enabled: !!character?.id })
   )
 
   const contributeMutation = useMutation({
-    ...trpc.investment.contribute.mutationOptions(),
+    ...trpcOptions.investment.contribute.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: trpc.investment.list.queryKey({ characterId: character?.id ?? '' }) })
       queryClient.invalidateQueries({ queryKey: trpc.character.get.queryKey() })

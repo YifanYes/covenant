@@ -1,6 +1,6 @@
 'use client'
 import { useAuthStore } from '@/stores/auth.store'
-import { trpc } from '@/utils/trpc.utils'
+import { trpcOptions } from '@/utils/trpc.utils'
 import AreasDistribution from './_components/areas-distribution/areas-distribution.component'
 import Blindspot from './_components/blindspot/blindspot.component'
 import EfficiencyMetrics from './_components/efficiency-metrics-component/efficiency-metrics.component'
@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next'
 export default function Dashboard() {
   const { t } = useTranslation()
   const { email } = useAuthStore()
-  const { data: dashboardData } = useSuspenseQuery(trpc.dashboard.get.queryOptions())
+  const { data: dashboardData } = useSuspenseQuery(trpcOptions.dashboard.get.queryOptions())
 
   const name = dashboardData.characterName || startCase(email ? email.split('@')[0] : '')
   const date = dayjs().format('L')

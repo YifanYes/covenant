@@ -497,7 +497,7 @@ shared/
 
 **Deliverable:** Full movement system with path preview
 
-### [ ] Phase 4: Combat Integration
+### [x] Phase 4: Combat Integration
 
 **Goal:** Existing dice combat works with positioning
 

@@ -2,7 +2,7 @@
 import { useDebouncedMutation } from '@/hooks/use-debounced-mutation'
 import { useCalendarStore } from '@/stores/calendar.store'
 import { useTasksStore } from '@/stores/tasks.store'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -14,12 +14,12 @@ import TaskList from './task-list.component'
 
 export default function TasksListBoard() {
   const { t } = useTranslation()
-  const { data } = useSuspenseQuery(trpc.tasks.getAll.queryOptions())
+  const { data } = useSuspenseQuery(trpcOptions.tasks.getAll.queryOptions())
   const { setTasks } = useTasksStore()
   const { monthIndex } = useCalendarStore()
 
   const reorderMutation = useDebouncedMutation(
-    trpc.tasks.bulkUpdate.mutationOptions({
+    trpcOptions.tasks.bulkUpdate.mutationOptions({
       onSuccess: async () =>
         queryClient.invalidateQueries({
           queryKey: trpc.tasks.getByDate.queryKey({

@@ -18,11 +18,14 @@ import type {
   TacticalStateData,
   TileState,
   MovementValidationResult,
-  MovementExecutionResult
+  MovementExecutionResult,
+  AttackValidationResult,
+  TacticalAttackResult
 } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
+import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 
 // Combat modifiers accumulated from active doctrines and status effects
 interface CombatModifiers {
@@ -97,7 +100,8 @@ const STATUS_EFFECT_HANDLERS: Record<StatusEffect, (mods: CombatModifiers, isPla
 export class CombatService {
   constructor(
     private characterRepository: CharacterRepository,
-    private activityParticipationRepository: ActivityParticipationRepository
+    private activityParticipationRepository: ActivityParticipationRepository,
+    private combatEnemyRepository?: CombatEnemyRepository
   ) {}
 
   // @ts-ignore: unused for now, will be used in future
@@ -934,6 +938,256 @@ export class CombatService {
       success: true,
       newPosition: destination,
       updatedState
+    }
+  }
+
+  /**
+   * Validate a tactical attack action.
+   * Checks if attacker can reach the target based on weapon range.
+   */
+  validateTacticalAttack(
+    state: TacticalStateData,
+    attackerId: string,
+    targetId: string,
+    attackRange: number
+  ): AttackValidationResult {
+    // Find attacker
+    const attackerState = state.units.find((u) => u.id === attackerId)
+    if (!attackerState) {
+      return { valid: false, reason: 'Attacker not found' }
+    }
+
+    // Find target
+    const targetState = state.units.find((u) => u.id === targetId)
+    if (!targetState) {
+      return { valid: false, reason: 'Target not found' }
+    }
+
+    // Check if it's the attacker's turn
+    const currentUnitId = state.turnOrder[state.currentTurnIndex]
+    if (currentUnitId !== attackerId) {
+      return { valid: false, reason: 'Not this unit\'s turn' }
+    }
+
+    // Check if attacker has already acted
+    if (attackerState.hasActed) {
+      return { valid: false, reason: 'Unit has already acted this turn' }
+    }
+
+    // Calculate Manhattan distance
+    const distance =
+      Math.abs(attackerState.position.x - targetState.position.x) +
+      Math.abs(attackerState.position.y - targetState.position.y)
+
+    // Check range
+    if (distance > attackRange) {
+      return { valid: false, reason: 'Target out of range', distance }
+    }
+
+    return { valid: true, distance }
+  }
+
+  /**
+   * Execute a tactical attack action.
+   * Uses dice rolling to resolve combat and updates the tactical state.
+   */
+  async executeTacticalAttack(
+    participationId: string,
+    attackerId: string,
+    targetId: string,
+    attackerRolls: number[],
+    defenderRolls: number[],
+    attackRange: number,
+    attackThreshold: number,
+    defenseThreshold: number,
+    attackCriticalThreshold: number = 6
+  ): Promise<TacticalAttackResult> {
+    // Get current tactical state
+    const participation = await this.activityParticipationRepository.findByIdWithTacticalState(participationId)
+
+    if (!participation) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
+    }
+
+    if (!participation.tacticalState || !participation.tacticalState.units || !Array.isArray(participation.tacticalState.units)) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'No tactical combat in progress'
+      })
+    }
+
+    const state = participation.tacticalState
+
+    // Validate the attack
+    const validation = this.validateTacticalAttack(state, attackerId, targetId, attackRange)
+
+    if (!validation.valid) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: validation.reason || 'Invalid attack' })
+    }
+
+    // Get unit data for combat resolution
+    const attackerIndex = state.units.findIndex((u) => u.id === attackerId)
+    const targetIndex = state.units.findIndex((u) => u.id === targetId)
+
+    if (attackerIndex === -1 || targetIndex === -1) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Unit not found in state' })
+    }
+
+    const timestamp = Date.now()
+    const logEntries: CombatLogEntry[] = []
+
+    // Resolve attacker's attack
+    const { results: attackerResults, count: attackerHits } = this.calculateHitsWithCount(
+      attackerRolls,
+      attackThreshold,
+      attackCriticalThreshold
+    )
+
+    // Log player attack
+    logEntries.push({
+      timestamp: timestamp + 1,
+      type: CombatLogType.PLAYER_ATTACK,
+      data: { dice: attackerRolls.length, rolls: attackerRolls }
+    })
+
+    logEntries.push({
+      timestamp: timestamp + 2,
+      type: CombatLogType.PLAYER_HITS,
+      data: { hits: attackerHits, criticals: attackerResults.filter((r) => r.isCritical).length }
+    })
+
+    // Resolve defender's defense
+    const { results: defenderResults, count: defenderBlocks } = this.calculateHitsWithCount(
+      defenderRolls,
+      defenseThreshold
+    )
+
+    // Log enemy defense
+    logEntries.push({
+      timestamp: timestamp + 3,
+      type: CombatLogType.ENEMY_DEFENDS,
+      data: { blocks: defenderBlocks, dice: defenderRolls.length }
+    })
+
+    // Calculate damage to target
+    const damageToTarget = Math.max(0, attackerHits - defenderBlocks)
+
+    // Get current health values from tactical state
+    const targetUnit = state.units[targetIndex]
+    const attackerUnit = state.units[attackerIndex]
+
+    const targetCurrentHealth = targetUnit.currentHealth
+    const attackerCurrentHealth = attackerUnit.currentHealth
+
+    const newTargetHealth = Math.max(0, targetCurrentHealth - damageToTarget)
+    const targetKilled = newTargetHealth <= 0
+
+    // Get enemy name from tactical state (name is stored when combat initializes)
+    const enemyName = targetUnit.name
+
+    // Log damage to enemy
+    logEntries.push({
+      timestamp: timestamp + 4,
+      type: CombatLogType.DAMAGE_TO_ENEMY,
+      data: {
+        enemy: enemyName,
+        damage: damageToTarget
+      }
+    })
+
+    // Log enemy defeated if killed
+    if (targetKilled) {
+      logEntries.push({
+        timestamp: timestamp + 5,
+        type: CombatLogType.ENEMY_DEFEATED,
+        data: {
+          enemy: enemyName
+        }
+      })
+    }
+
+    // Counter-attack (if target survives and is in range)
+    let counterAttackRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] = []
+    let counterDefenseRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] = []
+    let damageToAttacker = 0
+    let attackerKilled = false
+
+    // For now, skip counter-attacks to keep it simple
+    // Counter-attacks can be added in a future iteration
+
+    // Update state
+    const updatedUnits = state.units.map((unit, i) => {
+      if (i === attackerIndex) {
+        return {
+          ...unit,
+          hasActed: true,
+          currentHealth: attackerCurrentHealth - damageToAttacker
+        }
+      }
+      if (i === targetIndex) {
+        return {
+          ...unit,
+          currentHealth: newTargetHealth
+        }
+      }
+      return unit
+    })
+
+    // Remove dead units from tiles
+    const updatedTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })))
+    if (targetKilled) {
+      const targetPos = targetUnit.position
+      if (updatedTiles[targetPos.y]?.[targetPos.x]) {
+        updatedTiles[targetPos.y][targetPos.x].occupantId = null
+      }
+    }
+
+    // Filter out dead units from turn order
+    const updatedTurnOrder = state.turnOrder.filter((unitId) => {
+      const unit = updatedUnits.find((u) => u.id === unitId)
+      return unit && unit.currentHealth > 0
+    })
+
+    // Adjust current turn index if needed
+    let updatedCurrentTurnIndex = state.currentTurnIndex
+    if (updatedCurrentTurnIndex >= updatedTurnOrder.length) {
+      updatedCurrentTurnIndex = 0
+    }
+
+    // Create updated state
+    const updatedState: TacticalStateData = {
+      ...state,
+      tiles: updatedTiles,
+      units: updatedUnits.filter((u) => u.currentHealth > 0),
+      turnOrder: updatedTurnOrder,
+      currentTurnIndex: updatedCurrentTurnIndex
+    }
+
+    // Save tactical state to database
+    await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
+
+    // Save combat log entries to the active enemy
+    if (this.combatEnemyRepository) {
+      const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
+      if (activeEnemy) {
+        await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+      }
+    }
+
+    return {
+      success: true,
+      attackerId,
+      targetId,
+      damageDealt: damageToTarget,
+      targetKilled,
+      damageToAttacker,
+      attackerKilled,
+      updatedState,
+      attackerRolls: attackerResults,
+      defenderRolls: defenderResults,
+      counterAttackRolls,
+      counterDefenseRolls,
+      logEntries
     }
   }
 }

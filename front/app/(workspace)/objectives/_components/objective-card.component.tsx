@@ -16,7 +16,7 @@ import Dialog, {
   DialogTrigger
 } from '@/ui/dialog.component'
 import Textarea from '@/ui/textarea.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -33,10 +33,10 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
-  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
   const updateMutation = useMutation(
-    trpc.objectives.update.mutationOptions({
+    trpcOptions.objectives.update.mutationOptions({
       onSuccess: () => {
         toast.success(t('objectives.update.success'))
         queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })

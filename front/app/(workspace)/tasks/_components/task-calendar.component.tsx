@@ -3,7 +3,7 @@ import CalendarNavbar from '@/components/calendars/calendar-navbar.component'
 import MonthlyCalendar from '@/components/calendars/monthly-calendar.component'
 import { useCalendarStore } from '@/stores/calendar.store'
 import { getMonth } from '@/utils/calendar.utils'
-import { trpc } from '@/utils/trpc.utils'
+import { trpcOptions } from '@/utils/trpc.utils'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
@@ -19,7 +19,7 @@ export default function TaskCalendar() {
   const normalizedMonthIndex = targetDate.month()
 
   const { data: tasksData } = useQuery(
-    trpc.tasks.getByDate.queryOptions({
+    trpcOptions.tasks.getByDate.queryOptions({
       monthIndex: normalizedMonthIndex.toString(),
       year: year.toString()
     })

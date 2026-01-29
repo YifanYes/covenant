@@ -5,6 +5,7 @@ import { Heart, SpeedFast, Zap } from '@nsmr/pixelart-react'
 
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
 import { useTacticalMove } from '@/hooks/use-tactical-move.hook'
+import { useTacticalAttack } from '@/hooks/use-tactical-attack.hook'
 import type { TacticalUnit, TacticalPhase } from '@shared/types/tactical-combat.types'
 import Button from '@/components/ui/button.component'
 import { cn } from '@/lib/cn.lib'
@@ -16,9 +17,10 @@ interface ActionMenuProps {
 
 export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
   const { t } = useTranslation()
-  const { selectAction, cancelAction, confirmAction, pendingAction } =
+  const { selectAction, cancelAction, pendingAction } =
     useTacticalCombatStore()
   const { confirmMove, isLoading: isMoveLoading } = useTacticalMove()
+  const { getPendingAttackInfo, isLoading: isAttackLoading } = useTacticalAttack()
 
   const canMove = !activeUnit.hasMoved
   const canAttack = !activeUnit.hasActed
@@ -103,6 +105,9 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
 
   // Render move/target selection
   if (phase === 'select_move' || phase === 'select_target') {
+    const attackInfo = getPendingAttackInfo()
+    const isLoading = isMoveLoading || isAttackLoading
+
     return (
       <div className="space-y-2">
         <h3 className="text-sm font-semibold mb-3">
@@ -115,34 +120,43 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
             : 'Click an enemy to attack'}
         </p>
 
+        {/* Show target info when attacking */}
+        {phase === 'select_target' && attackInfo?.target && (
+          <div className="bg-muted/50 rounded p-2 mb-2 text-xs">
+            <div className="font-medium mb-1">{t('combat.target', 'Target')}: {attackInfo.target.name}</div>
+            <div className="flex justify-between text-muted-foreground">
+              <span>{t('inventory.health', 'HP')}</span>
+              <span>{attackInfo.target.currentHealth}/{attackInfo.target.maxHealth}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Show prompt to use dice roller for attacks */}
+        {phase === 'select_target' && attackInfo?.target && (
+          <div className="text-xs text-muted-foreground text-center py-2 border-t">
+            {t('combat.use_dice_roller', 'Use the Dice Roller to attack!')}
+          </div>
+        )}
+
         {pendingAction && (
           <div className="space-y-2">
-            <Button
-              variant="default"
-              size="sm"
-              className="w-full"
-              disabled={
-                isMoveLoading ||
-                (phase === 'select_move' && !pendingAction.path?.length) ||
-                (phase === 'select_target' && !pendingAction.targetUnitIds?.length)
-              }
-              onClick={() => {
-                if (phase === 'select_move') {
-                  // Use server-persisted move
-                  confirmMove()
-                } else {
-                  // For other actions (attack, etc.), use local action for now
-                  confirmAction()
-                }
-              }}
-            >
-              {isMoveLoading ? 'Moving...' : 'Confirm'}
-            </Button>
+            {/* Only show Confirm button for movement, not attacks */}
+            {phase === 'select_move' && (
+              <Button
+                variant="default"
+                size="sm"
+                className="w-full"
+                disabled={isLoading || !pendingAction.path?.length}
+                onClick={() => confirmMove()}
+              >
+                {isLoading ? 'Moving...' : 'Confirm'}
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
               className="w-full"
-              disabled={isMoveLoading}
+              disabled={isLoading}
               onClick={cancelAction}
             >
               Cancel

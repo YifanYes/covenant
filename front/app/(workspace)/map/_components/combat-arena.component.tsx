@@ -13,7 +13,7 @@ import { useCombatTurn } from '@/hooks/use-combat-turn.hook'
 import { cn } from '@/lib/cn.lib'
 import Image from 'next/image'
 import ScrollArea from '@/ui/scroll-area.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { Zap } from '@nsmr/pixelart-react'
 import { getConsumableById } from '@shared/constants/items'
 import {
@@ -96,7 +96,7 @@ export default function CombatArena({
   })
 
   const useConsumableMutation = useMutation({
-    ...trpc.character.useConsumable.mutationOptions(),
+    ...trpcOptions.character.useConsumable.mutationOptions(),
     onSuccess: (data) => {
       if (data.healthRestored) {
         toast.success(t('consumables.health_restored', { amount: data.healthRestored }))
@@ -113,7 +113,7 @@ export default function CombatArena({
   })
 
   const useDoctrineMutation = useMutation({
-    ...trpc.character.useDoctrine.mutationOptions(),
+    ...trpcOptions.character.useDoctrine.mutationOptions(),
     onSuccess: () => {
       toast.success(t('doctrines.success.used'))
       queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })

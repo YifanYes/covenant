@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -30,6 +30,8 @@ import TurnOrderDisplay from './turn-order-display.component'
 import ActionMenu from './action-menu.component'
 import TileInfoPanel from './tile-info-panel.component'
 
+import { useTacticalAttack } from '@/hooks/use-tactical-attack.hook'
+
 import HealthBar from '@/app/(workspace)/map/_components/health-bar.component'
 import EnemyCard from '@/app/(workspace)/map/_components/enemy-card.component'
 import DiceRoller from '@/app/(workspace)/map/_components/dice-roller.component'
@@ -44,7 +46,7 @@ import {
   type EnemyState,
   type InventoryCharacter
 } from '@shared/types/gamification.types'
-import type { TacticalUnit, GridPosition, TerrainType, TileState } from '@shared/types/tactical-combat.types'
+import type { TacticalUnit, TerrainType, TileState } from '@shared/types/tactical-combat.types'
 
 // Dynamic import for Phaser canvas (SSR-safe)
 const TacticalCanvas = dynamic(() => import('./tactical-canvas.component'), { ssr: false })
@@ -89,10 +91,8 @@ export default function TacticalCombatArena({
     playerUnits,
     enemyUnits,
     tiles,
-    isInitialized,
     initializeCombat,
-    hydrateFromState,
-    reset
+    hydrateFromState
   } = useTacticalCombatStore()
 
   // Fetch persisted tactical state if participationId is provided
@@ -124,6 +124,26 @@ export default function TacticalCombatArena({
 
   const targetEnemy = enemies.find((e) => e.currentHealth > 0)
 
+  // Tactical attack hook
+  const { confirmAttack, getPendingAttackInfo, isLoading: isTacticalAttackLoading } = useTacticalAttack()
+
+  // Handler for when dice rolling completes - routes to tactical or legacy combat
+  const handleTacticalAttack = useCallback(async (rolls: { attackRolls: number[]; defenseRolls: number[] }) => {
+    // Check if we have a pending tactical attack
+    const attackInfo = getPendingAttackInfo()
+
+    if (attackInfo && participationId) {
+      // Use tactical attack flow
+      await confirmAttack({
+        attackRolls: rolls.attackRolls,
+        defenseRolls: rolls.defenseRolls
+      })
+    } else {
+      // Fall back to legacy onAttack for non-tactical combat
+      onAttack(rolls)
+    }
+  }, [confirmAttack, getPendingAttackInfo, participationId, onAttack])
+
   // Combat turn hook for dice rolling
   const {
     pendingAttackRolls,
@@ -137,11 +157,11 @@ export default function TacticalCombatArena({
     showResults,
     handleRoll
   } = useCombatTurn({
-    isAttacking,
+    isAttacking: isAttacking || isTacticalAttackLoading,
     diceBank,
     weaponDice,
     armorDice,
-    onAttack,
+    onAttack: handleTacticalAttack,
     lastTurnResult
   })
 

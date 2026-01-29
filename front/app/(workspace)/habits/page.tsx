@@ -1,5 +1,5 @@
 'use client'
-import { trpc } from '@/utils/trpc.utils'
+import { trpcOptions } from '@/utils/trpc.utils'
 import CreateHabitDialog from './_components/create-habit-dialog.component'
 import UpdateHabitDialog from './_components/update-habit-dialog.component'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 
 export default function Habits() {
   const { t } = useTranslation()
-  const { data } = useSuspenseQuery(trpc.habits.getAll.queryOptions())
+  const { data } = useSuspenseQuery(trpcOptions.habits.getAll.queryOptions())
 
   return (
     <div className='min-h-screen w-full p-6'>

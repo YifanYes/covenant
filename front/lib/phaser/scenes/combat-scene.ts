@@ -21,6 +21,8 @@ export class CombatScene extends Phaser.Scene {
   private loadingTextures: Set<string> = new Set()
   private unsubscribe?: () => void
   private isAnimating = false
+  private isAttackAnimating = false
+  private floatingTexts: Phaser.GameObjects.Text[] = []
 
   // Camera drag state
   private isDragging = false
@@ -197,14 +199,20 @@ export class CombatScene extends Phaser.Scene {
       this.gridSystem.setTileHighlight(state.selectedTile, 'SELECTED')
     }
 
-    // Check for animation state
+    // Check for movement animation state
     if (state.phase === 'animating' && state.animatingUnitId && state.animationPath && !this.isAnimating) {
       this.handleMovementAnimation(state.animatingUnitId, state.animationPath)
       return // Don't sync units during animation - unit will update itself
     }
 
+    // Check for attack animation state
+    if (state.phase === 'animating' && state.isAttackAnimating && state.attackAnimationData && !this.isAttackAnimating) {
+      this.handleAttackAnimation(state.attackAnimationData)
+      return // Don't sync units during animation
+    }
+
     // Update units (skip during animation as the unit is updating itself)
-    if (!this.isAnimating) {
+    if (!this.isAnimating && !this.isAttackAnimating) {
       this.syncUnits([...state.playerUnits, ...state.enemyUnits])
     }
   }
@@ -227,6 +235,142 @@ export class CombatScene extends Phaser.Scene {
       // Signal animation complete to store
       useTacticalCombatStore.getState().completeAnimation()
     }
+  }
+
+  private async handleAttackAnimation(data: {
+    attackerId: string
+    targetId: string
+    damageDealt: number
+    targetKilled: boolean
+    damageToAttacker: number
+    attackerKilled: boolean
+  }): Promise<void> {
+    const attacker = this.units.get(data.attackerId)
+    const target = this.units.get(data.targetId)
+
+    if (!attacker || !target) {
+      // Units not found, complete animation immediately
+      useTacticalCombatStore.getState().completeAttackAnimation()
+      return
+    }
+
+    this.isAttackAnimating = true
+
+    try {
+      // Get target position for attack animation
+      const targetData = target.getUnitData()
+
+      // Play attack animation on attacker
+      await attacker.animateAttack(
+        targetData.position,
+        (x, y) => this.gridSystem.gridToScreen(x, y)
+      )
+
+      // Play damage animation on target and show damage number
+      if (data.damageDealt > 0) {
+        const damagePromise = target.animateDamage(data.damageDealt)
+        this.showDamageNumber(target, data.damageDealt)
+        await damagePromise
+      }
+
+      // Play death animation if target killed
+      if (data.targetKilled) {
+        await target.animateDeath()
+      }
+
+      // Handle counter-attack damage to attacker if any
+      if (data.damageToAttacker > 0) {
+        const attackerDamagePromise = attacker.animateDamage(data.damageToAttacker)
+        this.showDamageNumber(attacker, data.damageToAttacker)
+        await attackerDamagePromise
+
+        if (data.attackerKilled) {
+          await attacker.animateDeath()
+        }
+      }
+    } finally {
+      this.isAttackAnimating = false
+      // Signal animation complete to store
+      useTacticalCombatStore.getState().completeAttackAnimation()
+    }
+  }
+
+  /**
+   * Show a floating damage number above a unit.
+   */
+  private showDamageNumber(unit: Unit, damage: number): void {
+    const text = this.add.text(
+      unit.x,
+      unit.y - 30,
+      `-${damage}`,
+      {
+        fontFamily: 'monospace',
+        fontSize: '16px',
+        fontStyle: 'bold',
+        color: '#ff4444',
+        stroke: '#000000',
+        strokeThickness: 3
+      }
+    )
+    text.setOrigin(0.5, 0.5)
+    text.setDepth(DEPTH_LAYERS.UI)
+
+    this.floatingTexts.push(text)
+
+    // Animate the text floating up and fading
+    this.tweens.add({
+      targets: text,
+      y: text.y - 40,
+      alpha: 0,
+      duration: 1000,
+      ease: 'Quad.easeOut',
+      onComplete: () => {
+        text.destroy()
+        const index = this.floatingTexts.indexOf(text)
+        if (index > -1) {
+          this.floatingTexts.splice(index, 1)
+        }
+      }
+    })
+  }
+
+  /**
+   * Show a healing number above a unit (green, positive).
+   */
+  showHealNumber(unit: Unit, amount: number): void {
+    const text = this.add.text(
+      unit.x,
+      unit.y - 30,
+      `+${amount}`,
+      {
+        fontFamily: 'monospace',
+        fontSize: '16px',
+        fontStyle: 'bold',
+        color: '#44ff44',
+        stroke: '#000000',
+        strokeThickness: 3
+      }
+    )
+    text.setOrigin(0.5, 0.5)
+    text.setDepth(DEPTH_LAYERS.UI)
+
+    this.floatingTexts.push(text)
+
+    // Animate the text floating up and fading
+    this.tweens.add({
+      targets: text,
+      y: text.y - 40,
+      alpha: 0,
+      duration: 1000,
+      ease: 'Quad.easeOut',
+      onComplete: () => {
+        text.destroy()
+        const index = this.floatingTexts.indexOf(text)
+        if (index > -1) {
+          this.floatingTexts.splice(index, 1)
+        }
+      }
+    })
   }
 
   private syncUnits(units: TacticalUnit[]): void {
@@ -343,6 +487,12 @@ export class CombatScene extends Phaser.Scene {
     }
     this.units.clear()
     this.loadingTextures.clear()
+
+    // Cleanup floating texts
+    for (const text of this.floatingTexts) {
+      text.destroy()
+    }
+    this.floatingTexts = []
   }
 
   // Get unit at a specific grid position

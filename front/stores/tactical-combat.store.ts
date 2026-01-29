@@ -20,6 +20,16 @@ import {
   getPathCost
 } from '@/lib/phaser/systems/pathfinding'
 
+// Attack animation data
+interface AttackAnimationData {
+  attackerId: string
+  targetId: string
+  damageDealt: number
+  targetKilled: boolean
+  damageToAttacker: number
+  attackerKilled: boolean
+}
+
 interface TacticalCombatStore extends TacticalCombatState {
   // UI state (not in base TacticalCombatState)
   hoveredTile: GridPosition | null
@@ -27,6 +37,10 @@ interface TacticalCombatStore extends TacticalCombatState {
   animatingUnitId: string | null
   animationPath: GridPosition[] | null
   participationId: string | null
+
+  // Attack state
+  attackAnimationData: AttackAnimationData | null
+  isAttackAnimating: boolean
 
   // Actions
   initializeCombat: (data: TacticalInitData, participationId?: string) => void
@@ -47,6 +61,17 @@ interface TacticalCombatStore extends TacticalCombatState {
   updateUnit: (unitId: string, updates: Partial<TacticalUnit>) => void
   completeAnimation: () => void
   reset: () => void
+
+  // Attack actions
+  startAttackAnimation: (data: AttackAnimationData) => void
+  completeAttackAnimation: () => void
+  applyAttackResult: (
+    targetId: string,
+    damage: number,
+    killed: boolean,
+    attackerId?: string,
+    attackerDamage?: number
+  ) => void
 }
 
 // Default grid for testing (8x6 arena)
@@ -184,7 +209,9 @@ const initialState = (() => {
     isInitialized: true,
     animatingUnitId: null,
     animationPath: null,
-    participationId: null
+    participationId: null,
+    attackAnimationData: null,
+    isAttackAnimating: false
   }
 })()
 
@@ -652,6 +679,174 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     })
   },
 
+  // Attack actions
+  startAttackAnimation: (data: AttackAnimationData) => {
+    set({
+      phase: 'animating',
+      isAttackAnimating: true,
+      attackAnimationData: data,
+      highlightedTiles: []
+    })
+  },
+
+  completeAttackAnimation: () => {
+    const { attackAnimationData, playerUnits, enemyUnits, tiles, turnQueue, currentTurnIndex } = get()
+
+    if (!attackAnimationData) {
+      set({
+        isAttackAnimating: false,
+        attackAnimationData: null,
+        phase: 'select_action'
+      })
+      return
+    }
+
+    const { targetId, damageDealt, targetKilled, attackerId, damageToAttacker, attackerKilled } = attackAnimationData
+
+    // Apply damage to target
+    let updatedPlayerUnits = playerUnits.map((unit) => {
+      if (unit.id === targetId) {
+        return {
+          ...unit,
+          currentHealth: Math.max(0, unit.currentHealth - damageDealt)
+        }
+      }
+      if (unit.id === attackerId) {
+        return {
+          ...unit,
+          hasActed: true,
+          currentHealth: Math.max(0, unit.currentHealth - damageToAttacker)
+        }
+      }
+      return unit
+    })
+
+    let updatedEnemyUnits = enemyUnits.map((unit) => {
+      if (unit.id === targetId) {
+        return {
+          ...unit,
+          currentHealth: Math.max(0, unit.currentHealth - damageDealt)
+        }
+      }
+      if (unit.id === attackerId) {
+        return {
+          ...unit,
+          hasActed: true,
+          currentHealth: Math.max(0, unit.currentHealth - damageToAttacker)
+        }
+      }
+      return unit
+    })
+
+    // Update tiles to remove dead units
+    const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
+
+    if (targetKilled) {
+      const targetUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === targetId)
+      if (targetUnit) {
+        const { x, y } = targetUnit.position
+        if (updatedTiles[y]?.[x]) {
+          updatedTiles[y][x].occupantId = null
+        }
+      }
+      // Remove dead unit
+      updatedPlayerUnits = updatedPlayerUnits.filter((u) => u.id !== targetId)
+      updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== targetId)
+    }
+
+    if (attackerKilled) {
+      const attackerUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === attackerId)
+      if (attackerUnit) {
+        const { x, y } = attackerUnit.position
+        if (updatedTiles[y]?.[x]) {
+          updatedTiles[y][x].occupantId = null
+        }
+      }
+      // Remove dead unit
+      updatedPlayerUnits = updatedPlayerUnits.filter((u) => u.id !== attackerId)
+      updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== attackerId)
+    }
+
+    // Update turn queue to remove dead units
+    const allAliveUnits = [...updatedPlayerUnits, ...updatedEnemyUnits]
+    const aliveUnitIds = new Set(allAliveUnits.map((u) => u.id))
+    const updatedTurnQueue = turnQueue.filter((u) => aliveUnitIds.has(u.id))
+
+    // Adjust current turn index if needed
+    let newCurrentTurnIndex = currentTurnIndex
+    if (newCurrentTurnIndex >= updatedTurnQueue.length) {
+      newCurrentTurnIndex = 0
+    }
+
+    set({
+      playerUnits: updatedPlayerUnits,
+      enemyUnits: updatedEnemyUnits,
+      tiles: updatedTiles,
+      turnQueue: updatedTurnQueue,
+      currentTurnIndex: newCurrentTurnIndex,
+      isAttackAnimating: false,
+      attackAnimationData: null,
+      pendingAction: null,
+      phase: 'select_action'
+    })
+  },
+
+  applyAttackResult: (
+    targetId: string,
+    damage: number,
+    killed: boolean,
+    attackerId?: string,
+    attackerDamage?: number
+  ) => {
+    const { playerUnits, enemyUnits, tiles } = get()
+
+    let updatedPlayerUnits = playerUnits.map((unit) => {
+      if (unit.id === targetId) {
+        return { ...unit, currentHealth: Math.max(0, unit.currentHealth - damage) }
+      }
+      if (attackerId && unit.id === attackerId && attackerDamage) {
+        return { ...unit, hasActed: true, currentHealth: Math.max(0, unit.currentHealth - attackerDamage) }
+      }
+      if (attackerId && unit.id === attackerId) {
+        return { ...unit, hasActed: true }
+      }
+      return unit
+    })
+
+    let updatedEnemyUnits = enemyUnits.map((unit) => {
+      if (unit.id === targetId) {
+        return { ...unit, currentHealth: Math.max(0, unit.currentHealth - damage) }
+      }
+      if (attackerId && unit.id === attackerId && attackerDamage) {
+        return { ...unit, hasActed: true, currentHealth: Math.max(0, unit.currentHealth - attackerDamage) }
+      }
+      if (attackerId && unit.id === attackerId) {
+        return { ...unit, hasActed: true }
+      }
+      return unit
+    })
+
+    // Update tiles for dead units
+    const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
+    if (killed) {
+      const targetUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === targetId)
+      if (targetUnit) {
+        const { x, y } = targetUnit.position
+        if (updatedTiles[y]?.[x]) {
+          updatedTiles[y][x].occupantId = null
+        }
+      }
+      updatedPlayerUnits = updatedPlayerUnits.filter((u) => u.id !== targetId)
+      updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== targetId)
+    }
+
+    set({
+      playerUnits: updatedPlayerUnits,
+      enemyUnits: updatedEnemyUnits,
+      tiles: updatedTiles
+    })
+  },
+
   reset: () => {
     const tiles = createDefaultGrid()
     const { playerUnits, enemyUnits } = createDefaultUnits()
@@ -684,7 +879,9 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       isInitialized: true,
       animatingUnitId: null,
       animationPath: null,
-      participationId: null
+      participationId: null,
+      attackAnimationData: null,
+      isAttackAnimating: false
     })
   }
 }))
