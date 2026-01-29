@@ -132,9 +132,13 @@
     "enemies_defeated": "Enemigos Derrotados",
     "error": {
       "attack": "El ataque falló",
+      "attack_failed": "El ataque falló",
+      "invalid_attack": "Objetivo de ataque inválido",
       "invalid_move": "Movimiento inválido",
       "move_failed": "El movimiento falló",
       "no_active_unit": "No hay unidad activa seleccionada",
+      "no_participation": "No se encontró sesión de combate",
+      "target_not_found": "Objetivo no encontrado",
       "unit_not_found": "Unidad no encontrada",
       "unknown": "Ocurrió un error desconocido"
     },
@@ -167,8 +171,10 @@
     "roll_defense": "Preparar Defensa",
     "roll_dice": "Lanzar Dados",
     "rolling": "Lanzando",
+    "target": "Objetivo",
     "to_battle": "¡Al ataque!",
     "turn_summary": "Resumen del Turno",
+    "use_dice_roller": "¡Usa el Lanzador de Dados para atacar!",
     "your_hits": "Tus Impactos"
   },
   "common": {
@@ -1320,5 +1326,24 @@
     "status_placeholder": "Estado de la tarea",
     "title": "Actualizar tarea",
     "title_placeholder": "Título de la tarea"
+  },
+  "tactical": {
+    "actions": {
+      "attack": "Atacar",
+      "move": "Mover",
+      "next_turn": "Siguiente Turno"
+    },
+    "click_to_attack": "Haz clic en un enemigo para atacar",
+    "click_to_move": "Haz clic en una casilla resaltada para moverte",
+    "controls": {
+      "pan": "Arrastrar derecho: Mover cámara",
+      "select": "Clic izquierdo: Seleccionar",
+      "zoom": "Scroll: Zoom"
+    },
+    "moving": "Moviendo...",
+    "range": "rango",
+    "select_destination": "Seleccionar Destino",
+    "select_target": "Seleccionar Objetivo",
+    "tiles": "casillas"
   }
 }

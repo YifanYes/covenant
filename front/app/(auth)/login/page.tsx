@@ -5,7 +5,7 @@ import TextInput from '@/forms/text-input.component'
 import { authClient, useSession } from '@/lib/auth.lib'
 import { useAuthStore } from '@/stores/auth.store'
 import AlertComponent, { AlertDescription, AlertTitle } from '@/ui/alert.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import GoogleLoginButton from '../_components/google-login-button.component'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Alert, Check, Loader, Mail } from '@nsmr/pixelart-react'
@@ -42,7 +42,7 @@ export default function Login() {
       if (redirectTo) {
         router.push(redirectTo)
       } else {
-        queryClient.fetchQuery(trpc.character.hasCharacter.queryOptions())
+        queryClient.fetchQuery(trpcOptions.character.hasCharacter.queryOptions())
           .then(({ hasCharacter }) => {
             router.push(hasCharacter ? '/dashboard' : '/onboarding')
           })

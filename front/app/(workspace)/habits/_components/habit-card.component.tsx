@@ -3,7 +3,7 @@ import type { Habit } from '@/types/models.types'
 import Button from '@/ui/button.component'
 import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/tooltip.component'
 import { getRewardText } from '@/utils/text.utils'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { Check, Code, Loader } from '@nsmr/pixelart-react'
 import { HabitTimespan } from '@shared/schemas/habits.schemas'
 import { useMutation } from '@tanstack/react-query'
@@ -26,7 +26,7 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
     const timespanUnit = timespanUnits[timespan as HabitTimespan]
 
     const createCompletion = useMutation(
-      trpc.habits.createCompletion.mutationOptions({
+      trpcOptions.habits.createCompletion.mutationOptions({
         onSuccess: async (data) => {
           const currentCount =
             completions.filter(({ completedAt }) => dayjs().isSame(completedAt, timespanUnit)).length + 1

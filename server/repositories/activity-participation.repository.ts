@@ -89,4 +89,16 @@ export class ActivityParticipationRepository {
 
     return participation?.character?.userId === userId
   }
+
+  async findByIdWithActivity(participationId: string): Promise<{
+    id: string
+    activityId: string
+  } | null> {
+    const result = await this.prisma.activityParticipation.findUnique({
+      where: { id: participationId },
+      select: { id: true, activityId: true }
+    })
+
+    return result
+  }
 }

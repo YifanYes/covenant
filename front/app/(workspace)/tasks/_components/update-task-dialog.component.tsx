@@ -11,7 +11,7 @@ import { useCalendarStore } from '@/stores/calendar.store'
 import { useTasksStore } from '@/stores/tasks.store'
 import Textarea from '@/ui/textarea.component'
 import { getRewardText } from '@/utils/text.utils'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import {
   TaskEffort,
@@ -32,11 +32,11 @@ export default function UpdateTaskDialog() {
   const { t } = useTranslation()
   const { monthIndex } = useCalendarStore()
   const { selectedTask, setSelectedTask } = useTasksStore()
-  const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
-  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
+  const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
   const updateMutation = useMutation(
-    trpc.tasks.update.mutationOptions({
+    trpcOptions.tasks.update.mutationOptions({
       onSuccess: async (data: { diceEarned: number }) => {
         toast.success(t('tasks.success.update', { diceReward: getRewardText(data.diceEarned) }))
         await queryClient.invalidateQueries({
@@ -53,7 +53,7 @@ export default function UpdateTaskDialog() {
   )
 
   const deleteMutation = useMutation(
-    trpc.tasks.delete.mutationOptions({
+    trpcOptions.tasks.delete.mutationOptions({
       onSuccess: async () => {
         toast.success(t('tasks.success.delete'))
         await queryClient.invalidateQueries({
@@ -70,7 +70,7 @@ export default function UpdateTaskDialog() {
   )
 
   const duplicateMutation = useMutation(
-    trpc.tasks.duplicate.mutationOptions({
+    trpcOptions.tasks.duplicate.mutationOptions({
       onSuccess: async () => {
         toast.success(t('tasks.success.duplicate'))
         await queryClient.invalidateQueries({

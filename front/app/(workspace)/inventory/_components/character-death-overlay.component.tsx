@@ -1,6 +1,6 @@
 'use client'
 import LoaderButton from '@/components/common/loader-button.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { Heart } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -15,7 +15,7 @@ export default function CharacterDeathOverlay() {
   })
 
   const reviveMutation = useMutation({
-    ...trpc.character.revive.mutationOptions(),
+    ...trpcOptions.character.revive.mutationOptions(),
     onSuccess: () => {
       toast.success(t('inventory.success.revive'))
       queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })

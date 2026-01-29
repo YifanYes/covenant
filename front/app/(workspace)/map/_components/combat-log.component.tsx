@@ -75,6 +75,15 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
     }
   }
 
+  // Helper to translate enemy name (handles prefix|suffix format)
+  const translateEnemyName = (name: string): string => {
+    if (name.includes('|')) {
+      const [prefix, suffix] = name.split('|')
+      return `${t(prefix)} ${t(suffix)}`
+    }
+    return t(name)
+  }
+
   const formatEntry = (entry: CombatLogEntry): string => {
     const data = entry.data
     switch (entry.type) {
@@ -89,11 +98,11 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
       case CombatLogType.PLAYER_DEFENDS:
         return t('combat.log.player_defends', { blocks: data.blocks })
       case CombatLogType.DAMAGE_TO_ENEMY:
-        return t('combat.log.damage_to_enemy', { enemy: t(data.enemy as string), damage: data.damage })
+        return t('combat.log.damage_to_enemy', { enemy: translateEnemyName(data.enemy as string), damage: data.damage })
       case CombatLogType.DAMAGE_TO_PLAYER:
         return t('combat.log.damage_to_player', { damage: data.damage })
       case CombatLogType.ENEMY_DEFEATED:
-        return t('combat.log.enemy_defeated', { enemy: t(data.enemy as string) })
+        return t('combat.log.enemy_defeated', { enemy: translateEnemyName(data.enemy as string) })
       case CombatLogType.MANA_REGEN:
         return t('combat.log.mana_regen', { mana: data.mana })
       case CombatLogType.PHASE_COMPLETE:

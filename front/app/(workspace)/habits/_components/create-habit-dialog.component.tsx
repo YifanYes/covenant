@@ -6,7 +6,7 @@ import SingleSelect from '@/forms/single-select.component'
 import TextInput from '@/forms/text-input.component'
 import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
 import { createHabitSchema, HabitTimespan, type CreateHabitType } from '@shared/schemas/habits.schemas'
@@ -19,11 +19,11 @@ import { toast } from 'sonner'
 export default function CreateHabitDialog() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const { data: objectivesData } = useSuspenseQuery(trpc.objectives.getAll.queryOptions())
-  const { data: areasData } = useSuspenseQuery(trpc.areas.getAll.queryOptions())
+  const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
+  const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
   const mutation = useMutation(
-    trpc.habits.create.mutationOptions({
+    trpcOptions.habits.create.mutationOptions({
       onSuccess: async () => {
         toast.success(t('habits.success.create'))
         await queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })

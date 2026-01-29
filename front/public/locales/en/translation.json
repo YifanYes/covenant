@@ -132,9 +132,13 @@
     "enemies_defeated": "Enemies Defeated",
     "error": {
       "attack": "Attack failed",
+      "attack_failed": "Attack failed",
+      "invalid_attack": "No valid attack target",
       "invalid_move": "Invalid move action",
       "move_failed": "Movement failed",
       "no_active_unit": "No active unit selected",
+      "no_participation": "No combat session found",
+      "target_not_found": "Target not found",
       "unit_not_found": "Unit not found",
       "unknown": "An unknown error occurred"
     },
@@ -167,8 +171,10 @@
     "roll_defense": "Prepare Defense",
     "roll_dice": "Roll Dice",
     "rolling": "Rolling",
+    "target": "Target",
     "to_battle": "To Battle!",
     "turn_summary": "Turn Summary",
+    "use_dice_roller": "Use the Dice Roller to attack!",
     "your_hits": "Your Hits"
   },
   "common": {
@@ -1320,5 +1326,24 @@
     "status_placeholder": "Task status",
     "title": "Update task",
     "title_placeholder": "Task title"
+  },
+  "tactical": {
+    "actions": {
+      "attack": "Attack",
+      "move": "Move",
+      "next_turn": "Next Turn"
+    },
+    "click_to_attack": "Click an enemy to attack",
+    "click_to_move": "Click a highlighted tile to move",
+    "controls": {
+      "pan": "Right drag: Pan camera",
+      "select": "Left click: Select",
+      "zoom": "Scroll: Zoom"
+    },
+    "moving": "Moving...",
+    "range": "range",
+    "select_destination": "Select Destination",
+    "select_target": "Select Target",
+    "tiles": "tiles"
   }
 }

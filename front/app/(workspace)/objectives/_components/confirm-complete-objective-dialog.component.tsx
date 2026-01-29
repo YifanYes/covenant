@@ -3,7 +3,7 @@ import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
 import type { Objective } from '@/types/models.types'
 import Button from '@/ui/button.component'
 import { getRewardText } from '@/utils/text.utils'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { Check } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -20,7 +20,7 @@ export default function ConfirmCompleteObjectiveDialog({ objective, onCompleteSu
   const [open, setOpen] = useState(false)
 
   const completeMutation = useMutation(
-    trpc.objectives.complete.mutationOptions({
+    trpcOptions.objectives.complete.mutationOptions({
       onSuccess: (data) => {
         toast.success(t('objectives.complete.success', { diceReward: getRewardText(data.diceEarned) }))
         queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })

@@ -2,7 +2,7 @@
 import DoctrinePanel from '@/components/doctrine-panel.component'
 import OnboardingRedirect from '@/components/shared/onboarding-redirect'
 import Tabs, { TabsContent, TabsList, TabsTrigger } from '@/ui/tabs.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
 import { SlotType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -12,10 +12,10 @@ import CharacterTab from './_components/character-tab.component'
 
 export default function Inventory() {
   const { t } = useTranslation()
-  const { data: characterData } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
+  const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
 
   const equipMutation = useMutation({
-    ...trpc.character.equipItem.mutationOptions(),
+    ...trpcOptions.character.equipItem.mutationOptions(),
     onSuccess: () => {
       toast.success(t('inventory.success.equip'))
       queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
@@ -26,7 +26,7 @@ export default function Inventory() {
   })
 
   const unequipMutation = useMutation({
-    ...trpc.character.unequipItem.mutationOptions(),
+    ...trpcOptions.character.unequipItem.mutationOptions(),
     onSuccess: () => {
       toast.success(t('inventory.success.unequip'))
       queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })

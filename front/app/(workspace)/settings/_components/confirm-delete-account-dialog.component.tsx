@@ -2,7 +2,7 @@
 import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
 import { useAuthStore } from '@/stores/auth.store'
 import Button from '@/ui/button.component'
-import { trpc } from '@/utils/trpc.utils'
+import { trpcOptions } from '@/utils/trpc.utils'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -16,7 +16,7 @@ export const ConfirmDeleteAccountDialog = () => {
   const [open, setOpen] = useState(false)
 
   const deleteAccountMutation = useMutation(
-    trpc.auth.deleteAccount.mutationOptions({
+    trpcOptions.auth.deleteAccount.mutationOptions({
       onSuccess: async () => {
         await signOut()
         router.push('/sign-up')

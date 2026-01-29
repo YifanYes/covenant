@@ -237,6 +237,102 @@ export class Unit extends Phaser.GameObjects.Container {
     }
   }
 
+  /**
+   * Animate an attack toward a target position.
+   * @param targetPos Target grid position
+   * @param gridToScreen Function to convert grid position to screen coordinates
+   * @returns Promise that resolves when the animation completes
+   */
+  async animateAttack(
+    targetPos: GridPosition,
+    gridToScreen: (x: number, y: number) => { x: number; y: number }
+  ): Promise<void> {
+    const targetScreen = gridToScreen(targetPos.x, targetPos.y)
+    const originalX = this.x
+    const originalY = this.y
+
+    // Calculate direction to target
+    const dx = targetScreen.x - originalX
+    const dy = (targetScreen.y - 8) - originalY
+
+    // Normalize and scale for lunge distance
+    const distance = Math.sqrt(dx * dx + dy * dy)
+    const lungeDistance = Math.min(distance * 0.4, 20) // Lunge 40% toward target, max 20px
+    const normalizedDx = (dx / distance) * lungeDistance
+    const normalizedDy = (dy / distance) * lungeDistance
+
+    // Lunge forward
+    await new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        x: originalX + normalizedDx,
+        y: originalY + normalizedDy,
+        duration: ANIMATION_DURATION.UNIT_ATTACK / 2,
+        ease: 'Quad.easeOut',
+        onComplete: () => resolve()
+      })
+    })
+
+    // Return to original position
+    await new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        x: originalX,
+        y: originalY,
+        duration: ANIMATION_DURATION.UNIT_ATTACK / 2,
+        ease: 'Quad.easeIn',
+        onComplete: () => resolve()
+      })
+    })
+  }
+
+  /**
+   * Animate taking damage (flash red and shake).
+   * @param damage Amount of damage taken
+   * @returns Promise that resolves when the animation completes
+   */
+  async animateDamage(damage: number): Promise<void> {
+    if (damage <= 0) return
+
+    // Flash red
+    this.sprite.setTint(0xff0000)
+
+    // Shake effect
+    const originalX = this.sprite.x
+
+    await new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this.sprite,
+        x: [originalX - 3, originalX + 3, originalX - 2, originalX + 2, originalX],
+        duration: 200,
+        ease: 'Linear',
+        onComplete: () => {
+          // Clear tint after shake
+          this.sprite.clearTint()
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Animate death (fade out and fall).
+   * @returns Promise that resolves when the animation completes
+   */
+  async animateDeath(): Promise<void> {
+    await new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: this,
+        alpha: 0,
+        y: this.y + 10,
+        angle: 45,
+        duration: 400,
+        ease: 'Quad.easeIn',
+        onComplete: () => resolve()
+      })
+    })
+  }
+
   // Override destroy to cleanup
   destroy(fromScene?: boolean): void {
     this.stopBounce()
