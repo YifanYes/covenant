@@ -517,45 +517,13 @@ shared/
 
 **Tasks:**
 
-1. Define AoE patterns for all doctrines - `shared/constants/aoe-patterns.ts`
-2. Create `DoctrineTargetSelector` - `front/components/tactical/doctrine-target-selector.component.tsx`
-3. Implement AoE preview highlighting - Updated `combat-scene.ts` with doctrine highlighting
-4. Backend: `getAoETargets()` function - `combat.service.ts` with `calculateAoETargets()` and `executeTacticalDoctrine()`
-5. Add spell effect animations - `combat-scene.ts` with `playCastEffect()`, `playAoEEffect()`, `showStatusText()`
+1. Define AoE patterns - `shared/constants/aoe-patterns.ts`
+2. Create `DoctrineTargetSelector` component
+3. Implement AoE preview highlighting
+4. Backend `calculateAoETargets()` and `executeTacticalDoctrine()`
+5. Spell effect animations
 
-**Deliverable:** AoE doctrines target multiple enemies
-
-#### Missing Doctrine Effects (Not Yet Implemented)
-
-The following effects from `doctrines.ts` are not yet handled in `executeTacticalDoctrine`:
-
-**Missing DoctrineEffectTypes:**
-
-| Done | Effect Type         | Complexity | Affected Doctrines                                                                                                             |
-| ---- | ------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| [x]  | THRESHOLD_MODIFIER  | Low        | `light_shield`, `oracle_eye`, `kings_sword`                                                                                    |
-| [x]  | NEGATE_HITS         | Low        | `miraculous_protection`, `mana_barrier`, `arcane_push`, `blink`, `fractal_invocation`, `unbreakable_formation`, `iron_bastion` |
-| [x]  | GUARANTEED_CRITICAL | Low        | `precise_strike`, `shadow_step`, `judgment_aurora`, `wrath_avatar`                                                             |
-
-**Special Doctrine Behaviors:**
-
-| Done | Doctrine                      | Missing Behavior                     | Complexity |
-| ---- | ----------------------------- | ------------------------------------ | ---------- |
-| [x]  | `reckless_strike`, `audacity` | Defense becomes 0                    | Medium     |
-| [x]  | `plasma_missile`, `audacity`  | 1s hurt self                         | Medium     |
-| [x]  | `battle_fervor`               | Heal based on hits dealt (not flat)  | Medium     |
-| [x]  | `transfusion`                 | Sacrifice 2 health to restore 6 mana | Medium     |
-| [x]  | `disintegration_ray`          | Refund mana on kill                  | Medium     |
-| [ ]  | `karmic_retribution`          | Reflects damage taken                | High       |
-| [ ]  | `summary_execution`           | Instant kill if enemy ≤4 wounds      | High       |
-| [ ]  | `inspiration`                 | Copy enemy attack/defense value      | High       |
-| [ ]  | `fractal_invocation`          | 50% chance to negate (random)        | High       |
-
-**Implementation Priority:**
-
-1. **First** - Low complexity items (enables 7 doctrines) ✓
-2. **Second** - Medium complexity items ✓
-3. **Defer** - High complexity items (niche mechanics)
+**Deliverable:** AoE doctrines target multiple enemies, all doctrine effect types implemented
 
 ### [x] Phase 6: Enemy AI
 

@@ -266,6 +266,7 @@ export interface TacticalDoctrineResult {
     healthRestored?: number
     statusApplied?: string
     killed?: boolean
+    bonusDice?: number // For inspiration doctrine (scales with enemy tier)
   }[]
   // Mana spent
   manaCost: number

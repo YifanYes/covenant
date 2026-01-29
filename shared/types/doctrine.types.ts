@@ -51,6 +51,12 @@ export interface DoctrineEffect {
   duration?: number
   // Which status effect to apply (for APPLY_STATUS type)
   statusEffect?: StatusEffect
+  // Execute threshold: kills target if currentHealth < maxHealth * healthThreshold (0.25 = 25%)
+  healthThreshold?: number
+  // If true, the effect value scales with enemy tier (tier * 2 dice)
+  scalesWithEnemyTier?: boolean
+  // Thorns damage: flat damage dealt to attackers when the buff holder is hit (karmic_retribution)
+  thornsDamage?: number
 }
 
 export interface DoctrineDefinition {

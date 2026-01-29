@@ -563,17 +563,21 @@ export class CombatService {
       }
     })
 
-    // Check for NEGATE_HITS buff on defender (if defender is a player unit)
-    const defenderUnit = state.units[targetIndex]
-    const defenderBuffs = this.getActiveDoctrineBuffs(defenderUnit.activeDoctrines)
-
-    // Resolve defender's defense
+    // Resolve defender's defense first to know total incoming hits
     const { results: defenderResults, count: defenderBlocks } = this.calculateHitsWithCount(
       defenderRolls,
       defenseThreshold
     )
 
-    // Total blocks = dice blocks + negated hits from doctrines
+    // Calculate raw damage before defense buffs (for percentage-based negation)
+    const rawDamage = Math.max(0, attackerHits - defenderBlocks)
+
+    // Check for NEGATE_HITS buff on defender (if defender is a player unit)
+    // Pass incoming hits for percentage-based negation (fractal_invocation)
+    const defenderUnit = state.units[targetIndex]
+    const defenderBuffs = this.getActiveDoctrineBuffs(defenderUnit.activeDoctrines, rawDamage)
+
+    // Total blocks = dice blocks + negated hits from doctrines (may include percentage-based)
     const totalBlocks = defenderBlocks + defenderBuffs.negateHits
 
     // Log enemy defense (includes negated hits if any)
@@ -601,6 +605,21 @@ export class CombatService {
 
     // Get enemy name from tactical state (name is stored when combat initializes)
     const enemyName = targetUnit.name
+
+    // KARMIC_RETRIBUTION (Thorns): If defender has thorns buff and takes damage, deal damage back to attacker
+    let thornsDamageToAttacker = 0
+    if (damageToTarget > 0 && defenderBuffs.thornsDamage > 0) {
+      thornsDamageToAttacker = defenderBuffs.thornsDamage
+      logEntries.push({
+        timestamp: timestamp + 3.5,
+        type: CombatLogType.DOCTRINE_EFFECT,
+        data: {
+          effect: 'thorns',
+          damage: thornsDamageToAttacker,
+          source: 'karmic_retribution'
+        }
+      })
+    }
 
     // Log damage to enemy
     logEntries.push({
@@ -650,7 +669,12 @@ export class CombatService {
       }
     }
 
-    // Check if attacker is killed by self-damage
+    // Add thorns damage from karmic_retribution
+    if (thornsDamageToAttacker > 0) {
+      damageToAttacker += thornsDamageToAttacker
+    }
+
+    // Check if attacker is killed by self-damage or thorns
     const newAttackerHealth = Math.max(0, attackerCurrentHealth - damageToAttacker)
     attackerKilled = newAttackerHealth <= 0
 
@@ -1650,7 +1674,43 @@ export class CombatService {
             if (targetIndex === -1) continue
 
             const target = updatedUnits[targetIndex]
-            const damage = effect.value || 0
+            let damage = effect.value || 0
+
+            // SUMMARY_EXECUTION: Check healthThreshold - only execute if target is below threshold
+            if (effect.healthThreshold !== undefined && effect.healthThreshold > 0) {
+              const healthPercent = target.currentHealth / target.maxHealth
+              if (healthPercent >= effect.healthThreshold) {
+                // Target is NOT below threshold - deal no damage, log the failure
+                logEntries.push({
+                  timestamp: timestamp + 0.1,
+                  type: CombatLogType.DOCTRINE_EFFECT,
+                  data: {
+                    effect: 'execute_failed',
+                    reason: 'target_above_threshold',
+                    threshold: effect.healthThreshold,
+                    targetHealthPercent: healthPercent,
+                    enemy: target.name
+                  }
+                })
+                effects.push({
+                  unitId: targetId,
+                  damageDealt: 0,
+                  killed: false
+                })
+                continue // Skip this target
+              }
+              // Target is below threshold - execute (deal massive damage)
+              logEntries.push({
+                timestamp: timestamp + 0.05,
+                type: CombatLogType.DOCTRINE_EFFECT,
+                data: {
+                  effect: 'execute_triggered',
+                  threshold: effect.healthThreshold,
+                  enemy: target.name
+                }
+              })
+            }
+
             const newHealth = Math.max(0, target.currentHealth - damage)
             const killed = newHealth <= 0
 
@@ -1722,6 +1782,79 @@ export class CombatService {
           break
 
         case DoctrineEffectType.POWER_MODIFIER:
+          // INSPIRATION: Self buff that scales with enemy tier (+2 dice per tier)
+          if (effect.scalesWithEnemyTier && effect.target === DoctrineTarget.SELF) {
+            // Find the targeted enemy to get their tier
+            let enemyTier = 2 // Default tier if not found
+            for (const targetId of affectedUnitIds) {
+              if (targetId.startsWith('player-')) continue
+              const targetUnit = state.units.find((u) => u.id === targetId)
+              if (targetUnit) {
+                // Get enemy template to find tier
+                // Unit's name contains the templateId info, or we can look it up
+                // For tactical state, we need to get the enemy from the database
+                const enemyTemplate = getEnemy(targetUnit.name.split('|')[0]) // Try to get from name
+                  || state.units.find(u => u.id === targetId) // Fallback
+                if (enemyTemplate && 'tier' in enemyTemplate) {
+                  enemyTier = (enemyTemplate as any).tier || 2
+                } else {
+                  // Try to infer tier from enemy health (rough estimate)
+                  // Tier 1: ~4-8 HP, Tier 2: ~8-14 HP, Tier 3: ~14+ HP
+                  if (targetUnit.maxHealth >= 14) enemyTier = 3
+                  else if (targetUnit.maxHealth >= 8) enemyTier = 2
+                  else enemyTier = 1
+                }
+                break // Use first enemy found
+              }
+            }
+
+            // Calculate bonus dice: tier * 2
+            const bonusDice = enemyTier * 2
+
+            // Create buff effect on caster
+            const activeEffect: ActiveStatusEffect = {
+              effect: StatusEffect.DOCTRINE_ACTIVE,
+              remainingTurns: 1,
+              sourceDoctrineId: doctrineId
+            }
+
+            // Update caster's active doctrines with the scaled value
+            // Store the calculated bonus in a way that getActiveDoctrineBuffs can use
+            const casterInUnits = updatedUnits.findIndex((u) => u.id === casterId)
+            if (casterInUnits !== -1) {
+              const currentCaster = updatedUnits[casterInUnits]
+              const existingDoctrines = currentCaster.activeDoctrines || {}
+
+              // Store inspiration with calculated bonus dice in a metadata field
+              updatedUnits[casterInUnits] = {
+                ...currentCaster,
+                activeDoctrines: {
+                  ...existingDoctrines,
+                  [doctrineId]: activeEffect,
+                  // Store the calculated bonus dice as a special entry
+                  [`${doctrineId}_bonus`]: { ...activeEffect, calculatedBonusDice: bonusDice } as any
+                }
+              }
+            }
+
+            logEntries.push({
+              timestamp: timestamp + 0.1,
+              type: CombatLogType.DOCTRINE_EFFECT,
+              data: {
+                effect: 'inspiration_buff',
+                enemyTier,
+                bonusDice,
+                doctrine: doctrineId
+              }
+            })
+
+            effects.push({
+              unitId: casterId,
+              bonusDice
+            })
+            break // Don't fall through to normal POWER_MODIFIER handling
+          }
+
           // POWER_MODIFIER with SELF target: Roll power dice and deal damage to enemies in AoE
           // This is used by doctrines like stellar_collapse (10 dice, 6s generate extra hits)
           if (effect.target === DoctrineTarget.SELF) {
@@ -1999,15 +2132,19 @@ export class CombatService {
     }
 
     // Validate this is a self-buff doctrine (POWER_MODIFIER, THRESHOLD_MODIFIER, NEGATE_HITS, or GUARANTEED_CRITICAL with SELF target, no aoePattern)
+    // Special cases: karmic_retribution is a thorns buff (applied to self, triggers on being hit)
     const selfBuffEffectTypes: DoctrineEffectType[] = [
       DoctrineEffectType.POWER_MODIFIER,
       DoctrineEffectType.THRESHOLD_MODIFIER,
       DoctrineEffectType.NEGATE_HITS,
       DoctrineEffectType.GUARANTEED_CRITICAL
     ]
-    const isSelfBuff = doctrine.effects.some(
+    // Doctrines that are self-buffs but don't fit the standard pattern
+    const specialSelfBuffDoctrines = ['karmic_retribution']
+
+    const isSelfBuff = (doctrine.effects.some(
       (e) => selfBuffEffectTypes.includes(e.type) && e.target === DoctrineTarget.SELF
-    ) && !doctrine.aoePattern
+    ) && !doctrine.aoePattern) || specialSelfBuffDoctrines.includes(doctrineId)
 
     if (!isSelfBuff) {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'This doctrine requires targeting' })
@@ -2146,7 +2283,8 @@ export class CombatService {
    * Returns bonus dice, threshold modifiers, negate hits, and critical modifiers.
    */
   getActiveDoctrineBuffs(
-    unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined
+    unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined,
+    incomingHits?: number // Used to calculate percentage-based negation (fractal_invocation)
   ): {
     bonusDice: number
     sixesGenerateExtraHits: boolean
@@ -2156,6 +2294,7 @@ export class CombatService {
     criticalThresholdMod: number
     defenseZero: boolean
     onesHurtSelf: boolean
+    thornsDamage: number // karmic_retribution: damage reflected to attacker
   } {
     if (!unitActiveDoctrines) {
       return {
@@ -2166,7 +2305,8 @@ export class CombatService {
         guaranteedCritical: false,
         criticalThresholdMod: 0,
         defenseZero: false,
-        onesHurtSelf: false
+        onesHurtSelf: false,
+        thornsDamage: 0
       }
     }
 
@@ -2178,6 +2318,7 @@ export class CombatService {
     let criticalThresholdMod = 0
     let defenseZero = false
     let onesHurtSelf = false
+    let thornsDamage = 0
 
     // Doctrines that set defense to 0
     const defenseZeroDoctrines = ['reckless_strike', 'audacity']
@@ -2198,6 +2339,23 @@ export class CombatService {
         onesHurtSelf = true
       }
 
+      // KARMIC_RETRIBUTION: Thorns - deal flat damage to attacker
+      if (doctrineId === 'karmic_retribution') {
+        const thornEffect = doctrine.effects.find(e => e.thornsDamage !== undefined)
+        if (thornEffect?.thornsDamage) {
+          thornsDamage = thornEffect.thornsDamage
+        }
+      }
+
+      // INSPIRATION: Check for pre-calculated bonus dice from scalesWithEnemyTier
+      if (doctrineId === 'inspiration') {
+        const bonusEntry = unitActiveDoctrines[`${doctrineId}_bonus`] as any
+        if (bonusEntry?.calculatedBonusDice) {
+          bonusDice += bonusEntry.calculatedBonusDice
+          continue // Skip normal processing for this doctrine
+        }
+      }
+
       for (const doctrineEffect of doctrine.effects) {
         if (doctrineEffect.target !== DoctrineTarget.SELF) continue
         const value = doctrineEffect.value || 0
@@ -2216,7 +2374,15 @@ export class CombatService {
             break
 
           case DoctrineEffectType.NEGATE_HITS:
-            negateHits += value
+            // FRACTAL_INVOCATION: value >= 50 means percentage-based (50 = 50%)
+            if (value >= 50 && incomingHits !== undefined) {
+              // Negate 50% of incoming hits, rounded up
+              const percentageNegate = Math.ceil(incomingHits * (value / 100))
+              negateHits += percentageNegate
+            } else if (value < 50) {
+              // Standard flat hit negation
+              negateHits += value
+            }
             break
 
           case DoctrineEffectType.GUARANTEED_CRITICAL:
@@ -2239,7 +2405,8 @@ export class CombatService {
       guaranteedCritical,
       criticalThresholdMod,
       defenseZero,
-      onesHurtSelf
+      onesHurtSelf,
+      thornsDamage
     }
   }
 
