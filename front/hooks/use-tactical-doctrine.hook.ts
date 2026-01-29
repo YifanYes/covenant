@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { trpc, queryClient, trpcOptions } from '@/utils/trpc.utils'
+import { trpc, trpcOptions, queryClient } from '@/utils/trpc.utils'
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
 import { DOCTRINES } from '@shared/constants/doctrines'
 import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
@@ -78,12 +78,12 @@ export function useTacticalDoctrine() {
 
     try {
       // Call the backend to resolve and persist the doctrine
+      // Note: mana is validated server-side from the database, not client-provided
       const result = await executeTacticalDoctrineMutation.mutateAsync({
         participationId,
         casterId: activeUnitId,
         doctrineId: selectedDoctrineId,
-        targetPosition: pendingAction.targetPosition,
-        casterMana: caster.currentMana
+        targetPosition: pendingAction.targetPosition
       })
 
       if (result.success) {
@@ -98,7 +98,7 @@ export function useTacticalDoctrine() {
         })
 
         // Invalidate queries to refresh data
-        queryClient.invalidateQueries({ queryKey: trpc.activity.list.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
 
         return {
           success: true,
@@ -113,6 +113,8 @@ export function useTacticalDoctrine() {
       console.error('Failed to execute tactical doctrine:', error)
       const errorMessage = error instanceof Error ? error.message : t('combat.error.unknown')
       toast.error(t('combat.error.doctrine_failed', 'Doctrine cast failed'), { description: errorMessage })
+      // Clear doctrine selection state on failure to reset UI
+      clearDoctrineSelection()
       return {
         success: false,
         error: errorMessage
@@ -128,7 +130,8 @@ export function useTacticalDoctrine() {
     playerUnits,
     selectedDoctrineId,
     executeTacticalDoctrineMutation,
-    startDoctrineAnimation
+    startDoctrineAnimation,
+    clearDoctrineSelection
   ])
 
   // Get info about the pending doctrine for UI
@@ -229,11 +232,11 @@ export function useTacticalDoctrine() {
 
     try {
       // Call the backend to activate the self-buff
+      // Note: mana is validated server-side from the database, not client-provided
       const result = await useSelfBuffDoctrineMutation.mutateAsync({
         participationId,
         casterId: activeUnitId,
-        doctrineId,
-        casterMana: caster.currentMana
+        doctrineId
       })
 
       if (result.success) {
@@ -254,7 +257,7 @@ export function useTacticalDoctrine() {
         }))
 
         // Invalidate queries to refresh data
-        queryClient.invalidateQueries({ queryKey: trpc.activity.list.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
 
         return {
           success: true,

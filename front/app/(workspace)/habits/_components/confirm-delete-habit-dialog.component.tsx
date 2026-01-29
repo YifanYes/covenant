@@ -23,7 +23,7 @@ export default function ConfirmDeleteHabitDialog({
     trpcOptions.habits.delete.mutationOptions({
       onSuccess: () => {
         toast.success(t('habits.success.delete'))
-        queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })
         setOpen(false)
         onDeleteSuccess()
       },

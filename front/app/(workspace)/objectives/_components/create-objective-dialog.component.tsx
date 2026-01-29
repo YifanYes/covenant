@@ -25,7 +25,7 @@ export default function CreateObjectiveDialog() {
     trpcOptions.objectives.create.mutationOptions({
       onSuccess: () => {
         toast.success(t('create_objective_dialog.success'))
-        queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() })
         setOpen(false)
       },
       onError: (error) => {

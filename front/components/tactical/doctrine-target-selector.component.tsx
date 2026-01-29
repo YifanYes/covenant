@@ -7,7 +7,6 @@ import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
 import { useTacticalDoctrine } from '@/hooks/use-tactical-doctrine.hook'
 import { DOCTRINES } from '@shared/constants/doctrines'
 import { getDoctrineRange, getDoctrineAoEPattern, type AoEPatternType } from '@shared/constants/aoe-patterns'
-import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
 import Button from '@/components/ui/button.component'
 import { cn } from '@/lib/cn.lib'
 import type { TacticalUnit } from '@shared/types/tactical-combat.types'
@@ -96,7 +95,7 @@ export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }
                       </span>
                     ) : pattern !== 'SINGLE' && (
                       <span className="text-xs text-purple-400">
-                        {getPatternLabel(pattern)}
+                        {t(getPatternI18nKey(pattern), pattern)}
                       </span>
                     )}
                   </div>
@@ -139,7 +138,7 @@ export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">{t('tactical.pattern', 'Pattern')}</span>
-            <span className="text-purple-400">{getPatternLabel(pattern)}</span>
+            <span className="text-purple-400">{t(getPatternI18nKey(pattern), pattern)}</span>
           </div>
         </div>
 
@@ -187,21 +186,21 @@ export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }
   return null
 }
 
-// Helper function to get human-readable pattern label
-function getPatternLabel(pattern: AoEPatternType): string {
+// Helper function to get i18n key for pattern label
+function getPatternI18nKey(pattern: AoEPatternType): string {
   switch (pattern) {
     case 'SINGLE':
-      return 'Single'
+      return 'tactical.pattern_single'
     case 'CROSS':
-      return 'Cross'
+      return 'tactical.pattern_cross'
     case 'DIAMOND':
-      return 'Diamond'
+      return 'tactical.pattern_diamond'
     case 'LINE_3':
-      return 'Line'
+      return 'tactical.pattern_line'
     case 'CONE':
-      return 'Cone'
+      return 'tactical.pattern_cone'
     case 'CIRCLE_2':
-      return 'Circle'
+      return 'tactical.pattern_circle'
     default:
       return pattern
   }

@@ -158,8 +158,7 @@ export const activityRouter = t.router({
         participationId: z.string(),
         casterId: z.string(),
         doctrineId: z.string(),
-        targetPosition: gridPositionSchema,
-        casterMana: z.number().int().min(0)
+        targetPosition: gridPositionSchema
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -177,12 +176,22 @@ export const activityRouter = t.router({
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
       }
 
+      // Fetch authoritative mana from database instead of trusting client
+      const character = await ctx.services.character.getCurrentClass(ctx.user.id)
+      if (!character) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      }
+      const currentClass = character.classes.find((c) => c.className === character.currentClass)
+      if (!currentClass) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
+      }
+
       return ctx.services.combat.executeTacticalDoctrine(
         input.participationId,
         input.casterId,
         input.doctrineId,
         input.targetPosition,
-        input.casterMana
+        currentClass.mana
       )
     }),
 
@@ -192,8 +201,7 @@ export const activityRouter = t.router({
       z.object({
         participationId: z.string(),
         casterId: z.string(),
-        doctrineId: z.string(),
-        casterMana: z.number().int().min(0)
+        doctrineId: z.string()
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -211,11 +219,21 @@ export const activityRouter = t.router({
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
       }
 
+      // Fetch authoritative mana from database instead of trusting client
+      const character = await ctx.services.character.getCurrentClass(ctx.user.id)
+      if (!character) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      }
+      const currentClass = character.classes.find((c) => c.className === character.currentClass)
+      if (!currentClass) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
+      }
+
       return ctx.services.combat.useSelfBuffDoctrine(
         input.participationId,
         input.casterId,
         input.doctrineId,
-        input.casterMana
+        currentClass.mana
       )
     })
 })

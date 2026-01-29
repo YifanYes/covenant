@@ -2374,13 +2374,14 @@ export class CombatService {
             break
 
           case DoctrineEffectType.NEGATE_HITS:
-            // FRACTAL_INVOCATION: value >= 50 means percentage-based (50 = 50%)
-            if (value >= 50 && incomingHits !== undefined) {
-              // Negate 50% of incoming hits, rounded up
+            // FRACTAL_INVOCATION: value >= 50 && <= 100 means percentage-based (50 = 50%)
+            // IRON_BASTION: value = 99 (negate all) should work as flat negation when used standalone
+            if (value >= 50 && value <= 100 && incomingHits !== undefined) {
+              // Negate percentage of incoming hits, rounded up
               const percentageNegate = Math.ceil(incomingHits * (value / 100))
               negateHits += percentageNegate
-            } else if (value < 50) {
-              // Standard flat hit negation
+            } else {
+              // Standard flat hit negation (includes iron_bastion's 99 when no incomingHits context)
               negateHits += value
             }
             break

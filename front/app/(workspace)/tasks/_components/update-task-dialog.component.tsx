@@ -40,12 +40,12 @@ export default function UpdateTaskDialog() {
       onSuccess: async (data: { diceEarned: number }) => {
         toast.success(t('tasks.success.update', { diceReward: getRewardText(data.diceEarned) }))
         await queryClient.invalidateQueries({
-          queryKey: trpc.tasks.getByDate.queryKey({
+          queryKey: trpcOptions.tasks.getByDate.queryKey({
             monthIndex: monthIndex.toString(),
             year: dayjs().year().toString()
           })
         })
-        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
         setSelectedTask(undefined)
       },
       onError: (error) => toast.error(t('tasks.error.internal.update'), { description: error.message })
@@ -57,12 +57,12 @@ export default function UpdateTaskDialog() {
       onSuccess: async () => {
         toast.success(t('tasks.success.delete'))
         await queryClient.invalidateQueries({
-          queryKey: trpc.tasks.getByDate.queryKey({
+          queryKey: trpcOptions.tasks.getByDate.queryKey({
             monthIndex: monthIndex.toString(),
             year: dayjs().year().toString()
           })
         })
-        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
         setSelectedTask(undefined)
       },
       onError: (error) => toast.error(t('tasks.error.internal.delete'), { description: error.message })
@@ -74,12 +74,12 @@ export default function UpdateTaskDialog() {
       onSuccess: async () => {
         toast.success(t('tasks.success.duplicate'))
         await queryClient.invalidateQueries({
-          queryKey: trpc.tasks.getByDate.queryKey({
+          queryKey: trpcOptions.tasks.getByDate.queryKey({
             monthIndex: monthIndex.toString(),
             year: dayjs().year().toString()
           })
         })
-        await queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
         setSelectedTask(undefined)
       },
       onError: (error) => toast.error(t('tasks.error.internal.duplicate'), { description: error.message })

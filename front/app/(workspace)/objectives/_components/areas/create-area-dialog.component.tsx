@@ -22,7 +22,7 @@ export default function CreateAreaDialog() {
     trpcOptions.areas.create.mutationOptions({
       onSuccess: () => {
         toast.success(t('areas.success.create'))
-        queryClient.invalidateQueries({ queryKey: trpc.areas.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.areas.getAll.queryKey() })
         setOpen(false)
       },
       onError: (error) => toast.error(t('areas.error.internal.create'), { description: error.message })

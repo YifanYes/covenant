@@ -463,11 +463,17 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
             (h) => h.type === 'DOCTRINE' && h.position.x === position.x && h.position.y === position.y
           )
 
+          // Guard: need active unit for doctrine targeting
+          if (!activeUnit) {
+            set({ selectedTile: position })
+            break
+          }
+
           if (isInDoctrineRange) {
             // Calculate AoE area for this doctrine
             const aoeArea = calculateAoEArea(
               position,
-              activeUnit!.position,
+              activeUnit.position,
               selectedDoctrineId,
               get().gridWidth,
               get().gridHeight
@@ -478,7 +484,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
               aoeArea,
               allUnits,
               false, // Don't include allies for damage
-              activeUnit!.isPlayer
+              activeUnit.isPlayer
             )
 
             // Update highlights to show AoE preview

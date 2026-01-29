@@ -35,7 +35,7 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
               diceReward: getRewardText(data.diceEarned)
             })
           )
-          await queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })
+          await queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })
         },
         onError: () => toast.error(t('habits.error.complete'))
       })

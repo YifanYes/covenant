@@ -166,8 +166,8 @@ export default function TaskTable() {
   const updateTaskMutation = useMutation(
     trpcOptions.tasks.update.mutationOptions({
       onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: trpc.tasks.getFiltered.queryKey(queryParams) })
-        queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getFiltered.queryKey(queryParams) })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
         toast.success(t('tasks.success.update', { diceReward: getRewardText(data.diceEarned) }))
       },
       onError: (error) => toast.error(t('tasks.error.internal.update'), { description: error.message })

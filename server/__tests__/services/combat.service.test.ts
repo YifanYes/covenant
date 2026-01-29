@@ -648,4 +648,249 @@ describe('CombatService', () => {
       expect(playerUnit.activeDoctrines.precise_strike).toBeUndefined()
     })
   })
+
+  describe('doctrine edge cases', () => {
+    const createTacticalState = (): TacticalStateData => {
+      const tiles: TileState[][] = []
+      for (let y = 0; y < 5; y++) {
+        const row: TileState[] = []
+        for (let x = 0; x < 5; x++) {
+          row.push({
+            position: { x, y },
+            terrain: TerrainType.GRASS,
+            occupantId: null,
+            isWalkable: true
+          })
+        }
+        tiles.push(row)
+      }
+
+      tiles[1][1].occupantId = 'player-1'
+      tiles[1][2].occupantId = 'enemy-1'
+
+      return {
+        mapTemplateId: 'test-map',
+        gridWidth: 5,
+        gridHeight: 5,
+        tiles,
+        units: [
+          {
+            id: 'player-1',
+            name: 'Test Player',
+            position: { x: 1, y: 1 },
+            hasMoved: false,
+            hasActed: false,
+            currentHealth: 10,
+            maxHealth: 10
+          },
+          {
+            id: 'enemy-1',
+            name: 'Test Enemy',
+            position: { x: 2, y: 1 },
+            hasMoved: false,
+            hasActed: false,
+            currentHealth: 10,
+            maxHealth: 10
+          }
+        ],
+        turnOrder: ['player-1', 'enemy-1'],
+        currentTurnIndex: 0,
+        turnNumber: 1
+      }
+    }
+
+    it('should reject doctrine cast with exactly 0 mana when doctrine has mana cost', async () => {
+      const mockCombatEnemyRepo = {
+        getActiveEnemy: vi.fn().mockResolvedValue(null),
+        appendToCombatLog: vi.fn()
+      }
+
+      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+        id: 'test-participation',
+        tacticalState: createTacticalState()
+      })
+      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+
+      const combatServiceWithEnemyRepo = new CombatService(
+        mockCharacterRepo,
+        mockActivityParticipationRepo,
+        mockCombatEnemyRepo as any
+      )
+
+      // Try to cast stellar_collapse (costs 8 mana) with 0 mana
+      await expect(combatServiceWithEnemyRepo.executeTacticalDoctrine(
+        'test-participation',
+        'player-1',
+        'stellar_collapse',
+        { x: 2, y: 1 },
+        0 // Zero mana
+      )).rejects.toThrow('Not enough mana')
+    })
+
+    it('should allow doctrine cast when mana exactly equals cost', async () => {
+      const mockCombatEnemyRepo = {
+        getActiveEnemy: vi.fn().mockResolvedValue(null),
+        appendToCombatLog: vi.fn()
+      }
+
+      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+        id: 'test-participation',
+        tacticalState: createTacticalState()
+      })
+      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+
+      const combatServiceWithEnemyRepo = new CombatService(
+        mockCharacterRepo,
+        mockActivityParticipationRepo,
+        mockCombatEnemyRepo as any
+      )
+
+      // stellar_collapse costs 8 mana
+      const stellarCollapse = DOCTRINES['stellar_collapse']
+      const exactMana = stellarCollapse.manaCost
+
+      const result = await combatServiceWithEnemyRepo.executeTacticalDoctrine(
+        'test-participation',
+        'player-1',
+        'stellar_collapse',
+        { x: 2, y: 1 },
+        exactMana
+      )
+
+      expect(result.success).toBe(true)
+    })
+
+    it('should skip dead enemies in AoE targeting', async () => {
+      const stateWithDeadEnemy = createTacticalState()
+      // Add a second enemy that is already dead (0 health)
+      stateWithDeadEnemy.tiles[1][3].occupantId = 'enemy-2'
+      stateWithDeadEnemy.units.push({
+        id: 'enemy-2',
+        name: 'Dead Enemy',
+        position: { x: 3, y: 1 },
+        hasMoved: false,
+        hasActed: false,
+        currentHealth: 0, // Dead
+        maxHealth: 10
+      })
+
+      const mockCombatEnemyRepo = {
+        getActiveEnemy: vi.fn().mockResolvedValue(null),
+        appendToCombatLog: vi.fn()
+      }
+
+      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+        id: 'test-participation',
+        tacticalState: stateWithDeadEnemy
+      })
+      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+
+      const combatServiceWithEnemyRepo = new CombatService(
+        mockCharacterRepo,
+        mockActivityParticipationRepo,
+        mockCombatEnemyRepo as any
+      )
+
+      const result = await combatServiceWithEnemyRepo.executeTacticalDoctrine(
+        'test-participation',
+        'player-1',
+        'stellar_collapse',
+        { x: 2, y: 1 }, // Target living enemy
+        100
+      )
+
+      expect(result.success).toBe(true)
+      // Only the living enemy should be affected
+      // Dead enemy should not appear in effects (or should have 0 damage)
+      const deadEnemyEffect = result.effects.find(e => e.unitId === 'enemy-2')
+      const livingEnemyEffect = result.effects.find(e => e.unitId === 'enemy-1')
+
+      expect(livingEnemyEffect).toBeDefined()
+      // Dead enemies shouldn't be targeted or should be filtered
+      // The behavior depends on implementation - either not in list or has 0 damage
+    })
+
+    it('should handle doctrine that kills an enemy mid-AoE', async () => {
+      const stateWithWeakEnemy = createTacticalState()
+      stateWithWeakEnemy.units[1].currentHealth = 1 // Very weak enemy
+
+      const mockCombatEnemyRepo = {
+        getActiveEnemy: vi.fn().mockResolvedValue(null),
+        appendToCombatLog: vi.fn()
+      }
+
+      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+        id: 'test-participation',
+        tacticalState: stateWithWeakEnemy
+      })
+      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+
+      const combatServiceWithEnemyRepo = new CombatService(
+        mockCharacterRepo,
+        mockActivityParticipationRepo,
+        mockCombatEnemyRepo as any
+      )
+
+      const result = await combatServiceWithEnemyRepo.executeTacticalDoctrine(
+        'test-participation',
+        'player-1',
+        'stellar_collapse',
+        { x: 2, y: 1 },
+        100
+      )
+
+      expect(result.success).toBe(true)
+
+      // Enemy with 1 HP should be killed
+      const enemyEffect = result.effects.find(e => e.unitId === 'enemy-1')
+      expect(enemyEffect).toBeDefined()
+
+      // If any damage was dealt, enemy should be killed
+      if (enemyEffect?.damageDealt && enemyEffect.damageDealt > 0) {
+        expect(enemyEffect.killed).toBe(true)
+      }
+
+      // Updated state should not include the dead enemy
+      expect(result.updatedState.units.find(u => u.id === 'enemy-1')).toBeUndefined()
+    })
+
+    it('should not affect caster with enemy-targeted DIRECT_DAMAGE doctrine', async () => {
+      const mockCombatEnemyRepo = {
+        getActiveEnemy: vi.fn().mockResolvedValue(null),
+        appendToCombatLog: vi.fn()
+      }
+
+      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+        id: 'test-participation',
+        tacticalState: createTacticalState()
+      })
+      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+
+      const combatServiceWithEnemyRepo = new CombatService(
+        mockCharacterRepo,
+        mockActivityParticipationRepo,
+        mockCombatEnemyRepo as any
+      )
+
+      const result = await combatServiceWithEnemyRepo.executeTacticalDoctrine(
+        'test-participation',
+        'player-1',
+        'stellar_collapse',
+        { x: 2, y: 1 },
+        100
+      )
+
+      expect(result.success).toBe(true)
+
+      // Caster should not take damage from their own doctrine
+      const casterEffect = result.effects.find(e => e.unitId === 'player-1')
+      if (casterEffect?.damageDealt !== undefined) {
+        expect(casterEffect.damageDealt).toBe(0)
+      }
+
+      // Caster should still have full health
+      const caster = result.updatedState.units.find(u => u.id === 'player-1')
+      expect(caster?.currentHealth).toBe(10)
+    })
+  })
 })

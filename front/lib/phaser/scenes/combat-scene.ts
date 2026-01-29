@@ -321,7 +321,9 @@ export class CombatScene extends Phaser.Scene {
     const caster = this.units.get(data.casterId)
 
     if (!caster) {
-      // Caster not found, complete animation immediately
+      // Caster not found - log warning and ensure animation state is reset
+      console.warn(`[CombatScene] Caster unit not found for doctrine animation: ${data.casterId}`)
+      this.isDoctrineAnimating = false
       useTacticalCombatStore.getState().completeDoctrineAnimation()
       return
     }

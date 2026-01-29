@@ -22,7 +22,7 @@ export default function TasksListBoard() {
     trpcOptions.tasks.bulkUpdate.mutationOptions({
       onSuccess: async () =>
         queryClient.invalidateQueries({
-          queryKey: trpc.tasks.getByDate.queryKey({
+          queryKey: trpcOptions.tasks.getByDate.queryKey({
             monthIndex: monthIndex.toString(),
             year: dayjs().year().toString()
           })
