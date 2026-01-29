@@ -73,8 +73,10 @@ export function useFactionThemeProvider({ initialFaction }: { initialFaction: Fa
     })
 
     const cls = FACTION_TO_CLASS[faction]
-    root.classList.add(cls)
-    body.classList.add(cls)
+    if (cls) {
+      root.classList.add(cls)
+      body.classList.add(cls)
+    }
   }, [faction])
 
   return { faction, setFaction, factionClass: FACTION_TO_CLASS[faction] }
