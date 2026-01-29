@@ -1,7 +1,7 @@
 'use client'
 import OnboardingRedirect from '@/components/shared/onboarding-redirect'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import type { ItemDefinition } from '@shared/constants/items'
 import { ItemType } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -29,8 +29,8 @@ function StoreContent() {
       })
       setSelectedIds(new Set())
       setConsumableQuantities({})
-      queryClient.invalidateQueries({ queryKey: trpc.store.list.queryKey() })
-      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.store.list.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
     },
     onError: (error) => toast.error(t('store.error.buy'), { description: error.message })
   })

@@ -1341,6 +1341,12 @@
       "zoom": "Scroll: Zoom"
     },
     "moving": "Moving...",
+    "pattern_circle": "Circle",
+    "pattern_cone": "Cone",
+    "pattern_cross": "Cross",
+    "pattern_diamond": "Diamond",
+    "pattern_line": "Line",
+    "pattern_single": "Single",
     "range": "range",
     "select_destination": "Select Destination",
     "select_target": "Select Target",

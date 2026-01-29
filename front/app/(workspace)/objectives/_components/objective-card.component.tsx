@@ -39,7 +39,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
     trpcOptions.objectives.update.mutationOptions({
       onSuccess: () => {
         toast.success(t('objectives.update.success'))
-        queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() })
         setOpen(false)
       },
       onError: (error) => toast.error(t('objectives.update.error'), { description: error.message })

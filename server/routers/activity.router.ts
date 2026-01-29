@@ -38,28 +38,6 @@ export const activityRouter = t.router({
       return ctx.services.activity.joinActivity(input.activityId, input.characterId)
     }),
 
-  resolveTurn: protectedProcedure
-    .input(
-      z.object({
-        activityId: z.string(),
-        characterId: z.string(),
-        diceSpent: z.number(),
-        attackRolls: z.array(z.number()),
-        defenseRolls: z.array(z.number())
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const character = await ctx.services.character.getCharacterById(input.characterId)
-      return ctx.services.activity.resolveCombatTurn(
-        input.activityId,
-        input.characterId,
-        input.diceSpent,
-        input.attackRolls,
-        input.defenseRolls,
-        character
-      )
-    }),
-
   // Tactical combat: Execute movement
   executeTacticalMove: protectedProcedure
     .input(
@@ -170,6 +148,92 @@ export const activityRouter = t.router({
         input.enemyAttackRange,
         input.enemyAttackDice,
         input.enemyAttackThreshold
+      )
+    }),
+
+  // Tactical combat: Execute doctrine with AoE targeting
+  executeTacticalDoctrine: protectedProcedure
+    .input(
+      z.object({
+        participationId: z.string(),
+        casterId: z.string(),
+        doctrineId: z.string(),
+        targetPosition: gridPositionSchema
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Verify the user owns this participation
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
+        input.participationId,
+        ctx.user.id
+      )
+      if (!isOwner) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
+      }
+
+      // Verify the caster is a player unit
+      if (!input.casterId.startsWith('player-')) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
+      }
+
+      // Fetch authoritative mana from database instead of trusting client
+      const character = await ctx.services.character.getCurrentClass(ctx.user.id)
+      if (!character) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      }
+      const currentClass = character.classes.find((c) => c.className === character.currentClass)
+      if (!currentClass) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
+      }
+
+      return ctx.services.combat.executeTacticalDoctrine(
+        input.participationId,
+        input.casterId,
+        input.doctrineId,
+        input.targetPosition,
+        currentClass.mana
+      )
+    }),
+
+  // Tactical combat: Use self-buff doctrine (no targeting required)
+  useSelfBuffDoctrine: protectedProcedure
+    .input(
+      z.object({
+        participationId: z.string(),
+        casterId: z.string(),
+        doctrineId: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Verify the user owns this participation
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
+        input.participationId,
+        ctx.user.id
+      )
+      if (!isOwner) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
+      }
+
+      // Verify the caster is a player unit
+      if (!input.casterId.startsWith('player-')) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
+      }
+
+      // Fetch authoritative mana from database instead of trusting client
+      const character = await ctx.services.character.getCurrentClass(ctx.user.id)
+      if (!character) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      }
+      const currentClass = character.classes.find((c) => c.className === character.currentClass)
+      if (!currentClass) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
+      }
+
+      return ctx.services.combat.useSelfBuffDoctrine(
+        input.participationId,
+        input.casterId,
+        input.doctrineId,
+        currentClass.mana
       )
     })
 })

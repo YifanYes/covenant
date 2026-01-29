@@ -1341,6 +1341,12 @@
       "zoom": "Scroll: Zoom"
     },
     "moving": "Moviendo...",
+    "pattern_circle": "Círculo",
+    "pattern_cone": "Cono",
+    "pattern_cross": "Cruz",
+    "pattern_diamond": "Diamante",
+    "pattern_line": "Línea",
+    "pattern_single": "Individual",
     "range": "rango",
     "select_destination": "Seleccionar Destino",
     "select_target": "Seleccionar Objetivo",

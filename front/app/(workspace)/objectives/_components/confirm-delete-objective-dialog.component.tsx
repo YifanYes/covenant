@@ -22,7 +22,7 @@ export default function ConfirmDeleteObjectiveDialog({ objective, onDeleteSucces
     trpcOptions.objectives.delete.mutationOptions({
       onSuccess: () => {
         toast.success(t('objectives.delete.success'))
-        queryClient.invalidateQueries({ queryKey: trpc.objectives.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() })
         setOpen(false)
         onDeleteSuccess()
       },

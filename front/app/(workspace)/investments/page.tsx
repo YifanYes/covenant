@@ -21,8 +21,8 @@ export default function InvestmentsPage() {
   const contributeMutation = useMutation({
     ...trpcOptions.investment.contribute.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trpc.investment.list.queryKey({ characterId: character?.id ?? '' }) })
-      queryClient.invalidateQueries({ queryKey: trpc.character.get.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.investment.list.queryKey({ characterId: character?.id ?? '' }) })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.get.queryKey() })
       setSelectedInvestment(null)
     }
   })

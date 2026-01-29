@@ -1,4 +1,5 @@
 import type { CharacterClassName, MagicNature } from '../constants/classes'
+import type { AoEPatternType } from '../constants/aoe-patterns'
 
 export const DoctrineEffectType = {
   // Adds extra power dice to attack or defense
@@ -50,6 +51,12 @@ export interface DoctrineEffect {
   duration?: number
   // Which status effect to apply (for APPLY_STATUS type)
   statusEffect?: StatusEffect
+  // Execute threshold: kills target if currentHealth < maxHealth * healthThreshold (0.25 = 25%)
+  healthThreshold?: number
+  // If true, the effect value scales with enemy tier (tier * 2 dice)
+  scalesWithEnemyTier?: boolean
+  // Thorns damage: flat damage dealt to attackers when the buff holder is hit (karmic_retribution)
+  thornsDamage?: number
 }
 
 export interface DoctrineDefinition {
@@ -63,6 +70,10 @@ export interface DoctrineDefinition {
   manaCost: number
   isUltimate: boolean
   effects: DoctrineEffect[]
+  // Tactical combat AoE settings (optional, defaults to SINGLE)
+  aoePattern?: AoEPatternType
+  // Casting range for tactical combat (optional, defaults to weapon range or 3)
+  castRange?: number
 }
 
 export interface ActiveStatusEffect {

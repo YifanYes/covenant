@@ -1,5 +1,6 @@
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type DoctrineDefinition } from '../types/doctrine.types'
 import { CharacterClassName, MagicNature } from './classes'
+import { AoEPatternType } from './aoe-patterns'
 
 export const MAX_EQUIPPED_DOCTRINES = 2
 
@@ -91,6 +92,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -128,6 +131,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 2,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -309,6 +314,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 5,
     isUltimate: false,
+    aoePattern: AoEPatternType.CROSS,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -410,6 +417,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: true,
+    aoePattern: AoEPatternType.CROSS,
+    castRange: 2,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -448,9 +457,11 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     isUltimate: false,
     effects: [
       {
-        type: DoctrineEffectType.DIRECT_DAMAGE,
-        target: DoctrineTarget.ENEMY,
-        value: 0 // Reflects damage taken
+        type: DoctrineEffectType.NEGATE_HITS, // Using NEGATE_HITS to make it a valid self-buff
+        target: DoctrineTarget.SELF,
+        value: 0, // No hit negation, but triggers thorns
+        duration: 2,
+        thornsDamage: 2 // Custom field: deal 2 damage to attackers when hit
       }
     ]
   },
@@ -464,11 +475,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 7,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
         target: DoctrineTarget.ENEMY,
-        value: 99 // Instant kill if enemy <=4 wounds
+        value: 99, // Instant kill if enemy below 25% health
+        healthThreshold: 0.25 // Execute threshold: kills if currentHealth < maxHealth * 0.25
       }
     ]
   },
@@ -539,6 +553,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 4,
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -692,7 +708,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.NEGATE_HITS,
         target: DoctrineTarget.SELF,
-        value: 1 // 50% chance to negate all damage
+        value: 50 // Negate 50% of incoming hits (rounded up)
       }
     ]
   },
@@ -745,6 +761,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 5,
     isUltimate: false,
+    aoePattern: AoEPatternType.DIAMOND,
+    castRange: 3,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -827,10 +845,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: false,
+    aoePattern: AoEPatternType.DIAMOND,
+    castRange: 3,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.ENEMY,
+        target: DoctrineTarget.ALL_ENEMIES,
         value: -2, // All enemies -2 attack power
         duration: 1
       }
@@ -846,11 +866,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 4,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.SELF,
-        value: 0 // Copy enemy attack/defense value
+        value: 4, // Fixed buff: +2 dice per enemy tier (Tier 1=+2, Tier 2=+4, Tier 3=+6). Default +4.
+        scalesWithEnemyTier: true // Backend uses enemy tier to calculate: tier * 2
       }
     ]
   },
@@ -884,6 +907,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 10,
     isUltimate: true,
+    aoePattern: AoEPatternType.CIRCLE_2,
+    castRange: 4,
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -932,6 +957,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 8,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 5,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,

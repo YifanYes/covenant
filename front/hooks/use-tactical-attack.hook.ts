@@ -65,7 +65,17 @@ export function useTacticalAttack() {
     if (!target) {
       console.error('Target unit not found')
       toast.error(t('combat.error.target_not_found', 'Target not found'))
+      // Clear the pending action since the target no longer exists
+      useTacticalCombatStore.getState().cancelAction()
       return { success: false, error: 'Target not found' }
+    }
+
+    // Verify target is still alive
+    if (target.currentHealth <= 0) {
+      console.error('Target is already dead')
+      toast.error(t('combat.error.target_dead', 'Target is already defeated'))
+      useTacticalCombatStore.getState().cancelAction()
+      return { success: false, error: 'Target is already dead' }
     }
 
     setIsExecuting(true)

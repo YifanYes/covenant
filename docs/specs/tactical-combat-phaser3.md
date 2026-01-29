@@ -511,19 +511,19 @@ shared/
 
 **Deliverable:** Ranged attacks work, dice rolling preserved
 
-### [ ] Phase 5: Doctrine AoE
+### [x] Phase 5: Doctrine AoE
 
 **Goal:** Doctrines have spatial effects
 
 **Tasks:**
 
-1. Define AoE patterns for all doctrines
-2. Create `DoctrineTargetSelector`
+1. Define AoE patterns - `shared/constants/aoe-patterns.ts`
+2. Create `DoctrineTargetSelector` component
 3. Implement AoE preview highlighting
-4. Backend: `getAoETargets()` function
-5. Add spell effect animations
+4. Backend `calculateAoETargets()` and `executeTacticalDoctrine()`
+5. Spell effect animations
 
-**Deliverable:** AoE doctrines target multiple enemies
+**Deliverable:** AoE doctrines target multiple enemies, all doctrine effect types implemented
 
 ### [x] Phase 6: Enemy AI
 

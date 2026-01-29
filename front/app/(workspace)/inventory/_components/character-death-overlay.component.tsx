@@ -18,7 +18,7 @@ export default function CharacterDeathOverlay() {
     ...trpcOptions.character.revive.mutationOptions(),
     onSuccess: () => {
       toast.success(t('inventory.success.revive'))
-      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
     },
     onError: () => {
       toast.error(t('inventory.error.revive'))
