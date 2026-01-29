@@ -221,6 +221,8 @@ export interface TacticalAttackResult {
     currentHealth: number
     maxHealth: number
   }
+  // Self-damage from rolling 1s (plasma_missile, audacity)
+  selfDamageFromOnes?: number
 }
 
 // Enemy AI turn result
@@ -271,4 +273,8 @@ export interface TacticalDoctrineResult {
   updatedState: TacticalStateData
   // Combat log entries
   logEntries: CombatLogEntry[]
+  // Mana restored (for doctrines like transfusion, disintegration_ray on kill)
+  manaRestored?: number
+  // Self-damage dealt (for doctrines like transfusion that sacrifice health)
+  selfDamage?: number
 }

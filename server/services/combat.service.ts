@@ -632,13 +632,35 @@ export class CombatService {
     // For now, skip counter-attacks to keep it simple
     // Counter-attacks can be added in a future iteration
 
+    // Calculate self-damage from rolling 1s (plasma_missile, audacity special behavior)
+    let selfDamageFromOnes = 0
+    if (buffs.onesHurtSelf) {
+      selfDamageFromOnes = attackerRolls.filter((roll) => roll === 1).length
+      if (selfDamageFromOnes > 0) {
+        damageToAttacker += selfDamageFromOnes
+        logEntries.push({
+          timestamp: timestamp + 4.5,
+          type: CombatLogType.DAMAGE_TO_PLAYER,
+          data: {
+            damage: selfDamageFromOnes,
+            source: 'self_damage_from_ones',
+            onesRolled: selfDamageFromOnes
+          }
+        })
+      }
+    }
+
+    // Check if attacker is killed by self-damage
+    const newAttackerHealth = Math.max(0, attackerCurrentHealth - damageToAttacker)
+    attackerKilled = newAttackerHealth <= 0
+
     // Update state - clear consumed doctrines from attacker and defense buffs from defender
     const updatedUnits = state.units.map((unit, i) => {
       if (i === attackerIndex) {
         return {
           ...unit,
           hasActed: true,
-          currentHealth: attackerCurrentHealth - damageToAttacker,
+          currentHealth: newAttackerHealth,
           activeDoctrines: this.clearConsumedDoctrines(unit.activeDoctrines)
         }
       }
@@ -662,6 +684,17 @@ export class CombatService {
       if (updatedTiles[targetPos.y]?.[targetPos.x]) {
         updatedTiles[targetPos.y][targetPos.x].occupantId = null
       }
+    }
+    if (attackerKilled) {
+      const attackerPos = attackerUnit.position
+      if (updatedTiles[attackerPos.y]?.[attackerPos.x]) {
+        updatedTiles[attackerPos.y][attackerPos.x].occupantId = null
+      }
+      logEntries.push({
+        timestamp: timestamp + 5.5,
+        type: CombatLogType.PLAYER_DEFEATED,
+        data: { cause: 'self_damage_from_ones' }
+      })
     }
 
     // Filter out dead units from turn order
@@ -795,7 +828,8 @@ export class CombatService {
       counterDefenseRolls,
       logEntries,
       goldReward,
-      nextEnemy
+      nextEnemy,
+      selfDamageFromOnes: selfDamageFromOnes > 0 ? selfDamageFromOnes : undefined
     }
   }
 
@@ -1592,6 +1626,11 @@ export class CombatService {
     const logEntries: CombatLogEntry[] = []
     const effects: TacticalDoctrineResult['effects'] = []
 
+    // Track special doctrine results
+    let manaRestored = 0
+    let selfDamage = 0
+    let killCount = 0
+
     // Log doctrine cast
     logEntries.push({
       timestamp,
@@ -1737,12 +1776,23 @@ export class CombatService {
                 })
 
                 if (killed) {
+                  killCount++
                   logEntries.push({
                     timestamp: timestamp + 0.2,
                     type: CombatLogType.ENEMY_DEFEATED,
                     data: { enemy: target.name }
                   })
                 }
+              }
+
+              // DISINTEGRATION_RAY: Refund mana on kill
+              if (doctrineId === 'disintegration_ray' && killCount > 0) {
+                manaRestored = doctrine.manaCost
+                logEntries.push({
+                  timestamp: timestamp + 0.3,
+                  type: CombatLogType.DOCTRINE_EFFECT,
+                  data: { effect: 'mana_refund', manaRestored: manaRestored, reason: 'kill' }
+                })
               }
             }
           } else if (effect.target === DoctrineTarget.ALL_ENEMIES || effect.target === DoctrineTarget.ENEMY) {
@@ -1757,13 +1807,80 @@ export class CombatService {
           break
 
         case DoctrineEffectType.HEAL:
-          // Healing would typically target self or allies
-          // For now, apply to caster if SELF target
+          // Healing logic with special doctrine behaviors
           if (effect.target === DoctrineTarget.SELF) {
-            const healAmount = effect.value || 0
             const casterInUnits = updatedUnits.findIndex((u) => u.id === casterId)
-            if (casterInUnits !== -1) {
-              const currentCaster = updatedUnits[casterInUnits]
+            if (casterInUnits === -1) break
+
+            const currentCaster = updatedUnits[casterInUnits]
+
+            // TRANSFUSION: Sacrifice 2 health to restore 6 mana
+            if (doctrineId === 'transfusion') {
+              const healthCost = 2
+              const manaRestore = effect.value || 6
+
+              // Apply health cost
+              const newHealth = Math.max(0, currentCaster.currentHealth - healthCost)
+              updatedUnits[casterInUnits] = {
+                ...currentCaster,
+                currentHealth: newHealth
+              }
+
+              // Track mana restoration (handled by caller)
+              manaRestored = manaRestore
+              selfDamage = healthCost
+
+              effects.push({
+                unitId: casterId,
+                damageDealt: healthCost
+              })
+
+              logEntries.push({
+                timestamp: timestamp + 0.1,
+                type: CombatLogType.DOCTRINE_EFFECT,
+                data: { effect: 'transfusion', healthSacrificed: healthCost, manaRestored: manaRestore }
+              })
+
+              // Check if caster killed themselves
+              if (newHealth <= 0) {
+                effects.push({
+                  unitId: casterId,
+                  killed: true
+                })
+              }
+            }
+            // BATTLE_FERVOR: Roll dice, heal based on hits (up to value)
+            else if (doctrineId === 'battle_fervor') {
+              const maxHeal = effect.value || 3
+
+              // Roll dice to determine healing (same mechanics as attack)
+              const healDice = 3 // Roll 3 dice for healing
+              const healRolls = this.rollDice(healDice)
+              const { count: hits } = this.calculateHitsWithCount(healRolls, 4, 6)
+
+              // Heal based on hits, capped at maxHeal
+              const actualHeal = Math.min(hits, maxHeal)
+              const newHealth = Math.min(currentCaster.maxHealth, currentCaster.currentHealth + actualHeal)
+
+              updatedUnits[casterInUnits] = {
+                ...currentCaster,
+                currentHealth: newHealth
+              }
+
+              effects.push({
+                unitId: casterId,
+                healthRestored: actualHeal
+              })
+
+              logEntries.push({
+                timestamp: timestamp + 0.1,
+                type: CombatLogType.DOCTRINE_EFFECT,
+                data: { effect: 'battle_fervor', dice: healDice, rolls: healRolls, hits, healAmount: actualHeal }
+              })
+            }
+            // Standard healing
+            else {
+              const healAmount = effect.value || 0
               const newHealth = Math.min(currentCaster.maxHealth, currentCaster.currentHealth + healAmount)
               updatedUnits[casterInUnits] = {
                 ...currentCaster,
@@ -1852,7 +1969,9 @@ export class CombatService {
       effects,
       manaCost: doctrine.manaCost,
       updatedState,
-      logEntries
+      logEntries,
+      manaRestored: manaRestored > 0 ? manaRestored : undefined,
+      selfDamage: selfDamage > 0 ? selfDamage : undefined
     }
   }
 
@@ -2035,6 +2154,8 @@ export class CombatService {
     negateHits: number
     guaranteedCritical: boolean
     criticalThresholdMod: number
+    defenseZero: boolean
+    onesHurtSelf: boolean
   } {
     if (!unitActiveDoctrines) {
       return {
@@ -2043,7 +2164,9 @@ export class CombatService {
         thresholdMod: 0,
         negateHits: 0,
         guaranteedCritical: false,
-        criticalThresholdMod: 0
+        criticalThresholdMod: 0,
+        defenseZero: false,
+        onesHurtSelf: false
       }
     }
 
@@ -2053,12 +2176,27 @@ export class CombatService {
     let negateHits = 0
     let guaranteedCritical = false
     let criticalThresholdMod = 0
+    let defenseZero = false
+    let onesHurtSelf = false
+
+    // Doctrines that set defense to 0
+    const defenseZeroDoctrines = ['reckless_strike', 'audacity']
+    // Doctrines where rolling 1s hurts self
+    const onesHurtSelfDoctrines = ['plasma_missile', 'audacity']
 
     for (const [doctrineId, effect] of Object.entries(unitActiveDoctrines)) {
       if (effect.remainingTurns <= 0) continue
 
       const doctrine = DOCTRINES[doctrineId]
       if (!doctrine) continue
+
+      // Check for special doctrine behaviors
+      if (defenseZeroDoctrines.includes(doctrineId)) {
+        defenseZero = true
+      }
+      if (onesHurtSelfDoctrines.includes(doctrineId)) {
+        onesHurtSelf = true
+      }
 
       for (const doctrineEffect of doctrine.effects) {
         if (doctrineEffect.target !== DoctrineTarget.SELF) continue
@@ -2099,7 +2237,9 @@ export class CombatService {
       thresholdMod,
       negateHits,
       guaranteedCritical,
-      criticalThresholdMod
+      criticalThresholdMod,
+      defenseZero,
+      onesHurtSelf
     }
   }
 

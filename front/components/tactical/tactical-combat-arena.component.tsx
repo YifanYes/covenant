@@ -380,7 +380,7 @@ export default function TacticalCombatArena({
         <DiceResult key={`${prefix}-p-${i}`} value={v} isSuccess={false} isCritical={false} isRolling />
       ))
     }
-    if (isAttacking && submitted) {
+    if (isTacticalAttackLoading && submitted) {
       return submitted.map((v, i) => (
         <DiceResult
           key={`${prefix}-s-${i}`}
@@ -578,7 +578,7 @@ export default function TacticalCombatArena({
                 onRoll={handleRoll}
                 isRolling={isWaitingForResolve}
                 customButtonLabel={rollButtonLabel}
-                title={isAttacking ? t('combat.to_battle') : undefined}
+                title={isAttackPhase ? t('combat.to_battle') : undefined}
                 diceLimit={diceLimit}
               />
 
