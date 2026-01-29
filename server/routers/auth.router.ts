@@ -1,4 +1,4 @@
-import { loginSchema, signUpSchema } from '@shared/schemas/auth.schemas'
+import { loginSchema, signUpSchema, updateThemeSchema } from '@shared/schemas/auth.schemas'
 import { protectedProcedure, publicProcedure, t } from '../trpc'
 
 export const authRouter = t.router({
@@ -16,5 +16,13 @@ export const authRouter = t.router({
 
   deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {
     return ctx.services.auth.deleteAccount(ctx.user.id)
+  }),
+
+  updateTheme: protectedProcedure.input(updateThemeSchema).mutation(async ({ ctx, input }) => {
+    return ctx.services.auth.updateTheme(ctx.user.id, input)
+  }),
+
+  getProfile: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.services.auth.getProfile(ctx.user.id)
   })
 })

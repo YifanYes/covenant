@@ -1,10 +1,21 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '../styles/tokens.css';
+@import '../styles/faction-themes.css';
+@import '../styles/rpg.css';
+@import '../styles/typography.css';
+
+@theme {
+  --font-title: var(--font-cinzel);
+  --font-body: var(--font-eb-garamond);
+}
 
 @custom-variant dark (&:is(.dark *));
 
 @layer base {
+  html {
+    @apply bg-background;
+  }
   * {
     @apply border-border outline-ring/50;
   }

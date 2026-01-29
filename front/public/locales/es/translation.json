@@ -1155,8 +1155,9 @@
     "language_placeholder": "Seleccionar idioma",
     "logout_button": "Cerrar sesión",
     "theme_dark": "Oscuro",
-    "theme_label": "Tema",
+    "mode_label": "Modo",
     "theme_light": "Claro",
+    "faction_theme_label": "Tema de Facción",
     "title": "Configuración"
   },
   "sidebar": {

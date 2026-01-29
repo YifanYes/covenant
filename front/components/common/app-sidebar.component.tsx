@@ -13,6 +13,7 @@ import Sidebar, {
   SidebarTrigger
 } from '@/ui/sidebar.component'
 import { BookOpen, Coin, Dashboard, List, Luggage, Map, Sliders, Store, Trophy } from '@nsmr/pixelart-react'
+import Link from 'next/link'
 import type { ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -25,16 +26,16 @@ interface SidebarItem {
 function SidebarSection({ title, items }: { title?: string; items: SidebarItem[] }) {
   return (
     <SidebarGroup>
-      {title && <SidebarGroupLabel>{title}</SidebarGroupLabel>}
+      {title && <SidebarGroupLabel className="font-title text-sidebar-foreground">{title}</SidebarGroupLabel>}
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild tooltip={item.title}>
-                <a href={item.url}>
+                <Link href={item.url}>
                   <item.icon />
-                  <span>{item.title}</span>
-                </a>
+                  <span className="font-title">{item.title}</span>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

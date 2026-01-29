@@ -39,7 +39,10 @@ export const ConfirmDeleteAccountDialog = () => {
       confirmLabel='delete'
       isLoading={deleteAccountMutation.isPending}
       trigger={
-        <Button variant='destructive' disabled={deleteAccountMutation.isPending}>
+        <Button
+          className="text-destructive border-destructive hover:text-background hover:bg-destructive cursor-pointer border bg-transparent"
+          disabled={deleteAccountMutation.isPending}
+        >
           {t('confirm_delete_account_dialog.button')}
         </Button>
       }
