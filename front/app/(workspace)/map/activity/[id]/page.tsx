@@ -21,9 +21,9 @@ import { ActivityDifficulty } from '@shared/constants/activities'
 import { getEnemy } from '@shared/constants/enemies'
 import { type CombatLogEntry, type EnemyState, type InventoryCharacter } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRouter, useParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
@@ -35,7 +35,6 @@ const TacticalCombatArena = dynamic(
 
 export default function ActivityDetailPage() {
   const { id } = useParams()
-  const router = useRouter()
   const { t } = useTranslation()
 
   const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
@@ -45,7 +44,6 @@ export default function ActivityDetailPage() {
   const activity = activities.find((a) => a.id === id)
 
   const participation = (activity as any)?.participation
-  const [lastTurnResult, setLastTurnResult] = useState<any>(null)
 
   // Get combat log from active enemy
   const activeEnemy = participation?.activeEnemy
@@ -54,95 +52,43 @@ export default function ActivityDetailPage() {
   const [hasJoined, setHasJoined] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
-  // Build initial enemy state from new API structure
-  let initialEnemyState: EnemyState | null = null
-
-  if (participation?.activeEnemy) {
-    const ae = participation.activeEnemy
-    initialEnemyState = {
-      id: ae.id,
-      templateId: ae.templateId,
-      currentHealth: ae.currentHealth,
-      maxHealth: ae.maxHealth,
-      namePrefix: ae.namePrefix,
-      nameSuffix: ae.nameSuffix
-    }
-  } else if (!participation && activity?.enemySpawnWeights) {
-    // No participation yet, show preview of first enemy from spawn weights
-    const defaultEnemyId = Object.keys(activity.enemySpawnWeights)[0]
-    const template = getEnemy(defaultEnemyId)
-
-    if (template) {
-      initialEnemyState = {
-        id: 'enemy-preview',
-        templateId: template.id,
-        currentHealth: template.health,
-        maxHealth: template.health
+  // Build enemy state from participation data (reactive to query updates)
+  const currentEnemy = useMemo((): EnemyState | null => {
+    if (participation?.activeEnemy) {
+      const ae = participation.activeEnemy
+      return {
+        id: ae.id,
+        templateId: ae.templateId,
+        currentHealth: ae.currentHealth,
+        maxHealth: ae.maxHealth,
+        namePrefix: ae.namePrefix,
+        nameSuffix: ae.nameSuffix
       }
     }
-  }
-
-  const [currentEnemy, setCurrentEnemy] = useState<EnemyState | null>(initialEnemyState)
+    if (!participation && activity?.enemySpawnWeights) {
+      // No participation yet, show preview of first enemy from spawn weights
+      const defaultEnemyId = Object.keys(activity.enemySpawnWeights)[0]
+      const template = getEnemy(defaultEnemyId)
+      if (template) {
+        return {
+          id: 'enemy-preview',
+          templateId: template.id,
+          currentHealth: template.health,
+          maxHealth: template.health
+        }
+      }
+    }
+    return null
+  }, [participation, activity?.enemySpawnWeights])
 
   const joinMutation = useMutation({
     ...trpcOptions.activity.join.mutationOptions(),
-    onSuccess: (result: any) => {
+    onSuccess: () => {
       toast.success(t('activities.success.start'))
       queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
       setHasJoined(true)
-
-      // Set enemy from join response
-      if (result.participation?.activeEnemy) {
-        const ae = result.participation.activeEnemy
-        setCurrentEnemy({
-          id: ae.id,
-          templateId: ae.templateId,
-          currentHealth: ae.currentHealth,
-          maxHealth: ae.maxHealth,
-          namePrefix: ae.namePrefix,
-          nameSuffix: ae.nameSuffix
-        })
-      }
     },
     onError: (error) => toast.error(t('activities.error.start'), { description: error.message })
-  })
-
-  const resolveTurnMutation = useMutation({
-    ...trpcOptions.activity.resolveTurn.mutationOptions(),
-    onSuccess: (result: any) => {
-      setLastTurnResult(result)
-
-      if (result.isActivityCompleted) {
-        toast.success(t('activities.success.complete'))
-        setTimeout(() => router.push('/map'), 1500)
-      } else if (result.enemyDefeated) {
-        toast.success(t('combat.result_dialog.success_title'))
-
-        if (result.nextEnemyState) {
-          setCurrentEnemy({
-            id: result.nextEnemyState.id,
-            templateId: result.nextEnemyState.templateId,
-            currentHealth: result.nextEnemyState.currentHealth,
-            maxHealth: result.nextEnemyState.maxHealth,
-            namePrefix: result.nextEnemyState.namePrefix,
-            nameSuffix: result.nextEnemyState.nameSuffix
-          })
-        } else {
-          setCurrentEnemy(null)
-        }
-      } else {
-        if (currentEnemy) {
-          setCurrentEnemy({
-            ...currentEnemy,
-            currentHealth: Math.max(0, currentEnemy.currentHealth - result.damageToEnemy)
-          })
-        }
-      }
-
-      queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
-    },
-    onError: (error) => toast.error(t('combat.error.attack'), { description: error.message })
   })
 
   if (!activity) {
@@ -167,16 +113,6 @@ export default function ActivityDetailPage() {
   const confirmJoin = () => {
     setShowConfirmModal(false)
     joinMutation.mutate({ activityId: activity.id, characterId: character.id })
-  }
-
-  const handleAttack = ({ attackRolls, defenseRolls }: { attackRolls: number[]; defenseRolls: number[] }) => {
-    resolveTurnMutation.mutate({
-      activityId: activity.id,
-      characterId: character.id,
-      diceSpent: attackRolls.length,
-      attackRolls,
-      defenseRolls
-    })
   }
 
   const characterTier = character?.tier ?? 1
@@ -275,16 +211,14 @@ export default function ActivityDetailPage() {
       </div>
 
       {/* Tactical Combat Area */}
-      {currentEnemy && (
+      {currentEnemy && participation?.id && (
         <TacticalCombatArena
           character={character}
           enemies={[currentEnemy]}
           combatLog={combatLog}
           diceBank={(character.data as any)?.diceBank ?? 0}
-          onAttack={handleAttack}
-          isAttacking={resolveTurnMutation.isPending}
-          lastTurnResult={lastTurnResult}
-          participationId={participation?.id}
+          lastTurnResult={null}
+          participationId={participation.id}
           activeDoctrines={participation?.activeDoctrines as Record<string, any>}
           className='min-h-0 flex-1'
         />

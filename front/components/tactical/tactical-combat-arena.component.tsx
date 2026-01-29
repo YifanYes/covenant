@@ -59,11 +59,9 @@ interface TacticalCombatArenaProps {
   enemies: EnemyState[]
   combatLog: CombatLogEntry[]
   diceBank: number
-  onAttack: (rolls: { attackRolls: number[]; defenseRolls: number[] }) => void
-  isAttacking: boolean
   lastTurnResult: any
   className?: string
-  participationId?: string
+  participationId: string
   activeDoctrines?: Record<string, any>
 }
 
@@ -72,8 +70,6 @@ export default function TacticalCombatArena({
   enemies,
   combatLog,
   diceBank,
-  onAttack,
-  isAttacking,
   lastTurnResult,
   className,
   participationId,
@@ -174,27 +170,22 @@ export default function TacticalCombatArena({
   // Enemy AI turn hook - automatically executes when it's an enemy's turn
   const { isExecuting: isEnemyTurnExecuting } = useTacticalEnemyTurn()
 
-  // Handler for when dice rolling completes - routes to tactical or legacy combat
+  // Handler for when dice rolling completes - executes tactical combat
   const handleTacticalAttack = useCallback(async (rolls: { attackRolls: number[]; defenseRolls: number[] }) => {
-    // Check if we have a pending tactical attack
     const attackInfo = getPendingAttackInfo()
 
-    if (attackInfo && participationId) {
-      // Use tactical attack flow
-      const result = await confirmAttack({
+    if (attackInfo) {
+      await confirmAttack({
         attackRolls: rolls.attackRolls,
         defenseRolls: rolls.defenseRolls
       })
 
-      // Clear consumed doctrine buffs after attack (whether successful or not)
+      // Clear consumed doctrine buffs after attack
       if (doctrineBonusDice > 0) {
         clearActiveUnitDoctrines()
       }
-    } else {
-      // Fall back to legacy onAttack for non-tactical combat
-      onAttack(rolls)
     }
-  }, [confirmAttack, getPendingAttackInfo, participationId, onAttack, doctrineBonusDice, clearActiveUnitDoctrines])
+  }, [confirmAttack, getPendingAttackInfo, doctrineBonusDice, clearActiveUnitDoctrines])
 
   // Combat turn hook for dice rolling
   const {
@@ -209,7 +200,7 @@ export default function TacticalCombatArena({
     showResults,
     handleRoll
   } = useCombatTurn({
-    isAttacking: isAttacking || isTacticalAttackLoading,
+    isAttacking: isTacticalAttackLoading,
     diceBank,
     weaponDice,
     armorDice,

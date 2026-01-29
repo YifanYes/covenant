@@ -1,23 +1,19 @@
-import { calculateGoldReward, getEnemy } from '@shared/constants/enemies'
+import { getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
-import { getItemById, WeaponDamageType } from '@shared/constants/items'
-import type { CombatLogEntry, InventoryItem } from '@shared/types/gamification.types'
+import type { CombatLogEntry } from '@shared/types/gamification.types'
 import type { TacticalStateData, TileState, TerrainType } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import { ActivityDifficulty, getActivityById, selectRandomEnemy } from '../../shared/constants/activities'
-import type { CharacterWithClasses } from '../../shared/types/character.types'
 import type { ActivityRepository } from '../repositories/activity.repository'
 import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { CharacterService } from './character.service'
-import type { CombatService } from './combat.service'
 
 export class ActivityService {
   constructor(
     private activityRepository: ActivityRepository,
     private combatEnemyRepository: CombatEnemyRepository,
     private characterService: CharacterService,
-    private combatService: CombatService,
     private activityParticipationRepository: ActivityParticipationRepository
   ) {}
 
@@ -248,220 +244,6 @@ export class ActivityService {
           nameSuffix: activeEnemy.nameSuffix,
           combatLog: (activeEnemy.combatLog as unknown as CombatLogEntry[]) || []
         }
-      }
-    }
-  }
-
-  async resolveCombatTurn(
-    activityId: string,
-    characterId: string,
-    diceSpent: number,
-    attackRolls: number[],
-    defenseRolls: number[],
-    character: CharacterWithClasses
-  ) {
-    const config = getActivityById(activityId)
-    if (!config) throw new TRPCError({ code: 'NOT_FOUND', message: `Activity ${activityId} not found` })
-
-    const currentClass = this.combatService.getCurrentClassOrThrow(character)
-
-    const activityRecordId = await this.activityRepository.getActivityIdByTemplateId(config.id)
-    if (!activityRecordId) throw new TRPCError({ code: 'NOT_FOUND', message: `Activity ${activityId} not started` })
-
-    const participation = await this.activityRepository.getParticipation(activityRecordId, characterId)
-    if (!participation) throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
-
-    // Get active enemy from CombatEnemy table
-    const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participation.id)
-    if (!activeEnemy) throw new TRPCError({ code: 'NOT_FOUND', message: 'No active enemy found' })
-
-    const enemyTemplate = getEnemy(activeEnemy.templateId)
-    if (!enemyTemplate) throw new TRPCError({ code: 'NOT_FOUND', message: `Enemy ${activeEnemy.templateId} not found` })
-
-    // Construct enemy state with persisted health
-    const currentEnemy = {
-      ...enemyTemplate,
-      health: activeEnemy.maxHealth,
-      currentHealth: activeEnemy.currentHealth
-    }
-
-    // Get weapon damage type and speed from loadout
-    const loadout = (character.loadout as unknown as InventoryItem[]) || []
-    const equippedWeapon = loadout.find((item) => item.type.startsWith('WEAPON_'))
-    const weaponDefinition = equippedWeapon?.definitionId ? getItemById(equippedWeapon.definitionId) : undefined
-    const weaponDamageType = weaponDefinition?.stats?.damageType || WeaponDamageType.PHYSICAL
-    const weaponSpeed = weaponDefinition?.stats?.speed || 1
-
-    // Verify dice spent matches attack rolls
-    if (attackRolls.length !== diceSpent) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: `Dice spent (${diceSpent}) does not match attack rolls (${attackRolls.length})`
-      })
-    }
-
-    // Resolve combat against currentEnemy
-    const result = await this.combatService.resolveTurn({
-      attackRolls,
-      defenseRolls,
-      targetEnemyId: activeEnemy.templateId,
-      playerStrengthAtk: currentClass.strengthAtk,
-      playerStrengthDef: currentClass.strengthDef,
-      playerMagicAtk: currentClass.magicAtk,
-      playerMagicDef: currentClass.magicDef,
-      playerManaRegen: currentClass.manaRegen,
-      weaponDamageType,
-      weaponSpeed,
-      enemy: currentEnemy,
-      participationId: participation.id
-    })
-
-    // Update player health and mana if changed
-    if (result.damageToPlayer > 0 || result.manaRegenerated > 0 || result.healthRestored > 0) {
-      const healthChange = result.healthRestored - result.damageToPlayer
-      const newPlayerHealth = Math.max(0, Math.min(currentClass.maxHealth, currentClass.health + healthChange))
-      const newPlayerMana = Math.min(currentClass.maxMana, currentClass.mana + result.manaRegenerated)
-
-      await this.characterService.updateHealth(currentClass.id, newPlayerHealth, newPlayerMana)
-    }
-
-    // Update persisted enemy state
-    const newEnemyHealth = Math.max(0, currentEnemy.currentHealth - result.damageToEnemy)
-    const enemyDefeated = newEnemyHealth <= 0
-
-    // Count criticals from result
-    const criticalHits = result.playerAttackRolls.filter((r) => r.isCritical).length
-
-    // Build logs from logEntries
-    const logs = result.logEntries.map((entry) => {
-      switch (entry.type) {
-        case 'PLAYER_ATTACK':
-          return `You rolled ${entry.data.dice as number} dice: [${(entry.data.rolls as number[]).join(', ')}]`
-        case 'PLAYER_HITS':
-          return `You scored ${entry.data.hits as number} hits!`
-        case 'ENEMY_DEFENDS':
-          return `Enemy blocked ${entry.data.blocks as number} hits.`
-        case 'ENEMY_ATTACKS':
-          return `Enemy attacks with ${entry.data.hits as number} hits!`
-        case 'PLAYER_DEFENDS':
-          return `You blocked ${entry.data.blocks as number} hits.`
-        case 'DAMAGE_TO_ENEMY':
-          return `You dealt ${entry.data.damage as number} damage to ${entry.data.enemy}!`
-        case 'DAMAGE_TO_PLAYER':
-          return `You took ${entry.data.damage as number} damage!`
-        case 'MANA_REGEN':
-          return `Mana regenerated: +${entry.data.mana as number}`
-        case 'ENEMY_DEFEATED':
-          return `💀 Enemy defeated!`
-        case 'PHASE_COMPLETE':
-          return `🚩 Phase complete!`
-        default:
-          return ''
-      }
-    })
-
-    // Update enemy stats
-    await this.combatEnemyRepository.updateEnemy(activeEnemy.id, {
-      currentHealth: newEnemyHealth,
-      turnsElapsed: 1,
-      damageDealt: result.damageToEnemy,
-      damageTaken: result.damageToPlayer,
-      criticalHits
-    })
-
-    // Update combat log on enemy
-    const existingLog = (activeEnemy.combatLog as unknown as CombatLogEntry[]) || []
-    const newEntries = result.logEntries.map((e) => ({
-      ...e,
-      timestamp: e.timestamp || Date.now()
-    }))
-    const MAX_LOG_ENTRIES = 50
-    const updatedCombatLog = [...newEntries, ...existingLog].slice(0, MAX_LOG_ENTRIES)
-    await this.combatEnemyRepository.updateEnemy(activeEnemy.id, { combatLog: updatedCombatLog })
-
-    let isActivityCompleted = false
-    let nextEnemyState:
-      | {
-          id: string
-          templateId: string
-          currentHealth: number
-          maxHealth: number
-          namePrefix: string
-          nameSuffix: string
-        }
-      | undefined
-
-    if (enemyDefeated) {
-      // Mark enemy as defeated
-      await this.combatEnemyRepository.defeatEnemy(activeEnemy.id)
-
-      // Calculate gold reward from enemy's reward range
-      const goldReward = calculateGoldReward(enemyTemplate)
-
-      // Update kills on participation
-      await this.activityRepository.updateParticipation(participation.id, 1, goldReward)
-
-      // Update Activity Progress
-      await this.activityRepository.updateProgress(activityRecordId, 1)
-
-      // Check if activity is complete
-      const updatedActivity = await this.activityRepository.getActivityByTemplateId(config.id)
-      isActivityCompleted = !!(updatedActivity && updatedActivity.progress >= updatedActivity.target)
-
-      if (!isActivityCompleted) {
-        // Spawn next enemy using weighted random selection
-        const nextEnemyId = selectRandomEnemy(config.enemySpawnWeights)
-        const nextEnemyTemplate = getEnemy(nextEnemyId)
-
-        if (nextEnemyTemplate) {
-          const nameKeys = generateEnemyNameKeys(nextEnemyTemplate.type)
-          const newEnemy = await this.combatEnemyRepository.createEnemy({
-            participationId: participation.id,
-            templateId: nextEnemyId,
-            namePrefix: nameKeys.prefix,
-            nameSuffix: nameKeys.suffix,
-            maxHealth: nextEnemyTemplate.health,
-            currentHealth: nextEnemyTemplate.health
-          })
-
-          nextEnemyState = {
-            id: newEnemy.id,
-            templateId: newEnemy.templateId,
-            currentHealth: newEnemy.currentHealth,
-            maxHealth: newEnemy.maxHealth,
-            namePrefix: newEnemy.namePrefix,
-            nameSuffix: newEnemy.nameSuffix
-          }
-
-          // Reinitialize tactical state for the new enemy
-          const newEnemyName = `${newEnemy.namePrefix}|${newEnemy.nameSuffix}`
-          const tacticalState = this.createInitialTacticalState(
-            'player-1',
-            character.name,
-            { current: currentClass.health, max: currentClass.maxHealth },
-            newEnemy.id,
-            newEnemyName,
-            { current: newEnemy.currentHealth, max: newEnemy.maxHealth }
-          )
-          await this.activityParticipationRepository.updateTacticalState(participation.id, tacticalState)
-        }
-      } else {
-        await this.activityRepository.completeActivity(activityRecordId)
-      }
-
-      logs.push(`💀 Enemy defeated! +${goldReward} gold`)
-    }
-
-    return {
-      ...result,
-      logs,
-      enemyDefeated,
-      nextEnemyState,
-      updatedCombatLog,
-      isActivityCompleted,
-      currentEnemy: {
-        namePrefix: activeEnemy.namePrefix,
-        nameSuffix: activeEnemy.nameSuffix
       }
     }
   }

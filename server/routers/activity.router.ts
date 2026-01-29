@@ -38,28 +38,6 @@ export const activityRouter = t.router({
       return ctx.services.activity.joinActivity(input.activityId, input.characterId)
     }),
 
-  resolveTurn: protectedProcedure
-    .input(
-      z.object({
-        activityId: z.string(),
-        characterId: z.string(),
-        diceSpent: z.number(),
-        attackRolls: z.array(z.number()),
-        defenseRolls: z.array(z.number())
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const character = await ctx.services.character.getCharacterById(input.characterId)
-      return ctx.services.activity.resolveCombatTurn(
-        input.activityId,
-        input.characterId,
-        input.diceSpent,
-        input.attackRolls,
-        input.defenseRolls,
-        character
-      )
-    }),
-
   // Tactical combat: Execute movement
   executeTacticalMove: protectedProcedure
     .input(
