@@ -111,6 +111,8 @@ export function useTacticalAttack() {
 
         // Invalidate queries to refresh data
         queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
+        // Invalidate character data to update dice bank
+        queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
         // Also invalidate tactical state to ensure sync
         if (result.targetKilled) {
           queryClient.invalidateQueries({ queryKey: trpcOptions.activity.getTacticalState.queryKey({ participationId }) })

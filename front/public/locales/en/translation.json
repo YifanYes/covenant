@@ -120,6 +120,7 @@
     "attack_rolls": "Attacks",
     "attack_set": "Attack set: {{count}} dice",
     "criticals": "Criticals",
+    "doctrine_activated": "{{name}} activated! +{{dice}} power dice to next attack",
     "death_dialog": {
       "continue": "Continue",
       "description": "Your character has fallen in battle.",
@@ -133,11 +134,15 @@
     "error": {
       "attack": "Attack failed",
       "attack_failed": "Attack failed",
+      "doctrine_failed": "Doctrine cast failed",
+      "doctrine_not_found": "Doctrine not found",
       "invalid_attack": "No valid attack target",
+      "invalid_doctrine": "No valid doctrine target",
       "invalid_move": "Invalid move action",
       "move_failed": "Movement failed",
       "no_active_unit": "No active unit selected",
       "no_participation": "No combat session found",
+      "not_enough_mana": "Not enough mana",
       "target_not_found": "Target not found",
       "unit_not_found": "Unit not found",
       "unknown": "An unknown error occurred"
@@ -146,6 +151,7 @@
       "damage_to_enemy": "{{enemy}} takes {{damage}} damage",
       "damage_to_player": "You take {{damage}} damage",
       "doctrine_active": "Doctrine active: {{effect}}",
+      "doctrine_cast": "Doctrine: {{doctrine}} cast",
       "doctrine_effect": "Doctrine: {{doctrine}} applies {{effect}}",
       "empty": "No combat events yet",
       "enemy_attacks": "Enemy attacks with {{hits}} hits",
@@ -1198,7 +1204,8 @@
     "power_boost": "Power Boost",
     "purified": "Purified",
     "stunned": "Stunned",
-    "threshold_reduction": "Threshold Reduction"
+    "threshold_reduction": "Threshold Reduction",
+    "unknown": "Unknown Effect"
   },
   "store": {
     "buy": "Buy",
@@ -1340,16 +1347,21 @@
       "select": "Left click: Select",
       "zoom": "Scroll: Zoom"
     },
+    "casting": "Casting...",
+    "click_confirm_doctrine": "Click Confirm to cast",
+    "click_to_target_doctrine": "Click a tile to target",
     "moving": "Moving...",
+    "pattern": "Pattern",
     "pattern_circle": "Circle",
     "pattern_cone": "Cone",
     "pattern_cross": "Cross",
     "pattern_diamond": "Diamond",
     "pattern_line": "Line",
     "pattern_single": "Single",
-    "range": "range",
+    "range": "Range",
     "select_destination": "Select Destination",
     "select_target": "Select Target",
+    "targets_affected": "Targets Affected",
     "tiles": "tiles"
   }
 }

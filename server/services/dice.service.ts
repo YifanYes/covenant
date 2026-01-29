@@ -31,6 +31,32 @@ export class DiceService {
     }
   }
 
+  async consumeDiceFromBank(userId: string, amount: number): Promise<{ success: boolean; consumed: number; remaining: number }> {
+    const character = await this.characterRepository.findWithClasses(userId)
+
+    if (!character) return { success: false, consumed: 0, remaining: 0 }
+
+    const { diceBank: currentDice } = this.getCharacterProgress(character)
+    const rawCharacterData = (character.data as any) || {}
+
+    // Can only consume up to what's available
+    const consumed = Math.min(amount, currentDice)
+    const newDice = currentDice - consumed
+
+    const newData = {
+      ...rawCharacterData,
+      diceBank: newDice
+    }
+
+    await this.characterRepository.updateCharacterData(character.id, newData)
+
+    return {
+      success: true,
+      consumed,
+      remaining: newDice
+    }
+  }
+
   calculateHabitStreak(completions: { completedAt: Date }[]): number {
     if (completions.length === 0) return 0
 

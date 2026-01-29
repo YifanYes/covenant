@@ -34,6 +34,7 @@ import TileInfoPanel from './tile-info-panel.component'
 import { DOCTRINES } from '@shared/constants/doctrines'
 import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
 import { useTacticalAttack } from '@/hooks/use-tactical-attack.hook'
+import { useTacticalDoctrine } from '@/hooks/use-tactical-doctrine.hook'
 
 import HealthBar from '@/app/(workspace)/map/_components/health-bar.component'
 import EnemyCard from '@/app/(workspace)/map/_components/enemy-card.component'
@@ -92,7 +93,9 @@ export default function TacticalCombatArena({
     tiles,
     initializeCombat,
     hydrateFromState,
-    updateUnit
+    updateUnit,
+    clearActiveUnitDoctrines,
+    selectDoctrine
   } = useTacticalCombatStore()
 
   // Fetch persisted tactical state if participationId is provided
@@ -131,7 +134,6 @@ export default function TacticalCombatArena({
   const baseWeaponDice = weapon?.stats?.attackDice || 1
 
   // Get bonus dice from active self-buff doctrines (like Stellar Collapse)
-  const { clearActiveUnitDoctrines } = useTacticalCombatStore()
 
   // Calculate bonus dice from active effects (memoized to avoid infinite loops)
   const { doctrineBonusDice, sixesGenerateExtraHits } = useMemo(() => {
@@ -233,18 +235,8 @@ export default function TacticalCombatArena({
     }
   })
 
-  // Doctrine mutation
-  const useDoctrineMutation = useMutation({
-    ...trpcOptions.character.useDoctrine.mutationOptions(),
-    onSuccess: () => {
-      toast.success(t('doctrines.success.used'))
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
-      queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
-    },
-    onError: (error) => {
-      toast.error(t('doctrines.error.failed'), { description: error.message })
-    }
-  })
+  // Tactical doctrine hook
+  const { confirmSelfBuff, isSelfBuffDoctrine, isLoading: isDoctrineLoading } = useTacticalDoctrine()
 
   // Group consumables
   const inventoryConsumables = character.inventory.filter((item) => item.type === ItemType.CONSUMABLE)
@@ -530,9 +522,15 @@ export default function TacticalCombatArena({
                 toast.error(t('combat.error.no_participation'))
                 return
               }
-              useDoctrineMutation.mutate({ doctrineId: doctrine.id, participationId })
+              // Use the tactical self-buff doctrine endpoint
+              if (isSelfBuffDoctrine(doctrine.id)) {
+                confirmSelfBuff(doctrine.id)
+              } else {
+                // For targeted doctrines, enter targeting mode
+                selectDoctrine(doctrine.id)
+              }
             }}
-            isUsingDoctrine={useDoctrineMutation.isPending}
+            isUsingDoctrine={isDoctrineLoading}
             className='bg-card flex-none border-t'
           />
         </div>

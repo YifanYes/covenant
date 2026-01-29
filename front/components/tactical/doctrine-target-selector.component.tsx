@@ -1,14 +1,14 @@
 'use client'
 
-import { useTranslation } from 'react-i18next'
 import { Zap } from '@nsmr/pixelart-react'
+import { useTranslation } from 'react-i18next'
 
-import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
-import { useTacticalDoctrine } from '@/hooks/use-tactical-doctrine.hook'
-import { DOCTRINES } from '@shared/constants/doctrines'
-import { getDoctrineRange, getDoctrineAoEPattern, type AoEPatternType } from '@shared/constants/aoe-patterns'
 import Button from '@/components/ui/button.component'
+import { useTacticalDoctrine } from '@/hooks/use-tactical-doctrine.hook'
 import { cn } from '@/lib/cn.lib'
+import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
+import { getDoctrineAoEPattern, getDoctrineRange, type AoEPatternType } from '@shared/constants/aoe-patterns'
+import { DOCTRINES } from '@shared/constants/doctrines'
 import type { TacticalUnit } from '@shared/types/tactical-combat.types'
 
 interface DoctrineTargetSelectorProps {
@@ -18,22 +18,15 @@ interface DoctrineTargetSelectorProps {
 
 export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }: DoctrineTargetSelectorProps) {
   const { t } = useTranslation()
-  const {
-    selectedDoctrineId,
-    pendingAction,
-    phase,
-    selectDoctrine,
-    clearDoctrineSelection
-  } = useTacticalCombatStore()
+  const { selectedDoctrineId, pendingAction, phase, selectDoctrine, clearDoctrineSelection } = useTacticalCombatStore()
 
-  const { confirmDoctrine, confirmSelfBuff, getPendingDoctrineInfo, isSelfBuffDoctrine, isLoading } = useTacticalDoctrine()
+  const { confirmDoctrine, confirmSelfBuff, getPendingDoctrineInfo, isSelfBuffDoctrine, isLoading } =
+    useTacticalDoctrine()
 
   const pendingInfo = getPendingDoctrineInfo()
 
   // Get available doctrines (equipped and have enough mana)
-  const availableDoctrines = equippedDoctrines
-    .map((id) => DOCTRINES[id])
-    .filter((d) => d !== undefined)
+  const availableDoctrines = equippedDoctrines.map((id) => DOCTRINES[id]).filter((d) => d !== undefined)
 
   // Handle doctrine click - self-buffs are cast immediately, others go to targeting mode
   const handleDoctrineClick = async (doctrineId: string) => {
@@ -55,9 +48,7 @@ export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }
         </h4>
 
         {availableDoctrines.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic">
-            {t('combat.no_doctrines', 'No doctrines equipped')}
-          </p>
+          <p className="text-xs text-muted-foreground italic">{t('combat.no_doctrines', 'No doctrines equipped')}</p>
         ) : (
           <div className="space-y-1">
             {availableDoctrines.map((doctrine) => {
@@ -80,9 +71,7 @@ export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }
                 >
                   <DoctrineIcon className="w-4 h-4 mr-2 text-purple-400" />
                   <div className="flex-1 min-w-0">
-                    <div className="truncate text-xs">
-                      {t(doctrine.nameKey)}
-                    </div>
+                    <div className="truncate text-xs">{t(doctrine.nameKey)}</div>
                   </div>
                   <div className="flex items-center gap-2 ml-2">
                     <span className="text-xs text-blue-400 flex items-center">
@@ -90,13 +79,11 @@ export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }
                       {doctrine.manaCost}
                     </span>
                     {isSelfBuff ? (
-                      <span className="text-xs text-amber-400">
-                        {t('combat.self_buff', 'Self')}
-                      </span>
-                    ) : pattern !== 'SINGLE' && (
-                      <span className="text-xs text-purple-400">
-                        {t(getPatternI18nKey(pattern), pattern)}
-                      </span>
+                      <span className="text-xs text-amber-400">{t('combat.self_buff', 'Self')}</span>
+                    ) : (
+                      pattern !== 'SINGLE' && (
+                        <span className="text-xs text-purple-400">{t(getPatternI18nKey(pattern))}</span>
+                      )
                     )}
                   </div>
                 </Button>
@@ -126,19 +113,19 @@ export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }
           </span>
         </div>
 
-        <p className="text-xs text-muted-foreground">
-          {t(doctrine.descriptionKey)}
-        </p>
+        <p className="text-xs text-muted-foreground">{t(doctrine.descriptionKey)}</p>
 
         {/* Targeting info */}
         <div className="bg-muted/50 rounded p-2 text-xs space-y-1">
           <div className="flex justify-between">
             <span className="text-muted-foreground">{t('tactical.range')}</span>
-            <span>{range} {t('tactical.tiles')}</span>
+            <span>
+              {range} {t('tactical.tiles')}
+            </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">{t('tactical.pattern', 'Pattern')}</span>
-            <span className="text-purple-400">{t(getPatternI18nKey(pattern), pattern)}</span>
+            <span className="text-muted-foreground">{t('tactical.pattern')}</span>
+            <span className="text-purple-400">{t(getPatternI18nKey(pattern))}</span>
           </div>
         </div>
 
@@ -146,7 +133,7 @@ export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }
         {pendingInfo?.affectedUnits && pendingInfo.affectedUnits.length > 0 && (
           <div className="bg-red-950/30 border border-red-500/30 rounded p-2 text-xs">
             <div className="text-red-400 font-medium mb-1">
-              {t('tactical.targets_affected', 'Targets Affected')}: {pendingInfo.affectedUnits.length}
+              {t('tactical.targets_affected')}: {pendingInfo.affectedUnits.length}
             </div>
           </div>
         )}
@@ -154,8 +141,8 @@ export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }
         {/* Instructions */}
         <p className="text-xs text-muted-foreground text-center">
           {pendingAction.targetPosition
-            ? t('tactical.click_confirm_doctrine', 'Click Confirm to cast')
-            : t('tactical.click_to_target_doctrine', 'Click a tile to target')}
+            ? t('tactical.click_confirm_doctrine')
+            : t('tactical.click_to_target_doctrine')}
         </p>
 
         {/* Confirm/Cancel buttons */}
@@ -163,19 +150,13 @@ export default function DoctrineTargetSelector({ activeUnit, equippedDoctrines }
           <Button
             variant="default"
             size="sm"
-            className="w-full bg-purple-600 hover:bg-purple-700"
+            className="w-full bg-purple-800 hover:bg-purple-900 text-gray-100"
             disabled={isLoading || !pendingAction.targetPosition || !pendingInfo?.canCast}
             onClick={() => confirmDoctrine()}
           >
             {isLoading ? t('tactical.casting') : t('confirm')}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full"
-            disabled={isLoading}
-            onClick={clearDoctrineSelection}
-          >
+          <Button variant="outline" size="sm" className="w-full" disabled={isLoading} onClick={clearDoctrineSelection}>
             {t('cancel')}
           </Button>
         </div>

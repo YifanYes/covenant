@@ -54,6 +54,52 @@ describe('DiceService', () => {
     })
   })
 
+  describe('consumeDiceFromBank', () => {
+    it('should consume dice and return consumed amount', async () => {
+      const character = mockCharacter({
+        data: { diceBank: 10 }
+      })
+      mockCharacterRepo.findWithClasses.mockResolvedValue(character)
+
+      const result = await diceService.consumeDiceFromBank('user-1', 5)
+
+      expect(result.success).toBe(true)
+      expect(result.consumed).toBe(5)
+      expect(result.remaining).toBe(5)
+      expect(mockCharacterRepo.updateCharacterData).toHaveBeenCalledWith(
+        character.id,
+        expect.objectContaining({ diceBank: 5 })
+      )
+    })
+
+    it('should only consume available dice if requesting more than available', async () => {
+      const character = mockCharacter({
+        data: { diceBank: 3 }
+      })
+      mockCharacterRepo.findWithClasses.mockResolvedValue(character)
+
+      const result = await diceService.consumeDiceFromBank('user-1', 10)
+
+      expect(result.success).toBe(true)
+      expect(result.consumed).toBe(3)
+      expect(result.remaining).toBe(0)
+      expect(mockCharacterRepo.updateCharacterData).toHaveBeenCalledWith(
+        character.id,
+        expect.objectContaining({ diceBank: 0 })
+      )
+    })
+
+    it('should return failure if character not found', async () => {
+      mockCharacterRepo.findWithClasses.mockResolvedValue(null)
+
+      const result = await diceService.consumeDiceFromBank('nonexistent', 5)
+
+      expect(result.success).toBe(false)
+      expect(result.consumed).toBe(0)
+      expect(result.remaining).toBe(0)
+    })
+  })
+
   describe('calculateHabitStreak', () => {
     it('should identify a streak of 3 days', () => {
       const today = new Date()

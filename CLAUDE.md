@@ -99,8 +99,12 @@ const mutation = useMutation(trpcOptions.habits.create.mutationOptions({
 - Add `'use client'` only when using hooks, event handlers, or browser APIs
 
 ### i18n
-- All user-facing strings must use i18next
-- Add keys to both `front/public/locales/en/translation.json` and `es/translation.json`
+- **NEVER hardcode user-facing strings** - always use translation keys via `useTranslation()` hook
+- Translation files location:
+  - English: `front/public/locales/en/translation.json`
+  - Spanish: `front/public/locales/es/translation.json`
+- Add keys to BOTH locale files when adding new strings
+- Use `t('key')` for translations, never raw strings like `"Range"` or `"Pattern"`
 
 ## Adding Features
 
