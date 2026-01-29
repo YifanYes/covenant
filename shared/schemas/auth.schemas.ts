@@ -33,3 +33,8 @@ export const updatePasswordSchema = z.object({
   password: z.string()
 })
 export type UpdatePasswordSchema = z.infer<typeof updatePasswordSchema>
+
+export const updateThemeSchema = z.object({
+  theme: z.string()
+})
+export type UpdateThemeType = z.infer<typeof updateThemeSchema>

@@ -14,4 +14,11 @@ export class UserRepository {
       where: { id: userId }
     })
   }
+
+  async update(userId: string, data: Partial<User>): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data
+    })
+  }
 }

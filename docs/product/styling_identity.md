@@ -51,45 +51,45 @@ La estrategia cromática se basa en el concepto de **Eigengrau** (gris intrínse
 
 #### Caballeros Sagrados
 
-| Modo   | Background | Surface/Card | Texto Primario   | Acento           |
-| ------ | ---------- | ------------ | ---------------- | ---------------- |
-| Oscuro | `#1c1a17`  | `#2d2b27`    | `#c2b29a` (Bone) | `#b0a36a` (Gold) |
-| Claro  | `#f0ede5`  | `#e5e0d3`    | `#2d2a2e`        | `#8c7d4b`        |
+| Modo   | Background | Surface/Card | Texto Primario | Acento           |
+| ------ | ---------- | ------------ | -------------- | ---------------- |
+| Oscuro | `#1c1a17`  | `#2d2b27`    | `#c2b29a`      | `#b0a36a` (Gold) |
+| Claro  | `#edead9`  | `#ffffff`    | `#5a5444`      | `#8c7d4b`        |
 
 #### La Legión
 
-| Modo   | Background | Surface/Card | Texto Primario   | Acento             |
-| ------ | ---------- | ------------ | ---------------- | ------------------ |
-| Oscuro | `#0f0f13`  | `#1a1a21`    | `#c2b29a` (Bone) | `#5e4d69` (Purple) |
-| Claro  | `#e9e5f0`  | `#d8d1e3`    | `#0f0f13`        | `#4a3b54`          |
+| Modo   | Background | Surface/Card | Texto Primario | Acento             |
+| ------ | ---------- | ------------ | -------------- | ------------------ |
+| Oscuro | `#0f0f13`  | `#1a1a21`    | `#c2b29a`      | `#8e76a1` (Purple) |
+| Claro  | `#eae7ef`  | `#ffffff`    | `#4a3b54`      | `#4a3b54`          |
 
 #### Liga de Alquimistas
 
-| Modo   | Background | Surface/Card | Texto Primario   | Acento           |
-| ------ | ---------- | ------------ | ---------------- | ---------------- |
-| Oscuro | `#121b21`  | `#1d2a33`    | `#c2b29a` (Bone) | `#3f5b66` (Cyan) |
-| Claro  | `#e5edf0`  | `#d1dfe6`    | `#121b21`        | `#2a414a`        |
+| Modo   | Background | Surface/Card | Texto Primario | Acento           |
+| ------ | ---------- | ------------ | -------------- | ---------------- |
+| Oscuro | `#121b21`  | `#1d2a33`    | `#c2b29a`      | `#3f5b66` (Cyan) |
+| Claro  | `#e6edef`  | `#ffffff`    | `#2a414a`      | `#2a414a`        |
 
 #### La Muerte Errante
 
-| Modo   | Background | Surface/Card | Texto Primario   | Acento          |
-| ------ | ---------- | ------------ | ---------------- | --------------- |
-| Oscuro | `#242525`  | `#333535`    | `#c2b29a` (Bone) | `#787a7a` (Ash) |
-| Claro  | `#eeefef`  | `#dbdddd`    | `#242525`        | `#555757`       |
+| Modo   | Background | Surface/Card | Texto Primario | Acento          |
+| ------ | ---------- | ------------ | -------------- | --------------- |
+| Oscuro | `#242525`  | `#333535`    | `#c2b29a`      | `#787a7a` (Ash) |
+| Claro  | `#ebeded`  | `#ffffff`    | `#444545`      | `#555757`       |
 
 #### Inquisición Carmesí
 
-| Modo   | Background | Surface/Card | Texto Primario   | Acento          |
-| ------ | ---------- | ------------ | ---------------- | --------------- |
-| Oscuro | `#211212`  | `#2d1a1a`    | `#c2b29a` (Bone) | `#bf6b70` (Red) |
-| Claro  | `#f0e5e5`  | `#e6d1d1`    | `#211212`        | `#8c4b50`       |
+| Modo   | Background | Surface/Card | Texto Primario | Acento          |
+| ------ | ---------- | ------------ | -------------- | --------------- |
+| Oscuro | `#211212`  | `#2d1a1a`    | `#c2b29a`      | `#bf6b70` (Red) |
+| Claro  | `#ede6e6`  | `#ffffff`    | `#5a3c3c`      | `#8c4b50`       |
 
 #### Pacto de la Sangre
 
-| Modo   | Background | Surface/Card | Texto Primario   | Acento            |
-| ------ | ---------- | ------------ | ---------------- | ----------------- |
-| Oscuro | `#1a1a1a`  | `#262626`    | `#c2b29a` (Bone) | `#9a0707` (Blood) |
-| Claro  | `#ececec`  | `#d9d9d9`    | `#1a1a1a`        | `#7a0606`         |
+| Modo   | Background | Surface/Card | Texto Primario | Acento            |
+| ------ | ---------- | ------------ | -------------- | ----------------- |
+| Oscuro | `#1e1b1b`  | `#2a2525`    | `#c2b29a`      | `#a83232` (Blood) |
+| Claro  | `#eddada`  | `#ffffff`    | `#5c2a2a`      | `#8c1c1c`         |
 
 ---
 
@@ -148,12 +148,12 @@ li {
 
 ## 5. Tipografía y Jerarquía Visual
 
-| Elemento                      | Fuente         | Descripción                                                                                    |
-| ----------------------------- | -------------- | ---------------------------------------------------------------------------------------------- |
-| **Encabezados (H1, H2)**      | Alkhemikal     | Fuente Blackletter pixelada para títulos solemnes y nombres de sección. 87% de opacidad.       |
-| **Cuerpo y Listas de Tareas** | DotGothic16    | Fuente bitmap de alta legibilidad técnica. Opacidad al 60% en modo oscuro para reducir brillo. |
-| **Etiquetas de Interfaz**     | Press Start 2P | Estilo 8 bits para botones y estados.                                                          |
-| **Elementos deshabilitados**  | —              | 38% de opacidad.                                                                               |
+| Elemento                      | Fuente         | Descripción                                                                       |
+| ----------------------------- | -------------- | --------------------------------------------------------------------------------- |
+| **Encabezados (H1-H6)**       | Cinzel         | Fuente serif clásica para títulos solemnes y nombres de sección. 90% de opacidad. |
+| **Cuerpo y Listas de Tareas** | EB Garamond    | Fuente de alta elegibilidad técnica y estética académica. Opacidad al 80%.        |
+| **Etiquetas de Interfaz**     | Press Start 2P | Estilo 8 bits para elementos RPG específicos (si aplica).                         |
+| **Elementos deshabilitados**  | —              | 40% de opacidad.                                                                  |
 
 ---
 

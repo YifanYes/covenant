@@ -1,5 +1,6 @@
 'use client'
 import ThemeToggle from '@/common/theme-toggle.component'
+import FactionColorSelector from '@/forms/faction-color-selector.component'
 import SingleSelect from '@/forms/single-select.component'
 import { useAuthStore } from '@/stores/auth.store'
 import { useUserPreferencesStore } from '@/stores/user-preferences.store'
@@ -53,11 +54,17 @@ export default function Settings() {
           />
         </div>
         <div className='flex flex-col gap-2'>
-          <Label htmlFor='theme'>{t('settings.theme_label')}</Label>
+          <Label htmlFor="theme">{t('settings.mode_label')}</Label>
           <ThemeToggle />
         </div>
-        <div className='pt-4'>
-          <Button onClick={() => signOut()} variant='secondary' className='w-fit'>
+        <div className="flex flex-col gap-2">
+          <FactionColorSelector />
+        </div>
+        <div className="pt-4">
+          <Button
+            onClick={() => signOut()}
+            className="w-fit text-muted-foreground border-muted-foreground hover:text-background hover:bg-muted-foreground cursor-pointer border bg-transparent"
+          >
             {t('settings.logout_button')}
           </Button>
         </div>

@@ -1,0 +1,203 @@
+:root {
+  --color-success: #387072;
+  --color-error: #854d64;
+  --color-info: #3f5b66;
+  --color-warning: #b0a36a;
+  --text-bone: #c2b29a;
+}
+
+/* HOLY KNIGHTS - Gold & Bone */
+
+.faction-holy-knights {
+  --background: #edead9 !important;
+  --foreground: #5a5444 !important;
+  --card: #ffffff !important;
+  --card-foreground: #5a5444 !important;
+  --primary: #8c7d4b !important;
+  --primary-foreground: #fdfaf3 !important;
+  --muted: #e7e1cc !important;
+  --muted-foreground: #8c7d4b !important;
+  --border: rgba(140, 125, 75, 0.25) !important;
+  --sidebar: #fbf9f0 !important;
+  --input: #e2dfcd !important;
+}
+
+.dark .faction-holy-knights,
+.dark.faction-holy-knights {
+  --background: #1c1a17 !important;
+  --foreground: #c2b29a !important;
+  --card: #2d2b27 !important;
+  --card-foreground: #c2b29a !important;
+  --primary: #b0a36a !important;
+  --primary-foreground: #1c1a17 !important;
+  --muted: #2d2b27 !important;
+  --muted-foreground: #9a8f80 !important;
+  --border: rgba(194, 178, 154, 0.2) !important;
+  --input: #3b3935 !important;
+}
+
+/* LEGION - Purple & Shadow */
+
+.faction-legion {
+  --background: #eae7ef !important;
+  --foreground: #4a3b54 !important;
+  --card: #ffffff !important;
+  --card-foreground: #4a3b54 !important;
+  --primary: #4a3b54 !important;
+  --primary-foreground: #f7f4fa !important;
+  --muted: #dfd9e8 !important;
+  --muted-foreground: #6b5a75 !important;
+  --border: rgba(74, 59, 84, 0.2) !important;
+  --sidebar: #f8f6f9 !important;
+  --input: #d9d4e5 !important;
+}
+
+.dark .faction-legion,
+.dark.faction-legion {
+  --background: #0f0f13 !important;
+  --foreground: #b0a8c2 !important;
+  --card: #1a1a21 !important;
+  --card-foreground: #b0a8c2 !important;
+  --primary: #8e76a1 !important;
+  --primary-foreground: #0f0f13 !important;
+  --muted: #1a1a21 !important;
+  --muted-foreground: #6b617a !important;
+  --border: rgba(142, 118, 161, 0.2) !important;
+  --input: #26262e !important;
+}
+
+/* ALCHEMISTS LEAGUE - Cyan & Steel */
+
+.faction-alchemists-league {
+  --background: #e6edef !important;
+  --foreground: #2a414a !important;
+  --card: #ffffff !important;
+  --card-foreground: #2a414a !important;
+  --primary: #2a414a !important;
+  --primary-foreground: #f2f7f9 !important;
+  --muted: #d8e5e8 !important;
+  --muted-foreground: #4d6670 !important;
+  --border: rgba(42, 65, 74, 0.2) !important;
+  --sidebar: #f7fafb !important;
+  --input: #d1e2e6 !important;
+}
+
+.dark .faction-alchemists-league,
+.dark.faction-alchemists-league {
+  --background: #121b21 !important;
+  --foreground: #a8c2c2 !important;
+  --card: #1d2a33 !important;
+  --card-foreground: #a8c2c2 !important;
+  --primary: #3f5b66 !important;
+  --primary-foreground: #121b21 !important;
+  --muted: #1d2a33 !important;
+  --muted-foreground: #607d7d !important;
+  --border: rgba(168, 194, 194, 0.2) !important;
+  --input: #283641 !important;
+}
+
+/* DEATH MARCH - Ash & Grey */
+
+.faction-death-march {
+  --background: #ebeded !important;
+  --foreground: #444545 !important;
+  --card: #ffffff !important;
+  --card-foreground: #444545 !important;
+  --primary: #555757 !important;
+  --primary-foreground: #f8f9f9 !important;
+  --muted: #e2e5e5 !important;
+  --muted-foreground: #6a6c6c !important;
+  --border: rgba(68, 69, 69, 0.3) !important;
+  --input: #d8dbdb !important;
+}
+
+.dark .faction-death-march,
+.dark.faction-death-march {
+  --background: #242525 !important;
+  --foreground: #b1b1b1 !important;
+  --card: #333535 !important;
+  --card-foreground: #b1b1b1 !important;
+  --primary: #787a7a !important;
+  --primary-foreground: #242525 !important;
+  --muted: #333535 !important;
+  --muted-foreground: #787a7a !important;
+  --border: rgba(177, 177, 177, 0.15) !important;
+  --input: #3f4141 !important;
+}
+
+/* CRIMSON INQUISITION - Blood Red & Shadow */
+
+.faction-crimson-inquisition {
+  --background: #ede6e6 !important;
+  --foreground: #5a3c3c !important;
+  --card: #ffffff !important;
+  --card-foreground: #5a3c3c !important;
+  --primary: #8c4b50 !important;
+  --primary-foreground: #faf5f5 !important;
+  --muted: #e5dada !important;
+  --muted-foreground: #8a6666 !important;
+  --border: rgba(140, 75, 80, 0.2) !important;
+  --sidebar: #faf7f7 !important;
+  --input: #dcd0d0 !important;
+}
+
+.dark .faction-crimson-inquisition,
+.dark.faction-crimson-inquisition {
+  --background: #211212 !important;
+  --foreground: #c2a8a8 !important;
+  --card: #2d1a1a !important;
+  --card-foreground: #c2a8a8 !important;
+  --primary: #bf6b70 !important;
+  --primary-foreground: #211212 !important;
+  --muted: #2d1a1a !important;
+  --muted-foreground: #8a6a6a !important;
+  --border: rgba(191, 107, 112, 0.2) !important;
+  --input: #3b2626 !important;
+}
+
+/* BLOOD PACT - Deep Crimson & Black */
+
+.faction-blood-pact {
+  --background: #eddada !important;
+  --foreground: #5c2a2a !important;
+  --card: #ffffff !important;
+  --card-foreground: #5c2a2a !important;
+  --primary: #8c1c1c !important;
+  --primary-foreground: #fdfaf9 !important;
+  --muted: #e4cece !important;
+  --muted-foreground: #a84a4a !important;
+  --border: rgba(140, 28, 28, 0.2) !important;
+  --sidebar: #faf5f5 !important;
+  --input: #d8c2c2 !important;
+}
+
+.dark .faction-blood-pact,
+.dark.faction-blood-pact {
+  --background: #1e1b1b !important;
+  --foreground: #b08f8f !important;
+  --card: #2a2525 !important;
+  --card-foreground: #b08f8f !important;
+  --primary: #a83232 !important;
+  --primary-foreground: #1e1b1b !important;
+  --muted: #2a2525 !important;
+  --muted-foreground: #8c5a5a !important;
+  --border: rgba(168, 50, 50, 0.2) !important;
+  --input: #383333 !important;
+}
+
+/* Unified Mapping Layer */
+
+[class*='faction-'] {
+  --popover: var(--card) !important;
+  --popover-foreground: var(--card-foreground) !important;
+  --accent: var(--primary) !important;
+  --accent-foreground: var(--primary-foreground) !important;
+  --ring: var(--primary) !important;
+  --sidebar: var(--background) !important;
+  --sidebar-foreground: var(--foreground) !important;
+  --sidebar-primary: var(--card) !important;
+  --sidebar-primary-foreground: var(--foreground) !important;
+  --sidebar-accent: var(--primary) !important;
+  --sidebar-accent-foreground: var(--primary-foreground) !important;
+  --sidebar-border: var(--border) !important;
+}

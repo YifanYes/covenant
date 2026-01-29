@@ -8,7 +8,7 @@ export default function ThemeToggle() {
   return (
     <div className='relative'>
       <Switch
-        className='peer bg-input data-[state=checked]:bg-primary h-6 w-11 [&>span]:hidden'
+        className="peer bg-input data-[state=checked]:bg-primary h-6 w-11 cursor-pointer [&>span]:hidden"
         checked={theme === 'dark'}
         onCheckedChange={toggleTheme}
       />
