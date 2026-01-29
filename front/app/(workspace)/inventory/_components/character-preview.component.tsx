@@ -21,6 +21,7 @@ export default function CharacterPreview({ character }: CharacterPreviewProps) {
             alt={character.currentClass!}
             width={224}
             height={224}
+            priority
             className='pixelated h-full w-full object-contain'
             style={{ imageRendering: 'pixelated' }}
           />

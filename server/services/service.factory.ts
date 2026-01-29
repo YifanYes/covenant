@@ -102,6 +102,11 @@ export class ServiceFactory {
 
   // ============== Service Getters (public) ==============
 
+  // Repository access (for simple queries without business logic)
+  get activityParticipation(): ActivityParticipationRepository {
+    return this.activityParticipationRepository
+  }
+
   // Layer 1: Repository-only dependencies
   get area(): AreaService {
     return (this._areaService ??= new AreaService(this.areaRepository))
@@ -138,7 +143,8 @@ export class ServiceFactory {
       this.activityRepository,
       this.combatEnemyRepository,
       this.character,
-      this.combat
+      this.combat,
+      this.activityParticipationRepository
     ))
   }
 
