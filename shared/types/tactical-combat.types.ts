@@ -207,4 +207,40 @@ export interface TacticalAttackResult {
   counterDefenseRolls?: { value: number; isSuccess: boolean; isCritical: boolean }[]
   // Combat log entries generated from this attack
   logEntries: CombatLogEntry[]
+  // Gold reward if enemy was defeated
+  goldReward?: number
+  // Next enemy data if a new enemy was spawned
+  nextEnemy?: {
+    id: string
+    templateId: string
+    name: string
+    currentHealth: number
+    maxHealth: number
+  }
+}
+
+// Enemy AI turn result
+export interface EnemyTurnResult {
+  success: boolean
+  enemyId: string
+  action: 'move' | 'attack' | 'move_and_attack' | 'wait'
+
+  // Movement data (if moved)
+  moved: boolean
+  path?: GridPosition[]
+  newPosition?: GridPosition
+
+  // Attack data (if attacked)
+  attacked: boolean
+  targetId?: string
+  damageDealt?: number
+  targetKilled?: boolean
+  attackerRolls?: { value: number; isSuccess: boolean; isCritical: boolean }[]
+  defenderRolls?: { value: number; isSuccess: boolean; isCritical: boolean }[]
+
+  // Updated state
+  updatedState: TacticalStateData
+
+  // Combat log entries
+  logEntries?: CombatLogEntry[]
 }

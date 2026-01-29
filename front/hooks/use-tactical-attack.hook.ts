@@ -87,24 +87,33 @@ export function useTacticalAttack() {
 
       if (result.success) {
         // Server confirmed - trigger the attack animation
+        // Include nextEnemy data so the store can spawn the new enemy after animation completes
         startAttackAnimation({
           attackerId: activeUnitId,
           targetId,
           damageDealt: result.damageDealt,
           targetKilled: result.targetKilled,
           damageToAttacker: result.damageToAttacker,
-          attackerKilled: result.attackerKilled
+          attackerKilled: result.attackerKilled,
+          nextEnemy: result.nextEnemy,
+          goldReward: result.goldReward
         })
 
-        // Invalidate the activity list query to refresh the combat log
+        // Invalidate queries to refresh data
         queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
+        // Also invalidate tactical state to ensure sync
+        if (result.targetKilled) {
+          queryClient.invalidateQueries({ queryKey: trpcOptions.activity.getTacticalState.queryKey({ participationId }) })
+        }
 
         return {
           success: true,
           damageDealt: result.damageDealt,
           targetKilled: result.targetKilled,
           attackerRolls: result.attackerRolls,
-          defenderRolls: result.defenderRolls
+          defenderRolls: result.defenderRolls,
+          goldReward: result.goldReward,
+          nextEnemy: result.nextEnemy
         }
       }
 

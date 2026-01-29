@@ -1328,10 +1328,22 @@
     "title_placeholder": "Título de la tarea"
   },
   "tactical": {
+    "actions": {
+      "attack": "Atacar",
+      "move": "Mover",
+      "next_turn": "Siguiente Turno"
+    },
+    "click_to_attack": "Haz clic en un enemigo para atacar",
+    "click_to_move": "Haz clic en una casilla resaltada para moverte",
     "controls": {
       "pan": "Arrastrar derecho: Mover cámara",
       "select": "Clic izquierdo: Seleccionar",
       "zoom": "Scroll: Zoom"
-    }
+    },
+    "moving": "Moviendo...",
+    "range": "rango",
+    "select_destination": "Seleccionar Destino",
+    "select_target": "Seleccionar Objetivo",
+    "tiles": "casillas"
   }
 }

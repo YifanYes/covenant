@@ -1,7 +1,9 @@
 import { DOCTRINES } from '@shared/constants/doctrines'
 import { TERRAIN_CONFIG } from '@shared/constants/terrain'
-import { DamageType, getEnemy, type EnemyTemplate } from '@shared/constants/enemies'
+import { calculateGoldReward, DamageType, getEnemy, type EnemyTemplate } from '@shared/constants/enemies'
+import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import { getConsumableById, WeaponDamageType } from '@shared/constants/items'
+import { getActivityById, selectRandomEnemy } from '@shared/constants/activities'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 import type {
@@ -17,13 +19,17 @@ import type {
   GridPosition,
   TacticalStateData,
   TileState,
+  TerrainType,
   MovementValidationResult,
   MovementExecutionResult,
   AttackValidationResult,
-  TacticalAttackResult
+  TacticalAttackResult,
+  TacticalUnitState,
+  EnemyTurnResult
 } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
+import type { ActivityRepository } from '../repositories/activity.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 
@@ -101,7 +107,8 @@ export class CombatService {
   constructor(
     private characterRepository: CharacterRepository,
     private activityParticipationRepository: ActivityParticipationRepository,
-    private combatEnemyRepository?: CombatEnemyRepository
+    private combatEnemyRepository?: CombatEnemyRepository,
+    private activityRepository?: ActivityRepository
   ) {}
 
   // @ts-ignore: unused for now, will be used in future
@@ -1166,11 +1173,95 @@ export class CombatService {
     // Save tactical state to database
     await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
 
-    // Save combat log entries to the active enemy
+    // Sync CombatEnemy record and handle defeat
+    let goldReward = 0
+    let nextEnemy: { id: string; templateId: string; name: string; currentHealth: number; maxHealth: number } | undefined
+
     if (this.combatEnemyRepository) {
       const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
       if (activeEnemy) {
+        // Append combat log entries
         await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+
+        // Update enemy health in database
+        await this.combatEnemyRepository.updateEnemy(activeEnemy.id, {
+          currentHealth: newTargetHealth,
+          damageDealt: damageToTarget
+        })
+
+        // Handle enemy defeat
+        if (targetKilled) {
+          // Mark enemy as defeated
+          await this.combatEnemyRepository.defeatEnemy(activeEnemy.id)
+
+          // Get enemy template for gold calculation
+          const enemyTemplate = getEnemy(activeEnemy.templateId)
+          if (enemyTemplate) {
+            goldReward = calculateGoldReward(enemyTemplate)
+          }
+
+          // Update participation stats (kills, gold)
+          if (this.activityRepository) {
+            await this.activityRepository.updateParticipation(participationId, 1, goldReward)
+
+            // Get participation to find the activity
+            const participation = await this.activityParticipationRepository.findByIdWithActivity(participationId)
+            if (participation?.activityId) {
+              // Update activity progress
+              await this.activityRepository.updateProgress(participation.activityId, 1)
+
+              // Get activity config to spawn next enemy
+              const activity = await this.activityRepository.getActivityById(participation.activityId)
+              if (activity) {
+                const config = getActivityById(activity.activityId)
+
+                // Check if activity is complete
+                const isActivityCompleted = activity.progress + 1 >= activity.target
+
+                if (!isActivityCompleted && config) {
+                  // Spawn next enemy
+                  const nextEnemyId = selectRandomEnemy(config.enemySpawnWeights)
+                  const nextEnemyTemplate = getEnemy(nextEnemyId)
+
+                  if (nextEnemyTemplate) {
+                    const nameKeys = generateEnemyNameKeys(nextEnemyTemplate.type)
+                    const newEnemy = await this.combatEnemyRepository.createEnemy({
+                      participationId,
+                      templateId: nextEnemyId,
+                      namePrefix: nameKeys.prefix,
+                      nameSuffix: nameKeys.suffix,
+                      maxHealth: nextEnemyTemplate.health,
+                      currentHealth: nextEnemyTemplate.health
+                    })
+
+                    nextEnemy = {
+                      id: newEnemy.id,
+                      templateId: newEnemy.templateId,
+                      name: `${nameKeys.prefix}|${nameKeys.suffix}`,
+                      currentHealth: newEnemy.currentHealth,
+                      maxHealth: newEnemy.maxHealth
+                    }
+
+                    // Reinitialize tactical state with new enemy
+                    const playerUnit = updatedState.units.find((u) => u.id.startsWith('player-'))
+                    if (playerUnit) {
+                      const newTacticalState = this.createTacticalStateWithNewEnemy(
+                        updatedState,
+                        playerUnit,
+                        newEnemy.id,
+                        nextEnemy.name,
+                        { current: newEnemy.currentHealth, max: newEnemy.maxHealth }
+                      )
+                      await this.activityParticipationRepository.updateTacticalState(participationId, newTacticalState)
+                    }
+                  }
+                } else if (isActivityCompleted) {
+                  await this.activityRepository.completeActivity(participation.activityId)
+                }
+              }
+            }
+          }
+        }
       }
     }
 
@@ -1187,6 +1278,659 @@ export class CombatService {
       defenderRolls: defenderResults,
       counterAttackRolls,
       counterDefenseRolls,
+      logEntries,
+      goldReward,
+      nextEnemy
+    }
+  }
+
+  /**
+   * Create a new tactical state with a new enemy spawned.
+   * Preserves player position and state.
+   */
+  private createTacticalStateWithNewEnemy(
+    currentState: TacticalStateData,
+    playerUnit: TacticalUnitState,
+    newEnemyId: string,
+    newEnemyName: string,
+    newEnemyHealth: { current: number; max: number }
+  ): TacticalStateData {
+    // Create fresh grid
+    const gridWidth = currentState.gridWidth
+    const gridHeight = currentState.gridHeight
+    const tiles: TileState[][] = []
+
+    for (let y = 0; y < gridHeight; y++) {
+      tiles[y] = []
+      for (let x = 0; x < gridWidth; x++) {
+        let terrain: TerrainType = 'GRASS'
+        if (x === 0 || x === gridWidth - 1 || y === 0 || y === gridHeight - 1) {
+          terrain = 'STONE'
+        }
+        tiles[y][x] = {
+          position: { x, y },
+          terrain,
+          occupantId: null,
+          isWalkable: true
+        }
+      }
+    }
+
+    // Reset player to starting position
+    const playerPosition = { x: 1, y: 3 }
+    // Enemy spawns on the right side
+    const enemyPosition = { x: 6, y: 3 }
+
+    // Set occupants
+    tiles[playerPosition.y][playerPosition.x].occupantId = playerUnit.id
+    tiles[enemyPosition.y][enemyPosition.x].occupantId = newEnemyId
+
+    // Create updated player unit with reset position
+    const updatedPlayerUnit: TacticalUnitState = {
+      ...playerUnit,
+      position: playerPosition,
+      hasMoved: false,
+      hasActed: false
+    }
+
+    // Create new enemy unit
+    const newEnemyUnit: TacticalUnitState = {
+      id: newEnemyId,
+      name: newEnemyName,
+      position: enemyPosition,
+      hasMoved: false,
+      hasActed: false,
+      currentHealth: newEnemyHealth.current,
+      maxHealth: newEnemyHealth.max
+    }
+
+    const units = [updatedPlayerUnit, newEnemyUnit]
+    const turnOrder = [playerUnit.id, newEnemyId]
+
+    return {
+      mapTemplateId: currentState.mapTemplateId,
+      gridWidth,
+      gridHeight,
+      tiles,
+      units,
+      turnOrder,
+      currentTurnIndex: 0,
+      turnNumber: 1
+    }
+  }
+
+  // ============================================================
+  // ENEMY AI METHODS
+  // ============================================================
+
+  /**
+   * Calculate Manhattan distance between two positions.
+   */
+  private getManhattanDistance(from: GridPosition, to: GridPosition): number {
+    return Math.abs(from.x - to.x) + Math.abs(from.y - to.y)
+  }
+
+  /**
+   * Find the closest player unit to an enemy.
+   */
+  private findClosestPlayer(
+    enemyPos: GridPosition,
+    units: TacticalUnitState[]
+  ): TacticalUnitState | null {
+    const playerUnits = units.filter((u) => u.id.startsWith('player-') && u.currentHealth > 0)
+    if (playerUnits.length === 0) return null
+
+    let closest: TacticalUnitState | null = null
+    let minDistance = Infinity
+
+    for (const player of playerUnits) {
+      const distance = this.getManhattanDistance(enemyPos, player.position)
+      if (distance < minDistance) {
+        minDistance = distance
+        closest = player
+      }
+    }
+
+    return closest
+  }
+
+  /**
+   * Calculate movement range tiles using Dijkstra's algorithm.
+   * Returns a map of position keys to their costs.
+   */
+  private calculateMovementRange(
+    start: GridPosition,
+    movementPoints: number,
+    tiles: TileState[][],
+    units: TacticalUnitState[],
+    isPlayer: boolean
+  ): Map<string, { position: GridPosition; cost: number }> {
+    const gridHeight = tiles.length
+    const gridWidth = tiles[0]?.length ?? 0
+    const reachable = new Map<string, { position: GridPosition; cost: number }>()
+
+    if (gridWidth === 0 || gridHeight === 0) return reachable
+
+    // Build occupancy map (opposite side blocks movement)
+    const blocked = new Set<string>()
+    for (const unit of units) {
+      if ((unit.id.startsWith('player-')) !== isPlayer) {
+        blocked.add(`${unit.position.x},${unit.position.y}`)
+      }
+    }
+
+    // Also block friendly units (can't move through allies)
+    for (const unit of units) {
+      if ((unit.id.startsWith('player-')) === isPlayer) {
+        blocked.add(`${unit.position.x},${unit.position.y}`)
+      }
+    }
+
+    const distances = new Map<string, number>()
+    const queue: { position: GridPosition; cost: number }[] = []
+
+    distances.set(`${start.x},${start.y}`, 0)
+    queue.push({ position: start, cost: 0 })
+
+    const directions = [
+      { dx: 0, dy: -1 },
+      { dx: 1, dy: 0 },
+      { dx: 0, dy: 1 },
+      { dx: -1, dy: 0 }
+    ]
+
+    while (queue.length > 0) {
+      queue.sort((a, b) => a.cost - b.cost)
+      const current = queue.shift()!
+      const currentKey = `${current.position.x},${current.position.y}`
+
+      if (distances.has(currentKey) && distances.get(currentKey)! < current.cost) {
+        continue
+      }
+
+      for (const dir of directions) {
+        const nextX = current.position.x + dir.dx
+        const nextY = current.position.y + dir.dy
+        const nextPos: GridPosition = { x: nextX, y: nextY }
+        const nextKey = `${nextX},${nextY}`
+
+        // Check bounds
+        if (nextX < 0 || nextX >= gridWidth || nextY < 0 || nextY >= gridHeight) {
+          continue
+        }
+
+        // Get tile
+        const tile = tiles[nextY]?.[nextX]
+        if (!tile || !tile.isWalkable) continue
+
+        // Check if blocked
+        if (blocked.has(nextKey) && !(nextX === start.x && nextY === start.y)) {
+          continue
+        }
+
+        // Calculate cost
+        const terrainConfig = TERRAIN_CONFIG[tile.terrain]
+        const moveCost = terrainConfig?.movementCost ?? 1
+
+        if (!Number.isFinite(moveCost)) continue
+
+        const totalCost = current.cost + moveCost
+
+        if (totalCost > movementPoints) continue
+
+        if (!distances.has(nextKey) || distances.get(nextKey)! > totalCost) {
+          distances.set(nextKey, totalCost)
+          queue.push({ position: nextPos, cost: totalCost })
+
+          if (nextX !== start.x || nextY !== start.y) {
+            reachable.set(nextKey, { position: nextPos, cost: totalCost })
+          }
+        }
+      }
+    }
+
+    return reachable
+  }
+
+  /**
+   * Calculate A* path between two positions.
+   */
+  private calculateAIPath(
+    start: GridPosition,
+    end: GridPosition,
+    tiles: TileState[][],
+    units: TacticalUnitState[],
+    movingUnitId: string
+  ): GridPosition[] {
+    const gridHeight = tiles.length
+    const gridWidth = tiles[0]?.length ?? 0
+
+    if (gridWidth === 0 || gridHeight === 0) return []
+
+    // Build occupancy map (all units block except the moving unit)
+    const blocked = new Set<string>()
+    for (const unit of units) {
+      if (unit.id !== movingUnitId) {
+        blocked.add(`${unit.position.x},${unit.position.y}`)
+      }
+    }
+
+    const posKey = (pos: GridPosition) => `${pos.x},${pos.y}`
+    const heuristic = (pos: GridPosition) =>
+      Math.abs(pos.x - end.x) + Math.abs(pos.y - end.y)
+
+    const openSet: { pos: GridPosition; fScore: number }[] = []
+    const cameFrom = new Map<string, GridPosition>()
+    const gScore = new Map<string, number>()
+
+    gScore.set(posKey(start), 0)
+    openSet.push({ pos: start, fScore: heuristic(start) })
+
+    const directions = [
+      { dx: 0, dy: -1 },
+      { dx: 1, dy: 0 },
+      { dx: 0, dy: 1 },
+      { dx: -1, dy: 0 }
+    ]
+
+    while (openSet.length > 0) {
+      openSet.sort((a, b) => a.fScore - b.fScore)
+      const current = openSet.shift()!
+
+      if (current.pos.x === end.x && current.pos.y === end.y) {
+        const path: GridPosition[] = []
+        let curr: GridPosition | undefined = end
+        while (curr) {
+          path.unshift(curr)
+          curr = cameFrom.get(posKey(curr))
+        }
+        return path
+      }
+
+      const currentKey = posKey(current.pos)
+      const currentGScore = gScore.get(currentKey) ?? Infinity
+
+      for (const dir of directions) {
+        const nextX = current.pos.x + dir.dx
+        const nextY = current.pos.y + dir.dy
+        const nextPos: GridPosition = { x: nextX, y: nextY }
+        const nextKey = posKey(nextPos)
+
+        if (nextX < 0 || nextX >= gridWidth || nextY < 0 || nextY >= gridHeight) {
+          continue
+        }
+
+        const tile = tiles[nextY]?.[nextX]
+        if (!tile || !tile.isWalkable) continue
+
+        // Allow moving to destination even if blocked (for attack targeting)
+        if (blocked.has(nextKey) && !(nextX === end.x && nextY === end.y)) {
+          continue
+        }
+
+        const terrainConfig = TERRAIN_CONFIG[tile.terrain]
+        const moveCost = terrainConfig?.movementCost ?? 1
+
+        if (!Number.isFinite(moveCost)) continue
+
+        const tentativeGScore = currentGScore + moveCost
+
+        if (tentativeGScore < (gScore.get(nextKey) ?? Infinity)) {
+          cameFrom.set(nextKey, current.pos)
+          gScore.set(nextKey, tentativeGScore)
+          const fScore = tentativeGScore + heuristic(nextPos)
+
+          const inOpenSet = openSet.some((item) => item.pos.x === nextX && item.pos.y === nextY)
+          if (!inOpenSet) {
+            openSet.push({ pos: nextPos, fScore })
+          }
+        }
+      }
+    }
+
+    return []
+  }
+
+  /**
+   * Find the best tile to move to that gets closer to target.
+   * Returns the position and path to get there.
+   */
+  private findBestMoveTowardTarget(
+    enemy: TacticalUnitState,
+    target: TacticalUnitState,
+    movementRange: Map<string, { position: GridPosition; cost: number }>,
+    tiles: TileState[][],
+    units: TacticalUnitState[],
+    enemyAttackRange: number
+  ): { position: GridPosition; path: GridPosition[] } | null {
+    if (movementRange.size === 0) return null
+
+    // Build set of occupied positions (except enemy's current position)
+    const occupied = new Set<string>()
+    for (const unit of units) {
+      if (unit.id !== enemy.id) {
+        occupied.add(`${unit.position.x},${unit.position.y}`)
+      }
+    }
+
+    // Find the reachable tile that minimizes distance to target
+    let bestTile: GridPosition | null = null
+    let bestDistance = this.getManhattanDistance(enemy.position, target.position)
+    let bestIsInAttackRange = false
+
+    for (const [key, data] of movementRange) {
+      // Skip occupied tiles
+      if (occupied.has(key)) continue
+
+      const distance = this.getManhattanDistance(data.position, target.position)
+      const isInAttackRange = distance <= enemyAttackRange
+
+      // Prefer tiles that put us in attack range, then minimize distance
+      if (isInAttackRange && !bestIsInAttackRange) {
+        bestTile = data.position
+        bestDistance = distance
+        bestIsInAttackRange = true
+      } else if (isInAttackRange === bestIsInAttackRange && distance < bestDistance) {
+        bestTile = data.position
+        bestDistance = distance
+      }
+    }
+
+    if (!bestTile) return null
+
+    // Calculate path to best tile
+    const path = this.calculateAIPath(enemy.position, bestTile, tiles, units, enemy.id)
+    if (path.length < 2) return null
+
+    return { position: bestTile, path }
+  }
+
+  /**
+   * Execute an enemy AI turn.
+   * Decision tree:
+   * 1. If player in attack range → attack
+   * 2. Otherwise, move toward player
+   * 3. After moving, if player in attack range → attack
+   * 4. End turn
+   */
+  async executeEnemyTurn(
+    participationId: string,
+    enemyId: string,
+    enemyMovementRange: number,
+    enemyAttackRange: number,
+    enemyAttackDice: number,
+    enemyAttackThreshold: number
+  ): Promise<EnemyTurnResult> {
+    // Get current tactical state
+    const participation = await this.activityParticipationRepository.findByIdWithTacticalState(participationId)
+
+    if (!participation) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
+    }
+
+    if (!participation.tacticalState || !participation.tacticalState.units) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'No tactical combat in progress' })
+    }
+
+    let state = participation.tacticalState
+    const timestamp = Date.now()
+    const logEntries: CombatLogEntry[] = []
+
+    // Find the enemy unit
+    const enemyIndex = state.units.findIndex((u) => u.id === enemyId)
+    if (enemyIndex === -1) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Enemy not found' })
+    }
+
+    const enemy = state.units[enemyIndex]
+
+    // Find the enemy in the turn order and sync the turn index
+    // The frontend manages turn advancement, so we sync the backend to match
+    const enemyTurnIndex = state.turnOrder.indexOf(enemyId)
+    if (enemyTurnIndex === -1) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Enemy not in turn order' })
+    }
+
+    // Update currentTurnIndex to match the enemy being processed
+    state = { ...state, currentTurnIndex: enemyTurnIndex }
+
+    // Find closest player
+    const targetPlayer = this.findClosestPlayer(enemy.position, state.units)
+    if (!targetPlayer) {
+      // No players left - combat should end
+      return {
+        success: true,
+        enemyId,
+        action: 'wait',
+        moved: false,
+        attacked: false,
+        updatedState: state
+      }
+    }
+
+    let moved = false
+    let attacked = false
+    let path: GridPosition[] | undefined
+    let newPosition: GridPosition | undefined
+    let targetId: string | undefined
+    let damageDealt: number | undefined
+    let targetKilled: boolean | undefined
+    let attackerRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] | undefined
+    let defenderRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] | undefined
+
+    // Check if player is already in attack range
+    const initialDistance = this.getManhattanDistance(enemy.position, targetPlayer.position)
+    const inAttackRange = initialDistance <= enemyAttackRange
+
+    // If not in attack range and can move, move toward player
+    if (!inAttackRange && !enemy.hasMoved) {
+      const movementTiles = this.calculateMovementRange(
+        enemy.position,
+        enemyMovementRange,
+        state.tiles,
+        state.units,
+        false // enemy is not a player
+      )
+
+      const moveResult = this.findBestMoveTowardTarget(
+        enemy,
+        targetPlayer,
+        movementTiles,
+        state.tiles,
+        state.units,
+        enemyAttackRange
+      )
+
+      if (moveResult) {
+        // Execute the move
+        const oldPosition = enemy.position
+        path = moveResult.path
+        newPosition = moveResult.position
+        moved = true
+
+        // Update tiles
+        const updatedTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })))
+        if (updatedTiles[oldPosition.y]?.[oldPosition.x]) {
+          updatedTiles[oldPosition.y][oldPosition.x].occupantId = null
+        }
+        if (updatedTiles[newPosition.y]?.[newPosition.x]) {
+          updatedTiles[newPosition.y][newPosition.x].occupantId = enemyId
+        }
+
+        // Update unit state
+        const updatedUnits = state.units.map((unit, i) => {
+          if (i === enemyIndex) {
+            return { ...unit, position: newPosition!, hasMoved: true }
+          }
+          return unit
+        })
+
+        state = { ...state, tiles: updatedTiles, units: updatedUnits }
+
+        logEntries.push({
+          timestamp: timestamp + 1,
+          type: CombatLogType.ENEMY_ATTACKS, // Use existing log type for now
+          data: { enemy: enemy.name, action: 'move', from: oldPosition, to: newPosition }
+        })
+      }
+    }
+
+    // Check attack range again after potential move
+    const currentEnemy = state.units.find((u) => u.id === enemyId)!
+    const currentTarget = state.units.find((u) => u.id === targetPlayer.id)
+    const distanceAfterMove = currentTarget
+      ? this.getManhattanDistance(currentEnemy.position, currentTarget.position)
+      : Infinity
+
+    // Attack if in range and haven't acted
+    if (distanceAfterMove <= enemyAttackRange && !currentEnemy.hasActed && currentTarget) {
+      attacked = true
+      targetId = targetPlayer.id
+
+      // Roll attack dice
+      const attackRolls = this.rollDice(enemyAttackDice)
+      const { results: attackResults, count: attackHits } = this.calculateHitsWithCount(
+        attackRolls,
+        enemyAttackThreshold
+      )
+      attackerRolls = attackResults
+
+      // Roll defense dice for player (use a standard 2 defense dice)
+      const playerDefenseDice = 2
+      const defenseRollValues = this.rollDice(playerDefenseDice)
+      const { results: defenseResults, count: defenseBlocks } = this.calculateHitsWithCount(
+        defenseRollValues,
+        4 // Standard defense threshold
+      )
+      defenderRolls = defenseResults
+
+      // Calculate damage
+      damageDealt = Math.max(0, attackHits - defenseBlocks)
+      const newTargetHealth = Math.max(0, currentTarget.currentHealth - damageDealt)
+      targetKilled = newTargetHealth <= 0
+
+      logEntries.push({
+        timestamp: timestamp + 2,
+        type: CombatLogType.ENEMY_ATTACKS,
+        data: { enemy: enemy.name, hits: attackHits, dice: enemyAttackDice }
+      })
+
+      logEntries.push({
+        timestamp: timestamp + 3,
+        type: CombatLogType.PLAYER_DEFENDS,
+        data: { blocks: defenseBlocks, rolls: defenseRollValues }
+      })
+
+      logEntries.push({
+        timestamp: timestamp + 4,
+        type: CombatLogType.DAMAGE_TO_PLAYER,
+        data: { damage: damageDealt }
+      })
+
+      // Update state with attack result
+      let updatedUnits = state.units.map((unit) => {
+        if (unit.id === enemyId) {
+          return { ...unit, hasActed: true }
+        }
+        if (unit.id === targetId) {
+          return { ...unit, currentHealth: newTargetHealth }
+        }
+        return unit
+      })
+
+      // Update tiles and turn order if target killed
+      const updatedTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })))
+      if (targetKilled) {
+        const targetPos = currentTarget.position
+        if (updatedTiles[targetPos.y]?.[targetPos.x]) {
+          updatedTiles[targetPos.y][targetPos.x].occupantId = null
+        }
+        updatedUnits = updatedUnits.filter((u) => u.currentHealth > 0)
+
+        logEntries.push({
+          timestamp: timestamp + 5,
+          type: CombatLogType.PLAYER_DEFEATED,
+          data: { player: currentTarget.name }
+        })
+      }
+
+      // Update turn order
+      const updatedTurnOrder = state.turnOrder.filter((unitId) => {
+        const unit = updatedUnits.find((u) => u.id === unitId)
+        return unit && unit.currentHealth > 0
+      })
+
+      let updatedCurrentTurnIndex = state.currentTurnIndex
+      if (updatedCurrentTurnIndex >= updatedTurnOrder.length) {
+        updatedCurrentTurnIndex = 0
+      }
+
+      state = {
+        ...state,
+        tiles: updatedTiles,
+        units: updatedUnits,
+        turnOrder: updatedTurnOrder,
+        currentTurnIndex: updatedCurrentTurnIndex
+      }
+    }
+
+    // Advance turn to the next unit after enemy completes their turn
+    const nextTurnIndex = (state.currentTurnIndex + 1) % state.turnOrder.length
+    const nextUnitId = state.turnOrder[nextTurnIndex]
+
+    // Reset hasMoved and hasActed for the next unit
+    const unitsWithResetNextUnit = state.units.map((unit) => {
+      if (unit.id === nextUnitId) {
+        return { ...unit, hasMoved: false, hasActed: false }
+      }
+      return unit
+    })
+
+    // Update turn number if we've completed a full round
+    const newTurnNumber = nextTurnIndex === 0 ? state.turnNumber + 1 : state.turnNumber
+
+    state = {
+      ...state,
+      currentTurnIndex: nextTurnIndex,
+      turnNumber: newTurnNumber,
+      units: unitsWithResetNextUnit
+    }
+
+    // Save state to database
+    await this.activityParticipationRepository.updateTacticalState(participationId, state)
+
+    // Save combat log entries
+    if (this.combatEnemyRepository && logEntries.length > 0) {
+      const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
+      if (activeEnemy) {
+        await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+      }
+    }
+
+    // Determine action type
+    let action: 'move' | 'attack' | 'move_and_attack' | 'wait' = 'wait'
+    if (moved && attacked) {
+      action = 'move_and_attack'
+    } else if (moved) {
+      action = 'move'
+    } else if (attacked) {
+      action = 'attack'
+    }
+
+    return {
+      success: true,
+      enemyId,
+      action,
+      moved,
+      path,
+      newPosition,
+      attacked,
+      targetId,
+      damageDealt,
+      targetKilled,
+      attackerRolls,
+      defenderRolls,
+      updatedState: state,
       logEntries
     }
   }

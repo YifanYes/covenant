@@ -15,6 +15,7 @@ import { cn } from '@/lib/cn.lib'
 import { trpc, trpcOptions, queryClient } from '@/utils/trpc.utils'
 
 import DoctrinePanel from '@/components/doctrine-panel.component'
+import { useTacticalEnemyTurn } from '@/hooks/use-tactical-enemy-turn.hook'
 import AlertDialog, {
   AlertDialogAction,
   AlertDialogContent,
@@ -102,11 +103,18 @@ export default function TacticalCombatArena({
   )
 
   // Get active unit and hovered info for panels
-  const activeUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === activeUnitId)
+  const allUnits = [...playerUnits, ...enemyUnits]
+  const activeUnit = allUnits.find((u) => u.id === activeUnitId)
   const hoveredTileState = hoveredTile && tiles[hoveredTile.y]?.[hoveredTile.x]
   const hoveredUnit = hoveredTileState?.occupantId
-    ? [...playerUnits, ...enemyUnits].find((u) => u.id === hoveredTileState.occupantId)
+    ? allUnits.find((u) => u.id === hoveredTileState.occupantId)
     : null
+
+  // Create turn queue with updated health values from playerUnits/enemyUnits
+  const turnQueueWithHealth = turnQueue.map((unit) => {
+    const currentUnit = allUnits.find((u) => u.id === unit.id)
+    return currentUnit ?? unit
+  })
 
   // Character data
   const currentClass = character.classes.find((c) => c.className === character.currentClass)
@@ -126,6 +134,9 @@ export default function TacticalCombatArena({
 
   // Tactical attack hook
   const { confirmAttack, getPendingAttackInfo, isLoading: isTacticalAttackLoading } = useTacticalAttack()
+
+  // Enemy AI turn hook - automatically executes when it's an enemy's turn
+  const { isExecuting: isEnemyTurnExecuting } = useTacticalEnemyTurn()
 
   // Handler for when dice rolling completes - routes to tactical or legacy combat
   const handleTacticalAttack = useCallback(async (rolls: { attackRolls: number[]; defenseRolls: number[] }) => {
@@ -353,7 +364,7 @@ export default function TacticalCombatArena({
     <div className={cn('flex h-full flex-col', className)}>
       {/* Top bar - Turn order */}
       <div className='bg-card flex-none border-b p-2'>
-        <TurnOrderDisplay turnQueue={turnQueue} currentTurnIndex={currentTurnIndex} turnNumber={turnNumber} />
+        <TurnOrderDisplay turnQueue={turnQueueWithHealth} currentTurnIndex={currentTurnIndex} turnNumber={turnNumber} />
       </div>
 
       {/* Main content */}
@@ -426,9 +437,9 @@ export default function TacticalCombatArena({
               <ActionMenu activeUnit={activeUnit} phase={phase} />
             </div>
           )}
-          {phase === 'enemy_turn' && (
+          {(phase === 'enemy_turn' || isEnemyTurnExecuting) && (
             <div className='text-muted-foreground rounded-lg border p-3 text-center text-sm'>
-              {t('combat.enemy_turn', 'Enemy turn...')}
+              <span className='animate-pulse'>{t('combat.enemy_turn', 'Enemy turn...')}</span>
             </div>
           )}
 
@@ -490,9 +501,28 @@ export default function TacticalCombatArena({
             <h3 className='mb-2 text-sm font-semibold'>{t('combat.enemies')}</h3>
             <ScrollArea className='max-h-40'>
               <div className='flex flex-col gap-2 pr-2'>
-                {enemies.map((enemy) => (
-                  <EnemyCard key={enemy.id} enemy={enemy} isTarget={targetEnemy?.id === enemy.id} />
-                ))}
+                {enemyUnits.map((storeEnemy) => {
+                  // Build enemy state from store's tactical unit
+                  // Name format from server is "prefix|suffix"
+                  const [namePrefix, nameSuffix] = storeEnemy.name.includes('|')
+                    ? storeEnemy.name.split('|')
+                    : [undefined, storeEnemy.name]
+                  const displayEnemy: EnemyState = {
+                    id: storeEnemy.id,
+                    templateId: storeEnemy.templateId,
+                    currentHealth: storeEnemy.currentHealth,
+                    maxHealth: storeEnemy.maxHealth,
+                    namePrefix,
+                    nameSuffix
+                  }
+                  return (
+                    <EnemyCard
+                      key={storeEnemy.id}
+                      enemy={displayEnemy}
+                      isTarget={storeEnemy.currentHealth > 0}
+                    />
+                  )
+                })}
               </div>
             </ScrollArea>
           </div>

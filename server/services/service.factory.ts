@@ -125,7 +125,8 @@ export class ServiceFactory {
     return (this._combatService ??= new CombatService(
       this.characterRepository,
       this.activityParticipationRepository,
-      this.combatEnemyRepository
+      this.combatEnemyRepository,
+      this.activityRepository
     ))
   }
 

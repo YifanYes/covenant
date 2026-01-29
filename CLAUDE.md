@@ -59,6 +59,26 @@ Request → Router (validation) → Service (business logic) → Repository (dat
 - **Shared Components**: `components/` (ui primitives in `components/ui/`)
 - **State**: Server state via TanStack Query/tRPC, client state via Zustand
 
+### tRPC Usage
+Two exports from `@/utils/trpc.utils` serve different purposes:
+- **`trpcOptions`**: Use for `queryOptions()` and `mutationOptions()` with TanStack Query hooks
+- **`trpc`**: Use for `queryKey()` when invalidating queries
+
+```tsx
+// Queries - use trpcOptions for options
+const { data } = useSuspenseQuery(trpcOptions.dashboard.get.queryOptions())
+
+// Mutations - use trpcOptions for options
+const mutation = useMutation(trpcOptions.habits.create.mutationOptions({
+  onSuccess: () => {
+    // Invalidation - use trpc for queryKey
+    queryClient.invalidateQueries({ queryKey: trpc.habits.getAll.queryKey() })
+  }
+}))
+```
+
+**Common mistake**: Using `trpc.*.queryOptions()` or `trpc.*.mutationOptions()` will not work correctly. Always use `trpcOptions` for options.
+
 ## Code Conventions
 
 ### File Naming

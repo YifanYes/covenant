@@ -40,9 +40,9 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
             onClick={() => selectAction({ type: 'move' })}
           >
             <MoveIcon className="w-4 h-4 mr-2" />
-            Move
+            {t('tactical.actions.move')}
             <span className="ml-auto text-xs text-muted-foreground">
-              {activeUnit.movementRange} tiles
+              {activeUnit.movementRange} {t('tactical.tiles')}
             </span>
           </Button>
 
@@ -54,9 +54,9 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
             onClick={() => selectAction({ type: 'attack' })}
           >
             <AttackIcon className="w-4 h-4 mr-2" />
-            Attack
+            {t('tactical.actions.attack')}
             <span className="ml-auto text-xs text-muted-foreground">
-              {activeUnit.attackRange} range
+              {activeUnit.attackRange} {t('tactical.range')}
             </span>
           </Button>
 
@@ -67,7 +67,7 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
             onClick={() => selectAction({ type: 'wait' })}
           >
             <WaitIcon className="w-4 h-4 mr-2" />
-            Wait
+            {t('tactical.actions.next_turn')}
           </Button>
         </div>
 
@@ -111,21 +111,21 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
     return (
       <div className="space-y-2">
         <h3 className="text-sm font-semibold mb-3">
-          {phase === 'select_move' ? 'Select Destination' : 'Select Target'}
+          {phase === 'select_move' ? t('tactical.select_destination') : t('tactical.select_target')}
         </h3>
 
         <p className="text-xs text-muted-foreground mb-4">
           {phase === 'select_move'
-            ? 'Click a highlighted tile to move'
-            : 'Click an enemy to attack'}
+            ? t('tactical.click_to_move')
+            : t('tactical.click_to_attack')}
         </p>
 
         {/* Show target info when attacking */}
         {phase === 'select_target' && attackInfo?.target && (
           <div className="bg-muted/50 rounded p-2 mb-2 text-xs">
-            <div className="font-medium mb-1">{t('combat.target', 'Target')}: {attackInfo.target.name}</div>
+            <div className="font-medium mb-1">{t('combat.target')}: {attackInfo.target.name}</div>
             <div className="flex justify-between text-muted-foreground">
-              <span>{t('inventory.health', 'HP')}</span>
+              <span>{t('inventory.health')}</span>
               <span>{attackInfo.target.currentHealth}/{attackInfo.target.maxHealth}</span>
             </div>
           </div>
@@ -134,7 +134,7 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
         {/* Show prompt to use dice roller for attacks */}
         {phase === 'select_target' && attackInfo?.target && (
           <div className="text-xs text-muted-foreground text-center py-2 border-t">
-            {t('combat.use_dice_roller', 'Use the Dice Roller to attack!')}
+            {t('combat.use_dice_roller')}
           </div>
         )}
 
@@ -149,7 +149,7 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
                 disabled={isLoading || !pendingAction.path?.length}
                 onClick={() => confirmMove()}
               >
-                {isLoading ? 'Moving...' : 'Confirm'}
+                {isLoading ? t('tactical.moving') : t('confirm')}
               </Button>
             )}
             <Button
@@ -159,7 +159,7 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
               disabled={isLoading}
               onClick={cancelAction}
             >
-              Cancel
+              {t('cancel')}
             </Button>
           </div>
         )}

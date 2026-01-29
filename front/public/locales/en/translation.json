@@ -1328,10 +1328,22 @@
     "title_placeholder": "Task title"
   },
   "tactical": {
+    "actions": {
+      "attack": "Attack",
+      "move": "Move",
+      "next_turn": "Next Turn"
+    },
+    "click_to_attack": "Click an enemy to attack",
+    "click_to_move": "Click a highlighted tile to move",
     "controls": {
       "pan": "Right drag: Pan camera",
       "select": "Left click: Select",
       "zoom": "Scroll: Zoom"
-    }
+    },
+    "moving": "Moving...",
+    "range": "range",
+    "select_destination": "Select Destination",
+    "select_target": "Select Target",
+    "tiles": "tiles"
   }
 }

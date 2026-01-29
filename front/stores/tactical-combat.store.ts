@@ -19,6 +19,16 @@ import {
   calculatePath,
   getPathCost
 } from '@/lib/phaser/systems/pathfinding'
+import { getEnemy } from '@shared/constants/enemies'
+
+// Next enemy data returned from server when enemy is defeated
+interface NextEnemyData {
+  id: string
+  templateId: string
+  name: string
+  currentHealth: number
+  maxHealth: number
+}
 
 // Attack animation data
 interface AttackAnimationData {
@@ -28,6 +38,17 @@ interface AttackAnimationData {
   targetKilled: boolean
   damageToAttacker: number
   attackerKilled: boolean
+  // Data for the next enemy if one was spawned
+  nextEnemy?: NextEnemyData
+  goldReward?: number
+}
+
+// Pending enemy attack data (for after movement animation)
+interface PendingEnemyAttack {
+  attackerId: string
+  targetId: string
+  damageDealt: number
+  targetKilled: boolean
 }
 
 interface TacticalCombatStore extends TacticalCombatState {
@@ -41,6 +62,9 @@ interface TacticalCombatStore extends TacticalCombatState {
   // Attack state
   attackAnimationData: AttackAnimationData | null
   isAttackAnimating: boolean
+
+  // Enemy turn state
+  pendingEnemyAttack: PendingEnemyAttack | null
 
   // Actions
   initializeCombat: (data: TacticalInitData, participationId?: string) => void
@@ -65,6 +89,10 @@ interface TacticalCombatStore extends TacticalCombatState {
   // Attack actions
   startAttackAnimation: (data: AttackAnimationData) => void
   completeAttackAnimation: () => void
+
+  // Enemy turn actions
+  startEnemyMovement: (unitId: string, path: GridPosition[]) => void
+
   applyAttackResult: (
     targetId: string,
     damage: number,
@@ -211,7 +239,8 @@ const initialState = (() => {
     animationPath: null,
     participationId: null,
     attackAnimationData: null,
-    isAttackAnimating: false
+    isAttackAnimating: false,
+    pendingEnemyAttack: null
   }
 })()
 
@@ -268,6 +297,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       console.error('No units could be hydrated from persisted state, falling back to fresh combat')
       get().initializeCombat(
         {
+          mapTemplateId: persistedState.mapTemplateId,
           gridWidth: persistedState.gridWidth,
           gridHeight: persistedState.gridHeight,
           tiles: persistedState.tiles,
@@ -668,6 +698,52 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       return unit
     })
 
+    // Check if there's a pending enemy attack to execute after movement
+    const pendingAttack = get().pendingEnemyAttack
+
+    if (pendingAttack) {
+      // Clear the movement animation state and start attack animation
+      set({
+        tiles: updatedTiles,
+        playerUnits: updatedPlayerUnits,
+        enemyUnits: updatedEnemyUnits,
+        pendingAction: null,
+        animatingUnitId: null,
+        animationPath: null,
+        pendingEnemyAttack: null,
+        phase: 'animating',
+        isAttackAnimating: true,
+        attackAnimationData: {
+          attackerId: pendingAttack.attackerId,
+          targetId: pendingAttack.targetId,
+          damageDealt: pendingAttack.damageDealt,
+          targetKilled: pendingAttack.targetKilled,
+          damageToAttacker: 0,
+          attackerKilled: false
+        },
+        highlightedTiles: []
+      })
+      return
+    }
+
+    // Check if it was an enemy that finished moving
+    const wasEnemyMoving = !activeUnit?.isPlayer
+
+    // If it was an enemy that finished moving and they didn't attack, advance turn
+    if (wasEnemyMoving) {
+      set({
+        tiles: updatedTiles,
+        playerUnits: updatedPlayerUnits,
+        enemyUnits: updatedEnemyUnits,
+        pendingAction: null,
+        animatingUnitId: null,
+        animationPath: null
+      })
+      // Advance to next turn
+      get().nextTurn()
+      return
+    }
+
     set({
       tiles: updatedTiles,
       playerUnits: updatedPlayerUnits,
@@ -676,6 +752,16 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       animatingUnitId: null,
       animationPath: null,
       phase: 'select_action'
+    })
+  },
+
+  // Enemy turn actions
+  startEnemyMovement: (unitId: string, path: GridPosition[]) => {
+    set({
+      phase: 'animating',
+      animatingUnitId: unitId,
+      animationPath: path,
+      highlightedTiles: []
     })
   },
 
@@ -690,7 +776,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   },
 
   completeAttackAnimation: () => {
-    const { attackAnimationData, playerUnits, enemyUnits, tiles, turnQueue, currentTurnIndex } = get()
+    const { attackAnimationData, playerUnits, enemyUnits, tiles, turnQueue, currentTurnIndex, gridWidth, gridHeight } = get()
 
     if (!attackAnimationData) {
       set({
@@ -701,7 +787,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       return
     }
 
-    const { targetId, damageDealt, targetKilled, attackerId, damageToAttacker, attackerKilled } = attackAnimationData
+    const { targetId, damageDealt, targetKilled, attackerId, damageToAttacker, attackerKilled, nextEnemy } = attackAnimationData
 
     // Apply damage to target
     let updatedPlayerUnits = playerUnits.map((unit) => {
@@ -767,7 +853,90 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== attackerId)
     }
 
-    // Update turn queue to remove dead units
+    // Check if it was an enemy that attacked
+    const wasEnemyAttack = attackerId && !attackerId.startsWith('player-')
+
+    // If a next enemy was spawned (enemy defeated by player), reinitialize combat
+    if (nextEnemy && targetKilled && !wasEnemyAttack) {
+      const playerUnit = updatedPlayerUnits[0]
+      if (playerUnit) {
+        // Reset player position
+        const playerPosition = { x: 1, y: 3 }
+        const enemyPosition = { x: 6, y: 3 }
+
+        // Create fresh grid
+        const freshTiles: TileState[][] = []
+        for (let y = 0; y < gridHeight; y++) {
+          freshTiles[y] = []
+          for (let x = 0; x < gridWidth; x++) {
+            let terrain: TerrainType = 'GRASS'
+            if (x === 0 || x === gridWidth - 1 || y === 0 || y === gridHeight - 1) {
+              terrain = 'STONE'
+            }
+            freshTiles[y][x] = {
+              position: { x, y },
+              terrain,
+              occupantId: null,
+              isWalkable: true
+            }
+          }
+        }
+
+        // Set occupants
+        freshTiles[playerPosition.y][playerPosition.x].occupantId = playerUnit.id
+        freshTiles[enemyPosition.y][enemyPosition.x].occupantId = nextEnemy.id
+
+        // Reset player
+        const resetPlayer: TacticalUnit = {
+          ...playerUnit,
+          position: playerPosition,
+          hasMoved: false,
+          hasActed: false
+        }
+
+        // Create new enemy unit with sprite from template
+        const enemyTemplate = getEnemy(nextEnemy.templateId)
+        const newEnemyUnit: TacticalUnit = {
+          id: nextEnemy.id,
+          templateId: nextEnemy.templateId,
+          name: nextEnemy.name,
+          position: enemyPosition,
+          isPlayer: false,
+          spriteUrl: enemyTemplate?.imageId ? `/assets/enemies/${enemyTemplate.imageId}.png` : undefined,
+          currentHealth: nextEnemy.currentHealth,
+          maxHealth: nextEnemy.maxHealth,
+          currentMana: 0,
+          maxMana: 0,
+          movementRange: 2,
+          attackRange: enemyTemplate?.attackDice ?? 1,
+          speed: 1,
+          hasMoved: false,
+          hasActed: false,
+          activeEffects: []
+        }
+
+        const newTurnQueue = [resetPlayer, newEnemyUnit]
+
+        set({
+          tiles: freshTiles,
+          playerUnits: [resetPlayer],
+          enemyUnits: [newEnemyUnit],
+          turnQueue: newTurnQueue,
+          currentTurnIndex: 0,
+          activeUnitId: resetPlayer.id,
+          turnNumber: 1,
+          isAttackAnimating: false,
+          attackAnimationData: null,
+          pendingAction: null,
+          phase: 'select_action',
+          selectedTile: null,
+          highlightedTiles: []
+        })
+        return
+      }
+    }
+
+    // Standard flow: update turn queue to remove dead units
     const allAliveUnits = [...updatedPlayerUnits, ...updatedEnemyUnits]
     const aliveUnitIds = new Set(allAliveUnits.map((u) => u.id))
     const updatedTurnQueue = turnQueue.filter((u) => aliveUnitIds.has(u.id))
@@ -787,8 +956,13 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       isAttackAnimating: false,
       attackAnimationData: null,
       pendingAction: null,
-      phase: 'select_action'
+      phase: 'select_action' // Temporarily set to select_action
     })
+
+    // If it was an enemy attack, advance to next turn
+    if (wasEnemyAttack) {
+      get().nextTurn()
+    }
   },
 
   applyAttackResult: (
@@ -881,7 +1055,8 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       animationPath: null,
       participationId: null,
       attackAnimationData: null,
-      isAttackAnimating: false
+      isAttackAnimating: false,
+      pendingEnemyAttack: null
     })
   }
 }))

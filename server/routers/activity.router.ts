@@ -134,5 +134,42 @@ export const activityRouter = t.router({
         input.defenseThreshold,
         input.attackCriticalThreshold ?? 6
       )
+    }),
+
+  // Tactical combat: Execute enemy AI turn
+  executeTacticalEnemyTurn: protectedProcedure
+    .input(
+      z.object({
+        participationId: z.string(),
+        enemyId: z.string(),
+        enemyMovementRange: z.number().int().min(1),
+        enemyAttackRange: z.number().int().min(1),
+        enemyAttackDice: z.number().int().min(1),
+        enemyAttackThreshold: z.number().int().min(1).max(6)
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Verify the user owns this participation
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
+        input.participationId,
+        ctx.user.id
+      )
+      if (!isOwner) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
+      }
+
+      // Verify the unit is an enemy (not a player unit)
+      if (input.enemyId.startsWith('player-')) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot execute AI turn for player units' })
+      }
+
+      return ctx.services.combat.executeEnemyTurn(
+        input.participationId,
+        input.enemyId,
+        input.enemyMovementRange,
+        input.enemyAttackRange,
+        input.enemyAttackDice,
+        input.enemyAttackThreshold
+      )
     })
 })

@@ -6,7 +6,8 @@ import {
   CANVAS_HEIGHT,
   CAMERA_ZOOM_MIN,
   CAMERA_ZOOM_MAX,
-  CAMERA_ZOOM_DEFAULT
+  CAMERA_ZOOM_DEFAULT,
+  DEPTH_LAYERS
 } from '../config'
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
 import type {

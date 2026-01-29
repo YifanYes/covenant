@@ -525,7 +525,7 @@ shared/
 
 **Deliverable:** AoE doctrines target multiple enemies
 
-### [ ] Phase 6: Enemy AI
+### [x] Phase 6: Enemy AI
 
 **Goal:** Enemies take intelligent turns
 
@@ -544,12 +544,10 @@ shared/
 
 **Tasks:**
 
-1. Create/acquire pixel art sprites
-2. Sprite animation system
-3. Particle effects for spells
-4. Sound effects
-5. Camera follow
-6. Performance optimization
+1. Sprite animation system
+2. Particle effects for spells
+3. Camera follow
+4. Performance optimization
 
 **Deliverable:** Production-ready visuals
 

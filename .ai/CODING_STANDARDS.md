@@ -337,6 +337,35 @@ return <h1>Dashboard</h1>
 | Client state | Zustand                           |
 | URL state    | URL params (for filters, sorting) |
 
+### tRPC with TanStack Query
+
+Import both `trpc` and `trpcOptions` from `@/utils/trpc.utils`:
+
+```tsx
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+```
+
+**Use `trpcOptions` for query/mutation options:**
+
+```tsx
+// Queries
+const { data } = useSuspenseQuery(trpcOptions.tasks.getAll.queryOptions())
+const { data } = useQuery(trpcOptions.dashboard.get.queryOptions())
+
+// Mutations
+const mutation = useMutation(trpcOptions.tasks.create.mutationOptions({
+  onSuccess: () => { /* ... */ }
+}))
+```
+
+**Use `trpc` for query keys (cache invalidation):**
+
+```tsx
+queryClient.invalidateQueries({ queryKey: trpc.tasks.getAll.queryKey() })
+```
+
+**Common mistake:** Using `trpc.*.queryOptions()` or `trpc.*.mutationOptions()` - these don't work correctly. Always use `trpcOptions` for options.
+
 ---
 
 ## 8. Code Style (Prettier)
