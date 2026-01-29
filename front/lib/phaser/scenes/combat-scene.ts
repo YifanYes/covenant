@@ -23,7 +23,9 @@ export class CombatScene extends Phaser.Scene {
   private unsubscribe?: () => void
   private isAnimating = false
   private isAttackAnimating = false
+  private isDoctrineAnimating = false
   private floatingTexts: Phaser.GameObjects.Text[] = []
+  private spellEffects: Phaser.GameObjects.Graphics[] = []
 
   // Camera drag state
   private isDragging = false
@@ -212,8 +214,14 @@ export class CombatScene extends Phaser.Scene {
       return // Don't sync units during animation
     }
 
+    // Check for doctrine animation state
+    if (state.phase === 'animating' && state.isDoctrineAnimating && state.doctrineAnimationData && !this.isDoctrineAnimating) {
+      this.handleDoctrineAnimation(state.doctrineAnimationData)
+      return // Don't sync units during animation
+    }
+
     // Update units (skip during animation as the unit is updating itself)
-    if (!this.isAnimating && !this.isAttackAnimating) {
+    if (!this.isAnimating && !this.isAttackAnimating && !this.isDoctrineAnimating) {
       this.syncUnits([...state.playerUnits, ...state.enemyUnits])
     }
   }
@@ -294,6 +302,192 @@ export class CombatScene extends Phaser.Scene {
       // Signal animation complete to store
       useTacticalCombatStore.getState().completeAttackAnimation()
     }
+  }
+
+  private async handleDoctrineAnimation(data: {
+    casterId: string
+    doctrineId: string
+    targetPosition: GridPosition
+    affectedTiles: GridPosition[]
+    affectedUnitIds: string[]
+    effects: {
+      unitId: string
+      damageDealt?: number
+      healthRestored?: number
+      statusApplied?: string
+      killed?: boolean
+    }[]
+  }): Promise<void> {
+    const caster = this.units.get(data.casterId)
+
+    if (!caster) {
+      // Caster not found, complete animation immediately
+      useTacticalCombatStore.getState().completeDoctrineAnimation()
+      return
+    }
+
+    this.isDoctrineAnimating = true
+
+    try {
+      // Play cast animation on caster (flash effect)
+      await this.playCastEffect(caster)
+
+      // Show AoE effect on affected tiles
+      await this.playAoEEffect(data.affectedTiles, data.doctrineId)
+
+      // Apply effects to each affected unit
+      for (const effect of data.effects) {
+        const targetUnit = this.units.get(effect.unitId)
+        if (!targetUnit) continue
+
+        // Show damage/heal numbers and play animations
+        if (effect.damageDealt && effect.damageDealt > 0) {
+          const damagePromise = targetUnit.animateDamage(effect.damageDealt)
+          this.showDamageNumber(targetUnit, effect.damageDealt)
+          await damagePromise
+        }
+
+        if (effect.healthRestored && effect.healthRestored > 0) {
+          this.showHealNumber(targetUnit, effect.healthRestored)
+        }
+
+        if (effect.statusApplied) {
+          this.showStatusText(targetUnit, effect.statusApplied)
+        }
+
+        // Play death animation if killed
+        if (effect.killed) {
+          await targetUnit.animateDeath()
+        }
+      }
+    } finally {
+      this.isDoctrineAnimating = false
+      // Signal animation complete to store
+      useTacticalCombatStore.getState().completeDoctrineAnimation()
+    }
+  }
+
+  /**
+   * Play a casting effect on the caster unit (flash/glow).
+   */
+  private async playCastEffect(unit: Unit): Promise<void> {
+    return new Promise((resolve) => {
+      // Create a flash effect
+      const flash = this.add.graphics()
+      flash.fillStyle(0xa855f7, 0.5) // Purple for doctrine
+      flash.fillCircle(unit.x, unit.y, 30)
+      flash.setDepth(DEPTH_LAYERS.EFFECTS)
+
+      // Animate the flash expanding and fading
+      this.tweens.add({
+        targets: flash,
+        alpha: 0,
+        scaleX: 2,
+        scaleY: 2,
+        duration: 300,
+        ease: 'Quad.easeOut',
+        onComplete: () => {
+          flash.destroy()
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Play an AoE effect on the affected tiles.
+   */
+  private async playAoEEffect(tiles: GridPosition[], doctrineId: string): Promise<void> {
+    if (tiles.length === 0) return
+
+    return new Promise((resolve) => {
+      // Determine color based on doctrine (could be expanded)
+      let color = 0xa855f7 // Default purple
+
+      // Fire-based doctrines
+      if (doctrineId.includes('fire') || doctrineId.includes('igneous') || doctrineId.includes('combustion')) {
+        color = 0xff6b35 // Orange/fire
+      }
+      // Ice-based doctrines
+      else if (doctrineId.includes('ice') || doctrineId.includes('frost')) {
+        color = 0x4fc3f7 // Light blue
+      }
+      // Lightning-based doctrines
+      else if (doctrineId.includes('lightning') || doctrineId.includes('storm')) {
+        color = 0xffeb3b // Yellow
+      }
+      // Dark/chaos doctrines
+      else if (doctrineId.includes('black') || doctrineId.includes('void') || doctrineId.includes('disruption')) {
+        color = 0x7b1fa2 // Dark purple
+      }
+
+      const graphics = this.add.graphics()
+      this.spellEffects.push(graphics)
+
+      // Draw effect on each affected tile
+      for (const tile of tiles) {
+        const screenPos = this.gridSystem.gridToScreen(tile.x, tile.y)
+        graphics.fillStyle(color, 0.6)
+        graphics.fillCircle(screenPos.x, screenPos.y - 16, 25)
+      }
+
+      graphics.setDepth(DEPTH_LAYERS.EFFECTS)
+
+      // Animate and fade
+      this.tweens.add({
+        targets: graphics,
+        alpha: 0,
+        duration: 500,
+        ease: 'Quad.easeOut',
+        onComplete: () => {
+          graphics.destroy()
+          const index = this.spellEffects.indexOf(graphics)
+          if (index > -1) {
+            this.spellEffects.splice(index, 1)
+          }
+          resolve()
+        }
+      })
+    })
+  }
+
+  /**
+   * Show a status effect text above a unit.
+   */
+  private showStatusText(unit: Unit, status: string): void {
+    const text = this.add.text(
+      unit.x,
+      unit.y - 50,
+      status.toUpperCase(),
+      {
+        fontFamily: 'monospace',
+        fontSize: '12px',
+        fontStyle: 'bold',
+        color: '#a855f7',
+        stroke: '#000000',
+        strokeThickness: 2
+      }
+    )
+    text.setOrigin(0.5, 0.5)
+    text.setDepth(DEPTH_LAYERS.UI)
+
+    this.floatingTexts.push(text)
+
+    // Animate the text floating up and fading
+    this.tweens.add({
+      targets: text,
+      y: text.y - 30,
+      alpha: 0,
+      duration: 1200,
+      ease: 'Quad.easeOut',
+      onComplete: () => {
+        text.destroy()
+        const index = this.floatingTexts.indexOf(text)
+        if (index > -1) {
+          this.floatingTexts.splice(index, 1)
+        }
+      }
+    })
   }
 
   /**
@@ -494,6 +688,12 @@ export class CombatScene extends Phaser.Scene {
       text.destroy()
     }
     this.floatingTexts = []
+
+    // Cleanup spell effects
+    for (const effect of this.spellEffects) {
+      effect.destroy()
+    }
+    this.spellEffects = []
   }
 
   // Get unit at a specific grid position

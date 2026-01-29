@@ -1,5 +1,11 @@
 import type { GridPosition, TileState, TacticalUnit } from '@shared/types/tactical-combat.types'
 import { TERRAIN_CONFIG } from '@shared/constants/terrain'
+import {
+  type AoEPatternType,
+  getAoETilesWithRotation,
+  getDoctrineAoEPattern,
+  getDoctrineRange
+} from '@shared/constants/aoe-patterns'
 
 // Node for pathfinding
 interface PathNode {
@@ -329,4 +335,98 @@ export function getPathCost(path: GridPosition[], tiles: TileState[][]): number 
 export function isInRange(center: GridPosition, target: GridPosition, range: number): boolean {
   const distance = Math.abs(center.x - target.x) + Math.abs(center.y - target.y)
   return distance <= range
+}
+
+/**
+ * Calculate the tiles within doctrine casting range.
+ * Uses Manhattan distance like attack range.
+ *
+ * @param center - Caster position
+ * @param doctrineId - ID of the doctrine to get range for
+ * @param gridWidth - Grid width
+ * @param gridHeight - Grid height
+ * @returns Array of positions within casting range
+ */
+export function calculateDoctrineRange(
+  center: GridPosition,
+  doctrineId: string,
+  gridWidth: number,
+  gridHeight: number
+): GridPosition[] {
+  const range = getDoctrineRange(doctrineId)
+  return calculateAttackRange(center, range, gridWidth, gridHeight)
+}
+
+/**
+ * Calculate the tiles affected by an AoE doctrine at a target position.
+ *
+ * @param targetPosition - Center of the AoE effect
+ * @param casterPosition - Position of the caster (for directional patterns)
+ * @param doctrineId - ID of the doctrine
+ * @param gridWidth - Grid width
+ * @param gridHeight - Grid height
+ * @returns Array of positions affected by the AoE
+ */
+export function calculateAoEArea(
+  targetPosition: GridPosition,
+  casterPosition: GridPosition,
+  doctrineId: string,
+  gridWidth: number,
+  gridHeight: number
+): GridPosition[] {
+  const pattern = getDoctrineAoEPattern(doctrineId)
+  return getAoETilesWithRotation(
+    targetPosition,
+    casterPosition,
+    pattern,
+    gridWidth,
+    gridHeight
+  )
+}
+
+/**
+ * Find all units within an AoE area.
+ *
+ * @param aoeArea - Array of positions in the AoE
+ * @param allUnits - All units on the grid
+ * @param includeAllies - Whether to include friendly units (for healing)
+ * @param casterIsPlayer - Whether the caster is a player unit
+ * @returns Array of unit IDs within the AoE
+ */
+export function findUnitsInAoE(
+  aoeArea: GridPosition[],
+  allUnits: TacticalUnit[],
+  includeAllies: boolean = false,
+  casterIsPlayer: boolean = true
+): string[] {
+  const affectedIds: string[] = []
+  const areaSet = new Set(aoeArea.map(p => `${p.x},${p.y}`))
+
+  for (const unit of allUnits) {
+    const posKey = `${unit.position.x},${unit.position.y}`
+    if (areaSet.has(posKey)) {
+      // Check if we should include this unit
+      if (includeAllies) {
+        // Include all units (for healing or special effects)
+        affectedIds.push(unit.id)
+      } else {
+        // Only include enemies
+        if (unit.isPlayer !== casterIsPlayer) {
+          affectedIds.push(unit.id)
+        }
+      }
+    }
+  }
+
+  return affectedIds
+}
+
+/**
+ * Get the AoE pattern type for a doctrine.
+ *
+ * @param doctrineId - ID of the doctrine
+ * @returns The AoE pattern type
+ */
+export function getDoctrinePattern(doctrineId: string): AoEPatternType {
+  return getDoctrineAoEPattern(doctrineId)
 }

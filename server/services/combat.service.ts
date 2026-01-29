@@ -1,4 +1,10 @@
 import { DOCTRINES } from '@shared/constants/doctrines'
+import {
+  type AoEPatternType,
+  getAoETilesWithRotation,
+  getDoctrineAoEPattern,
+  getDoctrineRange
+} from '@shared/constants/aoe-patterns'
 import { TERRAIN_CONFIG } from '@shared/constants/terrain'
 import { calculateGoldReward, DamageType, getEnemy, type EnemyTemplate } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
@@ -25,7 +31,8 @@ import type {
   AttackValidationResult,
   TacticalAttackResult,
   TacticalUnitState,
-  EnemyTurnResult
+  EnemyTurnResult,
+  TacticalDoctrineResult
 } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
@@ -1043,25 +1050,67 @@ export class CombatService {
     const timestamp = Date.now()
     const logEntries: CombatLogEntry[] = []
 
-    // Resolve attacker's attack
-    const { results: attackerResults, count: attackerHits } = this.calculateHitsWithCount(
+    // Check for active doctrine buffs on the attacker
+    const attackerUnit = state.units[attackerIndex]
+    const buffs = this.getActiveDoctrineBuffs(attackerUnit.activeDoctrines)
+
+    // Log doctrine buff if active
+    if (buffs.bonusDice > 0 || buffs.thresholdMod !== 0 || buffs.guaranteedCritical || buffs.criticalThresholdMod > 0) {
+      logEntries.push({
+        timestamp: timestamp + 0.5,
+        type: CombatLogType.DOCTRINE_EFFECT,
+        data: {
+          effect: buffs.guaranteedCritical ? 'guaranteed_critical' : buffs.thresholdMod !== 0 ? 'threshold_reduction' : 'power_boost',
+          bonusDice: buffs.bonusDice,
+          sixesGenerateExtraHits: buffs.sixesGenerateExtraHits,
+          thresholdMod: buffs.thresholdMod,
+          guaranteedCritical: buffs.guaranteedCritical,
+          criticalThresholdMod: buffs.criticalThresholdMod
+        }
+      })
+    }
+
+    // Apply threshold modifier from doctrines (negative value = lower threshold = easier to hit)
+    const effectiveAttackThreshold = Math.max(2, attackThreshold + buffs.thresholdMod)
+
+    // Apply critical threshold modifier from doctrines (e.g., 5+ crits instead of 6+)
+    const effectiveCriticalThreshold = Math.max(2, attackCriticalThreshold - buffs.criticalThresholdMod)
+
+    // Resolve attacker's attack with applied buffs
+    const { results: attackerResults, count: baseAttackerHits } = this.calculateHitsWithCount(
       attackerRolls,
-      attackThreshold,
-      attackCriticalThreshold
+      effectiveAttackThreshold,
+      effectiveCriticalThreshold,
+      buffs.guaranteedCritical
     )
+
+    // For Stellar Collapse: 6s generate extra hits (criticals count as 2 hits each)
+    let attackerHits = baseAttackerHits
+    if (buffs.sixesGenerateExtraHits) {
+      const criticalCount = attackerResults.filter((r) => r.isCritical).length
+      attackerHits += criticalCount // Add extra hit for each 6
+    }
 
     // Log player attack
     logEntries.push({
       timestamp: timestamp + 1,
       type: CombatLogType.PLAYER_ATTACK,
-      data: { dice: attackerRolls.length, rolls: attackerRolls }
+      data: { dice: attackerRolls.length, rolls: attackerRolls, bonusDice: buffs.bonusDice }
     })
 
     logEntries.push({
       timestamp: timestamp + 2,
       type: CombatLogType.PLAYER_HITS,
-      data: { hits: attackerHits, criticals: attackerResults.filter((r) => r.isCritical).length }
+      data: {
+        hits: attackerHits,
+        criticals: attackerResults.filter((r) => r.isCritical).length,
+        extraHitsFrom6s: buffs.sixesGenerateExtraHits ? attackerResults.filter((r) => r.isCritical).length : 0
+      }
     })
+
+    // Check for NEGATE_HITS buff on defender (if defender is a player unit)
+    const defenderUnit = state.units[targetIndex]
+    const defenderBuffs = this.getActiveDoctrineBuffs(defenderUnit.activeDoctrines)
 
     // Resolve defender's defense
     const { results: defenderResults, count: defenderBlocks } = this.calculateHitsWithCount(
@@ -1069,19 +1118,25 @@ export class CombatService {
       defenseThreshold
     )
 
-    // Log enemy defense
+    // Total blocks = dice blocks + negated hits from doctrines
+    const totalBlocks = defenderBlocks + defenderBuffs.negateHits
+
+    // Log enemy defense (includes negated hits if any)
     logEntries.push({
       timestamp: timestamp + 3,
       type: CombatLogType.ENEMY_DEFENDS,
-      data: { blocks: defenderBlocks, dice: defenderRolls.length }
+      data: {
+        blocks: defenderBlocks,
+        dice: defenderRolls.length,
+        negatedHits: defenderBuffs.negateHits > 0 ? defenderBuffs.negateHits : undefined
+      }
     })
 
-    // Calculate damage to target
-    const damageToTarget = Math.max(0, attackerHits - defenderBlocks)
+    // Calculate damage to target (applying negate hits from defender's buffs)
+    const damageToTarget = Math.max(0, attackerHits - totalBlocks)
 
     // Get current health values from tactical state
     const targetUnit = state.units[targetIndex]
-    const attackerUnit = state.units[attackerIndex]
 
     const targetCurrentHealth = targetUnit.currentHealth
     const attackerCurrentHealth = attackerUnit.currentHealth
@@ -1122,19 +1177,24 @@ export class CombatService {
     // For now, skip counter-attacks to keep it simple
     // Counter-attacks can be added in a future iteration
 
-    // Update state
+    // Update state - clear consumed doctrines from attacker and defense buffs from defender
     const updatedUnits = state.units.map((unit, i) => {
       if (i === attackerIndex) {
         return {
           ...unit,
           hasActed: true,
-          currentHealth: attackerCurrentHealth - damageToAttacker
+          currentHealth: attackerCurrentHealth - damageToAttacker,
+          activeDoctrines: this.clearConsumedDoctrines(unit.activeDoctrines)
         }
       }
       if (i === targetIndex) {
         return {
           ...unit,
-          currentHealth: newTargetHealth
+          currentHealth: newTargetHealth,
+          // Clear defense buffs (NEGATE_HITS) from defender after they take damage
+          activeDoctrines: damageToTarget > 0 || defenderBuffs.negateHits > 0
+            ? this.clearConsumedDefenseDoctrines(unit.activeDoctrines)
+            : unit.activeDoctrines
         }
       }
       return unit
@@ -1933,5 +1993,746 @@ export class CombatService {
       updatedState: state,
       logEntries
     }
+  }
+
+  // ============================================================
+  // TACTICAL DOCTRINE METHODS
+  // ============================================================
+
+  /**
+   * Calculate tiles affected by an AoE doctrine.
+   */
+  calculateAoETargets(
+    targetPosition: GridPosition,
+    casterPosition: GridPosition,
+    doctrineId: string,
+    state: TacticalStateData
+  ): { tiles: GridPosition[]; unitIds: string[] } {
+    const pattern = getDoctrineAoEPattern(doctrineId)
+    const affectedTiles = getAoETilesWithRotation(
+      targetPosition,
+      casterPosition,
+      pattern,
+      state.gridWidth,
+      state.gridHeight
+    )
+
+    // Find units in affected tiles
+    const affectedSet = new Set(affectedTiles.map(t => `${t.x},${t.y}`))
+    const affectedUnitIds: string[] = []
+
+    for (const unit of state.units) {
+      const posKey = `${unit.position.x},${unit.position.y}`
+      if (affectedSet.has(posKey)) {
+        // Only include enemies for damage doctrines
+        // For now, assuming caster is player-unit (starts with 'player-')
+        if (!unit.id.startsWith('player-')) {
+          affectedUnitIds.push(unit.id)
+        }
+      }
+    }
+
+    return { tiles: affectedTiles, unitIds: affectedUnitIds }
+  }
+
+  /**
+   * Validate a tactical doctrine action.
+   * Checks if doctrine can be cast (equipped, mana, range).
+   */
+  validateTacticalDoctrine(
+    state: TacticalStateData,
+    casterId: string,
+    doctrineId: string,
+    targetPosition: GridPosition,
+    casterMana: number
+  ): { valid: boolean; reason?: string } {
+    // Find caster
+    const casterState = state.units.find((u) => u.id === casterId)
+    if (!casterState) {
+      return { valid: false, reason: 'Caster not found' }
+    }
+
+    // Check if it's the caster's turn
+    const currentUnitId = state.turnOrder[state.currentTurnIndex]
+    if (currentUnitId !== casterId) {
+      return { valid: false, reason: 'Not this unit\'s turn' }
+    }
+
+    // Check if caster has already acted
+    if (casterState.hasActed) {
+      return { valid: false, reason: 'Unit has already acted this turn' }
+    }
+
+    // Get doctrine
+    const doctrine = DOCTRINES[doctrineId]
+    if (!doctrine) {
+      return { valid: false, reason: 'Doctrine not found' }
+    }
+
+    // Check mana
+    if (casterMana < doctrine.manaCost) {
+      return { valid: false, reason: 'Not enough mana' }
+    }
+
+    // Check range
+    const castRange = getDoctrineRange(doctrineId)
+    const distance =
+      Math.abs(casterState.position.x - targetPosition.x) +
+      Math.abs(casterState.position.y - targetPosition.y)
+
+    if (distance > castRange) {
+      return { valid: false, reason: 'Target out of range' }
+    }
+
+    return { valid: true }
+  }
+
+  /**
+   * Execute a tactical doctrine action.
+   * Applies doctrine effects to all targets in the AoE.
+   */
+  async executeTacticalDoctrine(
+    participationId: string,
+    casterId: string,
+    doctrineId: string,
+    targetPosition: GridPosition,
+    casterMana: number
+  ): Promise<TacticalDoctrineResult> {
+    // Get current tactical state
+    const participation = await this.activityParticipationRepository.findByIdWithTacticalState(participationId)
+
+    if (!participation) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
+    }
+
+    if (!participation.tacticalState || !participation.tacticalState.units) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'No tactical combat in progress' })
+    }
+
+    const state = participation.tacticalState
+
+    // Validate the doctrine action
+    const validation = this.validateTacticalDoctrine(state, casterId, doctrineId, targetPosition, casterMana)
+
+    if (!validation.valid) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: validation.reason || 'Invalid doctrine use' })
+    }
+
+    // Get doctrine definition
+    const doctrine = DOCTRINES[doctrineId]!
+
+    // Find caster
+    const casterIndex = state.units.findIndex((u) => u.id === casterId)
+    const caster = state.units[casterIndex]
+
+    // Calculate AoE targets
+    const { tiles: affectedTiles, unitIds: affectedUnitIds } = this.calculateAoETargets(
+      targetPosition,
+      caster.position,
+      doctrineId,
+      state
+    )
+
+    const timestamp = Date.now()
+    const logEntries: CombatLogEntry[] = []
+    const effects: TacticalDoctrineResult['effects'] = []
+
+    // Log doctrine cast
+    logEntries.push({
+      timestamp,
+      type: CombatLogType.DOCTRINE_EFFECT,
+      data: { doctrine: doctrineId, caster: caster.name, targetCount: affectedUnitIds.length }
+    })
+
+    // Process doctrine effects for each target
+    let updatedUnits = [...state.units]
+
+    for (const effect of doctrine.effects) {
+      switch (effect.type) {
+        case DoctrineEffectType.DIRECT_DAMAGE:
+          // Apply direct damage to all targets
+          for (const targetId of affectedUnitIds) {
+            const targetIndex = updatedUnits.findIndex((u) => u.id === targetId)
+            if (targetIndex === -1) continue
+
+            const target = updatedUnits[targetIndex]
+            const damage = effect.value || 0
+            const newHealth = Math.max(0, target.currentHealth - damage)
+            const killed = newHealth <= 0
+
+            updatedUnits[targetIndex] = {
+              ...target,
+              currentHealth: newHealth
+            }
+
+            effects.push({
+              unitId: targetId,
+              damageDealt: damage,
+              killed
+            })
+
+            logEntries.push({
+              timestamp: timestamp + 0.1,
+              type: CombatLogType.DAMAGE_TO_ENEMY,
+              data: { enemy: target.name, damage, directDamage: damage }
+            })
+
+            if (killed) {
+              logEntries.push({
+                timestamp: timestamp + 0.2,
+                type: CombatLogType.ENEMY_DEFEATED,
+                data: { enemy: target.name }
+              })
+            }
+          }
+          break
+
+        case DoctrineEffectType.APPLY_STATUS:
+          // Apply status effect to all targets
+          for (const targetId of affectedUnitIds) {
+            // Skip player units for enemy-targeted status effects
+            if (effect.target === DoctrineTarget.ALL_ENEMIES || effect.target === DoctrineTarget.ENEMY) {
+              if (targetId.startsWith('player-')) continue
+            }
+
+            const targetIndex = updatedUnits.findIndex((u) => u.id === targetId)
+            if (targetIndex === -1) continue
+
+            const target = updatedUnits[targetIndex]
+
+            // Create the active status effect
+            const activeEffect: ActiveStatusEffect = {
+              effect: effect.statusEffect!,
+              remainingTurns: effect.duration || 1,
+              sourceDoctrineId: doctrineId
+            }
+
+            // Add status effect to unit's activeEffects
+            const currentEffects = target.activeEffects || []
+            updatedUnits[targetIndex] = {
+              ...target,
+              activeEffects: [...currentEffects, activeEffect]
+            }
+
+            effects.push({
+              unitId: targetId,
+              statusApplied: effect.statusEffect
+            })
+
+            logEntries.push({
+              timestamp: timestamp + 0.1,
+              type: CombatLogType.STATUS_EFFECT,
+              data: { effect: effect.statusEffect?.toLowerCase(), target: target.name }
+            })
+          }
+          break
+
+        case DoctrineEffectType.POWER_MODIFIER:
+          // POWER_MODIFIER with SELF target: Roll power dice and deal damage to enemies in AoE
+          // This is used by doctrines like stellar_collapse (10 dice, 6s generate extra hits)
+          if (effect.target === DoctrineTarget.SELF) {
+            const powerDice = effect.value || 0
+            if (powerDice > 0) {
+              // Roll power dice
+              const powerRolls = this.rollDice(powerDice)
+              // Threshold 4+ to hit, 6s are criticals (generate extra hits)
+              const { results: rollResults, count: hits } = this.calculateHitsWithCount(
+                powerRolls,
+                4, // Standard attack threshold
+                6  // 6s are criticals
+              )
+
+              // Count extra hits from criticals (6s)
+              const criticalCount = rollResults.filter(r => r.isCritical).length
+              const totalHits = hits + criticalCount // Criticals generate extra hits
+
+              logEntries.push({
+                timestamp: timestamp + 0.05,
+                type: CombatLogType.PLAYER_ATTACK,
+                data: { dice: powerDice, rolls: powerRolls, hits: totalHits, criticals: criticalCount }
+              })
+
+              // Apply damage to all enemies in the AoE
+              for (const targetId of affectedUnitIds) {
+                // Only damage enemy units (skip player units)
+                if (targetId.startsWith('player-')) continue
+
+                const targetIndex = updatedUnits.findIndex((u) => u.id === targetId)
+                if (targetIndex === -1) continue
+
+                const target = updatedUnits[targetIndex]
+                const newHealth = Math.max(0, target.currentHealth - totalHits)
+                const killed = newHealth <= 0
+
+                updatedUnits[targetIndex] = {
+                  ...target,
+                  currentHealth: newHealth
+                }
+
+                effects.push({
+                  unitId: targetId,
+                  damageDealt: totalHits,
+                  killed
+                })
+
+                logEntries.push({
+                  timestamp: timestamp + 0.1,
+                  type: CombatLogType.DAMAGE_TO_ENEMY,
+                  data: { enemy: target.name, damage: totalHits, hits: totalHits }
+                })
+
+                if (killed) {
+                  logEntries.push({
+                    timestamp: timestamp + 0.2,
+                    type: CombatLogType.ENEMY_DEFEATED,
+                    data: { enemy: target.name }
+                  })
+                }
+              }
+            }
+          } else if (effect.target === DoctrineTarget.ALL_ENEMIES || effect.target === DoctrineTarget.ENEMY) {
+            // For enemy-targeted power modifiers, apply WEAKENED status
+            for (const targetId of affectedUnitIds) {
+              effects.push({
+                unitId: targetId,
+                statusApplied: 'WEAKENED'
+              })
+            }
+          }
+          break
+
+        case DoctrineEffectType.HEAL:
+          // Healing would typically target self or allies
+          // For now, apply to caster if SELF target
+          if (effect.target === DoctrineTarget.SELF) {
+            const healAmount = effect.value || 0
+            const casterInUnits = updatedUnits.findIndex((u) => u.id === casterId)
+            if (casterInUnits !== -1) {
+              const currentCaster = updatedUnits[casterInUnits]
+              const newHealth = Math.min(currentCaster.maxHealth, currentCaster.currentHealth + healAmount)
+              updatedUnits[casterInUnits] = {
+                ...currentCaster,
+                currentHealth: newHealth
+              }
+
+              effects.push({
+                unitId: casterId,
+                healthRestored: healAmount
+              })
+
+              logEntries.push({
+                timestamp: timestamp + 0.1,
+                type: CombatLogType.DOCTRINE_EFFECT,
+                data: { effect: 'heal', value: healAmount }
+              })
+            }
+          }
+          break
+      }
+    }
+
+    // Mark caster as having acted
+    const casterUnitIndex = updatedUnits.findIndex((u) => u.id === casterId)
+    if (casterUnitIndex !== -1) {
+      updatedUnits[casterUnitIndex] = {
+        ...updatedUnits[casterUnitIndex],
+        hasActed: true
+      }
+    }
+
+    // Update tiles to remove dead units
+    const updatedTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })))
+    for (const effect of effects) {
+      if (effect.killed) {
+        const killedUnit = updatedUnits.find((u) => u.id === effect.unitId)
+        if (killedUnit) {
+          const { x, y } = killedUnit.position
+          if (updatedTiles[y]?.[x]) {
+            updatedTiles[y][x].occupantId = null
+          }
+        }
+      }
+    }
+
+    // Filter out dead units
+    updatedUnits = updatedUnits.filter((u) => u.currentHealth > 0)
+
+    // Update turn order to remove dead units
+    const aliveUnitIds = new Set(updatedUnits.map((u) => u.id))
+    const updatedTurnOrder = state.turnOrder.filter((unitId) => aliveUnitIds.has(unitId))
+
+    // Adjust current turn index if needed
+    let updatedCurrentTurnIndex = state.currentTurnIndex
+    if (updatedCurrentTurnIndex >= updatedTurnOrder.length) {
+      updatedCurrentTurnIndex = 0
+    }
+
+    // Create updated state
+    const updatedState: TacticalStateData = {
+      ...state,
+      tiles: updatedTiles,
+      units: updatedUnits,
+      turnOrder: updatedTurnOrder,
+      currentTurnIndex: updatedCurrentTurnIndex
+    }
+
+    // Save tactical state to database
+    await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
+
+    // Save combat log entries
+    if (this.combatEnemyRepository && logEntries.length > 0) {
+      const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
+      if (activeEnemy) {
+        await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+      }
+    }
+
+    return {
+      success: true,
+      casterId,
+      doctrineId,
+      targetPosition,
+      affectedTiles,
+      affectedUnitIds,
+      effects,
+      manaCost: doctrine.manaCost,
+      updatedState,
+      logEntries
+    }
+  }
+
+  /**
+   * Use a self-buff doctrine (like Stellar Collapse).
+   * These doctrines don't require targeting - they apply buffs to the caster
+   * that enhance their next attack.
+   */
+  async useSelfBuffDoctrine(
+    participationId: string,
+    casterId: string,
+    doctrineId: string,
+    casterMana: number
+  ): Promise<{
+    success: boolean
+    doctrineId: string
+    manaCost: number
+    bonusDice: number
+    logEntries: CombatLogEntry[]
+  }> {
+    // Get doctrine definition
+    const doctrine = DOCTRINES[doctrineId]
+    if (!doctrine) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Doctrine not found' })
+    }
+
+    // Validate this is a self-buff doctrine (POWER_MODIFIER, THRESHOLD_MODIFIER, NEGATE_HITS, or GUARANTEED_CRITICAL with SELF target, no aoePattern)
+    const selfBuffEffectTypes: DoctrineEffectType[] = [
+      DoctrineEffectType.POWER_MODIFIER,
+      DoctrineEffectType.THRESHOLD_MODIFIER,
+      DoctrineEffectType.NEGATE_HITS,
+      DoctrineEffectType.GUARANTEED_CRITICAL
+    ]
+    const isSelfBuff = doctrine.effects.some(
+      (e) => selfBuffEffectTypes.includes(e.type) && e.target === DoctrineTarget.SELF
+    ) && !doctrine.aoePattern
+
+    if (!isSelfBuff) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'This doctrine requires targeting' })
+    }
+
+    // Validate mana
+    if (casterMana < doctrine.manaCost) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not enough mana' })
+    }
+
+    // Get current tactical state
+    const participation = await this.activityParticipationRepository.findByIdWithTacticalState(participationId)
+
+    if (!participation) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
+    }
+
+    if (!participation.tacticalState || !participation.tacticalState.units) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'No tactical combat in progress' })
+    }
+
+    const state = participation.tacticalState
+
+    // Find caster
+    const casterIndex = state.units.findIndex((u) => u.id === casterId)
+    if (casterIndex === -1) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Caster not found' })
+    }
+
+    // Check if it's the caster's turn
+    const currentUnitId = state.turnOrder[state.currentTurnIndex]
+    if (currentUnitId !== casterId) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not this unit\'s turn' })
+    }
+
+    // Get the buff values from the doctrine
+    let bonusDice = 0
+    let thresholdMod = 0
+    let negateHits = 0
+    let guaranteedCritical = false
+    let criticalThresholdMod = 0
+
+    for (const effect of doctrine.effects) {
+      if (effect.target !== DoctrineTarget.SELF) continue
+      const value = effect.value || 0
+
+      switch (effect.type) {
+        case DoctrineEffectType.POWER_MODIFIER:
+          bonusDice += value
+          break
+        case DoctrineEffectType.THRESHOLD_MODIFIER:
+          thresholdMod += value
+          break
+        case DoctrineEffectType.NEGATE_HITS:
+          negateHits += value
+          break
+        case DoctrineEffectType.GUARANTEED_CRITICAL:
+          if (value === 1) {
+            guaranteedCritical = true
+          } else if (value >= 2 && value <= 6) {
+            // Lower critical threshold (e.g., 5 means 5+ is critical instead of 6+)
+            criticalThresholdMod = 6 - value
+          }
+          break
+      }
+    }
+
+    // Create the active doctrine effect
+    const activeEffect: ActiveStatusEffect = {
+      effect: StatusEffect.DOCTRINE_ACTIVE,
+      remainingTurns: 1, // Lasts until next attack
+      sourceDoctrineId: doctrineId
+    }
+
+    // Update unit's active doctrines
+    const updatedUnits = state.units.map((unit, i) => {
+      if (i === casterIndex) {
+        const existingDoctrines = unit.activeDoctrines || {}
+        return {
+          ...unit,
+          activeDoctrines: {
+            ...existingDoctrines,
+            [doctrineId]: activeEffect
+          }
+        }
+      }
+      return unit
+    })
+
+    const timestamp = Date.now()
+    const logEntries: CombatLogEntry[] = []
+
+    // Log doctrine activation
+    logEntries.push({
+      timestamp,
+      type: CombatLogType.DOCTRINE_EFFECT,
+      data: {
+        doctrine: doctrineId,
+        effect: bonusDice > 0 ? 'power_boost' : thresholdMod !== 0 ? 'threshold_reduction' : negateHits > 0 ? 'damage_negation' : guaranteedCritical ? 'guaranteed_critical' : 'buff',
+        bonusDice,
+        thresholdMod,
+        negateHits,
+        guaranteedCritical,
+        criticalThresholdMod
+      }
+    })
+
+    // Create updated state
+    const updatedState: TacticalStateData = {
+      ...state,
+      units: updatedUnits
+    }
+
+    // Save tactical state to database
+    await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
+
+    // Save combat log entries
+    if (this.combatEnemyRepository && logEntries.length > 0) {
+      const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
+      if (activeEnemy) {
+        await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+      }
+    }
+
+    return {
+      success: true,
+      doctrineId,
+      manaCost: doctrine.manaCost,
+      bonusDice,
+      logEntries
+    }
+  }
+
+  /**
+   * Get all active self-buff modifiers from doctrines on a unit.
+   * Returns bonus dice, threshold modifiers, negate hits, and critical modifiers.
+   */
+  getActiveDoctrineBuffs(
+    unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined
+  ): {
+    bonusDice: number
+    sixesGenerateExtraHits: boolean
+    thresholdMod: number
+    negateHits: number
+    guaranteedCritical: boolean
+    criticalThresholdMod: number
+  } {
+    if (!unitActiveDoctrines) {
+      return {
+        bonusDice: 0,
+        sixesGenerateExtraHits: false,
+        thresholdMod: 0,
+        negateHits: 0,
+        guaranteedCritical: false,
+        criticalThresholdMod: 0
+      }
+    }
+
+    let bonusDice = 0
+    let sixesGenerateExtraHits = false
+    let thresholdMod = 0
+    let negateHits = 0
+    let guaranteedCritical = false
+    let criticalThresholdMod = 0
+
+    for (const [doctrineId, effect] of Object.entries(unitActiveDoctrines)) {
+      if (effect.remainingTurns <= 0) continue
+
+      const doctrine = DOCTRINES[doctrineId]
+      if (!doctrine) continue
+
+      for (const doctrineEffect of doctrine.effects) {
+        if (doctrineEffect.target !== DoctrineTarget.SELF) continue
+        const value = doctrineEffect.value || 0
+
+        switch (doctrineEffect.type) {
+          case DoctrineEffectType.POWER_MODIFIER:
+            bonusDice += value
+            // Stellar Collapse has the special rule that 6s generate extra hits
+            if (doctrineId === 'stellar_collapse') {
+              sixesGenerateExtraHits = true
+            }
+            break
+
+          case DoctrineEffectType.THRESHOLD_MODIFIER:
+            thresholdMod += value
+            break
+
+          case DoctrineEffectType.NEGATE_HITS:
+            negateHits += value
+            break
+
+          case DoctrineEffectType.GUARANTEED_CRITICAL:
+            if (value === 1) {
+              guaranteedCritical = true
+            } else if (value >= 2 && value <= 6) {
+              // Lower critical threshold (e.g., 5 means 5+ is critical instead of 6+)
+              criticalThresholdMod = Math.max(criticalThresholdMod, 6 - value)
+            }
+            break
+        }
+      }
+    }
+
+    return {
+      bonusDice,
+      sixesGenerateExtraHits,
+      thresholdMod,
+      negateHits,
+      guaranteedCritical,
+      criticalThresholdMod
+    }
+  }
+
+  /**
+   * Get the bonus attack dice from active self-buff doctrines on a unit.
+   * Also returns whether 6s should generate extra hits (for Stellar Collapse).
+   * @deprecated Use getActiveDoctrineBuffs instead for full modifier support
+   */
+  getActiveDoctrineAttackBonus(
+    unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined
+  ): { bonusDice: number; sixesGenerateExtraHits: boolean } {
+    const buffs = this.getActiveDoctrineBuffs(unitActiveDoctrines)
+    return { bonusDice: buffs.bonusDice, sixesGenerateExtraHits: buffs.sixesGenerateExtraHits }
+  }
+
+  /**
+   * Clear consumed self-buff doctrines from a unit after an attack.
+   * This clears POWER_MODIFIER, THRESHOLD_MODIFIER, and GUARANTEED_CRITICAL effects.
+   * NEGATE_HITS are cleared separately after defense.
+   */
+  clearConsumedDoctrines(
+    unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined,
+    clearDefenseBuffs: boolean = false
+  ): Record<string, ActiveStatusEffect> {
+    if (!unitActiveDoctrines) {
+      return {}
+    }
+
+    const remaining: Record<string, ActiveStatusEffect> = {}
+
+    // Self-buff effect types that get consumed on attack
+    const attackBuffTypes: DoctrineEffectType[] = [
+      DoctrineEffectType.POWER_MODIFIER,
+      DoctrineEffectType.THRESHOLD_MODIFIER,
+      DoctrineEffectType.GUARANTEED_CRITICAL
+    ]
+
+    // Defense buff effect types that get consumed when taking damage
+    const defenseBuffTypes: DoctrineEffectType[] = [
+      DoctrineEffectType.NEGATE_HITS
+    ]
+
+    for (const [doctrineId, effect] of Object.entries(unitActiveDoctrines)) {
+      const doctrine = DOCTRINES[doctrineId]
+
+      // If doctrine is not found or is not a self-buff, preserve it if it has remaining turns
+      if (!doctrine) {
+        if (effect.remainingTurns > 0) {
+          remaining[doctrineId] = effect
+        }
+        continue
+      }
+
+      // Check if this is an attack self-buff - these get consumed after attack
+      const isAttackSelfBuff = doctrine.effects.some(
+        (e) => attackBuffTypes.includes(e.type) && e.target === DoctrineTarget.SELF
+      ) && !doctrine.aoePattern
+
+      // Check if this is a defense self-buff - these get consumed after taking damage
+      const isDefenseSelfBuff = doctrine.effects.some(
+        (e) => defenseBuffTypes.includes(e.type) && e.target === DoctrineTarget.SELF
+      ) && !doctrine.aoePattern
+
+      if (isAttackSelfBuff) {
+        // Attack self-buffs are consumed after attack
+        continue
+      }
+
+      if (clearDefenseBuffs && isDefenseSelfBuff) {
+        // Defense self-buffs are consumed after taking damage
+        continue
+      }
+
+      // Other effects persist
+      if (effect.remainingTurns > 0) {
+        remaining[doctrineId] = effect
+      }
+    }
+
+    return remaining
+  }
+
+  /**
+   * Clear consumed defense buff doctrines from a unit after receiving damage.
+   */
+  clearConsumedDefenseDoctrines(
+    unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined
+  ): Record<string, ActiveStatusEffect> {
+    return this.clearConsumedDoctrines(unitActiveDoctrines, true)
   }
 }

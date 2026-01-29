@@ -171,5 +171,73 @@ export const activityRouter = t.router({
         input.enemyAttackDice,
         input.enemyAttackThreshold
       )
+    }),
+
+  // Tactical combat: Execute doctrine with AoE targeting
+  executeTacticalDoctrine: protectedProcedure
+    .input(
+      z.object({
+        participationId: z.string(),
+        casterId: z.string(),
+        doctrineId: z.string(),
+        targetPosition: gridPositionSchema,
+        casterMana: z.number().int().min(0)
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Verify the user owns this participation
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
+        input.participationId,
+        ctx.user.id
+      )
+      if (!isOwner) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
+      }
+
+      // Verify the caster is a player unit
+      if (!input.casterId.startsWith('player-')) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
+      }
+
+      return ctx.services.combat.executeTacticalDoctrine(
+        input.participationId,
+        input.casterId,
+        input.doctrineId,
+        input.targetPosition,
+        input.casterMana
+      )
+    }),
+
+  // Tactical combat: Use self-buff doctrine (no targeting required)
+  useSelfBuffDoctrine: protectedProcedure
+    .input(
+      z.object({
+        participationId: z.string(),
+        casterId: z.string(),
+        doctrineId: z.string(),
+        casterMana: z.number().int().min(0)
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Verify the user owns this participation
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
+        input.participationId,
+        ctx.user.id
+      )
+      if (!isOwner) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
+      }
+
+      // Verify the caster is a player unit
+      if (!input.casterId.startsWith('player-')) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
+      }
+
+      return ctx.services.combat.useSelfBuffDoctrine(
+        input.participationId,
+        input.casterId,
+        input.doctrineId,
+        input.casterMana
+      )
     })
 })

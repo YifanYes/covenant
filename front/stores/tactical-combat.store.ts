@@ -17,9 +17,14 @@ import {
   calculateMovementRange as calcMoveRange,
   calculateAttackRange as calcAttackRange,
   calculatePath,
-  getPathCost
+  getPathCost,
+  calculateDoctrineRange,
+  calculateAoEArea,
+  findUnitsInAoE
 } from '@/lib/phaser/systems/pathfinding'
 import { getEnemy } from '@shared/constants/enemies'
+import { DOCTRINES } from '@shared/constants/doctrines'
+import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 
 // Next enemy data returned from server when enemy is defeated
 interface NextEnemyData {
@@ -51,6 +56,22 @@ interface PendingEnemyAttack {
   targetKilled: boolean
 }
 
+// Doctrine animation data
+interface DoctrineAnimationData {
+  casterId: string
+  doctrineId: string
+  targetPosition: GridPosition
+  affectedTiles: GridPosition[]
+  affectedUnitIds: string[]
+  effects: {
+    unitId: string
+    damageDealt?: number
+    healthRestored?: number
+    statusApplied?: string
+    killed?: boolean
+  }[]
+}
+
 interface TacticalCombatStore extends TacticalCombatState {
   // UI state (not in base TacticalCombatState)
   hoveredTile: GridPosition | null
@@ -65,6 +86,11 @@ interface TacticalCombatStore extends TacticalCombatState {
 
   // Enemy turn state
   pendingEnemyAttack: PendingEnemyAttack | null
+
+  // Doctrine state
+  selectedDoctrineId: string | null
+  doctrineAnimationData: DoctrineAnimationData | null
+  isDoctrineAnimating: boolean
 
   // Actions
   initializeCombat: (data: TacticalInitData, participationId?: string) => void
@@ -100,6 +126,17 @@ interface TacticalCombatStore extends TacticalCombatState {
     attackerId?: string,
     attackerDamage?: number
   ) => void
+
+  // Doctrine actions
+  selectDoctrine: (doctrineId: string) => void
+  clearDoctrineSelection: () => void
+  startDoctrineAnimation: (data: DoctrineAnimationData) => void
+  completeDoctrineAnimation: () => void
+
+  // Self-buff doctrine actions
+  applySelfBuffDoctrine: (unitId: string, doctrineId: string, bonusDice: number) => void
+  getActiveUnitBonusDice: () => { bonusDice: number; sixesGenerateExtraHits: boolean }
+  clearActiveUnitDoctrines: () => void
 }
 
 // Default grid for testing (8x6 arena)
@@ -240,7 +277,10 @@ const initialState = (() => {
     participationId: null,
     attackAnimationData: null,
     isAttackAnimating: false,
-    pendingEnemyAttack: null
+    pendingEnemyAttack: null,
+    selectedDoctrineId: null,
+    doctrineAnimationData: null,
+    isDoctrineAnimating: false
   }
 })()
 
@@ -414,28 +454,78 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
         break
 
       case 'select_target':
-        // Check if clicked tile has a valid target
-        if (occupant && !occupant.isPlayer) {
-          // Check if target is in attack range
-          const isInAttackRange = highlightedTiles.some(
-            (h) => h.type === 'ATTACK' && h.position.x === position.x && h.position.y === position.y
+        // Check if this is doctrine targeting mode
+        const { selectedDoctrineId, pendingAction: currentPendingAction } = get()
+
+        if (selectedDoctrineId && currentPendingAction?.type === 'doctrine') {
+          // Doctrine targeting mode - calculate AoE and affected units
+          const isInDoctrineRange = highlightedTiles.some(
+            (h) => h.type === 'DOCTRINE' && h.position.x === position.x && h.position.y === position.y
           )
 
-          if (isInAttackRange) {
-            const currentAction = get().pendingAction
+          if (isInDoctrineRange) {
+            // Calculate AoE area for this doctrine
+            const aoeArea = calculateAoEArea(
+              position,
+              activeUnit!.position,
+              selectedDoctrineId,
+              get().gridWidth,
+              get().gridHeight
+            )
+
+            // Find affected units (enemies only for damage doctrines)
+            const affectedUnitIds = findUnitsInAoE(
+              aoeArea,
+              allUnits,
+              false, // Don't include allies for damage
+              activeUnit!.isPlayer
+            )
+
+            // Update highlights to show AoE preview
+            const doctrineRangeHighlights = highlightedTiles.filter(h => h.type === 'DOCTRINE')
+            const aoeHighlights: HighlightedTile[] = aoeArea.map(pos => ({
+              position: pos,
+              type: 'SELECTED' as const
+            }))
+
             set({
               selectedTile: position,
+              highlightedTiles: [...doctrineRangeHighlights, ...aoeHighlights],
               pendingAction: {
-                type: currentAction?.type ?? 'attack',
-                ...currentAction,
+                type: 'doctrine',
+                doctrineId: selectedDoctrineId,
                 targetPosition: position,
-                targetUnitIds: [occupant.id]
+                targetUnitIds: affectedUnitIds
               }
             })
+          } else {
+            // Clicked outside doctrine range
+            set({ selectedTile: position })
           }
         } else {
-          // Clicked on non-enemy tile - update selected for info
-          set({ selectedTile: position })
+          // Regular attack targeting mode
+          if (occupant && !occupant.isPlayer) {
+            // Check if target is in attack range
+            const isInAttackRange = highlightedTiles.some(
+              (h) => h.type === 'ATTACK' && h.position.x === position.x && h.position.y === position.y
+            )
+
+            if (isInAttackRange) {
+              const currentAction = get().pendingAction
+              set({
+                selectedTile: position,
+                pendingAction: {
+                  type: currentAction?.type ?? 'attack',
+                  ...currentAction,
+                  targetPosition: position,
+                  targetUnitIds: [occupant.id]
+                }
+              })
+            }
+          } else {
+            // Clicked on non-enemy tile - update selected for info
+            set({ selectedTile: position })
+          }
         }
         break
 
@@ -517,6 +607,13 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
         get().nextTurn()
         break
 
+      case 'doctrine':
+        // Doctrine targeting mode - handled by selectDoctrine
+        if (action.doctrineId) {
+          get().selectDoctrine(action.doctrineId)
+        }
+        break
+
       default:
         set({ pendingAction: action })
     }
@@ -583,9 +680,51 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   },
 
   nextTurn: () => {
-    const { turnQueue, currentTurnIndex, turnNumber } = get()
-    const nextIndex = (currentTurnIndex + 1) % turnQueue.length
-    const nextUnit = turnQueue[nextIndex]
+    const { turnQueue, currentTurnIndex, turnNumber, playerUnits, enemyUnits } = get()
+
+    // Handle empty turn queue
+    if (turnQueue.length === 0) {
+      console.warn('[nextTurn] Turn queue is empty')
+      set({
+        activeUnitId: null,
+        phase: 'select_action',
+        selectedTile: null,
+        highlightedTiles: [],
+        pendingAction: null
+      })
+      return
+    }
+
+    // Find next ALIVE unit in the queue, skipping dead units
+    const allUnits = [...playerUnits, ...enemyUnits]
+    let nextIndex = (currentTurnIndex + 1) % turnQueue.length
+    let attempts = 0
+    let nextUnit = turnQueue[nextIndex]
+
+    // Safety check: skip any units that are dead (shouldn't happen but just in case)
+    while (attempts < turnQueue.length) {
+      nextUnit = turnQueue[nextIndex]
+      const actualUnit = allUnits.find((u) => u.id === nextUnit?.id)
+      if (actualUnit && actualUnit.currentHealth > 0) {
+        break // Found a valid alive unit
+      }
+      // Unit is dead or not found, try next
+      nextIndex = (nextIndex + 1) % turnQueue.length
+      attempts++
+    }
+
+    // If we couldn't find any alive unit, something is wrong
+    if (attempts >= turnQueue.length || !nextUnit) {
+      console.warn('[nextTurn] No alive units found in turn queue')
+      set({
+        activeUnitId: null,
+        phase: 'select_action',
+        selectedTile: null,
+        highlightedTiles: [],
+        pendingAction: null
+      })
+      return
+    }
 
     // Check if we've completed a full round
     const newTurnNumber = nextIndex === 0 ? turnNumber + 1 : turnNumber
@@ -776,7 +915,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   },
 
   completeAttackAnimation: () => {
-    const { attackAnimationData, playerUnits, enemyUnits, tiles, turnQueue, currentTurnIndex, gridWidth, gridHeight } = get()
+    const { attackAnimationData, playerUnits, enemyUnits, tiles, turnQueue, currentTurnIndex, gridWidth, gridHeight, activeUnitId } = get()
 
     if (!attackAnimationData) {
       set({
@@ -825,7 +964,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     })
 
     // Update tiles to remove dead units
-    const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
+    let updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
 
     if (targetKilled) {
       const targetUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === targetId)
@@ -941,10 +1080,33 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     const aliveUnitIds = new Set(allAliveUnits.map((u) => u.id))
     const updatedTurnQueue = turnQueue.filter((u) => aliveUnitIds.has(u.id))
 
-    // Adjust current turn index if needed
+    // Adjust current turn index if needed - ensure it points to a valid unit
     let newCurrentTurnIndex = currentTurnIndex
     if (newCurrentTurnIndex >= updatedTurnQueue.length) {
       newCurrentTurnIndex = 0
+    }
+
+    // Determine the active unit ID - the attacker should still be active after their attack
+    // unless they're dead or it was an enemy attack
+    let newActiveUnitId = activeUnitId
+    if (attackerKilled) {
+      // Attacker died, need to determine new active unit
+      const nextUnit = updatedTurnQueue[newCurrentTurnIndex]
+      newActiveUnitId = nextUnit?.id ?? null
+    } else if (!wasEnemyAttack) {
+      // Player attacked - they should remain active
+      newActiveUnitId = attackerId
+    }
+
+    // Determine phase based on remaining units
+    let newPhase: TacticalPhase = 'select_action'
+    if (updatedEnemyUnits.length === 0) {
+      // All enemies defeated - activity should be ending
+      // Keep in select_action but no enemies to target
+      newPhase = 'select_action'
+    } else if (wasEnemyAttack) {
+      // Enemy attacked - will advance turn after this
+      newPhase = 'select_action'
     }
 
     set({
@@ -953,10 +1115,13 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       tiles: updatedTiles,
       turnQueue: updatedTurnQueue,
       currentTurnIndex: newCurrentTurnIndex,
+      activeUnitId: newActiveUnitId,
       isAttackAnimating: false,
       attackAnimationData: null,
       pendingAction: null,
-      phase: 'select_action' // Temporarily set to select_action
+      phase: newPhase,
+      selectedTile: null,
+      highlightedTiles: []
     })
 
     // If it was an enemy attack, advance to next turn
@@ -1056,8 +1221,264 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       participationId: null,
       attackAnimationData: null,
       isAttackAnimating: false,
-      pendingEnemyAttack: null
+      pendingEnemyAttack: null,
+      selectedDoctrineId: null,
+      doctrineAnimationData: null,
+      isDoctrineAnimating: false
     })
+  },
+
+  // Doctrine actions
+  selectDoctrine: (doctrineId: string) => {
+    const { activeUnitId, playerUnits, gridWidth, gridHeight } = get()
+
+    // Find the active unit
+    const activeUnit = playerUnits.find((u) => u.id === activeUnitId)
+    if (!activeUnit) return
+
+    // Calculate doctrine range
+    const doctrineTiles = calculateDoctrineRange(
+      activeUnit.position,
+      doctrineId,
+      gridWidth,
+      gridHeight
+    )
+
+    set({
+      phase: 'select_target',
+      selectedDoctrineId: doctrineId,
+      pendingAction: {
+        type: 'doctrine',
+        doctrineId
+      },
+      highlightedTiles: doctrineTiles.map((pos) => ({
+        position: pos,
+        type: 'DOCTRINE' as const
+      }))
+    })
+  },
+
+  clearDoctrineSelection: () => {
+    set({
+      selectedDoctrineId: null,
+      phase: 'select_action',
+      pendingAction: null,
+      highlightedTiles: []
+    })
+  },
+
+  startDoctrineAnimation: (data: DoctrineAnimationData) => {
+    set({
+      phase: 'animating',
+      isDoctrineAnimating: true,
+      doctrineAnimationData: data,
+      highlightedTiles: []
+    })
+  },
+
+  completeDoctrineAnimation: () => {
+    const { doctrineAnimationData, playerUnits, enemyUnits, tiles, turnQueue, currentTurnIndex } = get()
+
+    if (!doctrineAnimationData) {
+      set({
+        isDoctrineAnimating: false,
+        doctrineAnimationData: null,
+        selectedDoctrineId: null,
+        phase: 'select_action'
+      })
+      return
+    }
+
+    const { effects, casterId } = doctrineAnimationData
+
+    // Apply effects to units
+    let updatedPlayerUnits = [...playerUnits]
+    let updatedEnemyUnits = [...enemyUnits]
+    const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
+
+    for (const effect of effects) {
+      const { unitId, damageDealt, healthRestored, killed, statusApplied } = effect
+
+      // Update player units
+      updatedPlayerUnits = updatedPlayerUnits.map((unit) => {
+        if (unit.id === unitId) {
+          let newHealth = unit.currentHealth
+          if (damageDealt) newHealth = Math.max(0, newHealth - damageDealt)
+          if (healthRestored) newHealth = Math.min(unit.maxHealth, newHealth + healthRestored)
+
+          // Apply status effect if present
+          let newActiveEffects = [...unit.activeEffects]
+          if (statusApplied) {
+            const newStatusEffect: ActiveStatusEffect = {
+              effect: statusApplied as StatusEffect,
+              remainingTurns: 1,
+              sourceDoctrineId: doctrineAnimationData.doctrineId
+            }
+            newActiveEffects = [...newActiveEffects, newStatusEffect]
+          }
+
+          return { ...unit, currentHealth: newHealth, activeEffects: newActiveEffects }
+        }
+        if (unit.id === casterId) {
+          return { ...unit, hasActed: true }
+        }
+        return unit
+      })
+
+      // Update enemy units
+      updatedEnemyUnits = updatedEnemyUnits.map((unit) => {
+        if (unit.id === unitId) {
+          let newHealth = unit.currentHealth
+          if (damageDealt) newHealth = Math.max(0, newHealth - damageDealt)
+          if (healthRestored) newHealth = Math.min(unit.maxHealth, newHealth + healthRestored)
+
+          // Apply status effect if present
+          let newActiveEffects = [...unit.activeEffects]
+          if (statusApplied) {
+            const newStatusEffect: ActiveStatusEffect = {
+              effect: statusApplied as StatusEffect,
+              remainingTurns: 1,
+              sourceDoctrineId: doctrineAnimationData.doctrineId
+            }
+            newActiveEffects = [...newActiveEffects, newStatusEffect]
+          }
+
+          return { ...unit, currentHealth: newHealth, activeEffects: newActiveEffects }
+        }
+        return unit
+      })
+
+      // Handle killed units
+      if (killed) {
+        const killedUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === unitId)
+        if (killedUnit) {
+          const { x, y } = killedUnit.position
+          if (updatedTiles[y]?.[x]) {
+            updatedTiles[y][x].occupantId = null
+          }
+        }
+        updatedPlayerUnits = updatedPlayerUnits.filter((u) => u.id !== unitId)
+        updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== unitId)
+      }
+    }
+
+    // Update turn queue to remove dead units
+    const allAliveUnits = [...updatedPlayerUnits, ...updatedEnemyUnits]
+    const aliveUnitIds = new Set(allAliveUnits.map((u) => u.id))
+    const updatedTurnQueue = turnQueue.filter((u) => aliveUnitIds.has(u.id))
+
+    // Adjust current turn index if needed
+    let newCurrentTurnIndex = currentTurnIndex
+    if (newCurrentTurnIndex >= updatedTurnQueue.length) {
+      newCurrentTurnIndex = 0
+    }
+
+    set({
+      playerUnits: updatedPlayerUnits,
+      enemyUnits: updatedEnemyUnits,
+      tiles: updatedTiles,
+      turnQueue: updatedTurnQueue,
+      currentTurnIndex: newCurrentTurnIndex,
+      isDoctrineAnimating: false,
+      doctrineAnimationData: null,
+      selectedDoctrineId: null,
+      pendingAction: null,
+      phase: 'select_action'
+    })
+  },
+
+  // Self-buff doctrine actions
+  applySelfBuffDoctrine: (unitId: string, doctrineId: string, bonusDice: number) => {
+    const { playerUnits, enemyUnits } = get()
+
+    // Create the active doctrine effect
+    const activeEffect: ActiveStatusEffect = {
+      effect: StatusEffect.DOCTRINE_ACTIVE,
+      remainingTurns: 1,
+      sourceDoctrineId: doctrineId
+    }
+
+    // Update the unit's active effects
+    const updatedPlayerUnits = playerUnits.map((unit) => {
+      if (unit.id === unitId) {
+        return {
+          ...unit,
+          activeEffects: [...unit.activeEffects, activeEffect]
+        }
+      }
+      return unit
+    })
+
+    set({ playerUnits: updatedPlayerUnits })
+  },
+
+  getActiveUnitBonusDice: () => {
+    const { activeUnitId, playerUnits } = get()
+
+    if (!activeUnitId) {
+      return { bonusDice: 0, sixesGenerateExtraHits: false }
+    }
+
+    const activeUnit = playerUnits.find((u) => u.id === activeUnitId)
+    if (!activeUnit) {
+      return { bonusDice: 0, sixesGenerateExtraHits: false }
+    }
+
+    let bonusDice = 0
+    let sixesGenerateExtraHits = false
+
+    for (const effect of activeUnit.activeEffects) {
+      if (effect.remainingTurns <= 0) continue
+
+      const doctrine = DOCTRINES[effect.sourceDoctrineId]
+      if (!doctrine) continue
+
+      for (const doctrineEffect of doctrine.effects) {
+        if (doctrineEffect.type === DoctrineEffectType.POWER_MODIFIER &&
+            doctrineEffect.target === DoctrineTarget.SELF) {
+          bonusDice += doctrineEffect.value || 0
+
+          // Stellar Collapse has the special rule that 6s generate extra hits
+          if (effect.sourceDoctrineId === 'stellar_collapse') {
+            sixesGenerateExtraHits = true
+          }
+        }
+      }
+    }
+
+    return { bonusDice, sixesGenerateExtraHits }
+  },
+
+  clearActiveUnitDoctrines: () => {
+    const { activeUnitId, playerUnits } = get()
+
+    if (!activeUnitId) return
+
+    const updatedPlayerUnits = playerUnits.map((unit) => {
+      if (unit.id === activeUnitId) {
+        // Filter out consumed self-buff doctrines
+        const remainingEffects = unit.activeEffects.filter((effect) => {
+          const doctrine = DOCTRINES[effect.sourceDoctrineId]
+          if (!doctrine) return false
+
+          // Check if this is a self-buff POWER_MODIFIER - these get consumed on attack
+          const isSelfBuff = doctrine.effects.some(
+            (e) => e.type === DoctrineEffectType.POWER_MODIFIER && e.target === DoctrineTarget.SELF
+          ) && !doctrine.aoePattern
+
+          // Keep non-self-buff effects
+          return !isSelfBuff
+        })
+
+        return {
+          ...unit,
+          activeEffects: remainingEffects
+        }
+      }
+      return unit
+    })
+
+    set({ playerUnits: updatedPlayerUnits })
   }
 }))
 

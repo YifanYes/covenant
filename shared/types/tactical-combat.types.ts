@@ -155,6 +155,10 @@ export interface TacticalUnitState {
   hasActed: boolean
   currentHealth: number
   maxHealth: number
+  // Active doctrine buffs (for self-buff doctrines like Stellar Collapse)
+  activeDoctrines?: Record<string, ActiveStatusEffect>
+  // Active status effects (burning, stunned, etc.)
+  activeEffects?: ActiveStatusEffect[]
 }
 
 // Tactical state stored in database (JSON field)
@@ -243,4 +247,28 @@ export interface EnemyTurnResult {
 
   // Combat log entries
   logEntries?: CombatLogEntry[]
+}
+
+// Tactical doctrine execution result
+export interface TacticalDoctrineResult {
+  success: boolean
+  casterId: string
+  doctrineId: string
+  targetPosition: GridPosition
+  affectedTiles: GridPosition[]
+  affectedUnitIds: string[]
+  // Effect results per unit
+  effects: {
+    unitId: string
+    damageDealt?: number
+    healthRestored?: number
+    statusApplied?: string
+    killed?: boolean
+  }[]
+  // Mana spent
+  manaCost: number
+  // Updated state
+  updatedState: TacticalStateData
+  // Combat log entries
+  logEntries: CombatLogEntry[]
 }

@@ -1,5 +1,6 @@
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type DoctrineDefinition } from '../types/doctrine.types'
 import { CharacterClassName, MagicNature } from './classes'
+import { AoEPatternType } from './aoe-patterns'
 
 export const MAX_EQUIPPED_DOCTRINES = 2
 
@@ -91,6 +92,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -128,6 +131,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 2,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -309,6 +314,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 5,
     isUltimate: false,
+    aoePattern: AoEPatternType.CROSS,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -410,6 +417,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: true,
+    aoePattern: AoEPatternType.CROSS,
+    castRange: 2,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -446,6 +455,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 8,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -464,6 +475,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 7,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -539,6 +552,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 4,
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -745,6 +760,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 5,
     isUltimate: false,
+    aoePattern: AoEPatternType.DIAMOND,
+    castRange: 3,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -827,10 +844,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: false,
+    aoePattern: AoEPatternType.DIAMOND,
+    castRange: 3,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.ENEMY,
+        target: DoctrineTarget.ALL_ENEMIES,
         value: -2, // All enemies -2 attack power
         duration: 1
       }
@@ -884,6 +903,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 10,
     isUltimate: true,
+    aoePattern: AoEPatternType.CIRCLE_2,
+    castRange: 4,
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -932,6 +953,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 8,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 5,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
