@@ -1255,8 +1255,6 @@ export class CombatService {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Enemy not found' })
     }
 
-    const enemy = state.units[enemyIndex]
-
     // Find the enemy in the turn order and sync the turn index
     // The frontend manages turn advancement, so we sync the backend to match
     const enemyTurnIndex = state.turnOrder.indexOf(enemyId)
@@ -1266,6 +1264,19 @@ export class CombatService {
 
     // Update currentTurnIndex to match the enemy being processed
     state = { ...state, currentTurnIndex: enemyTurnIndex }
+
+    // Reset the enemy's turn flags at the start of their turn
+    // This ensures they can move/act even if flags weren't properly reset from previous rounds
+    const unitsWithResetEnemy = state.units.map((unit, i) => {
+      if (i === enemyIndex) {
+        return { ...unit, hasMoved: false, hasActed: false }
+      }
+      return unit
+    })
+    state = { ...state, units: unitsWithResetEnemy }
+
+    // Update enemy reference after state change
+    const enemy = state.units[enemyIndex]
 
     // Find closest player
     const targetPlayer = this.findClosestPlayer(enemy.position, state.units)
@@ -1339,12 +1350,6 @@ export class CombatService {
         })
 
         state = { ...state, tiles: updatedTiles, units: updatedUnits }
-
-        logEntries.push({
-          timestamp: timestamp + 1,
-          type: CombatLogType.ENEMY_ATTACKS, // Use existing log type for now
-          data: { enemy: enemy.name, action: 'move', from: oldPosition, to: newPosition }
-        })
       }
     }
 
@@ -2085,11 +2090,31 @@ export class CombatService {
     await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
 
     // Save combat log entries
+    console.log(`[executeTacticalDoctrine] Attempting to save ${logEntries.length} log entries for participation ${participationId}`)
+    console.log(`[executeTacticalDoctrine] combatEnemyRepository exists: ${!!this.combatEnemyRepository}`)
+
     if (this.combatEnemyRepository && logEntries.length > 0) {
-      const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
+      let activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
+      console.log(`[executeTacticalDoctrine] getActiveEnemy result: ${activeEnemy ? activeEnemy.id : 'null'}`)
+
+      // Fallback: if no active enemy found by status, try finding by ID from tactical state
+      if (!activeEnemy) {
+        const enemyUnit = state.units.find((u) => !u.id.startsWith('player-'))
+        console.log(`[executeTacticalDoctrine] Fallback - found enemy unit: ${enemyUnit ? enemyUnit.id : 'null'}`)
+        if (enemyUnit) {
+          activeEnemy = await this.combatEnemyRepository.findById(enemyUnit.id)
+          console.log(`[executeTacticalDoctrine] findById result: ${activeEnemy ? activeEnemy.id : 'null'}`)
+        }
+      }
+
       if (activeEnemy) {
         await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+        console.log(`[executeTacticalDoctrine] Successfully appended log entries to enemy ${activeEnemy.id}`)
+      } else {
+        console.warn(`[executeTacticalDoctrine] No enemy found for participationId: ${participationId}. Combat log entries not saved.`)
       }
+    } else {
+      console.warn(`[executeTacticalDoctrine] Skipping log save - repo: ${!!this.combatEnemyRepository}, entries: ${logEntries.length}`)
     }
 
     return {
@@ -2262,11 +2287,31 @@ export class CombatService {
     await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
 
     // Save combat log entries
+    console.log(`[useSelfBuffDoctrine] Attempting to save ${logEntries.length} log entries for participation ${participationId}`)
+    console.log(`[useSelfBuffDoctrine] combatEnemyRepository exists: ${!!this.combatEnemyRepository}`)
+
     if (this.combatEnemyRepository && logEntries.length > 0) {
-      const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
+      let activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
+      console.log(`[useSelfBuffDoctrine] getActiveEnemy result: ${activeEnemy ? activeEnemy.id : 'null'}`)
+
+      // Fallback: if no active enemy found by status, try finding by ID from tactical state
+      if (!activeEnemy) {
+        const enemyUnit = state.units.find((u) => !u.id.startsWith('player-'))
+        console.log(`[useSelfBuffDoctrine] Fallback - found enemy unit: ${enemyUnit ? enemyUnit.id : 'null'}`)
+        if (enemyUnit) {
+          activeEnemy = await this.combatEnemyRepository.findById(enemyUnit.id)
+          console.log(`[useSelfBuffDoctrine] findById result: ${activeEnemy ? activeEnemy.id : 'null'}`)
+        }
+      }
+
       if (activeEnemy) {
         await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+        console.log(`[useSelfBuffDoctrine] Successfully appended log entries to enemy ${activeEnemy.id}`)
+      } else {
+        console.warn(`[useSelfBuffDoctrine] No enemy found for participationId: ${participationId}. Combat log entries not saved.`)
       }
+    } else {
+      console.warn(`[useSelfBuffDoctrine] Skipping log save - repo: ${!!this.combatEnemyRepository}, entries: ${logEntries.length}`)
     }
 
     return {

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslation } from 'react-i18next'
 import type { TacticalUnit } from '@shared/types/tactical-combat.types'
 import { cn } from '@/lib/cn.lib'
 
@@ -9,11 +10,21 @@ interface TurnOrderDisplayProps {
   turnNumber: number
 }
 
+// Helper to translate enemy names from "prefix|suffix" format
+function translateUnitName(name: string, t: (key: string) => string): string {
+  if (name.includes('|')) {
+    const [prefix, suffix] = name.split('|')
+    return `${t(prefix)} ${t(suffix)}`
+  }
+  return name
+}
+
 export default function TurnOrderDisplay({
   turnQueue,
   currentTurnIndex,
   turnNumber
 }: TurnOrderDisplayProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex items-center gap-4">
       <div className="text-sm font-medium text-muted-foreground">
@@ -44,13 +55,13 @@ export default function TurnOrderDisplay({
                     : 'bg-red-500 text-white'
                 )}
               >
-                {unit.name.charAt(0)}
+                {translateUnitName(unit.name, t).charAt(0)}
               </div>
 
               {/* Unit info */}
               <div className="flex flex-col">
                 <span className="text-xs font-medium truncate max-w-20">
-                  {unit.name}
+                  {translateUnitName(unit.name, t)}
                 </span>
                 <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                   <span>{unit.currentHealth}/{unit.maxHealth}</span>

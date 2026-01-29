@@ -6,6 +6,15 @@ import { useTranslation } from 'react-i18next'
 import { TERRAIN_CONFIG } from '@shared/constants/terrain'
 import type { GridPosition, TacticalUnit, TileState } from '@shared/types/tactical-combat.types'
 
+// Helper to translate enemy names from "prefix|suffix" format
+function translateUnitName(name: string, t: (key: string) => string): string {
+  if (name.includes('|')) {
+    const [prefix, suffix] = name.split('|')
+    return `${t(prefix)} ${t(suffix)}`
+  }
+  return name
+}
+
 interface TileInfoPanelProps {
   hoveredTile: GridPosition | null
   hoveredTileState: TileState | null
@@ -76,9 +85,9 @@ export default function TileInfoPanel({
                   hoveredUnit.isPlayer ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                 }`}
               >
-                {hoveredUnit.name.charAt(0)}
+                {translateUnitName(hoveredUnit.name, t).charAt(0)}
               </div>
-              <span className="font-medium">{hoveredUnit.name}</span>
+              <span className="font-medium">{translateUnitName(hoveredUnit.name, t)}</span>
             </div>
 
             {/* Health bar */}
