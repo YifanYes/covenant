@@ -101,6 +101,10 @@ export const activityRouter = t.router({
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot attack with enemy units' })
       }
 
+      // Consume dice from the player's dice bank (attack + defense dice)
+      const totalDiceUsed = input.attackRolls.length + input.defenseRolls.length
+      await ctx.services.dice.consumeDiceFromBank(ctx.user.id, totalDiceUsed)
+
       return ctx.services.combat.executeTacticalAttack(
         input.participationId,
         input.attackerId,
@@ -186,13 +190,24 @@ export const activityRouter = t.router({
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
       }
 
-      return ctx.services.combat.executeTacticalDoctrine(
+      const result = await ctx.services.combat.executeTacticalDoctrine(
         input.participationId,
         input.casterId,
         input.doctrineId,
         input.targetPosition,
         currentClass.mana
       )
+
+      // Deduct mana from the character's class after successful doctrine use
+      if (result.success) {
+        await ctx.services.character.updateHealth(
+          currentClass.id,
+          currentClass.health,
+          currentClass.mana - result.manaCost
+        )
+      }
+
+      return result
     }),
 
   // Tactical combat: Use self-buff doctrine (no targeting required)
@@ -229,11 +244,22 @@ export const activityRouter = t.router({
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
       }
 
-      return ctx.services.combat.useSelfBuffDoctrine(
+      const result = await ctx.services.combat.useSelfBuffDoctrine(
         input.participationId,
         input.casterId,
         input.doctrineId,
         currentClass.mana
       )
+
+      // Deduct mana from the character's class after successful doctrine use
+      if (result.success) {
+        await ctx.services.character.updateHealth(
+          currentClass.id,
+          currentClass.health,
+          currentClass.mana - result.manaCost
+        )
+      }
+
+      return result
     })
 })

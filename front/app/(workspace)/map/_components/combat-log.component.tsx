@@ -108,7 +108,7 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
       case CombatLogType.PHASE_COMPLETE:
         return t('combat.phase_complete')
       case CombatLogType.STATUS_EFFECT: {
-        const effectKey = (data.effect as string).toLowerCase()
+        const effectKey = (data.effect as string)?.toLowerCase() ?? 'unknown'
         const targetKey = data.target === 'player' ? 'ti' : (data.target as string)
 
         if (effectKey === 'doctrine_active') {
@@ -119,14 +119,21 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
 
         return t('combat.log.status_effect', {
           effect: t(`status_effects.${effectKey}`, { defaultValue: effectKey }),
-          target: targetKey === 'ti' ? 'ti' : t(targetKey)
+          target: targetKey === 'ti' ? 'ti' : translateEnemyName(targetKey)
         })
       }
       case CombatLogType.DOCTRINE_EFFECT: {
-        const doctrineId = (data.doctrine as string)?.toLowerCase()
+        const doctrineId = (data.doctrine as string)?.toLowerCase() ?? 'unknown'
         const effectName = (data.effect as string)?.toLowerCase()
+        const doctrineName = t(`doctrines.${doctrineId}.name`, { defaultValue: doctrineId })
+
+        // If no effect specified, just show the doctrine name
+        if (!effectName) {
+          return t('combat.log.doctrine_cast', { doctrine: doctrineName })
+        }
+
         return t('combat.log.doctrine_effect', {
-          doctrine: t(`doctrines.${doctrineId}.name`, { defaultValue: doctrineId }),
+          doctrine: doctrineName,
           effect: t(`status_effects.${effectName}`, { defaultValue: effectName })
         })
       }

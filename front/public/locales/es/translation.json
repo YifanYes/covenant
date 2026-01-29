@@ -120,6 +120,7 @@
     "attack_rolls": "Ataques",
     "attack_set": "Ataque preparado: {{count}} dados",
     "criticals": "Críticos",
+    "doctrine_activated": "¡{{name}} activada! +{{dice}} dados de poder en el próximo ataque",
     "death_dialog": {
       "continue": "Continuar",
       "description": "Tu personaje ha caído en batalla.",
@@ -133,11 +134,15 @@
     "error": {
       "attack": "El ataque falló",
       "attack_failed": "El ataque falló",
+      "doctrine_failed": "Falló el lanzamiento de doctrina",
+      "doctrine_not_found": "Doctrina no encontrada",
       "invalid_attack": "Objetivo de ataque inválido",
+      "invalid_doctrine": "Objetivo de doctrina inválido",
       "invalid_move": "Movimiento inválido",
       "move_failed": "El movimiento falló",
       "no_active_unit": "No hay unidad activa seleccionada",
       "no_participation": "No se encontró sesión de combate",
+      "not_enough_mana": "Maná insuficiente",
       "target_not_found": "Objetivo no encontrado",
       "unit_not_found": "Unidad no encontrada",
       "unknown": "Ocurrió un error desconocido"
@@ -146,6 +151,7 @@
       "damage_to_enemy": "{{enemy}} recibe {{damage}} de daño",
       "damage_to_player": "Recibes {{damage}} de daño",
       "doctrine_active": "Doctrina activa: {{effect}}",
+      "doctrine_cast": "Doctrina: {{doctrine}} lanzada",
       "doctrine_effect": "Doctrina: {{doctrine}} aplica {{effect}}",
       "empty": "Sin eventos de combate aún",
       "enemy_attacks": "El enemigo ataca con {{hits}} impactos",
@@ -1198,7 +1204,8 @@
     "power_boost": "Aumento de Potencia",
     "purified": "Purificado",
     "stunned": "Aturdido",
-    "threshold_reduction": "Reducción de Umbral"
+    "threshold_reduction": "Reducción de Umbral",
+    "unknown": "Efecto Desconocido"
   },
   "store": {
     "buy": "Comprar",
@@ -1340,16 +1347,21 @@
       "select": "Clic izquierdo: Seleccionar",
       "zoom": "Scroll: Zoom"
     },
+    "casting": "Lanzando...",
+    "click_confirm_doctrine": "Haz clic en Confirmar para lanzar",
+    "click_to_target_doctrine": "Haz clic en una casilla para apuntar",
     "moving": "Moviendo...",
+    "pattern": "Patrón",
     "pattern_circle": "Círculo",
     "pattern_cone": "Cono",
     "pattern_cross": "Cruz",
     "pattern_diamond": "Diamante",
     "pattern_line": "Línea",
     "pattern_single": "Individual",
-    "range": "rango",
+    "range": "Rango",
     "select_destination": "Seleccionar Destino",
     "select_target": "Seleccionar Objetivo",
+    "targets_affected": "Objetivos Afectados",
     "tiles": "casillas"
   }
 }

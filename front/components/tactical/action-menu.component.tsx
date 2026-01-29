@@ -12,6 +12,15 @@ import Button from '@/components/ui/button.component'
 import { cn } from '@/lib/cn.lib'
 import DoctrineTargetSelector from './doctrine-target-selector.component'
 
+// Helper to translate enemy names from "prefix|suffix" format
+function translateUnitName(name: string, t: (key: string) => string): string {
+  if (name.includes('|')) {
+    const [prefix, suffix] = name.split('|')
+    return `${t(prefix)} ${t(suffix)}`
+  }
+  return name
+}
+
 interface ActionMenuProps {
   activeUnit: TacticalUnit
   phase: TacticalPhase
@@ -182,7 +191,7 @@ export default function ActionMenu({ activeUnit, phase, equippedDoctrines = [] }
         {/* Show target info when attacking */}
         {attackInfo?.target && (
           <div className="bg-muted/50 rounded p-2 mb-2 text-xs">
-            <div className="font-medium mb-1">{t('combat.target')}: {attackInfo.target.name}</div>
+            <div className="font-medium mb-1">{t('combat.target')}: {translateUnitName(attackInfo.target.name, t)}</div>
             <div className="flex justify-between text-muted-foreground">
               <span>{t('inventory.health')}</span>
               <span>{attackInfo.target.currentHealth}/{attackInfo.target.maxHealth}</span>

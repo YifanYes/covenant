@@ -42,7 +42,7 @@ export function useTacticalDoctrine() {
 
     if (!selectedDoctrineId || !pendingAction || pendingAction.type !== 'doctrine' || !pendingAction.targetPosition) {
       console.error('No valid doctrine action pending')
-      toast.error(t('combat.error.invalid_doctrine', 'No valid doctrine target'))
+      toast.error(t('combat.error.invalid_doctrine'))
       return { success: false, error: 'No valid doctrine action' }
     }
 
@@ -64,13 +64,13 @@ export function useTacticalDoctrine() {
     const doctrine = DOCTRINES[selectedDoctrineId]
     if (!doctrine) {
       console.error('Doctrine not found')
-      toast.error(t('combat.error.doctrine_not_found', 'Doctrine not found'))
+      toast.error(t('combat.error.doctrine_not_found'))
       return { success: false, error: 'Doctrine not found' }
     }
 
     // Check mana
     if (caster.currentMana < doctrine.manaCost) {
-      toast.error(t('combat.error.not_enough_mana', 'Not enough mana'))
+      toast.error(t('combat.error.not_enough_mana'))
       return { success: false, error: 'Not enough mana' }
     }
 
@@ -97,7 +97,8 @@ export function useTacticalDoctrine() {
           effects: result.effects
         })
 
-        // Invalidate queries to refresh data
+        // Invalidate queries to refresh data (mana and combat log)
+        queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
         queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
 
         return {
@@ -107,12 +108,12 @@ export function useTacticalDoctrine() {
         }
       }
 
-      toast.error(t('combat.error.doctrine_failed', 'Doctrine cast failed'))
+      toast.error(t('combat.error.doctrine_failed'))
       return { success: false, error: 'Server returned failure' }
     } catch (error) {
       console.error('Failed to execute tactical doctrine:', error)
       const errorMessage = error instanceof Error ? error.message : t('combat.error.unknown')
-      toast.error(t('combat.error.doctrine_failed', 'Doctrine cast failed'), { description: errorMessage })
+      toast.error(t('combat.error.doctrine_failed'), { description: errorMessage })
       // Clear doctrine selection state on failure to reset UI
       clearDoctrineSelection()
       return {
@@ -218,13 +219,13 @@ export function useTacticalDoctrine() {
     const doctrine = DOCTRINES[doctrineId]
     if (!doctrine) {
       console.error('Doctrine not found')
-      toast.error(t('combat.error.doctrine_not_found', 'Doctrine not found'))
+      toast.error(t('combat.error.doctrine_not_found'))
       return { success: false, error: 'Doctrine not found' }
     }
 
     // Check mana
     if (caster.currentMana < doctrine.manaCost) {
-      toast.error(t('combat.error.not_enough_mana', 'Not enough mana'))
+      toast.error(t('combat.error.not_enough_mana'))
       return { success: false, error: 'Not enough mana' }
     }
 
@@ -251,12 +252,13 @@ export function useTacticalDoctrine() {
         })
 
         // Show success message
-        toast.success(t('combat.doctrine_activated', '{{name}} activated! +{{dice}} power dice to next attack', {
+        toast.success(t('combat.doctrine_activated', {
           name: t(doctrine.nameKey),
           dice: result.bonusDice
         }))
 
-        // Invalidate queries to refresh data
+        // Invalidate queries to refresh data (mana and combat log)
+        queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
         queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
 
         return {
@@ -265,12 +267,12 @@ export function useTacticalDoctrine() {
         }
       }
 
-      toast.error(t('combat.error.doctrine_failed', 'Doctrine cast failed'))
+      toast.error(t('combat.error.doctrine_failed'))
       return { success: false, error: 'Server returned failure' }
     } catch (error) {
       console.error('Failed to use self-buff doctrine:', error)
       const errorMessage = error instanceof Error ? error.message : t('combat.error.unknown')
-      toast.error(t('combat.error.doctrine_failed', 'Doctrine cast failed'), { description: errorMessage })
+      toast.error(t('combat.error.doctrine_failed'), { description: errorMessage })
       return {
         success: false,
         error: errorMessage
