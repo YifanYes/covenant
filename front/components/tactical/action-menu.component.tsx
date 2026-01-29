@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Heart, SpeedFast, Zap } from '@nsmr/pixelart-react'
 
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
+import { useTacticalMove } from '@/hooks/use-tactical-move.hook'
 import type { TacticalUnit, TacticalPhase } from '@shared/types/tactical-combat.types'
 import Button from '@/components/ui/button.component'
 import { cn } from '@/lib/cn.lib'
@@ -17,6 +18,7 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
   const { t } = useTranslation()
   const { selectAction, cancelAction, confirmAction, pendingAction } =
     useTacticalCombatStore()
+  const { confirmMove, isLoading: isMoveLoading } = useTacticalMove()
 
   const canMove = !activeUnit.hasMoved
   const canAttack = !activeUnit.hasActed
@@ -120,17 +122,27 @@ export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
               size="sm"
               className="w-full"
               disabled={
+                isMoveLoading ||
                 (phase === 'select_move' && !pendingAction.path?.length) ||
                 (phase === 'select_target' && !pendingAction.targetUnitIds?.length)
               }
-              onClick={() => confirmAction()}
+              onClick={() => {
+                if (phase === 'select_move') {
+                  // Use server-persisted move
+                  confirmMove()
+                } else {
+                  // For other actions (attack, etc.), use local action for now
+                  confirmAction()
+                }
+              }}
             >
-              Confirm
+              {isMoveLoading ? 'Moving...' : 'Confirm'}
             </Button>
             <Button
               variant="outline"
               size="sm"
               className="w-full"
+              disabled={isMoveLoading}
               onClick={cancelAction}
             >
               Cancel

@@ -1,7 +1,7 @@
 'use client'
 import Button from '@/components/ui/button.component'
 import { cn } from '@/lib/cn.lib'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Loader, Trophy, Zap } from '@nsmr/pixelart-react'
 import Image from 'next/image'
 import type { DoctrineDefinition } from '@shared/types/doctrine.types'
@@ -37,19 +37,19 @@ export default function DoctrinePanel({
   const { t } = useTranslation()
 
   const { data: availableDoctrines = [] } = useQuery({
-    ...trpc.character.getAvailableDoctrines.queryOptions()
+    ...trpcOptions.character.getAvailableDoctrines.queryOptions()
   })
 
   const { data: equippedDoctrines = [] } = useQuery({
-    ...trpc.character.equippedDoctrines.queryOptions()
+    ...trpcOptions.character.equippedDoctrines.queryOptions()
   })
 
   const equipMutation = useMutation({
-    ...trpc.character.equipDoctrine.mutationOptions(),
+    ...trpcOptions.character.equipDoctrine.mutationOptions(),
     onSuccess: () => {
       toast.success(t('doctrines.success.equip'))
-      queryClient.invalidateQueries({ queryKey: trpc.character.equippedDoctrines.queryKey() })
-      queryClient.invalidateQueries({ queryKey: trpc.character.getAvailableDoctrines.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.equippedDoctrines.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getAvailableDoctrines.queryKey() })
     },
     onError: () => {
       toast.error(t('doctrines.error.equip'))
@@ -57,11 +57,11 @@ export default function DoctrinePanel({
   })
 
   const unequipMutation = useMutation({
-    ...trpc.character.unequipDoctrine.mutationOptions(),
+    ...trpcOptions.character.unequipDoctrine.mutationOptions(),
     onSuccess: () => {
       toast.success(t('doctrines.success.unequip'))
-      queryClient.invalidateQueries({ queryKey: trpc.character.equippedDoctrines.queryKey() })
-      queryClient.invalidateQueries({ queryKey: trpc.character.getAvailableDoctrines.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.equippedDoctrines.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getAvailableDoctrines.queryKey() })
     },
     onError: () => {
       toast.error(t('doctrines.error.unequip'))

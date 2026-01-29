@@ -15,7 +15,7 @@ import { Badge } from '@/ui/badge.component'
 import Button from '@/ui/button.component'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { Progress } from '@/ui/progress.component'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { ChevronLeft } from '@nsmr/pixelart-react'
 import { ActivityDifficulty } from '@shared/constants/activities'
 import { getEnemy } from '@shared/constants/enemies'
@@ -38,10 +38,10 @@ export default function ActivityDetailPage() {
   const router = useRouter()
   const { t } = useTranslation()
 
-  const { data: characterData } = useSuspenseQuery(trpc.character.getCurrentClass.queryOptions())
+  const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
   const character = characterData as InventoryCharacter
 
-  const { data: activities } = useSuspenseQuery(trpc.activity.list.queryOptions({ characterId: character.id }))
+  const { data: activities } = useSuspenseQuery(trpcOptions.activity.list.queryOptions({ characterId: character.id }))
   const activity = activities.find((a) => a.id === id)
 
   const participation = (activity as any)?.participation
@@ -85,10 +85,10 @@ export default function ActivityDetailPage() {
   const [currentEnemy, setCurrentEnemy] = useState<EnemyState | null>(initialEnemyState)
 
   const joinMutation = useMutation({
-    ...trpc.activity.join.mutationOptions(),
+    ...trpcOptions.activity.join.mutationOptions(),
     onSuccess: (result: any) => {
       toast.success(t('activities.success.start'))
-      queryClient.invalidateQueries({ queryKey: trpc.activity.list.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
       setHasJoined(true)
 
       // Set enemy from join response
@@ -108,7 +108,7 @@ export default function ActivityDetailPage() {
   })
 
   const resolveTurnMutation = useMutation({
-    ...trpc.activity.resolveTurn.mutationOptions(),
+    ...trpcOptions.activity.resolveTurn.mutationOptions(),
     onSuccess: (result: any) => {
       setLastTurnResult(result)
 
@@ -139,8 +139,8 @@ export default function ActivityDetailPage() {
         }
       }
 
-      queryClient.invalidateQueries({ queryKey: trpc.activity.list.queryKey() })
-      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
     },
     onError: (error) => toast.error(t('combat.error.attack'), { description: error.message })
   })

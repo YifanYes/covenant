@@ -159,6 +159,7 @@ model ActivityParticipation {
   activeDoctrines      Json?         @default("{}")
   enemyActiveDoctrines Json?         @default("{}")
   combatStats          Json?         @default("{}")
+  tacticalState        Json?         @default("{}")
   enemies              CombatEnemy[]
   activity             MapActivity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
   character            Character     @relation(fields: [characterId], references: [id], onDelete: Cascade)

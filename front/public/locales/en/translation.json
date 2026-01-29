@@ -131,7 +131,12 @@
     "enemies": "Enemies",
     "enemies_defeated": "Enemies Defeated",
     "error": {
-      "attack": "Attack failed"
+      "attack": "Attack failed",
+      "invalid_move": "Invalid move action",
+      "move_failed": "Movement failed",
+      "no_active_unit": "No active unit selected",
+      "unit_not_found": "Unit not found",
+      "unknown": "An unknown error occurred"
     },
     "log": {
       "damage_to_enemy": "{{enemy}} takes {{damage}} damage",

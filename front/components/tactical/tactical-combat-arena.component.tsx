@@ -12,7 +12,7 @@ import { Zap } from '@nsmr/pixelart-react'
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
 import { useCombatTurn } from '@/hooks/use-combat-turn.hook'
 import { cn } from '@/lib/cn.lib'
-import { queryClient, trpc } from '@/utils/trpc.utils'
+import { trpc, trpcOptions, queryClient } from '@/utils/trpc.utils'
 
 import DoctrinePanel from '@/components/doctrine-panel.component'
 import AlertDialog, {
@@ -91,8 +91,15 @@ export default function TacticalCombatArena({
     tiles,
     isInitialized,
     initializeCombat,
+    hydrateFromState,
     reset
   } = useTacticalCombatStore()
+
+  // Fetch persisted tactical state if participationId is provided
+  const { data: persistedTacticalState, isLoading: isLoadingTacticalState } = trpc.activity.getTacticalState.useQuery(
+    { participationId: participationId! },
+    { enabled: !!participationId }
+  )
 
   // Get active unit and hovered info for panels
   const activeUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === activeUnitId)
@@ -140,7 +147,7 @@ export default function TacticalCombatArena({
 
   // Consumable mutation
   const useConsumableMutation = useMutation({
-    ...trpc.character.useConsumable.mutationOptions(),
+    ...trpcOptions.character.useConsumable.mutationOptions(),
     onSuccess: (data) => {
       if (data.healthRestored) {
         toast.success(t('consumables.health_restored', { amount: data.healthRestored }))
@@ -148,8 +155,8 @@ export default function TacticalCombatArena({
       if (data.manaRestored) {
         toast.success(t('consumables.mana_restored', { amount: data.manaRestored }))
       }
-      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
-      queryClient.invalidateQueries({ queryKey: trpc.activity.list.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
     },
     onError: () => {
       toast.error(t('consumables.error'))
@@ -158,11 +165,11 @@ export default function TacticalCombatArena({
 
   // Doctrine mutation
   const useDoctrineMutation = useMutation({
-    ...trpc.character.useDoctrine.mutationOptions(),
+    ...trpcOptions.character.useDoctrine.mutationOptions(),
     onSuccess: () => {
       toast.success(t('doctrines.success.used'))
-      queryClient.invalidateQueries({ queryKey: trpc.character.getCurrentClass.queryKey() })
-      queryClient.invalidateQueries({ queryKey: trpc.activity.list.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
     },
     onError: (error) => {
       toast.error(t('doctrines.error.failed'), { description: error.message })
@@ -186,13 +193,15 @@ export default function TacticalCombatArena({
   // Initialize tactical combat state from character and enemies
   useEffect(() => {
     if (!character || enemies.length === 0) return
+    // Wait for tactical state query to complete if we have a participationId
+    if (participationId && isLoadingTacticalState) return
 
-    // Create player unit from character
+    // Create player unit template from character
     const playerUnit: TacticalUnit = {
       id: 'player-1',
       templateId: character.currentClass ?? 'player',
       name: character.name,
-      position: { x: 1, y: 3 },
+      position: { x: 1, y: 3 }, // Default position, will be overridden if hydrating
       isPlayer: true,
       spriteUrl: `/assets/classes/${character.currentClass}.png`,
       currentHealth: currentClass?.health ?? 100,
@@ -207,7 +216,7 @@ export default function TacticalCombatArena({
       activeEffects: []
     }
 
-    // Create enemy units from enemies
+    // Create enemy unit templates from enemies
     const tacticalEnemies: TacticalUnit[] = enemies.map((enemy, index) => {
       const template = getEnemy(enemy.templateId)
       return {
@@ -216,7 +225,7 @@ export default function TacticalCombatArena({
         name: enemy.namePrefix && enemy.nameSuffix
           ? `${t(enemy.namePrefix)} ${t(enemy.nameSuffix)}`
           : t(template?.name ?? 'Enemy'),
-        position: { x: 6, y: 2 + index },
+        position: { x: 6, y: 2 + index }, // Default position, will be overridden if hydrating
         isPlayer: false,
         spriteUrl: template?.imageId ? `/assets/enemies/${template.imageId}.png` : undefined,
         currentHealth: enemy.currentHealth,
@@ -232,6 +241,15 @@ export default function TacticalCombatArena({
       }
     })
 
+    const allUnitTemplates = [playerUnit, ...tacticalEnemies]
+
+    // If we have persisted state with valid structure, hydrate from it
+    if (persistedTacticalState?.units && participationId) {
+      hydrateFromState(persistedTacticalState, allUnitTemplates, participationId)
+      return
+    }
+
+    // Otherwise, create fresh combat state
     // Create grid
     const gridWidth = 8
     const gridHeight = 6
@@ -277,8 +295,8 @@ export default function TacticalCombatArena({
       playerUnits: [playerUnit],
       enemyUnits: tacticalEnemies,
       turnQueue
-    })
-  }, [character?.id, enemies.length])
+    }, participationId)
+  }, [character?.id, enemies.length, participationId, isLoadingTacticalState, persistedTacticalState])
 
   // Helper to render dice groups
   const renderDice = (

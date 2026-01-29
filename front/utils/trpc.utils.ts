@@ -48,14 +48,9 @@ const trpcOptions = createTRPCOptionsProxy<AppRouter>({
   queryClient,
 })
 
-// Hybrid client that combines both approaches
-export const trpc = new Proxy(trpcReact, {
-  get(target, prop) {
-    // If the property exists on trpcReact, use it (for Provider, hooks, etc.)
-    if (prop in target) {
-      return target[prop as keyof typeof target]
-    }
-    // Otherwise, delegate to trpcOptions (for queryOptions, mutationOptions, etc.)
-    return (trpcOptions as any)[prop]
-  },
-}) as typeof trpcReact & typeof trpcOptions
+// Export trpcReact directly for hooks (useQuery, useMutation, etc.)
+export const trpc = trpcReact
+
+// Export trpcOptions separately for queryOptions/mutationOptions
+// Use this with useSuspenseQuery, useQuery from @tanstack/react-query
+export { trpcOptions }

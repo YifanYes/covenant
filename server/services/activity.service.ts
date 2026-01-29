@@ -2,10 +2,12 @@ import { calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import { getItemById, WeaponDamageType } from '@shared/constants/items'
 import type { CombatLogEntry, InventoryItem } from '@shared/types/gamification.types'
+import type { TacticalStateData, TileState, TerrainType } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import { ActivityDifficulty, getActivityById, selectRandomEnemy } from '../../shared/constants/activities'
 import type { CharacterWithClasses } from '../../shared/types/character.types'
 import type { ActivityRepository } from '../repositories/activity.repository'
+import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { CharacterService } from './character.service'
 import type { CombatService } from './combat.service'
@@ -15,8 +17,89 @@ export class ActivityService {
     private activityRepository: ActivityRepository,
     private combatEnemyRepository: CombatEnemyRepository,
     private characterService: CharacterService,
-    private combatService: CombatService
+    private combatService: CombatService,
+    private activityParticipationRepository: ActivityParticipationRepository
   ) {}
+
+  /**
+   * Create default grid for tactical combat (8x6 arena)
+   */
+  private createDefaultGrid(): TileState[][] {
+    const width = 8
+    const height = 6
+    const tiles: TileState[][] = []
+
+    for (let y = 0; y < height; y++) {
+      tiles[y] = []
+      for (let x = 0; x < width; x++) {
+        // Create border of stone tiles
+        let terrain: TerrainType = 'GRASS'
+        if (x === 0 || x === width - 1 || y === 0 || y === height - 1) {
+          terrain = 'STONE'
+        }
+
+        tiles[y][x] = {
+          position: { x, y },
+          terrain,
+          occupantId: null,
+          isWalkable: true
+        }
+      }
+    }
+
+    return tiles
+  }
+
+  /**
+   * Create initial tactical state for a new combat
+   */
+  private createInitialTacticalState(
+    playerUnitId: string,
+    enemyUnitId: string
+  ): TacticalStateData {
+    const tiles = this.createDefaultGrid()
+    const gridWidth = 8
+    const gridHeight = 6
+
+    // Player spawns on the left side
+    const playerPosition = { x: 1, y: 3 }
+    // Enemy spawns on the right side
+    const enemyPosition = { x: 6, y: 3 }
+
+    // Set occupants on tiles
+    tiles[playerPosition.y][playerPosition.x].occupantId = playerUnitId
+    tiles[enemyPosition.y][enemyPosition.x].occupantId = enemyUnitId
+
+    // Create unit state entries
+    const units = [
+      {
+        id: playerUnitId,
+        position: playerPosition,
+        hasMoved: false,
+        hasActed: false
+      },
+      {
+        id: enemyUnitId,
+        position: enemyPosition,
+        hasMoved: false,
+        hasActed: false
+      }
+    ]
+
+    // Player goes first (higher speed assumed)
+    const turnOrder = [playerUnitId, enemyUnitId]
+
+    return {
+      mapTemplateId: 'default',
+      gridWidth,
+      gridHeight,
+      tiles,
+      units,
+      turnOrder,
+      currentTurnIndex: 0,
+      turnNumber: 1
+    }
+  }
 
   async getActivities(characterId?: string) {
     const activities = await this.activityRepository.getActiveActivities()
@@ -91,6 +174,7 @@ export class ActivityService {
 
     // Check if there's an active enemy, if not spawn one
     let activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participation.id)
+    let shouldInitializeTacticalState = false
     if (!activeEnemy) {
       const enemyId = selectRandomEnemy(config.enemySpawnWeights)
       const enemyTemplate = getEnemy(enemyId)
@@ -105,6 +189,16 @@ export class ActivityService {
         maxHealth: enemyTemplate.health,
         currentHealth: enemyTemplate.health
       })
+      shouldInitializeTacticalState = true
+    }
+
+    // Initialize tactical state if needed (new enemy spawned)
+    if (shouldInitializeTacticalState) {
+      const tacticalState = this.createInitialTacticalState(
+        'player-1', // Player unit ID
+        activeEnemy.id // Use enemy's DB ID as unit ID
+      )
+      await this.activityParticipationRepository.updateTacticalState(participation.id, tacticalState)
     }
 
     // Update active activity
@@ -316,6 +410,10 @@ export class ActivityService {
             namePrefix: newEnemy.namePrefix,
             nameSuffix: newEnemy.nameSuffix
           }
+
+          // Reinitialize tactical state for the new enemy
+          const tacticalState = this.createInitialTacticalState('player-1', newEnemy.id)
+          await this.activityParticipationRepository.updateTacticalState(participation.id, tacticalState)
         }
       } else {
         await this.activityRepository.completeActivity(activityRecordId)

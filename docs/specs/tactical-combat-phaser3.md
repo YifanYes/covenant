@@ -468,22 +468,22 @@ shared/
 
 **Deliverable:** Isometric grid renders in React, camera controls work
 
-### [ ] Phase 2: Units & Selection
+### [x] Phase 2: Units & Selection
 
 **Goal:** Units on grid, selection working
 
 **Tasks:**
 
-1. Create `Unit` sprite class
-2. Implement tile click detection
-3. Wire up selection to Zustand
-4. Calculate movement range
-5. Create `TurnOrderDisplay` component
-6. Create `ActionMenu` component
+1. Create `Unit` sprite class - `front/lib/phaser/entities/unit.ts`
+2. Implement tile click detection - Enhanced in `CombatScene`
+3. Wire up selection to Zustand - `selectTile` with path preview
+4. Calculate movement range - Dijkstra's algorithm in `front/lib/phaser/systems/pathfinding.ts`
+5. Create `TurnOrderDisplay` component - Already complete from Phase 1
+6. Create `ActionMenu` component - Already complete from Phase 1
 
 **Deliverable:** Units spawn, clicking selects, movement range highlights
 
-### [ ] Phase 3: Movement
+### [x] Phase 3: Movement
 
 **Goal:** Units can move on the grid
 
