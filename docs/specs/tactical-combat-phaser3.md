@@ -483,7 +483,7 @@ shared/
 
 **Deliverable:** Units spawn, clicking selects, movement range highlights
 
-### [ ] Phase 3: Movement
+### [x] Phase 3: Movement
 
 **Goal:** Units can move on the grid
 

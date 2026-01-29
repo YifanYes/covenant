@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { DEPTH_LAYERS } from '../config'
+import { DEPTH_LAYERS, ANIMATION_DURATION } from '../config'
 import type { TacticalUnit, GridPosition } from '@shared/types/tactical-combat.types'
 
 // Unit visual states
@@ -10,34 +10,27 @@ export class Unit extends Phaser.GameObjects.Container {
   private sprite: Phaser.GameObjects.Image
   private healthBarBg: Phaser.GameObjects.Rectangle
   private healthBarFill: Phaser.GameObjects.Rectangle
-  private selectionIndicator: Phaser.GameObjects.Graphics
-  private activeGlow: Phaser.GameObjects.Graphics
 
   // Unit data
   private unitData: TacticalUnit
   private visualState: UnitVisualState = 'idle'
+
+  // Animation
+  private bounceTween: Phaser.Tweens.Tween | null = null
+  private spriteBaseY: number = 0
 
   // Configuration
   private readonly SPRITE_SIZE = 32
   private readonly HEALTH_BAR_WIDTH = 28
   private readonly HEALTH_BAR_HEIGHT = 4
   private readonly HEALTH_BAR_OFFSET_Y = -20
-  private readonly SELECTION_RADIUS = 18
+  private readonly BOUNCE_AMOUNT = 4
+  private readonly BOUNCE_DURATION = 600
 
   constructor(scene: Phaser.Scene, unitData: TacticalUnit, screenPos: { x: number; y: number }) {
     super(scene, screenPos.x, screenPos.y - 8) // Offset up to sit on tile
 
     this.unitData = unitData
-
-    // Create selection indicator (drawn first, behind everything)
-    this.selectionIndicator = scene.add.graphics()
-    this.add(this.selectionIndicator)
-    this.selectionIndicator.setVisible(false)
-
-    // Create active glow (pulsing effect for active unit)
-    this.activeGlow = scene.add.graphics()
-    this.add(this.activeGlow)
-    this.activeGlow.setVisible(false)
 
     // Determine texture key
     const textureKey = unitData.isPlayer ? 'unit_player' : 'unit_enemy'
@@ -70,9 +63,8 @@ export class Unit extends Phaser.GameObjects.Container {
     // Initialize health bar
     this.updateHealthBar()
 
-    // Draw selection and glow graphics
-    this.drawSelectionIndicator()
-    this.drawActiveGlow()
+    // Store the sprite's base Y position for bounce animation
+    this.spriteBaseY = this.sprite.y
 
     // Make interactive
     this.setSize(this.SPRITE_SIZE, this.SPRITE_SIZE)
@@ -86,38 +78,34 @@ export class Unit extends Phaser.GameObjects.Container {
     scene.add.existing(this)
   }
 
-  private drawSelectionIndicator(): void {
-    this.selectionIndicator.clear()
+  private startBounce(): void {
+    // Stop any existing bounce
+    this.stopBounce()
 
-    // Draw a dashed circle for selection
-    this.selectionIndicator.lineStyle(2, 0xfbbf24, 1) // Yellow/amber
+    // Create a looping bounce animation on the sprite
+    this.bounceTween = this.scene.tweens.add({
+      targets: this.sprite,
+      y: this.spriteBaseY - this.BOUNCE_AMOUNT,
+      duration: this.BOUNCE_DURATION / 2,
+      ease: 'Sine.easeInOut',
+      yoyo: true,
+      repeat: -1
+    })
+  }
 
-    // Draw circle using arcs
-    const segments = 16
-    const radius = this.SELECTION_RADIUS
-    for (let i = 0; i < segments; i += 2) {
-      const startAngle = (i / segments) * Math.PI * 2
-      const endAngle = ((i + 1) / segments) * Math.PI * 2
-
-      this.selectionIndicator.beginPath()
-      this.selectionIndicator.arc(0, 0, radius, startAngle, endAngle, false)
-      this.selectionIndicator.strokePath()
+  private stopBounce(): void {
+    if (this.bounceTween) {
+      this.bounceTween.stop()
+      this.bounceTween = null
+      // Reset sprite to base position
+      this.sprite.setY(this.spriteBaseY)
     }
   }
 
-  private drawActiveGlow(): void {
-    this.activeGlow.clear()
-
-    // Draw a solid circle glow for active unit
-    this.activeGlow.lineStyle(3, 0xfbbf24, 0.8) // Yellow/amber with slight transparency
-    this.activeGlow.strokeCircle(0, 0, this.SELECTION_RADIUS + 2)
-
-    // Inner glow
-    this.activeGlow.lineStyle(2, 0xfef3c7, 0.5) // Light yellow
-    this.activeGlow.strokeCircle(0, 0, this.SELECTION_RADIUS - 2)
-  }
-
   private updateHealthBar(): void {
+    // Check if health bar components are still valid (not destroyed)
+    if (!this.healthBarFill?.active || !this.healthBarBg?.active) return
+
     const healthPercent = this.unitData.maxHealth > 0
       ? this.unitData.currentHealth / this.unitData.maxHealth
       : 0
@@ -150,16 +138,17 @@ export class Unit extends Phaser.GameObjects.Container {
     this.visualState = state
 
     // Reset all indicators
-    this.selectionIndicator.setVisible(false)
-    this.activeGlow.setVisible(false)
+    this.stopBounce()
     this.sprite.clearTint()
 
     switch (state) {
       case 'selected':
-        this.selectionIndicator.setVisible(true)
+        // Gentle bounce for selected unit
+        this.startBounce()
         break
       case 'active':
-        this.activeGlow.setVisible(true)
+        // Bounce animation for active unit (their turn)
+        this.startBounce()
         break
       case 'targetable':
         // Slight red tint to indicate targetable enemy
@@ -204,10 +193,53 @@ export class Unit extends Phaser.GameObjects.Container {
     this.sprite.setDisplaySize(this.SPRITE_SIZE, this.SPRITE_SIZE)
   }
 
+  /**
+   * Animate the unit moving along a path.
+   * @param path Array of grid positions forming the movement path
+   * @param gridToScreen Function to convert grid position to screen coordinates
+   * @returns Promise that resolves when the animation completes
+   */
+  async animateMovement(
+    path: GridPosition[],
+    gridToScreen: (x: number, y: number) => { x: number; y: number }
+  ): Promise<void> {
+    if (path.length < 2) return
+
+    // Skip the starting position (index 0), animate through rest of path
+    for (let i = 1; i < path.length; i++) {
+      const gridPos = path[i]
+      const screenPos = gridToScreen(gridPos.x, gridPos.y)
+
+      // Update depth during movement for proper layering
+      const newDepth = DEPTH_LAYERS.UNIT + (gridPos.x + gridPos.y) * 0.01
+
+      await new Promise<void>((resolve) => {
+        this.scene.tweens.add({
+          targets: this,
+          x: screenPos.x,
+          y: screenPos.y - 8, // Apply vertical offset
+          duration: ANIMATION_DURATION.UNIT_MOVE,
+          ease: 'Sine.easeInOut',
+          onUpdate: () => {
+            // Update depth during tween for smooth transitions
+            this.setDepth(newDepth)
+          },
+          onComplete: () => {
+            // Update internal position tracking
+            this.unitData = {
+              ...this.unitData,
+              position: gridPos
+            }
+            resolve()
+          }
+        })
+      })
+    }
+  }
+
   // Override destroy to cleanup
   destroy(fromScene?: boolean): void {
-    this.selectionIndicator.destroy()
-    this.activeGlow.destroy()
+    this.stopBounce()
     this.sprite.destroy()
     this.healthBarBg.destroy()
     this.healthBarFill.destroy()

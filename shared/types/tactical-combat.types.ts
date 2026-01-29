@@ -144,3 +144,34 @@ export interface TacticalInitData {
   enemyUnits: TacticalUnit[]
   turnQueue: TacticalUnit[]
 }
+
+// Tactical state stored in database (JSON field)
+export interface TacticalStateData {
+  mapTemplateId: string
+  gridWidth: number
+  gridHeight: number
+  tiles: TileState[][]
+  units: {
+    id: string
+    position: GridPosition
+    hasMoved: boolean
+    hasActed: boolean
+  }[]
+  turnOrder: string[] // Unit IDs in turn order
+  currentTurnIndex: number
+  turnNumber: number
+}
+
+// Movement validation result
+export interface MovementValidationResult {
+  valid: boolean
+  reason?: string
+  pathCost?: number
+}
+
+// Movement execution result
+export interface MovementExecutionResult {
+  success: boolean
+  newPosition: GridPosition
+  updatedState: TacticalStateData
+}

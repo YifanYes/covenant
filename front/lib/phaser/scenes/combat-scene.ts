@@ -20,6 +20,7 @@ export class CombatScene extends Phaser.Scene {
   private units: Map<string, Unit> = new Map()
   private loadingTextures: Set<string> = new Set()
   private unsubscribe?: () => void
+  private isAnimating = false
 
   // Camera drag state
   private isDragging = false
@@ -196,8 +197,36 @@ export class CombatScene extends Phaser.Scene {
       this.gridSystem.setTileHighlight(state.selectedTile, 'SELECTED')
     }
 
-    // Update units
-    this.syncUnits([...state.playerUnits, ...state.enemyUnits])
+    // Check for animation state
+    if (state.phase === 'animating' && state.animatingUnitId && state.animationPath && !this.isAnimating) {
+      this.handleMovementAnimation(state.animatingUnitId, state.animationPath)
+      return // Don't sync units during animation - unit will update itself
+    }
+
+    // Update units (skip during animation as the unit is updating itself)
+    if (!this.isAnimating) {
+      this.syncUnits([...state.playerUnits, ...state.enemyUnits])
+    }
+  }
+
+  private async handleMovementAnimation(unitId: string, path: GridPosition[]): Promise<void> {
+    const unit = this.units.get(unitId)
+    if (!unit) {
+      // Unit not found, complete animation immediately
+      useTacticalCombatStore.getState().completeAnimation()
+      return
+    }
+
+    this.isAnimating = true
+
+    try {
+      // Perform the animation
+      await unit.animateMovement(path, (x, y) => this.gridSystem.gridToScreen(x, y))
+    } finally {
+      this.isAnimating = false
+      // Signal animation complete to store
+      useTacticalCombatStore.getState().completeAnimation()
+    }
   }
 
   private syncUnits(units: TacticalUnit[]): void {

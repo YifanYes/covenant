@@ -1,8 +1,8 @@
 'use client'
 import Button from '@/ui/button.component'
-import { trpc } from '@/utils/trpc.utils'
+import { trpcOptions } from '@/utils/trpc.utils'
 import { ScriptText } from '@nsmr/pixelart-react'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
@@ -11,9 +11,9 @@ export default function WorldMapView() {
   const { t } = useTranslation()
   const router = useRouter()
 
-  const { data: character } = useQuery(trpc.character.get.queryOptions())
-  const { data: activities } = useQuery(
-    trpc.activity.list.queryOptions({ characterId: character?.id }, { enabled: !!character?.id })
+  const { data: character } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
+  const { data: activities } = useSuspenseQuery(
+    trpcOptions.activity.list.queryOptions({ characterId: character?.id })
   )
 
   const activeActivity = activities?.find((a) => (a as any).isParticipating)
@@ -35,7 +35,7 @@ export default function WorldMapView() {
       <div className='relative h-full w-full overflow-auto rounded-lg border border-slate-700 bg-black'>
         <div className='relative w-full min-w-200'>
           {/* Placeholder Map Image - w-full h-auto makes it resize with width, maintaining aspect ratio */}
-          <Image src='/assets/maps/santa_cruz.png' alt='World Map' width={1600} height={900} className='h-auto w-full opacity-50' />
+          <Image src='/assets/maps/santa_cruz.png' alt='World Map' width={1600} height={900} priority className='h-auto w-full opacity-50' />
 
           {/* Lore Overlay */}
           <div className='absolute top-4 left-4 max-w-md rounded bg-black/40 p-4 text-sm text-slate-200 backdrop-blur-sm'>

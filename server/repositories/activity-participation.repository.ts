@@ -1,4 +1,5 @@
 import type { ActiveStatusEffect } from '@shared/types/doctrine.types'
+import type { TacticalStateData } from '@shared/types/tactical-combat.types'
 import type { ActivityParticipation, PrismaClient } from '../generated/prisma'
 
 export class ActivityParticipationRepository {
@@ -51,5 +52,41 @@ export class ActivityParticipationRepository {
       where: { id: participationId },
       data: { activeDoctrines: activeDoctrines as any }
     })
+  }
+
+  async findByIdWithTacticalState(participationId: string): Promise<{
+    id: string
+    tacticalState: TacticalStateData | null
+  } | null> {
+    const result = await this.prisma.activityParticipation.findUnique({
+      where: { id: participationId },
+      select: { id: true, tacticalState: true }
+    })
+
+    if (!result) return null
+
+    return {
+      id: result.id,
+      tacticalState: result.tacticalState as unknown as TacticalStateData | null
+    }
+  }
+
+  async updateTacticalState(
+    participationId: string,
+    tacticalState: TacticalStateData
+  ): Promise<void> {
+    await this.prisma.activityParticipation.update({
+      where: { id: participationId },
+      data: { tacticalState: tacticalState as any }
+    })
+  }
+
+  async verifyOwnership(participationId: string, userId: string): Promise<boolean> {
+    const participation = await this.prisma.activityParticipation.findUnique({
+      where: { id: participationId },
+      include: { character: { select: { userId: true } } }
+    })
+
+    return participation?.character?.userId === userId
   }
 }

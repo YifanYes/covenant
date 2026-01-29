@@ -10,6 +10,7 @@ import type {
   HighlightedTile,
   TacticalPhase,
   TacticalInitData,
+  TacticalStateData,
   TerrainType
 } from '@shared/types/tactical-combat.types'
 import {
@@ -23,9 +24,18 @@ interface TacticalCombatStore extends TacticalCombatState {
   // UI state (not in base TacticalCombatState)
   hoveredTile: GridPosition | null
   isInitialized: boolean
+  animatingUnitId: string | null
+  animationPath: GridPosition[] | null
+  participationId: string | null
 
   // Actions
-  initializeCombat: (data: TacticalInitData) => void
+  initializeCombat: (data: TacticalInitData, participationId?: string) => void
+  hydrateFromState: (
+    persistedState: TacticalStateData,
+    unitTemplates: TacticalUnit[],
+    participationId: string
+  ) => void
+  setParticipationId: (id: string | null) => void
   selectTile: (position: GridPosition) => void
   setHoveredTile: (position: GridPosition | null) => void
   selectAction: (action: TacticalAction) => void
@@ -35,6 +45,7 @@ interface TacticalCombatStore extends TacticalCombatState {
   setPhase: (phase: TacticalPhase) => void
   setHighlightedTiles: (tiles: HighlightedTile[]) => void
   updateUnit: (unitId: string, updates: Partial<TacticalUnit>) => void
+  completeAnimation: () => void
   reset: () => void
 }
 
@@ -170,14 +181,17 @@ const initialState = (() => {
     highlightedTiles: [],
     pendingAction: null,
     hoveredTile: null,
-    isInitialized: true
+    isInitialized: true,
+    animatingUnitId: null,
+    animationPath: null,
+    participationId: null
   }
 })()
 
 export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => ({
   ...initialState,
 
-  initializeCombat: (data: TacticalInitData) => {
+  initializeCombat: (data: TacticalInitData, participationId?: string) => {
     const allUnits = [...data.playerUnits, ...data.enemyUnits]
     const turnQueue = initializeTurnOrder(allUnits)
 
@@ -195,8 +209,86 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       selectedTile: null,
       highlightedTiles: [],
       pendingAction: null,
-      isInitialized: true
+      isInitialized: true,
+      participationId: participationId ?? null
     })
+  },
+
+  hydrateFromState: (
+    persistedState: TacticalStateData,
+    unitTemplates: TacticalUnit[],
+    participationId: string
+  ) => {
+    // Merge persisted unit state with full unit templates
+    // Filter out units that don't have a matching template (graceful degradation)
+    const hydratedUnits: TacticalUnit[] = []
+    for (const persistedUnit of persistedState.units) {
+      const template = unitTemplates.find((t) => t.id === persistedUnit.id)
+      if (!template) {
+        console.warn(`Unit template not found for id: ${persistedUnit.id}, skipping unit`)
+        continue
+      }
+      hydratedUnits.push({
+        ...template,
+        position: persistedUnit.position,
+        hasMoved: persistedUnit.hasMoved,
+        hasActed: persistedUnit.hasActed
+      })
+    }
+
+    // If no units could be hydrated, fall back to fresh state
+    if (hydratedUnits.length === 0) {
+      console.error('No units could be hydrated from persisted state, falling back to fresh combat')
+      get().initializeCombat(
+        {
+          gridWidth: persistedState.gridWidth,
+          gridHeight: persistedState.gridHeight,
+          tiles: persistedState.tiles,
+          playerUnits: unitTemplates.filter((u) => u.isPlayer),
+          enemyUnits: unitTemplates.filter((u) => !u.isPlayer),
+          turnQueue: unitTemplates
+        },
+        participationId
+      )
+      return
+    }
+
+    const playerUnits = hydratedUnits.filter((u) => u.isPlayer)
+    const enemyUnits = hydratedUnits.filter((u) => !u.isPlayer)
+
+    // Reconstruct turn queue from persisted turn order
+    const turnQueue = persistedState.turnOrder
+      .map((id) => hydratedUnits.find((u) => u.id === id))
+      .filter((u): u is TacticalUnit => u !== undefined)
+
+    // Determine active unit
+    const activeUnitId = turnQueue[persistedState.currentTurnIndex]?.id ?? null
+    const activeUnit = hydratedUnits.find((u) => u.id === activeUnitId)
+
+    // Determine phase based on active unit
+    const phase: TacticalPhase = activeUnit?.isPlayer ? 'select_action' : 'enemy_turn'
+
+    set({
+      gridWidth: persistedState.gridWidth,
+      gridHeight: persistedState.gridHeight,
+      tiles: persistedState.tiles,
+      playerUnits,
+      enemyUnits,
+      turnQueue,
+      currentTurnIndex: persistedState.currentTurnIndex,
+      activeUnitId,
+      turnNumber: persistedState.turnNumber,
+      phase,
+      selectedTile: null,
+      highlightedTiles: [],
+      pendingAction: null,
+      isInitialized: true,
+      participationId
+    })
+  },
+
+  setParticipationId: (id: string | null) => {
+    set({ participationId: id })
   },
 
   selectTile: (position: GridPosition) => {
@@ -374,44 +466,31 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   },
 
   confirmAction: async () => {
-    const { pendingAction, activeUnitId, playerUnits, enemyUnits, tiles } = get()
+    const { pendingAction, activeUnitId, playerUnits, enemyUnits } = get()
     if (!pendingAction || !activeUnitId) return
 
     // Find the active unit
     const activeUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === activeUnitId)
     if (!activeUnit) return
 
-    // Clone tiles for mutation
-    const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
-
-    let newPosition = activeUnit.position
-
-    // Handle move action - update position
-    if (pendingAction.type === 'move' && pendingAction.path && pendingAction.path.length > 0) {
-      const destination = pendingAction.path[pendingAction.path.length - 1]
-
-      // Clear old tile occupant
-      const oldTile = updatedTiles[activeUnit.position.y]?.[activeUnit.position.x]
-      if (oldTile) {
-        oldTile.occupantId = null
-      }
-
-      // Set new tile occupant
-      const newTile = updatedTiles[destination.y]?.[destination.x]
-      if (newTile) {
-        newTile.occupantId = activeUnitId
-      }
-
-      newPosition = destination
+    // Handle move action - trigger animation
+    if (pendingAction.type === 'move' && pendingAction.path && pendingAction.path.length > 1) {
+      // Set animation state - the scene will pick this up and animate
+      set({
+        phase: 'animating',
+        animatingUnitId: activeUnitId,
+        animationPath: pendingAction.path,
+        highlightedTiles: []
+      })
+      // Don't update position yet - completeAnimation will do that
+      return
     }
 
-    // Update units
+    // For non-movement actions, update immediately
     const updatedPlayerUnits = playerUnits.map((unit) => {
       if (unit.id === activeUnitId) {
         return {
           ...unit,
-          position: newPosition,
-          hasMoved: pendingAction.type === 'move' ? true : unit.hasMoved,
           hasActed: pendingAction.type === 'attack' ? true : unit.hasActed
         }
       }
@@ -422,8 +501,6 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       if (unit.id === activeUnitId) {
         return {
           ...unit,
-          position: newPosition,
-          hasMoved: pendingAction.type === 'move' ? true : unit.hasMoved,
           hasActed: pendingAction.type === 'attack' ? true : unit.hasActed
         }
       }
@@ -431,7 +508,6 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     })
 
     set({
-      tiles: updatedTiles,
       playerUnits: updatedPlayerUnits,
       enemyUnits: updatedEnemyUnits,
       pendingAction: null,
@@ -500,6 +576,82 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     }))
   },
 
+  completeAnimation: () => {
+    const { animatingUnitId, animationPath, playerUnits, enemyUnits, tiles } = get()
+    if (!animatingUnitId || !animationPath || animationPath.length < 2) {
+      // No animation to complete
+      set({
+        animatingUnitId: null,
+        animationPath: null,
+        phase: 'select_action',
+        pendingAction: null
+      })
+      return
+    }
+
+    const destination = animationPath[animationPath.length - 1]
+
+    // Find the unit that was animating
+    const activeUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === animatingUnitId)
+    if (!activeUnit) {
+      set({
+        animatingUnitId: null,
+        animationPath: null,
+        phase: 'select_action',
+        pendingAction: null
+      })
+      return
+    }
+
+    // Clone tiles for mutation
+    const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
+
+    // Clear old tile occupant
+    const oldTile = updatedTiles[activeUnit.position.y]?.[activeUnit.position.x]
+    if (oldTile) {
+      oldTile.occupantId = null
+    }
+
+    // Set new tile occupant
+    const newTile = updatedTiles[destination.y]?.[destination.x]
+    if (newTile) {
+      newTile.occupantId = animatingUnitId
+    }
+
+    // Update units
+    const updatedPlayerUnits = playerUnits.map((unit) => {
+      if (unit.id === animatingUnitId) {
+        return {
+          ...unit,
+          position: destination,
+          hasMoved: true
+        }
+      }
+      return unit
+    })
+
+    const updatedEnemyUnits = enemyUnits.map((unit) => {
+      if (unit.id === animatingUnitId) {
+        return {
+          ...unit,
+          position: destination,
+          hasMoved: true
+        }
+      }
+      return unit
+    })
+
+    set({
+      tiles: updatedTiles,
+      playerUnits: updatedPlayerUnits,
+      enemyUnits: updatedEnemyUnits,
+      pendingAction: null,
+      animatingUnitId: null,
+      animationPath: null,
+      phase: 'select_action'
+    })
+  },
+
   reset: () => {
     const tiles = createDefaultGrid()
     const { playerUnits, enemyUnits } = createDefaultUnits()
@@ -529,7 +681,10 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       highlightedTiles: [],
       pendingAction: null,
       hoveredTile: null,
-      isInitialized: true
+      isInitialized: true,
+      animatingUnitId: null,
+      animationPath: null,
+      participationId: null
     })
   }
 }))

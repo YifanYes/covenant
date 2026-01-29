@@ -131,7 +131,12 @@
     "enemies": "Enemigos",
     "enemies_defeated": "Enemigos Derrotados",
     "error": {
-      "attack": "El ataque falló"
+      "attack": "El ataque falló",
+      "invalid_move": "Movimiento inválido",
+      "move_failed": "El movimiento falló",
+      "no_active_unit": "No hay unidad activa seleccionada",
+      "unit_not_found": "Unidad no encontrada",
+      "unknown": "Ocurrió un error desconocido"
     },
     "log": {
       "damage_to_enemy": "{{enemy}} recibe {{damage}} de daño",
