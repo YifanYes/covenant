@@ -32,6 +32,11 @@ export async function createGame(parent: HTMLElement): Promise<Phaser.Game> {
     render: {
       antialias: false,
       pixelArt: true
+    },
+    fps: {
+      target: 60,
+      min: 10, // Prevent complete throttling by browser
+      forceSetTimeOut: false // Use rAF but wake() ensures responsiveness
     }
   })
 

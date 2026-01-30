@@ -221,6 +221,13 @@ export class BootScene extends Phaser.Scene {
     unitGraphics.strokeCircle(16, 16, 14)
     unitGraphics.generateTexture('unit_enemy', 32, 32)
 
+    // Hit spark particle (small bright circle for impact effects)
+    const particleGraphics = this.make.graphics({ x: 0, y: 0 })
+    particleGraphics.fillStyle(0xffffff)
+    particleGraphics.fillCircle(4, 4, 4)
+    particleGraphics.generateTexture('particle_spark', 8, 8)
+    particleGraphics.destroy()
+
     // Cleanup
     tileGraphics.destroy()
     unitGraphics.destroy()

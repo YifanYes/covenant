@@ -242,6 +242,12 @@ export class CombatScene extends Phaser.Scene {
     if (!this.isAnimating && !this.isAttackAnimating && !this.isDoctrineAnimating) {
       this.syncUnits([...state.playerUnits, ...state.enemyUnits])
     }
+
+    // Wake up the game loop to ensure render happens immediately
+    // This prevents browser rAF throttling from delaying unit visibility
+    if (this.game?.loop) {
+      this.game.loop.wake()
+    }
   }
 
   private async handleMovementAnimation(unitId: string, path: GridPosition[]): Promise<void> {
@@ -297,6 +303,7 @@ export class CombatScene extends Phaser.Scene {
       if (data.damageDealt > 0) {
         const damagePromise = target.animateDamage(data.damageDealt)
         this.showDamageNumber(target, data.damageDealt)
+        this.playHitSparks(target, this.getShakeIntensity(data.damageDealt, data.targetKilled))
         this.shakeCamera(this.getShakeIntensity(data.damageDealt, data.targetKilled))
         await damagePromise
       }
@@ -310,6 +317,7 @@ export class CombatScene extends Phaser.Scene {
       if (data.damageToAttacker > 0) {
         const attackerDamagePromise = attacker.animateDamage(data.damageToAttacker)
         this.showDamageNumber(attacker, data.damageToAttacker)
+        this.playHitSparks(attacker, this.getShakeIntensity(data.damageToAttacker, data.attackerKilled))
         this.shakeCamera(this.getShakeIntensity(data.damageToAttacker, data.attackerKilled))
         await attackerDamagePromise
 
@@ -370,6 +378,7 @@ export class CombatScene extends Phaser.Scene {
         if (effect.damageDealt && effect.damageDealt > 0) {
           const damagePromise = targetUnit.animateDamage(effect.damageDealt)
           this.showDamageNumber(targetUnit, effect.damageDealt)
+          this.playHitSparks(targetUnit, this.getShakeIntensity(effect.damageDealt, effect.killed ?? false))
           maxDamage = Math.max(maxDamage, effect.damageDealt)
           await damagePromise
         }
@@ -425,6 +434,40 @@ export class CombatScene extends Phaser.Scene {
     if (damage >= 15) return 'heavy'
     if (damage >= 8) return 'medium'
     return 'light'
+  }
+
+  /**
+   * Play hit spark particles at a unit's position.
+   * @param unit The unit being hit
+   * @param intensity How many particles to emit (scales with damage)
+   */
+  private playHitSparks(unit: Unit, intensity: 'light' | 'medium' | 'heavy' = 'medium'): void {
+    if (!this.isSceneActive()) return
+
+    const particleCount = { light: 6, medium: 10, heavy: 16 }[intensity]
+    const speedRange = { light: [80, 120], medium: [100, 160], heavy: [120, 200] }[intensity]
+
+    // Create particle emitter at unit position
+    const particles = this.add.particles(unit.x, unit.y - 10, 'particle_spark', {
+      lifespan: { min: 200, max: 400 },
+      speed: { min: speedRange[0], max: speedRange[1] },
+      angle: { min: 200, max: 340 }, // Upward spread
+      scale: { start: 0.8, end: 0 },
+      alpha: { start: 1, end: 0 },
+      gravityY: 300,
+      tint: [0xffffff, 0xffff88, 0xffaa44], // White to yellow to orange
+      emitting: false
+    })
+
+    particles.setDepth(DEPTH_LAYERS.EFFECTS)
+
+    // Emit burst of particles
+    particles.explode(particleCount)
+
+    // Clean up after particles fade
+    this.time.delayedCall(500, () => {
+      particles.destroy()
+    })
   }
 
   /**
@@ -734,6 +777,10 @@ export class CombatScene extends Phaser.Scene {
           const existingUnit = this.units.get(unitData.id)
           if (existingUnit && this.textures.exists(customTextureKey)) {
             existingUnit.setCustomSprite(customTextureKey)
+          }
+          // Wake up game loop to render the new texture immediately
+          if (this.game?.loop) {
+            this.game.loop.wake()
           }
         })
         this.load.start()

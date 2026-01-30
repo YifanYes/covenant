@@ -540,91 +540,19 @@ shared/
 
 ### [ ] Phase 7: Polish
 
-**Goal:** Visual quality, game feel, and performance
+**Goal:** Visual quality and performance
 
-#### 7.1 Animation Enhancements
+#### 7.1 Visual Effects
 
-| Task                     | Description                                                                                    |
-| ------------------------ | ---------------------------------------------------------------------------------------------- |
-| Sprite animation system  | Replace placeholder circles with animated sprite sheets (idle, walk, attack, cast, hit, death) |
-| Idle breathing animation | Subtle scale oscillation (1.0 → 1.02 → 1.0) on all units to make them feel alive               |
-| Direction facing         | Units face their movement direction and attack targets; flip sprites horizontally for E/W      |
-| Hit stagger              | Brief recoil animation (50ms pushback) when taking damage                                      |
+| Task                        | Description                                                                       | Status |
+| --------------------------- | --------------------------------------------------------------------------------- | ------ |
+| Screen shake                | Camera shake on heavy attacks (intensity based on damage), deaths, and AoE spells | ✅     |
+| Idle breathing animation    | Subtle scale oscillation (1.0 → 1.02 → 1.0) on all units to make them feel alive  | ✅     |
+| Hit sparks/particles        | Particle burst on melee impacts, projectile trails for ranged attacks             | ✅     |
+| Status effect overlays      | Visual indicators on units: poison drip, burn flames, ice crystals, shield glow   |        |
+| Particle effects for spells | Fire embers, ice shards, lightning arcs, holy rays, dark tendrils                 |        |
 
-#### 7.2 Visual Effects
-
-| Task                        | Description                                                                       |
-| --------------------------- | --------------------------------------------------------------------------------- |
-| Screen shake                | Camera shake on heavy attacks (intensity based on damage), deaths, and AoE spells |
-| Hit sparks/particles        | Particle burst on melee impacts, projectile trails for ranged attacks             |
-| Critical hit effects        | Larger damage numbers, special flash effect, screen shake amplified               |
-| Status effect overlays      | Visual indicators on units: poison drip, burn flames, ice crystals, shield glow   |
-| Particle effects for spells | Fire embers, ice shards, lightning arcs, holy rays, dark tendrils                 |
-
-**Screen Shake Implementation:**
-
-```typescript
-function shakeCamera(scene: Phaser.Scene, intensity: 'light' | 'medium' | 'heavy'): void {
-  const config = {
-    light: { intensity: 0.005, duration: 100 },
-    medium: { intensity: 0.01, duration: 150 },
-    heavy: { intensity: 0.02, duration: 200 }
-  }
-  const { intensity: i, duration } = config[intensity]
-  scene.cameras.main.shake(duration, i)
-}
-
-// Usage
-shakeCamera(this, damage >= 20 ? 'heavy' : damage >= 10 ? 'medium' : 'light')
-```
-
-#### 7.3 Movement & Targeting UX
-
-| Task                   | Description                                                             |
-| ---------------------- | ----------------------------------------------------------------------- |
-| Movement ghost preview | Semi-transparent unit sprite at destination tile before confirming move |
-| Camera follow          | Auto-pan to active unit at turn start; smooth follow during movement    |
-| Path preview dots      | Small dots along movement path showing exact route                      |
-
-**Movement Ghost Implementation:**
-
-```typescript
-interface MovementGhost {
-  sprite: Phaser.GameObjects.Sprite
-  show(position: GridPosition): void
-  hide(): void
-}
-
-// In CombatScene
-private movementGhost: MovementGhost
-
-createMovementGhost(): void {
-  this.movementGhost = {
-    sprite: this.add.sprite(0, 0, 'unit_player')
-      .setAlpha(0.4)
-      .setVisible(false)
-      .setDepth(DEPTH.UNITS - 1),
-    show(pos) {
-      const screen = gridToScreen(pos.x, pos.y)
-      this.sprite.setPosition(screen.x, screen.y).setVisible(true)
-    },
-    hide() {
-      this.sprite.setVisible(false)
-    }
-  }
-}
-
-// Show ghost when hovering valid move tile
-onTileHover(pos: GridPosition): void {
-  if (this.isValidMoveDestination(pos)) {
-    this.movementGhost.show(pos)
-  } else {
-    this.movementGhost.hide()
-  }
-}
-```
-
-#### 7.4 Performance Optimization
+#### 7.2 Performance & UX
 
 | Task              | Description                                                                     |
 | ----------------- | ------------------------------------------------------------------------------- |
@@ -765,33 +693,30 @@ update(): void {
 }
 ```
 
-#### 7.5 Deliverables
+#### 7.3 Deliverables
 
-- Units animate smoothly with direction awareness
-- Combat feels impactful with screen shake, particles, and hit effects
-- Critical hits are visually distinct and satisfying
+- ✅ Screen shake on impacts
+- ✅ Units feel alive with idle breathing
 - Status effects are immediately visible on affected units
-- Movement preview eliminates misclick frustration
+- Combat feels impactful with particles and hit effects
 - Stable 60fps on mid-range devices
 - No GC stutters during combat
 
-#### 7.6 Implementation Order
+#### 7.4 Implementation Order
 
 Ordered by dependency chain and testability. Each item is independently verifiable before moving to the next.
 
-| #   | Task                               | Files to Modify            | How to Test                             | Status |
-| --- | ---------------------------------- | -------------------------- | --------------------------------------- | ------ |
-| 1   | [x] Screen shake                   | `combat-scene.ts`          | Attack enemy, take damage, kill enemy   |        |
-| 2   | [x] Idle breathing                 | `unit.ts`                  | Watch any unit idle for 2 seconds       |        |
-| 3   | [ ] Critical hit effects           | `combat-scene.ts`, store   | Attack until crit (or add debug)        |        |
-| 4   | [ ] Movement ghost preview         | `combat-scene.ts`          | Select Move, hover over valid tiles     |        |
-| 5   | [ ] Camera follow on turn start    | `combat-scene.ts`          | End turn, watch camera pan to next unit |        |
-| 6   | [ ] Direction facing               | `unit.ts`                  | Move unit, attack different directions  |        |
-| 7   | [ ] Hit sparks (basic particles)   | `combat-scene.ts`          | Attack enemy, see particle burst        |        |
-| 8   | [ ] Status effect overlays         | `unit.ts`, `boot-scene.ts` | Cast doctrine with status effect        |        |
-| 9   | [ ] Object pooling (floating text) | `combat-scene.ts`          | Spam attacks, check DevTools memory     |        |
-| 10  | [ ] Animation queue                | `combat-scene.ts`          | Rapid actions, no visual glitches       |        |
-| 11  | [ ] Tile culling                   | `grid-system.ts`           | Zoom out fully, check FPS stable        |        |
+| #   | Task                               | Files to Modify            | How to Test                         | Status |
+| --- | ---------------------------------- | -------------------------- | ----------------------------------- | ------ |
+| 1   | [x] Screen shake                   | `combat-scene.ts`          | Attack enemy, take damage, kill enemy | ✅   |
+| 2   | [x] Idle breathing                 | `unit.ts`                  | Watch any unit idle for 2 seconds     | ✅   |
+| 3   | [x] Hit sparks (basic particles)   | `combat-scene.ts`          | Attack enemy, see particle burst    | ✅     |
+| 4   | [ ] Status effect overlays         | `unit.ts`, `boot-scene.ts` | Cast doctrine with status effect    |        |
+| 5   | [ ] Particle effects for spells    | `combat-scene.ts`          | Cast doctrine, see spell particles  |        |
+| 6   | [ ] Object pooling (floating text) | `combat-scene.ts`          | Spam attacks, check DevTools memory |        |
+| 7   | [ ] Animation queue                | `combat-scene.ts`          | Rapid actions, no visual glitches   |        |
+| 8   | [ ] Tile culling                   | `grid-system.ts`           | Zoom out fully, check FPS stable    |        |
+| 9   | [ ] Loading skeleton               | React components           | Refresh page, see skeleton UI       |        |
 
 **Workflow:**
 

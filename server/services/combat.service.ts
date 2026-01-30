@@ -113,21 +113,31 @@ export class CombatService {
 
     const currentClass = this.getCurrentClassOrThrow(character)
 
+    // Check if there's an active tactical combat - use tactical state health if so
+    // IMPORTANT: Use character.id (main character ID), NOT currentClass.id (class ID)
+    const participation = await this.activityParticipationRepository.findActiveByCharacterId(character.id)
+    const playerUnit = participation?.tacticalState?.units?.find((u) => u.id.startsWith('player-'))
+
+    // Use tactical combat health if in tactical combat, otherwise use database health
+    const currentHealth = playerUnit?.currentHealth ?? currentClass.health
+    const maxHealth = playerUnit?.maxHealth ?? currentClass.maxHealth
+
     let healthRestored = 0
     let manaRestored = 0
 
     if (consumable.effect.healHealth) {
-      healthRestored = Math.min(consumable.effect.healHealth, currentClass.maxHealth - currentClass.health)
+      healthRestored = Math.min(consumable.effect.healHealth, maxHealth - currentHealth)
     }
     if (consumable.effect.healMana) {
       manaRestored = Math.min(consumable.effect.healMana, currentClass.maxMana - currentClass.mana)
     }
 
-    const newHealth = currentClass.health + healthRestored
+    // Update database health (add to existing DB health, not tactical health)
+    const newDbHealth = currentClass.health + healthRestored
     const newMana = currentClass.mana + manaRestored
+    await this.characterRepository.updateHealth(currentClass.id, newDbHealth, newMana)
 
-    await this.characterRepository.updateHealth(currentClass.id, newHealth, newMana)
-
+    // Remove consumable from inventory
     const newInventory = [...inventory]
     newInventory.splice(itemIndex, 1)
     await this.characterRepository.updateInventoryAndLoadout(
@@ -135,6 +145,24 @@ export class CombatService {
       newInventory,
       character.loadout as unknown as InventoryItem[]
     )
+
+    // Update tactical combat state if there's an active tactical combat
+    if (participation?.tacticalState?.units && playerUnit && healthRestored > 0) {
+      const units = [...participation.tacticalState.units]
+      const playerUnitIndex = units.findIndex((u) => u.id.startsWith('player-'))
+
+      if (playerUnitIndex !== -1) {
+        units[playerUnitIndex] = {
+          ...units[playerUnitIndex],
+          currentHealth: Math.min(playerUnit.currentHealth + healthRestored, playerUnit.maxHealth)
+        }
+
+        await this.activityParticipationRepository.updateTacticalState(participation.id, {
+          ...participation.tacticalState,
+          units
+        })
+      }
+    }
 
     return {
       success: true,
@@ -511,10 +539,18 @@ export class CombatService {
 
     // Log doctrine buff if active
     if (buffs.bonusDice > 0 || buffs.thresholdMod !== 0 || buffs.guaranteedCritical || buffs.criticalThresholdMod > 0) {
+      // Find the source doctrine ID(s) that contributed these buffs
+      const sourceDoctrineIds = Object.keys(attackerUnit.activeDoctrines || {}).filter((docId) => {
+        const effect = attackerUnit.activeDoctrines?.[docId]
+        return effect && effect.remainingTurns > 0 && !docId.includes('_bonus')
+      })
+      const sourceDoctrineId = sourceDoctrineIds[0] || 'unknown'
+
       logEntries.push({
         timestamp: timestamp + 0.5,
         type: CombatLogType.DOCTRINE_EFFECT,
         data: {
+          doctrine: sourceDoctrineId,
           effect: buffs.guaranteedCritical ? 'guaranteed_critical' : buffs.thresholdMod !== 0 ? 'threshold_reduction' : 'power_boost',
           bonusDice: buffs.bonusDice,
           sixesGenerateExtraHits: buffs.sixesGenerateExtraHits,
@@ -734,10 +770,11 @@ export class CombatService {
     }
 
     // Create updated state
+    // Keep dead players (for death dialog), but remove dead enemies
     const updatedState: TacticalStateData = {
       ...state,
       tiles: updatedTiles,
-      units: updatedUnits.filter((u) => u.currentHealth > 0),
+      units: updatedUnits.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0),
       turnOrder: updatedTurnOrder,
       currentTurnIndex: updatedCurrentTurnIndex
     }
@@ -1423,7 +1460,8 @@ export class CombatService {
         if (updatedTiles[targetPos.y]?.[targetPos.x]) {
           updatedTiles[targetPos.y][targetPos.x].occupantId = null
         }
-        updatedUnits = updatedUnits.filter((u) => u.currentHealth > 0)
+        // Keep dead players (for death dialog), but remove dead enemies
+        updatedUnits = updatedUnits.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0)
 
         logEntries.push({
           timestamp: timestamp + 5,
@@ -2087,11 +2125,11 @@ export class CombatService {
       }
     }
 
-    // Filter out dead units
-    updatedUnits = updatedUnits.filter((u) => u.currentHealth > 0)
+    // Filter out dead enemies, but keep dead players (for death dialog)
+    updatedUnits = updatedUnits.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0)
 
-    // Update turn order to remove dead units
-    const aliveUnitIds = new Set(updatedUnits.map((u) => u.id))
+    // Update turn order to remove dead units (including dead players)
+    const aliveUnitIds = new Set(updatedUnits.filter((u) => u.currentHealth > 0).map((u) => u.id))
     const updatedTurnOrder = state.turnOrder.filter((unitId) => aliveUnitIds.has(unitId))
 
     // Adjust current turn index if needed
