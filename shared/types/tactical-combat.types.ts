@@ -252,6 +252,11 @@ export interface EnemyTurnResult {
 
   // Mana regenerated at end of round
   manaRegenerated?: number
+
+  // Status effect damage taken at start of turn
+  statusEffectDamage?: number
+  // Whether enemy died from status effect damage
+  diedFromStatusEffect?: boolean
 }
 
 // Tactical doctrine execution result

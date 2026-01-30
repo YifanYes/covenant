@@ -56,6 +56,13 @@ interface PendingEnemyAttack {
   targetKilled: boolean
 }
 
+// Pending status effect damage (for turn start DoT effects)
+interface PendingStatusEffectDamage {
+  unitId: string
+  damage: number
+  killed: boolean
+}
+
 // Doctrine animation data
 interface DoctrineAnimationData {
   casterId: string
@@ -87,6 +94,7 @@ interface TacticalCombatStore extends TacticalCombatState {
 
   // Enemy turn state
   pendingEnemyAttack: PendingEnemyAttack | null
+  pendingStatusEffectDamage: PendingStatusEffectDamage | null
 
   // Doctrine state
   selectedDoctrineId: string | null
@@ -128,6 +136,10 @@ interface TacticalCombatStore extends TacticalCombatState {
     attackerId?: string,
     attackerDamage?: number
   ) => void
+
+  // Status effect damage actions
+  applyStatusEffectDamage: (unitId: string, damage: number, killed: boolean) => void
+  completeStatusEffectAnimation: () => void
 
   // Doctrine actions
   selectDoctrine: (doctrineId: string) => void
@@ -281,6 +293,7 @@ const initialState = (() => {
     attackAnimationData: null,
     isAttackAnimating: false,
     pendingEnemyAttack: null,
+    pendingStatusEffectDamage: null,
     selectedDoctrineId: null,
     doctrineAnimationData: null,
     isDoctrineAnimating: false
@@ -337,7 +350,8 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
         currentHealth: persistedUnit.currentHealth,
         maxHealth: persistedUnit.maxHealth,
         hasMoved: persistedUnit.hasMoved,
-        hasActed: persistedUnit.hasActed
+        hasActed: persistedUnit.hasActed,
+        activeEffects: persistedUnit.activeEffects ?? []
       })
     }
 
@@ -1208,6 +1222,60 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     })
   },
 
+  applyStatusEffectDamage: (unitId: string, damage: number, killed: boolean) => {
+    const { playerUnits, enemyUnits, tiles, turnQueue } = get()
+
+    // Update health
+    const updatedPlayerUnits = playerUnits.map((unit) => {
+      if (unit.id === unitId) {
+        return { ...unit, currentHealth: Math.max(0, unit.currentHealth - damage) }
+      }
+      return unit
+    })
+
+    let updatedEnemyUnits = enemyUnits.map((unit) => {
+      if (unit.id === unitId) {
+        return { ...unit, currentHealth: Math.max(0, unit.currentHealth - damage) }
+      }
+      return unit
+    })
+
+    // Update tiles and remove dead enemy from turn queue
+    const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
+    let updatedTurnQueue = turnQueue
+
+    if (killed) {
+      const targetUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === unitId)
+      if (targetUnit) {
+        const { x, y } = targetUnit.position
+        if (updatedTiles[y]?.[x]) {
+          updatedTiles[y][x].occupantId = null
+        }
+      }
+      // Remove dead enemies, but keep dead players (for death dialog)
+      const isPlayerTarget = unitId.startsWith('player-')
+      if (!isPlayerTarget) {
+        updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== unitId)
+        updatedTurnQueue = turnQueue.filter((u) => u.id !== unitId)
+      }
+    }
+
+    // Set pending status effect damage for visual feedback (no phase change)
+    // The hook will continue processing after a delay
+    set({
+      playerUnits: updatedPlayerUnits,
+      enemyUnits: updatedEnemyUnits,
+      tiles: updatedTiles,
+      turnQueue: updatedTurnQueue,
+      pendingStatusEffectDamage: { unitId, damage, killed }
+    })
+  },
+
+  completeStatusEffectAnimation: () => {
+    // Just clear the pending damage - hook handles what comes next
+    set({ pendingStatusEffectDamage: null })
+  },
+
   reset: () => {
     const tiles = createDefaultGrid()
     const { playerUnits, enemyUnits } = createDefaultUnits()
@@ -1245,6 +1313,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       attackAnimationData: null,
       isAttackAnimating: false,
       pendingEnemyAttack: null,
+      pendingStatusEffectDamage: null,
       selectedDoctrineId: null,
       doctrineAnimationData: null,
       isDoctrineAnimating: false

@@ -24,6 +24,7 @@ export class CombatScene extends Phaser.Scene {
   private isAnimating = false
   private isAttackAnimating = false
   private isDoctrineAnimating = false
+  private isStatusEffectAnimating = false
   private floatingTexts: Phaser.GameObjects.Text[] = []
   private spellEffects: Phaser.GameObjects.Graphics[] = []
 
@@ -238,6 +239,12 @@ export class CombatScene extends Phaser.Scene {
       return // Don't sync units during animation
     }
 
+    // Check for status effect damage animation (doesn't require animating phase)
+    if (state.pendingStatusEffectDamage && !this.isStatusEffectAnimating) {
+      this.handleStatusEffectDamage(state.pendingStatusEffectDamage)
+      // Continue to sync units - status effect animation runs independently
+    }
+
     // Update units (skip during animation as the unit is updating itself)
     if (!this.isAnimating && !this.isAttackAnimating && !this.isDoctrineAnimating) {
       this.syncUnits([...state.playerUnits, ...state.enemyUnits])
@@ -359,8 +366,8 @@ export class CombatScene extends Phaser.Scene {
     this.isDoctrineAnimating = true
 
     try {
-      // Play cast animation on caster (flash effect)
-      await this.playCastEffect(caster)
+      // Play cast animation on caster (flash effect with element-specific particles)
+      await this.playCastEffect(caster, data.doctrineId)
 
       // Show AoE effect on affected tiles
       await this.playAoEEffect(data.affectedTiles, data.doctrineId)
@@ -406,6 +413,41 @@ export class CombatScene extends Phaser.Scene {
       this.isDoctrineAnimating = false
       // Signal animation complete to store
       useTacticalCombatStore.getState().completeDoctrineAnimation()
+    }
+  }
+
+  /**
+   * Handle status effect damage at the start of a unit's turn (burn, poison, etc.).
+   */
+  private async handleStatusEffectDamage(data: {
+    unitId: string
+    damage: number
+    killed: boolean
+  }): Promise<void> {
+    const targetUnit = this.units.get(data.unitId)
+
+    if (!targetUnit) {
+      // Unit not found, complete animation immediately
+      useTacticalCombatStore.getState().completeStatusEffectAnimation()
+      return
+    }
+
+    this.isStatusEffectAnimating = true
+
+    try {
+      // Show damage number with fire/poison color (orange for burn)
+      this.showDamageNumber(targetUnit, data.damage)
+
+      // Play damage animation on the unit
+      await targetUnit.animateDamage(data.damage)
+
+      // Play death animation if killed
+      if (data.killed) {
+        await targetUnit.animateDeath()
+      }
+    } finally {
+      this.isStatusEffectAnimating = false
+      useTacticalCombatStore.getState().completeStatusEffectAnimation()
     }
   }
 
@@ -471,20 +513,51 @@ export class CombatScene extends Phaser.Scene {
   }
 
   /**
-   * Play a casting effect on the caster unit (flash/glow).
+   * Play a casting effect on the caster unit (flash/glow with element-specific particles).
    */
-  private async playCastEffect(unit: Unit): Promise<void> {
+  private async playCastEffect(unit: Unit, doctrineId?: string): Promise<void> {
     if (!this.isSceneActive()) {
       console.debug('[CombatScene] playCastEffect skipped: scene inactive')
       return
     }
 
+    const element = doctrineId ? this.getSpellElement(doctrineId) : 'default'
+    const colorMap = {
+      fire: 0xff6b35,
+      ice: 0x4fc3f7,
+      lightning: 0xffeb3b,
+      holy: 0xffd700,
+      dark: 0x7b1fa2,
+      default: 0xa855f7
+    }
+    const color = colorMap[element]
+
     return new Promise((resolve) => {
       // Create a flash effect
       const flash = this.add.graphics()
-      flash.fillStyle(0xa855f7, 0.5) // Purple for doctrine
+      flash.fillStyle(color, 0.5)
       flash.fillCircle(unit.x, unit.y, 30)
       flash.setDepth(DEPTH_LAYERS.EFFECTS)
+
+      // Add casting particles swirling around the caster
+      const particleKey = element === 'fire' ? 'particle_ember' :
+                          element === 'ice' ? 'particle_ice' :
+                          element === 'lightning' ? 'particle_lightning' :
+                          element === 'holy' ? 'particle_holy' :
+                          element === 'dark' ? 'particle_dark' :
+                          'particle_spark'
+
+      const castParticles = this.add.particles(unit.x, unit.y - 8, particleKey, {
+        lifespan: 300,
+        speed: { min: 40, max: 80 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 0.6, end: 0 },
+        alpha: { start: 0.8, end: 0 },
+        tint: color,
+        emitting: false
+      })
+      castParticles.setDepth(DEPTH_LAYERS.EFFECTS)
+      castParticles.explode(8)
 
       // Animate the flash expanding and fading
       this.tweens.add({
@@ -496,6 +569,7 @@ export class CombatScene extends Phaser.Scene {
         ease: 'Quad.easeOut',
         onComplete: () => {
           flash.destroy()
+          castParticles.destroy()
           resolve()
         }
       })
@@ -503,7 +577,30 @@ export class CombatScene extends Phaser.Scene {
   }
 
   /**
-   * Play an AoE effect on the affected tiles.
+   * Determine the spell element type from doctrine ID.
+   */
+  private getSpellElement(doctrineId: string): 'fire' | 'ice' | 'lightning' | 'holy' | 'dark' | 'default' {
+    const id = doctrineId.toLowerCase()
+    if (id.includes('fire') || id.includes('igneous') || id.includes('combustion') || id.includes('burn') || id.includes('flame')) {
+      return 'fire'
+    }
+    if (id.includes('ice') || id.includes('frost') || id.includes('freeze') || id.includes('cold')) {
+      return 'ice'
+    }
+    if (id.includes('lightning') || id.includes('storm') || id.includes('thunder') || id.includes('shock')) {
+      return 'lightning'
+    }
+    if (id.includes('holy') || id.includes('divine') || id.includes('sacred') || id.includes('light') || id.includes('heal') || id.includes('purif')) {
+      return 'holy'
+    }
+    if (id.includes('black') || id.includes('void') || id.includes('dark') || id.includes('shadow') || id.includes('disruption') || id.includes('chaos')) {
+      return 'dark'
+    }
+    return 'default'
+  }
+
+  /**
+   * Play an AoE effect on the affected tiles with element-specific particles.
    */
   private async playAoEEffect(tiles: GridPosition[], doctrineId: string): Promise<void> {
     if (tiles.length === 0) return
@@ -512,44 +609,40 @@ export class CombatScene extends Phaser.Scene {
       return
     }
 
+    const element = this.getSpellElement(doctrineId)
+
+    // Play element-specific particle effect
+    this.playSpellParticles(tiles, element)
+
+    // Play the base glow effect
     return new Promise((resolve) => {
-      // Determine color based on doctrine (could be expanded)
-      let color = 0xa855f7 // Default purple
-
-      // Fire-based doctrines
-      if (doctrineId.includes('fire') || doctrineId.includes('igneous') || doctrineId.includes('combustion')) {
-        color = 0xff6b35 // Orange/fire
-      }
-      // Ice-based doctrines
-      else if (doctrineId.includes('ice') || doctrineId.includes('frost')) {
-        color = 0x4fc3f7 // Light blue
-      }
-      // Lightning-based doctrines
-      else if (doctrineId.includes('lightning') || doctrineId.includes('storm')) {
-        color = 0xffeb3b // Yellow
-      }
-      // Dark/chaos doctrines
-      else if (doctrineId.includes('black') || doctrineId.includes('void') || doctrineId.includes('disruption')) {
-        color = 0x7b1fa2 // Dark purple
+      const colorMap = {
+        fire: 0xff6b35,
+        ice: 0x4fc3f7,
+        lightning: 0xffeb3b,
+        holy: 0xffd700,
+        dark: 0x7b1fa2,
+        default: 0xa855f7
       }
 
+      const color = colorMap[element]
       const graphics = this.add.graphics()
       this.spellEffects.push(graphics)
 
       // Draw effect on each affected tile
       for (const tile of tiles) {
         const screenPos = this.gridSystem.gridToScreen(tile.x, tile.y)
-        graphics.fillStyle(color, 0.6)
-        graphics.fillCircle(screenPos.x, screenPos.y - 16, 25)
+        graphics.fillStyle(color, 0.5)
+        graphics.fillCircle(screenPos.x, screenPos.y - 16, 28)
       }
 
-      graphics.setDepth(DEPTH_LAYERS.EFFECTS)
+      graphics.setDepth(DEPTH_LAYERS.EFFECTS - 1) // Behind particles
 
       // Animate and fade
       this.tweens.add({
         targets: graphics,
         alpha: 0,
-        duration: 500,
+        duration: 600,
         ease: 'Quad.easeOut',
         onComplete: () => {
           graphics.destroy()
@@ -561,6 +654,334 @@ export class CombatScene extends Phaser.Scene {
         }
       })
     })
+  }
+
+  /**
+   * Play element-specific particle effects for spells.
+   */
+  private playSpellParticles(tiles: GridPosition[], element: 'fire' | 'ice' | 'lightning' | 'holy' | 'dark' | 'default'): void {
+    if (!this.isSceneActive()) return
+
+    // Calculate center point of all affected tiles
+    const positions = tiles.map(tile => this.gridSystem.gridToScreen(tile.x, tile.y))
+
+    switch (element) {
+      case 'fire':
+        this.playFireEffect(positions)
+        break
+      case 'ice':
+        this.playIceEffect(positions)
+        break
+      case 'lightning':
+        this.playLightningEffect(positions)
+        break
+      case 'holy':
+        this.playHolyEffect(positions)
+        break
+      case 'dark':
+        this.playDarkEffect(positions)
+        break
+      default:
+        this.playDefaultMagicEffect(positions)
+        break
+    }
+  }
+
+  /**
+   * Fire spell effect - rising embers and flame burst.
+   */
+  private playFireEffect(positions: { x: number; y: number }[]): void {
+    for (const pos of positions) {
+      // Ember particles rising up
+      const embers = this.add.particles(pos.x, pos.y - 16, 'particle_ember', {
+        lifespan: { min: 400, max: 800 },
+        speed: { min: 40, max: 100 },
+        angle: { min: 240, max: 300 },
+        scale: { start: 0.9, end: 0.2 },
+        alpha: { start: 1, end: 0 },
+        gravityY: -50,
+        tint: [0xff6b35, 0xff4500, 0xffaa44],
+        emitting: false
+      })
+      embers.setDepth(DEPTH_LAYERS.EFFECTS)
+      embers.explode(12)
+
+      // Inner flame burst
+      const flames = this.add.particles(pos.x, pos.y - 16, 'particle_flame', {
+        lifespan: { min: 200, max: 400 },
+        speed: { min: 60, max: 120 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 1, end: 0.3 },
+        alpha: { start: 0.9, end: 0 },
+        tint: [0xff4500, 0xff6b35, 0xffa500],
+        emitting: false
+      })
+      flames.setDepth(DEPTH_LAYERS.EFFECTS)
+      flames.explode(8)
+
+      // Cleanup
+      this.time.delayedCall(900, () => {
+        embers.destroy()
+        flames.destroy()
+      })
+    }
+  }
+
+  /**
+   * Ice spell effect - expanding freeze ring and ice shards.
+   */
+  private playIceEffect(positions: { x: number; y: number }[]): void {
+    for (const pos of positions) {
+      // Ice shards shooting outward
+      const shards = this.add.particles(pos.x, pos.y - 16, 'particle_shard', {
+        lifespan: { min: 400, max: 700 },
+        speed: { min: 80, max: 150 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 0.8, end: 0.4 },
+        alpha: { start: 1, end: 0.3 },
+        rotate: { min: 0, max: 360 },
+        tint: [0xbae6fd, 0x7dd3fc, 0xe0f2fe],
+        emitting: false
+      })
+      shards.setDepth(DEPTH_LAYERS.EFFECTS)
+      shards.explode(10)
+
+      // Ice crystals floating up slowly
+      const crystals = this.add.particles(pos.x, pos.y - 10, 'particle_ice', {
+        lifespan: { min: 600, max: 900 },
+        speed: { min: 15, max: 35 },
+        angle: { min: 250, max: 290 },
+        scale: { start: 0.7, end: 0.3 },
+        alpha: { start: 0.9, end: 0 },
+        tint: [0xe0f2fe, 0xbae6fd, 0xffffff],
+        emitting: false
+      })
+      crystals.setDepth(DEPTH_LAYERS.EFFECTS)
+      crystals.explode(6)
+
+      // Freeze ring expanding outward
+      const ring = this.add.graphics()
+      ring.lineStyle(3, 0x7dd3fc, 0.8)
+      ring.strokeCircle(pos.x, pos.y - 16, 5)
+      ring.setDepth(DEPTH_LAYERS.EFFECTS)
+
+      this.tweens.add({
+        targets: ring,
+        scaleX: 6,
+        scaleY: 6,
+        alpha: 0,
+        duration: 400,
+        ease: 'Quad.easeOut',
+        onComplete: () => ring.destroy()
+      })
+
+      // Cleanup particles
+      this.time.delayedCall(1000, () => {
+        shards.destroy()
+        crystals.destroy()
+      })
+    }
+  }
+
+  /**
+   * Lightning spell effect - bright flashes and electric sparks.
+   */
+  private playLightningEffect(positions: { x: number; y: number }[]): void {
+    for (const pos of positions) {
+      // Bright initial flash
+      const flash = this.add.graphics()
+      flash.fillStyle(0xffffff, 0.9)
+      flash.fillCircle(pos.x, pos.y - 16, 35)
+      flash.setDepth(DEPTH_LAYERS.EFFECTS + 1)
+
+      this.tweens.add({
+        targets: flash,
+        alpha: 0,
+        duration: 100,
+        ease: 'Quad.easeOut',
+        onComplete: () => flash.destroy()
+      })
+
+      // Electric sparks shooting outward
+      const sparks = this.add.particles(pos.x, pos.y - 16, 'particle_lightning', {
+        lifespan: { min: 150, max: 300 },
+        speed: { min: 150, max: 300 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 1, end: 0.3 },
+        alpha: { start: 1, end: 0 },
+        tint: [0xffff88, 0xffffff, 0xffeb3b],
+        emitting: false
+      })
+      sparks.setDepth(DEPTH_LAYERS.EFFECTS)
+      sparks.explode(15)
+
+      // Secondary delayed burst
+      this.time.delayedCall(80, () => {
+        const sparks2 = this.add.particles(pos.x, pos.y - 16, 'particle_spark', {
+          lifespan: { min: 100, max: 200 },
+          speed: { min: 100, max: 200 },
+          angle: { min: 0, max: 360 },
+          scale: { start: 0.7, end: 0 },
+          alpha: { start: 1, end: 0 },
+          tint: [0xffffff, 0xffff88],
+          emitting: false
+        })
+        sparks2.setDepth(DEPTH_LAYERS.EFFECTS)
+        sparks2.explode(8)
+
+        this.time.delayedCall(300, () => sparks2.destroy())
+      })
+
+      // Cleanup
+      this.time.delayedCall(400, () => {
+        sparks.destroy()
+      })
+    }
+  }
+
+  /**
+   * Holy spell effect - golden rays radiating outward.
+   */
+  private playHolyEffect(positions: { x: number; y: number }[]): void {
+    for (const pos of positions) {
+      // Golden sparkles radiating outward
+      const sparkles = this.add.particles(pos.x, pos.y - 16, 'particle_holy', {
+        lifespan: { min: 500, max: 800 },
+        speed: { min: 30, max: 80 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 0.8, end: 0.2 },
+        alpha: { start: 1, end: 0 },
+        tint: [0xffd700, 0xffec8b, 0xfffacd],
+        emitting: false
+      })
+      sparkles.setDepth(DEPTH_LAYERS.EFFECTS)
+      sparkles.explode(12)
+
+      // Light rays shooting upward
+      const rays = this.add.particles(pos.x, pos.y - 20, 'particle_ray', {
+        lifespan: { min: 400, max: 600 },
+        speed: { min: 60, max: 100 },
+        angle: { min: 250, max: 290 },
+        scale: { start: 1, end: 0.4 },
+        alpha: { start: 0.9, end: 0 },
+        rotate: { min: -20, max: 20 },
+        tint: [0xffd700, 0xfffacd, 0xffffff],
+        emitting: false
+      })
+      rays.setDepth(DEPTH_LAYERS.EFFECTS)
+      rays.explode(6)
+
+      // Soft golden glow pulse
+      const glow = this.add.graphics()
+      glow.fillStyle(0xffd700, 0.4)
+      glow.fillCircle(pos.x, pos.y - 16, 15)
+      glow.setDepth(DEPTH_LAYERS.EFFECTS - 1)
+
+      this.tweens.add({
+        targets: glow,
+        scaleX: 3,
+        scaleY: 3,
+        alpha: 0,
+        duration: 500,
+        ease: 'Quad.easeOut',
+        onComplete: () => glow.destroy()
+      })
+
+      // Cleanup particles
+      this.time.delayedCall(900, () => {
+        sparkles.destroy()
+        rays.destroy()
+      })
+    }
+  }
+
+  /**
+   * Dark spell effect - swirling tendrils and imploding particles.
+   */
+  private playDarkEffect(positions: { x: number; y: number }[]): void {
+    for (const pos of positions) {
+      // Dark tendrils swirling inward
+      const tendrils = this.add.particles(pos.x, pos.y - 16, 'particle_dark', {
+        lifespan: { min: 500, max: 800 },
+        speed: { min: -60, max: -30 }, // Negative speed = imploding
+        angle: { min: 0, max: 360 },
+        scale: { start: 0.4, end: 0.9 },
+        alpha: { start: 0.3, end: 0.9 },
+        tint: [0x7b1fa2, 0x4a148c, 0x9c27b0],
+        emitting: false,
+        radial: true,
+        emitZone: {
+          type: 'edge',
+          source: new Phaser.Geom.Circle(0, 0, 40),
+          quantity: 16
+        } as Phaser.Types.GameObjects.Particles.EmitZoneData
+      })
+      tendrils.setDepth(DEPTH_LAYERS.EFFECTS)
+      tendrils.explode(16)
+
+      // Dark core pulsing
+      const core = this.add.graphics()
+      core.fillStyle(0x4a148c, 0.7)
+      core.fillCircle(pos.x, pos.y - 16, 20)
+      core.setDepth(DEPTH_LAYERS.EFFECTS - 1)
+
+      this.tweens.add({
+        targets: core,
+        scaleX: 0.3,
+        scaleY: 0.3,
+        alpha: 0,
+        duration: 600,
+        ease: 'Quad.easeIn',
+        onComplete: () => core.destroy()
+      })
+
+      // Void sparks at the end
+      this.time.delayedCall(400, () => {
+        const sparks = this.add.particles(pos.x, pos.y - 16, 'particle_spark', {
+          lifespan: { min: 200, max: 400 },
+          speed: { min: 80, max: 150 },
+          angle: { min: 0, max: 360 },
+          scale: { start: 0.6, end: 0 },
+          alpha: { start: 0.8, end: 0 },
+          tint: [0x7b1fa2, 0x9c27b0, 0xce93d8],
+          emitting: false
+        })
+        sparks.setDepth(DEPTH_LAYERS.EFFECTS)
+        sparks.explode(10)
+
+        this.time.delayedCall(500, () => sparks.destroy())
+      })
+
+      // Cleanup
+      this.time.delayedCall(900, () => {
+        tendrils.destroy()
+      })
+    }
+  }
+
+  /**
+   * Default magic effect - purple magical burst.
+   */
+  private playDefaultMagicEffect(positions: { x: number; y: number }[]): void {
+    for (const pos of positions) {
+      // Magic sparkles
+      const sparkles = this.add.particles(pos.x, pos.y - 16, 'particle_spark', {
+        lifespan: { min: 400, max: 700 },
+        speed: { min: 50, max: 120 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 0.7, end: 0.2 },
+        alpha: { start: 1, end: 0 },
+        tint: [0xa855f7, 0xc084fc, 0xe9d5ff],
+        emitting: false
+      })
+      sparkles.setDepth(DEPTH_LAYERS.EFFECTS)
+      sparkles.explode(10)
+
+      // Cleanup
+      this.time.delayedCall(800, () => {
+        sparkles.destroy()
+      })
+    }
   }
 
   /**

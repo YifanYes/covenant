@@ -122,4 +122,24 @@ export class ActivityParticipationRepository {
       tacticalState: result.tacticalState as unknown as TacticalStateData | null
     }
   }
+
+  async findByCharacterAndActivity(
+    characterId: string,
+    activityId: string
+  ): Promise<{
+    id: string
+    tacticalState: TacticalStateData | null
+  } | null> {
+    const result = await this.prisma.activityParticipation.findFirst({
+      where: { characterId, activityId },
+      select: { id: true, tacticalState: true }
+    })
+
+    if (!result) return null
+
+    return {
+      id: result.id,
+      tacticalState: result.tacticalState as unknown as TacticalStateData | null
+    }
+  }
 }

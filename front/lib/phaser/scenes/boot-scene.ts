@@ -268,6 +268,48 @@ export class BootScene extends Phaser.Scene {
     particleGraphics.fillTriangle(3, 0, 6, 3, 3, 6)
     particleGraphics.generateTexture('particle_ice', 6, 6)
 
+    // Spell effect particles
+
+    // Fire ember - larger glowing ember
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xff6b35)
+    particleGraphics.fillCircle(4, 4, 3)
+    particleGraphics.fillStyle(0xffaa44, 0.7)
+    particleGraphics.fillCircle(4, 4, 4)
+    particleGraphics.generateTexture('particle_ember', 8, 8)
+
+    // Lightning spark - bright jagged shape
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xffff88)
+    particleGraphics.fillCircle(3, 3, 2)
+    particleGraphics.fillStyle(0xffffff)
+    particleGraphics.fillCircle(3, 3, 1)
+    particleGraphics.generateTexture('particle_lightning', 6, 6)
+
+    // Dark tendril - purple wisp
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0x7b1fa2)
+    particleGraphics.fillCircle(3, 4, 2)
+    particleGraphics.fillStyle(0x4a148c, 0.7)
+    particleGraphics.fillCircle(3, 3, 3)
+    particleGraphics.generateTexture('particle_dark', 6, 8)
+
+    // Holy ray - golden streak
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xffd700)
+    particleGraphics.fillRect(0, 2, 8, 2)
+    particleGraphics.fillStyle(0xfffacd)
+    particleGraphics.fillRect(1, 2, 6, 2)
+    particleGraphics.generateTexture('particle_ray', 8, 6)
+
+    // Ice shard - angular crystal
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xbae6fd)
+    particleGraphics.fillTriangle(3, 0, 0, 6, 6, 6)
+    particleGraphics.fillStyle(0xe0f2fe, 0.8)
+    particleGraphics.fillTriangle(3, 1, 1, 5, 5, 5)
+    particleGraphics.generateTexture('particle_shard', 6, 6)
+
     particleGraphics.destroy()
 
     // Cleanup
