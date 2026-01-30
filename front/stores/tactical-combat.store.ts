@@ -76,6 +76,7 @@ interface TacticalCombatStore extends TacticalCombatState {
   // UI state (not in base TacticalCombatState)
   hoveredTile: GridPosition | null
   isInitialized: boolean
+  isSceneReady: boolean
   animatingUnitId: string | null
   animationPath: GridPosition[] | null
   participationId: string | null
@@ -93,6 +94,7 @@ interface TacticalCombatStore extends TacticalCombatState {
   isDoctrineAnimating: boolean
 
   // Actions
+  setSceneReady: (ready: boolean) => void
   initializeCombat: (data: TacticalInitData, participationId?: string) => void
   hydrateFromState: (
     persistedState: TacticalStateData,
@@ -134,7 +136,7 @@ interface TacticalCombatStore extends TacticalCombatState {
   completeDoctrineAnimation: () => void
 
   // Self-buff doctrine actions
-  applySelfBuffDoctrine: (unitId: string, doctrineId: string, bonusDice: number) => void
+  applySelfBuffDoctrine: (unitId: string, doctrineId: string) => void
   getActiveUnitBonusDice: () => { bonusDice: number; sixesGenerateExtraHits: boolean }
   clearActiveUnitDoctrines: () => void
 }
@@ -272,6 +274,7 @@ const initialState = (() => {
     pendingAction: null,
     hoveredTile: null,
     isInitialized: true,
+    isSceneReady: false,
     animatingUnitId: null,
     animationPath: null,
     participationId: null,
@@ -286,6 +289,10 @@ const initialState = (() => {
 
 export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => ({
   ...initialState,
+
+  setSceneReady: (ready: boolean) => {
+    set({ isSceneReady: ready })
+  },
 
   initializeCombat: (data: TacticalInitData, participationId?: string) => {
     const allUnits = [...data.playerUnits, ...data.enemyUnits]
@@ -970,7 +977,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     })
 
     // Update tiles to remove dead units
-    let updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
+    const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
 
     if (targetKilled) {
       const targetUnit = [...playerUnits, ...enemyUnits].find((u) => u.id === targetId)
@@ -1222,6 +1229,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       pendingAction: null,
       hoveredTile: null,
       isInitialized: true,
+      isSceneReady: false,
       animatingUnitId: null,
       animationPath: null,
       participationId: null,
@@ -1394,8 +1402,8 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   },
 
   // Self-buff doctrine actions
-  applySelfBuffDoctrine: (unitId: string, doctrineId: string, bonusDice: number) => {
-    const { playerUnits, enemyUnits } = get()
+  applySelfBuffDoctrine: (unitId: string, doctrineId: string) => {
+    const { playerUnits } = get()
 
     // Create the active doctrine effect
     const activeEffect: ActiveStatusEffect = {
@@ -1444,8 +1452,8 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
             doctrineEffect.target === DoctrineTarget.SELF) {
           bonusDice += doctrineEffect.value || 0
 
-          // Stellar Collapse has the special rule that 6s generate extra hits
-          if (effect.sourceDoctrineId === 'stellar_collapse') {
+          // Check if this effect has the sixesGenerateExtraHits property
+          if (doctrineEffect.sixesGenerateExtraHits) {
             sixesGenerateExtraHits = true
           }
         }

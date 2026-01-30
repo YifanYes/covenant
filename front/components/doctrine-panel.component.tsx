@@ -166,19 +166,19 @@ export default function DoctrinePanel({
 
   // For combat: only show equipped doctrines
   if (showUseControls && !showEquipControls) {
-    if (equippedDoctrines.length === 0) {
-      return null
-    }
-
     if (horizontal) {
       return (
         <div className={cn('p-3', className)}>
           <div className='mb-2 text-xs font-medium tracking-wider text-purple-500/80 uppercase'>
             {t('doctrines.title')}
           </div>
-          <div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
-            {equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}
-          </div>
+          {equippedDoctrines.length === 0 ? (
+            <p className='text-muted-foreground text-sm'>{t('doctrines.empty_equipped')}</p>
+          ) : (
+            <div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
+              {equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}
+            </div>
+          )}
         </div>
       )
     }
@@ -188,7 +188,11 @@ export default function DoctrinePanel({
         <div className='mb-2 text-sm font-medium tracking-wider text-purple-500/80 uppercase'>
           {t('doctrines.title')}
         </div>
-        <div className='space-y-2'>{equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}</div>
+        {equippedDoctrines.length === 0 ? (
+          <p className='text-muted-foreground text-sm'>{t('doctrines.empty_equipped')}</p>
+        ) : (
+          <div className='space-y-2'>{equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}</div>
+        )}
       </div>
     )
   }
