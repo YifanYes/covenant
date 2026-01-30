@@ -221,6 +221,97 @@ export class BootScene extends Phaser.Scene {
     unitGraphics.strokeCircle(16, 16, 14)
     unitGraphics.generateTexture('unit_enemy', 32, 32)
 
+    // Hit spark particle (small bright circle for impact effects)
+    const particleGraphics = this.make.graphics({ x: 0, y: 0 })
+    particleGraphics.fillStyle(0xffffff)
+    particleGraphics.fillCircle(4, 4, 4)
+    particleGraphics.generateTexture('particle_spark', 8, 8)
+
+    // Status effect particles
+    // Burning - orange/red flame particle
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xff6b35)
+    particleGraphics.fillCircle(3, 3, 3)
+    particleGraphics.generateTexture('particle_flame', 6, 6)
+
+    // Poisoned - green droplet particle
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0x22c55e)
+    particleGraphics.fillCircle(2, 3, 2)
+    particleGraphics.fillTriangle(2, 0, 0, 3, 4, 3) // Droplet top
+    particleGraphics.generateTexture('particle_poison', 5, 6)
+
+    // Purified - golden holy sparkle
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xffd700)
+    particleGraphics.fillCircle(3, 3, 2)
+    // Small cross/star shape
+    particleGraphics.fillRect(2, 0, 2, 6)
+    particleGraphics.fillRect(0, 2, 6, 2)
+    particleGraphics.generateTexture('particle_holy', 6, 6)
+
+    // Stunned - yellow star particle
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xfbbf24)
+    // Simple 4-point star
+    particleGraphics.fillTriangle(4, 0, 3, 4, 5, 4) // Top
+    particleGraphics.fillTriangle(8, 4, 4, 3, 4, 5) // Right
+    particleGraphics.fillTriangle(4, 8, 5, 4, 3, 4) // Bottom
+    particleGraphics.fillTriangle(0, 4, 4, 5, 4, 3) // Left
+    particleGraphics.generateTexture('particle_stun', 8, 8)
+
+    // Immobilized - ice crystal particle (light blue)
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0x7dd3fc)
+    // Diamond shape for ice crystal
+    particleGraphics.fillTriangle(3, 0, 0, 3, 3, 6)
+    particleGraphics.fillTriangle(3, 0, 6, 3, 3, 6)
+    particleGraphics.generateTexture('particle_ice', 6, 6)
+
+    // Spell effect particles
+
+    // Fire ember - larger glowing ember
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xff6b35)
+    particleGraphics.fillCircle(4, 4, 3)
+    particleGraphics.fillStyle(0xffaa44, 0.7)
+    particleGraphics.fillCircle(4, 4, 4)
+    particleGraphics.generateTexture('particle_ember', 8, 8)
+
+    // Lightning spark - bright jagged shape
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xffff88)
+    particleGraphics.fillCircle(3, 3, 2)
+    particleGraphics.fillStyle(0xffffff)
+    particleGraphics.fillCircle(3, 3, 1)
+    particleGraphics.generateTexture('particle_lightning', 6, 6)
+
+    // Dark tendril - purple wisp
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0x7b1fa2)
+    particleGraphics.fillCircle(3, 4, 2)
+    particleGraphics.fillStyle(0x4a148c, 0.7)
+    particleGraphics.fillCircle(3, 3, 3)
+    particleGraphics.generateTexture('particle_dark', 6, 8)
+
+    // Holy ray - golden streak
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xffd700)
+    particleGraphics.fillRect(0, 2, 8, 2)
+    particleGraphics.fillStyle(0xfffacd)
+    particleGraphics.fillRect(1, 2, 6, 2)
+    particleGraphics.generateTexture('particle_ray', 8, 6)
+
+    // Ice shard - angular crystal
+    particleGraphics.clear()
+    particleGraphics.fillStyle(0xbae6fd)
+    particleGraphics.fillTriangle(3, 0, 0, 6, 6, 6)
+    particleGraphics.fillStyle(0xe0f2fe, 0.8)
+    particleGraphics.fillTriangle(3, 1, 1, 5, 5, 5)
+    particleGraphics.generateTexture('particle_shard', 6, 6)
+
+    particleGraphics.destroy()
+
     // Cleanup
     tileGraphics.destroy()
     unitGraphics.destroy()

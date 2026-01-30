@@ -103,4 +103,43 @@ export class ActivityParticipationRepository {
 
     return result
   }
+
+  async findActiveByCharacterId(characterId: string): Promise<{
+    id: string
+    characterId: string
+    tacticalState: TacticalStateData | null
+  } | null> {
+    const result = await this.prisma.activityParticipation.findFirst({
+      where: { characterId },
+      select: { id: true, characterId: true, tacticalState: true }
+    })
+
+    if (!result) return null
+
+    return {
+      id: result.id,
+      characterId: result.characterId,
+      tacticalState: result.tacticalState as unknown as TacticalStateData | null
+    }
+  }
+
+  async findByCharacterAndActivity(
+    characterId: string,
+    activityId: string
+  ): Promise<{
+    id: string
+    tacticalState: TacticalStateData | null
+  } | null> {
+    const result = await this.prisma.activityParticipation.findFirst({
+      where: { characterId, activityId },
+      select: { id: true, tacticalState: true }
+    })
+
+    if (!result) return null
+
+    return {
+      id: result.id,
+      tacticalState: result.tacticalState as unknown as TacticalStateData | null
+    }
+  }
 }
