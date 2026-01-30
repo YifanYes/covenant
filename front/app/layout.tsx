@@ -49,7 +49,7 @@ export default async function RootLayout({
   const headerStore = await headers()
 
   const theme = cookieStore.get('theme')?.value || 'light'
-  const faction = cookieStore.get('arq-faction-theme')?.value || 'holy-knights'
+  const faction = cookieStore.get('arq-faction-theme')?.value || Faction.HOLY_KNIGHTS
   const lang = cookieStore.get('i18nextLng')?.value || getParsedHeadersLang(headerStore.get('accept-language'))
 
   const factionClass = `faction-${faction.toLowerCase().replace(/_/g, '-')}`
