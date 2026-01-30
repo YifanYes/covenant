@@ -334,6 +334,8 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       hydratedUnits.push({
         ...template,
         position: persistedUnit.position,
+        currentHealth: persistedUnit.currentHealth,
+        maxHealth: persistedUnit.maxHealth,
         hasMoved: persistedUnit.hasMoved,
         hasActed: persistedUnit.hasActed
       })
@@ -987,9 +989,11 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
           updatedTiles[y][x].occupantId = null
         }
       }
-      // Remove dead unit
-      updatedPlayerUnits = updatedPlayerUnits.filter((u) => u.id !== targetId)
-      updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== targetId)
+      // Remove dead enemies, but keep dead players (for death dialog)
+      const isPlayerTarget = targetId.startsWith('player-')
+      if (!isPlayerTarget) {
+        updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== targetId)
+      }
     }
 
     if (attackerKilled) {
@@ -1000,9 +1004,11 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
           updatedTiles[y][x].occupantId = null
         }
       }
-      // Remove dead unit
-      updatedPlayerUnits = updatedPlayerUnits.filter((u) => u.id !== attackerId)
-      updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== attackerId)
+      // Remove dead enemies, but keep dead players (for death dialog)
+      const isPlayerAttacker = attackerId?.startsWith('player-')
+      if (!isPlayerAttacker) {
+        updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== attackerId)
+      }
     }
 
     // Check if it was an enemy that attacked
@@ -1188,8 +1194,11 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
           updatedTiles[y][x].occupantId = null
         }
       }
-      updatedPlayerUnits = updatedPlayerUnits.filter((u) => u.id !== targetId)
-      updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== targetId)
+      // Remove dead enemies, but keep dead players (for death dialog)
+      const isPlayerTarget = targetId.startsWith('player-')
+      if (!isPlayerTarget) {
+        updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== targetId)
+      }
     }
 
     set({
@@ -1371,8 +1380,11 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
             updatedTiles[y][x].occupantId = null
           }
         }
-        updatedPlayerUnits = updatedPlayerUnits.filter((u) => u.id !== unitId)
-        updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== unitId)
+        // Remove dead enemies, but keep dead players (for death dialog)
+        const isPlayerUnit = unitId.startsWith('player-')
+        if (!isPlayerUnit) {
+          updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== unitId)
+        }
       }
     }
 

@@ -16,7 +16,7 @@ import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { Progress } from '@/ui/progress.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { ChevronLeft } from '@nsmr/pixelart-react'
-import { ActivityDifficulty } from '@shared/constants/activities'
+import { ActivityDifficulty, getActivityById } from '@shared/constants/activities'
 import { getEnemy } from '@shared/constants/enemies'
 import { type CombatLogEntry, type EnemyState, type InventoryCharacter } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -220,6 +220,7 @@ export default function ActivityDetailPage() {
           lastTurnResult={null}
           participationId={participation.id}
           activeDoctrines={participation?.activeDoctrines as Record<string, any>}
+          failureText={getActivityById(activity.id)?.failureText}
           className="min-h-0 flex-1"
         />
       )}

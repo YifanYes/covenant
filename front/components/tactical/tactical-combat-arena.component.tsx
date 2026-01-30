@@ -58,6 +58,7 @@ interface TacticalCombatArenaProps {
   className?: string
   participationId: string
   activeDoctrines?: Record<string, any>
+  failureText?: string
 }
 
 export default function TacticalCombatArena({
@@ -68,7 +69,8 @@ export default function TacticalCombatArena({
   lastTurnResult,
   className,
   participationId,
-  activeDoctrines
+  activeDoctrines,
+  failureText
 }: TacticalCombatArenaProps) {
   const { t } = useTranslation()
   const router = useRouter()
@@ -114,7 +116,10 @@ export default function TacticalCombatArena({
 
   // Character data
   const currentClass = character.classes.find((c) => c.className === character.currentClass)
-  const isDead = (playerUnit?.currentHealth ?? currentClass?.health ?? 0) <= 0
+  // Player is dead if: their health is 0, OR they were removed from the combat (killed and filtered out)
+  const isDead = playerUnit
+    ? playerUnit.currentHealth <= 0
+    : isSceneReady && playerUnits.length === 0
 
   // Item stats for dice rolling
   const armor = character?.loadout?.find((item) => item.type === ItemType.ARMOR)
@@ -656,7 +661,9 @@ export default function TacticalCombatArena({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('combat.death_dialog.title')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('combat.death_dialog.description')}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {failureText ? t(failureText) : t('combat.death_dialog.description')}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => router.push('/inventory')}>
