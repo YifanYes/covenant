@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { DEPTH_LAYERS, ANIMATION_DURATION } from '../config'
 import type { TacticalUnit, GridPosition } from '@shared/types/tactical-combat.types'
+import type { StatusEffect } from '@shared/types/doctrine.types'
 
 // Unit visual states
 export type UnitVisualState = 'idle' | 'selected' | 'active' | 'targetable'
@@ -21,6 +22,11 @@ export class Unit extends Phaser.GameObjects.Container {
   private spriteBaseY: number = 0
   private spriteBaseScaleX: number = 1
   private spriteBaseScaleY: number = 1
+
+  // Status effect overlays
+  private statusEffectEmitters: Map<StatusEffect, Phaser.GameObjects.Particles.ParticleEmitter> = new Map()
+  private stunOrbitTween: Phaser.Tweens.Tween | null = null
+  private stunStars: Phaser.GameObjects.Image[] = []
 
   // Configuration
   private readonly SPRITE_SIZE = 32
@@ -168,6 +174,7 @@ export class Unit extends Phaser.GameObjects.Container {
   updateFromState(unitData: TacticalUnit): void {
     this.unitData = unitData
     this.updateHealthBar()
+    this.updateStatusEffects()
   }
 
   // Set visual state
@@ -226,6 +233,7 @@ export class Unit extends Phaser.GameObjects.Container {
   updateGridPosition(screenPos: { x: number; y: number }, gridPos: GridPosition): void {
     this.setPosition(screenPos.x, screenPos.y - 8)
     this.setDepth(DEPTH_LAYERS.UNIT + (gridPos.x + gridPos.y) * 0.01)
+    this.updateStatusEffectPositions()
   }
 
   // Set custom sprite texture
@@ -277,6 +285,8 @@ export class Unit extends Phaser.GameObjects.Container {
           onUpdate: () => {
             // Update depth during tween for smooth transitions
             this.setDepth(newDepth)
+            // Update status effect positions to follow unit
+            this.updateStatusEffectPositions()
           },
           onComplete: () => {
             // Update internal position tracking
@@ -323,6 +333,7 @@ export class Unit extends Phaser.GameObjects.Container {
         y: originalY + normalizedDy,
         duration: ANIMATION_DURATION.UNIT_ATTACK / 2,
         ease: 'Quad.easeOut',
+        onUpdate: () => this.updateStatusEffectPositions(),
         onComplete: () => resolve()
       })
     })
@@ -335,6 +346,7 @@ export class Unit extends Phaser.GameObjects.Container {
         y: originalY,
         duration: ANIMATION_DURATION.UNIT_ATTACK / 2,
         ease: 'Quad.easeIn',
+        onUpdate: () => this.updateStatusEffectPositions(),
         onComplete: () => resolve()
       })
     })
@@ -387,10 +399,227 @@ export class Unit extends Phaser.GameObjects.Container {
     })
   }
 
+  /**
+   * Update status effect visual overlays based on activeEffects.
+   */
+  private updateStatusEffects(): void {
+    const activeEffectTypes = new Set(
+      this.unitData.activeEffects?.map((e) => e.effect) ?? []
+    )
+
+    // Remove effects that are no longer active
+    for (const [effectType, emitter] of this.statusEffectEmitters) {
+      if (!activeEffectTypes.has(effectType)) {
+        emitter.stop()
+        this.scene.time.delayedCall(500, () => {
+          emitter.destroy()
+        })
+        this.statusEffectEmitters.delete(effectType)
+      }
+    }
+
+    // Special handling for stunned (uses orbiting stars, not particle emitter)
+    if (!activeEffectTypes.has('STUNNED')) {
+      this.clearStunEffect()
+    }
+
+    // Add new effects
+    for (const effectType of activeEffectTypes) {
+      if (effectType === 'STUNNED') {
+        if (this.stunStars.length === 0) {
+          this.createStunEffect()
+        }
+        continue
+      }
+
+      if (!this.statusEffectEmitters.has(effectType)) {
+        this.createStatusEffectEmitter(effectType)
+      }
+    }
+  }
+
+  /**
+   * Create a particle emitter for a status effect.
+   */
+  private createStatusEffectEmitter(effectType: StatusEffect): void {
+    // Skip DOCTRINE_ACTIVE as it's not a visual status
+    if (effectType === 'DOCTRINE_ACTIVE' || effectType === 'STUNNED') return
+
+    let emitter: Phaser.GameObjects.Particles.ParticleEmitter
+
+    switch (effectType) {
+      case 'BURNING':
+        emitter = this.scene.add.particles(this.x, this.y - 8, 'particle_flame', {
+          lifespan: { min: 400, max: 700 },
+          speed: { min: 20, max: 40 },
+          angle: { min: 250, max: 290 }, // Upward
+          scale: { start: 0.8, end: 0.2 },
+          alpha: { start: 0.9, end: 0 },
+          frequency: 80,
+          quantity: 1,
+          emitZone: {
+            type: 'random',
+            source: new Phaser.Geom.Rectangle(-8, -4, 16, 8)
+          } as Phaser.Types.GameObjects.Particles.EmitZoneData,
+          tint: [0xff6b35, 0xff4500, 0xffa500]
+        })
+        break
+
+      case 'POISONED':
+        emitter = this.scene.add.particles(this.x, this.y - 16, 'particle_poison', {
+          lifespan: { min: 500, max: 800 },
+          speed: { min: 15, max: 30 },
+          angle: { min: 70, max: 110 }, // Downward
+          scale: { start: 0.7, end: 0.3 },
+          alpha: { start: 0.8, end: 0 },
+          frequency: 150,
+          quantity: 1,
+          emitZone: {
+            type: 'random',
+            source: new Phaser.Geom.Rectangle(-6, -12, 12, 4)
+          } as Phaser.Types.GameObjects.Particles.EmitZoneData,
+          tint: [0x22c55e, 0x16a34a, 0x4ade80]
+        })
+        break
+
+      case 'PURIFIED':
+        emitter = this.scene.add.particles(this.x, this.y - 8, 'particle_holy', {
+          lifespan: { min: 600, max: 900 },
+          speed: { min: 10, max: 25 },
+          angle: { min: 0, max: 360 }, // All directions
+          scale: { start: 0.6, end: 0 },
+          alpha: { start: 1, end: 0 },
+          frequency: 120,
+          quantity: 1,
+          emitZone: {
+            type: 'random',
+            source: new Phaser.Geom.Circle(0, 0, 14)
+          } as Phaser.Types.GameObjects.Particles.EmitZoneData,
+          tint: [0xffd700, 0xffec8b, 0xfffacd]
+        })
+        break
+
+      case 'IMMOBILIZED':
+        emitter = this.scene.add.particles(this.x, this.y + 6, 'particle_ice', {
+          lifespan: { min: 800, max: 1200 },
+          speed: { min: 5, max: 15 },
+          angle: { min: 240, max: 300 }, // Slightly upward
+          scale: { start: 0.7, end: 0.4 },
+          alpha: { start: 0.9, end: 0.3 },
+          frequency: 200,
+          quantity: 1,
+          emitZone: {
+            type: 'random',
+            source: new Phaser.Geom.Rectangle(-10, -2, 20, 4)
+          } as Phaser.Types.GameObjects.Particles.EmitZoneData,
+          tint: [0x7dd3fc, 0xbae6fd, 0xe0f2fe]
+        })
+        break
+
+      default:
+        return
+    }
+
+    emitter.setDepth(DEPTH_LAYERS.EFFECTS)
+    this.statusEffectEmitters.set(effectType, emitter)
+  }
+
+  /**
+   * Create orbiting stars effect for stunned status.
+   */
+  private createStunEffect(): void {
+    const numStars = 3
+    const orbitRadius = 12
+    const orbitCenterY = -24 // Above the unit
+
+    for (let i = 0; i < numStars; i++) {
+      const angle = (i / numStars) * Math.PI * 2
+      const star = this.scene.add.image(
+        this.x + Math.cos(angle) * orbitRadius,
+        this.y + orbitCenterY + Math.sin(angle) * (orbitRadius * 0.5),
+        'particle_stun'
+      )
+      star.setScale(0.8)
+      star.setDepth(DEPTH_LAYERS.EFFECTS)
+      star.setData('orbitAngle', angle)
+      this.stunStars.push(star)
+    }
+
+    // Create orbit animation
+    this.stunOrbitTween = this.scene.tweens.addCounter({
+      from: 0,
+      to: Math.PI * 2,
+      duration: 1500,
+      repeat: -1,
+      onUpdate: (tween) => {
+        const progress = tween.getValue() ?? 0
+        this.stunStars.forEach((star, i) => {
+          const baseAngle = (i / numStars) * Math.PI * 2
+          const currentAngle = baseAngle + progress
+          star.setPosition(
+            this.x + Math.cos(currentAngle) * orbitRadius,
+            this.y + orbitCenterY + Math.sin(currentAngle) * (orbitRadius * 0.5)
+          )
+          // Slight scale pulse
+          star.setScale(0.7 + Math.sin(progress * 2 + i) * 0.15)
+        })
+      }
+    })
+  }
+
+  /**
+   * Clear the stunned effect visuals.
+   */
+  private clearStunEffect(): void {
+    if (this.stunOrbitTween) {
+      this.stunOrbitTween.stop()
+      this.stunOrbitTween = null
+    }
+    for (const star of this.stunStars) {
+      star.destroy()
+    }
+    this.stunStars = []
+  }
+
+  /**
+   * Clear all status effect visuals.
+   */
+  private clearAllStatusEffects(): void {
+    for (const emitter of this.statusEffectEmitters.values()) {
+      emitter.destroy()
+    }
+    this.statusEffectEmitters.clear()
+    this.clearStunEffect()
+  }
+
+  /**
+   * Update status effect emitter positions when unit moves.
+   */
+  private updateStatusEffectPositions(): void {
+    for (const [effectType, emitter] of this.statusEffectEmitters) {
+      switch (effectType) {
+        case 'BURNING':
+          emitter.setPosition(this.x, this.y - 8)
+          break
+        case 'POISONED':
+          emitter.setPosition(this.x, this.y - 16)
+          break
+        case 'PURIFIED':
+          emitter.setPosition(this.x, this.y - 8)
+          break
+        case 'IMMOBILIZED':
+          emitter.setPosition(this.x, this.y + 6)
+          break
+      }
+    }
+    // Stun stars are updated by their tween
+  }
+
   // Override destroy to cleanup
   destroy(fromScene?: boolean): void {
     this.stopBounce()
     this.stopBreathing()
+    this.clearAllStatusEffects()
     this.sprite.destroy()
     this.healthBarBg.destroy()
     this.healthBarFill.destroy()

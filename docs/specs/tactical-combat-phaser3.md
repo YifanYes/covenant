@@ -549,7 +549,7 @@ shared/
 | Screen shake                | Camera shake on heavy attacks (intensity based on damage), deaths, and AoE spells | ✅     |
 | Idle breathing animation    | Subtle scale oscillation (1.0 → 1.02 → 1.0) on all units to make them feel alive  | ✅     |
 | Hit sparks/particles        | Particle burst on melee impacts, projectile trails for ranged attacks             | ✅     |
-| Status effect overlays      | Visual indicators on units: poison drip, burn flames, ice crystals, shield glow   |        |
+| Status effect overlays      | Visual indicators on units: poison drip, burn flames, ice crystals, shield glow   | ✅     |
 | Particle effects for spells | Fire embers, ice shards, lightning arcs, holy rays, dark tendrils                 |        |
 
 #### 7.2 Performance & UX
@@ -697,7 +697,7 @@ update(): void {
 
 - ✅ Screen shake on impacts
 - ✅ Units feel alive with idle breathing
-- Status effects are immediately visible on affected units
+- ✅ Status effects are immediately visible on affected units
 - Combat feels impactful with particles and hit effects
 - Stable 60fps on mid-range devices
 - No GC stutters during combat
@@ -711,7 +711,7 @@ Ordered by dependency chain and testability. Each item is independently verifiab
 | 1   | [x] Screen shake                   | `combat-scene.ts`          | Attack enemy, take damage, kill enemy | ✅   |
 | 2   | [x] Idle breathing                 | `unit.ts`                  | Watch any unit idle for 2 seconds     | ✅   |
 | 3   | [x] Hit sparks (basic particles)   | `combat-scene.ts`          | Attack enemy, see particle burst    | ✅     |
-| 4   | [ ] Status effect overlays         | `unit.ts`, `boot-scene.ts` | Cast doctrine with status effect    |        |
+| 4   | [x] Status effect overlays         | `unit.ts`, `boot-scene.ts` | Cast doctrine with status effect    | ✅     |
 | 5   | [ ] Particle effects for spells    | `combat-scene.ts`          | Cast doctrine, see spell particles  |        |
 | 6   | [ ] Object pooling (floating text) | `combat-scene.ts`          | Spam attacks, check DevTools memory |        |
 | 7   | [ ] Animation queue                | `combat-scene.ts`          | Rapid actions, no visual glitches   |        |
