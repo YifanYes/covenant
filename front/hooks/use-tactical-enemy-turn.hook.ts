@@ -88,6 +88,26 @@ export function useTacticalEnemyTurn() {
           return
         }
 
+        // Handle status effect damage (burn, poison, etc.) at turn start
+        if (result.statusEffectDamage && result.statusEffectDamage > 0) {
+          useTacticalCombatStore.getState().applyStatusEffectDamage(
+            activeUnitId,
+            result.statusEffectDamage,
+            result.diedFromStatusEffect ?? false
+          )
+          // Wait for status effect damage animation
+          await new Promise((resolve) => setTimeout(resolve, 600))
+          // Clear the animation state
+          useTacticalCombatStore.getState().completeStatusEffectAnimation()
+
+          // If enemy died from status effect, advance turn and stop
+          if (result.diedFromStatusEffect) {
+            queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
+            useTacticalCombatStore.getState().nextTurn()
+            return
+          }
+        }
+
         // Handle mana regeneration at end of round
         if (result.manaRegenerated && result.manaRegenerated > 0) {
           const playerUnit = useTacticalCombatStore.getState().playerUnits[0]

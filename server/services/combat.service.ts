@@ -113,21 +113,41 @@ export class CombatService {
 
     const currentClass = this.getCurrentClassOrThrow(character)
 
+    // Check if there's an active tactical combat - use tactical state health if so
+    // Get the active activity ID from character data
+    const activeActivityId = (character.data as any)?.activeActivityId
+    let participation: { id: string; tacticalState: TacticalStateData | null } | null = null
+
+    if (activeActivityId) {
+      // Find participation for the active activity
+      participation = await this.activityParticipationRepository.findByCharacterAndActivity(
+        character.id,
+        activeActivityId
+      )
+    }
+
+    const playerUnit = participation?.tacticalState?.units?.find((u) => u.id.startsWith('player-'))
+
+    // Use tactical combat health if in tactical combat, otherwise use database health
+    const currentHealth = playerUnit?.currentHealth ?? currentClass.health
+    const maxHealth = playerUnit?.maxHealth ?? currentClass.maxHealth
+
     let healthRestored = 0
     let manaRestored = 0
 
     if (consumable.effect.healHealth) {
-      healthRestored = Math.min(consumable.effect.healHealth, currentClass.maxHealth - currentClass.health)
+      healthRestored = Math.min(consumable.effect.healHealth, maxHealth - currentHealth)
     }
     if (consumable.effect.healMana) {
       manaRestored = Math.min(consumable.effect.healMana, currentClass.maxMana - currentClass.mana)
     }
 
-    const newHealth = currentClass.health + healthRestored
+    // Update database health (add to existing DB health, not tactical health)
+    const newDbHealth = currentClass.health + healthRestored
     const newMana = currentClass.mana + manaRestored
+    await this.characterRepository.updateHealth(currentClass.id, newDbHealth, newMana)
 
-    await this.characterRepository.updateHealth(currentClass.id, newHealth, newMana)
-
+    // Remove consumable from inventory
     const newInventory = [...inventory]
     newInventory.splice(itemIndex, 1)
     await this.characterRepository.updateInventoryAndLoadout(
@@ -135,6 +155,24 @@ export class CombatService {
       newInventory,
       character.loadout as unknown as InventoryItem[]
     )
+
+    // Update tactical combat state if there's an active tactical combat
+    if (participation?.tacticalState?.units && playerUnit && healthRestored > 0) {
+      const units = [...participation.tacticalState.units]
+      const playerUnitIndex = units.findIndex((u) => u.id.startsWith('player-'))
+
+      if (playerUnitIndex !== -1) {
+        units[playerUnitIndex] = {
+          ...units[playerUnitIndex],
+          currentHealth: Math.min(playerUnit.currentHealth + healthRestored, playerUnit.maxHealth)
+        }
+
+        await this.activityParticipationRepository.updateTacticalState(participation.id, {
+          ...participation.tacticalState,
+          units
+        })
+      }
+    }
 
     return {
       success: true,
@@ -511,10 +549,18 @@ export class CombatService {
 
     // Log doctrine buff if active
     if (buffs.bonusDice > 0 || buffs.thresholdMod !== 0 || buffs.guaranteedCritical || buffs.criticalThresholdMod > 0) {
+      // Find the source doctrine ID(s) that contributed these buffs
+      const sourceDoctrineIds = Object.keys(attackerUnit.activeDoctrines || {}).filter((docId) => {
+        const effect = attackerUnit.activeDoctrines?.[docId]
+        return effect && effect.remainingTurns > 0 && !docId.includes('_bonus')
+      })
+      const sourceDoctrineId = sourceDoctrineIds[0] || 'unknown'
+
       logEntries.push({
         timestamp: timestamp + 0.5,
         type: CombatLogType.DOCTRINE_EFFECT,
         data: {
+          doctrine: sourceDoctrineId,
           effect: buffs.guaranteedCritical ? 'guaranteed_critical' : buffs.thresholdMod !== 0 ? 'threshold_reduction' : 'power_boost',
           bonusDice: buffs.bonusDice,
           sixesGenerateExtraHits: buffs.sixesGenerateExtraHits,
@@ -734,10 +780,11 @@ export class CombatService {
     }
 
     // Create updated state
+    // Keep dead players (for death dialog), but remove dead enemies
     const updatedState: TacticalStateData = {
       ...state,
       tiles: updatedTiles,
-      units: updatedUnits.filter((u) => u.currentHealth > 0),
+      units: updatedUnits.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0),
       turnOrder: updatedTurnOrder,
       currentTurnIndex: updatedCurrentTurnIndex
     }
@@ -1275,8 +1322,132 @@ export class CombatService {
     })
     state = { ...state, units: unitsWithResetEnemy }
 
+    // Process status effects at the start of enemy's turn (BURNING, POISONED, PURIFIED)
+    let statusEffectDamage = 0
+    let diedFromStatusEffect = false
+    const enemyForStatusCheck = state.units[enemyIndex]
+    if (enemyForStatusCheck.activeEffects && enemyForStatusCheck.activeEffects.length > 0) {
+      // Look up enemy template to check for demon immunity
+      let isDemon = false
+      if (this.combatEnemyRepository) {
+        const combatEnemy = await this.combatEnemyRepository.findById(enemyId)
+        isDemon = combatEnemy?.templateId?.includes('demon') ?? false
+      }
+
+      // Check for damage-over-time effects
+      for (const effect of enemyForStatusCheck.activeEffects) {
+        if (effect.effect === StatusEffect.BURNING && !isDemon) {
+          statusEffectDamage += 1
+        } else if (effect.effect === StatusEffect.PURIFIED) {
+          statusEffectDamage += 1
+        } else if (effect.effect === StatusEffect.POISONED) {
+          statusEffectDamage += 2
+        }
+      }
+      if (statusEffectDamage > 0) {
+        const newEnemyHealth = Math.max(0, enemyForStatusCheck.currentHealth - statusEffectDamage)
+        diedFromStatusEffect = newEnemyHealth <= 0
+
+        // Decrement remaining turns and remove expired effects
+        const updatedEffects = enemyForStatusCheck.activeEffects
+          .map((e) => ({ ...e, remainingTurns: e.remainingTurns - 1 }))
+          .filter((e) => e.remainingTurns > 0)
+
+        // Update state with damage and decremented effects
+        state = {
+          ...state,
+          units: state.units.map((unit, i) => {
+            if (i === enemyIndex) {
+              return {
+                ...unit,
+                currentHealth: newEnemyHealth,
+                activeEffects: updatedEffects
+              }
+            }
+            return unit
+          })
+        }
+
+        // Log the status effect damage
+        logEntries.push({
+          timestamp,
+          type: CombatLogType.DAMAGE_TO_ENEMY,
+          data: { damage: statusEffectDamage, source: 'status_effect' }
+        })
+
+        if (diedFromStatusEffect) {
+          logEntries.push({
+            timestamp: timestamp + 1,
+            type: CombatLogType.ENEMY_DEFEATED,
+            data: { enemyId }
+          })
+        }
+      } else {
+        // No damage, but still decrement and clean up expired effects
+        const updatedEffects = enemyForStatusCheck.activeEffects
+          .map((e) => ({ ...e, remainingTurns: e.remainingTurns - 1 }))
+          .filter((e) => e.remainingTurns > 0)
+
+        state = {
+          ...state,
+          units: state.units.map((unit, i) => {
+            if (i === enemyIndex) {
+              return { ...unit, activeEffects: updatedEffects }
+            }
+            return unit
+          })
+        }
+      }
+    }
+
+    // If enemy died from status effect, skip their turn
+    if (diedFromStatusEffect) {
+      // Remove dead enemy from tiles and turn order
+      const deadEnemy = state.units[enemyIndex]
+      const updatedTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })))
+      if (updatedTiles[deadEnemy.position.y]?.[deadEnemy.position.x]) {
+        updatedTiles[deadEnemy.position.y][deadEnemy.position.x].occupantId = null
+      }
+
+      const updatedUnits = state.units.filter((u) => u.currentHealth > 0)
+      const updatedTurnOrder = state.turnOrder.filter((id) => {
+        const unit = updatedUnits.find((u) => u.id === id)
+        return unit && unit.currentHealth > 0
+      })
+
+      state = {
+        ...state,
+        tiles: updatedTiles,
+        units: updatedUnits,
+        turnOrder: updatedTurnOrder
+      }
+
+      // Save state to database
+      await this.activityParticipationRepository.updateTacticalState(participationId, state)
+
+      // Save combat log
+      if (this.combatEnemyRepository && logEntries.length > 0) {
+        const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
+        if (activeEnemy) {
+          await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+        }
+      }
+
+      return {
+        success: true,
+        enemyId,
+        action: 'wait',
+        moved: false,
+        attacked: false,
+        updatedState: state,
+        logEntries,
+        statusEffectDamage,
+        diedFromStatusEffect
+      }
+    }
+
     // Update enemy reference after state change
-    const enemy = state.units[enemyIndex]
+    const enemy = state.units.find((u) => u.id === enemyId)!
 
     // Find closest player
     const targetPlayer = this.findClosestPlayer(enemy.position, state.units)
@@ -1423,7 +1594,8 @@ export class CombatService {
         if (updatedTiles[targetPos.y]?.[targetPos.x]) {
           updatedTiles[targetPos.y][targetPos.x].occupantId = null
         }
-        updatedUnits = updatedUnits.filter((u) => u.currentHealth > 0)
+        // Keep dead players (for death dialog), but remove dead enemies
+        updatedUnits = updatedUnits.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0)
 
         logEntries.push({
           timestamp: timestamp + 5,
@@ -1532,7 +1704,9 @@ export class CombatService {
       defenderRolls,
       updatedState: state,
       logEntries,
-      manaRegenerated
+      manaRegenerated,
+      statusEffectDamage: statusEffectDamage > 0 ? statusEffectDamage : undefined,
+      diedFromStatusEffect: diedFromStatusEffect || undefined
     }
   }
 
@@ -2087,11 +2261,11 @@ export class CombatService {
       }
     }
 
-    // Filter out dead units
-    updatedUnits = updatedUnits.filter((u) => u.currentHealth > 0)
+    // Filter out dead enemies, but keep dead players (for death dialog)
+    updatedUnits = updatedUnits.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0)
 
-    // Update turn order to remove dead units
-    const aliveUnitIds = new Set(updatedUnits.map((u) => u.id))
+    // Update turn order to remove dead units (including dead players)
+    const aliveUnitIds = new Set(updatedUnits.filter((u) => u.currentHealth > 0).map((u) => u.id))
     const updatedTurnOrder = state.turnOrder.filter((unitId) => aliveUnitIds.has(unitId))
 
     // Adjust current turn index if needed
@@ -2113,31 +2287,20 @@ export class CombatService {
     await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
 
     // Save combat log entries
-    console.log(`[executeTacticalDoctrine] Attempting to save ${logEntries.length} log entries for participation ${participationId}`)
-    console.log(`[executeTacticalDoctrine] combatEnemyRepository exists: ${!!this.combatEnemyRepository}`)
-
     if (this.combatEnemyRepository && logEntries.length > 0) {
       let activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
-      console.log(`[executeTacticalDoctrine] getActiveEnemy result: ${activeEnemy ? activeEnemy.id : 'null'}`)
 
       // Fallback: if no active enemy found by status, try finding by ID from tactical state
       if (!activeEnemy) {
         const enemyUnit = state.units.find((u) => !u.id.startsWith('player-'))
-        console.log(`[executeTacticalDoctrine] Fallback - found enemy unit: ${enemyUnit ? enemyUnit.id : 'null'}`)
         if (enemyUnit) {
           activeEnemy = await this.combatEnemyRepository.findById(enemyUnit.id)
-          console.log(`[executeTacticalDoctrine] findById result: ${activeEnemy ? activeEnemy.id : 'null'}`)
         }
       }
 
       if (activeEnemy) {
         await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
-        console.log(`[executeTacticalDoctrine] Successfully appended log entries to enemy ${activeEnemy.id}`)
-      } else {
-        console.warn(`[executeTacticalDoctrine] No enemy found for participationId: ${participationId}. Combat log entries not saved.`)
       }
-    } else {
-      console.warn(`[executeTacticalDoctrine] Skipping log save - repo: ${!!this.combatEnemyRepository}, entries: ${logEntries.length}`)
     }
 
     return {
@@ -2310,31 +2473,20 @@ export class CombatService {
     await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
 
     // Save combat log entries
-    console.log(`[useSelfBuffDoctrine] Attempting to save ${logEntries.length} log entries for participation ${participationId}`)
-    console.log(`[useSelfBuffDoctrine] combatEnemyRepository exists: ${!!this.combatEnemyRepository}`)
-
     if (this.combatEnemyRepository && logEntries.length > 0) {
       let activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
-      console.log(`[useSelfBuffDoctrine] getActiveEnemy result: ${activeEnemy ? activeEnemy.id : 'null'}`)
 
       // Fallback: if no active enemy found by status, try finding by ID from tactical state
       if (!activeEnemy) {
         const enemyUnit = state.units.find((u) => !u.id.startsWith('player-'))
-        console.log(`[useSelfBuffDoctrine] Fallback - found enemy unit: ${enemyUnit ? enemyUnit.id : 'null'}`)
         if (enemyUnit) {
           activeEnemy = await this.combatEnemyRepository.findById(enemyUnit.id)
-          console.log(`[useSelfBuffDoctrine] findById result: ${activeEnemy ? activeEnemy.id : 'null'}`)
         }
       }
 
       if (activeEnemy) {
         await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
-        console.log(`[useSelfBuffDoctrine] Successfully appended log entries to enemy ${activeEnemy.id}`)
-      } else {
-        console.warn(`[useSelfBuffDoctrine] No enemy found for participationId: ${participationId}. Combat log entries not saved.`)
       }
-    } else {
-      console.warn(`[useSelfBuffDoctrine] Skipping log save - repo: ${!!this.combatEnemyRepository}, entries: ${logEntries.length}`)
     }
 
     return {

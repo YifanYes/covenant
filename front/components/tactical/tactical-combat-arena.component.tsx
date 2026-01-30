@@ -58,6 +58,7 @@ interface TacticalCombatArenaProps {
   className?: string
   participationId: string
   activeDoctrines?: Record<string, any>
+  failureText?: string
 }
 
 export default function TacticalCombatArena({
@@ -68,7 +69,8 @@ export default function TacticalCombatArena({
   lastTurnResult,
   className,
   participationId,
-  activeDoctrines
+  activeDoctrines,
+  failureText
 }: TacticalCombatArenaProps) {
   const { t } = useTranslation()
   const router = useRouter()
@@ -114,7 +116,10 @@ export default function TacticalCombatArena({
 
   // Character data
   const currentClass = character.classes.find((c) => c.className === character.currentClass)
-  const isDead = (playerUnit?.currentHealth ?? currentClass?.health ?? 0) <= 0
+  // Player is dead if: their health is 0, OR they were removed from the combat (killed and filtered out)
+  const isDead = playerUnit
+    ? playerUnit.currentHealth <= 0
+    : isSceneReady && playerUnits.length === 0
 
   // Item stats for dice rolling
   const armor = character?.loadout?.find((item) => item.type === ItemType.ARMOR)
@@ -212,11 +217,18 @@ export default function TacticalCombatArena({
       if (data.manaRestored) {
         toast.success(t('consumables.mana_restored', { amount: data.manaRestored }))
       }
-      // Update the tactical store's player unit so the UI reflects the change
-      if (playerUnit && (data.healthRestored || data.manaRestored)) {
-        updateUnit(playerUnit.id, {
-          currentHealth: playerUnit.currentHealth + (data.healthRestored ?? 0),
-          currentMana: playerUnit.currentMana + (data.manaRestored ?? 0)
+      // Get fresh player unit from store to avoid stale closure
+      const currentPlayerUnit = useTacticalCombatStore.getState().playerUnits[0]
+      if (currentPlayerUnit && (data.healthRestored || data.manaRestored)) {
+        updateUnit(currentPlayerUnit.id, {
+          currentHealth: Math.min(
+            currentPlayerUnit.currentHealth + (data.healthRestored ?? 0),
+            currentPlayerUnit.maxHealth
+          ),
+          currentMana: Math.min(
+            currentPlayerUnit.currentMana + (data.manaRestored ?? 0),
+            currentPlayerUnit.maxMana
+          )
         })
       }
       queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
@@ -649,7 +661,9 @@ export default function TacticalCombatArena({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('combat.death_dialog.title')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('combat.death_dialog.description')}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {failureText ? t(failureText) : t('combat.death_dialog.description')}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => router.push('/inventory')}>
