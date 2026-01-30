@@ -782,7 +782,7 @@ Ordered by dependency chain and testability. Each item is independently verifiab
 | #   | Task                               | Files to Modify            | How to Test                             | Status |
 | --- | ---------------------------------- | -------------------------- | --------------------------------------- | ------ |
 | 1   | [x] Screen shake                   | `combat-scene.ts`          | Attack enemy, take damage, kill enemy   |        |
-| 2   | [ ] Idle breathing                 | `unit.ts`                  | Watch any unit idle for 2 seconds       |        |
+| 2   | [x] Idle breathing                 | `unit.ts`                  | Watch any unit idle for 2 seconds       |        |
 | 3   | [ ] Critical hit effects           | `combat-scene.ts`, store   | Attack until crit (or add debug)        |        |
 | 4   | [ ] Movement ghost preview         | `combat-scene.ts`          | Select Move, hover over valid tiles     |        |
 | 5   | [ ] Camera follow on turn start    | `combat-scene.ts`          | End turn, watch camera pan to next unit |        |

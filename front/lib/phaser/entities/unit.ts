@@ -17,7 +17,10 @@ export class Unit extends Phaser.GameObjects.Container {
 
   // Animation
   private bounceTween: Phaser.Tweens.Tween | null = null
+  private breathingTween: Phaser.Tweens.Tween | null = null
   private spriteBaseY: number = 0
+  private spriteBaseScaleX: number = 1
+  private spriteBaseScaleY: number = 1
 
   // Configuration
   private readonly SPRITE_SIZE = 32
@@ -26,6 +29,8 @@ export class Unit extends Phaser.GameObjects.Container {
   private readonly HEALTH_BAR_OFFSET_Y = -20
   private readonly BOUNCE_AMOUNT = 4
   private readonly BOUNCE_DURATION = 600
+  private readonly BREATHING_SCALE = 0.04
+  private readonly BREATHING_DURATION = 2000
 
   constructor(scene: Phaser.Scene, unitData: TacticalUnit, screenPos: { x: number; y: number }) {
     super(scene, screenPos.x, screenPos.y - 8) // Offset up to sit on tile
@@ -38,6 +43,9 @@ export class Unit extends Phaser.GameObjects.Container {
     // Create main sprite
     this.sprite = scene.add.image(0, 0, textureKey)
     this.sprite.setDisplaySize(this.SPRITE_SIZE, this.SPRITE_SIZE)
+    // Store base scale for breathing animation
+    this.spriteBaseScaleX = this.sprite.scaleX
+    this.spriteBaseScaleY = this.sprite.scaleY
     this.add(this.sprite)
 
     // Create health bar background
@@ -74,6 +82,9 @@ export class Unit extends Phaser.GameObjects.Container {
     this.setData('unitId', unitData.id)
     this.setData('isPlayer', unitData.isPlayer)
 
+    // Start idle breathing animation
+    this.startBreathing()
+
     // Add to scene
     scene.add.existing(this)
   }
@@ -99,6 +110,32 @@ export class Unit extends Phaser.GameObjects.Container {
       this.bounceTween = null
       // Reset sprite to base position
       this.sprite.setY(this.spriteBaseY)
+    }
+  }
+
+  private startBreathing(): void {
+    // Stop any existing breathing
+    this.stopBreathing()
+
+    // Create a subtle scale animation to simulate breathing
+    // Use base scale values to work with custom sprites of any size
+    this.breathingTween = this.scene.tweens.add({
+      targets: this.sprite,
+      scaleX: this.spriteBaseScaleX * (1 + this.BREATHING_SCALE),
+      scaleY: this.spriteBaseScaleY * (1 + this.BREATHING_SCALE),
+      duration: this.BREATHING_DURATION / 2,
+      ease: 'Sine.easeInOut',
+      yoyo: true,
+      repeat: -1
+    })
+  }
+
+  private stopBreathing(): void {
+    if (this.breathingTween) {
+      this.breathingTween.stop()
+      this.breathingTween = null
+      // Reset sprite to base scale
+      this.sprite.setScale(this.spriteBaseScaleX, this.spriteBaseScaleY)
     }
   }
 
@@ -139,6 +176,7 @@ export class Unit extends Phaser.GameObjects.Container {
 
     // Reset all indicators
     this.stopBounce()
+    this.stopBreathing()
     this.sprite.clearTint()
 
     switch (state) {
@@ -153,10 +191,13 @@ export class Unit extends Phaser.GameObjects.Container {
       case 'targetable':
         // Slight red tint to indicate targetable enemy
         this.sprite.setTint(0xffaaaa)
+        // Continue breathing while targetable
+        this.startBreathing()
         break
       case 'idle':
       default:
-        // No special indicators
+        // Idle breathing animation
+        this.startBreathing()
         break
     }
   }
@@ -189,8 +230,21 @@ export class Unit extends Phaser.GameObjects.Container {
 
   // Set custom sprite texture
   setCustomSprite(textureKey: string): void {
+    // Stop breathing to avoid animation conflicts
+    const wasBreathing = this.breathingTween !== null
+    this.stopBreathing()
+
     this.sprite.setTexture(textureKey)
     this.sprite.setDisplaySize(this.SPRITE_SIZE, this.SPRITE_SIZE)
+
+    // Update base scale for the new texture
+    this.spriteBaseScaleX = this.sprite.scaleX
+    this.spriteBaseScaleY = this.sprite.scaleY
+
+    // Restart breathing if it was active
+    if (wasBreathing) {
+      this.startBreathing()
+    }
   }
 
   /**
@@ -336,6 +390,7 @@ export class Unit extends Phaser.GameObjects.Container {
   // Override destroy to cleanup
   destroy(fromScene?: boolean): void {
     this.stopBounce()
+    this.stopBreathing()
     this.sprite.destroy()
     this.healthBarBg.destroy()
     this.healthBarFill.destroy()
