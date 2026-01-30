@@ -184,9 +184,14 @@ export function useTacticalDoctrine() {
     const doctrine = DOCTRINES[doctrineId]
     if (!doctrine) return false
 
-    return doctrine.effects.some(
-      (e) => e.type === DoctrineEffectType.POWER_MODIFIER && e.target === DoctrineTarget.SELF
-    ) && !doctrine.aoePattern
+    // Self-buff doctrines are those that target SELF and don't have an AoE pattern
+    // This includes POWER_MODIFIER (bonus dice) and GUARANTEED_CRITICAL (ignores defense)
+    const isSelfBuff = doctrine.effects.some(
+      (e) => (e.type === DoctrineEffectType.POWER_MODIFIER || e.type === DoctrineEffectType.GUARANTEED_CRITICAL) &&
+             e.target === DoctrineTarget.SELF
+    )
+
+    return isSelfBuff && !doctrine.aoePattern
   }, [])
 
   // Use self-buff doctrine mutation
@@ -243,7 +248,7 @@ export function useTacticalDoctrine() {
       if (result.success) {
         // Update the store with the active doctrine buff
         const { applySelfBuffDoctrine } = useTacticalCombatStore.getState()
-        applySelfBuffDoctrine(activeUnitId, doctrineId, result.bonusDice)
+        applySelfBuffDoctrine(activeUnitId, doctrineId)
 
         // Update mana in the store
         const { updateUnit } = useTacticalCombatStore.getState()
@@ -251,11 +256,21 @@ export function useTacticalDoctrine() {
           currentMana: caster.currentMana - doctrine.manaCost
         })
 
-        // Show success message
-        toast.success(t('combat.doctrine_activated', {
-          name: t(doctrine.nameKey),
-          dice: result.bonusDice
-        }))
+        // Show success message based on doctrine effect type
+        const hasGuaranteedCritical = doctrine.effects.some(
+          (e) => e.type === DoctrineEffectType.GUARANTEED_CRITICAL && e.target === DoctrineTarget.SELF
+        )
+
+        if (hasGuaranteedCritical) {
+          toast.success(t('combat.doctrine_activated_buff', {
+            name: t(doctrine.nameKey)
+          }))
+        } else {
+          toast.success(t('combat.doctrine_activated', {
+            name: t(doctrine.nameKey),
+            dice: result.bonusDice
+          }))
+        }
 
         // Invalidate queries to refresh data (mana and combat log)
         queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })

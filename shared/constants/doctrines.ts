@@ -893,7 +893,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.SELF,
-        value: 10 // 10 power dice, 6s generate extra hits
+        value: 10,
+        sixesGenerateExtraHits: 1 // Each 6 rolled generates 1 extra hit
       }
     ]
   },

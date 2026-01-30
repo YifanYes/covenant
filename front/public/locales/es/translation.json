@@ -121,6 +121,7 @@
     "attack_set": "Ataque preparado: {{count}} dados",
     "criticals": "Críticos",
     "doctrine_activated": "¡{{name}} activada! +{{dice}} dados de poder en el próximo ataque",
+    "doctrine_activated_buff": "¡{{name}} activada! El próximo ataque ignora la defensa enemiga",
     "death_dialog": {
       "continue": "Continuar",
       "description": "Tu personaje ha caído en batalla.",

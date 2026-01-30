@@ -2408,8 +2408,8 @@ export class CombatService {
         switch (doctrineEffect.type) {
           case DoctrineEffectType.POWER_MODIFIER:
             bonusDice += value
-            // Stellar Collapse has the special rule that 6s generate extra hits
-            if (doctrineId === 'stellar_collapse') {
+            // Check if this effect has the sixesGenerateExtraHits property
+            if (doctrineEffect.sixesGenerateExtraHits) {
               sixesGenerateExtraHits = true
             }
             break

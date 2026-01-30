@@ -1,5 +1,4 @@
 'use client'
-import dynamic from 'next/dynamic'
 import LoaderButton from '@/common/loader-button.component'
 import TierBadge from '@/common/tier-badge.component'
 import AlertDialog, {
@@ -21,17 +20,17 @@ import { ActivityDifficulty } from '@shared/constants/activities'
 import { getEnemy } from '@shared/constants/enemies'
 import { type CombatLogEntry, type EnemyState, type InventoryCharacter } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import dynamic from 'next/dynamic'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
 import { toast } from 'sonner'
 
 // Dynamic import for tactical combat (SSR-safe due to Phaser)
-const TacticalCombatArena = dynamic(
-  () => import('@/components/tactical/tactical-combat-arena.component'),
-  { ssr: false }
-)
+const TacticalCombatArena = dynamic(() => import('@/components/tactical/tactical-combat-arena.component'), {
+  ssr: false
+})
 
 export default function ActivityDetailPage() {
   const { id } = useParams()
@@ -44,6 +43,7 @@ export default function ActivityDetailPage() {
   const activity = activities.find((a) => a.id === id)
 
   const participation = (activity as any)?.participation
+  const enemySpawnWeights = activity?.enemySpawnWeights
 
   // Get combat log from active enemy
   const activeEnemy = participation?.activeEnemy
@@ -65,9 +65,9 @@ export default function ActivityDetailPage() {
         nameSuffix: ae.nameSuffix
       }
     }
-    if (!participation && activity?.enemySpawnWeights) {
+    if (!participation && enemySpawnWeights) {
       // No participation yet, show preview of first enemy from spawn weights
-      const defaultEnemyId = Object.keys(activity.enemySpawnWeights)[0]
+      const defaultEnemyId = Object.keys(enemySpawnWeights)[0]
       const template = getEnemy(defaultEnemyId)
       if (template) {
         return {
@@ -79,7 +79,7 @@ export default function ActivityDetailPage() {
       }
     }
     return null
-  }, [participation, activity?.enemySpawnWeights])
+  }, [participation, enemySpawnWeights])
 
   const joinMutation = useMutation({
     ...trpcOptions.activity.join.mutationOptions(),
@@ -93,8 +93,8 @@ export default function ActivityDetailPage() {
 
   if (!activity) {
     return (
-      <div className='flex h-full items-center justify-center'>
-        <p className='text-muted-foreground'>{t('activities.not_found')}</p>
+      <div className="flex h-full items-center justify-center">
+        <p className="text-muted-foreground">{t('activities.not_found')}</p>
       </div>
     )
   }
@@ -122,23 +122,23 @@ export default function ActivityDetailPage() {
 
   if (!hasJoined && !activity.isParticipating) {
     return (
-      <div className='flex h-full w-full flex-col gap-6 overflow-auto p-6'>
-        <div className='mx-auto w-full max-w-5xl space-y-6'>
-          <div className='flex items-center gap-4'>
-            <Button variant='ghost' size='icon' asChild>
-              <Link href='/map'>
-                <ChevronLeft className='h-5 w-5' />
+      <div className="flex h-full w-full flex-col gap-6 overflow-auto p-6">
+        <div className="mx-auto w-full max-w-5xl space-y-6">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/map">
+                <ChevronLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <div className='flex flex-1 items-center gap-3'>
-              <h1 className='text-2xl font-bold'>{t(activity.name)}</h1>
+            <div className="flex flex-1 items-center gap-3">
+              <h1 className="text-2xl font-bold">{t(activity.name)}</h1>
               <TierBadge tier={activityTier} />
             </div>
           </div>
 
           <Card>
             <CardContent>
-              <p className='text-muted-foreground italic'>{t(activity.description)}</p>
+              <p className="text-muted-foreground italic">{t(activity.description)}</p>
             </CardContent>
           </Card>
 
@@ -147,8 +147,8 @@ export default function ActivityDetailPage() {
               <CardTitle>{t('activities.progress')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className='space-y-2'>
-                <div className='flex justify-between text-sm'>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
                   <span>
                     {activity.progress} / {activity.target} {t('combat.enemies_defeated')}
                   </span>
@@ -159,7 +159,7 @@ export default function ActivityDetailPage() {
             </CardContent>
           </Card>
 
-          <div className='flex gap-4'>
+          <div className="flex gap-4">
             <LoaderButton
               onClick={handleJoin}
               disabled={!canJoin}
@@ -186,25 +186,25 @@ export default function ActivityDetailPage() {
   }
 
   return (
-    <div className='flex h-full w-full flex-col overflow-hidden'>
+    <div className="bg-background fixed inset-0 left-(--sidebar-width) flex flex-col overflow-hidden transition-[left] duration-200 ease-linear peer-data-[state=collapsed]:left-(--sidebar-width-icon)">
       {/* Header */}
-      <div className='bg-card flex-none border-b px-4 py-2'>
-        <div className='flex items-center gap-4'>
-          <Button variant='ghost' size='icon' asChild>
-            <Link href='/map'>
-              <ChevronLeft className='h-5 w-5' />
+      <div className="bg-card flex-none border-b px-4 py-2">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/map">
+              <ChevronLeft className="h-5 w-5" />
             </Link>
           </Button>
-          <div className='flex flex-1 items-center justify-between gap-3'>
-            <div className='flex items-center gap-3'>
-              <h1 className='text-xl font-bold'>{t(activity.name)}</h1>
-              <Badge variant='secondary'>{t('activities.status.active')}</Badge>
+          <div className="flex flex-1 items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold">{t(activity.name)}</h1>
+              <Badge variant="secondary">{t('activities.status.active')}</Badge>
             </div>
-            <div className='flex items-center gap-2'>
-              <span className='text-muted-foreground text-sm'>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-sm">
                 {activity.progress}/{activity.target}
               </span>
-              <Progress value={(activity.progress / activity.target) * 100} className='w-24' />
+              <Progress value={(activity.progress / activity.target) * 100} className="w-24" />
             </div>
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function ActivityDetailPage() {
           lastTurnResult={null}
           participationId={participation.id}
           activeDoctrines={participation?.activeDoctrines as Record<string, any>}
-          className='min-h-0 flex-1'
+          className="min-h-0 flex-1"
         />
       )}
     </div>

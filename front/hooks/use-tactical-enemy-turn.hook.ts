@@ -63,8 +63,11 @@ export function useTacticalEnemyTurn() {
 
       const alivePlayers = playerUnits.filter((u) => u.currentHealth > 0)
       if (alivePlayers.length === 0) {
-        console.log('[EnemyTurn] No players left')
-        nextTurn()
+        console.log('[EnemyTurn] No players left, stopping enemy turn loop. Game over state will be handled by death dialog.')
+        // Don't call nextTurn() - this would create an infinite loop
+        // The death dialog in TacticalCombatArena handles the game over state
+        // by showing a modal that redirects the user when dismissed.
+        // If the death dialog is not rendered, combat will be stuck here.
         return
       }
 
