@@ -121,6 +121,7 @@
     "attack_set": "Attack set: {{count}} dice",
     "criticals": "Criticals",
     "doctrine_activated": "{{name}} activated! +{{dice}} power dice to next attack",
+    "doctrine_activated_buff": "{{name}} activated! Next attack ignores enemy defense",
     "death_dialog": {
       "continue": "Continue",
       "description": "Your character has fallen in battle.",

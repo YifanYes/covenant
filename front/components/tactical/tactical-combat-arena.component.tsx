@@ -1,21 +1,11 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-import Image from 'next/image'
-import { useCallback, useEffect, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
-import { useMutation } from '@tanstack/react-query'
-import { Zap } from '@nsmr/pixelart-react'
-
-import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
-import { useCombatTurn } from '@/hooks/use-combat-turn.hook'
-import { cn } from '@/lib/cn.lib'
-import { trpc, trpcOptions, queryClient } from '@/utils/trpc.utils'
-
+import CombatLog from '@/app/(workspace)/map/_components/combat-log.component'
+import DiceResult from '@/app/(workspace)/map/_components/dice-result.component'
+import DiceRoller from '@/app/(workspace)/map/_components/dice-roller.component'
+import EnemyCard from '@/app/(workspace)/map/_components/enemy-card.component'
+import HealthBar from '@/app/(workspace)/map/_components/health-bar.component'
 import DoctrinePanel from '@/components/doctrine-panel.component'
-import { useTacticalEnemyTurn } from '@/hooks/use-tactical-enemy-turn.hook'
 import AlertDialog, {
   AlertDialogAction,
   AlertDialogContent,
@@ -25,25 +15,19 @@ import AlertDialog, {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog.component'
 import Button from '@/components/ui/button.component'
-import ScrollArea from '@/ui/scroll-area.component'
-
-import TurnOrderDisplay from './turn-order-display.component'
-import ActionMenu from './action-menu.component'
-import TileInfoPanel from './tile-info-panel.component'
-
-import { DOCTRINES } from '@shared/constants/doctrines'
-import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
+import { useCombatTurn } from '@/hooks/use-combat-turn.hook'
 import { useTacticalAttack } from '@/hooks/use-tactical-attack.hook'
 import { useTacticalDoctrine } from '@/hooks/use-tactical-doctrine.hook'
-
-import HealthBar from '@/app/(workspace)/map/_components/health-bar.component'
-import EnemyCard from '@/app/(workspace)/map/_components/enemy-card.component'
-import DiceRoller from '@/app/(workspace)/map/_components/dice-roller.component'
-import DiceResult from '@/app/(workspace)/map/_components/dice-result.component'
-import CombatLog from '@/app/(workspace)/map/_components/combat-log.component'
-
-import { getConsumableById } from '@shared/constants/items'
+import { useTacticalEnemyTurn } from '@/hooks/use-tactical-enemy-turn.hook'
+import { cn } from '@/lib/cn.lib'
+import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
+import ScrollArea from '@/ui/scroll-area.component'
+import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { Zap } from '@nsmr/pixelart-react'
+import { DOCTRINES } from '@shared/constants/doctrines'
 import { getEnemy } from '@shared/constants/enemies'
+import { getConsumableById } from '@shared/constants/items'
+import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
 import {
   ItemType,
   type CombatLogEntry,
@@ -51,6 +35,16 @@ import {
   type InventoryCharacter
 } from '@shared/types/gamification.types'
 import type { TacticalUnit, TerrainType, TileState } from '@shared/types/tactical-combat.types'
+import { useMutation } from '@tanstack/react-query'
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
+import ActionMenu from './action-menu.component'
+import TileInfoPanel from './tile-info-panel.component'
+import TurnOrderDisplay from './turn-order-display.component'
 
 // Dynamic import for Phaser canvas (SSR-safe)
 const TacticalCanvas = dynamic(() => import('./tactical-canvas.component'), { ssr: false })
@@ -91,6 +85,7 @@ export default function TacticalCombatArena({
     playerUnits,
     enemyUnits,
     tiles,
+    isSceneReady,
     initializeCombat,
     hydrateFromState,
     updateUnit,
@@ -109,9 +104,7 @@ export default function TacticalCombatArena({
   const activeUnit = allUnits.find((u) => u.id === activeUnitId)
   const playerUnit = playerUnits[0]
   const hoveredTileState = hoveredTile && tiles[hoveredTile.y]?.[hoveredTile.x]
-  const hoveredUnit = hoveredTileState?.occupantId
-    ? allUnits.find((u) => u.id === hoveredTileState.occupantId)
-    : null
+  const hoveredUnit = hoveredTileState?.occupantId ? allUnits.find((u) => u.id === hoveredTileState.occupantId) : null
 
   // Create turn queue with updated health values from playerUnits/enemyUnits
   const turnQueueWithHealth = turnQueue.map((unit) => {
@@ -136,12 +129,11 @@ export default function TacticalCombatArena({
   // Get bonus dice from active self-buff doctrines (like Stellar Collapse)
 
   // Calculate bonus dice from active effects (memoized to avoid infinite loops)
-  const { doctrineBonusDice, sixesGenerateExtraHits } = useMemo(() => {
+  const doctrineBonusDice = useMemo(() => {
     const activeUnit = playerUnits.find((u) => u.id === activeUnitId)
-    if (!activeUnit) return { doctrineBonusDice: 0, sixesGenerateExtraHits: false }
+    if (!activeUnit) return 0
 
     let bonusDice = 0
-    let hasExtraHits = false
 
     for (const effect of activeUnit.activeEffects) {
       if (effect.remainingTurns <= 0) continue
@@ -149,22 +141,19 @@ export default function TacticalCombatArena({
       if (!doctrine) continue
 
       for (const doctrineEffect of doctrine.effects) {
-        if (doctrineEffect.type === DoctrineEffectType.POWER_MODIFIER &&
-            doctrineEffect.target === DoctrineTarget.SELF) {
+        if (
+          doctrineEffect.type === DoctrineEffectType.POWER_MODIFIER &&
+          doctrineEffect.target === DoctrineTarget.SELF
+        ) {
           bonusDice += doctrineEffect.value || 0
-          if (effect.sourceDoctrineId === 'stellar_collapse') {
-            hasExtraHits = true
-          }
         }
       }
     }
 
-    return { doctrineBonusDice: bonusDice, sixesGenerateExtraHits: hasExtraHits }
+    return bonusDice
   }, [activeUnitId, playerUnits])
 
   const weaponDice = baseWeaponDice + doctrineBonusDice
-
-  const targetEnemy = enemies.find((e) => e.currentHealth > 0)
 
   // Tactical attack hook
   const { confirmAttack, getPendingAttackInfo, isLoading: isTacticalAttackLoading } = useTacticalAttack()
@@ -173,21 +162,24 @@ export default function TacticalCombatArena({
   const { isExecuting: isEnemyTurnExecuting } = useTacticalEnemyTurn()
 
   // Handler for when dice rolling completes - executes tactical combat
-  const handleTacticalAttack = useCallback(async (rolls: { attackRolls: number[]; defenseRolls: number[] }) => {
-    const attackInfo = getPendingAttackInfo()
+  const handleTacticalAttack = useCallback(
+    async (rolls: { attackRolls: number[]; defenseRolls: number[] }) => {
+      const attackInfo = getPendingAttackInfo()
 
-    if (attackInfo) {
-      await confirmAttack({
-        attackRolls: rolls.attackRolls,
-        defenseRolls: rolls.defenseRolls
-      })
+      if (attackInfo) {
+        await confirmAttack({
+          attackRolls: rolls.attackRolls,
+          defenseRolls: rolls.defenseRolls
+        })
 
-      // Clear consumed doctrine buffs after attack
-      if (doctrineBonusDice > 0) {
-        clearActiveUnitDoctrines()
+        // Clear consumed doctrine buffs after attack
+        if (doctrineBonusDice > 0) {
+          clearActiveUnitDoctrines()
+        }
       }
-    }
-  }, [confirmAttack, getPendingAttackInfo, doctrineBonusDice, clearActiveUnitDoctrines])
+    },
+    [confirmAttack, getPendingAttackInfo, doctrineBonusDice, clearActiveUnitDoctrines]
+  )
 
   // Combat turn hook for dice rolling
   const {
@@ -284,9 +276,10 @@ export default function TacticalCombatArena({
       return {
         id: enemy.id,
         templateId: enemy.templateId,
-        name: enemy.namePrefix && enemy.nameSuffix
-          ? `${t(enemy.namePrefix)} ${t(enemy.nameSuffix)}`
-          : t(template?.name ?? 'Enemy'),
+        name:
+          enemy.namePrefix && enemy.nameSuffix
+            ? `${t(enemy.namePrefix)} ${t(enemy.nameSuffix)}`
+            : t(template?.name ?? 'Enemy'),
         position: { x: 6, y: 2 + index }, // Default position, will be overridden if hydrating
         isPlayer: false,
         spriteUrl: template?.imageId ? `/assets/enemies/${template.imageId}.png` : undefined,
@@ -349,15 +342,19 @@ export default function TacticalCombatArena({
       return a.isPlayer ? -1 : 1
     })
 
-    initializeCombat({
-      mapTemplateId: 'arena_small',
-      gridWidth,
-      gridHeight,
-      tiles: newTiles,
-      playerUnits: [playerUnit],
-      enemyUnits: tacticalEnemies,
-      turnQueue
-    }, participationId)
+    initializeCombat(
+      {
+        mapTemplateId: 'arena_small',
+        gridWidth,
+        gridHeight,
+        tiles: newTiles,
+        playerUnits: [playerUnit],
+        enemyUnits: tacticalEnemies,
+        turnQueue
+      },
+      participationId
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Initialization effect: only re-run when IDs change, not when derived values (health, mana) change during combat
   }, [character?.id, enemies.length, participationId, isLoadingTacticalState, persistedTacticalState])
 
   // Helper to render dice groups
@@ -379,7 +376,7 @@ export default function TacticalCombatArena({
           value={v}
           isSuccess={false}
           isCritical={false}
-          className='animate-pulse opacity-70'
+          className="animate-pulse opacity-70"
         />
       ))
     }
@@ -392,52 +389,59 @@ export default function TacticalCombatArena({
   const rollButtonLabel = isAttackPhase ? t('combat.roll_attack') : t('combat.roll_defense')
 
   return (
-    <div className={cn('flex h-full flex-col', className)}>
+    <div className={cn('flex min-h-0 flex-col', className)}>
       {/* Top bar - Turn order */}
-      <div className='bg-card flex-none border-b p-2'>
+      <div className="bg-card flex-none border-b p-2">
         <TurnOrderDisplay turnQueue={turnQueueWithHealth} currentTurnIndex={currentTurnIndex} turnNumber={turnNumber} />
       </div>
 
       {/* Main content */}
-      <div className='flex min-h-0 flex-1'>
+      <div className="flex min-h-0 flex-1">
         {/* Left sidebar - Character + Actions + Consumables + Doctrines */}
-        <div className='bg-card flex w-72 flex-none flex-col gap-3 overflow-y-auto border-r p-3'>
+        <div className="bg-card flex w-72 flex-none flex-col gap-3 overflow-y-auto border-r p-3">
           {/* Character Status */}
-          <div className='rounded-lg border p-3'>
-            <div className='flex gap-3'>
-              <div className='bg-muted/50 relative flex aspect-square w-16 shrink-0 items-center justify-center rounded-md border p-1'>
+          <div className="rounded-lg border p-3">
+            <div className="flex gap-3">
+              <div className="bg-muted/50 relative flex aspect-square w-16 shrink-0 items-center justify-center rounded-md border p-1">
                 <Image
                   src={`/assets/classes/${character.currentClass!}.png`}
                   alt={character.currentClass!}
                   width={64}
                   height={64}
-                  className='h-full w-full object-contain'
+                  className="h-full w-full object-contain"
                   style={{ imageRendering: 'pixelated' }}
                 />
               </div>
-              <div className='flex flex-1 flex-col justify-center'>
-                <h3 className='mb-1 text-sm font-semibold'>{character.name}</h3>
-                <div className='space-y-1'>
-                  <div className='max-w-40'>
-                    <div className='text-muted-foreground mb-0.5 flex justify-between text-[10px]'>
+              <div className="flex flex-1 flex-col justify-center">
+                <h3 className="mb-1 text-sm font-semibold">{character.name}</h3>
+                <div className="space-y-1">
+                  <div className="max-w-40">
+                    <div className="text-muted-foreground mb-0.5 flex justify-between text-[10px]">
                       <span>{t('inventory.health')}</span>
                       <span>
-                        {playerUnit?.currentHealth ?? currentClass.health}/{playerUnit?.maxHealth ?? currentClass.maxHealth}
+                        {playerUnit?.currentHealth ?? currentClass.health}/
+                        {playerUnit?.maxHealth ?? currentClass.maxHealth}
                       </span>
                     </div>
-                    <HealthBar current={playerUnit?.currentHealth ?? currentClass.health} max={playerUnit?.maxHealth ?? currentClass.maxHealth} showLabel={false} />
+                    <HealthBar
+                      current={playerUnit?.currentHealth ?? currentClass.health}
+                      max={playerUnit?.maxHealth ?? currentClass.maxHealth}
+                      showLabel={false}
+                    />
                   </div>
-                  <div className='max-w-40'>
-                    <div className='text-muted-foreground mb-0.5 flex justify-between text-[10px]'>
+                  <div className="max-w-40">
+                    <div className="text-muted-foreground mb-0.5 flex justify-between text-[10px]">
                       <span>{t('inventory.mana')}</span>
                       <span>
                         {playerUnit?.currentMana ?? currentClass.mana}/{playerUnit?.maxMana ?? currentClass.maxMana}
                       </span>
                     </div>
-                    <div className='bg-muted relative h-1.5 overflow-hidden rounded-full'>
+                    <div className="bg-muted relative h-1.5 overflow-hidden rounded-full">
                       <div
-                        className='absolute inset-y-0 left-0 bg-blue-500 transition-all duration-300'
-                        style={{ width: `${((playerUnit?.currentMana ?? currentClass.mana) / (playerUnit?.maxMana ?? currentClass.maxMana)) * 100}%` }}
+                        className="absolute inset-y-0 left-0 bg-blue-500 transition-all duration-300"
+                        style={{
+                          width: `${((playerUnit?.currentMana ?? currentClass.mana) / (playerUnit?.maxMana ?? currentClass.maxMana)) * 100}%`
+                        }}
                       />
                     </div>
                   </div>
@@ -447,57 +451,57 @@ export default function TacticalCombatArena({
 
             {/* Active Status Effects */}
             {activeDoctrines && Object.values(activeDoctrines).length > 0 && (
-              <div className='mt-2 flex flex-wrap gap-1 border-t pt-2'>
+              <div className="mt-2 flex flex-wrap gap-1 border-t pt-2">
                 {Object.values(activeDoctrines).map((effect: any, i) => (
                   <div
                     key={i}
-                    className='flex items-center gap-1 rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-500'
+                    className="flex items-center gap-1 rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-500"
                   >
-                    <Zap className='h-3 w-3' />
+                    <Zap className="h-3 w-3" />
                     <span>{effect.effect}</span>
-                    <span className='opacity-70'>({effect.remainingTurns}t)</span>
+                    <span className="opacity-70">({effect.remainingTurns}t)</span>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Action Menu (when it's player's turn) */}
-          {activeUnit?.isPlayer && phase !== 'enemy_turn' && (
-            <div className='rounded-lg border p-3'>
+          {/* Action Menu (when it's player's turn) - fixed height container */}
+          <div className="min-h-45 rounded-lg border p-3">
+            {activeUnit?.isPlayer && phase !== 'enemy_turn' && (
               <ActionMenu
                 activeUnit={activeUnit}
                 phase={phase}
                 equippedDoctrines={currentClass?.equippedDoctrines ?? []}
               />
-            </div>
-          )}
-          {(phase === 'enemy_turn' || isEnemyTurnExecuting) && (
-            <div className='text-muted-foreground rounded-lg border p-3 text-center text-sm'>
-              <span className='animate-pulse'>{t('combat.enemy_turn', 'Enemy turn...')}</span>
-            </div>
-          )}
+            )}
+            {(phase === 'enemy_turn' || isEnemyTurnExecuting) && (
+              <div className="text-muted-foreground text-center text-sm">
+                <span className="animate-pulse">{t('combat.enemy_turn', 'Enemy turn...')}</span>
+              </div>
+            )}
+          </div>
 
           {/* Consumables Section */}
           {Object.keys(groupedConsumables).length > 0 && (
-            <div className='rounded-lg border p-3'>
-              <div className='mb-2 text-xs font-medium tracking-wider text-green-500/80 uppercase'>
+            <div className="rounded-lg border p-3">
+              <div className="mb-2 text-xs font-medium tracking-wider text-green-500/80 uppercase">
                 {t('consumables.title')}
               </div>
-              <div className='flex flex-wrap gap-1.5'>
+              <div className="flex flex-wrap gap-1.5">
                 {Object.entries(groupedConsumables).map(([defId, { item, count }]) => {
                   const definition = getConsumableById(defId)
                   return (
                     <Button
                       key={defId}
-                      variant='outline'
-                      size='sm'
+                      variant="outline"
+                      size="sm"
                       disabled={useConsumableMutation.isPending}
                       onClick={() => useConsumableMutation.mutate({ consumableId: defId })}
-                      className='flex items-center gap-1.5 text-xs'
+                      className="flex items-center gap-1.5 text-xs"
                     >
                       <span>{t(definition?.nameKey || item.nameKey)}</span>
-                      <span className='text-muted-foreground'>x{count}</span>
+                      <span className="text-muted-foreground">x{count}</span>
                     </Button>
                   )
                 })}
@@ -507,41 +511,51 @@ export default function TacticalCombatArena({
         </div>
 
         {/* Center - Phaser canvas + Doctrines */}
-        <div className='flex flex-1 flex-col'>
-          <div className='bg-background relative min-h-0 flex-1'>
-            <TacticalCanvas className='absolute inset-0' />
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="bg-background relative min-h-75 flex-1">
+            <TacticalCanvas className="absolute inset-0" />
+            {!isSceneReady && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                  <span className="text-sm text-white">{t('common.loading')}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Doctrines Section - below game scene */}
-          <DoctrinePanel
-            showUseControls
-            horizontal
-            currentMana={currentClass?.mana ?? 0}
-            onUseDoctrine={(doctrine) => {
-              if (!participationId) {
-                toast.error(t('combat.error.no_participation'))
-                return
-              }
-              // Use the tactical self-buff doctrine endpoint
-              if (isSelfBuffDoctrine(doctrine.id)) {
-                confirmSelfBuff(doctrine.id)
-              } else {
-                // For targeted doctrines, enter targeting mode
-                selectDoctrine(doctrine.id)
-              }
-            }}
-            isUsingDoctrine={isDoctrineLoading}
-            className='bg-card flex-none border-t'
-          />
+          <div className="bg-card h-32 flex-none border-t">
+            <DoctrinePanel
+              showUseControls
+              horizontal
+              currentMana={currentClass?.mana ?? 0}
+              onUseDoctrine={(doctrine) => {
+                if (!participationId) {
+                  toast.error(t('combat.error.no_participation'))
+                  return
+                }
+                // Use the tactical self-buff doctrine endpoint
+                if (isSelfBuffDoctrine(doctrine.id)) {
+                  confirmSelfBuff(doctrine.id)
+                } else {
+                  // For targeted doctrines, enter targeting mode
+                  selectDoctrine(doctrine.id)
+                }
+              }}
+              isUsingDoctrine={isDoctrineLoading}
+              className="h-full overflow-y-auto"
+            />
+          </div>
         </div>
 
         {/* Right sidebar - Enemies + Dice + Combat Log */}
-        <div className='bg-card flex w-80 flex-none flex-col gap-3 overflow-y-auto border-l p-3'>
+        <div className="bg-card flex w-80 flex-none flex-col gap-3 overflow-y-auto border-l p-3">
           {/* Enemies */}
-          <div className='rounded-lg border p-3'>
-            <h3 className='mb-2 text-sm font-semibold'>{t('combat.enemies')}</h3>
-            <ScrollArea className='max-h-40'>
-              <div className='flex flex-col gap-2 pr-2'>
+          <div className="rounded-lg border p-3">
+            <h3 className="mb-2 text-sm font-semibold">{t('combat.enemies')}</h3>
+            <ScrollArea className="max-h-40">
+              <div className="flex flex-col gap-2 pr-2">
                 {enemyUnits.map((storeEnemy) => {
                   // Build enemy state from store's tactical unit
                   // Name format from server is "prefix|suffix"
@@ -556,13 +570,7 @@ export default function TacticalCombatArena({
                     namePrefix,
                     nameSuffix
                   }
-                  return (
-                    <EnemyCard
-                      key={storeEnemy.id}
-                      enemy={displayEnemy}
-                      isTarget={storeEnemy.currentHealth > 0}
-                    />
-                  )
+                  return <EnemyCard key={storeEnemy.id} enemy={displayEnemy} isTarget={storeEnemy.currentHealth > 0} />
                 })}
               </div>
             </ScrollArea>
@@ -581,15 +589,15 @@ export default function TacticalCombatArena({
               />
 
               {/* Attack/Defense Dice Results */}
-              <div className='space-y-2'>
+              <div className="space-y-2">
                 {(pendingAttackRolls ||
                   submittedAttackRolls ||
                   (showResults && !!lastTurnResult?.playerAttackRolls?.length)) && (
-                  <div className='rounded-lg border p-2 transition-all duration-300'>
-                    <div className='mb-1 text-xs font-medium tracking-wider text-orange-500/80 uppercase'>
+                  <div className="rounded-lg border p-2 transition-all duration-300">
+                    <div className="mb-1 text-xs font-medium tracking-wider text-orange-500/80 uppercase">
                       {t('combat.attack_rolls')}
                     </div>
-                    <div className='flex flex-wrap justify-center gap-1'>
+                    <div className="flex flex-wrap justify-center gap-1">
                       {renderDice(pendingAttackRolls, submittedAttackRolls, lastTurnResult?.playerAttackRolls, 'atk')}
                     </div>
                   </div>
@@ -598,12 +606,17 @@ export default function TacticalCombatArena({
                 {(pendingDefenseRolls ||
                   submittedDefenseRolls ||
                   (showResults && !!lastTurnResult?.playerDefenseRolls?.length)) && (
-                  <div className='rounded-lg border p-2 transition-all duration-300'>
-                    <div className='mb-1 text-xs font-medium tracking-wider text-blue-500/80 uppercase'>
+                  <div className="rounded-lg border p-2 transition-all duration-300">
+                    <div className="mb-1 text-xs font-medium tracking-wider text-blue-500/80 uppercase">
                       {t('combat.defense_rolls')}
                     </div>
-                    <div className='flex flex-wrap justify-center gap-1'>
-                      {renderDice(pendingDefenseRolls, submittedDefenseRolls, lastTurnResult?.playerDefenseRolls, 'def')}
+                    <div className="flex flex-wrap justify-center gap-1">
+                      {renderDice(
+                        pendingDefenseRolls,
+                        submittedDefenseRolls,
+                        lastTurnResult?.playerDefenseRolls,
+                        'def'
+                      )}
                     </div>
                   </div>
                 )}
@@ -613,7 +626,7 @@ export default function TacticalCombatArena({
 
           {/* Tile Info Panel (when not attacking) */}
           {phase !== 'select_target' && (
-            <div className='rounded-lg border p-3'>
+            <div className="rounded-lg border p-3">
               <TileInfoPanel
                 hoveredTile={hoveredTile}
                 hoveredTileState={hoveredTileState ?? null}
@@ -624,14 +637,14 @@ export default function TacticalCombatArena({
           )}
 
           {/* Combat Log */}
-          <CombatLog entries={combatLog} className='max-h-60 flex-1 overflow-y-auto' />
+          <CombatLog entries={combatLog} className="max-h-60 flex-1 overflow-y-auto" />
         </div>
       </div>
 
       {/* Bottom bar - Controls hint */}
-      <div className='bg-card text-muted-foreground flex-none border-t p-2 text-xs'>
-        <span className='mr-4'>{t('tactical.controls.select', 'Left click: Select')}</span>
-        <span className='mr-4'>{t('tactical.controls.pan', 'Right drag: Pan camera')}</span>
+      <div className="bg-card text-muted-foreground flex-none border-t p-2 text-xs">
+        <span className="mr-4">{t('tactical.controls.select', 'Left click: Select')}</span>
+        <span className="mr-4">{t('tactical.controls.pan', 'Right drag: Pan camera')}</span>
         <span>{t('tactical.controls.zoom', 'Scroll: Zoom')}</span>
       </div>
 

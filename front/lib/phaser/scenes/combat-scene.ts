@@ -61,6 +61,9 @@ export class CombatScene extends Phaser.Scene {
 
     // Set up camera controls
     this.setupCamera()
+
+    // Mark scene as ready
+    useTacticalCombatStore.getState().setSceneReady(true)
   }
 
   private setupInputHandlers(): void {
@@ -177,9 +180,24 @@ export class CombatScene extends Phaser.Scene {
     )
   }
 
+  /**
+   * Check if the scene is still active and safe to use.
+   */
+  private isSceneActive(): boolean {
+    // Must check scene.manager exists before calling isActive() since
+    // isActive() internally accesses manager which may be null during initialization
+    return !!(this.sys && this.tweens && this.scene?.manager && this.scene.isActive())
+  }
+
   private syncWithState(
     state: ReturnType<typeof useTacticalCombatStore.getState>
   ): void {
+    // Guard against calls after scene destruction
+    if (!this.isSceneActive()) {
+      console.debug('[CombatScene] syncWithState skipped: scene inactive')
+      return
+    }
+
     // Update grid if dimensions changed
     if (
       this.gridSystem.getDimensions().width !== state.gridWidth ||
@@ -373,6 +391,11 @@ export class CombatScene extends Phaser.Scene {
    * Play a casting effect on the caster unit (flash/glow).
    */
   private async playCastEffect(unit: Unit): Promise<void> {
+    if (!this.isSceneActive()) {
+      console.debug('[CombatScene] playCastEffect skipped: scene inactive')
+      return
+    }
+
     return new Promise((resolve) => {
       // Create a flash effect
       const flash = this.add.graphics()
@@ -401,6 +424,10 @@ export class CombatScene extends Phaser.Scene {
    */
   private async playAoEEffect(tiles: GridPosition[], doctrineId: string): Promise<void> {
     if (tiles.length === 0) return
+    if (!this.isSceneActive()) {
+      console.debug('[CombatScene] playAoEEffect skipped: scene inactive')
+      return
+    }
 
     return new Promise((resolve) => {
       // Determine color based on doctrine (could be expanded)
@@ -457,6 +484,11 @@ export class CombatScene extends Phaser.Scene {
    * Show a status effect text above a unit.
    */
   private showStatusText(unit: Unit, status: string): void {
+    if (!this.isSceneActive()) {
+      console.debug('[CombatScene] showStatusText skipped: scene inactive')
+      return
+    }
+
     const text = this.add.text(
       unit.x,
       unit.y - 50,
@@ -496,6 +528,11 @@ export class CombatScene extends Phaser.Scene {
    * Show a floating damage number above a unit.
    */
   private showDamageNumber(unit: Unit, damage: number): void {
+    if (!this.isSceneActive()) {
+      console.debug('[CombatScene] showDamageNumber skipped: scene inactive')
+      return
+    }
+
     const text = this.add.text(
       unit.x,
       unit.y - 30,
@@ -535,6 +572,11 @@ export class CombatScene extends Phaser.Scene {
    * Show a healing number above a unit (green, positive).
    */
   showHealNumber(unit: Unit, amount: number): void {
+    if (!this.isSceneActive()) {
+      console.debug('[CombatScene] showHealNumber skipped: scene inactive')
+      return
+    }
+
     const text = this.add.text(
       unit.x,
       unit.y - 30,
@@ -670,6 +712,9 @@ export class CombatScene extends Phaser.Scene {
   }
 
   shutdown(): void {
+    // Mark scene as not ready
+    useTacticalCombatStore.getState().setSceneReady(false)
+
     // Cleanup subscriptions
     if (this.unsubscribe) {
       this.unsubscribe()

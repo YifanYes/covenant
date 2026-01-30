@@ -57,6 +57,8 @@ export interface DoctrineEffect {
   scalesWithEnemyTier?: boolean
   // Thorns damage: flat damage dealt to attackers when the buff holder is hit (karmic_retribution)
   thornsDamage?: number
+  // Extra hits generated per 6 rolled (stellar_collapse)
+  sixesGenerateExtraHits?: number
 }
 
 export interface DoctrineDefinition {
