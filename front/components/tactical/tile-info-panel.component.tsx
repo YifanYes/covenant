@@ -31,7 +31,7 @@ export default function TileInfoPanel({
   const { t } = useTranslation()
 
   if (!hoveredTile || !hoveredTileState) {
-    return <div className="text-sm text-muted-foreground text-center py-4">Hover over a tile to see info</div>
+    return <div className="text-sm text-muted-foreground text-center py-4">{t('tactical.tile_info.hover_hint')}</div>
   }
 
   const terrainConfig = TERRAIN_CONFIG[hoveredTileState.terrain]
@@ -40,31 +40,31 @@ export default function TileInfoPanel({
     <div className="space-y-4">
       {/* Tile info */}
       <div>
-        <h4 className="text-xs font-semibold text-muted-foreground mb-2">TILE</h4>
+        <h4 className="text-xs font-semibold text-muted-foreground mb-2">{t('tactical.tile_info.tile').toUpperCase()}</h4>
         <div className="space-y-1 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Position</span>
+            <span className="text-muted-foreground">{t('tactical.tile_info.position')}</span>
             <span>
               ({hoveredTile.x}, {hoveredTile.y})
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Terrain</span>
+            <span className="text-muted-foreground">{t('tactical.tile_info.terrain')}</span>
             <span className="capitalize">{hoveredTileState.terrain.toLowerCase()}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Move Cost</span>
-            <span>{terrainConfig.movementCost === Infinity ? 'Blocked' : terrainConfig.movementCost}</span>
+            <span className="text-muted-foreground">{t('tactical.tile_info.move_cost')}</span>
+            <span>{terrainConfig.movementCost === Infinity ? t('tactical.tile_info.blocked') : terrainConfig.movementCost}</span>
           </div>
           {terrainConfig.damagePerTurn > 0 && (
             <div className="flex justify-between text-red-500">
-              <span>Damage/Turn</span>
+              <span>{t('tactical.tile_info.damage_per_turn')}</span>
               <span>{terrainConfig.damagePerTurn}</span>
             </div>
           )}
           {terrainConfig.statusEffect && (
             <div className="flex justify-between text-blue-500">
-              <span>Effect</span>
+              <span>{t('tactical.tile_info.effect')}</span>
               <span>{terrainConfig.statusEffect}</span>
             </div>
           )}
@@ -75,7 +75,7 @@ export default function TileInfoPanel({
       {hoveredUnit && (
         <div className="pt-4 border-t">
           <h4 className="text-xs font-semibold text-muted-foreground mb-2">
-            {hoveredUnit.isPlayer ? 'ALLY' : 'ENEMY'}
+            {hoveredUnit.isPlayer ? t('tactical.tile_info.ally').toUpperCase() : t('tactical.tile_info.enemy').toUpperCase()}
           </h4>
 
           <div className="space-y-2">
@@ -143,11 +143,11 @@ export default function TileInfoPanel({
             {/* Stats */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Move</span>
+                <span className="text-muted-foreground">{t('tactical.tile_info.move')}</span>
                 <span>{hoveredUnit.movementRange}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Range</span>
+                <span className="text-muted-foreground">{t('tactical.tile_info.range')}</span>
                 <span>{hoveredUnit.attackRange}</span>
               </div>
               <div className="flex justify-between">
@@ -162,7 +162,7 @@ export default function TileInfoPanel({
             {/* Status effects */}
             {hoveredUnit.activeEffects.length > 0 && (
               <div className="mt-2">
-                <span className="text-xs text-muted-foreground">Effects:</span>
+                <span className="text-xs text-muted-foreground">{t('tactical.tile_info.effects')}:</span>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {hoveredUnit.activeEffects.map((effect, i) => (
                     <span key={i} className="text-xs px-1.5 py-0.5 bg-muted rounded">
@@ -179,7 +179,7 @@ export default function TileInfoPanel({
       {/* Selected tile indicator */}
       {selectedTile && (
         <div className="pt-4 border-t text-xs text-muted-foreground">
-          Selected: ({selectedTile.x}, {selectedTile.y})
+          {t('tactical.tile_info.selected')}: ({selectedTile.x}, {selectedTile.y})
         </div>
       )}
     </div>

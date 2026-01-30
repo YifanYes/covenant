@@ -88,6 +88,18 @@ export function useTacticalEnemyTurn() {
           return
         }
 
+        // Handle mana regeneration at end of round
+        if (result.manaRegenerated && result.manaRegenerated > 0) {
+          const playerUnit = useTacticalCombatStore.getState().playerUnits[0]
+          if (playerUnit) {
+            useTacticalCombatStore.getState().updateUnit(playerUnit.id, {
+              currentMana: Math.min(playerUnit.currentMana + result.manaRegenerated, playerUnit.maxMana)
+            })
+          }
+          // Invalidate character query to sync mana display
+          queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+        }
+
         if (result.moved && result.path && result.path.length > 1) {
           startEnemyMovement(activeUnitId, result.path)
 
