@@ -540,16 +540,238 @@ shared/
 
 ### [ ] Phase 7: Polish
 
-**Goal:** Visual quality and performance
+**Goal:** Visual quality, game feel, and performance
 
-**Tasks:**
+#### 7.1 Animation Enhancements
 
-1. Sprite animation system
-2. Particle effects for spells
-3. Camera follow
-4. Performance optimization
+| Task | Description |
+|------|-------------|
+| Sprite animation system | Replace placeholder circles with animated sprite sheets (idle, walk, attack, cast, hit, death) |
+| Idle breathing animation | Subtle scale oscillation (1.0 → 1.02 → 1.0) on all units to make them feel alive |
+| Direction facing | Units face their movement direction and attack targets; flip sprites horizontally for E/W |
+| Hit stagger | Brief recoil animation (50ms pushback) when taking damage |
 
-**Deliverable:** Production-ready visuals
+#### 7.2 Visual Effects
+
+| Task | Description |
+|------|-------------|
+| Screen shake | Camera shake on heavy attacks (intensity based on damage), deaths, and AoE spells |
+| Hit sparks/particles | Particle burst on melee impacts, projectile trails for ranged attacks |
+| Critical hit effects | Larger damage numbers, special flash effect, screen shake amplified |
+| Status effect overlays | Visual indicators on units: poison drip, burn flames, ice crystals, shield glow |
+| Particle effects for spells | Fire embers, ice shards, lightning arcs, holy rays, dark tendrils |
+
+**Screen Shake Implementation:**
+
+```typescript
+function shakeCamera(scene: Phaser.Scene, intensity: 'light' | 'medium' | 'heavy'): void {
+  const config = {
+    light: { intensity: 0.005, duration: 100 },
+    medium: { intensity: 0.01, duration: 150 },
+    heavy: { intensity: 0.02, duration: 200 }
+  }
+  const { intensity: i, duration } = config[intensity]
+  scene.cameras.main.shake(duration, i)
+}
+
+// Usage
+shakeCamera(this, damage >= 20 ? 'heavy' : damage >= 10 ? 'medium' : 'light')
+```
+
+#### 7.3 Movement & Targeting UX
+
+| Task | Description |
+|------|-------------|
+| Movement ghost preview | Semi-transparent unit sprite at destination tile before confirming move |
+| Camera follow | Auto-pan to active unit at turn start; smooth follow during movement |
+| Path preview dots | Small dots along movement path showing exact route |
+
+**Movement Ghost Implementation:**
+
+```typescript
+interface MovementGhost {
+  sprite: Phaser.GameObjects.Sprite
+  show(position: GridPosition): void
+  hide(): void
+}
+
+// In CombatScene
+private movementGhost: MovementGhost
+
+createMovementGhost(): void {
+  this.movementGhost = {
+    sprite: this.add.sprite(0, 0, 'unit_player')
+      .setAlpha(0.4)
+      .setVisible(false)
+      .setDepth(DEPTH.UNITS - 1),
+    show(pos) {
+      const screen = gridToScreen(pos.x, pos.y)
+      this.sprite.setPosition(screen.x, screen.y).setVisible(true)
+    },
+    hide() {
+      this.sprite.setVisible(false)
+    }
+  }
+}
+
+// Show ghost when hovering valid move tile
+onTileHover(pos: GridPosition): void {
+  if (this.isValidMoveDestination(pos)) {
+    this.movementGhost.show(pos)
+  } else {
+    this.movementGhost.hide()
+  }
+}
+```
+
+#### 7.4 Performance Optimization
+
+| Task | Description |
+|------|-------------|
+| Object pooling | Pool floating text, particles, and highlight sprites to reduce GC pressure |
+| Tile culling | Only render tiles within camera viewport + 1 tile buffer |
+| Animation queuing | Queue multiple animations to prevent race conditions and ensure smooth chaining |
+| Loading skeleton | Replace spinner with skeleton UI showing grid outline and unit silhouettes |
+
+**Object Pool Implementation:**
+
+```typescript
+class FloatingTextPool {
+  private pool: Phaser.GameObjects.Text[] = []
+  private active: Set<Phaser.GameObjects.Text> = new Set()
+
+  constructor(private scene: Phaser.Scene, private poolSize: number = 20) {
+    for (let i = 0; i < poolSize; i++) {
+      const text = scene.add.text(0, 0, '', {
+        fontSize: '16px',
+        fontFamily: 'monospace',
+        stroke: '#000',
+        strokeThickness: 3
+      }).setVisible(false).setDepth(DEPTH.UI)
+      this.pool.push(text)
+    }
+  }
+
+  spawn(x: number, y: number, value: string, color: string): Phaser.GameObjects.Text | null {
+    const text = this.pool.find(t => !this.active.has(t))
+    if (!text) return null
+
+    text.setText(value)
+      .setColor(color)
+      .setPosition(x, y)
+      .setVisible(true)
+      .setAlpha(1)
+
+    this.active.add(text)
+
+    this.scene.tweens.add({
+      targets: text,
+      y: y - 40,
+      alpha: 0,
+      duration: 1000,
+      ease: 'Cubic.easeOut',
+      onComplete: () => {
+        text.setVisible(false)
+        this.active.delete(text)
+      }
+    })
+
+    return text
+  }
+
+  clear(): void {
+    this.active.forEach(t => t.setVisible(false))
+    this.active.clear()
+  }
+}
+```
+
+**Animation Queue Implementation:**
+
+```typescript
+class AnimationQueue {
+  private queue: Array<() => Promise<void>> = []
+  private isProcessing = false
+
+  async enqueue(animation: () => Promise<void>): Promise<void> {
+    return new Promise((resolve) => {
+      this.queue.push(async () => {
+        await animation()
+        resolve()
+      })
+      this.processQueue()
+    })
+  }
+
+  private async processQueue(): Promise<void> {
+    if (this.isProcessing || this.queue.length === 0) return
+    this.isProcessing = true
+
+    while (this.queue.length > 0) {
+      const animation = this.queue.shift()!
+      await animation()
+    }
+
+    this.isProcessing = false
+  }
+
+  clear(): void {
+    this.queue = []
+  }
+}
+
+// Usage in CombatScene
+private animationQueue = new AnimationQueue()
+
+async playAttackSequence(attacker: Unit, target: Unit, damage: number): Promise<void> {
+  await this.animationQueue.enqueue(async () => {
+    await attacker.playAttackAnimation(target.position)
+    await target.playDamageAnimation()
+    this.showFloatingDamage(target.position, damage)
+    this.shakeCamera('medium')
+  })
+}
+```
+
+**Tile Culling Implementation:**
+
+```typescript
+// In GridSystem
+updateVisibleTiles(camera: Phaser.Cameras.Scene2D.Camera): void {
+  const bounds = camera.worldView
+  const buffer = TILE_WIDTH // 1 tile buffer
+
+  for (let y = 0; y < this.height; y++) {
+    for (let x = 0; x < this.width; x++) {
+      const screen = gridToScreen(x, y)
+      const tile = this.tiles[y][x]
+
+      const visible =
+        screen.x >= bounds.x - buffer &&
+        screen.x <= bounds.x + bounds.width + buffer &&
+        screen.y >= bounds.y - buffer &&
+        screen.y <= bounds.y + bounds.height + buffer
+
+      tile.setVisible(visible)
+    }
+  }
+}
+
+// Call in scene update loop
+update(): void {
+  this.gridSystem.updateVisibleTiles(this.cameras.main)
+}
+```
+
+#### 7.5 Deliverables
+
+- Units animate smoothly with direction awareness
+- Combat feels impactful with screen shake, particles, and hit effects
+- Critical hits are visually distinct and satisfying
+- Status effects are immediately visible on affected units
+- Movement preview eliminates misclick frustration
+- Stable 60fps on mid-range devices
+- No GC stutters during combat
 
 ---
 
