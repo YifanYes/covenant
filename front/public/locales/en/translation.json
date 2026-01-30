@@ -182,7 +182,8 @@
     "to_battle": "To Battle!",
     "turn_summary": "Turn Summary",
     "use_dice_roller": "Use the Dice Roller to attack!",
-    "your_hits": "Your Hits"
+    "your_hits": "Your Hits",
+    "enemy_turn": "Enemy turn..."
   },
   "common": {
     "cancel": "Cancel",
@@ -1364,6 +1365,22 @@
     "select_destination": "Select Destination",
     "select_target": "Select Target",
     "targets_affected": "Targets Affected",
+    "tile_info": {
+      "ally": "Ally",
+      "blocked": "Blocked",
+      "damage_per_turn": "Damage/Turn",
+      "effect": "Effect",
+      "effects": "Effects",
+      "enemy": "Enemy",
+      "hover_hint": "Hover over a tile to see info",
+      "move": "Move",
+      "move_cost": "Move Cost",
+      "position": "Position",
+      "range": "Range",
+      "selected": "Selected",
+      "terrain": "Terrain",
+      "tile": "Tile"
+    },
     "tiles": "tiles"
   }
 }

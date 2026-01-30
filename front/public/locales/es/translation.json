@@ -182,7 +182,8 @@
     "to_battle": "¡Al ataque!",
     "turn_summary": "Resumen del Turno",
     "use_dice_roller": "¡Usa el Lanzador de Dados para atacar!",
-    "your_hits": "Tus Impactos"
+    "your_hits": "Tus Impactos",
+    "enemy_turn": "Turno enemigo..."
   },
   "common": {
     "cancel": "Cancelar",
@@ -1364,6 +1365,22 @@
     "select_destination": "Seleccionar Destino",
     "select_target": "Seleccionar Objetivo",
     "targets_affected": "Objetivos Afectados",
+    "tile_info": {
+      "ally": "Aliado",
+      "blocked": "Bloqueado",
+      "damage_per_turn": "Daño/Turno",
+      "effect": "Efecto",
+      "effects": "Efectos",
+      "enemy": "Enemigo",
+      "hover_hint": "Pasa el cursor sobre una casilla para ver info",
+      "move": "Movimiento",
+      "move_cost": "Coste de Movimiento",
+      "position": "Posición",
+      "range": "Alcance",
+      "selected": "Seleccionado",
+      "terrain": "Terreno",
+      "tile": "Casilla"
+    },
     "tiles": "casillas"
   }
 }

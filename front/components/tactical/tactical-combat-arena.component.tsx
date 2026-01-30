@@ -469,15 +469,11 @@ export default function TacticalCombatArena({
           {/* Action Menu (when it's player's turn) - fixed height container */}
           <div className="min-h-45 rounded-lg border p-3">
             {activeUnit?.isPlayer && phase !== 'enemy_turn' && (
-              <ActionMenu
-                activeUnit={activeUnit}
-                phase={phase}
-                equippedDoctrines={currentClass?.equippedDoctrines ?? []}
-              />
+              <ActionMenu activeUnit={activeUnit} phase={phase} />
             )}
             {(phase === 'enemy_turn' || isEnemyTurnExecuting) && (
               <div className="text-muted-foreground text-center text-sm">
-                <span className="animate-pulse">{t('combat.enemy_turn', 'Enemy turn...')}</span>
+                <span className="animate-pulse">{t('combat.enemy_turn')}</span>
               </div>
             )}
           </div>
@@ -643,9 +639,9 @@ export default function TacticalCombatArena({
 
       {/* Bottom bar - Controls hint */}
       <div className="bg-card text-muted-foreground flex-none border-t p-2 text-xs">
-        <span className="mr-4">{t('tactical.controls.select', 'Left click: Select')}</span>
-        <span className="mr-4">{t('tactical.controls.pan', 'Right drag: Pan camera')}</span>
-        <span>{t('tactical.controls.zoom', 'Scroll: Zoom')}</span>
+        <span className="mr-4">{t('tactical.controls.select')}</span>
+        <span className="mr-4">{t('tactical.controls.pan')}</span>
+        <span>{t('tactical.controls.zoom')}</span>
       </div>
 
       {/* Death Dialog */}

@@ -24,10 +24,9 @@ function translateUnitName(name: string, t: (key: string) => string): string {
 interface ActionMenuProps {
   activeUnit: TacticalUnit
   phase: TacticalPhase
-  equippedDoctrines?: string[]
 }
 
-export default function ActionMenu({ activeUnit, phase, equippedDoctrines = [] }: ActionMenuProps) {
+export default function ActionMenu({ activeUnit, phase }: ActionMenuProps) {
   const { t } = useTranslation()
   const { selectAction, cancelAction, pendingAction, selectedDoctrineId } =
     useTacticalCombatStore()
@@ -37,7 +36,6 @@ export default function ActionMenu({ activeUnit, phase, equippedDoctrines = [] }
 
   const canMove = !activeUnit.hasMoved
   const canAttack = !activeUnit.hasActed
-  const canUseDoctrine = !activeUnit.hasActed && equippedDoctrines.length > 0
 
   // Render action selection
   if (phase === 'select_action') {
@@ -113,13 +111,6 @@ export default function ActionMenu({ activeUnit, phase, equippedDoctrines = [] }
             <span className="text-foreground">{activeUnit.speed}</span>
           </div>
         </div>
-
-        {/* Doctrines */}
-        {canUseDoctrine && (
-          <div className="mt-4 pt-4 border-t">
-            <DoctrineTargetSelector activeUnit={activeUnit} equippedDoctrines={equippedDoctrines} />
-          </div>
-        )}
       </div>
     )
   }
@@ -172,9 +163,7 @@ export default function ActionMenu({ activeUnit, phase, equippedDoctrines = [] }
 
     // Doctrine targeting mode
     if (selectedDoctrineId && doctrineInfo) {
-      return (
-        <DoctrineTargetSelector activeUnit={activeUnit} equippedDoctrines={equippedDoctrines} />
-      )
+      return <DoctrineTargetSelector />
     }
 
     // Attack targeting mode

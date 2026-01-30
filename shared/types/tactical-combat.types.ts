@@ -249,6 +249,9 @@ export interface EnemyTurnResult {
 
   // Combat log entries
   logEntries?: CombatLogEntry[]
+
+  // Mana regenerated at end of round
+  manaRegenerated?: number
 }
 
 // Tactical doctrine execution result

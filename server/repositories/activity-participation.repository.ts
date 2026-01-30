@@ -56,17 +56,19 @@ export class ActivityParticipationRepository {
 
   async findByIdWithTacticalState(participationId: string): Promise<{
     id: string
+    characterId: string
     tacticalState: TacticalStateData | null
   } | null> {
     const result = await this.prisma.activityParticipation.findUnique({
       where: { id: participationId },
-      select: { id: true, tacticalState: true }
+      select: { id: true, characterId: true, tacticalState: true }
     })
 
     if (!result) return null
 
     return {
       id: result.id,
+      characterId: result.characterId,
       tacticalState: result.tacticalState as unknown as TacticalStateData | null
     }
   }

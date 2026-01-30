@@ -1466,12 +1466,34 @@ export class CombatService {
 
     // Update turn number if we've completed a full round
     const newTurnNumber = nextTurnIndex === 0 ? state.turnNumber + 1 : state.turnNumber
+    const isNewRound = nextTurnIndex === 0
 
     state = {
       ...state,
       currentTurnIndex: nextTurnIndex,
       turnNumber: newTurnNumber,
       units: unitsWithResetNextUnit
+    }
+
+    // Regenerate mana at the start of a new round
+    let manaRegenerated: number | undefined
+    if (isNewRound && participation.characterId) {
+      const character = await this.characterRepository.findByIdWithClasses(participation.characterId)
+      if (character) {
+        const currentClass = this.getCurrentClassOrThrow(character)
+        const currentMana = currentClass.mana
+        const maxMana = currentClass.maxMana
+        const baseRegen = 1 // Base mana regeneration per round
+
+        if (currentMana < maxMana) {
+          manaRegenerated = Math.min(baseRegen, maxMana - currentMana)
+          await this.characterRepository.updateHealth(
+            currentClass.id,
+            currentClass.health,
+            currentMana + manaRegenerated
+          )
+        }
+      }
     }
 
     // Save state to database
@@ -1509,7 +1531,8 @@ export class CombatService {
       attackerRolls,
       defenderRolls,
       updatedState: state,
-      logEntries
+      logEntries,
+      manaRegenerated
     }
   }
 
