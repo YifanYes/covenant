@@ -212,11 +212,18 @@ export default function TacticalCombatArena({
       if (data.manaRestored) {
         toast.success(t('consumables.mana_restored', { amount: data.manaRestored }))
       }
-      // Update the tactical store's player unit so the UI reflects the change
-      if (playerUnit && (data.healthRestored || data.manaRestored)) {
-        updateUnit(playerUnit.id, {
-          currentHealth: playerUnit.currentHealth + (data.healthRestored ?? 0),
-          currentMana: playerUnit.currentMana + (data.manaRestored ?? 0)
+      // Get fresh player unit from store to avoid stale closure
+      const currentPlayerUnit = useTacticalCombatStore.getState().playerUnits[0]
+      if (currentPlayerUnit && (data.healthRestored || data.manaRestored)) {
+        updateUnit(currentPlayerUnit.id, {
+          currentHealth: Math.min(
+            currentPlayerUnit.currentHealth + (data.healthRestored ?? 0),
+            currentPlayerUnit.maxHealth
+          ),
+          currentMana: Math.min(
+            currentPlayerUnit.currentMana + (data.manaRestored ?? 0),
+            currentPlayerUnit.maxMana
+          )
         })
       }
       queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })

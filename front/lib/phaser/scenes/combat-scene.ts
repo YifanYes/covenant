@@ -297,6 +297,7 @@ export class CombatScene extends Phaser.Scene {
       if (data.damageDealt > 0) {
         const damagePromise = target.animateDamage(data.damageDealt)
         this.showDamageNumber(target, data.damageDealt)
+        this.shakeCamera(this.getShakeIntensity(data.damageDealt, data.targetKilled))
         await damagePromise
       }
 
@@ -309,6 +310,7 @@ export class CombatScene extends Phaser.Scene {
       if (data.damageToAttacker > 0) {
         const attackerDamagePromise = attacker.animateDamage(data.damageToAttacker)
         this.showDamageNumber(attacker, data.damageToAttacker)
+        this.shakeCamera(this.getShakeIntensity(data.damageToAttacker, data.attackerKilled))
         await attackerDamagePromise
 
         if (data.attackerKilled) {
@@ -356,6 +358,10 @@ export class CombatScene extends Phaser.Scene {
       await this.playAoEEffect(data.affectedTiles, data.doctrineId)
 
       // Apply effects to each affected unit
+      // Track total damage for a combined shake effect
+      let maxDamage = 0
+      let anyKilled = false
+
       for (const effect of data.effects) {
         const targetUnit = this.units.get(effect.unitId)
         if (!targetUnit) continue
@@ -364,6 +370,7 @@ export class CombatScene extends Phaser.Scene {
         if (effect.damageDealt && effect.damageDealt > 0) {
           const damagePromise = targetUnit.animateDamage(effect.damageDealt)
           this.showDamageNumber(targetUnit, effect.damageDealt)
+          maxDamage = Math.max(maxDamage, effect.damageDealt)
           await damagePromise
         }
 
@@ -377,14 +384,47 @@ export class CombatScene extends Phaser.Scene {
 
         // Play death animation if killed
         if (effect.killed) {
+          anyKilled = true
           await targetUnit.animateDeath()
         }
+      }
+
+      // Single shake for the entire doctrine effect (based on max damage dealt)
+      if (maxDamage > 0) {
+        this.shakeCamera(this.getShakeIntensity(maxDamage, anyKilled))
       }
     } finally {
       this.isDoctrineAnimating = false
       // Signal animation complete to store
       useTacticalCombatStore.getState().completeDoctrineAnimation()
     }
+  }
+
+  /**
+   * Shake the camera for impact feedback.
+   * @param intensity - 'light' for small hits, 'medium' for normal, 'heavy' for crits/deaths
+   */
+  private shakeCamera(intensity: 'light' | 'medium' | 'heavy'): void {
+    if (!this.isSceneActive()) return
+
+    const config = {
+      light: { intensity: 0.003, duration: 80 },
+      medium: { intensity: 0.006, duration: 120 },
+      heavy: { intensity: 0.012, duration: 180 }
+    }
+
+    const { intensity: i, duration } = config[intensity]
+    this.cameras.main.shake(duration, i)
+  }
+
+  /**
+   * Determine shake intensity based on damage dealt.
+   */
+  private getShakeIntensity(damage: number, isKill: boolean): 'light' | 'medium' | 'heavy' {
+    if (isKill) return 'heavy'
+    if (damage >= 15) return 'heavy'
+    if (damage >= 8) return 'medium'
+    return 'light'
   }
 
   /**

@@ -544,22 +544,22 @@ shared/
 
 #### 7.1 Animation Enhancements
 
-| Task | Description |
-|------|-------------|
-| Sprite animation system | Replace placeholder circles with animated sprite sheets (idle, walk, attack, cast, hit, death) |
-| Idle breathing animation | Subtle scale oscillation (1.0 → 1.02 → 1.0) on all units to make them feel alive |
-| Direction facing | Units face their movement direction and attack targets; flip sprites horizontally for E/W |
-| Hit stagger | Brief recoil animation (50ms pushback) when taking damage |
+| Task                     | Description                                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------------------- |
+| Sprite animation system  | Replace placeholder circles with animated sprite sheets (idle, walk, attack, cast, hit, death) |
+| Idle breathing animation | Subtle scale oscillation (1.0 → 1.02 → 1.0) on all units to make them feel alive               |
+| Direction facing         | Units face their movement direction and attack targets; flip sprites horizontally for E/W      |
+| Hit stagger              | Brief recoil animation (50ms pushback) when taking damage                                      |
 
 #### 7.2 Visual Effects
 
-| Task | Description |
-|------|-------------|
-| Screen shake | Camera shake on heavy attacks (intensity based on damage), deaths, and AoE spells |
-| Hit sparks/particles | Particle burst on melee impacts, projectile trails for ranged attacks |
-| Critical hit effects | Larger damage numbers, special flash effect, screen shake amplified |
-| Status effect overlays | Visual indicators on units: poison drip, burn flames, ice crystals, shield glow |
-| Particle effects for spells | Fire embers, ice shards, lightning arcs, holy rays, dark tendrils |
+| Task                        | Description                                                                       |
+| --------------------------- | --------------------------------------------------------------------------------- |
+| Screen shake                | Camera shake on heavy attacks (intensity based on damage), deaths, and AoE spells |
+| Hit sparks/particles        | Particle burst on melee impacts, projectile trails for ranged attacks             |
+| Critical hit effects        | Larger damage numbers, special flash effect, screen shake amplified               |
+| Status effect overlays      | Visual indicators on units: poison drip, burn flames, ice crystals, shield glow   |
+| Particle effects for spells | Fire embers, ice shards, lightning arcs, holy rays, dark tendrils                 |
 
 **Screen Shake Implementation:**
 
@@ -580,11 +580,11 @@ shakeCamera(this, damage >= 20 ? 'heavy' : damage >= 10 ? 'medium' : 'light')
 
 #### 7.3 Movement & Targeting UX
 
-| Task | Description |
-|------|-------------|
+| Task                   | Description                                                             |
+| ---------------------- | ----------------------------------------------------------------------- |
 | Movement ghost preview | Semi-transparent unit sprite at destination tile before confirming move |
-| Camera follow | Auto-pan to active unit at turn start; smooth follow during movement |
-| Path preview dots | Small dots along movement path showing exact route |
+| Camera follow          | Auto-pan to active unit at turn start; smooth follow during movement    |
+| Path preview dots      | Small dots along movement path showing exact route                      |
 
 **Movement Ghost Implementation:**
 
@@ -626,12 +626,12 @@ onTileHover(pos: GridPosition): void {
 
 #### 7.4 Performance Optimization
 
-| Task | Description |
-|------|-------------|
-| Object pooling | Pool floating text, particles, and highlight sprites to reduce GC pressure |
-| Tile culling | Only render tiles within camera viewport + 1 tile buffer |
+| Task              | Description                                                                     |
+| ----------------- | ------------------------------------------------------------------------------- |
+| Object pooling    | Pool floating text, particles, and highlight sprites to reduce GC pressure      |
+| Tile culling      | Only render tiles within camera viewport + 1 tile buffer                        |
 | Animation queuing | Queue multiple animations to prevent race conditions and ensure smooth chaining |
-| Loading skeleton | Replace spinner with skeleton UI showing grid outline and unit silhouettes |
+| Loading skeleton  | Replace spinner with skeleton UI showing grid outline and unit silhouettes      |
 
 **Object Pool Implementation:**
 
@@ -640,27 +640,29 @@ class FloatingTextPool {
   private pool: Phaser.GameObjects.Text[] = []
   private active: Set<Phaser.GameObjects.Text> = new Set()
 
-  constructor(private scene: Phaser.Scene, private poolSize: number = 20) {
+  constructor(
+    private scene: Phaser.Scene,
+    private poolSize: number = 20
+  ) {
     for (let i = 0; i < poolSize; i++) {
-      const text = scene.add.text(0, 0, '', {
-        fontSize: '16px',
-        fontFamily: 'monospace',
-        stroke: '#000',
-        strokeThickness: 3
-      }).setVisible(false).setDepth(DEPTH.UI)
+      const text = scene.add
+        .text(0, 0, '', {
+          fontSize: '16px',
+          fontFamily: 'monospace',
+          stroke: '#000',
+          strokeThickness: 3
+        })
+        .setVisible(false)
+        .setDepth(DEPTH.UI)
       this.pool.push(text)
     }
   }
 
   spawn(x: number, y: number, value: string, color: string): Phaser.GameObjects.Text | null {
-    const text = this.pool.find(t => !this.active.has(t))
+    const text = this.pool.find((t) => !this.active.has(t))
     if (!text) return null
 
-    text.setText(value)
-      .setColor(color)
-      .setPosition(x, y)
-      .setVisible(true)
-      .setAlpha(1)
+    text.setText(value).setColor(color).setPosition(x, y).setVisible(true).setAlpha(1)
 
     this.active.add(text)
 
@@ -680,7 +682,7 @@ class FloatingTextPool {
   }
 
   clear(): void {
-    this.active.forEach(t => t.setVisible(false))
+    this.active.forEach((t) => t.setVisible(false))
     this.active.clear()
   }
 }
@@ -772,6 +774,33 @@ update(): void {
 - Movement preview eliminates misclick frustration
 - Stable 60fps on mid-range devices
 - No GC stutters during combat
+
+#### 7.6 Implementation Order
+
+Ordered by dependency chain and testability. Each item is independently verifiable before moving to the next.
+
+| #   | Task                               | Files to Modify            | How to Test                             | Status |
+| --- | ---------------------------------- | -------------------------- | --------------------------------------- | ------ |
+| 1   | [x] Screen shake                   | `combat-scene.ts`          | Attack enemy, take damage, kill enemy   |        |
+| 2   | [ ] Idle breathing                 | `unit.ts`                  | Watch any unit idle for 2 seconds       |        |
+| 3   | [ ] Critical hit effects           | `combat-scene.ts`, store   | Attack until crit (or add debug)        |        |
+| 4   | [ ] Movement ghost preview         | `combat-scene.ts`          | Select Move, hover over valid tiles     |        |
+| 5   | [ ] Camera follow on turn start    | `combat-scene.ts`          | End turn, watch camera pan to next unit |        |
+| 6   | [ ] Direction facing               | `unit.ts`                  | Move unit, attack different directions  |        |
+| 7   | [ ] Hit sparks (basic particles)   | `combat-scene.ts`          | Attack enemy, see particle burst        |        |
+| 8   | [ ] Status effect overlays         | `unit.ts`, `boot-scene.ts` | Cast doctrine with status effect        |        |
+| 9   | [ ] Object pooling (floating text) | `combat-scene.ts`          | Spam attacks, check DevTools memory     |        |
+| 10  | [ ] Animation queue                | `combat-scene.ts`          | Rapid actions, no visual glitches       |        |
+| 11  | [ ] Tile culling                   | `grid-system.ts`           | Zoom out fully, check FPS stable        |        |
+
+**Workflow:**
+
+1. Implement one feature
+2. User tests in browser
+3. Fix any bugs
+4. Check off the item
+5. Optional: commit
+6. Move to next feature
 
 ---
 
