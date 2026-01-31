@@ -188,16 +188,14 @@ export default function TacticalCombatArena({
 
   // Combat turn hook for dice rolling
   const {
-    pendingAttackRolls,
-    pendingDefenseRolls,
     submittedAttackRolls,
     submittedDefenseRolls,
-    currentAvailableDice,
-    diceLimit,
-    isAttackPhase,
+    attackDiceCount,
+    defenseDiceCount,
     isWaitingForResolve,
     showResults,
-    handleRoll
+    handleRoll,
+    clearResults
   } = useCombatTurn({
     isAttacking: isTacticalAttackLoading,
     diceBank,
@@ -206,6 +204,13 @@ export default function TacticalCombatArena({
     onAttack: handleTacticalAttack,
     lastTurnResult
   })
+
+  // Clear dice results when phase transitions back to select_action (new turn starts)
+  useEffect(() => {
+    if (phase === 'select_action' && !isWaitingForResolve) {
+      clearResults()
+    }
+  }, [phase, isWaitingForResolve, clearResults])
 
   // Consumable mutation
   const useConsumableMutation = useMutation({
@@ -398,7 +403,6 @@ export default function TacticalCombatArena({
   }
 
   if (!currentClass) return null
-  const rollButtonLabel = isAttackPhase ? t('combat.roll_attack') : t('combat.roll_defense')
 
   return (
     <div className={cn('flex min-h-0 flex-col', className)}>
@@ -588,31 +592,28 @@ export default function TacticalCombatArena({
           {phase === 'select_target' && (
             <>
               <DiceRoller
-                diceBank={currentAvailableDice}
+                diceBank={diceBank}
+                attackDiceCount={attackDiceCount}
+                defenseDiceCount={defenseDiceCount}
                 onRoll={handleRoll}
                 isRolling={isWaitingForResolve}
-                customButtonLabel={rollButtonLabel}
-                title={isAttackPhase ? t('combat.to_battle') : undefined}
-                diceLimit={diceLimit}
               />
 
               {/* Attack/Defense Dice Results */}
               <div className="space-y-2">
-                {(pendingAttackRolls ||
-                  submittedAttackRolls ||
+                {(submittedAttackRolls ||
                   (showResults && !!lastTurnResult?.playerAttackRolls?.length)) && (
                   <div className="rounded-lg border p-2 transition-all duration-300">
                     <div className="mb-1 text-xs font-medium tracking-wider text-orange-500/80 uppercase">
                       {t('combat.attack_rolls')}
                     </div>
                     <div className="flex flex-wrap justify-center gap-1">
-                      {renderDice(pendingAttackRolls, submittedAttackRolls, lastTurnResult?.playerAttackRolls, 'atk')}
+                      {renderDice(undefined, submittedAttackRolls, lastTurnResult?.playerAttackRolls, 'atk')}
                     </div>
                   </div>
                 )}
 
-                {(pendingDefenseRolls ||
-                  submittedDefenseRolls ||
+                {(submittedDefenseRolls ||
                   (showResults && !!lastTurnResult?.playerDefenseRolls?.length)) && (
                   <div className="rounded-lg border p-2 transition-all duration-300">
                     <div className="mb-1 text-xs font-medium tracking-wider text-blue-500/80 uppercase">
@@ -620,7 +621,7 @@ export default function TacticalCombatArena({
                     </div>
                     <div className="flex flex-wrap justify-center gap-1">
                       {renderDice(
-                        pendingDefenseRolls,
+                        undefined,
                         submittedDefenseRolls,
                         lastTurnResult?.playerDefenseRolls,
                         'def'
