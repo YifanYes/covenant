@@ -1,14 +1,22 @@
-import { getEnemy } from '@shared/constants/enemies'
+import { selectEnemyWithFallback } from '@shared/constants/activities'
+import { applyStatScaling, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
+import { generateEncounterSequence, getNextEncounterSlot, type ResolvedEncounterSlot } from '@shared/constants/encounter-patterns'
 import { generateMapTiles } from '@shared/constants/map-themes'
 import type { CombatLogEntry } from '@shared/types/gamification.types'
 import type { TacticalStateData } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
-import { ActivityDifficulty, getActivityById, selectRandomEnemy } from '../../shared/constants/activities'
+import { ActivityDifficulty, getActivityById } from '../../shared/constants/activities'
 import type { ActivityRepository } from '../repositories/activity.repository'
 import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { CharacterService } from './character.service'
+
+export interface EncounterState {
+  encounterPattern: ResolvedEncounterSlot[]
+  encounterIndex: number
+  sessionStartedAt: string
+}
 
 export class ActivityService {
   constructor(
@@ -151,33 +159,58 @@ export class ActivityService {
       participation = await this.activityRepository.createParticipation(activityRecord.id, characterId)
     }
 
+    // Get character for tier information
+    const character = await this.characterService.getCharacterById(characterId)
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    const characterTier = currentClass?.tier || 1
+
     // Check if there's an active enemy, if not spawn one
     let activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participation.id)
     let shouldInitializeTacticalState = false
-    if (!activeEnemy) {
-      const enemyId = selectRandomEnemy(config.enemySpawnWeights)
-      const enemyTemplate = getEnemy(enemyId)
-      if (!enemyTemplate) throw new TRPCError({ code: 'NOT_FOUND', message: `Enemy ${enemyId} not found` })
 
-      const nameKeys = generateEnemyNameKeys(enemyTemplate.type)
+    // Get or initialize encounter state
+    let combatStats = await this.activityParticipationRepository.getCombatStats(participation.id)
+    let encounterState = combatStats as EncounterState | null
+
+    if (!activeEnemy) {
+      // Generate new encounter pattern if needed
+      if (!encounterState || !encounterState.encounterPattern) {
+        const encounterPattern = generateEncounterSequence(characterTier)
+        encounterState = {
+          encounterPattern,
+          encounterIndex: 0,
+          sessionStartedAt: new Date().toISOString()
+        }
+        await this.activityParticipationRepository.updateCombatStats(participation.id, encounterState)
+      }
+
+      // Get the current encounter slot
+      const currentSlot = getNextEncounterSlot(encounterState.encounterPattern, encounterState.encounterIndex)
+      const requiredType = currentSlot?.type
+
+      // Select enemy with fallback chain
+      const selected = selectEnemyWithFallback(config.enemySpawnWeights, characterTier, requiredType)
+      if (!selected) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'No suitable enemy found for spawn' })
+      }
+
+      // Apply stat scaling if character tier > enemy tier
+      const scaledTemplate = applyStatScaling(selected.template, characterTier)
+
+      const nameKeys = generateEnemyNameKeys(scaledTemplate.type)
       activeEnemy = await this.combatEnemyRepository.createEnemy({
         participationId: participation.id,
-        templateId: enemyId,
+        templateId: selected.enemyId,
         namePrefix: nameKeys.prefix,
         nameSuffix: nameKeys.suffix,
-        maxHealth: enemyTemplate.health,
-        currentHealth: enemyTemplate.health
+        maxHealth: scaledTemplate.health,
+        currentHealth: scaledTemplate.health
       })
       shouldInitializeTacticalState = true
     }
 
-    // Update active activity
-    const character = await this.characterService.getCharacterById(characterId)
-
     // Initialize tactical state if needed (new enemy spawned)
     if (shouldInitializeTacticalState) {
-      // Get player health from current class
-      const currentClass = character.classes.find((c) => c.className === character.currentClass)
       if (!currentClass) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
       }

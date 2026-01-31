@@ -525,6 +525,51 @@ export const getEnemiesByTier = (tier: number): EnemyTemplate[] => {
 }
 
 /**
+ * Stat scaling multipliers based on tier difference
+ * Applied when character tier exceeds enemy tier
+ */
+export const TIER_SCALING_MULTIPLIERS: Record<number, number> = {
+  0: 1.0,
+  1: 1.15,
+  2: 1.25,
+  3: 1.35
+}
+
+/**
+ * Get the stat scaling multiplier for a given tier difference
+ */
+export function getStatScalingMultiplier(characterTier: number, enemyTier: number): number {
+  const tierDiff = Math.max(0, characterTier - enemyTier)
+  // Cap at 3 for the highest multiplier
+  const cappedDiff = Math.min(tierDiff, 3)
+  return TIER_SCALING_MULTIPLIERS[cappedDiff] || 1.0
+}
+
+/**
+ * Apply stat scaling to an enemy template based on character tier
+ * Returns a new template with scaled stats (does not modify the original)
+ */
+export function applyStatScaling(template: EnemyTemplate, characterTier: number): EnemyTemplate {
+  const multiplier = getStatScalingMultiplier(characterTier, template.tier)
+
+  if (multiplier === 1.0) {
+    return template
+  }
+
+  return {
+    ...template,
+    health: Math.ceil(template.health * multiplier),
+    mana: Math.ceil(template.mana * multiplier),
+    strengthDef: Math.ceil(template.strengthDef * multiplier),
+    magicDef: Math.ceil(template.magicDef * multiplier),
+    goldReward: {
+      min: Math.ceil(template.goldReward.min * multiplier),
+      max: Math.ceil(template.goldReward.max * multiplier)
+    }
+  }
+}
+
+/**
  * Calculate a random gold reward from an enemy's reward range
  */
 export function calculateGoldReward(enemy: EnemyTemplate): number {
