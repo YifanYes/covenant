@@ -9,6 +9,7 @@ import { calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import { getConsumableById } from '@shared/constants/items'
 import { getActivityById, selectRandomEnemy } from '@shared/constants/activities'
+import { generateMapTiles } from '@shared/constants/map-themes'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 import type {
@@ -21,7 +22,6 @@ import type {
   GridPosition,
   TacticalStateData,
   TileState,
-  TerrainType,
   MovementValidationResult,
   MovementExecutionResult,
   AttackValidationResult,
@@ -919,26 +919,10 @@ export class CombatService {
     newEnemyName: string,
     newEnemyHealth: { current: number; max: number }
   ): TacticalStateData {
-    // Create fresh grid
+    // Create fresh grid using the map's theme
     const gridWidth = currentState.gridWidth
     const gridHeight = currentState.gridHeight
-    const tiles: TileState[][] = []
-
-    for (let y = 0; y < gridHeight; y++) {
-      tiles[y] = []
-      for (let x = 0; x < gridWidth; x++) {
-        let terrain: TerrainType = 'GRASS'
-        if (x === 0 || x === gridWidth - 1 || y === 0 || y === gridHeight - 1) {
-          terrain = 'STONE'
-        }
-        tiles[y][x] = {
-          position: { x, y },
-          terrain,
-          occupantId: null,
-          isWalkable: true
-        }
-      }
-    }
+    const tiles = generateMapTiles(currentState.mapTemplateId, gridWidth, gridHeight)
 
     // Reset player to starting position
     const playerPosition = { x: 1, y: 3 }
