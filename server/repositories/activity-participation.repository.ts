@@ -95,10 +95,11 @@ export class ActivityParticipationRepository {
   async findByIdWithActivity(participationId: string): Promise<{
     id: string
     activityId: string
+    characterId: string
   } | null> {
     const result = await this.prisma.activityParticipation.findUnique({
       where: { id: participationId },
-      select: { id: true, activityId: true }
+      select: { id: true, activityId: true, characterId: true }
     })
 
     return result
@@ -141,5 +142,24 @@ export class ActivityParticipationRepository {
       id: result.id,
       tacticalState: result.tacticalState as unknown as TacticalStateData | null
     }
+  }
+
+  async updateCombatStats<T extends object>(
+    participationId: string,
+    combatStats: T
+  ): Promise<void> {
+    await this.prisma.activityParticipation.update({
+      where: { id: participationId },
+      data: { combatStats: combatStats as any }
+    })
+  }
+
+  async getCombatStats<T>(participationId: string): Promise<T | null> {
+    const result = await this.prisma.activityParticipation.findUnique({
+      where: { id: participationId },
+      select: { combatStats: true }
+    })
+
+    return result?.combatStats as T | null
   }
 }

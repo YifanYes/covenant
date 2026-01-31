@@ -5,10 +5,17 @@ import {
   getDoctrineRange
 } from '@shared/constants/aoe-patterns'
 import { TERRAIN_CONFIG } from '@shared/constants/terrain'
-import { calculateGoldReward, getEnemy } from '@shared/constants/enemies'
+import { getActivityById, selectEnemyWithFallback } from '@shared/constants/activities'
+import { applyStatScaling, calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
+import { generateEncounterSequence, getNextEncounterSlot, type ResolvedEncounterSlot } from '@shared/constants/encounter-patterns'
 import { getConsumableById } from '@shared/constants/items'
-import { getActivityById, selectRandomEnemy } from '@shared/constants/activities'
+
+interface EncounterState {
+  encounterPattern: ResolvedEncounterSlot[]
+  encounterIndex: number
+  sessionStartedAt: string
+}
 import { generateMapTiles } from '@shared/constants/map-themes'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
@@ -842,19 +849,63 @@ export class CombatService {
                 const isActivityCompleted = activity.progress + 1 >= activity.target
 
                 if (!isActivityCompleted && config) {
-                  // Spawn next enemy
-                  const nextEnemyId = selectRandomEnemy(config.enemySpawnWeights)
-                  const nextEnemyTemplate = getEnemy(nextEnemyId)
+                  // Get character tier for encounter system
+                  const character = await this.characterRepository.findByIdWithClasses(participation.characterId)
+                  const currentClass = character?.classes.find((c) => c.className === character.currentClass)
+                  const characterTier = currentClass?.tier || 1
 
-                  if (nextEnemyTemplate) {
-                    const nameKeys = generateEnemyNameKeys(nextEnemyTemplate.type)
+                  // Get or update encounter state
+                  let combatStats = await this.activityParticipationRepository.getCombatStats(participationId)
+                  let encounterState = combatStats as EncounterState | null
+
+                  // Increment encounter index or reset pattern if sequence complete
+                  if (encounterState && encounterState.encounterPattern) {
+                    const newIndex = encounterState.encounterIndex + 1
+                    if (newIndex >= encounterState.encounterPattern.length) {
+                      // Sequence complete, generate new pattern
+                      const newPattern = generateEncounterSequence(characterTier)
+                      encounterState = {
+                        encounterPattern: newPattern,
+                        encounterIndex: 0,
+                        sessionStartedAt: new Date().toISOString()
+                      }
+                    } else {
+                      encounterState = {
+                        ...encounterState,
+                        encounterIndex: newIndex
+                      }
+                    }
+                    await this.activityParticipationRepository.updateCombatStats(participationId, encounterState)
+                  } else {
+                    // Initialize encounter state if not present
+                    const newPattern = generateEncounterSequence(characterTier)
+                    encounterState = {
+                      encounterPattern: newPattern,
+                      encounterIndex: 0,
+                      sessionStartedAt: new Date().toISOString()
+                    }
+                    await this.activityParticipationRepository.updateCombatStats(participationId, encounterState)
+                  }
+
+                  // Get the current encounter slot
+                  const currentSlot = getNextEncounterSlot(encounterState.encounterPattern, encounterState.encounterIndex)
+                  const requiredType = currentSlot?.type
+
+                  // Select enemy with fallback chain
+                  const selected = selectEnemyWithFallback(config.enemySpawnWeights, characterTier, requiredType)
+
+                  if (selected) {
+                    // Apply stat scaling if character tier > enemy tier
+                    const scaledTemplate = applyStatScaling(selected.template, characterTier)
+
+                    const nameKeys = generateEnemyNameKeys(scaledTemplate.type)
                     const newEnemy = await this.combatEnemyRepository.createEnemy({
                       participationId,
-                      templateId: nextEnemyId,
+                      templateId: selected.enemyId,
                       namePrefix: nameKeys.prefix,
                       nameSuffix: nameKeys.suffix,
-                      maxHealth: nextEnemyTemplate.health,
-                      currentHealth: nextEnemyTemplate.health
+                      maxHealth: scaledTemplate.health,
+                      currentHealth: scaledTemplate.health
                     })
 
                     nextEnemy = {
