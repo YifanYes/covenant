@@ -163,6 +163,9 @@ export default function TacticalCombatArena({
   // Tactical attack hook
   const { confirmAttack, getPendingAttackInfo, isLoading: isTacticalAttackLoading } = useTacticalAttack()
 
+  // Get pending attack info for UI
+  const pendingAttackInfo = getPendingAttackInfo()
+
   // Enemy AI turn hook - automatically executes when it's an enemy's turn
   const { isExecuting: isEnemyTurnExecuting } = useTacticalEnemyTurn()
 
@@ -205,12 +208,12 @@ export default function TacticalCombatArena({
     lastTurnResult
   })
 
-  // Clear dice results when phase transitions back to select_action (new turn starts)
+  // Clear dice results when user starts a different action (Move) or it becomes enemy turn
   useEffect(() => {
-    if (phase === 'select_action' && !isWaitingForResolve) {
+    if (phase === 'select_move' || phase === 'enemy_turn') {
       clearResults()
     }
-  }, [phase, isWaitingForResolve, clearResults])
+  }, [phase, clearResults])
 
   // Consumable mutation
   const useConsumableMutation = useMutation({
@@ -386,20 +389,26 @@ export default function TacticalCombatArena({
         <DiceResult key={`${prefix}-p-${i}`} value={v} isSuccess={false} isCritical={false} isRolling />
       ))
     }
-    if (isTacticalAttackLoading && submitted) {
+    // Show resolved results if available
+    if (resolved?.length) {
+      return resolved.map((r, i) => (
+        <DiceResult key={`${prefix}-${i}`} value={r.value} isSuccess={r.isSuccess} isCritical={r.isCritical} />
+      ))
+    }
+    // Show submitted dice while waiting for results or as fallback
+    // Calculate success/critical based on standard thresholds (4+ success, 6 critical)
+    if (submitted) {
       return submitted.map((v, i) => (
         <DiceResult
           key={`${prefix}-s-${i}`}
           value={v}
-          isSuccess={false}
-          isCritical={false}
-          className="animate-pulse opacity-70"
+          isSuccess={v >= 4}
+          isCritical={v === 6}
+          className={isTacticalAttackLoading ? "animate-pulse opacity-70" : ""}
         />
       ))
     }
-    return resolved?.map((r, i) => (
-      <DiceResult key={`${prefix}-${i}`} value={r.value} isSuccess={r.isSuccess} isCritical={r.isCritical} />
-    ))
+    return null
   }
 
   if (!currentClass) return null
@@ -588,16 +597,18 @@ export default function TacticalCombatArena({
             </ScrollArea>
           </div>
 
-          {/* Dice Roller (when attacking) */}
-          {phase === 'select_target' && (
+          {/* Dice Roller (when attacking with target selected, or showing results) */}
+          {(pendingAttackInfo?.target || showResults || submittedAttackRolls || submittedDefenseRolls) && (
             <>
-              <DiceRoller
-                diceBank={diceBank}
-                attackDiceCount={attackDiceCount}
-                defenseDiceCount={defenseDiceCount}
-                onRoll={handleRoll}
-                isRolling={isWaitingForResolve}
-              />
+              {phase === 'select_target' && pendingAttackInfo?.target && (
+                <DiceRoller
+                  diceBank={diceBank}
+                  attackDiceCount={attackDiceCount}
+                  defenseDiceCount={defenseDiceCount}
+                  onRoll={handleRoll}
+                  isRolling={isWaitingForResolve}
+                />
+              )}
 
               {/* Attack/Defense Dice Results */}
               <div className="space-y-2">
@@ -633,8 +644,8 @@ export default function TacticalCombatArena({
             </>
           )}
 
-          {/* Tile Info Panel (when not attacking) */}
-          {phase !== 'select_target' && (
+          {/* Tile Info Panel (when not attacking and no dice results to show) */}
+          {phase !== 'select_target' && !showResults && !submittedAttackRolls && !submittedDefenseRolls && (
             <div className="rounded-lg border p-3">
               <TileInfoPanel
                 hoveredTile={hoveredTile}
