@@ -244,6 +244,7 @@
     "dice_to_spend": "Dice to spend",
     "enemies": "Enemies",
     "enemies_defeated": "Enemies Defeated",
+    "unknown_enemy": "Unknown Enemy",
     "error": {
       "attack": "Attack failed",
       "attack_failed": "Attack failed",
