@@ -92,9 +92,9 @@ export class BootScene extends Phaser.Scene {
     tileGraphics.strokePath()
     tileGraphics.generateTexture('tile_water', 64, 32)
 
-    // Lava tile (orange/red diamond)
+    // Lava tile (muted dark red diamond)
     tileGraphics.clear()
-    tileGraphics.fillStyle(0xff4500)
+    tileGraphics.fillStyle(0x8b3a3a)
     tileGraphics.beginPath()
     tileGraphics.moveTo(32, 0)
     tileGraphics.lineTo(64, 16)
@@ -102,7 +102,7 @@ export class BootScene extends Phaser.Scene {
     tileGraphics.lineTo(0, 16)
     tileGraphics.closePath()
     tileGraphics.fillPath()
-    tileGraphics.lineStyle(1, 0xcc3700)
+    tileGraphics.lineStyle(1, 0x5c2626)
     tileGraphics.strokePath()
     tileGraphics.generateTexture('tile_lava', 64, 32)
 

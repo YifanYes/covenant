@@ -6,7 +6,7 @@ import SingleSelect from '@/forms/single-select.component'
 import TextInput from '@/forms/text-input.component'
 import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
 import { createHabitSchema, HabitTimespan, type CreateHabitType } from '@shared/schemas/habits.schemas'
@@ -68,10 +68,10 @@ export default function CreateHabitDialog() {
     <BaseFormDialog
       open={open}
       onOpenChange={handleOpenChange}
-      title='create_habit_dialog.title'
-      description='create_habit_dialog.description'
+      title="create_habit_dialog.title"
+      description="create_habit_dialog.description"
       onSubmit={handleSubmit(onSubmit)}
-      submitLabel='create'
+      submitLabel="create"
       isLoading={mutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
       trigger={
@@ -81,41 +81,41 @@ export default function CreateHabitDialog() {
         </Button>
       }
     >
-      <div className='grid gap-4' key={`create-habit-form-${open}`}>
-        <div className='grid gap-3'>
+      <div className="grid gap-4" key={`create-habit-form-${open}`}>
+        <div className="grid gap-3">
           <TextInput
-            type='text'
+            type="text"
             label={t('create_habit_dialog.name_placeholder')}
             placeholder={t('create_habit_dialog.name_placeholder')}
-            className='h-9'
+            className="h-9"
             {...register('name')}
             {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
             required
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Textarea
             placeholder={t('create_habit_dialog.description_placeholder')}
-            className='min-h-20 resize-none'
+            className="min-h-20 resize-none"
             {...register('description')}
             {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <TextInput
-            type='number'
+            type="number"
             label={t('create_habit_dialog.recurrence_placeholder')}
             placeholder={t('create_habit_dialog.recurrence_placeholder')}
-            className='h-9'
+            className="h-9"
             min={1}
             {...register('recurrence', { valueAsNumber: true })}
             {...(errors.recurrence?.message && { errorMessage: t(errors.recurrence.message.toString()) })}
             required
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='timespan'
+            name="timespan"
             control={control}
             render={({ field }) => (
               <SingleSelect
@@ -129,14 +129,14 @@ export default function CreateHabitDialog() {
             )}
           />
         </div>
-        <div className='grid min-w-0 gap-3'>
+        <div className="grid min-w-0 gap-3">
           <ObjectivesSelector
             control={control}
             objectives={objectivesData?.objectives || []}
             placeholder={t('create_habit_dialog.objectives_placeholder')}
           />
         </div>
-        <div className='grid min-w-0 gap-3'>
+        <div className="grid min-w-0 gap-3">
           <AreasSelector
             control={control}
             areas={areasData?.areas || []}
