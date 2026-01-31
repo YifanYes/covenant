@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import ArmoryTab from './_components/armory-tab.component'
 import CharacterTab from './_components/character-tab.component'
+import KillRecordTab from './_components/kill-record-tab.component'
 
 export default function Inventory() {
   const { t } = useTranslation()
@@ -63,6 +64,7 @@ export default function Inventory() {
           <TabsTrigger value='character'>{t('inventory.tabs.character')}</TabsTrigger>
           <TabsTrigger value='armory'>{t('inventory.tabs.armory')}</TabsTrigger>
           <TabsTrigger value='doctrines'>{t('inventory.tabs.doctrines')}</TabsTrigger>
+          <TabsTrigger value='kill_record'>{t('inventory.tabs.kill_record')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value='character' className='mt-4 flex-1 overflow-auto'>
@@ -75,6 +77,10 @@ export default function Inventory() {
 
         <TabsContent value='doctrines' className='mt-4 flex-1 overflow-auto'>
           <DoctrinePanel showEquipControls />
+        </TabsContent>
+
+        <TabsContent value='kill_record' className='mt-4 flex-1 overflow-auto'>
+          <KillRecordTab />
         </TabsContent>
       </Tabs>
     </div>

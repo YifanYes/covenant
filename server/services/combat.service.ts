@@ -803,9 +803,13 @@ export class CombatService {
         await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
 
         // Update enemy health in database
+        // Track damageDealt (damage player dealt to enemy), criticalHits, and damageTaken (damage from thorns/self-damage)
+        const playerCriticalHits = attackerResults.filter((r) => r.isCritical).length
         await this.combatEnemyRepository.updateEnemy(activeEnemy.id, {
           currentHealth: newTargetHealth,
-          damageDealt: damageToTarget
+          damageDealt: damageToTarget,
+          criticalHits: playerCriticalHits,
+          damageTaken: damageToAttacker > 0 ? damageToAttacker : undefined
         })
 
         // Handle enemy defeat
@@ -1671,11 +1675,17 @@ export class CombatService {
     // Save state to database
     await this.activityParticipationRepository.updateTacticalState(participationId, state)
 
-    // Save combat log entries
+    // Save combat log entries and update stats
     if (this.combatEnemyRepository && logEntries.length > 0) {
       const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
       if (activeEnemy) {
         await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+        // Track damageTaken (damage enemy dealt to player)
+        if (damageDealt && damageDealt > 0) {
+          await this.combatEnemyRepository.updateEnemy(activeEnemy.id, {
+            damageTaken: damageDealt
+          })
+        }
       }
     }
 
