@@ -1,7 +1,8 @@
 import { getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
+import { generateMapTiles } from '@shared/constants/map-themes'
 import type { CombatLogEntry } from '@shared/types/gamification.types'
-import type { TacticalStateData, TileState, TerrainType } from '@shared/types/tactical-combat.types'
+import type { TacticalStateData } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import { ActivityDifficulty, getActivityById, selectRandomEnemy } from '../../shared/constants/activities'
 import type { ActivityRepository } from '../repositories/activity.repository'
@@ -18,35 +19,6 @@ export class ActivityService {
   ) {}
 
   /**
-   * Create default grid for tactical combat (8x6 arena)
-   */
-  private createDefaultGrid(): TileState[][] {
-    const width = 8
-    const height = 6
-    const tiles: TileState[][] = []
-
-    for (let y = 0; y < height; y++) {
-      tiles[y] = []
-      for (let x = 0; x < width; x++) {
-        // Create border of stone tiles
-        let terrain: TerrainType = 'GRASS'
-        if (x === 0 || x === width - 1 || y === 0 || y === height - 1) {
-          terrain = 'STONE'
-        }
-
-        tiles[y][x] = {
-          position: { x, y },
-          terrain,
-          occupantId: null,
-          isWalkable: true
-        }
-      }
-    }
-
-    return tiles
-  }
-
-  /**
    * Create initial tactical state for a new combat
    */
   private createInitialTacticalState(
@@ -55,11 +27,12 @@ export class ActivityService {
     playerHealth: { current: number; max: number },
     enemyUnitId: string,
     enemyName: string,
-    enemyHealth: { current: number; max: number }
+    enemyHealth: { current: number; max: number },
+    mapId: string = 'default'
   ): TacticalStateData {
-    const tiles = this.createDefaultGrid()
     const gridWidth = 8
     const gridHeight = 6
+    const tiles = generateMapTiles(mapId, gridWidth, gridHeight)
 
     // Player spawns on the left side
     const playerPosition = { x: 1, y: 3 }
@@ -96,7 +69,7 @@ export class ActivityService {
     const turnOrder = [playerUnitId, enemyUnitId]
 
     return {
-      mapTemplateId: 'default',
+      mapTemplateId: mapId,
       gridWidth,
       gridHeight,
       tiles,
@@ -217,7 +190,8 @@ export class ActivityService {
         { current: currentClass.health, max: currentClass.maxHealth },
         activeEnemy.id, // Use enemy's DB ID as unit ID
         enemyName,
-        { current: activeEnemy.currentHealth, max: activeEnemy.maxHealth }
+        { current: activeEnemy.currentHealth, max: activeEnemy.maxHealth },
+        config.mapId // Use activity's map ID for terrain generation
       )
       await this.activityParticipationRepository.updateTacticalState(participation.id, tacticalState)
     }

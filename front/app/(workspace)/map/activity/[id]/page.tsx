@@ -221,6 +221,7 @@ export default function ActivityDetailPage() {
           participationId={participation.id}
           activeDoctrines={participation?.activeDoctrines as Record<string, any>}
           failureText={getActivityById(activity.id)?.failureText}
+          mapId={getActivityById(activity.id)?.mapId}
           className="min-h-0 flex-1"
         />
       )}

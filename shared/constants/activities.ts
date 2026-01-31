@@ -36,7 +36,7 @@ export const ACTIVITIES: Record<string, ActivityTemplate> = {
   defense_north_gate: {
     id: 'defense_north_gate',
     name: 'activities.defense_north_gate.name',
-    mapId: 'santa_cruz',
+    mapId: 'northern_fortress',
     position: { x: 50, y: 15 },
     factionId: Faction.HOLY_KNIGHTS,
     description: 'activities.defense_north_gate.description',
@@ -57,7 +57,7 @@ export const ACTIVITIES: Record<string, ActivityTemplate> = {
   assault_ships: {
     id: 'assault_ships',
     name: 'activities.assault_ships.name',
-    mapId: 'santa_cruz',
+    mapId: 'coastal_harbor',
     position: { x: 15, y: 50 },
     factionId: Faction.HOLY_KNIGHTS,
     description: 'activities.assault_ships.description',
@@ -79,7 +79,7 @@ export const ACTIVITIES: Record<string, ActivityTemplate> = {
   defense_south_wall: {
     id: 'defense_south_wall',
     name: 'activities.defense_south_wall.name',
-    mapId: 'santa_cruz',
+    mapId: 'southern_outpost',
     position: { x: 50, y: 85 },
     factionId: Faction.HOLY_KNIGHTS,
     description: 'activities.defense_south_wall.description',

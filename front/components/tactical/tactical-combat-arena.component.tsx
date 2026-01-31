@@ -34,7 +34,8 @@ import {
   type EnemyState,
   type InventoryCharacter
 } from '@shared/types/gamification.types'
-import type { TacticalUnit, TerrainType, TileState } from '@shared/types/tactical-combat.types'
+import type { TacticalUnit, TileState } from '@shared/types/tactical-combat.types'
+import { generateMapTiles } from '@shared/constants/map-themes'
 import { useMutation } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -59,6 +60,7 @@ interface TacticalCombatArenaProps {
   participationId: string
   activeDoctrines?: Record<string, any>
   failureText?: string
+  mapId?: string
 }
 
 export default function TacticalCombatArena({
@@ -70,7 +72,8 @@ export default function TacticalCombatArena({
   className,
   participationId,
   activeDoctrines,
-  failureText
+  failureText,
+  mapId = 'default'
 }: TacticalCombatArenaProps) {
   const { t } = useTranslation()
   const router = useRouter()
@@ -325,26 +328,10 @@ export default function TacticalCombatArena({
     }
 
     // Otherwise, create fresh combat state
-    // Create grid
+    // Create grid using map theme
     const gridWidth = 8
     const gridHeight = 6
-    const newTiles: TileState[][] = []
-
-    for (let y = 0; y < gridHeight; y++) {
-      newTiles[y] = []
-      for (let x = 0; x < gridWidth; x++) {
-        let terrain: TerrainType = 'GRASS'
-        if (x === 0 || x === gridWidth - 1 || y === 0 || y === gridHeight - 1) {
-          terrain = 'STONE'
-        }
-        newTiles[y][x] = {
-          position: { x, y },
-          terrain,
-          occupantId: null,
-          isWalkable: true
-        }
-      }
-    }
+    const newTiles: TileState[][] = generateMapTiles(mapId, gridWidth, gridHeight)
 
     // Set occupants
     newTiles[playerUnit.position.y][playerUnit.position.x].occupantId = playerUnit.id
@@ -364,7 +351,7 @@ export default function TacticalCombatArena({
 
     initializeCombat(
       {
-        mapTemplateId: 'arena_small',
+        mapTemplateId: mapId,
         gridWidth,
         gridHeight,
         tiles: newTiles,
@@ -375,7 +362,7 @@ export default function TacticalCombatArena({
       participationId
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Initialization effect: only re-run when IDs change, not when derived values (health, mana) change during combat
-  }, [character?.id, enemies.length, participationId, isLoadingTacticalState, persistedTacticalState])
+  }, [character?.id, enemies.length, participationId, isLoadingTacticalState, persistedTacticalState, mapId])
 
   // Helper to render dice groups
   const renderDice = (
