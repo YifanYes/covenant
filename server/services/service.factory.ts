@@ -19,6 +19,7 @@ import { DeadlineService } from './deadline.service'
 import { DiceService } from './dice.service'
 import { HabitService } from './habit.service'
 import { InvestmentService } from './investment.service'
+import { KillRecordService } from './kill-record.service'
 import { ObjectiveService } from './objective.service'
 import { StoreService } from './store.services'
 import { TaskService } from './task.service'
@@ -52,6 +53,7 @@ export class ServiceFactory {
   private _diceService?: DiceService
   private _habitService?: HabitService
   private _investmentService?: InvestmentService
+  private _killRecordService?: KillRecordService
   private _objectiveService?: ObjectiveService
   private _storeService?: StoreService
   private _taskService?: TaskService
@@ -175,6 +177,10 @@ export class ServiceFactory {
 
   get investment(): InvestmentService {
     return (this._investmentService ??= new InvestmentService(this.investmentRepository, this.characterRepository))
+  }
+
+  get killRecord(): KillRecordService {
+    return (this._killRecordService ??= new KillRecordService(this.characterRepository, this.combatEnemyRepository))
   }
 
   get store(): StoreService {

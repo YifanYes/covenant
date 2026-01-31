@@ -851,7 +851,21 @@
     "tabs": {
       "armory": "Armería y Equipamiento",
       "character": "Personaje",
-      "doctrines": "Doctrinas"
+      "doctrines": "Doctrinas",
+      "kill_record": "Historial de Batallas"
+    },
+    "kill_record": {
+      "total_kills": "Enemigos Derrotados",
+      "damage_dealt": "Daño Total Infligido",
+      "damage_received": "Daño Total Recibido",
+      "critical_hits": "Golpes Críticos",
+      "damage_dealt_short": "Infligido",
+      "damage_received_short": "Recibido",
+      "turns": "Turnos",
+      "max_health": "Vida Máxima",
+      "combat_log": "Registro de Combate",
+      "empty": "Aún no has derrotado ningún enemigo. ¡Comienza una actividad para empezar tu cacería!",
+      "unknown_time": "Desconocido"
     },
     "tier": "Tier",
     "title": "Inventario"

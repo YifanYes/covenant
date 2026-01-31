@@ -851,7 +851,21 @@
     "tabs": {
       "armory": "Armory & Loadout",
       "character": "Character",
-      "doctrines": "Doctrines"
+      "doctrines": "Doctrines",
+      "kill_record": "Kill Record"
+    },
+    "kill_record": {
+      "total_kills": "Enemies Defeated",
+      "damage_dealt": "Total Damage Dealt",
+      "damage_received": "Total Damage Received",
+      "critical_hits": "Critical Hits",
+      "damage_dealt_short": "Dealt",
+      "damage_received_short": "Received",
+      "turns": "Turns",
+      "max_health": "Max Health",
+      "combat_log": "Combat Log",
+      "empty": "No enemies defeated yet. Start an activity to begin your hunt!",
+      "unknown_time": "Unknown"
     },
     "tier": "Tier",
     "title": "Inventory"

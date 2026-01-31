@@ -122,4 +122,42 @@ export class CombatEnemyRepository {
       data: { combatLog: updatedLog as Prisma.InputJsonValue }
     })
   }
+
+  async getDefeatedEnemiesByCharacter(characterId: string, limit = 50, cursor?: string) {
+    return this.prisma.combatEnemy.findMany({
+      where: {
+        participation: {
+          characterId
+        },
+        status: CombatEnemyStatus.DEFEATED
+      },
+      orderBy: { defeatedAt: 'desc' },
+      take: limit,
+      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
+    })
+  }
+
+  async getKillStats(characterId: string) {
+    const result = await this.prisma.combatEnemy.aggregate({
+      where: {
+        participation: {
+          characterId
+        },
+        status: CombatEnemyStatus.DEFEATED
+      },
+      _count: { id: true },
+      _sum: {
+        damageDealt: true,
+        damageTaken: true,
+        criticalHits: true
+      }
+    })
+
+    return {
+      totalKills: result._count.id,
+      totalDamageDealt: result._sum.damageDealt ?? 0,
+      totalDamageTaken: result._sum.damageTaken ?? 0,
+      totalCriticalHits: result._sum.criticalHits ?? 0
+    }
+  }
 }
