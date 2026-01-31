@@ -282,6 +282,68 @@ This allows combat to be resumed if the player closes the browser.
 
 ---
 
+## Enemy Scaling System
+
+The enemy scaling system ensures combat difficulty scales appropriately with character progression. It uses a hybrid approach combining encounter sequence patterns, enemy pool filtering, and stat scaling.
+
+### Encounter Patterns
+
+Each character tier has a defined encounter pattern that determines the sequence of enemy types faced:
+
+| Tier | Pattern | Description |
+|------|---------|-------------|
+| 1 | `[MINION, MINION?]` | 1 minion, 30% chance for 2nd |
+| 2 | `[MINION, MINION, ELITE]` | 2 minions then 1 elite |
+| 3 | `[MINION, ELITE, MINION?, BOSS?]` | 1 minion, 1 elite, 40% for each optional |
+| 4 | `[ELITE, MINION, ELITE, BOSS]` | Hard encounters with guaranteed boss |
+
+Patterns are generated when joining an activity and stored in `ActivityParticipation.combatStats`:
+
+```typescript
+interface EncounterState {
+  encounterPattern: ResolvedEncounterSlot[]  // Resolved sequence (optional slots rolled)
+  encounterIndex: number                      // Current position in sequence
+  sessionStartedAt: string                    // ISO timestamp
+}
+```
+
+When the sequence completes, a new pattern is generated.
+
+### Enemy Selection
+
+Enemies are selected using a fallback chain:
+
+1. **Match type AND tier** - Filter activity's spawn weights by required type (from pattern) and tier ≤ character tier
+2. **Match any type at tier** - If no match, try any type at tier ≤ character tier
+3. **Original behavior** - If still no match, use original weighted random selection (no tier filtering)
+
+This ensures activities always spawn enemies while respecting the encounter pattern when possible.
+
+### Stat Scaling
+
+When a character's tier exceeds the enemy's tier, the enemy receives scaled stats to remain challenging:
+
+| Tier Difference | Multiplier | Scaled Stats |
+|-----------------|------------|--------------|
+| 0 | 1.0x | No scaling |
+| 1 | 1.15x | health, mana, strengthDef, magicDef, goldReward |
+| 2 | 1.25x | health, mana, strengthDef, magicDef, goldReward |
+| 3+ | 1.35x | health, mana, strengthDef, magicDef, goldReward |
+
+Note: Offensive stats (attack, dice) are not scaled to avoid making enemies overly punishing.
+
+### Related Files
+
+| File | Purpose |
+|------|---------|
+| [`shared/constants/encounter-patterns.ts`](../../shared/constants/encounter-patterns.ts) | Pattern definitions and sequence generation |
+| [`shared/constants/enemies.ts`](../../shared/constants/enemies.ts) | Stat scaling multipliers and `applyStatScaling()` |
+| [`shared/constants/activities.ts`](../../shared/constants/activities.ts) | Enemy filtering and fallback selection |
+| [`server/services/activity.service.ts`](../../server/services/activity.service.ts) | Encounter initialization on activity join |
+| [`server/services/combat.service.ts`](../../server/services/combat.service.ts) | Encounter progression on enemy defeat |
+
+---
+
 ## Implementation Status
 
 All phases are complete:

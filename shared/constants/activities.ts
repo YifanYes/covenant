@@ -1,3 +1,5 @@
+import { ENEMIES, type EnemyTemplate, type EnemyType } from './enemies'
+
 export enum ActivityDifficulty {
   EASY = 'EASY',
   NORMAL = 'NORMAL',
@@ -117,4 +119,96 @@ export function selectRandomEnemy(weights: Record<string, number>): string {
   }
 
   return entries[0][0]
+}
+
+export interface FilteredEnemy {
+  id: string
+  template: EnemyTemplate
+  weight: number
+}
+
+/**
+ * Filter enemies for spawning based on:
+ * - Activity spawn weights (enemy must be in the activity's weight list)
+ * - Maximum tier (enemy tier must be <= maxTier)
+ * - Required enemy type (optional, filters by MINION/ELITE/BOSS)
+ */
+export function filterEnemiesForSpawn(
+  weights: Record<string, number>,
+  maxTier: number,
+  requiredType?: EnemyType
+): FilteredEnemy[] {
+  const filtered: FilteredEnemy[] = []
+
+  for (const [enemyId, weight] of Object.entries(weights)) {
+    const template = ENEMIES[enemyId]
+    if (!template) continue
+
+    // Check tier cap
+    if (template.tier > maxTier) continue
+
+    // Check required type if specified
+    if (requiredType && template.type !== requiredType) continue
+
+    filtered.push({ id: enemyId, template, weight })
+  }
+
+  return filtered
+}
+
+/**
+ * Select a random enemy from a filtered pool based on weights
+ * Returns null if pool is empty
+ */
+export function selectEnemyFromPool(pool: FilteredEnemy[]): FilteredEnemy | null {
+  if (pool.length === 0) return null
+
+  const totalWeight = pool.reduce((sum, entry) => sum + entry.weight, 0)
+  let random = Math.random() * totalWeight
+
+  for (const entry of pool) {
+    random -= entry.weight
+    if (random <= 0) {
+      return entry
+    }
+  }
+
+  return pool[0]
+}
+
+/**
+ * Select an enemy with fallback chain:
+ * 1. Match type AND tier <= character tier
+ * 2. Match any type at tier <= character tier
+ * 3. Use original selectRandomEnemy behavior
+ */
+export function selectEnemyWithFallback(
+  weights: Record<string, number>,
+  characterTier: number,
+  requiredType?: EnemyType
+): { enemyId: string; template: EnemyTemplate } | null {
+  // Try 1: Match type AND tier
+  if (requiredType) {
+    const pool = filterEnemiesForSpawn(weights, characterTier, requiredType)
+    const selected = selectEnemyFromPool(pool)
+    if (selected) {
+      return { enemyId: selected.id, template: selected.template }
+    }
+  }
+
+  // Try 2: Match any type at tier <= character tier
+  const anyTypePool = filterEnemiesForSpawn(weights, characterTier)
+  const anySelected = selectEnemyFromPool(anyTypePool)
+  if (anySelected) {
+    return { enemyId: anySelected.id, template: anySelected.template }
+  }
+
+  // Try 3: Original behavior (no tier filtering)
+  const enemyId = selectRandomEnemy(weights)
+  const template = ENEMIES[enemyId]
+  if (template) {
+    return { enemyId, template }
+  }
+
+  return null
 }
