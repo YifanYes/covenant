@@ -1,4 +1,116 @@
 {
+  "landing": {
+    "meta": {
+      "title": "ARQ - Transform Your Productivity Into Real Power",
+      "description": "A gamified productivity app where every task, every habit, and every goal you complete forges your character. No shortcuts. No excuses. Only results you can see, measure, and equip."
+    },
+    "hero": {
+      "title": "ARQ transforms your productivity into real power.",
+      "subtitle": "Your daily discipline forges your divine legend.",
+      "body": "A productivity app where every completed task, every sustained habit, and every closed objective forges your character. No shortcuts. No excuses. Only results you can see, measure, and equip.",
+      "cta": "JOIN THE WAR"
+    },
+    "value_proposition": {
+      "title": "ARQ is not another to-do app.",
+      "body": "It's a persistent progression system where every action counts and every omission is paid for. Your productivity shapes the destiny of the world."
+    },
+    "productivity": {
+      "title": "Productivity",
+      "tasks": {
+        "title": "Complete Task Management",
+        "body": "Multiple views to fit your style: List, Calendar, Table, and Eisenhower Matrix. Organize your chaos with the precision of a military campaign."
+      },
+      "habits": {
+        "title": "Habit System",
+        "body": "Daily habit tracking with consistency bonuses. Every day you maintain a habit strengthens your character. Every day you fail weakens it. Simple."
+      },
+      "goals": {
+        "title": "Areas and Goals",
+        "body": "Define life Areas and long-term Goals. These aren't aspirational lists—they're progression lines with a start, cost, and closure."
+      }
+    },
+    "character": {
+      "title": "Your Character",
+      "stats": {
+        "title": "Living Stats",
+        "body": "It's not a decorative avatar. Your character reflects your real behavior: Strength, Magic, Health, and Mana stats that evolve according to what you do."
+      },
+      "doctrines": {
+        "title": "Doctrines and Mana System",
+        "body": "Unlock special abilities based on your class. Each doctrine has a mana cost—use them strategically or run out of resources."
+      },
+      "classes": {
+        "title": "Classes with Identity",
+        "body": "Your class defines your doctrines and combat style. No artificial boosts. No shortcuts. Only work."
+      }
+    },
+    "combat": {
+      "title": "Combat System",
+      "dice": {
+        "title": "Dice System",
+        "body": "Complete tasks → Earn dice. Dice are your combat resource.",
+        "table": {
+          "action": "Action",
+          "dice": "Dice",
+          "daily_habit": "Daily habit",
+          "high_impact_task": "High impact task",
+          "completed_objective": "Completed objective",
+          "habit_streak": "Habit streak (21 days)"
+        }
+      },
+      "missions": {
+        "title": "Missions and Adventures",
+        "body": "Tasks don't just get checked off—they become power to complete missions. Choose from different Tier missions. Every victory grants gold, experience, and equipment."
+      },
+      "reactive": {
+        "title": "Reactive Combat",
+        "body": "Roll dice to fight against the armies of evil. Simultaneous attack and defense. Each roll has visual and narrative weight."
+      },
+      "equipment": {
+        "title": "Equipment and Loadout",
+        "body": "Weapons, armor, and accessories that modify your stats. Tier 1 gear is free. From Tier 2 onwards, you earn it or buy it with gold. Progress feels real because you can equip it."
+      }
+    },
+    "coming_soon": {
+      "title": "Coming Soon",
+      "features": {
+        "journaling": {
+          "title": "Integrated Journaling",
+          "description": "Daily reflection connected with your progress. Document victories, analyze defeats."
+        },
+        "pvp": {
+          "title": "PvP: Duels",
+          "description": "Challenge other players using the dice system. Your real consistency against theirs."
+        },
+        "leaderboards": {
+          "title": "Leaderboards",
+          "description": "Rankings for the most disciplined."
+        },
+        "coop": {
+          "title": "Co-op System (2-4)",
+          "description": "Form a party with friends. Round-robin turns, individual loot."
+        },
+        "seasonal": {
+          "title": "Seasonal Missions",
+          "description": "New content based on moments from the ARQ world history."
+        },
+        "scaling": {
+          "title": "Dynamic Scaling",
+          "description": "Difficulty adjusts to your dice bank."
+        }
+      }
+    },
+    "closing": {
+      "line1": "ARQ doesn't push you to do more.",
+      "line2": "It forces you to do what you say matters.",
+      "line3": "Every completed task is dice. Every die is a roll. Every roll is an impact, both in the story and in your life.",
+      "line4": "Your productivity has consequences. Make them count.",
+      "cta": "BEGIN MY LEGEND"
+    },
+    "socials": {
+      "title": "Follow Us"
+    }
+  },
   "activities": {
     "assault_ships": {
       "description": "A fleet of ships besieges the docks. If they fall, maritime reinforcements will not arrive in time. Destroy them without mercy.",
@@ -177,6 +289,7 @@
     "roll_attack": "Prepare Attack",
     "roll_defense": "Prepare Defense",
     "roll_dice": "Roll Dice",
+    "roll_dice_action": "Roll dice!",
     "rolling": "Rolling",
     "target": "Target",
     "to_battle": "To Battle!",
@@ -851,7 +964,21 @@
     "tabs": {
       "armory": "Armory & Loadout",
       "character": "Character",
-      "doctrines": "Doctrines"
+      "doctrines": "Doctrines",
+      "kill_record": "Kill Record"
+    },
+    "kill_record": {
+      "total_kills": "Enemies Defeated",
+      "damage_dealt": "Total Damage Dealt",
+      "damage_received": "Total Damage Received",
+      "critical_hits": "Critical Hits",
+      "damage_dealt_short": "Dealt",
+      "damage_received_short": "Received",
+      "turns": "Turns",
+      "max_health": "Max Health",
+      "combat_log": "Combat Log",
+      "empty": "No enemies defeated yet. Start an activity to begin your hunt!",
+      "unknown_time": "Unknown"
     },
     "tier": "Tier",
     "title": "Inventory"

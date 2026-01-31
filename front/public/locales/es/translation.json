@@ -1,4 +1,116 @@
 {
+  "landing": {
+    "meta": {
+      "title": "ARQ - Transforma tu Productividad en Poder Real",
+      "description": "Una app de productividad gamificada donde cada tarea, cada hábito y cada objetivo que completas forja a tu personaje. Sin atajos. Sin excusas. Solo resultados que puedes ver, medir y equipar."
+    },
+    "hero": {
+      "title": "ARQ transforma tu productividad en poder real.",
+      "subtitle": "Tu disciplina diaria forja tu leyenda divina.",
+      "body": "Una app de productividad donde cada tarea completada, cada hábito sostenido y cada objetivo cerrado forja a tu personaje. Sin atajos. Sin excusas. Solo resultados que puedes ver, medir y equipar.",
+      "cta": "UNIRSE A LA GUERRA"
+    },
+    "value_proposition": {
+      "title": "ARQ no es otra app de to-dos.",
+      "body": "Es un sistema de progreso persistente donde cada acción cuenta y cada omisión se paga. Tu productividad moldea el destino del mundo."
+    },
+    "productivity": {
+      "title": "Productividad",
+      "tasks": {
+        "title": "Gestión de Tareas Completa",
+        "body": "Múltiples vistas para adaptarse a tu estilo: Lista, Calendario, Tabla y Matriz de Eisenhower. Organiza tu caos con la precisión de una campaña militar."
+      },
+      "habits": {
+        "title": "Sistema de Hábitos",
+        "body": "Seguimiento diario de hábitos con bonus de consistencia. Cada día que mantienes un hábito fortalece tu personaje. Cada día que fallas le debilita. Simple."
+      },
+      "goals": {
+        "title": "Áreas y Objetivos",
+        "body": "Define Áreas de vida y Objetivos a largo plazo. No son listas aspiracionales—son líneas de progresión con inicio, coste y cierre."
+      }
+    },
+    "character": {
+      "title": "Tu Personaje",
+      "stats": {
+        "title": "Estadísticas Vivas",
+        "body": "No es un avatar decorativo. Tu personaje refleja tu comportamiento real: estadísticas de Fuerza, Magia, Vida y Maná que evolucionan según lo que haces."
+      },
+      "doctrines": {
+        "title": "Sistema de Doctrinas y Maná",
+        "body": "Desbloquea habilidades especiales según tu clase. Cada doctrina tiene coste de maná—úsalas estratégicamente o quédate sin recursos."
+      },
+      "classes": {
+        "title": "Clases con Identidad",
+        "body": "Tu clase define tus doctrinas y estilo de combate. Sin boosts artificiales. No hay atajos. Solo trabajo."
+      }
+    },
+    "combat": {
+      "title": "Sistema de Combate",
+      "dice": {
+        "title": "Sistema de Dados",
+        "body": "Completa tareas → Gana dados. Los dados son tu recurso de combate.",
+        "table": {
+          "action": "Acción",
+          "dice": "Dados",
+          "daily_habit": "Hábito diario",
+          "high_impact_task": "Tarea de alto impacto",
+          "completed_objective": "Objetivo completado",
+          "habit_streak": "Racha de hábito (21 días)"
+        }
+      },
+      "missions": {
+        "title": "Misiones y Aventuras",
+        "body": "Las tareas no se tachan—se convierten en poder para completar misiones. Elige entre misiones de diferentes Tiers. Cada victoria otorga oro, experiencia y equipo."
+      },
+      "reactive": {
+        "title": "Combate Reactivo",
+        "body": "Lanza dados para luchar contra los ejércitos del mal. Ataque y defensa simultánea. Cada tirada tiene peso visual y narrativo."
+      },
+      "equipment": {
+        "title": "Equipamiento y Loadout",
+        "body": "Armas, armaduras y accesorios que modifican tus estadísticas. El equipo Tier 1 es gratis. A partir del Tier 2, lo ganas o lo compras con oro. El progreso se siente porque lo puedes equipar."
+      }
+    },
+    "coming_soon": {
+      "title": "Próximamente",
+      "features": {
+        "journaling": {
+          "title": "Journaling Integrado",
+          "description": "Reflexión diaria conectada con tu progreso. Documenta victorias, analiza derrotas."
+        },
+        "pvp": {
+          "title": "PvP: Duelos",
+          "description": "Reta a otros jugadores usando el sistema de dados. Tu consistencia real contra la de otro."
+        },
+        "leaderboards": {
+          "title": "Leaderboards",
+          "description": "Tablas de clasificación para los más disciplinados."
+        },
+        "coop": {
+          "title": "Sistema Co-op (2-4)",
+          "description": "Forma party con amigos. Turnos round-robin, loot individual."
+        },
+        "seasonal": {
+          "title": "Misiones Estacionales",
+          "description": "Contenido nuevo basado en momentos de la historia del mundo de ARQ."
+        },
+        "scaling": {
+          "title": "Escalado Dinámico",
+          "description": "La dificultad se ajusta a tu banco de dados."
+        }
+      }
+    },
+    "closing": {
+      "line1": "ARQ no te empuja a hacer más.",
+      "line2": "Te obliga a hacer lo que dices que importa.",
+      "line3": "Cada tarea completada son dados. Cada dado es una tirada. Cada tirada es un impacto, tanto en la historia como en tu vida.",
+      "line4": "Tu productividad tiene consecuencias. Hazlas contar.",
+      "cta": "COMENZAR MI LEYENDA"
+    },
+    "socials": {
+      "title": "Síguenos"
+    }
+  },
   "activities": {
     "assault_ships": {
       "description": "Una flota de navíos asedia los muelles. En caso de caer, los refuerzos marítimos no podrán llegar a tiempo. Destrúyelos sin piedad.",
@@ -177,6 +289,7 @@
     "roll_attack": "Preparar Ataque",
     "roll_defense": "Preparar Defensa",
     "roll_dice": "Lanzar Dados",
+    "roll_dice_action": "¡Lanzar dados!",
     "rolling": "Lanzando",
     "target": "Objetivo",
     "to_battle": "¡Al ataque!",
@@ -851,7 +964,21 @@
     "tabs": {
       "armory": "Armería y Equipamiento",
       "character": "Personaje",
-      "doctrines": "Doctrinas"
+      "doctrines": "Doctrinas",
+      "kill_record": "Historial de Batallas"
+    },
+    "kill_record": {
+      "total_kills": "Enemigos Derrotados",
+      "damage_dealt": "Daño Total Infligido",
+      "damage_received": "Daño Total Recibido",
+      "critical_hits": "Golpes Críticos",
+      "damage_dealt_short": "Infligido",
+      "damage_received_short": "Recibido",
+      "turns": "Turnos",
+      "max_health": "Vida Máxima",
+      "combat_log": "Registro de Combate",
+      "empty": "Aún no has derrotado ningún enemigo. ¡Comienza una actividad para empezar tu cacería!",
+      "unknown_time": "Desconocido"
     },
     "tier": "Tier",
     "title": "Inventario"

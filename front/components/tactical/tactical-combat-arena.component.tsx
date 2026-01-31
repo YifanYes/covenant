@@ -163,6 +163,9 @@ export default function TacticalCombatArena({
   // Tactical attack hook
   const { confirmAttack, getPendingAttackInfo, isLoading: isTacticalAttackLoading } = useTacticalAttack()
 
+  // Get pending attack info for UI
+  const pendingAttackInfo = getPendingAttackInfo()
+
   // Enemy AI turn hook - automatically executes when it's an enemy's turn
   const { isExecuting: isEnemyTurnExecuting } = useTacticalEnemyTurn()
 
@@ -188,16 +191,14 @@ export default function TacticalCombatArena({
 
   // Combat turn hook for dice rolling
   const {
-    pendingAttackRolls,
-    pendingDefenseRolls,
     submittedAttackRolls,
     submittedDefenseRolls,
-    currentAvailableDice,
-    diceLimit,
-    isAttackPhase,
+    attackDiceCount,
+    defenseDiceCount,
     isWaitingForResolve,
     showResults,
-    handleRoll
+    handleRoll,
+    clearResults
   } = useCombatTurn({
     isAttacking: isTacticalAttackLoading,
     diceBank,
@@ -206,6 +207,13 @@ export default function TacticalCombatArena({
     onAttack: handleTacticalAttack,
     lastTurnResult
   })
+
+  // Clear dice results when user starts a different action (Move) or it becomes enemy turn
+  useEffect(() => {
+    if (phase === 'select_move' || phase === 'enemy_turn') {
+      clearResults()
+    }
+  }, [phase, clearResults])
 
   // Consumable mutation
   const useConsumableMutation = useMutation({
@@ -381,24 +389,29 @@ export default function TacticalCombatArena({
         <DiceResult key={`${prefix}-p-${i}`} value={v} isSuccess={false} isCritical={false} isRolling />
       ))
     }
-    if (isTacticalAttackLoading && submitted) {
+    // Show resolved results if available
+    if (resolved?.length) {
+      return resolved.map((r, i) => (
+        <DiceResult key={`${prefix}-${i}`} value={r.value} isSuccess={r.isSuccess} isCritical={r.isCritical} />
+      ))
+    }
+    // Show submitted dice while waiting for results or as fallback
+    // Calculate success/critical based on standard thresholds (4+ success, 6 critical)
+    if (submitted) {
       return submitted.map((v, i) => (
         <DiceResult
           key={`${prefix}-s-${i}`}
           value={v}
-          isSuccess={false}
-          isCritical={false}
-          className="animate-pulse opacity-70"
+          isSuccess={v >= 4}
+          isCritical={v === 6}
+          className={isTacticalAttackLoading ? "animate-pulse opacity-70" : ""}
         />
       ))
     }
-    return resolved?.map((r, i) => (
-      <DiceResult key={`${prefix}-${i}`} value={r.value} isSuccess={r.isSuccess} isCritical={r.isCritical} />
-    ))
+    return null
   }
 
   if (!currentClass) return null
-  const rollButtonLabel = isAttackPhase ? t('combat.roll_attack') : t('combat.roll_defense')
 
   return (
     <div className={cn('flex min-h-0 flex-col', className)}>
@@ -584,35 +597,34 @@ export default function TacticalCombatArena({
             </ScrollArea>
           </div>
 
-          {/* Dice Roller (when attacking) */}
-          {phase === 'select_target' && (
+          {/* Dice Roller (when attacking with target selected, or showing results) */}
+          {(pendingAttackInfo?.target || showResults || submittedAttackRolls || submittedDefenseRolls) && (
             <>
-              <DiceRoller
-                diceBank={currentAvailableDice}
-                onRoll={handleRoll}
-                isRolling={isWaitingForResolve}
-                customButtonLabel={rollButtonLabel}
-                title={isAttackPhase ? t('combat.to_battle') : undefined}
-                diceLimit={diceLimit}
-              />
+              {phase === 'select_target' && pendingAttackInfo?.target && (
+                <DiceRoller
+                  diceBank={diceBank}
+                  attackDiceCount={attackDiceCount}
+                  defenseDiceCount={defenseDiceCount}
+                  onRoll={handleRoll}
+                  isRolling={isWaitingForResolve}
+                />
+              )}
 
               {/* Attack/Defense Dice Results */}
               <div className="space-y-2">
-                {(pendingAttackRolls ||
-                  submittedAttackRolls ||
+                {(submittedAttackRolls ||
                   (showResults && !!lastTurnResult?.playerAttackRolls?.length)) && (
                   <div className="rounded-lg border p-2 transition-all duration-300">
                     <div className="mb-1 text-xs font-medium tracking-wider text-orange-500/80 uppercase">
                       {t('combat.attack_rolls')}
                     </div>
                     <div className="flex flex-wrap justify-center gap-1">
-                      {renderDice(pendingAttackRolls, submittedAttackRolls, lastTurnResult?.playerAttackRolls, 'atk')}
+                      {renderDice(undefined, submittedAttackRolls, lastTurnResult?.playerAttackRolls, 'atk')}
                     </div>
                   </div>
                 )}
 
-                {(pendingDefenseRolls ||
-                  submittedDefenseRolls ||
+                {(submittedDefenseRolls ||
                   (showResults && !!lastTurnResult?.playerDefenseRolls?.length)) && (
                   <div className="rounded-lg border p-2 transition-all duration-300">
                     <div className="mb-1 text-xs font-medium tracking-wider text-blue-500/80 uppercase">
@@ -620,7 +632,7 @@ export default function TacticalCombatArena({
                     </div>
                     <div className="flex flex-wrap justify-center gap-1">
                       {renderDice(
-                        pendingDefenseRolls,
+                        undefined,
                         submittedDefenseRolls,
                         lastTurnResult?.playerDefenseRolls,
                         'def'
@@ -632,8 +644,8 @@ export default function TacticalCombatArena({
             </>
           )}
 
-          {/* Tile Info Panel (when not attacking) */}
-          {phase !== 'select_target' && (
+          {/* Tile Info Panel (when not attacking and no dice results to show) */}
+          {phase !== 'select_target' && !showResults && !submittedAttackRolls && !submittedDefenseRolls && (
             <div className="rounded-lg border p-3">
               <TileInfoPanel
                 hoveredTile={hoveredTile}

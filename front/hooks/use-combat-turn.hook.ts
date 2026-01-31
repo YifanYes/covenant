@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 interface UseCombatTurnProps {
   isAttacking: boolean
@@ -19,74 +19,44 @@ export function useCombatTurn({
   onAttack,
   lastTurnResult
 }: UseCombatTurnProps) {
-  const [pendingAttackRolls, setPendingAttackRolls] = useState<number[] | undefined>()
-  const [pendingDefenseRolls, setPendingDefenseRolls] = useState<number[] | undefined>()
-
   // "Submitted" means sent to parent/backend but waiting for response
   const [submittedAttackRolls, setSubmittedAttackRolls] = useState<number[] | undefined>()
   const [submittedDefenseRolls, setSubmittedDefenseRolls] = useState<number[] | undefined>()
 
-  // Clear submitted rolls when we get a result
-  useEffect(() => {
-    if (lastTurnResult) {
-      // Small timeout to allow UI to transition smoothly if needed,
-      // or immediate clear if we want instant result display
-      const timer = setTimeout(() => {
-        setSubmittedAttackRolls(undefined)
-        setSubmittedDefenseRolls(undefined)
-      }, 0)
-      return () => clearTimeout(timer)
-    }
-  }, [lastTurnResult])
+  // Roll both attack and defense dice at once
+  const handleRoll = () => {
+    const attackCount = Math.min(diceBank, weaponDice)
+    const defenseCount = Math.min(diceBank, armorDice)
+    const attackRolls = Array.from({ length: attackCount }, () => Math.floor(Math.random() * 6) + 1)
+    const defenseRolls = Array.from({ length: defenseCount }, () => Math.floor(Math.random() * 6) + 1)
 
-  const handleRoll = (count: number) => {
-    const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1)
+    setSubmittedAttackRolls(attackRolls)
+    setSubmittedDefenseRolls(defenseRolls)
 
-    if (!pendingAttackRolls) {
-      // New turn start
-      setSubmittedAttackRolls(undefined)
-      setSubmittedDefenseRolls(undefined)
-      setPendingAttackRolls(rolls)
-    } else {
-      // Defense roll (Second phase) - Trigger attack immediately
-      const attackRolls = pendingAttackRolls
-      const defenseRolls = rolls
-
-      setPendingAttackRolls(undefined)
-      setPendingDefenseRolls(undefined)
-
-      setSubmittedAttackRolls(attackRolls)
-      setSubmittedDefenseRolls(defenseRolls)
-
-      onAttack({ attackRolls, defenseRolls })
-    }
+    onAttack({ attackRolls, defenseRolls })
   }
 
-  // Derived state
-  const currentAvailableDice = (() => {
-    let usedDice = 0
-    if (pendingAttackRolls) usedDice += pendingAttackRolls.length
-    if (pendingDefenseRolls) usedDice += pendingDefenseRolls.length
-    return Math.max(0, diceBank - usedDice)
-  })()
+  // Clear results when user proceeds to next turn
+  const clearResults = () => {
+    setSubmittedAttackRolls(undefined)
+    setSubmittedDefenseRolls(undefined)
+  }
 
-  // Determine what phase we are in for UI button label / limitation
-  const isAttackPhase = !pendingAttackRolls
-  const diceLimit = Math.min(diceBank, isAttackPhase ? weaponDice : armorDice)
+  // Calculate dice counts for display
+  const attackDiceCount = Math.min(diceBank, weaponDice)
+  const defenseDiceCount = Math.min(diceBank, armorDice)
 
-  const isWaitingForResolve = !!(pendingAttackRolls && pendingDefenseRolls) || isAttacking
-  const showResults = !!(lastTurnResult && !isAttacking && !pendingAttackRolls && !pendingDefenseRolls)
+  const isWaitingForResolve = isAttacking
+  const showResults = !!(lastTurnResult && !isAttacking)
 
   return {
-    pendingAttackRolls,
-    pendingDefenseRolls,
     submittedAttackRolls,
     submittedDefenseRolls,
-    currentAvailableDice,
-    diceLimit,
-    isAttackPhase,
+    attackDiceCount,
+    defenseDiceCount,
     isWaitingForResolve,
     showResults,
-    handleRoll
+    handleRoll,
+    clearResults
   }
 }

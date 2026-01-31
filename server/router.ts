@@ -6,6 +6,7 @@ import { dashboardRouter } from './routers/dashboard.router'
 import { deadlineRouter } from './routers/deadline.router'
 import { habitsRouter } from './routers/habits.router'
 import { investmentRouter } from './routers/investment.router'
+import { killRecordRouter } from './routers/kill-record.router'
 import { objectivesRouter } from './routers/objectives.router'
 import { storeRouter } from './routers/store.router'
 import { tasksRouter } from './routers/tasks.router'
@@ -26,6 +27,7 @@ export const appRouter = t.router({
   dashboard: dashboardRouter,
   activity: activityRouter,
   investment: investmentRouter,
+  killRecord: killRecordRouter,
   store: storeRouter,
   deadline: deadlineRouter
 })
