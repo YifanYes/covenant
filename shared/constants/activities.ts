@@ -70,8 +70,7 @@ export const ACTIVITIES: Record<string, ActivityTemplate> = {
     communityBonus: 600,
     enemySpawnWeights: {
       bandit_stalker: 40,
-      bandit_runic: 30,
-      bandit_chief: 30
+      bandit_runic: 30
     },
     successConsequence: 'activities.assault_ships.success_consequence',
     failureConsequence: 'activities.assault_ships.failure_consequence',

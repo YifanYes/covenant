@@ -76,7 +76,8 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
   }
 
   // Helper to translate enemy name (handles prefix|suffix format)
-  const translateEnemyName = (name: string): string => {
+  const translateEnemyName = (name: string | undefined): string => {
+    if (!name) return t('combat.unknown_enemy')
     if (name.includes('|')) {
       const [prefix, suffix] = name.split('|')
       return `${t(prefix)} ${t(suffix)}`

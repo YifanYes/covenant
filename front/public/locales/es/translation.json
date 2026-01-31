@@ -244,6 +244,7 @@
     "dice_to_spend": "Dados a gastar",
     "enemies": "Enemigos",
     "enemies_defeated": "Enemigos Derrotados",
+    "unknown_enemy": "Enemigo Desconocido",
     "error": {
       "attack": "El ataque falló",
       "attack_failed": "El ataque falló",
