@@ -11,21 +11,21 @@ ARQ is a gamified productivity platform combining task management, habit trackin
 ### Development
 ```bash
 # Backend (Terminal 1)
-cd server && bun run dev
+cd server && pnpm dev
 
 # Frontend (Terminal 2)
-cd front && bun run dev
+cd front && pnpm dev
 ```
 
 ### Testing
 ```bash
-cd server && bun run test           # Run tests
-cd server && bun run test:coverage  # Run with coverage
+cd server && pnpm test           # Run tests
+cd server && pnpm test:coverage  # Run with coverage
 ```
 
 ### Linting
 ```bash
-cd front && bun run lint
+cd front && pnpm lint
 ```
 
 ### Database
@@ -40,7 +40,7 @@ npx prisma migrate dev  # Create migration
 
 ### Monorepo Structure
 - `front/` - Next.js 16 frontend (App Router, React 19, TailwindCSS v4)
-- `server/` - Backend (Bun, tRPC, Fastify, Prisma)
+- `server/` - Backend (Node.js, tRPC, Fastify, Prisma)
 - `shared/` - Zod schemas (single source of truth for types)
 - `docs/specs/` - Technical specifications for complex features
 

@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=22.6.0"
   },
   "scripts": {
-    "dev": "bun --watch server.ts",
-    "start": "bun server.ts",
+    "dev": "tsx --watch server.ts",
+    "start": "tsx server.ts",
     "db:generate": "prisma migrate dev",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
@@ -17,10 +17,11 @@
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
-    "@trpc/server": "^11.8.1",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
+    "@trpc/server": "^11.8.1",
     "better-auth": "^1.4.17",
+    "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
     "fastify": "^5.7.2",
     "node-cron": "^4.2.1",
@@ -33,6 +34,7 @@
     "@types/node-cron": "^3.0.11",
     "@types/pg": "^8.16.0",
     "@vitest/coverage-v8": "^4.0.18",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^6.0.5",
     "vitest": "^4.0.18"

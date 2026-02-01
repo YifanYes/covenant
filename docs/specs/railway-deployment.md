@@ -31,7 +31,10 @@ In your domain registrar, add CNAME records:
 
 ## Important Notes
 
+- **Package Manager**: The project uses pnpm. Railway will auto-detect from `pnpm-lock.yaml`
+- **Node.js Version**: Requires Node.js 20+
 - **Internal networking**: `postgres.railway.internal` only works within the same Railway project
 - **Google OAuth**: Update redirect URIs in Google Cloud Console:
   - `https://api.arq-game.com/api/auth/callback/google`
 - **Redeployment**: Push to main branch or use Railway dashboard to trigger manual deploy
+- **Cleanup**: Remove any `RAILPACK_INSTALL_COMMAND` variable from Railway if previously added
