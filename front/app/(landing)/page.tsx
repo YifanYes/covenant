@@ -26,13 +26,11 @@ function HeroSection() {
   const { t } = useTranslation()
 
   return (
-    <section className="relative flex min-h-[80vh] flex-col items-center justify-center px-4 py-16 text-center">
-      <div className="absolute inset-0 bg-gradient-to-b from-secondary/10 to-transparent" />
+    <section className="relative flex min-h-screen snap-start flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="absolute inset-0 bg-linear-to-b from-secondary/10 to-transparent" />
       <div className="relative z-10 flex max-w-4xl flex-col items-center gap-8">
         <div className="flex flex-col items-center gap-2">
-          <h1 className="text-primary text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
-            ARQ
-          </h1>
+          <h1 className="text-primary text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">ARQ</h1>
           <div className="bg-primary/20 h-1 w-24 rounded-full" />
         </div>
 
@@ -40,13 +38,9 @@ function HeroSection() {
           {t('landing.hero.title')}
         </h2>
 
-        <p className="text-accent text-xl font-semibold md:text-2xl">
-          {t('landing.hero.subtitle')}
-        </p>
+        <p className="text-accent text-xl font-semibold md:text-2xl">{t('landing.hero.subtitle')}</p>
 
-        <p className="text-muted-foreground max-w-2xl text-lg">
-          {t('landing.hero.body')}
-        </p>
+        <p className="text-muted-foreground max-w-2xl text-lg">{t('landing.hero.body')}</p>
 
         <Button asChild size="lg" className="mt-4 text-lg font-bold uppercase tracking-wider">
           <Link href="/sign-up">{t('landing.hero.cta')}</Link>
@@ -60,14 +54,12 @@ function ValuePropositionSection() {
   const { t } = useTranslation()
 
   return (
-    <section className="bg-card/50 px-4 py-16">
+    <section className="bg-card/50 flex min-h-screen snap-start flex-col justify-center px-4 py-16">
       <div className="mx-auto max-w-3xl text-center">
         <h2 className="font-title text-foreground mb-6 text-3xl font-bold md:text-4xl">
           {t('landing.value_proposition.title')}
         </h2>
-        <p className="text-muted-foreground text-lg md:text-xl">
-          {t('landing.value_proposition.body')}
-        </p>
+        <p className="text-muted-foreground text-lg md:text-xl">{t('landing.value_proposition.body')}</p>
       </div>
     </section>
   )
@@ -95,7 +87,7 @@ function ProductivitySection() {
   ]
 
   return (
-    <section className="px-4 py-16">
+    <section className="flex min-h-screen snap-start flex-col justify-center px-4 py-16">
       <div className="mx-auto max-w-6xl">
         <h2 className="font-title text-foreground mb-12 text-center text-3xl font-bold md:text-4xl">
           {t('landing.productivity.title')}
@@ -142,7 +134,7 @@ function CharacterSection() {
   ]
 
   return (
-    <section className="bg-secondary/5 px-4 py-16">
+    <section className="bg-secondary/5 flex min-h-screen snap-start flex-col justify-center px-4 py-16">
       <div className="mx-auto max-w-6xl">
         <h2 className="font-title text-foreground mb-12 text-center text-3xl font-bold md:text-4xl">
           {t('landing.character.title')}
@@ -155,9 +147,7 @@ function CharacterSection() {
                 <feature.icon className="text-accent h-6 w-6" />
               </div>
               <div>
-                <h3 className="font-title text-foreground mb-2 text-lg font-semibold">
-                  {feature.title}
-                </h3>
+                <h3 className="font-title text-foreground mb-2 text-lg font-semibold">{feature.title}</h3>
                 <p className="text-muted-foreground">{feature.body}</p>
               </div>
             </div>
@@ -214,51 +204,36 @@ function CombatSection() {
   ]
 
   return (
-    <section className="px-4 py-16">
+    <section className="flex min-h-screen snap-start flex-col justify-center px-4 py-8">
       <div className="mx-auto max-w-6xl">
-        <h2 className="font-title text-foreground mb-12 text-center text-3xl font-bold md:text-4xl">
+        <h2 className="font-title text-foreground mb-8 text-center text-3xl font-bold md:text-4xl">
           {t('landing.combat.title')}
         </h2>
 
-        <div className="mb-12">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card className="border-accent/30">
             <CardHeader>
-              <div className="flex items-center gap-3">
-                <Gamepad className="text-accent h-8 w-8" />
-                <CardTitle className="text-2xl">{t('landing.combat.dice.title')}</CardTitle>
+              <div className="bg-primary/10 mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
+                <Gamepad className="text-primary h-6 w-6" />
               </div>
-              <CardDescription className="text-base">
-                {t('landing.combat.dice.body')}
-              </CardDescription>
+              <CardTitle>{t('landing.combat.dice.title')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="overflow-hidden rounded-lg border">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-muted/50">
-                      <th className="font-title px-4 py-3 text-left font-semibold">
-                        {t('landing.combat.dice.table.action')}
-                      </th>
-                      <th className="font-title px-4 py-3 text-right font-semibold">
-                        {t('landing.combat.dice.table.dice')}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {diceTable.map((row, index) => (
-                      <tr key={index} className="border-t">
-                        <td className="px-4 py-3">{row.action}</td>
-                        <td className="text-primary px-4 py-3 text-right font-bold">{row.dice}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <CardDescription className="mb-6 text-base">{t('landing.combat.dice.body')}</CardDescription>
+              <div className="space-y-3">
+                {diceTable.map((row, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between border-b border-border/50 pb-2 last:border-0 last:pb-0"
+                  >
+                    <span className="text-muted-foreground text-sm">{row.action}</span>
+                    <span className="text-primary font-bold">{row.dice}</span>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
-        </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
           {combatFeatures.map((feature, index) => (
             <Card key={index}>
               <CardHeader>
@@ -315,9 +290,9 @@ function ComingSoonSection() {
   ]
 
   return (
-    <section className="bg-card/50 px-4 py-16">
+    <section className="bg-card/50 flex min-h-screen snap-start flex-col justify-center px-4 py-8">
       <div className="mx-auto max-w-6xl">
-        <h2 className="font-title text-foreground mb-12 text-center text-3xl font-bold md:text-4xl">
+        <h2 className="font-title text-foreground mb-8 text-center text-3xl font-bold md:text-4xl">
           {t('landing.coming_soon.title')}
         </h2>
 
@@ -342,54 +317,46 @@ function ComingSoonSection() {
   )
 }
 
-function ClosingSection() {
+function ClosingAndFooterSection() {
   const { t } = useTranslation()
 
   return (
-    <section className="bg-secondary/10 px-4 py-20">
-      <div className="mx-auto max-w-3xl text-center">
-        <p className="text-foreground mb-4 text-xl md:text-2xl">{t('landing.closing.line1')}</p>
-        <p className="text-primary mb-8 text-2xl font-bold md:text-3xl">
-          {t('landing.closing.line2')}
-        </p>
-        <p className="text-muted-foreground mb-4 text-lg">{t('landing.closing.line3')}</p>
-        <p className="text-foreground mb-10 text-xl font-semibold">{t('landing.closing.line4')}</p>
+    <div className="snap-start">
+      <section className="bg-secondary/10 flex min-h-[calc(100vh-150px)] flex-col justify-center px-4 py-10">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-foreground mb-4 text-xl md:text-2xl">{t('landing.closing.line1')}</p>
+          <p className="text-primary mb-8 text-2xl font-bold md:text-3xl">{t('landing.closing.line2')}</p>
+          <p className="text-muted-foreground mb-4 text-lg">{t('landing.closing.line3')}</p>
+          <p className="text-foreground mb-10 text-xl font-semibold">{t('landing.closing.line4')}</p>
 
-        <Button asChild size="lg" className="text-lg font-bold uppercase tracking-wider">
-          <Link href="/sign-up">{t('landing.closing.cta')}</Link>
-        </Button>
-      </div>
-    </section>
-  )
-}
-
-function Footer() {
-  return (
-    <footer className="bg-card border-t px-4 py-8">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-primary text-2xl font-bold">ARQ</span>
+          <Button asChild size="lg" className="mt-8 text-lg font-bold uppercase tracking-wider">
+            <Link href="/sign-up">{t('landing.closing.cta')}</Link>
+          </Button>
         </div>
-        <Separator className="w-24" />
-        <p className="text-muted-foreground text-sm">
-          &copy; {new Date().getFullYear()} ARQ. All rights reserved.
-        </p>
-      </div>
-    </footer>
+      </section>
+      <footer className="bg-card border-t px-4 py-8">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-primary text-2xl font-bold">ARQ</span>
+          </div>
+          <Separator className="w-24" />
+          <p className="text-muted-foreground text-sm">&copy; {new Date().getFullYear()} ARQ. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
   )
 }
 
 export default function LandingPage() {
   return (
-    <main className="bg-background min-h-screen">
+    <main className="bg-background h-screen overflow-y-auto scroll-smooth snap-y snap-mandatory">
       <HeroSection />
       <ValuePropositionSection />
       <ProductivitySection />
       <CharacterSection />
       <CombatSection />
       <ComingSoonSection />
-      <ClosingSection />
-      <Footer />
+      <ClosingAndFooterSection />
     </main>
   )
 }
