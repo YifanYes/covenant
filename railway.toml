@@ -1,5 +1,5 @@
 [build]
-builder = "nixpacks"
+builder = "railpack"
 buildCommand = "pnpm install && pnpm --filter server run postinstall"
 
 [deploy]
