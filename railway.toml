@@ -1,8 +1,9 @@
 [build]
 builder = "nixpacks"
+buildCommand = "cd server && bunx prisma generate"
 
 [deploy]
-startCommand = "cd server && bunx prisma generate && bunx prisma db push && bun start"
+startCommand = "cd server && bunx prisma db push && bun start"
 healthcheckPath = "/trpc"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
