@@ -4,7 +4,7 @@ buildCommand = "pnpm install && pnpm --filter server run postinstall"
 
 [deploy]
 startCommand = "pnpm --filter server run db:push && pnpm --filter server start"
-healthcheckPath = "/trpc"
+healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10

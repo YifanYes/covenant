@@ -4,9 +4,9 @@ import fastify from 'fastify'
 import cron from 'node-cron'
 import { env } from './config'
 import { createContext } from './context'
+import { auth } from './lib/auth'
 import { prisma } from './lib/prisma'
 import { appRouter, type AppRouter } from './router'
-import { auth } from './lib/auth'
 import { ServiceFactory } from './services/service.factory'
 
 const server = fastify({
@@ -22,6 +22,11 @@ async function startServer() {
       credentials: true
     })
 
+    // Health check route
+    server.get('/health', async () => {
+      return { status: 'ok', timestamp: new Date().toISOString() }
+    })
+
     // Better Auth routes (must be before tRPC)
     server.route({
       method: ['GET', 'POST'],
@@ -35,9 +40,7 @@ async function startServer() {
             if (value) headers.append(key, Array.isArray(value) ? value.join(', ') : value)
           })
 
-          const body = request.method === 'POST' && request.body
-            ? JSON.stringify(request.body)
-            : undefined
+          const body = request.method === 'POST' && request.body ? JSON.stringify(request.body) : undefined
 
           const req = new Request(url.toString(), {
             method: request.method,
