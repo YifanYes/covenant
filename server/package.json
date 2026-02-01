@@ -7,6 +7,7 @@
     "node": ">=22.6.0"
   },
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "tsx --watch server.ts",
     "start": "tsx server.ts",
     "db:generate": "prisma migrate dev",

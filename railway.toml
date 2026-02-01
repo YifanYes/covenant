@@ -1,9 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd server && npx prisma generate"
+buildCommand = "pnpm install && npx prisma generate"
 
 [deploy]
-startCommand = "cd server && npx prisma db push && pnpm start"
+startCommand = "npx prisma db push && pnpm start"
 healthcheckPath = "/trpc"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
