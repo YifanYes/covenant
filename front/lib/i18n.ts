@@ -28,8 +28,10 @@ i18n
     interpolation: {
       escapeValue: false
     },
-    supportedLngs: ['en', 'es'],
+    supportedLngs: ['en', 'es']
   })
+
+dayjs.locale(i18n.language)
 
 i18n.on('languageChanged', (lng) => dayjs.locale(lng))
 

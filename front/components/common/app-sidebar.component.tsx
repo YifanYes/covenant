@@ -103,9 +103,12 @@ export default function AppSidebar() {
   }
 
   return (
-    <Sidebar collapsible='icon'>
+    <Sidebar collapsible="icon">
       <SidebarHeader>
-        <div className='flex h-16 w-full items-center justify-start px-4 group-data-[collapsible=icon]:h-12 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
+        <Link
+          href="/"
+          className="group/logo flex h-fit w-full items-end gap-3 justify-start p-2 mt-2 transition-all duration-300 hover:scale-105 active:scale-95 origin-left group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:origin-center"
+        >
           <div
             style={{
               maskImage: 'url(/arq-logo.svg)',
@@ -117,9 +120,15 @@ export default function AppSidebar() {
               WebkitMaskSize: 'contain',
               WebkitMaskPosition: 'center'
             }}
-            className='bg-foreground h-12 w-32 transition-all duration-200 group-data-[collapsible=icon]:h-9 group-data-[collapsible=icon]:w-9'
+            className="bg-foreground h-9 w-9 shrink-0 transition-colors duration-300 group-hover/logo:bg-primary group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7"
           />
-        </div>
+          <span
+            className="font-title font-medium text-2xl tracking-widest transition-colors duration-300 group-hover/logo:text-primary inline-block group-data-[collapsible=icon]:hidden"
+            style={{ fontFamily: 'var(--font-cinzel)' }}
+          >
+            Arq
+          </span>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarSection title={t('sidebar.productivity')} items={sidebarItems.productivity} />

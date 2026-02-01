@@ -20,12 +20,14 @@ const geistMono = Geist_Mono({
 
 const ebGaramond = EB_Garamond({
   variable: '--font-eb-garamond',
-  subsets: ['latin']
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800']
 })
 
 const cinzel = Cinzel({
   variable: '--font-cinzel',
-  subsets: ['latin']
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900']
 })
 
 // Helper to get preferred language from headers
@@ -36,9 +38,10 @@ function getParsedHeadersLang(acceptLang: string | null) {
 }
 
 export const metadata: Metadata = {
-  title: "Arq - Gamified Productivity",
-  description: "Level up your productivity with Arq",
-};
+  title: 'ARQ - Gamified Productivity',
+  description: 'Level up your productivity with ARQ',
+  icons: { icon: '/arq-logo.svg' }
+}
 
 export default async function RootLayout({
   children
