@@ -1,5 +1,6 @@
 [build]
 builder = "nixpacks"
+appDirectory = "server"
 buildCommand = "pnpm install && npx prisma generate"
 
 [deploy]
