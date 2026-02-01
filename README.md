@@ -4,8 +4,8 @@ A personal productivity app for managing tasks, habits, and objectives with an R
 
 ## Prerequisites
 
-- [Bun](https://bun.sh/) (JavaScript runtime)
-- [Node.js](https://nodejs.org/) (v18+)
+- [Node.js](https://nodejs.org/) (v20+)
+- [pnpm](https://pnpm.io/) (package manager)
 - PostgreSQL database in Supabase
 
 ## Installation
@@ -20,17 +20,8 @@ cd arq
 2. Install dependencies:
 
 ```bash
-# Install root dependencies
-bun install
-
-# Install frontend dependencies
-cd front && bun install && cd ..
-
-# Install server dependencies
-cd server && bun install && cd ..
-
-# Install shared dependencies
-cd shared && bun install && cd ..
+# Install all workspace dependencies from root
+pnpm install
 ```
 
 3. Configure environment variables:
@@ -56,10 +47,10 @@ Run the development servers:
 
 ```bash
 # Terminal 1: Start the backend server
-cd server && bun run dev
+cd server && pnpm dev
 
 # Terminal 2: Start the frontend
-cd front && bun run dev
+cd front && pnpm dev
 ```
 
 ## Project Structure
@@ -104,7 +95,7 @@ This project follows **Spec-Driven Development** principles to ensure architectu
 ## Tech Stack
 
 - **Frontend**: Next.js 16 (App Router), React 19, TypeScript, TailwindCSS v4, TanStack Query, Zustand
-- **Backend**: Bun, tRPC, Prisma, PostgreSQL
+- **Backend**: Node.js, tRPC, Prisma, PostgreSQL
 - **Validation**: Zod
 - **Internationalization**: i18next
 
@@ -112,13 +103,13 @@ This project follows **Spec-Driven Development** principles to ensure architectu
 
 ```bash
 # Build the frontend (Next.js)
-cd front && bun run build
+cd front && pnpm build
 
 # Start the frontend in production
-cd front && bun run start
+cd front && pnpm start
 
-# Build the server
-cd server && npx tsc
+# Start the server in production
+cd server && pnpm start
 ```
 
 ## Testing
@@ -131,7 +122,7 @@ To run the test suite for the server:
 
 ```bash
 cd server
-bun run test
+pnpm test
 ```
 
 ### Coverage
@@ -140,5 +131,5 @@ To generate a coverage report:
 
 ```bash
 cd server
-bun run test:coverage
+pnpm test:coverage
 ```
