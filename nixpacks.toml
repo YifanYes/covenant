@@ -1,3 +1,5 @@
+nixpkgsArchive = '51ad838b03a05b1de6f9f2a0fffecee64a9788ee'
+
 [variables]
-NIXPACKS_NODE_VERSION = '24'
-NODE_VERSION = '24'
+NIXPACKS_NODE_VERSION = '22'
+NODE_VERSION = '22'
