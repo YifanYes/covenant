@@ -71,7 +71,7 @@ async function startServer() {
       } satisfies FastifyTRPCPluginOptions<AppRouter>['trpcOptions']
     })
 
-    await server.listen({ port: env.PORT })
+    await server.listen({ port: env.PORT, host: '0.0.0.0' })
     console.log(`Server is running at port ${env.PORT}`)
 
     // Schedule deadline validation cron job to run daily at 00:00

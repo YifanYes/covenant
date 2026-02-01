@@ -6,14 +6,9 @@
   "workspaces": [
     "front",
     "server",
-    "shared",
-    "aws"
+    "shared"
   ],
-  "scripts": {
-    "deploy:all": "bun install && bun run build:prod --filter front && cd aws && bun run cdk deploy -- --all",
-    "deploy:front": "bun install && bun run build:prod --filter front && cd aws && bun run cdk deploy Front",
-    "deploy:server": "bun install && cd aws && bun run cdk deploy Server"
-  },
+  "scripts": {},
   "dependencies": {
     "@trpc/server": "^11.8.1",
     "@trpc/client": "^11.8.1",
