@@ -33,7 +33,7 @@ async function startServer() {
       url: '/api/auth/*',
       async handler(request, reply) {
         try {
-          const url = new URL(request.url, `http://${request.headers.host}`)
+          const url = new URL(request.url, env.APP_URL)
 
           const headers = new Headers()
           Object.entries(request.headers).forEach(([key, value]) => {
