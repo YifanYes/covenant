@@ -19,48 +19,8 @@ import {
   Users,
   Zap
 } from '@nsmr/pixelart-react'
-import ArqLogo from '@/components/common/arq-logo.component'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
-
-function Navbar() {
-  const { t } = useTranslation()
-
-  const navLinks = [
-    { href: '/news', label: t('landing.nav.news') },
-    { href: '/mechanics', label: t('landing.nav.mechanics') },
-    { href: '/magic-nature', label: t('landing.nav.magic_nature') },
-    { href: '/roadmap', label: t('landing.nav.roadmap') }
-  ]
-
-  return (
-    <nav className="bg-background/80 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-sm">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/">
-          <ArqLogo className="h-12" />
-        </Link>
-
-        <div className="flex items-center gap-6">
-          <div className="hidden items-center gap-6 md:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          <Button asChild size="sm">
-            <Link href="/login">{t('landing.nav.enter')}</Link>
-          </Button>
-        </div>
-      </div>
-    </nav>
-  )
-}
 
 function HeroSection() {
   const { t } = useTranslation()
@@ -393,9 +353,7 @@ function ClosingAndFooterSection() {
 
 export default function LandingPage() {
   return (
-    <>
-      <Navbar />
-      <main className="bg-background h-screen overflow-y-auto scroll-smooth pt-16 snap-y snap-mandatory scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+    <main className="bg-background h-screen overflow-y-auto scroll-smooth pt-16 snap-y snap-mandatory scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
         <HeroSection />
         <ValuePropositionSection />
         <ProductivitySection />
@@ -404,6 +362,5 @@ export default function LandingPage() {
         <ComingSoonSection />
         <ClosingAndFooterSection />
       </main>
-    </>
   )
 }
