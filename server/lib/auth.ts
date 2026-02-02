@@ -38,19 +38,6 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24
-  },
-  advanced: {
-    defaultCookieAttributes: {
-      sameSite: 'none',
-      secure: true
-    }
-  },
-  secondaryStorage: {
-    get: async (key) => {
-      return null
-    },
-    set: async (key, value) => {},
-    delete: async (key) => {}
   }
 })
 
