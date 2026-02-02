@@ -10,7 +10,11 @@ export async function proxy(request: NextRequest) {
   // Public routes
   const authRoutes = ['/login', '/sign-up', '/auth/callback']
   const landingRoutes = ['/', '/news', '/mechanics', '/magic-nature', '/roadmap']
-  const isPublicRoute = authRoutes.some(r => pathname.startsWith(r)) || landingRoutes.includes(pathname)
+  const landingPrefixRoutes = ['/story']
+  const isPublicRoute =
+    authRoutes.some((r) => pathname.startsWith(r)) ||
+    landingRoutes.includes(pathname) ||
+    landingPrefixRoutes.some((r) => pathname.startsWith(r))
 
   // Redirect logic
   if (!isPublicRoute && !hasSession) {
@@ -19,7 +23,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (authRoutes.some(r => pathname.startsWith(r)) && hasSession) {
+  if (authRoutes.some((r) => pathname.startsWith(r)) && hasSession) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
@@ -27,7 +31,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)']
 }

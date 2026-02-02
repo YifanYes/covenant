@@ -9,6 +9,7 @@ import DropdownMenu, {
 } from '@/components/ui/dropdown-menu.component'
 import { ChevronDown } from '@nsmr/pixelart-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 
 const locales = [
@@ -18,13 +19,16 @@ const locales = [
 
 export default function Navbar() {
   const { t, i18n } = useTranslation()
+  const router = useRouter()
 
   const changeLocale = (locale: string) => {
     i18n.changeLanguage(locale)
+    router.refresh()
   }
 
   const navLinks = [
     { href: '/news', label: t('landing.nav.news') },
+    { href: '/story', label: t('landing.nav.story') },
     { href: '/mechanics', label: t('landing.nav.mechanics') },
     { href: '/magic-nature', label: t('landing.nav.magic_nature') },
     { href: '/roadmap', label: t('landing.nav.roadmap') }
