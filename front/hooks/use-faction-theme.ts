@@ -1,5 +1,6 @@
 'use client'
 
+import { useSession } from '@/lib/auth.lib'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { Faction } from '@shared/constants/activities'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -36,7 +37,12 @@ export function useFactionTheme() {
 
 export function useFactionThemeProvider({ initialFaction }: { initialFaction: Faction }) {
   const [overrideFaction, setOverrideFaction] = useState<Faction | null>(null)
-  const { data: profile } = useQuery(trpcOptions.auth.getProfile.queryOptions())
+  const { data: session, isPending } = useSession()
+  const { data: profile } = useQuery({
+    ...trpcOptions.auth.getProfile.queryOptions(),
+    enabled: !isPending && !!session?.user,
+    retry: false
+  })
   const updateThemeMutation = useMutation(trpcOptions.auth.updateTheme.mutationOptions())
   const lastSyncedTheme = useRef<string | null>(null)
   const faction = overrideFaction || (profile?.theme as Faction) || initialFaction
