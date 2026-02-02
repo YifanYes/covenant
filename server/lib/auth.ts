@@ -40,11 +40,8 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24
   },
   advanced: {
-    crossSubDomainCookies: {
-      enabled: true
-    },
     defaultCookieAttributes: {
-      sameSite: 'none',
+      sameSite: 'lax',
       secure: true
     }
   },

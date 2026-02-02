@@ -15,7 +15,7 @@ import Sidebar, {
 } from '@/ui/sidebar.component'
 import { BookOpen, Coin, Dashboard, List, Luggage, Map, Sliders, Store, Trophy } from '@nsmr/pixelart-react'
 import Link from 'next/link'
-import type { ElementType } from 'react'
+import { useSyncExternalStore, type ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
 
 interface SidebarItem {
@@ -48,6 +48,21 @@ function SidebarSection({ title, items }: { title?: string; items: SidebarItem[]
 
 export default function AppSidebar() {
   const { t } = useTranslation()
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  )
+
+  if (!mounted) {
+    return (
+      <Sidebar collapsible="icon">
+        <SidebarHeader className="h-[60px]" />
+        <SidebarContent />
+        <SidebarFooter className="h-[48px]" />
+      </Sidebar>
+    )
+  }
 
   const sidebarItems = {
     productivity: [
