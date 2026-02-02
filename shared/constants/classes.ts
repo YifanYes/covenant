@@ -6,8 +6,8 @@ export enum CharacterClassName {
 }
 
 export enum MagicNature {
-  ORDER = 'order',
-  CHAOS = 'chaos'
+  FORM = 'form',
+  VOID = 'void'
 }
 
 export const CLASS_INITIAL_STATS = {

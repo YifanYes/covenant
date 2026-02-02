@@ -1,7 +1,7 @@
 'use client'
 import { cn } from '@/lib/cn.lib'
 import { EnemyType, getEnemy } from '@shared/constants/enemies'
-import { formatDistanceToNow } from 'date-fns'
+import dayjs from 'dayjs'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
@@ -52,7 +52,7 @@ export default function KillRecordCard({ enemy, onClick }: KillRecordCardProps) 
 
   const getTimeAgo = () => {
     if (!enemy.defeatedAt) return t('inventory.kill_record.unknown_time')
-    return formatDistanceToNow(new Date(enemy.defeatedAt), { addSuffix: true })
+    return dayjs(enemy.defeatedAt).fromNow()
   }
 
   return (

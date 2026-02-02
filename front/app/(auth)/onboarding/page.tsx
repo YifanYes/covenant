@@ -16,16 +16,16 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 const MAGIC_NATURE_QUESTIONS = [
-  { id: 1, firstNature: MagicNature.ORDER },
-  { id: 2, firstNature: MagicNature.CHAOS },
-  { id: 3, firstNature: MagicNature.ORDER },
-  { id: 4, firstNature: MagicNature.CHAOS },
-  { id: 5, firstNature: MagicNature.ORDER }
+  { id: 1, firstNature: MagicNature.FORM },
+  { id: 2, firstNature: MagicNature.VOID },
+  { id: 3, firstNature: MagicNature.FORM },
+  { id: 4, firstNature: MagicNature.VOID },
+  { id: 5, firstNature: MagicNature.FORM }
 ] as const
 
 function calculateMagicNature(answers: Record<number, MagicNature>): MagicNature {
-  const orderCount = Object.values(answers).filter((a) => a === MagicNature.ORDER).length
-  return orderCount >= 3 ? MagicNature.ORDER : MagicNature.CHAOS
+  const formCount = Object.values(answers).filter((a) => a === MagicNature.FORM).length
+  return formCount >= 3 ? MagicNature.FORM : MagicNature.VOID
 }
 
 export default function Onboarding() {
@@ -52,7 +52,7 @@ export default function Onboarding() {
     defaultValues: {
       name: '',
       className: CharacterClassName.TEMPLAR,
-      magicNature: MagicNature.ORDER
+      magicNature: MagicNature.FORM
     },
     resolver: standardSchemaResolver(createCharacterSchema),
     mode: 'onSubmit'
@@ -173,9 +173,9 @@ export default function Onboarding() {
               {MAGIC_NATURE_QUESTIONS.map((question) => {
                 // Order the natures based on firstNature
                 const orderedNatures =
-                  question.firstNature === MagicNature.ORDER
-                    ? [MagicNature.ORDER, MagicNature.CHAOS]
-                    : [MagicNature.CHAOS, MagicNature.ORDER]
+                  question.firstNature === MagicNature.FORM
+                    ? [MagicNature.FORM, MagicNature.VOID]
+                    : [MagicNature.VOID, MagicNature.FORM]
 
                 return (
                   <div key={question.id} className='grid gap-3'>

@@ -109,6 +109,15 @@ export function useTacticalAttack() {
           goldReward: result.goldReward
         })
 
+        // Show toast when enemy is defeated with gold reward
+        if (result.targetKilled && result.goldReward) {
+          // Translate enemy name (handles prefix|suffix format)
+          const enemyName = target.name.includes('|')
+            ? target.name.split('|').map((part) => t(part)).join(' ')
+            : target.name
+          toast.success(t('combat.enemy_defeated_reward', { enemy: enemyName, gold: result.goldReward }))
+        }
+
         // Invalidate queries to refresh data
         queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
         // Invalidate character data to update dice bank

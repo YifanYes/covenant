@@ -38,7 +38,11 @@ export default function Inventory() {
   })
 
   if (!characterData) {
-    return <OnboardingRedirect />
+    return (
+      <div className='flex h-[calc(100vh-6rem)] items-center justify-center'>
+        <OnboardingRedirect />
+      </div>
+    )
   }
 
   const character = characterData as InventoryCharacter

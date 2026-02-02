@@ -19,18 +19,58 @@ import {
   Users,
   Zap
 } from '@nsmr/pixelart-react'
+import ArqLogo from '@/components/common/arq-logo.component'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
+
+function Navbar() {
+  const { t } = useTranslation()
+
+  const navLinks = [
+    { href: '/news', label: t('landing.nav.news') },
+    { href: '/mechanics', label: t('landing.nav.mechanics') },
+    { href: '/magic-nature', label: t('landing.nav.magic_nature') },
+    { href: '/roadmap', label: t('landing.nav.roadmap') }
+  ]
+
+  return (
+    <nav className="bg-background/80 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-sm">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <Link href="/">
+          <ArqLogo className="h-12" />
+        </Link>
+
+        <div className="flex items-center gap-6">
+          <div className="hidden items-center gap-6 md:flex">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          <Button asChild size="sm">
+            <Link href="/login">{t('landing.nav.enter')}</Link>
+          </Button>
+        </div>
+      </div>
+    </nav>
+  )
+}
 
 function HeroSection() {
   const { t } = useTranslation()
 
   return (
-    <section className="relative flex min-h-screen snap-start flex-col items-center justify-center px-4 py-16 text-center">
+    <section className="relative grid min-h-screen snap-start lg:grid-cols-2">
       <div className="absolute inset-0 bg-linear-to-b from-secondary/10 to-transparent" />
-      <div className="relative z-10 flex max-w-4xl flex-col items-center gap-8">
-        <div className="flex flex-col items-center gap-2">
-          <h1 className="text-primary text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">ARQ</h1>
+      <div className="relative z-10 flex flex-col justify-center gap-6 px-4 py-16 lg:pl-[max(1rem,calc((100vw-72rem)/2+1rem))]">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-primary text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">Arq</h1>
           <div className="bg-primary/20 h-1 w-24 rounded-full" />
         </div>
 
@@ -40,11 +80,15 @@ function HeroSection() {
 
         <p className="text-accent text-xl font-semibold md:text-2xl">{t('landing.hero.subtitle')}</p>
 
-        <p className="text-muted-foreground max-w-2xl text-lg">{t('landing.hero.body')}</p>
+        <p className="text-muted-foreground max-w-xl text-lg">{t('landing.hero.body')}</p>
 
-        <Button asChild size="lg" className="mt-4 text-lg font-bold uppercase tracking-wider">
+        <Button asChild size="lg" className="mt-4 w-fit text-lg font-bold uppercase tracking-wider">
           <Link href="/sign-up">{t('landing.hero.cta')}</Link>
         </Button>
+      </div>
+
+      <div className="relative z-10 hidden lg:block">
+        <div className="bg-muted/30 border-primary/20 absolute inset-0 border-l-2 border-dashed" />
       </div>
     </section>
   )
@@ -349,14 +393,17 @@ function ClosingAndFooterSection() {
 
 export default function LandingPage() {
   return (
-    <main className="bg-background h-screen overflow-y-auto scroll-smooth snap-y snap-mandatory">
-      <HeroSection />
-      <ValuePropositionSection />
-      <ProductivitySection />
-      <CharacterSection />
-      <CombatSection />
-      <ComingSoonSection />
-      <ClosingAndFooterSection />
-    </main>
+    <>
+      <Navbar />
+      <main className="bg-background h-screen overflow-y-auto scroll-smooth pt-16 snap-y snap-mandatory scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+        <HeroSection />
+        <ValuePropositionSection />
+        <ProductivitySection />
+        <CharacterSection />
+        <CombatSection />
+        <ComingSoonSection />
+        <ClosingAndFooterSection />
+      </main>
+    </>
   )
 }

@@ -836,6 +836,12 @@ export class CombatService {
 
             // Get participation to find the activity
             const participation = await this.activityParticipationRepository.findByIdWithActivity(participationId)
+
+            // Add gold to character's balance
+            if (participation?.characterId && goldReward > 0) {
+              await this.characterRepository.addGold(participation.characterId, goldReward)
+            }
+
             if (participation?.activityId) {
               // Update activity progress
               await this.activityRepository.updateProgress(participation.activityId, 1)

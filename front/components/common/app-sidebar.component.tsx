@@ -1,4 +1,5 @@
 'use client'
+import ArqLogo from '@/components/common/arq-logo.component'
 import Separator from '@/ui/separator.component'
 import Sidebar, {
   SidebarContent,
@@ -109,19 +110,7 @@ export default function AppSidebar() {
           href="/"
           className="group/logo flex h-fit w-full items-end gap-3 justify-start p-2 mt-2 transition-all duration-300 hover:scale-105 active:scale-95 origin-left group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:origin-center"
         >
-          <div
-            style={{
-              maskImage: 'url(/arq-logo.svg)',
-              maskRepeat: 'no-repeat',
-              maskSize: 'contain',
-              maskPosition: 'center',
-              WebkitMaskImage: 'url(/arq-logo.svg)',
-              WebkitMaskRepeat: 'no-repeat',
-              WebkitMaskSize: 'contain',
-              WebkitMaskPosition: 'center'
-            }}
-            className="bg-foreground h-9 w-9 shrink-0 transition-colors duration-300 group-hover/logo:bg-primary group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7"
-          />
+          <ArqLogo className="h-9 shrink-0 transition-colors duration-300 group-hover/logo:bg-primary group-data-[collapsible=icon]:h-7" />
           <span
             className="font-title font-medium text-2xl tracking-widest transition-colors duration-300 group-hover/logo:text-primary inline-block group-data-[collapsible=icon]:hidden"
             style={{ fontFamily: 'var(--font-cinzel)' }}

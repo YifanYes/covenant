@@ -87,6 +87,13 @@ export class CharacterRepository {
     })
   }
 
+  async addGold(characterId: string, amount: number): Promise<void> {
+    await this.prisma.character.update({
+      where: { id: characterId },
+      data: { gold: { increment: amount } }
+    })
+  }
+
   async updateInventoryAndLoadout(characterId: string, inventory: unknown[], loadout: unknown[]): Promise<void> {
     await this.prisma.character.update({
       where: { id: characterId },
