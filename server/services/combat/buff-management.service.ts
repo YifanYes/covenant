@@ -1,6 +1,18 @@
 import { DOCTRINES } from '@shared/constants/doctrines'
 import { DoctrineEffectType, DoctrineTarget, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 
+/** Doctrines that set defense to zero when active */
+const DEFENSE_ZERO_DOCTRINES = ['reckless_strike', 'audacity'] as const
+
+/** Doctrines where rolling 1s hurts the caster */
+const ONES_HURT_SELF_DOCTRINES = ['plasma_missile', 'audacity'] as const
+
+/** Doctrine that provides thorns damage */
+const THORNS_DOCTRINE = 'karmic_retribution' as const
+
+/** Doctrine that provides dynamic bonus dice based on context */
+const DYNAMIC_BONUS_DOCTRINE = 'inspiration' as const
+
 export class BuffManagementService {
   /**
    * Get all active self-buff modifiers from doctrines on a unit.
@@ -44,30 +56,27 @@ export class BuffManagementService {
     let onesHurtSelf = false
     let thornsDamage = 0
 
-    const defenseZeroDoctrines = ['reckless_strike', 'audacity']
-    const onesHurtSelfDoctrines = ['plasma_missile', 'audacity']
-
     for (const [doctrineId, effect] of Object.entries(unitActiveDoctrines)) {
       if (effect.remainingTurns <= 0) continue
 
       const doctrine = DOCTRINES[doctrineId]
       if (!doctrine) continue
 
-      if (defenseZeroDoctrines.includes(doctrineId)) {
+      if ((DEFENSE_ZERO_DOCTRINES as readonly string[]).includes(doctrineId)) {
         defenseZero = true
       }
-      if (onesHurtSelfDoctrines.includes(doctrineId)) {
+      if ((ONES_HURT_SELF_DOCTRINES as readonly string[]).includes(doctrineId)) {
         onesHurtSelf = true
       }
 
-      if (doctrineId === 'karmic_retribution') {
+      if (doctrineId === THORNS_DOCTRINE) {
         const thornEffect = doctrine.effects.find(e => e.thornsDamage !== undefined)
         if (thornEffect?.thornsDamage) {
           thornsDamage = thornEffect.thornsDamage
         }
       }
 
-      if (doctrineId === 'inspiration') {
+      if (doctrineId === DYNAMIC_BONUS_DOCTRINE) {
         const bonusEntry = unitActiveDoctrines[`${doctrineId}_bonus`] as unknown as { calculatedBonusDice?: number }
         if (bonusEntry?.calculatedBonusDice) {
           bonusDice += bonusEntry.calculatedBonusDice
