@@ -1,6 +1,6 @@
 [build]
 builder = "railpack"
-buildCommand = "pnpm install && pnpm --filter front build"
+buildCommand = "pnpm install --ignore-scripts && pnpm --filter front build"
 
 [deploy]
 startCommand = "pnpm --filter front start"
