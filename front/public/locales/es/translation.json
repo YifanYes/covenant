@@ -2,10 +2,22 @@
   "landing": {
     "nav": {
       "news": "Noticias",
+      "story": "Historia",
       "mechanics": "Mecánicas",
       "magic_nature": "Naturaleza Mágica",
       "roadmap": "Hoja de Ruta",
       "enter": "Entrar"
+    },
+    "story": {
+      "title": "Las Cronicas de ARQ",
+      "subtitle": "Novelas ligeras que se desarrollan segun la comunidad moldea el destino del mundo.",
+      "episode": "Episodio",
+      "episodes": {
+        "sabotaje_nocturno": {
+          "title": "Sabotaje Nocturno",
+          "description": "Los Caballeros Sagrados lanzan un audaz asalto nocturno a la flota enemiga. Ezequiel, un caballero recien ordenado e hijo de un panadero, debe demostrar su valor en el fragor de la batalla."
+        }
+      }
     },
     "pages": {
       "news": "Noticias",

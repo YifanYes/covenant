@@ -5,6 +5,7 @@
 Comprehensive review of the ARQ monorepo identified improvements across SOLID principles, DRY, and architectural patterns. The codebase is generally well-structured but shows organic growth patterns in the combat domain.
 
 **Key Metrics:**
+
 - `CombatService`: 2,700+ lines (SRP violation)
 - `tactical-combat.store.ts`: 1,500+ lines (needs decomposition)
 - 3x duplicated `getCharacterProgress` logic
@@ -19,11 +20,13 @@ Comprehensive review of the ARQ monorepo identified improvements across SOLID pr
 **Problem:** `getCharacterProgress()` duplicated in 3 files with identical logic.
 
 **Files:**
+
 - `server/services/character.service.ts` (lines 15-27)
 - `server/services/combat.service.ts` (lines 95-100)
 - `server/services/dice.service.ts`
 
-**Solution:** Create `server/utils/character-progress.utils.ts`:
+**Solution:** Create `server/utils/character.utils.ts`:
+
 ```typescript
 export function getCharacterProgress(character: CharacterWithClasses): CharacterProgress {
   const currentClass = character.classes.find((c) => c.className === character.currentClass)
@@ -41,6 +44,7 @@ export function getCharacterProgress(character: CharacterWithClasses): Character
 **Files:** `server/services/character.service.ts`
 
 **Solution:** Replace all `throw new Error()` with `TRPCError`:
+
 ```typescript
 // Before
 throw new Error('Character not found')
@@ -53,6 +57,7 @@ throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
 **Problem:** Dice reward logic scattered between `HabitService` and `TaskService`.
 
 **Solution:** Move streak bonus logic to `shared/constants/dice.constants.ts`:
+
 ```typescript
 export const HABIT_STREAK_THRESHOLDS = [
   { days: 21, bonus: 3 },
@@ -70,6 +75,7 @@ export const HABIT_STREAK_THRESHOLDS = [
 **Problem:** 2,700+ lines handling 8+ responsibilities (SRP violation).
 
 **Current responsibilities:**
+
 - Dice rolling & hit calculation
 - Movement validation/execution
 - Attack execution
@@ -80,6 +86,7 @@ export const HABIT_STREAK_THRESHOLDS = [
 - State management
 
 **Solution:** Create `server/services/combat/` directory:
+
 ```
 server/services/combat/
   index.ts                    # Re-exports
@@ -93,7 +100,8 @@ server/services/combat/
 
 ### 2.2 Extract Combat Math Utilities
 
-**Solution:** Create `server/utils/combat-math.utils.ts`:
+**Solution:** Create `server/utils/combat.utils.ts`:
+
 ```typescript
 export function rollDice(count: number): number[]
 export function calculateHits(rolls: number[], threshold: number, criticalThreshold?: number)
@@ -108,7 +116,35 @@ export function getManhattanDistance(from: GridPosition, to: GridPosition): numb
 
 **Problem:** `tactical-combat.store.ts` has 1,500+ lines with 150+ state properties.
 
-**Solution:** Use Zustand slices pattern:
+**Solution:** Use Zustand slices pattern.
+
+> **Zustand Slices Pattern:** Split a large store into smaller "slices", each managing a specific domain of state. Each slice is a function that receives `set` and `get` and returns its state + actions. Slices are combined using the spread operator in the main store's `create()` call. This keeps each slice focused (~200-400 lines) while sharing access to the full store state.
+
+```typescript
+// Example slice structure
+type CoreSlice = { grid: Grid; units: Unit[]; setGrid: (grid: Grid) => void }
+type UISlice = { hoveredId: string | null; setHovered: (id: string | null) => void }
+
+const createCoreSlice: StateCreator<Store, [], [], CoreSlice> = (set) => ({
+  grid: null,
+  units: [],
+  setGrid: (grid) => set({ grid })
+})
+
+const createUISlice: StateCreator<Store, [], [], UISlice> = (set) => ({
+  hoveredId: null,
+  setHovered: (id) => set({ hoveredId: id })
+})
+
+// Combine slices
+const useStore = create<Store>()((...args) => ({
+  ...createCoreSlice(...args),
+  ...createUISlice(...args)
+}))
+```
+
+**Proposed directory structure:**
+
 ```
 front/stores/tactical-combat/
   index.ts                    # Main store combining slices
@@ -124,6 +160,7 @@ front/stores/tactical-combat/
 **Problem:** Duplicated validation in `use-tactical-attack.hook.ts` and `use-tactical-doctrine.hook.ts`.
 
 **Solution:** Create `front/utils/tactical-validation.utils.ts`:
+
 ```typescript
 export function validateCombatAction(params: {
   participationId: string | null
@@ -139,13 +176,10 @@ export function validateCombatAction(params: {
 **Problem:** `create-task-dialog`, `create-habit-dialog`, `create-objective-dialog` follow identical patterns.
 
 **Solution:** Create higher-order component or hook:
+
 ```typescript
-// front/hooks/use-entity-form-dialog.ts
-export function useEntityFormDialog<T>({
-  schema,
-  mutationOptions,
-  invalidateQueries
-})
+// front/hooks/use-form-dialog.ts
+export function useFormDialog<T>({ schema, mutationOptions, invalidateQueries })
 ```
 
 ---
@@ -155,6 +189,7 @@ export function useEntityFormDialog<T>({
 **Problem:** Same `invalidateQueries` calls scattered across hooks/components.
 
 **Solution:** Create `front/utils/query-invalidation.utils.ts`:
+
 ```typescript
 export function invalidateTaskQueries(monthIndex: number)
 export function invalidateCombatQueries(participationId?: string)
@@ -168,6 +203,7 @@ export function invalidateHabitQueries()
 **Problem:** 4 repositories implement identical `findByIdOrThrow` with ownership check.
 
 **Solution:** Create `server/repositories/base.repository.ts`:
+
 ```typescript
 export abstract class BaseRepository<T extends { id: string; userId: string }> {
   async findByIdOrThrow(id: string, userId: string): Promise<T> {
@@ -184,96 +220,16 @@ export abstract class BaseRepository<T extends { id: string; userId: string }> {
 
 ## Files to Modify
 
-| Priority | File | Change |
-|----------|------|--------|
-| 1 | `server/utils/character-progress.utils.ts` | Create new |
-| 1 | `server/services/character.service.ts` | Use utility, fix errors |
-| 1 | `server/services/combat.service.ts` | Use utility |
-| 1 | `shared/constants/dice.constants.ts` | Add streak thresholds |
-| 2 | `server/services/combat/` | Create directory + services |
-| 2 | `server/utils/combat-math.utils.ts` | Create new |
-| 3 | `front/stores/tactical-combat/` | Create sliced store |
-| 3 | `front/utils/tactical-validation.utils.ts` | Create new |
-| 4 | `front/hooks/use-entity-form-dialog.ts` | Create new |
-| 5 | `front/utils/query-invalidation.utils.ts` | Create new |
-| 6 | `server/repositories/base.repository.ts` | Create new |
-
----
-
-## Detailed Findings
-
-### Backend Architecture Analysis
-
-#### Router Layer (GOOD)
-- All routers are thin delegation layers
-- Exception: `activity.router.ts` (265 lines) has business logic that should be in services
-
-#### Service Layer Issues
-1. **CombatService** - Massive SRP violation with 8+ responsibilities
-2. **Duplicated ownership/authorization logic** across services
-3. **Character progress calculation** duplicated 3 times
-4. **Mixed error handling** - `Error` vs `TRPCError` inconsistency
-5. **DashboardService** (280 lines) does too much - metrics, aggregation, transforms
-
-#### Repository Layer (GOOD)
-- Clean Prisma queries
-- No business logic leaking
-- Opportunity: Base repository for common patterns
-
-#### Dependency Injection (EXCELLENT)
-- ServiceFactory pattern well implemented
-- Lazy initialization
-- Clear layer dependencies
-
-### Frontend Architecture Analysis
-
-#### Component Patterns (GOOD)
-- Proper separation of concerns
-- Good use of BaseFormDialog
-
-#### State Management Issues
-1. **tactical-combat.store.ts** - 1,500+ lines, needs slicing
-2. **Query invalidation** scattered everywhere
-3. **Form dialogs** follow identical patterns (could abstract)
-
-#### Hook Patterns
-- Combat hooks have duplicated validation
-- Missing abstraction for common mutation patterns
-
-### Shared Code (EXCELLENT)
-- Schemas properly centralized
-- Constants well-organized (3,035 lines)
-- Good type safety through tRPC
-
----
-
-## Verification Plan
-
-1. **Unit Tests:** Run `cd server && bun run test` after each priority
-2. **Type Check:** Run `cd front && bun run lint` to verify no type errors
-3. **Manual Testing:** Start dev servers and test combat flow end-to-end
-4. **Regression:** Verify existing functionality still works after refactoring
-
----
-
-## Summary
-
-| Category | Current | After Refactoring |
-|----------|---------|-------------------|
-| CombatService size | 2,700 lines | ~300 lines orchestrator |
-| Tactical store size | 1,500 lines | ~300 lines per slice |
-| Duplicated utilities | 3+ copies | 1 shared utility |
-| Error handling | Inconsistent | Standardized TRPCError |
-| Form dialog code | ~150 lines each | ~50 lines each |
-
----
-
-## SOLID Principles Summary
-
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| **S**ingle Responsibility | VIOLATED | CombatService, DashboardService, tactical store |
-| **O**pen/Closed | VIOLATED | Adding features requires modifying existing code |
-| **L**iskov Substitution | OK | Not heavily using inheritance |
-| **I**nterface Segregation | OK | Services focused on domains |
-| **D**ependency Inversion | GOOD | Excellent DI via ServiceFactory |
+| Priority | File                                       | Change                      |
+| -------- | ------------------------------------------ | --------------------------- |
+| 1        | `server/utils/character-progress.utils.ts` | Create new                  |
+| 1        | `server/services/character.service.ts`     | Use utility, fix errors     |
+| 1        | `server/services/combat.service.ts`        | Use utility                 |
+| 1        | `shared/constants/dice.constants.ts`       | Add streak thresholds       |
+| 2        | `server/services/combat/`                  | Create directory + services |
+| 2        | `server/utils/combat-math.utils.ts`        | Create new                  |
+| 3        | `front/stores/tactical-combat/`            | Create sliced store         |
+| 3        | `front/utils/tactical-validation.utils.ts` | Create new                  |
+| 4        | `front/hooks/use-entity-form-dialog.ts`    | Create new                  |
+| 5        | `front/utils/query-invalidation.utils.ts`  | Create new                  |
+| 6        | `server/repositories/base.repository.ts`   | Create new                  |

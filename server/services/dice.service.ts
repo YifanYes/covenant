@@ -1,7 +1,6 @@
-import { getMaxDiceForTier } from '@shared/constants/dice.constants'
-import type { CharacterWithClasses } from '@shared/types/character.types'
 import type { DiceAddResult } from '@shared/types/dice.types'
 import type { CharacterRepository } from '../repositories/character.repository'
+import { getCharacterProgress } from '../utils/character.utils'
 
 export class DiceService {
   constructor(private characterRepository: CharacterRepository) {}
@@ -11,7 +10,7 @@ export class DiceService {
 
     if (!character) return { success: false, earned: 0 }
 
-    const { maxDice: maxCapacity, diceBank: currentDice } = this.getCharacterProgress(character)
+    const { maxDice: maxCapacity, diceBank: currentDice } = getCharacterProgress(character)
     const rawCharacterData = (character.data as any) || {}
     const newDice = Math.min(currentDice + amount, maxCapacity)
     const earned = newDice - currentDice
@@ -36,7 +35,7 @@ export class DiceService {
 
     if (!character) return { success: false, consumed: 0, remaining: 0 }
 
-    const { diceBank: currentDice } = this.getCharacterProgress(character)
+    const { diceBank: currentDice } = getCharacterProgress(character)
     const rawCharacterData = (character.data as any) || {}
 
     // Can only consume up to what's available
@@ -93,14 +92,5 @@ export class DiceService {
     }
 
     return streak
-  }
-
-  private getCharacterProgress(character: CharacterWithClasses) {
-    const currentClass = character.classes.find((c) => c.className === character.currentClass)
-    const tier = currentClass?.tier || 1
-    const maxDice = getMaxDiceForTier(tier)
-    const diceBank = (character.data as any)?.diceBank || 0
-
-    return { tier, maxDice, diceBank }
   }
 }

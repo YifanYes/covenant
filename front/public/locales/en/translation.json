@@ -2,10 +2,22 @@
   "landing": {
     "nav": {
       "news": "News",
+      "story": "Story",
       "mechanics": "Mechanics",
       "magic_nature": "Magic Nature",
       "roadmap": "Roadmap",
       "enter": "Enter"
+    },
+    "story": {
+      "title": "The Chronicles of ARQ",
+      "subtitle": "Light novels that unfold as the community shapes the world's destiny.",
+      "episode": "Episode",
+      "episodes": {
+        "sabotaje_nocturno": {
+          "title": "Night Sabotage",
+          "description": "The Holy Knights launch a daring night assault on the enemy fleet. Ezekiel, a newly ordained knight and son of a baker, must prove his worth in the heat of battle."
+        }
+      }
     },
     "pages": {
       "news": "News",
