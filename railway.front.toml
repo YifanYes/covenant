@@ -1,8 +1,9 @@
 [build]
-builder = "nixpacks"
+builder = "railpack"
+buildCommand = "pnpm install && pnpm --filter front build"
 
 [deploy]
-startCommand = "bun start"
+startCommand = "pnpm --filter front start"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
