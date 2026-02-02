@@ -92,13 +92,6 @@ export class CombatService {
     return currentClass
   }
 
-  getCharacterProgress(character: CharacterWithClasses) {
-    const currentClass = character.classes.find((c) => c.className === character.currentClass)
-    const tier = currentClass?.tier || 1
-    const diceBank = (character.data as any)?.diceBank || 0
-    return { tier, diceBank }
-  }
-
   async useConsumable(
     userId: string,
     consumableId: string
