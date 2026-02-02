@@ -7,20 +7,19 @@ export async function proxy(request: NextRequest) {
   const sessionToken = request.cookies.get('better-auth.session_token')?.value
   const hasSession = Boolean(sessionToken)
 
-  // Public routes (login, sign-up, auth callback)
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/sign-up') || pathname.startsWith('/auth/callback')
-
-  // Protected routes
-  const isProtectedRoute = !isAuthRoute && pathname !== '/'
+  // Public routes
+  const authRoutes = ['/login', '/sign-up', '/auth/callback']
+  const landingRoutes = ['/', '/news', '/mechanics', '/magic-nature', '/roadmap']
+  const isPublicRoute = authRoutes.some(r => pathname.startsWith(r)) || landingRoutes.includes(pathname)
 
   // Redirect logic
-  if (isProtectedRoute && !hasSession) {
+  if (!isPublicRoute && !hasSession) {
     const redirectUrl = new URL('/login', request.url)
     redirectUrl.searchParams.set('redirect_to', pathname)
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (isAuthRoute && hasSession) {
+  if (authRoutes.some(r => pathname.startsWith(r)) && hasSession) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 

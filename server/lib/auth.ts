@@ -2,8 +2,8 @@ import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { magicLink } from 'better-auth/plugins'
 import { Resend } from 'resend'
-import { prisma } from './prisma'
 import { env } from '../config'
+import { prisma } from './prisma'
 
 const resend = new Resend(env.RESEND_API_KEY)
 
@@ -38,6 +38,19 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24
+  },
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: 'lax',
+      secure: true
+    }
+  },
+  secondaryStorage: {
+    get: async (key) => {
+      return null
+    },
+    set: async (key, value) => {},
+    delete: async (key) => {}
   }
 })
 
