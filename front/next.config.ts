@@ -1,10 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  transpilePackages: ['shared'],
   experimental: {
-    optimizePackageImports: ['@nsmr/pixelart-react', 'recharts'],
-  },
-};
+    optimizePackageImports: ['@nsmr/pixelart-react', 'recharts']
+  }
+}
 
-export default nextConfig;
+export default nextConfig
