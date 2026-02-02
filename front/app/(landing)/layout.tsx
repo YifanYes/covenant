@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Navbar from './_components/navbar.component'
 
 export const metadata: Metadata = {
   title: 'ARQ - Transform Your Productivity Into Real Power',
@@ -38,5 +39,10 @@ export default function LandingLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <>{children}</>
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  )
 }
