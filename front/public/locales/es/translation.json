@@ -1,17 +1,30 @@
 {
   "landing": {
+    "nav": {
+      "news": "Noticias",
+      "mechanics": "Mecánicas",
+      "magic_nature": "Naturaleza Mágica",
+      "roadmap": "Hoja de Ruta",
+      "enter": "Entrar"
+    },
+    "pages": {
+      "news": "Noticias",
+      "mechanics": "Mecánicas",
+      "magic_nature": "Naturaleza Mágica",
+      "roadmap": "Hoja de Ruta"
+    },
     "meta": {
-      "title": "ARQ - Transforma tu Productividad en Poder Real",
+      "title": "ARQ - Productividad Gamificada",
       "description": "Una app de productividad gamificada donde cada tarea, cada hábito y cada objetivo que completas forja a tu personaje. Sin atajos. Sin excusas. Solo resultados que puedes ver, medir y equipar."
     },
     "hero": {
-      "title": "ARQ transforma tu productividad en poder real.",
+      "title": "Completa tareas. Mata demonios.",
       "subtitle": "Tu disciplina diaria forja tu leyenda divina.",
-      "body": "Una app de productividad donde cada tarea completada, cada hábito sostenido y cada objetivo cerrado forja a tu personaje. Sin atajos. Sin excusas. Solo resultados que puedes ver, medir y equipar.",
+      "body": "Una app de productividad donde cada tarea completada, cada hábito sostenido y cada objetivo cerrado forja a tu personaje y el destino del mundo.",
       "cta": "UNIRSE A LA GUERRA"
     },
     "value_proposition": {
-      "title": "ARQ no es otra app de to-dos.",
+      "title": "¿Otra app de to-dos? (=____=)",
       "body": "Es un sistema de progreso persistente donde cada acción cuenta y cada omisión se paga. Tu productividad moldea el destino del mundo."
     },
     "productivity": {
@@ -22,11 +35,11 @@
       },
       "habits": {
         "title": "Sistema de Hábitos",
-        "body": "Seguimiento diario de hábitos con bonus de consistencia. Cada día que mantienes un hábito fortalece tu personaje. Cada día que fallas le debilita. Simple."
+        "body": "Seguimiento de hábitos con bonus de consistencia."
       },
       "goals": {
         "title": "Áreas y Objetivos",
-        "body": "Define Áreas de vida y Objetivos a largo plazo. No son listas aspiracionales—son líneas de progresión con inicio, coste y cierre."
+        "body": "Define Áreas de vida y Objetivos a largo plazo. No son listas aspiracionales — son líneas de progresión con inicio, coste y cierre."
       }
     },
     "character": {
@@ -48,7 +61,7 @@
       "title": "Sistema de Combate",
       "dice": {
         "title": "Sistema de Dados",
-        "body": "Completa tareas → Gana dados. Los dados son tu recurso de combate.",
+        "body": "Completa tareas → Gana dados → Tira dados → Mata demonios",
         "table": {
           "action": "Acción",
           "dice": "Dados",
@@ -59,8 +72,8 @@
         }
       },
       "missions": {
-        "title": "Misiones y Aventuras",
-        "body": "Las tareas no se tachan—se convierten en poder para completar misiones. Elige entre misiones de diferentes Tiers. Cada victoria otorga oro, experiencia y equipo."
+        "title": "Actividades Globales",
+        "body": "Las tareas no se tachan — se convierten en poder para participar en el mundo. Cada victoria otorga oro, materiales y equipo."
       },
       "reactive": {
         "title": "Combate Reactivo",
@@ -87,16 +100,16 @@
           "description": "Tablas de clasificación para los más disciplinados."
         },
         "coop": {
-          "title": "Sistema Co-op (2-4)",
-          "description": "Forma party con amigos. Turnos round-robin, loot individual."
-        },
-        "seasonal": {
-          "title": "Misiones Estacionales",
-          "description": "Contenido nuevo basado en momentos de la historia del mundo de ARQ."
+          "title": "Nuevas Clases y Facciones",
+          "description": "Amplía tus opciones con nuevas clases y únete a facciones poderosas."
         },
         "scaling": {
-          "title": "Escalado Dinámico",
-          "description": "La dificultad se ajusta a tu banco de dados."
+          "title": "Cocina y Fabricación",
+          "description": "Crea consumibles y forja equipamiento con materiales recolectados."
+        },
+        "seasonal": {
+          "title": "Lanzamiento del Juego de Mesa",
+          "description": "La versión física de ARQ llega a tu mesa."
         }
       }
     },
@@ -244,6 +257,7 @@
     "dice_to_spend": "Dados a gastar",
     "enemies": "Enemigos",
     "enemies_defeated": "Enemigos Derrotados",
+    "enemy_defeated_reward": "¡{{enemy}} derrotado! +{{gold}} oro",
     "unknown_enemy": "Enemigo Desconocido",
     "error": {
       "attack": "El ataque falló",
@@ -577,8 +591,8 @@
       "name": "Estallido de Relámpagos"
     },
     "magic_nature": {
-      "chaos": "Caos",
-      "order": "Orden"
+      "void": "Vacío",
+      "form": "Forma"
     },
     "mana_barrier": {
       "description": "Anula el primer Impacto mágico recibido.",
@@ -927,9 +941,9 @@
     "magic_atk": "Ataque Mágico",
     "magic_def": "Defensa Mágica",
     "magic_nature": {
-      "chaos": "Caos",
-      "label": "Naturaleza Mágica",
-      "order": "Orden"
+      "void": "Vacío",
+      "form": "Forma",
+      "label": "Naturaleza Mágica"
     },
     "mana": "Maná",
     "mana_regen": "Regeneración de Maná",
@@ -1231,29 +1245,29 @@
     "loading": "Creando tu personaje...",
     "magic_nature": {
       "q1": {
-        "chaos": "Me maravillo con la nueva forma de los fragmentos y los uso para crear un mosaico o una trampa de pinchos. La rotura es una oportunidad.",
-        "order": "Busco cada mota de polvo y uso mi voluntad para restaurar su estructura molecular exacta. Lo que fue perfecto, debe volver a serlo.",
-        "question": "Encuentras un jarrón milenario hecho añicos. ¿Cuál es tu reacción?"
+        "void": "Dejo que se extinga naturalmente. Todo debe volver a la nada; de este final, nuevos comienzos pueden surgir.",
+        "form": "Realizo el antiguo ritual para reavivarla, asegurando que su luz siga manifestándose en el mundo.",
+        "question": "Una llama sagrada que ha ardido durante milenios se está apagando. Tienes el poder de intervenir."
       },
       "q2": {
-        "chaos": "De los rebeldes. Prefiero morir en el estallido de un cambio incierto que vivir una vida dictada por el diseño de otro.",
-        "order": "Del lado de la corona. El desorden solo trae hambre y muerte; la ley es el único escudo contra el abismo.",
-        "question": "Un reino vive en paz total, pero bajo leyes tan estrictas que nadie puede elegir su propia profesión. Se gesta una revolución violenta. ¿De qué lado estás?"
+        "void": "Preservo el vacío. En este espacio de posibilidad infinita, crear una cosa significa excluir todas las demás.",
+        "form": "Comienzo a crear de inmediato: paisajes, estructuras, vida. El potencial debe hacerse real para tener significado.",
+        "question": "Entras en una dimensión de pura posibilidad—nada existe aquí todavía, pero cualquier cosa podría existir."
       },
       "q3": {
-        "chaos": "Lanzo una pequeña doctrina al centro para ver qué pasa. Si explota, al menos habré aprendido algo sobre su fuerza bruta.",
-        "order": "Construyo una serie de sellos de contención y estudio sus ciclos durante años antes de intentar canalizar una sola gota.",
-        "question": "Descubres un flujo de energía inmensa pero totalmente impredecible. ¿Qué haces?"
+        "void": "La deshago por completo, liberando su esencia de vuelta a la energía sin forma. Algunas cosas no pueden salvarse, solo terminarse.",
+        "form": "La reforjo, purificando la corrupción y dándole forma de una nueva arma de luz.",
+        "question": "Una espada sagrada ha sido contaminada por esencia demoníaca. Su poder permanece, pero retorcido."
       },
       "q4": {
-        "chaos": "Una selva indómita llena de híbridos extraños que crecen según su propia voluntad, donde cada paseo es una aventura diferente.",
-        "order": "Un diseño perfectamente simétrico, con senderos alineados con los astros y plantas que florecen en un orden cronológico estricto.",
-        "question": "Te conceden un terreno baldío para que crees lo que quieras. ¿Cómo es el resultado final?"
+        "void": "Lo absuelvo y lo encomiendo al Creador. Su forma terrenal ya está corrompida; aferrarse a ella solo prolonga su agonía. Que su espíritu encuentre paz.",
+        "form": "Me arrodillo y rezo fervientemente para que Dios tenga misericordia y restaure su forma celestial. Toda criatura del Señor merece una oportunidad de redención.",
+        "question": "Un ángel caído, herido en batalla contra las huestes del Enemigo, yace moribundo ante ti. Su luz divina parpadea débilmente mientras te suplica ayuda."
       },
       "q5": {
-        "chaos": "Gritas '¡Entropía!', lanzas la carta por la ventana y decides que hoy se cena lo que sea que encuentres primero.",
-        "order": "Elaboras un sistema de votación ponderado por antigüedad y nivel de hambre, asegurándote de que el reparto de aceitunas sea geométricamente equitativo.",
-        "question": "Estás con tus amigos y nadie se pone de acuerdo con los ingredientes de la pizza. El tiempo pasa y el hambre aprieta. ¿Cómo lo resuelves?"
+        "void": "Preservo el grimorio sin usarlo. El hechizo tiene valor infinito como posibilidad; manifestar un deseo destruye todos los demás.",
+        "form": "Lo lanzo sin dudarlo. ¿De qué sirve el potencial si nunca se hace real?",
+        "question": "Un grimorio antiguo contiene un hechizo de creación definitiva—una vez lanzado, materializará tu deseo más profundo, pero el libro se convertirá en polvo."
       },
       "subtitle": "Responde estas preguntas para descubrir tu afinidad mágica.",
       "title": "Naturaleza Mágica"

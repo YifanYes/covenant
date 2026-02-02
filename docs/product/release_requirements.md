@@ -25,13 +25,13 @@ _Sistemas de juego base operativos y claros._
 
 - [x] **Progresión:** Sistema de tiers funcionando correctamente.
 - [x] **Feedback:** Recompensas claras (stats, desbloqueos, recursos) al instante.
-- [ ] **Orden vs Caos:** Penalizaciones y fricción alineadas con la filosofía del juego.
+- [ ] **Forma vs Vacío:** Penalizaciones y fricción alineadas con la filosofía del juego.
 
 ## Identidad Mecánica Clara
 
 _Diferenciación real del producto frente a otras apps de productividad._
 
-- [ ] **Afinidad dinámica:** Impacto real de la dualidad Orden/Caos desde el primer momento.
+- [ ] **Afinidad dinámica:** Impacto real de la dualidad Forma/Vacío desde el primer momento.
 - [x] **Consecuencias reales:** Las decisiones mecánicas deben afectar el gameplay, no solo ser cosméticas.
 - [ ] **Progreso dual:** Diferenciación nítida entre disciplina (progreso) y entropía (corrupción).
 

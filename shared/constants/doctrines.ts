@@ -5,14 +5,14 @@ import { AoEPatternType } from './aoe-patterns'
 export const MAX_EQUIPPED_DOCTRINES = 2
 
 export const DOCTRINES: Record<string, DoctrineDefinition> = {
-  // TEMPLAR - TIER 1 - ORDER
+  // TEMPLAR - TIER 1 - FORM
   truth_blade: {
     id: 'truth_blade',
     nameKey: 'doctrines.truth_blade.name',
     descriptionKey: 'doctrines.truth_blade.description',
     flavorTextKey: 'doctrines.truth_blade.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -30,7 +30,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.miraculous_protection.description',
     flavorTextKey: 'doctrines.miraculous_protection.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -48,7 +48,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.shield_bash.description',
     flavorTextKey: 'doctrines.shield_bash.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -67,7 +67,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.challenge.description',
     flavorTextKey: 'doctrines.challenge.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -81,14 +81,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // TEMPLAR - TIER 1 - CHAOS
+  // TEMPLAR - TIER 1 - VOID
   igneous_cut: {
     id: 'igneous_cut',
     nameKey: 'doctrines.igneous_cut.name',
     descriptionKey: 'doctrines.igneous_cut.description',
     flavorTextKey: 'doctrines.igneous_cut.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -109,7 +109,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.reckless_strike.description',
     flavorTextKey: 'doctrines.reckless_strike.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -127,7 +127,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.bite.description',
     flavorTextKey: 'doctrines.bite.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 1,
     manaCost: 2,
     isUltimate: false,
@@ -147,7 +147,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.shoulder_charge.description',
     flavorTextKey: 'doctrines.shoulder_charge.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 1,
     manaCost: 2,
     isUltimate: false,
@@ -166,14 +166,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // TEMPLAR - TIER 2 - ORDER
+  // TEMPLAR - TIER 2 - FORM
   light_shield: {
     id: 'light_shield',
     nameKey: 'doctrines.light_shield.name',
     descriptionKey: 'doctrines.light_shield.description',
     flavorTextKey: 'doctrines.light_shield.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 2,
     manaCost: 3,
     isUltimate: false,
@@ -192,7 +192,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.righteous_charge.description',
     flavorTextKey: 'doctrines.righteous_charge.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
@@ -216,7 +216,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.unbreakable_formation.description',
     flavorTextKey: 'doctrines.unbreakable_formation.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
@@ -235,7 +235,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.bulwark.description',
     flavorTextKey: 'doctrines.bulwark.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
@@ -249,14 +249,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // TEMPLAR - TIER 2 - CHAOS
+  // TEMPLAR - TIER 2 - VOID
   precise_strike: {
     id: 'precise_strike',
     nameKey: 'doctrines.precise_strike.name',
     descriptionKey: 'doctrines.precise_strike.description',
     flavorTextKey: 'doctrines.precise_strike.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 2,
     manaCost: 3,
     isUltimate: false,
@@ -274,7 +274,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.battle_fervor.description',
     flavorTextKey: 'doctrines.battle_fervor.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
@@ -292,7 +292,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.audacity.description',
     flavorTextKey: 'doctrines.audacity.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
@@ -310,7 +310,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.fan_cut.description',
     flavorTextKey: 'doctrines.fan_cut.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 2,
     manaCost: 5,
     isUltimate: false,
@@ -325,14 +325,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // TEMPLAR - TIER 3 - ORDER (ULTIMATES)
+  // TEMPLAR - TIER 3 - FORM (ULTIMATES)
   iron_bastion: {
     id: 'iron_bastion',
     nameKey: 'doctrines.iron_bastion.name',
     descriptionKey: 'doctrines.iron_bastion.description',
     flavorTextKey: 'doctrines.iron_bastion.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 3,
     manaCost: 6,
     isUltimate: true,
@@ -350,7 +350,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.kings_sword.description',
     flavorTextKey: 'doctrines.kings_sword.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 3,
     manaCost: 7,
     isUltimate: true,
@@ -368,7 +368,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.law_hammer.description',
     flavorTextKey: 'doctrines.law_hammer.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 3,
     manaCost: 6,
     isUltimate: false,
@@ -392,7 +392,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.glory_banner.description',
     flavorTextKey: 'doctrines.glory_banner.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 3,
     manaCost: 7,
     isUltimate: false,
@@ -406,14 +406,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // TEMPLAR - TIER 3 - CHAOS (ULTIMATES)
+  // TEMPLAR - TIER 3 - VOID (ULTIMATES)
   disruption_storm: {
     id: 'disruption_storm',
     nameKey: 'doctrines.disruption_storm.name',
     descriptionKey: 'doctrines.disruption_storm.description',
     flavorTextKey: 'doctrines.disruption_storm.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 3,
     manaCost: 6,
     isUltimate: true,
@@ -433,7 +433,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.wrath_avatar.description',
     flavorTextKey: 'doctrines.wrath_avatar.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 3,
     manaCost: 8,
     isUltimate: true,
@@ -451,7 +451,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.karmic_retribution.description',
     flavorTextKey: 'doctrines.karmic_retribution.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 3,
     manaCost: 8,
     isUltimate: false,
@@ -471,7 +471,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.summary_execution.description',
     flavorTextKey: 'doctrines.summary_execution.flavor',
     className: CharacterClassName.TEMPLAR,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 3,
     manaCost: 7,
     isUltimate: false,
@@ -487,14 +487,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // HERALD - TIER 1 - ORDER
+  // HERALD - TIER 1 - FORM
   ice_lance: {
     id: 'ice_lance',
     nameKey: 'doctrines.ice_lance.name',
     descriptionKey: 'doctrines.ice_lance.description',
     flavorTextKey: 'doctrines.ice_lance.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -513,7 +513,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.mana_barrier.description',
     flavorTextKey: 'doctrines.mana_barrier.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -531,7 +531,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.arcane_push.description',
     flavorTextKey: 'doctrines.arcane_push.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 1,
     manaCost: 2,
     isUltimate: false,
@@ -549,7 +549,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.unerring_dart.description',
     flavorTextKey: 'doctrines.unerring_dart.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -564,14 +564,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // HERALD - TIER 1 - CHAOS
+  // HERALD - TIER 1 - VOID
   combustion: {
     id: 'combustion',
     nameKey: 'doctrines.combustion.name',
     descriptionKey: 'doctrines.combustion.description',
     flavorTextKey: 'doctrines.combustion.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 1,
     manaCost: 4,
     isUltimate: false,
@@ -590,7 +590,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.plasma_missile.description',
     flavorTextKey: 'doctrines.plasma_missile.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -608,7 +608,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.lightning_burst.description',
     flavorTextKey: 'doctrines.lightning_burst.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -626,7 +626,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.shadow_step.description',
     flavorTextKey: 'doctrines.shadow_step.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -639,14 +639,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // HERALD - TIER 2 - ORDER
+  // HERALD - TIER 2 - FORM
   oracle_eye: {
     id: 'oracle_eye',
     nameKey: 'doctrines.oracle_eye.name',
     descriptionKey: 'doctrines.oracle_eye.description',
     flavorTextKey: 'doctrines.oracle_eye.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
@@ -664,7 +664,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.blink.description',
     flavorTextKey: 'doctrines.blink.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
@@ -682,7 +682,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.nullify.description',
     flavorTextKey: 'doctrines.nullify.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
@@ -700,7 +700,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.fractal_invocation.description',
     flavorTextKey: 'doctrines.fractal_invocation.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 2,
     manaCost: 5,
     isUltimate: false,
@@ -713,14 +713,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // HERALD - TIER 2 - CHAOS
+  // HERALD - TIER 2 - VOID
   silence_vortex: {
     id: 'silence_vortex',
     nameKey: 'doctrines.silence_vortex.name',
     descriptionKey: 'doctrines.silence_vortex.description',
     flavorTextKey: 'doctrines.silence_vortex.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
@@ -739,7 +739,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.transfusion.description',
     flavorTextKey: 'doctrines.transfusion.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 2,
     manaCost: 5,
     isUltimate: false,
@@ -757,7 +757,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.fireball.description',
     flavorTextKey: 'doctrines.fireball.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 2,
     manaCost: 5,
     isUltimate: false,
@@ -783,7 +783,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.fragility_curse.description',
     flavorTextKey: 'doctrines.fragility_curse.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
@@ -797,14 +797,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // HERALD - TIER 3 - ORDER (ULTIMATES)
+  // HERALD - TIER 3 - FORM (ULTIMATES)
   judgment_aurora: {
     id: 'judgment_aurora',
     nameKey: 'doctrines.judgment_aurora.name',
     descriptionKey: 'doctrines.judgment_aurora.description',
     flavorTextKey: 'doctrines.judgment_aurora.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 3,
     manaCost: 9,
     isUltimate: true,
@@ -822,7 +822,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.temporal_prison.description',
     flavorTextKey: 'doctrines.temporal_prison.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 3,
     manaCost: 9,
     isUltimate: true,
@@ -841,7 +841,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.blinding_faith.description',
     flavorTextKey: 'doctrines.blinding_faith.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 3,
     manaCost: 6,
     isUltimate: false,
@@ -862,7 +862,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.inspiration.description',
     flavorTextKey: 'doctrines.inspiration.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.ORDER,
+    magicNature: MagicNature.FORM,
     tier: 3,
     manaCost: 6,
     isUltimate: false,
@@ -878,14 +878,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // HERALD - TIER 3 - CHAOS (ULTIMATES)
+  // HERALD - TIER 3 - VOID (ULTIMATES)
   stellar_collapse: {
     id: 'stellar_collapse',
     nameKey: 'doctrines.stellar_collapse.name',
     descriptionKey: 'doctrines.stellar_collapse.description',
     flavorTextKey: 'doctrines.stellar_collapse.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 3,
     manaCost: 10,
     isUltimate: true,
@@ -904,7 +904,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.black_hole.description',
     flavorTextKey: 'doctrines.black_hole.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 3,
     manaCost: 10,
     isUltimate: true,
@@ -930,7 +930,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.flaming_apotheosis.description',
     flavorTextKey: 'doctrines.flaming_apotheosis.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 3,
     manaCost: 7,
     isUltimate: false,
@@ -954,7 +954,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     descriptionKey: 'doctrines.disintegration_ray.description',
     flavorTextKey: 'doctrines.disintegration_ray.flavor',
     className: CharacterClassName.HERALD,
-    magicNature: MagicNature.CHAOS,
+    magicNature: MagicNature.VOID,
     tier: 3,
     manaCost: 8,
     isUltimate: false,

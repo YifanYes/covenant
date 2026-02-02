@@ -66,16 +66,16 @@ export const AOE_PATTERNS: Record<AoEPatternType, [number, number][]> = {
 
 // Doctrine to AoE pattern mapping
 export const DOCTRINE_AOE_PATTERNS: Record<string, AoEPatternType> = {
-  // Templar - CHAOS
+  // Templar - VOID
   igneous_cut: 'SINGLE',
   fan_cut: 'CROSS',           // Attacks up to 2 enemies in cross pattern
   disruption_storm: 'CROSS',  // Ultimate - 4 power dice split between enemies
 
-  // Herald - CHAOS
+  // Herald - VOID
   fireball: 'DIAMOND',        // Force 4 attack against all enemies + burning
   black_hole: 'CIRCLE_2',     // Ultimate - stun all enemies + 2 direct damage
 
-  // Herald - ORDER
+  // Herald - FORM
   blinding_faith: 'DIAMOND',  // All enemies -2 attack power
 
   // Single target doctrines (for completeness)

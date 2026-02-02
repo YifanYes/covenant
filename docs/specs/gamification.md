@@ -255,7 +255,7 @@ function WorldMap({ mapId, activities }: WorldMapProps) {
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
-      <img src={mapSrc} alt="Map" style={{ width: '100%', height: 'auto' }} />
+      <Image src={mapSrc} alt="Map" style={{ width: '100%', height: 'auto' }} />
       {activities.map(activity => (
         <MapMarker key={activity.id} activity={activity} onClick={() => ...} />
       ))}
@@ -781,7 +781,7 @@ The Morality System tracks the character's ethical alignment based on narrative 
   - **Visuals**: Radiant UI elements and saintly titles.
 - **Neutral (26 - 74)**: Most characters will reside here, maintaining a balance.
   - **Effects**: Standard interactions and balanced access to most world content.
-- **Demon (0 - 25)**: Characters who embrace chaos or selfishness.
+- **Demon (0 - 25)**: Characters who embrace the void or selfishness.
   - **Effects**: Unlocks "Shadow" quest branches, access to black markets, and intimidation-based narrative shortcuts.
   - **Visuals**: Fiery or dark UI accents and demonic titles.
 

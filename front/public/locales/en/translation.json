@@ -1,17 +1,30 @@
 {
   "landing": {
+    "nav": {
+      "news": "News",
+      "mechanics": "Mechanics",
+      "magic_nature": "Magic Nature",
+      "roadmap": "Roadmap",
+      "enter": "Enter"
+    },
+    "pages": {
+      "news": "News",
+      "mechanics": "Mechanics",
+      "magic_nature": "Magic Nature",
+      "roadmap": "Roadmap"
+    },
     "meta": {
-      "title": "ARQ - Transform Your Productivity Into Real Power",
+      "title": "ARQ - Gamified Productivity",
       "description": "A gamified productivity app where every task, every habit, and every goal you complete forges your character. No shortcuts. No excuses. Only results you can see, measure, and equip."
     },
     "hero": {
-      "title": "ARQ transforms your productivity into real power.",
+      "title": "Complete tasks. Kill demons.",
       "subtitle": "Your daily discipline forges your divine legend.",
-      "body": "A productivity app where every completed task, every sustained habit, and every closed objective forges your character. No shortcuts. No excuses. Only results you can see, measure, and equip.",
+      "body": "A productivity app where every completed task, every sustained habit, and every closed objective forges your character and the world's destiny.",
       "cta": "JOIN THE WAR"
     },
     "value_proposition": {
-      "title": "ARQ is not another to-do app.",
+      "title": "Another to-do app? (=____=)",
       "body": "It's a persistent progression system where every action counts and every omission is paid for. Your productivity shapes the destiny of the world."
     },
     "productivity": {
@@ -22,11 +35,11 @@
       },
       "habits": {
         "title": "Habit System",
-        "body": "Daily habit tracking with consistency bonuses. Every day you maintain a habit strengthens your character. Every day you fail weakens it. Simple."
+        "body": "Habit tracking with consistency bonuses."
       },
       "goals": {
         "title": "Areas and Goals",
-        "body": "Define life Areas and long-term Goals. These aren't aspirational lists—they're progression lines with a start, cost, and closure."
+        "body": "Define life Areas and long-term Goals. These aren't aspirational lists — they're progression lines with a start, cost, and closure."
       }
     },
     "character": {
@@ -48,7 +61,7 @@
       "title": "Combat System",
       "dice": {
         "title": "Dice System",
-        "body": "Complete tasks → Earn dice. Dice are your combat resource.",
+        "body": "Complete tasks → Earn dice → Roll dice → Kill demons",
         "table": {
           "action": "Action",
           "dice": "Dice",
@@ -59,8 +72,8 @@
         }
       },
       "missions": {
-        "title": "Missions and Adventures",
-        "body": "Tasks don't just get checked off—they become power to complete missions. Choose from different Tier missions. Every victory grants gold, experience, and equipment."
+        "title": "Global Activities",
+        "body": "Tasks don't just get checked off—they become power to participate in activities. Every victory grants gold, materials, and equipment."
       },
       "reactive": {
         "title": "Reactive Combat",
@@ -68,7 +81,7 @@
       },
       "equipment": {
         "title": "Equipment and Loadout",
-        "body": "Weapons, armor, and accessories that modify your stats. Tier 1 gear is free. From Tier 2 onwards, you earn it or buy it with gold. Progress feels real because you can equip it."
+        "body": "Weapons, armor, and accessories that modify your stats. Tier 1 gear is free. From Tier 2 onwards, you forge it, earn it or buy it with gold. Progress feels real because you can equip it."
       }
     },
     "coming_soon": {
@@ -87,16 +100,16 @@
           "description": "Rankings for the most disciplined."
         },
         "coop": {
-          "title": "Co-op System (2-4)",
-          "description": "Form a party with friends. Round-robin turns, individual loot."
-        },
-        "seasonal": {
-          "title": "Seasonal Missions",
-          "description": "New content based on moments from the ARQ world history."
+          "title": "New Classes and Factions",
+          "description": "Expand your options with new classes and join powerful factions."
         },
         "scaling": {
-          "title": "Dynamic Scaling",
-          "description": "Difficulty adjusts to your dice bank."
+          "title": "Cooking and Crafting",
+          "description": "Create consumables and forge equipment with gathered materials."
+        },
+        "seasonal": {
+          "title": "Board Game Release",
+          "description": "The physical version of ARQ arrives at your table."
         }
       }
     },
@@ -244,6 +257,7 @@
     "dice_to_spend": "Dice to spend",
     "enemies": "Enemies",
     "enemies_defeated": "Enemies Defeated",
+    "enemy_defeated_reward": "{{enemy}} defeated! +{{gold}} gold",
     "unknown_enemy": "Unknown Enemy",
     "error": {
       "attack": "Attack failed",
@@ -577,8 +591,8 @@
       "name": "Lightning Burst"
     },
     "magic_nature": {
-      "chaos": "Chaos",
-      "order": "Order"
+      "void": "Void",
+      "form": "Form"
     },
     "mana_barrier": {
       "description": "Negate the first magic hit received.",
@@ -927,9 +941,9 @@
     "magic_atk": "Magic Atk",
     "magic_def": "Magic Def",
     "magic_nature": {
-      "chaos": "Chaos",
-      "label": "Magic Nature",
-      "order": "Order"
+      "void": "Void",
+      "form": "Form",
+      "label": "Magic Nature"
     },
     "mana": "Mana",
     "mana_regen": "Mana Regeneration",
@@ -1231,29 +1245,29 @@
     "loading": "Creating your character...",
     "magic_nature": {
       "q1": {
-        "chaos": "I marvel at the new form of the fragments and use them to create a mosaic or a spike trap. The breakage is an opportunity.",
-        "order": "I search for every speck of dust and use my will to restore its exact molecular structure. What was perfect must be perfect again.",
-        "question": "You find a millennial vase shattered to pieces. What is your reaction?"
+        "void": "I let it extinguish naturally. All things must return to nothing; from this ending, new beginnings may arise.",
+        "form": "I perform the ancient ritual to reignite it, ensuring its light continues to manifest in the world.",
+        "question": "A sacred flame that has burned for a millennium is fading. You have the power to intervene."
       },
       "q2": {
-        "chaos": "The rebels'. I'd rather die in the explosion of uncertain change than live a life dictated by another's design.",
-        "order": "The crown's side. Disorder only brings hunger and death; the law is the only shield against the abyss.",
-        "question": "A kingdom lives in total peace, but under laws so strict that no one can choose their own profession. A violent revolution is brewing. Whose side are you on?"
+        "void": "I preserve the emptiness. In this space of infinite possibility, creating one thing means excluding all others.",
+        "form": "I immediately begin to create: landscapes, structures, life. Potential must become real to have meaning.",
+        "question": "You step into a dimension of pure possibility—nothing exists here yet, but anything could."
       },
       "q3": {
-        "chaos": "I throw a small doctrine into the center to see what happens. If it explodes, at least I'll have learned something about its raw power.",
-        "order": "I build a series of containment seals and study its cycles for years before attempting to channel a single drop.",
-        "question": "You discover a flow of immense but totally unpredictable energy. What do you do?"
+        "void": "I unmake it entirely, releasing its essence back into formless energy. Some things cannot be saved, only ended.",
+        "form": "I reforge it, purifying the corruption and reshaping it into a new weapon of light.",
+        "question": "A holy sword has been tainted by demonic essence. Its power remains, but twisted."
       },
       "q4": {
-        "chaos": "An untamed jungle full of strange hybrids that grow according to their own will, where every walk is a different adventure.",
-        "order": "A perfectly symmetrical design, with paths aligned to the stars and plants that bloom in strict chronological order.",
-        "question": "You are granted a barren land to create whatever you want. What is the final result?"
+        "void": "I absolve it and commend it to the Creator. Its earthly form is already corrupted; clinging to it only prolongs its agony. May its spirit find peace.",
+        "form": "I kneel and pray fervently for God to have mercy and restore its celestial form. Every creature of the Lord deserves a chance at redemption.",
+        "question": "A fallen angel, wounded in battle against the Enemy's hosts, lies dying before you. Its divine light flickers faintly as it begs for your help."
       },
       "q5": {
-        "chaos": "You shout 'Entropy!', throw the menu out the window, and decide you'll eat whatever you find first.",
-        "order": "You devise a weighted voting system by seniority and hunger level, ensuring the olive distribution is geometrically equitable.",
-        "question": "You're with friends and no one agrees on pizza toppings. Time passes and hunger sets in. How do you resolve it?"
+        "void": "I preserve the grimoire uncast. The spell holds infinite value as possibility; manifesting one desire destroys all others.",
+        "form": "I cast it without hesitation. What good is potential if it never becomes real?",
+        "question": "An ancient grimoire contains a spell of ultimate creation—once cast, it will materialize your deepest desire, but the book will crumble to dust."
       },
       "subtitle": "Answer these questions to discover your magical affinity.",
       "title": "Magic Nature"

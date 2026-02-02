@@ -4,7 +4,7 @@ import { cn } from '@/lib/cn.lib'
 import Dialog, { DialogContent, DialogHeader, DialogTitle } from '@/ui/dialog.component'
 import { EnemyType, getEnemy } from '@shared/constants/enemies'
 import type { CombatLogEntry } from '@shared/types/gamification.types'
-import { formatDistanceToNow } from 'date-fns'
+import dayjs from 'dayjs'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
@@ -58,7 +58,7 @@ export default function KillRecordDetailDialog({ enemy, open, onOpenChange }: Ki
 
   const getTimeAgo = () => {
     if (!enemy.defeatedAt) return t('inventory.kill_record.unknown_time')
-    return formatDistanceToNow(new Date(enemy.defeatedAt), { addSuffix: true })
+    return dayjs(enemy.defeatedAt).fromNow()
   }
 
   const combatLogEntries = (enemy.combatLog as CombatLogEntry[]) || []
