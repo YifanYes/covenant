@@ -3,8 +3,8 @@ builder = "railpack"
 buildCommand = "pnpm install --ignore-scripts && pnpm --filter front build"
 
 [deploy]
-startCommand = "pnpm --filter front start"
+startCommand = "pnpm --filter front start -- -p ${PORT:-3000} -H 0.0.0.0"
 healthcheckPath = "/"
-healthcheckTimeout = 100
+healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
