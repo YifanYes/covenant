@@ -6,159 +6,226 @@ Este documento combina la estructura visual, los elementos funcionales y el cont
 
 ## Bloque A: Hero Principal
 
-**Visual:** El Arca de la Alianza en pixel art como logo estático centrado (obligatorio). Arte conceptual de un campo de batalla dividido por la guerra (opcional).
+**Estado:** ✅ Implementado
+
+**Visual:** Layout de dos columnas en desktop (contenido izquierda, espacio visual derecha). Gradiente sutil de fondo. Logo "Arq" como H1 con línea decorativa debajo.
 
 **Elementos:**
 
-- **Titular (H1):** "ARQ transforma tu productividad en poder real."
-- **Subtítulo:** "Tu disciplina diaria forja tu leyenda divina."
-- **Cuerpo:** Una app de productividad donde cada tarea completada, cada hábito sostenido y cada objetivo cerrado forja a tu personaje. Sin atajos. Sin excusas. Solo resultados que puedes ver, medir y equipar.
-- **CTA Primario:** Botón "UNIRSE A LA GUERRA" (Press Start 2P) con efecto de brillo en el acento de facción.
+- **Logo (H1):** "Arq" con línea decorativa primaria
+- **Titular (H2):** `landing.hero.title` - "ARQ transforma tu productividad en poder real."
+- **Subtítulo:** `landing.hero.subtitle` - "Tu disciplina diaria forja tu leyenda divina."
+- **Cuerpo:** `landing.hero.body` - Descripción de la app
+- **CTA Primario:** `landing.hero.cta` - Botón enlazando a `/sign-up`
 
 ---
 
 ## Bloque B: Propuesta de Valor
 
-**Visual:** Transición del campo de batalla a una sala de estrategia con mapas de guerra iluminados por velas (opcional).
+**Estado:** ✅ Implementado
+
+**Visual:** Sección centrada con fondo card/50. Texto centrado con ancho máximo de 3xl.
 
 **Elementos:**
 
-- **Titular (H2):** "ARQ no es otra app de to-dos."
-- **Cuerpo:** Es un sistema de progreso persistente donde cada acción cuenta y cada omisión se paga. Tu productividad moldea el destino del mundo.
+- **Titular (H2):** `landing.value_proposition.title` - "ARQ no es otra app de to-dos."
+- **Cuerpo:** `landing.value_proposition.body` - Descripción del sistema de progreso persistente
 
 ---
 
 ## Bloque C: Productividad
 
+**Estado:** ✅ Implementado
+
 Agrupa las funcionalidades de gestión personal: tareas, hábitos y objetivos.
 
-**Visual:** Representación de las interfaces de productividad (obligatorio) sobre retablos de piedra tallada con bordes barrocos (opcional).
+**Visual:** Grid de 3 columnas en desktop con Cards. Cada card tiene icono en contenedor con fondo primario/10.
+
+**Iconos utilizados:** List, Repeat, Bullseye (de @nsmr/pixelart-react)
 
 ### Gestión de Tareas Completa
 
-- **Titular:** Gestión de Tareas Completa
-- **Cuerpo:** Múltiples vistas para adaptarse a tu estilo: Lista, Calendario, Tabla y Matriz de Eisenhower. Organiza tu caos con la precisión de una campaña militar.
+- **Icono:** List
+- **Titular:** `landing.productivity.tasks.title`
+- **Cuerpo:** `landing.productivity.tasks.body`
 
 ### Sistema de Hábitos
 
-- **Titular:** Sistema de Hábitos
-- **Cuerpo:** Seguimiento diario de hábitos con bonus de consistencia. Cada día que mantienes un hábito fortalece tu personaje. Cada día que fallas le debilita. Simple.
-- **Visual secundario:** Gráfico de momentum ilustrando cómo la racha genera recursos de combate.
+- **Icono:** Repeat
+- **Titular:** `landing.productivity.habits.title`
+- **Cuerpo:** `landing.productivity.habits.body`
 
 ### Áreas y Objetivos
 
-- **Titular:** Áreas y Objetivos
-- **Cuerpo:** Define Áreas de vida y Objetivos a largo plazo. No son listas aspiracionales—son líneas de progresión con inicio, coste y cierre.
+- **Icono:** Bullseye
+- **Titular:** `landing.productivity.goals.title`
+- **Cuerpo:** `landing.productivity.goals.body`
 
 ---
 
 ## Bloque D: Tu Personaje
 
+**Estado:** ✅ Implementado
+
 Presenta la experiencia RPG personal: avatar, estadísticas y habilidades.
 
-**Visual:** Grid interactivo con iconos de Pixelarticons sobre tarjetas (obligatorio) con bordes barrocos (opcional). Visualizador de estadísticas reales: Fuerza, Magia, Vida y Maná.
+**Visual:** Fondo secondary/5. Grid de features (2 cols md, 3 cols lg) + grid de estadísticas (2 cols, 4 cols md).
+
+**Iconos utilizados:** Sliders, BookOpen, User, Trophy, Zap, Heart, Shield (de @nsmr/pixelart-react)
 
 ### Estadísticas Vivas
 
-- **Titular:** Tu Personaje
-- **Cuerpo:** No es un avatar decorativo. Tu personaje refleja tu comportamiento real: estadísticas de Fuerza, Magia, Vida y Maná que evolucionan según lo que haces.
+- **Icono:** Sliders
+- **Titular:** `landing.character.stats.title`
+- **Cuerpo:** `landing.character.stats.body`
 
 ### Sistema de Doctrinas y Maná
 
-- **Titular:** Sistema de Doctrinas y Maná
-- **Cuerpo:** Desbloquea habilidades especiales según tu clase. Cada doctrina tiene coste de maná—úsalas estratégicamente o quédate sin recursos.
+- **Icono:** BookOpen
+- **Titular:** `landing.character.doctrines.title`
+- **Cuerpo:** `landing.character.doctrines.body`
 
 ### Clases con Identidad
 
-- **Cuerpo:** Tu clase define tus doctrinas y estilo de combate. Sin boosts artificiales. No hay atajos. Solo trabajo.
+- **Icono:** User
+- **Titular:** `landing.character.classes.title`
+- **Cuerpo:** `landing.character.classes.body`
+
+### Grid de Estadísticas
+
+Cards con iconos mostrando las 4 estadísticas:
+- **STR** (Trophy)
+- **MAG** (Zap)
+- **HP** (Heart)
+- **MP** (Shield)
 
 ---
 
 ## Bloque E: Sistema de Combate
 
+**Estado:** ✅ Implementado
+
 El loop de juego completo: dados → misiones → combate → recompensas.
 
-**Visual:** Animación 16-bit de dados rodando (obligatorio). Superficie de piedra limpia donde se presentan las mecánicas (opcional).
+**Visual:** Grid de 4 columnas (2 md, 4 lg) con Cards. Primera card con borde accent/30 para destacar el sistema de dados.
+
+**Iconos utilizados:** Gamepad, Flag, Shield (de @nsmr/pixelart-react)
 
 ### Sistema de Dados
 
-Completa tareas → Gana dados. Los dados son tu recurso de combate.
+- **Icono:** Gamepad
+- **Titular:** `landing.combat.dice.title`
+- **Cuerpo:** `landing.combat.dice.body`
 
-| Acción                    | Dados   |
-| ------------------------- | ------- |
-| Hábito diario             | 2       |
-| Tarea de alto impacto     | 4       |
-| Objetivo completado       | 6       |
-| Racha de hábito (21 días) | Hasta 5 |
+**Tabla de dados (dentro de la card):**
+
+| Clave i18n                                    | Dados |
+| --------------------------------------------- | ----- |
+| `landing.combat.dice.table.daily_habit`       | 2     |
+| `landing.combat.dice.table.high_impact_task`  | 4     |
+| `landing.combat.dice.table.completed_objective` | 6   |
+| `landing.combat.dice.table.habit_streak`      | 5     |
 
 ### Misiones y Aventuras
 
-- **Cuerpo:** Las tareas no se tachan—se convierten en poder para completar misiones. Elige entre misiones de diferentes Tiers. Cada victoria otorga oro, experiencia y equipo.
+- **Icono:** Flag
+- **Titular:** `landing.combat.missions.title`
+- **Cuerpo:** `landing.combat.missions.body`
 
 ### Combate Reactivo
 
-- **Cuerpo:** Lanza dados para luchar contra los ejércitos del mal. Ataque y defensa simultánea. Cada tirada tiene peso visual y narrativo.
-- **Visual secundario:** Infografía del sistema de combate reactivo (resolución de ataques y defensas).
+- **Icono:** Gamepad
+- **Titular:** `landing.combat.reactive.title`
+- **Cuerpo:** `landing.combat.reactive.body`
 
 ### Equipamiento y Tienda
 
-- **Titular:** Equipamiento y Loadout
-- **Cuerpo:** Armas, armaduras y accesorios que modifican tus estadísticas. El equipo Tier 1 es gratis. A partir del Tier 2, lo ganas o lo compras con oro. Gasta tu oro en armas, armaduras y accesorios. El progreso se siente porque lo puedes equipar.
-- **Visual secundario:** Interfaz de inventario estilo RPG clásico con slots de equipo iluminados.
+- **Icono:** Shield
+- **Titular:** `landing.combat.equipment.title`
+- **Cuerpo:** `landing.combat.equipment.body`
 
 ---
 
 ## Bloque F: Próximamente
 
-**Visual:** Línea temporal (obligatorio) estilo mapa de campaña militar con hitos marcados (opcional).
+**Estado:** ✅ Implementado
 
-| Feature               | Descripción                                                                                |
-| --------------------- | ------------------------------------------------------------------------------------------ |
-| Journaling Integrado  | Reflexión diaria conectada con tu progreso. Documenta victorias, analiza derrotas.         |
-| PvP: Duelos           | Reta a otros jugadores usando el sistema de dados. Tu consistencia real contra la de otro. |
-| Leaderboards          | Tablas de clasificación para los más disciplinados.                                        |
-| Sistema Co-op (2-4)   | Forma party con amigos. Turnos round-robin, loot individual.                               |
-| Misiones Estacionales | Contenido nuevo basado en momentos de la historia del mundo de ARQ.                        |
-| Escalado Dinámico     | La dificultad se ajusta a tu banco de dados.                                               |
+**Visual:** Fondo card/50. Grid de 2 columnas (sm) o 3 columnas (lg). Cada feature en card con icono y texto.
+
+**Iconos utilizados:** BookOpen, Gamepad, Trophy, Users, Calendar, Zap (de @nsmr/pixelart-react)
+
+| Feature | Icono | Claves i18n |
+| ------- | ----- | ----------- |
+| Journaling | BookOpen | `landing.coming_soon.features.journaling.title/description` |
+| PvP | Gamepad | `landing.coming_soon.features.pvp.title/description` |
+| Leaderboards | Trophy | `landing.coming_soon.features.leaderboards.title/description` |
+| Co-op | Users | `landing.coming_soon.features.coop.title/description` |
+| Seasonal | Calendar | `landing.coming_soon.features.seasonal.title/description` |
+| Scaling | Zap | `landing.coming_soon.features.scaling.title/description` |
 
 ---
 
 ## Bloque G: Cierre y CTA Final
 
-**Visual:** Retorno al campo de batalla con el personaje del jugador en primer plano, armado con el equipo que ha ganado (opcional).
+**Estado:** ✅ Implementado
+
+**Visual:** Fondo secondary/10. Texto centrado con ancho máximo de 3xl.
 
 **Contenido:**
 
-ARQ no te empuja a hacer más.
+- **Línea 1:** `landing.closing.line1` - "ARQ no te empuja a hacer más."
+- **Línea 2:** `landing.closing.line2` - "Te obliga a hacer lo que dices que importa." (destacado en primary)
+- **Línea 3:** `landing.closing.line3` - Descripción de dados y tiradas
+- **Línea 4:** `landing.closing.line4` - "Tu productividad tiene consecuencias. Hazlas contar."
 
-**Te obliga a hacer lo que dices que importa.**
-
-Cada tarea completada son dados. Cada dado es una tirada. Cada tirada es un impacto, tanto en la historia como en tu vida.
-
-**Tu productividad tiene consecuencias. Hazlas contar.**
-
-**CTA Final:** Botón "COMENZAR MI LEYENDA" (Press Start 2P, tamaño prominente).
+**CTA Final:** `landing.closing.cta` - Botón enlazando a `/sign-up`
 
 ---
 
-## Bloque H: Socials
+## Bloque H: Footer
 
-- **Redes Sociales:** Iconos 8-bit de Pixelarticons con sombra paralela dura.
+**Estado:** ✅ Implementado (combinado con Bloque G en ClosingAndFooterSection)
+
+**Visual:** Fondo card con borde superior. Contenido centrado.
+
+**Elementos:**
+- Logo "ARQ" en texto primario
+- Separador decorativo
+- Copyright dinámico con año actual
 
 ---
 
 ## Resumen de Estructura
 
-| Bloque                | Propósito                | CTAs                  |
-| --------------------- | ------------------------ | --------------------- |
-| A. Hero               | Captura de atención      | "UNIRSE A LA GUERRA"  |
-| B. Propuesta          | Diferenciación           | —                     |
-| C. Productividad      | Features de gestión      | —                     |
-| D. Tu Personaje       | Experiencia RPG personal | —                     |
-| E. Sistema de Combate | Loop de juego            | —                     |
-| F. Próximamente       | Roadmap / FOMO           | —                     |
-| G. Cierre             | Conversión final         | "COMENZAR MI LEYENDA" |
-| H. Socials            | Enlaces a redes sociales | —                     |
+| Bloque                | Componente                  | Propósito                | CTAs                    | Estado |
+| --------------------- | --------------------------- | ------------------------ | ----------------------- | ------ |
+| A. Hero               | `HeroSection`               | Captura de atención      | `/sign-up`              | ✅     |
+| B. Propuesta          | `ValuePropositionSection`   | Diferenciación           | —                       | ✅     |
+| C. Productividad      | `ProductivitySection`       | Features de gestión      | —                       | ✅     |
+| D. Tu Personaje       | `CharacterSection`          | Experiencia RPG personal | —                       | ✅     |
+| E. Sistema de Combate | `CombatSection`             | Loop de juego            | —                       | ✅     |
+| F. Próximamente       | `ComingSoonSection`         | Roadmap / FOMO           | —                       | ✅     |
+| G. Cierre + H. Footer | `ClosingAndFooterSection`   | Conversión final         | `/sign-up`              | ✅     |
+
+---
+
+## Implementación Técnica
+
+**Archivo:** `front/app/(landing)/page.tsx`
+
+**Características:**
+- Scroll snap vertical (`snap-y snap-mandatory`)
+- Cada sección ocupa altura mínima de pantalla (`min-h-screen`)
+- i18n vía `react-i18next` con hook `useTranslation()`
+- Iconos de `@nsmr/pixelart-react`
+- Componentes UI reutilizables: Button, Card, Separator
+
+**Componentes importados:**
+```tsx
+import Button from '@/components/ui/button.component'
+import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.component'
+import Separator from '@/components/ui/separator.component'
+```
 
 ---
 
