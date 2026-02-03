@@ -4,7 +4,10 @@ import { env } from './config.lib'
 
 export const authClient = createAuthClient({
   baseURL: env.NEXT_PUBLIC_API_URL,
-  plugins: [magicLinkClient()]
+  plugins: [magicLinkClient()],
+  fetchOptions: {
+    credentials: 'include'
+  }
 })
 
 export const { signIn, signOut, useSession } = authClient
