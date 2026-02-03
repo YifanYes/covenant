@@ -6,15 +6,15 @@ import { authClient, useSession } from '@/lib/auth.lib'
 import { useAuthStore } from '@/stores/auth.store'
 import AlertComponent, { AlertDescription, AlertTitle } from '@/ui/alert.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import GoogleLoginButton from '../_components/google-login-button.component'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Alert, Check, Loader, Mail } from '@nsmr/pixelart-react'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
+import GoogleLoginButton from '../_components/google-login-button.component'
 
 export default function Login() {
   const { t } = useTranslation()
@@ -41,16 +41,35 @@ export default function Login() {
       })
 
       const redirectTo = searchParams.get('redirect_to')
+      const targetUrl = redirectTo && redirectTo !== '/login' ? redirectTo : null
 
-      if (redirectTo && redirectTo !== '/login') {
-        router.push(redirectTo)
+      const performRedirect = async (url: string) => {
+        console.log('[Login] Attempting redirect to:', url)
+        try {
+          router.push(url)
+          // Fallback: if still on login page after 2 seconds, force navigation
+          setTimeout(() => {
+            if (window.location.pathname === '/login') {
+              console.log('[Login] Router.push failed, using window.location')
+              window.location.href = url
+            }
+          }, 2000)
+        } catch (error) {
+          console.error('[Login] Router.push error:', error)
+          window.location.href = url
+        }
+      }
+
+      if (targetUrl) {
+        performRedirect(targetUrl)
       } else {
-        queryClient.fetchQuery(trpcOptions.character.hasCharacter.queryOptions())
+        queryClient
+          .fetchQuery(trpcOptions.character.hasCharacter.queryOptions())
           .then(({ hasCharacter }) => {
-            router.push(hasCharacter ? '/dashboard' : '/onboarding')
+            performRedirect(hasCharacter ? '/dashboard' : '/onboarding')
           })
           .catch(() => {
-            router.push('/dashboard')
+            performRedirect('/dashboard')
           })
       }
     }
@@ -70,24 +89,27 @@ export default function Login() {
     }
   }, [urlError])
 
-  const onSubmit = useCallback(async (data: LoginType) => {
-    setIsLoading(true)
-    try {
-      const redirectTo = searchParams.get('redirect_to') || '/login'
-      await authClient.signIn.magicLink({
-        email: data.email,
-        callbackURL: `${window.location.origin}${redirectTo}`
-      })
-      setMagicLinkSent(true)
-      toast.success(t('login.success'))
-    } catch (error) {
-      toast.error(t('login.error.title'), {
-        description: error instanceof Error ? error.message : 'Unknown error'
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }, [searchParams, t])
+  const onSubmit = useCallback(
+    async (data: LoginType) => {
+      setIsLoading(true)
+      try {
+        const redirectTo = searchParams.get('redirect_to') || '/login'
+        await authClient.signIn.magicLink({
+          email: data.email,
+          callbackURL: `${window.location.origin}${redirectTo}`
+        })
+        setMagicLinkSent(true)
+        toast.success(t('login.success'))
+      } catch (error) {
+        toast.error(t('login.error.title'), {
+          description: error instanceof Error ? error.message : 'Unknown error'
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [searchParams, t]
+  )
 
   const {
     register,
@@ -117,11 +139,11 @@ export default function Login() {
   // Show loading while checking session or redirecting
   if (isSessionPending || isRedirecting) {
     return (
-      <div className='flex w-md flex-col items-center justify-center gap-6 py-8'>
-        <Loader className='h-10 w-10 animate-spin' />
-        <div className='flex flex-col items-center gap-2 text-center'>
-          <h2 className='text-xl font-semibold'>{t('login.verifying_title')}</h2>
-          <p className='text-muted-foreground text-sm'>{verifyingMessage}</p>
+      <div className="flex w-md flex-col items-center justify-center gap-6 py-8">
+        <Loader className="h-10 w-10 animate-spin" />
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h2 className="text-xl font-semibold">{t('login.verifying_title')}</h2>
+          <p className="text-muted-foreground text-sm">{verifyingMessage}</p>
         </div>
       </div>
     )
@@ -129,9 +151,9 @@ export default function Login() {
 
   if (magicLinkSent) {
     return (
-      <div className='flex w-md flex-col gap-2.5'>
+      <div className="flex w-md flex-col gap-2.5">
         <h2>{t('login.check_email_title')}</h2>
-        <AlertComponent variant='success'>
+        <AlertComponent variant="success">
           <Mail />
           <AlertTitle>{t('login.magic_link_sent_title')}</AlertTitle>
           <AlertDescription>{t('login.magic_link_sent_description')}</AlertDescription>
@@ -141,28 +163,26 @@ export default function Login() {
   }
 
   return (
-    <div className='flex w-md flex-col gap-2.5'>
+    <div className="flex w-md flex-col gap-2.5">
       <h2>{t('login.title')}</h2>
       {isAccountVerified && (
-        <AlertComponent variant='success'>
+        <AlertComponent variant="success">
           <Check />
           <AlertTitle>{t('login.account_verified.title')}</AlertTitle>
           <AlertDescription>{t('login.account_verified.description')}</AlertDescription>
         </AlertComponent>
       )}
       {urlError && (
-        <AlertComponent variant='destructive'>
+        <AlertComponent variant="destructive">
           <Alert />
           <AlertTitle>{t('login.error.magic_link_error')}</AlertTitle>
           <AlertDescription>
-            {urlError === 'Email link is invalid or has expired'
-              ? t('login.error.invalid_magic_link')
-              : urlError}
+            {urlError === 'Email link is invalid or has expired' ? t('login.error.invalid_magic_link') : urlError}
           </AlertDescription>
         </AlertComponent>
       )}
       <TextInput
-        type='email'
+        type="email"
         placeholder={t('login.email')}
         {...register('email')}
         {...(errors.email?.message && { errorMessage: t(errors.email.message) })}
@@ -174,15 +194,15 @@ export default function Login() {
         label={t('login.button')}
         onClick={handleSubmit(onSubmit)}
       />
-      <div className='relative flex items-center gap-2 py-2'>
-        <div className='bg-border h-px w-full' />
-        <span className='text-muted-foreground text-xs uppercase'>{t('login.or')}</span>
-        <div className='bg-border h-px w-full' />
+      <div className="relative flex items-center gap-2 py-2">
+        <div className="bg-border h-px w-full" />
+        <span className="text-muted-foreground text-xs uppercase">{t('login.or')}</span>
+        <div className="bg-border h-px w-full" />
       </div>
       <GoogleLoginButton />
-      <div className='flex flex-row gap-1'>
+      <div className="flex flex-row gap-1">
         <p>{t('login.dont_have_account')}</p>
-        <Link href='/sign-up'>{t('login.create_account')}</Link>
+        <Link href="/sign-up">{t('login.create_account')}</Link>
       </div>
     </div>
   )
