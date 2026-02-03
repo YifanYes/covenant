@@ -10,7 +10,7 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Alert, Check, Loader, Mail } from '@nsmr/pixelart-react'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -24,24 +24,12 @@ export default function Login() {
   const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
-  const [redirectTarget, setRedirectTarget] = useState<string | null>(null)
-  const redirectLinkRef = useRef<HTMLAnchorElement>(null)
-  const [isMounted, setIsMounted] = useState(false)
 
-  // Hydration guard - wait for client-side mount before using session
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  const { data: session, isPending: isSessionPending, error: sessionError } = useSession()
-
-  // DEBUG: Remove after fixing
-  console.log('[Login Debug]', { session, isSessionPending, sessionError, isRedirecting, isMounted })
+  const { data: session, isPending: isSessionPending } = useSession()
 
   // Handle session changes - redirect when logged in
   useEffect(() => {
     if (session?.user && !isRedirecting) {
-      console.log('[Login] Session detected, starting redirect...')
       setIsRedirecting(true)
 
       updateUserInfo({
@@ -51,33 +39,20 @@ export default function Login() {
 
       const redirectTo = searchParams.get('redirect_to')
 
-      if (redirectTo && redirectTo !== '/login') {
-        console.log('[Login] Redirecting to:', redirectTo)
-        setRedirectTarget(redirectTo)
+      if (redirectTo) {
+        router.push(redirectTo)
       } else {
-        console.log('[Login] No redirect_to, checking character...')
         queryClient
           .fetchQuery(trpcOptions.character.hasCharacter.queryOptions())
           .then(({ hasCharacter }) => {
-            const target = hasCharacter ? '/dashboard' : '/onboarding'
-            console.log('[Login] Character check done, redirecting to:', target)
-            setRedirectTarget(target)
+            router.push(hasCharacter ? '/dashboard' : '/onboarding')
           })
-          .catch((err) => {
-            console.error('[Login] Character check failed:', err)
-            setRedirectTarget('/dashboard')
+          .catch(() => {
+            router.push('/dashboard')
           })
       }
     }
-  }, [session, updateUserInfo, searchParams, isRedirecting])
-
-  // When redirectTarget is set, click the hidden link
-  useEffect(() => {
-    if (redirectTarget && redirectLinkRef.current) {
-      console.log('[Login] Clicking hidden link to:', redirectTarget)
-      redirectLinkRef.current.click()
-    }
-  }, [redirectTarget])
+  }, [session, updateUserInfo, router, searchParams, isRedirecting])
 
   // Check for error in URL params (from magic link failure)
   const urlError = useMemo(() => {
@@ -130,37 +105,25 @@ export default function Login() {
     [searchParams]
   )
 
-  // Use null as initial value to match SSR, then set random value after mount
-  const [randomQuoteIndex, setRandomQuoteIndex] = useState<number | null>(null)
-
-  useEffect(() => {
-    setRandomQuoteIndex(Math.random())
-  }, [])
+  const [randomQuoteIndex] = useState(() => Math.random())
 
   const verifyingMessage = useMemo(() => {
     const messages = t('login.verifying_messages', { returnObjects: true }) as string[]
-    // Only show random message if randomQuoteIndex has been set (after mount)
-    if (Array.isArray(messages) && messages.length > 0 && randomQuoteIndex !== null) {
+    if (Array.isArray(messages) && messages.length > 0) {
       return messages[Math.floor(randomQuoteIndex * messages.length)]
     }
-    return null
+    return t('login.verifying_title')
   }, [t, randomQuoteIndex])
 
-  // Show loading while not mounted, checking session or redirecting
-  if (!isMounted || isSessionPending || isRedirecting) {
+  // Show loading while checking session or redirecting
+  if (isSessionPending || isRedirecting) {
     return (
       <div className="flex w-md flex-col items-center justify-center gap-6 py-8">
         <Loader className="h-10 w-10 animate-spin" />
         <div className="flex flex-col items-center gap-2 text-center">
           <h2 className="text-xl font-semibold">{t('login.verifying_title')}</h2>
-          {verifyingMessage ? (
-            <p className="text-muted-foreground text-sm">{verifyingMessage}</p>
-          ) : (
-            <div className="bg-muted h-4 w-48 animate-pulse rounded" />
-          )}
+          <p className="text-muted-foreground text-sm">{verifyingMessage}</p>
         </div>
-        {/* Hidden link for programmatic navigation */}
-        {redirectTarget && <a ref={redirectLinkRef} href={redirectTarget} className="hidden" aria-hidden />}
       </div>
     )
   }
