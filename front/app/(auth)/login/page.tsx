@@ -33,6 +33,7 @@ export default function Login() {
   // Handle session changes - redirect when logged in
   useEffect(() => {
     if (session?.user && !isRedirecting) {
+      console.log('[Login] Session detected, starting redirect...')
       setIsRedirecting(true)
 
       updateUserInfo({
@@ -41,35 +42,22 @@ export default function Login() {
       })
 
       const redirectTo = searchParams.get('redirect_to')
-      const targetUrl = redirectTo && redirectTo !== '/login' ? redirectTo : null
 
-      const performRedirect = async (url: string) => {
-        console.log('[Login] Attempting redirect to:', url)
-        try {
-          router.push(url)
-          // Fallback: if still on login page after 2 seconds, force navigation
-          setTimeout(() => {
-            if (window.location.pathname === '/login') {
-              console.log('[Login] Router.push failed, using window.location')
-              window.location.href = url
-            }
-          }, 2000)
-        } catch (error) {
-          console.error('[Login] Router.push error:', error)
-          window.location.href = url
-        }
-      }
-
-      if (targetUrl) {
-        performRedirect(targetUrl)
+      if (redirectTo && redirectTo !== '/login') {
+        console.log('[Login] Redirecting to:', redirectTo)
+        router.replace(redirectTo)
       } else {
+        console.log('[Login] No redirect_to, checking character...')
         queryClient
           .fetchQuery(trpcOptions.character.hasCharacter.queryOptions())
           .then(({ hasCharacter }) => {
-            performRedirect(hasCharacter ? '/dashboard' : '/onboarding')
+            const target = hasCharacter ? '/dashboard' : '/onboarding'
+            console.log('[Login] Character check done, redirecting to:', target)
+            router.replace(target)
           })
-          .catch(() => {
-            performRedirect('/dashboard')
+          .catch((err) => {
+            console.error('[Login] Character check failed:', err)
+            router.replace('/dashboard')
           })
       }
     }
