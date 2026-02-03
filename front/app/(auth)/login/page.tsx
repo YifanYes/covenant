@@ -25,7 +25,10 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
 
-  const { data: session, isPending: isSessionPending } = useSession()
+  const { data: session, isPending: isSessionPending, error: sessionError } = useSession()
+
+  // DEBUG: Remove after fixing
+  console.log('[Login Debug]', { session, isSessionPending, sessionError, isRedirecting })
 
   // Handle session changes - redirect when logged in
   useEffect(() => {
