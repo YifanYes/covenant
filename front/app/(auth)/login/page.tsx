@@ -39,7 +39,7 @@ export default function Login() {
 
       const redirectTo = searchParams.get('redirect_to')
 
-      if (redirectTo) {
+      if (redirectTo && redirectTo !== '/login') {
         router.push(redirectTo)
       } else {
         queryClient.fetchQuery(trpcOptions.character.hasCharacter.queryOptions())

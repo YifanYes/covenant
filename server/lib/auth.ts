@@ -44,7 +44,7 @@ export const auth = betterAuth({
       ? {
           defaultCookieAttributes: {
             domain: '.arq-game.com',
-            sameSite: 'lax',
+            sameSite: 'none',
             secure: true
           },
           trustProxy: true
