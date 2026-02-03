@@ -12,7 +12,8 @@ import { ServiceFactory } from './services/service.factory'
 const server = fastify({
   routerOptions: {
     maxParamLength: 5000
-  }
+  },
+  trustProxy: env.NODE_ENV === 'prod'
 })
 
 async function startServer() {
@@ -33,7 +34,7 @@ async function startServer() {
       url: '/api/auth/*',
       async handler(request, reply) {
         try {
-          const url = new URL(request.url, `http://${request.headers.host}`)
+          const url = new URL(request.url, `${request.protocol}://${request.headers.host}`)
 
           const headers = new Headers()
           Object.entries(request.headers).forEach(([key, value]) => {
