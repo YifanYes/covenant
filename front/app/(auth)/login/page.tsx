@@ -154,7 +154,7 @@ export default function Login() {
           )}
         </div>
         {/* Hidden link for programmatic navigation */}
-        {redirectTarget && <NextLink ref={redirectLinkRef} href={redirectTarget} className="hidden" replace />}
+        {redirectTarget && <a ref={redirectLinkRef} href={redirectTarget} className="hidden" aria-hidden />}
       </div>
     )
   }
