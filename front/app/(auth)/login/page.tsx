@@ -45,7 +45,8 @@ export default function Login() {
 
       if (redirectTo && redirectTo !== '/login') {
         console.log('[Login] Redirecting to:', redirectTo)
-        router.replace(redirectTo)
+        // Use window.location for reliable navigation
+        window.location.assign(redirectTo)
       } else {
         console.log('[Login] No redirect_to, checking character...')
         queryClient
@@ -53,15 +54,15 @@ export default function Login() {
           .then(({ hasCharacter }) => {
             const target = hasCharacter ? '/dashboard' : '/onboarding'
             console.log('[Login] Character check done, redirecting to:', target)
-            router.replace(target)
+            window.location.assign(target)
           })
           .catch((err) => {
             console.error('[Login] Character check failed:', err)
-            router.replace('/dashboard')
+            window.location.assign('/dashboard')
           })
       }
     }
-  }, [session, updateUserInfo, router, searchParams, isRedirecting])
+  }, [session, updateUserInfo, searchParams, isRedirecting])
 
   // Check for error in URL params (from magic link failure)
   const urlError = useMemo(() => {
@@ -114,14 +115,20 @@ export default function Login() {
     [searchParams]
   )
 
-  const [randomQuoteIndex] = useState(() => Math.random())
+  // Use null as initial value to match SSR, then set random value after mount
+  const [randomQuoteIndex, setRandomQuoteIndex] = useState<number | null>(null)
+
+  useEffect(() => {
+    setRandomQuoteIndex(Math.random())
+  }, [])
 
   const verifyingMessage = useMemo(() => {
     const messages = t('login.verifying_messages', { returnObjects: true }) as string[]
-    if (Array.isArray(messages) && messages.length > 0) {
+    // Only show random message if randomQuoteIndex has been set (after mount)
+    if (Array.isArray(messages) && messages.length > 0 && randomQuoteIndex !== null) {
       return messages[Math.floor(randomQuoteIndex * messages.length)]
     }
-    return t('login.verifying_title')
+    return null
   }, [t, randomQuoteIndex])
 
   // Show loading while checking session or redirecting
@@ -131,7 +138,11 @@ export default function Login() {
         <Loader className="h-10 w-10 animate-spin" />
         <div className="flex flex-col items-center gap-2 text-center">
           <h2 className="text-xl font-semibold">{t('login.verifying_title')}</h2>
-          <p className="text-muted-foreground text-sm">{verifyingMessage}</p>
+          {verifyingMessage ? (
+            <p className="text-muted-foreground text-sm">{verifyingMessage}</p>
+          ) : (
+            <div className="bg-muted h-4 w-48 animate-pulse rounded" />
+          )}
         </div>
       </div>
     )
