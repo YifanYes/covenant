@@ -10,7 +10,7 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Alert, Check, Loader, Mail } from '@nsmr/pixelart-react'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { startTransition, useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -45,7 +45,9 @@ export default function Login() {
 
       if (redirectTo && redirectTo !== '/login') {
         console.log('[Login] Redirecting to:', redirectTo)
-        router.replace(redirectTo)
+        startTransition(() => {
+          router.replace(redirectTo)
+        })
       } else {
         console.log('[Login] No redirect_to, checking character...')
         queryClient
@@ -53,11 +55,15 @@ export default function Login() {
           .then(({ hasCharacter }) => {
             const target = hasCharacter ? '/dashboard' : '/onboarding'
             console.log('[Login] Character check done, redirecting to:', target)
-            router.replace(target)
+            startTransition(() => {
+              router.replace(target)
+            })
           })
           .catch((err) => {
             console.error('[Login] Character check failed:', err)
-            router.replace('/dashboard')
+            startTransition(() => {
+              router.replace('/dashboard')
+            })
           })
       }
     }
