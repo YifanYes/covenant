@@ -10,7 +10,7 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Alert, Check, Loader, Mail } from '@nsmr/pixelart-react'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { startTransition, useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -24,6 +24,8 @@ export default function Login() {
   const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
+  const [redirectTarget, setRedirectTarget] = useState<string | null>(null)
+  const redirectLinkRef = useRef<HTMLAnchorElement>(null)
 
   const { data: session, isPending: isSessionPending, error: sessionError } = useSession()
 
@@ -45,9 +47,7 @@ export default function Login() {
 
       if (redirectTo && redirectTo !== '/login') {
         console.log('[Login] Redirecting to:', redirectTo)
-        startTransition(() => {
-          router.replace(redirectTo)
-        })
+        setRedirectTarget(redirectTo)
       } else {
         console.log('[Login] No redirect_to, checking character...')
         queryClient
@@ -55,19 +55,23 @@ export default function Login() {
           .then(({ hasCharacter }) => {
             const target = hasCharacter ? '/dashboard' : '/onboarding'
             console.log('[Login] Character check done, redirecting to:', target)
-            startTransition(() => {
-              router.replace(target)
-            })
+            setRedirectTarget(target)
           })
           .catch((err) => {
             console.error('[Login] Character check failed:', err)
-            startTransition(() => {
-              router.replace('/dashboard')
-            })
+            setRedirectTarget('/dashboard')
           })
       }
     }
-  }, [session, updateUserInfo, router, searchParams, isRedirecting])
+  }, [session, updateUserInfo, searchParams, isRedirecting])
+
+  // When redirectTarget is set, click the hidden link
+  useEffect(() => {
+    if (redirectTarget && redirectLinkRef.current) {
+      console.log('[Login] Clicking hidden link to:', redirectTarget)
+      redirectLinkRef.current.click()
+    }
+  }, [redirectTarget])
 
   // Check for error in URL params (from magic link failure)
   const urlError = useMemo(() => {
@@ -149,6 +153,8 @@ export default function Login() {
             <div className="bg-muted h-4 w-48 animate-pulse rounded" />
           )}
         </div>
+        {/* Hidden link for programmatic navigation */}
+        {redirectTarget && <NextLink ref={redirectLinkRef} href={redirectTarget} className="hidden" replace />}
       </div>
     )
   }
