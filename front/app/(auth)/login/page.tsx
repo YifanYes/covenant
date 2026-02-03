@@ -45,8 +45,7 @@ export default function Login() {
 
       if (redirectTo && redirectTo !== '/login') {
         console.log('[Login] Redirecting to:', redirectTo)
-        // Use window.location for reliable navigation
-        window.location.assign(redirectTo)
+        router.replace(redirectTo)
       } else {
         console.log('[Login] No redirect_to, checking character...')
         queryClient
@@ -54,15 +53,15 @@ export default function Login() {
           .then(({ hasCharacter }) => {
             const target = hasCharacter ? '/dashboard' : '/onboarding'
             console.log('[Login] Character check done, redirecting to:', target)
-            window.location.assign(target)
+            router.replace(target)
           })
           .catch((err) => {
             console.error('[Login] Character check failed:', err)
-            window.location.assign('/dashboard')
+            router.replace('/dashboard')
           })
       }
     }
-  }, [session, updateUserInfo, searchParams, isRedirecting])
+  }, [session, updateUserInfo, router, searchParams, isRedirecting])
 
   // Check for error in URL params (from magic link failure)
   const urlError = useMemo(() => {
