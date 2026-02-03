@@ -38,6 +38,18 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24
+  },
+  advanced: {
+    ...(env.NODE_ENV === 'prod'
+      ? {
+          defaultCookieAttributes: {
+            domain: '.arq-game.com',
+            sameSite: 'lax',
+            secure: true
+          },
+          trustProxy: true
+        }
+      : {})
   }
 })
 
