@@ -6,7 +6,7 @@ import useFactionTheme from '@/hooks/use-faction-theme'
 import { useSession } from '@/lib/auth.lib'
 import { useAuthStore } from '@/stores/auth.store'
 import { Loader } from '@nsmr/pixelart-react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useEffect, useSyncExternalStore } from 'react'
 import ProductivityLayout from './productivity-layout'
 import RPGLayout from './rpg-layout'
@@ -17,21 +17,12 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
   const { data: session, isPending: isSessionPending } = useSession()
   const updateUserInfo = useAuthStore((state) => state.updateUserInfo)
   const pathname = usePathname()
-  const router = useRouter()
   const { factionClass } = useFactionTheme()
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
     () => false
   )
-
-  // Auth guard: redirect to login if not authenticated
-  useEffect(() => {
-    if (!isSessionPending && !session?.user) {
-      console.log('[WorkspaceLayout] No session, redirecting to login')
-      router.replace(`/login?redirect_to=${encodeURIComponent(pathname)}`)
-    }
-  }, [session, isSessionPending, router, pathname])
 
   useEffect(() => {
     if (session?.user) {
@@ -42,17 +33,8 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
     }
   }, [session, updateUserInfo])
 
-  // Show loading while checking auth
+  // Show loading while checking auth or not mounted
   if (!mounted || isSessionPending) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader className="h-10 w-10 animate-spin" />
-      </div>
-    )
-  }
-
-  // If no session after loading, don't render anything (redirect is happening)
-  if (!session?.user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader className="h-10 w-10 animate-spin" />
