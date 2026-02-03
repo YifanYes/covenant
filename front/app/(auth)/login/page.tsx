@@ -26,11 +26,17 @@ export default function Login() {
   const [isRedirecting, setIsRedirecting] = useState(false)
   const [redirectTarget, setRedirectTarget] = useState<string | null>(null)
   const redirectLinkRef = useRef<HTMLAnchorElement>(null)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Hydration guard - wait for client-side mount before using session
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const { data: session, isPending: isSessionPending, error: sessionError } = useSession()
 
   // DEBUG: Remove after fixing
-  console.log('[Login Debug]', { session, isSessionPending, sessionError, isRedirecting })
+  console.log('[Login Debug]', { session, isSessionPending, sessionError, isRedirecting, isMounted })
 
   // Handle session changes - redirect when logged in
   useEffect(() => {
@@ -140,8 +146,8 @@ export default function Login() {
     return null
   }, [t, randomQuoteIndex])
 
-  // Show loading while checking session or redirecting
-  if (isSessionPending || isRedirecting) {
+  // Show loading while not mounted, checking session or redirecting
+  if (!isMounted || isSessionPending || isRedirecting) {
     return (
       <div className="flex w-md flex-col items-center justify-center gap-6 py-8">
         <Loader className="h-10 w-10 animate-spin" />
