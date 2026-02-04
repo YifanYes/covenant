@@ -2,6 +2,7 @@ import { activityRouter } from './routers/activity.router'
 import { areasRouter } from './routers/areas.router'
 import { authRouter } from './routers/auth.router'
 import { characterRouter } from './routers/character.router'
+import { craftingRouter } from './routers/crafting.router'
 import { dashboardRouter } from './routers/dashboard.router'
 import { deadlineRouter } from './routers/deadline.router'
 import { habitsRouter } from './routers/habits.router'
@@ -29,6 +30,7 @@ export const appRouter = t.router({
   investment: investmentRouter,
   killRecord: killRecordRouter,
   store: storeRouter,
+  crafting: craftingRouter,
   deadline: deadlineRouter
 })
 

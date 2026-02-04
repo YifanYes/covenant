@@ -19,7 +19,7 @@
 - **Internacionalización**
   - [x] Soporte multi-idioma con i18next.
 
-## 🔜 Fase 2: Expansión de Mecánicas (Próximamente)
+## 🔜 Fase 2: Expansión de Mecánicas (Marzo 2026)
 
 - [x] Crear componentes base reutilizables `BaseFormDialog.tsx` y `BaseConfirmDialog.tsx`. Refactorizar diálogos CRUD para usar componentes base.
 - [x] Optimizar `index.css`. Actualmente tiene **4,058 bytes**. Usar más variables CSS de Tailwind y extraer tokens de diseño a un archivo separado.
@@ -49,33 +49,39 @@
   - [ ] Renderizar el personaje con los items equipados.
   - [ ] Definir accesorios
   - [ ] Definir decisiones de la historia
+  - [ ] Sistema de crafteo
+  - [ ] Sistema de moralidad
   - [x] Añadir tests
   - [x] Landing page
 
-## 🎯 Fase 2.5: Requisitos Beta (Próximo Hito)
+## 🎯 Fase 3: Requisitos Beta (Junio 2026)
 
 _Validar si el sistema se sostiene bajo uso real._
 
 ### Identidad Mecánica
+
 - [ ] **Afinidad dinámica:** Impacto real de la dualidad Forma/Vacío desde el primer momento.
 - [ ] **Progreso dual:** Diferenciación nítida entre disciplina (progreso) y entropía (corrupción).
 - [ ] **Forma vs Vacío:** Penalizaciones y fricción alineadas con la filosofía del juego.
 
 ### Onboarding Mínimo
+
 - [ ] **Introducción funcional:** Explicación del loop y consecuencias (evitar lore pesado).
 - [ ] **Estado inicial guiado:** Evitar decisiones irreversibles sin contexto previo.
 - [ ] **UI Anti-vacío:** Ninguna pantalla debe aparecer vacía o sin instrucciones.
 
 ### Telemetría y Control
+
 - [ ] **Logging:** Registro de eventos clave (progreso, abandono, errores críticos).
 - [ ] **Wipe Tools:** Herramientas para resetear el progreso de usuarios beta.
 - [ ] **Rollback:** Capacidad de rollback o wipe controlado ante fallos graves.
 
 ### Alcance y Calidad
+
 - [ ] **Sistemas terminados:** Ninguna funcionalidad "a medio hacer" expuesta al usuario.
 - [ ] **Foco absoluto:** Eliminar cualquier elemento que no contribuya a validar el core.
 
-## 🔮 Fase 3: Características Avanzadas (Futuro)
+## 🔮 Fase 4: Características Avanzadas (Futuro)
 
 - [ ] Módulo de journaling
 - [ ] **Sistema PvP**: Duelos entre jugadores usando el sistema de dados

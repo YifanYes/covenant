@@ -1,30 +1,30 @@
 'use client'
 
-import { create } from 'zustand'
-import type {
-  TacticalCombatState,
-  TacticalAction,
-  GridPosition,
-  TacticalUnit,
-  TileState,
-  HighlightedTile,
-  TacticalPhase,
-  TacticalInitData,
-  TacticalStateData,
-  TerrainType
-} from '@shared/types/tactical-combat.types'
 import {
-  calculateMovementRange as calcMoveRange,
   calculateAttackRange as calcAttackRange,
-  calculatePath,
-  getPathCost,
-  calculateDoctrineRange,
+  calculateMovementRange as calcMoveRange,
   calculateAoEArea,
-  findUnitsInAoE
+  calculateDoctrineRange,
+  calculatePath,
+  findUnitsInAoE,
+  getPathCost
 } from '@/lib/phaser/systems/pathfinding'
-import { getEnemy } from '@shared/constants/enemies'
 import { DOCTRINES } from '@shared/constants/doctrines'
+import { getEnemy } from '@shared/constants/enemies'
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
+import type {
+  GridPosition,
+  HighlightedTile,
+  TacticalAction,
+  TacticalCombatState,
+  TacticalInitData,
+  TacticalPhase,
+  TacticalStateData,
+  TacticalUnit,
+  TerrainType,
+  TileState
+} from '@shared/types/tactical-combat.types'
+import { create } from 'zustand'
 
 // Next enemy data returned from server when enemy is defeated
 interface NextEnemyData {
@@ -77,6 +77,9 @@ interface DoctrineAnimationData {
     statusApplied?: string
     killed?: boolean
   }[]
+  // Data for the next enemy if one was spawned
+  nextEnemy?: NextEnemyData
+  goldReward?: number
 }
 
 interface TacticalCombatStore extends TacticalCombatState {
@@ -104,11 +107,7 @@ interface TacticalCombatStore extends TacticalCombatState {
   // Actions
   setSceneReady: (ready: boolean) => void
   initializeCombat: (data: TacticalInitData, participationId?: string) => void
-  hydrateFromState: (
-    persistedState: TacticalStateData,
-    unitTemplates: TacticalUnit[],
-    participationId: string
-  ) => void
+  hydrateFromState: (persistedState: TacticalStateData, unitTemplates: TacticalUnit[], participationId: string) => void
   setParticipationId: (id: string | null) => void
   selectTile: (position: GridPosition) => void
   setHoveredTile: (position: GridPosition | null) => void
@@ -330,11 +329,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     })
   },
 
-  hydrateFromState: (
-    persistedState: TacticalStateData,
-    unitTemplates: TacticalUnit[],
-    participationId: string
-  ) => {
+  hydrateFromState: (persistedState: TacticalStateData, unitTemplates: TacticalUnit[], participationId: string) => {
     // Merge persisted unit state with full unit templates
     // Filter out units that don't have a matching template (graceful degradation)
     const hydratedUnits: TacticalUnit[] = []
@@ -440,13 +435,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
 
         if (isInMoveRange && activeUnit) {
           // Calculate path to destination
-          const path = calculatePath(
-            activeUnit.position,
-            position,
-            tiles,
-            allUnits,
-            activeUnit.isPlayer
-          )
+          const path = calculatePath(activeUnit.position, position, tiles, allUnits, activeUnit.isPlayer)
 
           if (path.length > 0) {
             // Validate path cost is within movement range
@@ -511,8 +500,8 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
             )
 
             // Update highlights to show AoE preview
-            const doctrineRangeHighlights = highlightedTiles.filter(h => h.type === 'DOCTRINE')
-            const aoeHighlights: HighlightedTile[] = aoeArea.map(pos => ({
+            const doctrineRangeHighlights = highlightedTiles.filter((h) => h.type === 'DOCTRINE')
+            const aoeHighlights: HighlightedTile[] = aoeArea.map((pos) => ({
               position: pos,
               type: 'SELECTED' as const
             }))
@@ -599,17 +588,10 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
 
       case 'attack':
         // Calculate attack range (simple Manhattan distance, no terrain blocking)
-        const attackTiles = calcAttackRange(
-          activeUnit.position,
-          activeUnit.attackRange,
-          gridWidth,
-          gridHeight
-        )
+        const attackTiles = calcAttackRange(activeUnit.position, activeUnit.attackRange, gridWidth, gridHeight)
         // Filter to only highlight tiles with enemies
         const tilesWithEnemies = attackTiles.filter((pos) => {
-          const enemy = enemyUnits.find(
-            (u) => u.position.x === pos.x && u.position.y === pos.y
-          )
+          const enemy = enemyUnits.find((u) => u.position.x === pos.x && u.position.y === pos.y)
           return enemy !== undefined
         })
         set({
@@ -773,12 +755,8 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       selectedTile: null,
       highlightedTiles: [],
       pendingAction: null,
-      playerUnits: state.playerUnits.map(
-        (u) => (u.id === nextUnit?.id ? resetUnit(u) : u)
-      ),
-      enemyUnits: state.enemyUnits.map(
-        (u) => (u.id === nextUnit?.id ? resetUnit(u) : u)
-      )
+      playerUnits: state.playerUnits.map((u) => (u.id === nextUnit?.id ? resetUnit(u) : u)),
+      enemyUnits: state.enemyUnits.map((u) => (u.id === nextUnit?.id ? resetUnit(u) : u))
     }))
   },
 
@@ -792,12 +770,8 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
 
   updateUnit: (unitId: string, updates: Partial<TacticalUnit>) => {
     set((state) => ({
-      playerUnits: state.playerUnits.map((unit) =>
-        unit.id === unitId ? { ...unit, ...updates } : unit
-      ),
-      enemyUnits: state.enemyUnits.map((unit) =>
-        unit.id === unitId ? { ...unit, ...updates } : unit
-      )
+      playerUnits: state.playerUnits.map((unit) => (unit.id === unitId ? { ...unit, ...updates } : unit)),
+      enemyUnits: state.enemyUnits.map((unit) => (unit.id === unitId ? { ...unit, ...updates } : unit))
     }))
   },
 
@@ -944,7 +918,17 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   },
 
   completeAttackAnimation: () => {
-    const { attackAnimationData, playerUnits, enemyUnits, tiles, turnQueue, currentTurnIndex, gridWidth, gridHeight, activeUnitId } = get()
+    const {
+      attackAnimationData,
+      playerUnits,
+      enemyUnits,
+      tiles,
+      turnQueue,
+      currentTurnIndex,
+      gridWidth,
+      gridHeight,
+      activeUnitId
+    } = get()
 
     if (!attackAnimationData) {
       set({
@@ -955,10 +939,11 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       return
     }
 
-    const { targetId, damageDealt, targetKilled, attackerId, damageToAttacker, attackerKilled, nextEnemy } = attackAnimationData
+    const { targetId, damageDealt, targetKilled, attackerId, damageToAttacker, attackerKilled, nextEnemy } =
+      attackAnimationData
 
     // Apply damage to target
-    let updatedPlayerUnits = playerUnits.map((unit) => {
+    const updatedPlayerUnits = playerUnits.map((unit) => {
       if (unit.id === targetId) {
         return {
           ...unit,
@@ -1028,12 +1013,12 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     // Check if it was an enemy that attacked
     const wasEnemyAttack = attackerId && !attackerId.startsWith('player-')
 
-    // If a next enemy was spawned (enemy defeated by player), reinitialize combat
+    // If a next enemy was spawned (enemy defeated by player), add new enemy while preserving player position
     if (nextEnemy && targetKilled && !wasEnemyAttack) {
       const playerUnit = updatedPlayerUnits[0]
       if (playerUnit) {
-        // Reset player position
-        const playerPosition = { x: 1, y: 3 }
+        // Preserve player's current position
+        const playerPosition = playerUnit.position
         const enemyPosition = { x: 6, y: 3 }
 
         // Create fresh grid
@@ -1172,7 +1157,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   ) => {
     const { playerUnits, enemyUnits, tiles } = get()
 
-    let updatedPlayerUnits = playerUnits.map((unit) => {
+    const updatedPlayerUnits = playerUnits.map((unit) => {
       if (unit.id === targetId) {
         return { ...unit, currentHealth: Math.max(0, unit.currentHealth - damage) }
       }
@@ -1329,12 +1314,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     if (!activeUnit) return
 
     // Calculate doctrine range
-    const doctrineTiles = calculateDoctrineRange(
-      activeUnit.position,
-      doctrineId,
-      gridWidth,
-      gridHeight
-    )
+    const doctrineTiles = calculateDoctrineRange(activeUnit.position, doctrineId, gridWidth, gridHeight)
 
     set({
       phase: 'select_target',
@@ -1369,7 +1349,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
   },
 
   completeDoctrineAnimation: () => {
-    const { doctrineAnimationData, playerUnits, enemyUnits, tiles, turnQueue, currentTurnIndex } = get()
+    const { doctrineAnimationData, playerUnits, enemyUnits, tiles, turnQueue, currentTurnIndex, gridWidth, gridHeight } = get()
 
     if (!doctrineAnimationData) {
       set({
@@ -1381,12 +1361,15 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       return
     }
 
-    const { effects, casterId } = doctrineAnimationData
+    const { effects, casterId, nextEnemy } = doctrineAnimationData
 
     // Apply effects to units
     let updatedPlayerUnits = [...playerUnits]
     let updatedEnemyUnits = [...enemyUnits]
     const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })))
+
+    // Track if any enemy was killed
+    let enemyKilled = false
 
     for (const effect of effects) {
       const { unitId, damageDealt, healthRestored, killed, statusApplied } = effect
@@ -1453,11 +1436,93 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
         const isPlayerUnit = unitId.startsWith('player-')
         if (!isPlayerUnit) {
           updatedEnemyUnits = updatedEnemyUnits.filter((u) => u.id !== unitId)
+          enemyKilled = true
         }
       }
     }
 
-    // Update turn queue to remove dead units
+    // If a next enemy was spawned (enemy defeated by doctrine), add new enemy while preserving player position
+    if (nextEnemy && enemyKilled) {
+      const playerUnit = updatedPlayerUnits[0]
+      if (playerUnit) {
+        // Preserve player's current position
+        const playerPosition = playerUnit.position
+        const enemyPosition = { x: 6, y: 3 }
+
+        // Create fresh grid
+        const freshTiles: TileState[][] = []
+        for (let y = 0; y < gridHeight; y++) {
+          freshTiles[y] = []
+          for (let x = 0; x < gridWidth; x++) {
+            let terrain: TerrainType = 'GRASS'
+            if (x === 0 || x === gridWidth - 1 || y === 0 || y === gridHeight - 1) {
+              terrain = 'STONE'
+            }
+            freshTiles[y][x] = {
+              position: { x, y },
+              terrain,
+              occupantId: null,
+              isWalkable: true
+            }
+          }
+        }
+
+        // Set occupants
+        freshTiles[playerPosition.y][playerPosition.x].occupantId = playerUnit.id
+        freshTiles[enemyPosition.y][enemyPosition.x].occupantId = nextEnemy.id
+
+        // Reset player
+        const resetPlayer: TacticalUnit = {
+          ...playerUnit,
+          position: playerPosition,
+          hasMoved: false,
+          hasActed: false
+        }
+
+        // Create new enemy unit with sprite from template
+        const enemyTemplate = getEnemy(nextEnemy.templateId)
+        const newEnemyUnit: TacticalUnit = {
+          id: nextEnemy.id,
+          templateId: nextEnemy.templateId,
+          name: nextEnemy.name,
+          position: enemyPosition,
+          isPlayer: false,
+          spriteUrl: enemyTemplate?.imageId ? `/assets/enemies/${enemyTemplate.imageId}.png` : undefined,
+          currentHealth: nextEnemy.currentHealth,
+          maxHealth: nextEnemy.maxHealth,
+          currentMana: 0,
+          maxMana: 0,
+          movementRange: 2,
+          attackRange: enemyTemplate?.attackDice ?? 1,
+          speed: 1,
+          hasMoved: false,
+          hasActed: false,
+          activeEffects: []
+        }
+
+        const newTurnQueue = [resetPlayer, newEnemyUnit]
+
+        set({
+          tiles: freshTiles,
+          playerUnits: [resetPlayer],
+          enemyUnits: [newEnemyUnit],
+          turnQueue: newTurnQueue,
+          currentTurnIndex: 0,
+          activeUnitId: resetPlayer.id,
+          turnNumber: 1,
+          isDoctrineAnimating: false,
+          doctrineAnimationData: null,
+          selectedDoctrineId: null,
+          pendingAction: null,
+          phase: 'select_action',
+          selectedTile: null,
+          highlightedTiles: []
+        })
+        return
+      }
+    }
+
+    // Standard flow: update turn queue to remove dead units
     const allAliveUnits = [...updatedPlayerUnits, ...updatedEnemyUnits]
     const aliveUnitIds = new Set(allAliveUnits.map((u) => u.id))
     const updatedTurnQueue = turnQueue.filter((u) => aliveUnitIds.has(u.id))
@@ -1529,8 +1594,10 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       if (!doctrine) continue
 
       for (const doctrineEffect of doctrine.effects) {
-        if (doctrineEffect.type === DoctrineEffectType.POWER_MODIFIER &&
-            doctrineEffect.target === DoctrineTarget.SELF) {
+        if (
+          doctrineEffect.type === DoctrineEffectType.POWER_MODIFIER &&
+          doctrineEffect.target === DoctrineTarget.SELF
+        ) {
           bonusDice += doctrineEffect.value || 0
 
           // Check if this effect has the sixesGenerateExtraHits property
@@ -1557,9 +1624,10 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
           if (!doctrine) return false
 
           // Check if this is a self-buff POWER_MODIFIER - these get consumed on attack
-          const isSelfBuff = doctrine.effects.some(
-            (e) => e.type === DoctrineEffectType.POWER_MODIFIER && e.target === DoctrineTarget.SELF
-          ) && !doctrine.aoePattern
+          const isSelfBuff =
+            doctrine.effects.some(
+              (e) => e.type === DoctrineEffectType.POWER_MODIFIER && e.target === DoctrineTarget.SELF
+            ) && !doctrine.aoePattern
 
           // Keep non-self-buff effects
           return !isSelfBuff
@@ -1576,4 +1644,3 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
     set({ playerUnits: updatedPlayerUnits })
   }
 }))
-

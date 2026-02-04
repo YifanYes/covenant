@@ -29,6 +29,7 @@ export interface CharacterType {
   gold: number
   inventory: any
   loadout: any
+  materials: any
   createdAt: Date
   updatedAt: Date
 }

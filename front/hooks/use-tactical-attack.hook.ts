@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { trpc, queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
+import { getMaterialById } from '@shared/constants/materials'
 
 interface AttackParams {
   attackRolls: number[]
@@ -115,7 +116,21 @@ export function useTacticalAttack() {
           const enemyName = target.name.includes('|')
             ? target.name.split('|').map((part) => t(part)).join(' ')
             : target.name
-          toast.success(t('combat.enemy_defeated_reward', { enemy: enemyName, gold: result.goldReward }))
+
+          // Build material drops description if any
+          let materialDescription: string | undefined
+          if (result.materialDrops && result.materialDrops.length > 0) {
+            const materialNames = result.materialDrops.map((drop) => {
+              const material = getMaterialById(drop.materialId)
+              const name = material ? t(material.nameKey) : drop.materialId
+              return `+${drop.quantity} ${name}`
+            })
+            materialDescription = materialNames.join(', ')
+          }
+
+          toast.success(t('combat.enemy_defeated_reward', { enemy: enemyName, gold: result.goldReward }), {
+            description: materialDescription
+          })
         }
 
         // Invalidate queries to refresh data

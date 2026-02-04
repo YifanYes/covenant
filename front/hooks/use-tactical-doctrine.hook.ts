@@ -8,6 +8,7 @@ import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
 import { DOCTRINES } from '@shared/constants/doctrines'
 import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
 import { calculateAoEArea, findUnitsInAoE } from '@/lib/phaser/systems/pathfinding'
+import { getMaterialById } from '@shared/constants/materials'
 
 /**
  * Hook to handle tactical doctrine usage with AoE targeting.
@@ -88,14 +89,46 @@ export function useTacticalDoctrine() {
 
       if (result.success) {
         // Server confirmed - trigger the doctrine animation
+        // Include nextEnemy data so the store can spawn the new enemy after animation completes
         startDoctrineAnimation({
           casterId: activeUnitId,
           doctrineId: selectedDoctrineId,
           targetPosition: pendingAction.targetPosition,
           affectedTiles: result.affectedTiles,
           affectedUnitIds: result.affectedUnitIds,
-          effects: result.effects
+          effects: result.effects,
+          nextEnemy: result.nextEnemy,
+          goldReward: result.goldReward
         })
+
+        // Show toast when enemy is defeated with gold reward
+        if (result.goldReward) {
+          // Find the killed enemy's name
+          const killedEffect = result.effects.find((e) => e.killed)
+          if (killedEffect) {
+            const target = enemyUnits.find((u) => u.id === killedEffect.unitId)
+            if (target) {
+              const enemyName = target.name.includes('|')
+                ? target.name.split('|').map((part) => t(part)).join(' ')
+                : target.name
+
+              // Build material drops description if any
+              let materialDescription: string | undefined
+              if (result.materialDrops && result.materialDrops.length > 0) {
+                const materialNames = result.materialDrops.map((drop) => {
+                  const material = getMaterialById(drop.materialId)
+                  const name = material ? t(material.nameKey) : drop.materialId
+                  return `+${drop.quantity} ${name}`
+                })
+                materialDescription = materialNames.join(', ')
+              }
+
+              toast.success(t('combat.enemy_defeated_reward', { enemy: enemyName, gold: result.goldReward }), {
+                description: materialDescription
+              })
+            }
+          }
+        }
 
         // Invalidate queries to refresh data (mana and combat log)
         queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
@@ -104,7 +137,9 @@ export function useTacticalDoctrine() {
         return {
           success: true,
           affectedUnitIds: result.affectedUnitIds,
-          effects: result.effects
+          effects: result.effects,
+          goldReward: result.goldReward,
+          nextEnemy: result.nextEnemy
         }
       }
 
@@ -129,6 +164,7 @@ export function useTacticalDoctrine() {
     pendingAction,
     activeUnitId,
     playerUnits,
+    enemyUnits,
     selectedDoctrineId,
     executeTacticalDoctrineMutation,
     startDoctrineAnimation,

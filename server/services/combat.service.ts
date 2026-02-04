@@ -9,7 +9,8 @@ import { getActivityById, selectEnemyWithFallback } from '@shared/constants/acti
 import { applyStatScaling, calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import { generateEncounterSequence, getNextEncounterSlot, type ResolvedEncounterSlot } from '@shared/constants/encounter-patterns'
-import { getConsumableById } from '@shared/constants/items'
+import { getConsumableById, WeaponDamageType } from '@shared/constants/items'
+import { getEnemyTypeFromTemplate, rollMaterialDrops, type MaterialDrop } from '@shared/constants/drop-tables'
 
 interface EncounterState {
   encounterPattern: ResolvedEncounterSlot[]
@@ -794,6 +795,7 @@ export class CombatService {
 
     // Sync CombatEnemy record and handle defeat
     let goldReward = 0
+    let materialDrops: MaterialDrop[] = []
     let nextEnemy: { id: string; templateId: string; name: string; currentHealth: number; maxHealth: number } | undefined
 
     if (this.combatEnemyRepository) {
@@ -835,6 +837,23 @@ export class CombatService {
               await this.characterRepository.addGold(participation.characterId, goldReward)
             }
 
+            // Roll for material drops based on enemy type
+            if (participation?.characterId && enemyTemplate) {
+              const enemyType = getEnemyTypeFromTemplate(activeEnemy.templateId)
+              // Determine damage type from enemy template if available
+              const enemyDamageType = enemyTemplate.damageType as WeaponDamageType | undefined
+              materialDrops = rollMaterialDrops(enemyType, enemyDamageType)
+
+              // Add materials to character
+              if (materialDrops.length > 0) {
+                const materialsToAdd: Record<string, number> = {}
+                for (const drop of materialDrops) {
+                  materialsToAdd[drop.materialId] = (materialsToAdd[drop.materialId] || 0) + drop.quantity
+                }
+                await this.characterRepository.addMaterials(participation.characterId, materialsToAdd)
+              }
+            }
+
             if (participation?.activityId) {
               // Update activity progress
               await this.activityRepository.updateProgress(participation.activityId, 1)
@@ -844,8 +863,8 @@ export class CombatService {
               if (activity) {
                 const config = getActivityById(activity.activityId)
 
-                // Check if activity is complete
-                const isActivityCompleted = activity.progress + 1 >= activity.target
+                // Check if activity is complete (progress was already incremented by updateProgress)
+                const isActivityCompleted = activity.progress >= activity.target
 
                 if (!isActivityCompleted && config) {
                   // Get character tier for encounter system
@@ -953,6 +972,7 @@ export class CombatService {
       counterDefenseRolls,
       logEntries,
       goldReward,
+      materialDrops: materialDrops.length > 0 ? materialDrops : undefined,
       nextEnemy,
       selfDamageFromOnes: selfDamageFromOnes > 0 ? selfDamageFromOnes : undefined
     }
@@ -2330,8 +2350,15 @@ export class CombatService {
     // Save tactical state to database
     await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
 
-    // Save combat log entries
-    if (this.combatEnemyRepository && logEntries.length > 0) {
+    // Handle enemy defeats and spawn next enemy
+    let goldReward = 0
+    let materialDrops: MaterialDrop[] = []
+    let nextEnemy: { id: string; templateId: string; name: string; currentHealth: number; maxHealth: number } | undefined
+
+    // Check if any enemy was killed
+    const killedEnemyEffects = effects.filter((e) => e.killed && !e.unitId.startsWith('player-'))
+
+    if (this.combatEnemyRepository) {
       let activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
 
       // Fallback: if no active enemy found by status, try finding by ID from tactical state
@@ -2343,7 +2370,144 @@ export class CombatService {
       }
 
       if (activeEnemy) {
+        // Append combat log entries
         await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+
+        // Handle enemy defeat
+        if (killedEnemyEffects.length > 0) {
+          // Mark enemy as defeated
+          await this.combatEnemyRepository.defeatEnemy(activeEnemy.id)
+
+          // Get enemy template for gold calculation
+          const enemyTemplate = getEnemy(activeEnemy.templateId)
+          if (enemyTemplate) {
+            goldReward = calculateGoldReward(enemyTemplate)
+          }
+
+          // Update participation stats (kills, gold)
+          if (this.activityRepository) {
+            await this.activityRepository.updateParticipation(participationId, 1, goldReward)
+
+            // Get participation to find the activity
+            const fullParticipation = await this.activityParticipationRepository.findByIdWithActivity(participationId)
+
+            // Add gold to character's balance
+            if (fullParticipation?.characterId && goldReward > 0) {
+              await this.characterRepository.addGold(fullParticipation.characterId, goldReward)
+            }
+
+            // Roll for material drops based on enemy type
+            if (fullParticipation?.characterId && enemyTemplate) {
+              const enemyType = getEnemyTypeFromTemplate(activeEnemy.templateId)
+              const enemyDamageType = enemyTemplate.damageType as WeaponDamageType | undefined
+              materialDrops = rollMaterialDrops(enemyType, enemyDamageType)
+
+              // Add materials to character
+              if (materialDrops.length > 0) {
+                const materialsToAdd: Record<string, number> = {}
+                for (const drop of materialDrops) {
+                  materialsToAdd[drop.materialId] = (materialsToAdd[drop.materialId] || 0) + drop.quantity
+                }
+                await this.characterRepository.addMaterials(fullParticipation.characterId, materialsToAdd)
+              }
+            }
+
+            if (fullParticipation?.activityId) {
+              // Update activity progress
+              await this.activityRepository.updateProgress(fullParticipation.activityId, 1)
+
+              // Get activity config to spawn next enemy
+              const activity = await this.activityRepository.getActivityById(fullParticipation.activityId)
+              if (activity) {
+                const config = getActivityById(activity.activityId)
+
+                // Check if activity is complete
+                const isActivityCompleted = activity.progress >= activity.target
+
+                if (!isActivityCompleted && config) {
+                  // Get character tier for encounter system
+                  const character = await this.characterRepository.findByIdWithClasses(fullParticipation.characterId)
+                  const currentClass = character?.classes.find((c) => c.className === character.currentClass)
+                  const characterTier = currentClass?.tier || 1
+
+                  // Get or update encounter state
+                  let combatStats = await this.activityParticipationRepository.getCombatStats(participationId)
+                  let encounterState = combatStats as EncounterState | null
+
+                  // Generate new encounter pattern if needed
+                  if (!encounterState || !encounterState.encounterPattern) {
+                    const encounterPattern = generateEncounterSequence(characterTier)
+                    encounterState = {
+                      encounterPattern,
+                      encounterIndex: 0,
+                      sessionStartedAt: new Date().toISOString()
+                    }
+                  } else {
+                    // Advance to next encounter slot
+                    encounterState = {
+                      ...encounterState,
+                      encounterIndex: encounterState.encounterIndex + 1
+                    }
+                  }
+
+                  // Save updated encounter state
+                  await this.activityParticipationRepository.updateCombatStats(participationId, encounterState)
+
+                  // Get the current encounter slot
+                  const currentSlot = getNextEncounterSlot(encounterState.encounterPattern, encounterState.encounterIndex)
+                  const requiredType = currentSlot?.type
+
+                  // Select next enemy
+                  const selected = selectEnemyWithFallback(config.enemySpawnWeights, characterTier, requiredType)
+
+                  if (selected) {
+                    // Apply stat scaling
+                    const scaledTemplate = applyStatScaling(selected.template, characterTier)
+                    const nameKeys = generateEnemyNameKeys(scaledTemplate.type)
+
+                    // Create new enemy in database
+                    const newEnemy = await this.combatEnemyRepository.createEnemy({
+                      participationId,
+                      templateId: selected.enemyId,
+                      namePrefix: nameKeys.prefix,
+                      nameSuffix: nameKeys.suffix,
+                      maxHealth: scaledTemplate.health,
+                      currentHealth: scaledTemplate.health
+                    })
+
+                    // Build enemy name
+                    const newEnemyName = `${nameKeys.prefix}|${nameKeys.suffix}`
+
+                    // Get the player unit from current state
+                    const playerUnit = updatedState.units.find((u) => u.id.startsWith('player-'))
+                    if (playerUnit) {
+                      // Create new tactical state with the new enemy
+                      const newTacticalState = this.createTacticalStateWithNewEnemy(
+                        updatedState,
+                        playerUnit,
+                        newEnemy.id,
+                        newEnemyName,
+                        { current: scaledTemplate.health, max: scaledTemplate.health }
+                      )
+
+                      // Save the new tactical state
+                      await this.activityParticipationRepository.updateTacticalState(participationId, newTacticalState)
+
+                      // Set the next enemy data for frontend
+                      nextEnemy = {
+                        id: newEnemy.id,
+                        templateId: selected.enemyId,
+                        name: newEnemyName,
+                        currentHealth: scaledTemplate.health,
+                        maxHealth: scaledTemplate.health
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
 
@@ -2359,7 +2523,10 @@ export class CombatService {
       updatedState,
       logEntries,
       manaRestored: manaRestored > 0 ? manaRestored : undefined,
-      selfDamage: selfDamage > 0 ? selfDamage : undefined
+      selfDamage: selfDamage > 0 ? selfDamage : undefined,
+      goldReward: goldReward > 0 ? goldReward : undefined,
+      materialDrops: materialDrops.length > 0 ? materialDrops : undefined,
+      nextEnemy
     }
   }
 
