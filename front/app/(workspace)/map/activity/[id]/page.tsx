@@ -23,7 +23,7 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -51,6 +51,7 @@ export default function ActivityDetailPage() {
 
   const [hasJoined, setHasJoined] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [isSpawning, setIsSpawning] = useState(false)
 
   // Build enemy state from participation data (reactive to query updates)
   const currentEnemy = useMemo((): EnemyState | null => {
@@ -87,9 +88,33 @@ export default function ActivityDetailPage() {
       toast.success(t('activities.success.start'))
       queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
       setHasJoined(true)
+      setIsSpawning(false)
     },
-    onError: (error) => toast.error(t('activities.error.start'), { description: error.message })
+    onError: (error) => {
+      toast.error(t('activities.error.start'), { description: error.message })
+      setIsSpawning(false)
+    }
   })
+
+  // Auto-spawn enemy when participating but no active enemy and activity not completed
+  const isActivityCompleted = activity ? activity.progress >= activity.target : false
+  const shouldSpawnEnemy =
+    activity &&
+    (activity.isParticipating || hasJoined) &&
+    !participation?.activeEnemy &&
+    !isActivityCompleted
+
+  // Use effect to trigger spawn when conditions are met
+  useEffect(() => {
+    if (shouldSpawnEnemy && !isSpawning && !joinMutation.isPending && activity) {
+      // Small delay to let React batch state updates and avoid race conditions
+      const timeoutId = setTimeout(() => {
+        setIsSpawning(true)
+        joinMutation.mutate({ activityId: activity.id, characterId: character.id })
+      }, 100)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [shouldSpawnEnemy, isSpawning, joinMutation.isPending, activity?.id, character.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!activity) {
     return (
@@ -224,6 +249,13 @@ export default function ActivityDetailPage() {
           mapId={getActivityById(activity.id)?.mapId}
           className="min-h-0 flex-1"
         />
+      )}
+
+      {/* Loading state while spawning enemy */}
+      {!currentEnemy && (activity.isParticipating || hasJoined) && !isActivityCompleted && (isSpawning || shouldSpawnEnemy) && (
+        <div className="flex min-h-0 flex-1 items-center justify-center">
+          <div className="text-muted-foreground animate-pulse">{t('combat.spawning_enemy')}</div>
+        </div>
       )}
     </div>
   )

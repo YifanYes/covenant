@@ -273,12 +273,22 @@ export default function TacticalCombatArena({
     // Wait for tactical state query to complete if we have a participationId
     if (participationId && isLoadingTacticalState) return
 
+    // Skip reinitialization if an animation is in progress (avoid race conditions)
+    const storeState = useTacticalCombatStore.getState()
+    if (storeState.isAttackAnimating || storeState.isDoctrineAnimating || storeState.animatingUnitId) {
+      return
+    }
+
+    // Preserve existing player position if available (for when new enemy spawns mid-combat)
+    const existingPlayerUnit = storeState.playerUnits[0]
+    const playerPosition = existingPlayerUnit?.position ?? { x: 1, y: 3 }
+
     // Create player unit template from character
     const playerUnit: TacticalUnit = {
       id: 'player-1',
       templateId: character.currentClass ?? 'player',
       name: character.name,
-      position: { x: 1, y: 3 }, // Default position, will be overridden if hydrating
+      position: playerPosition, // Use existing position if available
       isPlayer: true,
       spriteUrl: `/assets/classes/${character.currentClass}.png`,
       currentHealth: currentClass?.health ?? 100,
