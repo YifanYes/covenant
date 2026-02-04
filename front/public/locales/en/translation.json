@@ -270,6 +270,7 @@
     "enemies": "Enemies",
     "enemies_defeated": "Enemies Defeated",
     "enemy_defeated_reward": "{{enemy}} defeated! +{{gold}} gold",
+    "spawning_enemy": "Summoning next enemy...",
     "unknown_enemy": "Unknown Enemy",
     "error": {
       "attack": "Attack failed",
@@ -331,6 +332,154 @@
     "error": "Error loading data",
     "failed": "Failed",
     "loading": "Loading..."
+  },
+  "crafting": {
+    "title": "Crafting",
+    "subtitle": "Forge equipment and consumables from gathered materials",
+    "materials": "Materials",
+    "recipes": "Recipes",
+    "craft": "Craft",
+    "crafting": "Crafting...",
+    "ingredients": "Ingredients",
+    "result": "Result",
+    "gold_cost": "Gold Cost",
+    "tier_required": "Requires Tier {{tier}}",
+    "missing_materials": "Missing Materials",
+    "no_materials": "No materials yet",
+    "no_recipes": "No recipes available",
+    "tier": {
+      "title": "Tier {{tier}}",
+      "description_1": "Basic recipes for novice crafters. Requires common materials.",
+      "description_2": "Intermediate recipes with improved stats. Requires uncommon materials.",
+      "description_3": "Advanced recipes for expert crafters. Requires rare materials."
+    },
+    "filter": {
+      "all": "All",
+      "weapon": "Weapons",
+      "armor": "Armor",
+      "consumable": "Consumables",
+      "accessory": "Accessories"
+    },
+    "success": {
+      "craft": "Item crafted successfully!"
+    },
+    "error": {
+      "craft": "Failed to craft item",
+      "insufficient_materials": "Insufficient materials",
+      "insufficient_gold": "Insufficient gold"
+    }
+  },
+  "materials": {
+    "functional_steel": {
+      "name": "Functional Steel",
+      "description": "Common steel used in everyday equipment."
+    },
+    "willow_wood": {
+      "name": "Willow Wood",
+      "description": "Flexible wood that channels mana effectively."
+    },
+    "copper": {
+      "name": "Copper",
+      "description": "A conductive metal used in magical equipment."
+    },
+    "quartz_crystal": {
+      "name": "Quartz Crystal",
+      "description": "A rare crystal that amplifies magical energy."
+    },
+    "reinforced_steel": {
+      "name": "Reinforced Steel",
+      "description": "Treated steel with enhanced durability."
+    },
+    "cold_iron": {
+      "name": "Cold Iron",
+      "description": "Iron forged at low temperatures, effective against demons."
+    },
+    "sacred_steel": {
+      "name": "Sacred Steel",
+      "description": "Holy metal blessed by the Church."
+    },
+    "silver": {
+      "name": "Silver",
+      "description": "A noble metal with purifying properties."
+    },
+    "gold_material": {
+      "name": "Gold",
+      "description": "Precious metal that enhances magical conductivity."
+    },
+    "ether": {
+      "name": "Ether",
+      "description": "Crystallized magical essence from powerful beings."
+    },
+    "iridium": {
+      "name": "Iridium",
+      "description": "An extremely rare metal from special encounters."
+    }
+  },
+  "recipes": {
+    "health_potion": {
+      "name": "Health Potion",
+      "description": "Brew a batch of healing potions."
+    },
+    "mana_potion": {
+      "name": "Mana Potion",
+      "description": "Brew a batch of mana restoration potions."
+    },
+    "official_sabre": {
+      "name": "Officer's Sabre",
+      "description": "Forge an elegant officer's blade."
+    },
+    "great_war_axe": {
+      "name": "Great War Axe",
+      "description": "Forge a devastating two-handed axe."
+    },
+    "advanced_revolver": {
+      "name": "Advanced Revolver",
+      "description": "Craft a precision revolver with improved mechanisms."
+    },
+    "ebony_staff": {
+      "name": "Ebony Staff",
+      "description": "Craft a powerful staff from dark wood."
+    },
+    "arcanist_codex": {
+      "name": "Arcanist Codex",
+      "description": "Bind a tome of concentrated arcane power."
+    },
+    "cold_iron_armor": {
+      "name": "Cold Iron Armor",
+      "description": "Forge armor effective against demons."
+    },
+    "bronze_plate_armor": {
+      "name": "Bronze Plate Armor",
+      "description": "Craft armor attuned to magical energies."
+    },
+    "water_drop": {
+      "name": "Water Drop Blade",
+      "description": "Forge a legendary blade of unmatched speed."
+    },
+    "war_breaker": {
+      "name": "War Breaker",
+      "description": "Forge a massive weapon that shatters defenses."
+    },
+    "wind_color": {
+      "name": "Wind Color",
+      "description": "Craft a swift ranged weapon blessed by the winds."
+    },
+    "ether_whisper": {
+      "name": "Ether Whisper Wand",
+      "description": "Craft a wand that channels pure ether."
+    },
+    "compendium_of_truths": {
+      "name": "Compendium of Truths",
+      "description": "Inscribe the ultimate tome of arcane knowledge."
+    },
+    "gothic_armor": {
+      "name": "Gothic Armor",
+      "description": "Forge imposing plate armor of legendary protection."
+    },
+    "gold_plate_armor": {
+      "name": "Gold Plate Armor",
+      "description": "Craft ornate armor infused with magical gold."
+    }
   },
   "confirm": "Confirm",
   "confirm_delete_account_dialog": {
@@ -1319,6 +1468,7 @@
   "sidebar": {
     "calendar": "Calendar",
     "close": "Collapse menu",
+    "crafting": "Crafting",
     "dashboard": "Dashboard",
     "habits": "Habits",
     "inventory": "Inventory",
@@ -1370,13 +1520,21 @@
     "cart": "Cart",
     "empty_cart": "Your cart is empty",
     "error": {
-      "buy": "Failed to purchase items"
+      "buy": "Failed to purchase items",
+      "buy_material": "Failed to purchase material"
     },
     "filter": {
       "all_tiers": "All Tiers",
       "all_types": "All Types",
       "tier": "Tier",
       "type": "Type"
+    },
+    "materials": {
+      "title": "Materials",
+      "quantity": "Quantity",
+      "price_each": "{{price}}g each",
+      "total": "Total: {{total}}g",
+      "success": "Material purchased!"
     },
     "items_purchased": "items purchased",
     "no_items": "No items available",

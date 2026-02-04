@@ -83,6 +83,7 @@ model Character {
   inventory               Json?                    @default("[]")
   loadout                 Json?                    @default("[]")
   magicNature             String?                  @db.VarChar(50)
+  materials               Json?                    @default("{}")
   user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   activityParticipations  ActivityParticipation[]
   classes                 CharacterClass[]

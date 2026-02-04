@@ -270,6 +270,7 @@
     "enemies": "Enemigos",
     "enemies_defeated": "Enemigos Derrotados",
     "enemy_defeated_reward": "¡{{enemy}} derrotado! +{{gold}} oro",
+    "spawning_enemy": "Invocando siguiente enemigo...",
     "unknown_enemy": "Enemigo Desconocido",
     "error": {
       "attack": "El ataque falló",
@@ -331,6 +332,154 @@
     "error": "Error al cargar datos",
     "failed": "Fallida",
     "loading": "Cargando..."
+  },
+  "crafting": {
+    "title": "Forja",
+    "subtitle": "Forja equipo y consumibles con materiales recolectados",
+    "materials": "Materiales",
+    "recipes": "Recetas",
+    "craft": "Forjar",
+    "crafting": "Forjando...",
+    "ingredients": "Ingredientes",
+    "result": "Resultado",
+    "gold_cost": "Coste en Oro",
+    "tier_required": "Requiere Tier {{tier}}",
+    "missing_materials": "Materiales faltantes",
+    "no_materials": "Sin materiales aún",
+    "no_recipes": "No hay recetas disponibles",
+    "tier": {
+      "title": "Tier {{tier}}",
+      "description_1": "Recetas básicas para artesanos novatos. Requiere materiales comunes.",
+      "description_2": "Recetas intermedias con estadísticas mejoradas. Requiere materiales poco comunes.",
+      "description_3": "Recetas avanzadas para artesanos expertos. Requiere materiales raros."
+    },
+    "filter": {
+      "all": "Todos",
+      "weapon": "Armas",
+      "armor": "Armaduras",
+      "consumable": "Consumibles",
+      "accessory": "Accesorios"
+    },
+    "success": {
+      "craft": "¡Objeto forjado con éxito!"
+    },
+    "error": {
+      "craft": "Error al forjar objeto",
+      "insufficient_materials": "Materiales insuficientes",
+      "insufficient_gold": "Oro insuficiente"
+    }
+  },
+  "materials": {
+    "functional_steel": {
+      "name": "Acero Funcional",
+      "description": "Acero común usado en equipo cotidiano."
+    },
+    "willow_wood": {
+      "name": "Madera de Sauce",
+      "description": "Madera flexible que canaliza el maná eficientemente."
+    },
+    "copper": {
+      "name": "Cobre",
+      "description": "Un metal conductor usado en equipo mágico."
+    },
+    "quartz_crystal": {
+      "name": "Cristal de Cuarzo",
+      "description": "Un cristal raro que amplifica la energía mágica."
+    },
+    "reinforced_steel": {
+      "name": "Acero Reforzado",
+      "description": "Acero tratado con mayor durabilidad."
+    },
+    "cold_iron": {
+      "name": "Hierro Frío",
+      "description": "Hierro forjado a bajas temperaturas, efectivo contra demonios."
+    },
+    "sacred_steel": {
+      "name": "Acero Sagrado",
+      "description": "Metal santo bendecido por la Iglesia."
+    },
+    "silver": {
+      "name": "Plata",
+      "description": "Un metal noble con propiedades purificadoras."
+    },
+    "gold_material": {
+      "name": "Oro",
+      "description": "Metal precioso que mejora la conductividad mágica."
+    },
+    "ether": {
+      "name": "Éter",
+      "description": "Esencia mágica cristalizada de seres poderosos."
+    },
+    "iridium": {
+      "name": "Iridio",
+      "description": "Un metal extremadamente raro de encuentros especiales."
+    }
+  },
+  "recipes": {
+    "health_potion": {
+      "name": "Poción de Salud",
+      "description": "Prepara un lote de pociones curativas."
+    },
+    "mana_potion": {
+      "name": "Poción de Maná",
+      "description": "Prepara un lote de pociones de restauración de maná."
+    },
+    "official_sabre": {
+      "name": "Sable de Oficial",
+      "description": "Forja una elegante espada de oficial."
+    },
+    "great_war_axe": {
+      "name": "Gran Hacha de Guerra",
+      "description": "Forja un hacha a dos manos devastadora."
+    },
+    "advanced_revolver": {
+      "name": "Revólver Avanzado",
+      "description": "Fabrica un revólver de precisión con mecanismos mejorados."
+    },
+    "ebony_staff": {
+      "name": "Báculo de Ébano",
+      "description": "Fabrica un poderoso báculo de madera oscura."
+    },
+    "arcanist_codex": {
+      "name": "Códice del Arcanista",
+      "description": "Encuaderna un tomo de poder arcano concentrado."
+    },
+    "cold_iron_armor": {
+      "name": "Armadura de Hierro Frío",
+      "description": "Forja una armadura efectiva contra demonios."
+    },
+    "bronze_plate_armor": {
+      "name": "Armadura de Placas de Bronce",
+      "description": "Fabrica una armadura sintonizada con energías mágicas."
+    },
+    "water_drop": {
+      "name": "Gota de Agua",
+      "description": "Forja una espada legendaria de velocidad inigualable."
+    },
+    "war_breaker": {
+      "name": "Rompe Guerras",
+      "description": "Forja un arma masiva que destroza defensas."
+    },
+    "wind_color": {
+      "name": "Color del Viento",
+      "description": "Fabrica un arma a distancia bendecida por los vientos."
+    },
+    "ether_whisper": {
+      "name": "Susurro del Éter",
+      "description": "Fabrica una vara que canaliza éter puro."
+    },
+    "compendium_of_truths": {
+      "name": "Compendio de Verdades",
+      "description": "Inscribe el tomo definitivo de conocimiento arcano."
+    },
+    "gothic_armor": {
+      "name": "Armadura Gótica",
+      "description": "Forja una imponente armadura de placas de protección legendaria."
+    },
+    "gold_plate_armor": {
+      "name": "Armadura de Placas de Oro",
+      "description": "Fabrica una armadura ornamentada infundida con oro mágico."
+    }
   },
   "confirm": "Confirmar",
   "confirm_delete_account_dialog": {
@@ -1319,6 +1468,7 @@
   "sidebar": {
     "calendar": "Calendario",
     "close": "Colapsar menú",
+    "crafting": "Forja",
     "dashboard": "Panel de control",
     "habits": "Hábitos",
     "inventory": "Inventario",
@@ -1370,13 +1520,21 @@
     "cart": "Carrito",
     "empty_cart": "Tu carrito está vacío",
     "error": {
-      "buy": "Error al comprar los objetos"
+      "buy": "Error al comprar los objetos",
+      "buy_material": "Error al comprar material"
     },
     "filter": {
       "all_tiers": "Todos los Tiers",
       "all_types": "Todos los Tipos",
       "tier": "Tier",
       "type": "Tipo"
+    },
+    "materials": {
+      "title": "Materiales",
+      "quantity": "Cantidad",
+      "price_each": "{{price}}g cada uno",
+      "total": "Total: {{total}}g",
+      "success": "¡Material comprado!"
     },
     "items_purchased": "objetos comprados",
     "no_items": "No hay objetos disponibles",

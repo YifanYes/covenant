@@ -14,6 +14,7 @@ import { AreaService } from './area.service'
 import { AuthService } from './auth.service'
 import { CharacterService } from './character.service'
 import { CombatService } from './combat.service'
+import { CraftingService } from './crafting.service'
 import { DashboardService } from './dashboard.service'
 import { DeadlineService } from './deadline.service'
 import { DiceService } from './dice.service'
@@ -48,6 +49,7 @@ export class ServiceFactory {
   private _authService?: AuthService
   private _characterService?: CharacterService
   private _combatService?: CombatService
+  private _craftingService?: CraftingService
   private _dashboardService?: DashboardService
   private _deadlineService?: DeadlineService
   private _diceService?: DiceService
@@ -130,6 +132,10 @@ export class ServiceFactory {
       this.combatEnemyRepository,
       this.activityRepository
     ))
+  }
+
+  get crafting(): CraftingService {
+    return (this._craftingService ??= new CraftingService(this.characterRepository, this.character))
   }
 
   get habit(): HabitService {

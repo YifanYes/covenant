@@ -213,6 +213,8 @@ export interface TacticalAttackResult {
   logEntries: CombatLogEntry[]
   // Gold reward if enemy was defeated
   goldReward?: number
+  // Material drops if enemy was defeated
+  materialDrops?: { materialId: string; quantity: number }[]
   // Next enemy data if a new enemy was spawned
   nextEnemy?: {
     id: string
@@ -286,4 +288,15 @@ export interface TacticalDoctrineResult {
   manaRestored?: number
   // Self-damage dealt (for doctrines like transfusion that sacrifice health)
   selfDamage?: number
+  // Enemy defeat rewards
+  goldReward?: number
+  materialDrops?: { materialId: string; quantity: number }[]
+  // Next enemy spawned after defeat
+  nextEnemy?: {
+    id: string
+    templateId: string
+    name: string
+    currentHealth: number
+    maxHealth: number
+  }
 }
