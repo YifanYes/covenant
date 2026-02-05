@@ -2,7 +2,6 @@
 import { Close, Money } from '@nsmr/pixelart-react'
 import type { ItemDefinition } from '@shared/constants/items'
 import Image from 'next/image'
-import { ItemRarity } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 import StoreItemTooltip from './store-item-tooltip.component'
 
@@ -10,12 +9,6 @@ interface CartItemProps {
   item: ItemDefinition
   quantity?: number
   onRemove: () => void
-}
-
-const rarityStyles: Record<ItemRarity, string> = {
-  [ItemRarity.LEGENDARY]: 'border-rarity-legendary/50 bg-rarity-legendary/5',
-  [ItemRarity.RARE]: 'border-rarity-rare/50 bg-rarity-rare/5',
-  [ItemRarity.COMMON]: 'border-rarity-common/50'
 }
 
 export default function CartItem({ item, quantity, onRemove }: CartItemProps) {
@@ -26,9 +19,7 @@ export default function CartItem({ item, quantity, onRemove }: CartItemProps) {
 
   return (
     <StoreItemTooltip item={item}>
-      <div
-        className={`relative flex cursor-default items-center gap-2 rounded-md border-2 p-2 ${rarityStyles[item.rarity] || 'border-gray-500/50'}`}
-      >
+      <div className='relative flex cursor-default items-center gap-2 rounded-md border-2 border-border p-2'>
         <button
           onClick={onRemove}
           className='bg-card border-destructive absolute -top-2 -right-2 z-20 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full border'

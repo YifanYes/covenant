@@ -2,7 +2,6 @@ import {
   ALL_ITEMS,
   CONSUMABLES,
   createInventoryItem,
-  createInventoryItemWithRandomRarity,
   getConsumableById,
   getItemById
 } from '@shared/constants/items'
@@ -108,7 +107,7 @@ export class StoreService {
         return createInventoryItem(def)
       }
 
-      return createInventoryItemWithRandomRarity(def)
+      return createInventoryItem(def)
     })
 
     const newInventory: any = [...inventory, ...newItems]

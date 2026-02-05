@@ -1,4 +1,5 @@
 'use client'
+import ItemStatsDisplay from '@/components/common/item-stats-display.component'
 import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import { ItemRarity, type InventoryItem } from '@shared/types/gamification.types'
 import Image from 'next/image'
@@ -31,34 +32,7 @@ export default function ItemTooltip({ item, quantity = 1, children }: ItemToolti
           </div>
           {itemDescription && <p className='text-xs text-zinc-400'>{itemDescription}</p>}
           <div className='border-t border-zinc-700 pt-2'>
-            <div className='flex flex-wrap gap-x-4 gap-y-1 text-xs'>
-              {item.stats.attackDice && (
-                <div className='flex gap-1'>
-                  <span className='text-zinc-400'>{t('inventory.stats.attack_dice')}</span>
-                  <span className='font-medium text-red-400'>{item.stats.attackDice}</span>
-                </div>
-              )}
-              {item.stats.damageType && (
-                <div className='flex gap-1'>
-                  <span className='text-zinc-400'>{t('inventory.stats.damage_type')}</span>
-                  <span className='font-medium text-zinc-200'>
-                    {t(`inventory.damage_type.${item.stats.damageType}`)}
-                  </span>
-                </div>
-              )}
-              {item.stats.physicalDefDice && (
-                <div className='flex gap-1'>
-                  <span className='text-zinc-400'>{t('inventory.stats.phys_def')}</span>
-                  <span className='font-medium text-orange-400'>{item.stats.physicalDefDice}</span>
-                </div>
-              )}
-              {item.stats.magicDefDice && (
-                <div className='flex gap-1'>
-                  <span className='text-zinc-400'>{t('inventory.stats.magic_def')}</span>
-                  <span className='font-medium text-blue-400'>{item.stats.magicDefDice}</span>
-                </div>
-              )}
-            </div>
+            <ItemStatsDisplay stats={item.stats} />
           </div>
           <div className='flex items-center justify-between text-xs'>
             <span className='text-zinc-400'>Tier {item.tier}</span>
