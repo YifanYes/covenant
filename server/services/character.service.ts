@@ -23,8 +23,12 @@ export class CharacterService {
     return character
   }
 
-  async getCharacterById(characterId: string) {
-    return this.characterRepository.findByIdWithClassesOrThrow(characterId)
+  async getCharacterById(characterId: string, userId?: string) {
+    return this.characterRepository.findByIdWithClassesOrThrow(characterId, userId)
+  }
+
+  async verifyCharacterOwnership(characterId: string, userId: string): Promise<boolean> {
+    return this.characterRepository.verifyOwnership(characterId, userId)
   }
 
   async getCurrentClass(userId: string) {
