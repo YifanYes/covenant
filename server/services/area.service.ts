@@ -15,14 +15,12 @@ export class AreaService {
   }
 
   async update(userId: string, input: UpdateAreaBodyType) {
-    await this.areaRepository.findByIdOrThrow(input.id, userId)
-    const area = await this.areaRepository.update(input.id, input)
+    const area = await this.areaRepository.update(input.id, userId, input)
     return { area }
   }
 
   async delete(userId: string, id: string) {
-    await this.areaRepository.findByIdOrThrow(id, userId)
-    await this.areaRepository.delete(id)
+    await this.areaRepository.delete(id, userId)
     return { message: 'Area deleted successfully' }
   }
 }

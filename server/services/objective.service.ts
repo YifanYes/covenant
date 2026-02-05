@@ -19,14 +19,12 @@ export class ObjectiveService {
   }
 
   async update(userId: string, input: UpdateObjectiveBodyType) {
-    await this.objectiveRepository.findByIdOrThrow(input.id, userId)
-    const objective = await this.objectiveRepository.update(input.id, input)
+    const objective = await this.objectiveRepository.update(input.id, userId, input)
     return { objective }
   }
 
   async complete(userId: string, id: string) {
-    await this.objectiveRepository.findByIdOrThrow(id, userId)
-    const objective = await this.objectiveRepository.complete(id)
+    const objective = await this.objectiveRepository.complete(id, userId)
     const result = await this.diceService.addDiceToBank(userId, 6)
 
     return {
@@ -36,8 +34,7 @@ export class ObjectiveService {
   }
 
   async delete(userId: string, id: string) {
-    await this.objectiveRepository.findByIdOrThrow(id, userId)
-    await this.objectiveRepository.delete(id)
+    await this.objectiveRepository.delete(id, userId)
     return { message: 'Objective deleted successfully' }
   }
 }

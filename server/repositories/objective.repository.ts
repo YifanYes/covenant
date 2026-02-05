@@ -41,7 +41,12 @@ export class ObjectiveRepository {
     })
   }
 
-  async update(id: string, input: UpdateObjectiveBodyType): Promise<Objective> {
+  async update(id: string, userId: string, input: UpdateObjectiveBodyType): Promise<Objective> {
+    const objective = await this.prisma.objective.findUnique({ where: { id } })
+    if (!objective || objective.userId !== userId) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Objective ${id} not found` })
+    }
+
     return this.prisma.objective.update({
       where: { id },
       data: {
@@ -56,14 +61,24 @@ export class ObjectiveRepository {
     })
   }
 
-  async complete(id: string): Promise<Objective> {
+  async complete(id: string, userId: string): Promise<Objective> {
+    const objective = await this.prisma.objective.findUnique({ where: { id } })
+    if (!objective || objective.userId !== userId) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Objective ${id} not found` })
+    }
+
     return this.prisma.objective.update({
       where: { id },
       data: { completedAt: new Date() }
     })
   }
 
-  async delete(id: string): Promise<Objective> {
+  async delete(id: string, userId: string): Promise<Objective> {
+    const objective = await this.prisma.objective.findUnique({ where: { id } })
+    if (!objective || objective.userId !== userId) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Objective ${id} not found` })
+    }
+
     return this.prisma.objective.delete({
       where: { id }
     })
