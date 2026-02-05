@@ -1744,14 +1744,18 @@ export class CombatService {
     await this.activityParticipationRepository.updateTacticalState(participationId, state)
 
     // Save combat log entries and update stats
-    if (this.combatEnemyRepository && logEntries.length > 0) {
+    if (this.combatEnemyRepository) {
       const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
       if (activeEnemy) {
-        await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
-        // Track damageTaken (damage enemy dealt to player)
-        if (damageDealt && damageDealt > 0) {
+        if (logEntries.length > 0) {
+          await this.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
+        }
+        // Track damageTaken (damage enemy dealt to player) and turnsElapsed
+        const shouldUpdateStats = (damageDealt && damageDealt > 0) || isNewRound
+        if (shouldUpdateStats) {
           await this.combatEnemyRepository.updateEnemy(activeEnemy.id, {
-            damageTaken: damageDealt
+            damageTaken: damageDealt && damageDealt > 0 ? damageDealt : undefined,
+            turnsElapsed: isNewRound ? 1 : undefined
           })
         }
       }
