@@ -18,8 +18,9 @@ We will implement different mechanics for character progression to ensure users 
   - Loop: Complete tasks/habits -> Get dice -> Enter Adventure -> Defeat enemies -> Level up/Get Gear.
 - Tier Promotion
   - Tracking: The system tracks enemy defeats via the `CombatEnemy` model, not on `CharacterClass`.
-  - Tier 2 Requirement: Defeat 50 total enemies.
-  - Tier 3 Requirement: Defeat 100 total enemies.
+  - Tier 2 Requirement: Defeat 10 total enemies (beta).
+  - Tier 3 Requirement: Defeat 30 total enemies (beta).
+  - Note: Requirements are accelerated for closed beta testing. Production values will be higher.
 
 ## Core Loop
 

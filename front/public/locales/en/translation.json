@@ -1108,7 +1108,6 @@
     },
     "mana": "Mana",
     "mana_regen": "Mana Regeneration",
-    "missions": "Missions",
     "no_character": {
       "button": "Begin adventure",
       "description": "Create a character to start your adventure.",
@@ -1648,6 +1647,13 @@
     "status_placeholder": "Task status",
     "title": "Update task",
     "title_placeholder": "Task title"
+  },
+  "tier_progress": {
+    "title": "Tier Progress",
+    "tier_label": "Tier {{tier}}",
+    "kills_progress": "{{current}} / {{required}} enemies defeated",
+    "max_tier_reached": "Maximum tier reached (Beta)",
+    "tier_up_message": "You've reached Tier {{tier}}!"
   },
   "tactical": {
     "actions": {

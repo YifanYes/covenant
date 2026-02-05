@@ -130,7 +130,8 @@ export class ServiceFactory {
       this.characterRepository,
       this.activityParticipationRepository,
       this.combatEnemyRepository,
-      this.activityRepository
+      this.activityRepository,
+      this.killRecord
     ))
   }
 

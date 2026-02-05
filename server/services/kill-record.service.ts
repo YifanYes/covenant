@@ -1,5 +1,18 @@
+import { TRPCError } from '@trpc/server'
+import { calculateTierFromKills, getTierProgress, type TierProgressInfo } from '@shared/constants/tier-progression'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
+
+export interface TierProgressionResult {
+  tierChanged: boolean
+  oldTier: number
+  newTier: number
+}
+
+export interface TierProgressInfoResponse {
+  currentTier: number
+  progress: TierProgressInfo | null
+}
 
 export class KillRecordService {
   constructor(
@@ -38,5 +51,79 @@ export class KillRecordService {
     }
 
     return this.combatEnemyRepository.getKillStats(character.id)
+  }
+
+  /**
+   * Check if the user has earned a tier-up based on total kills and apply it
+   */
+  async checkAndApplyTierProgression(userId: string): Promise<TierProgressionResult> {
+    const character = await this.characterRepository.findWithClasses(userId)
+    if (!character) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `Character not found for user ${userId}`
+      })
+    }
+
+    return this.applyTierProgressionForCharacter(character)
+  }
+
+  /**
+   * Check if the character has earned a tier-up based on total kills and apply it
+   * Used internally when we have characterId instead of userId
+   */
+  async checkAndApplyTierProgressionByCharacterId(characterId: string): Promise<TierProgressionResult> {
+    const character = await this.characterRepository.findByIdWithClasses(characterId)
+    if (!character) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `Character ${characterId} not found`
+      })
+    }
+
+    return this.applyTierProgressionForCharacter(character)
+  }
+
+  private async applyTierProgressionForCharacter(
+    character: NonNullable<Awaited<ReturnType<typeof this.characterRepository.findWithClasses>>>
+  ): Promise<TierProgressionResult> {
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: `Current class ${character.currentClass} not found for character ${character.id}`
+      })
+    }
+
+    const stats = await this.combatEnemyRepository.getKillStats(character.id)
+    const oldTier = currentClass.tier
+    const newTier = calculateTierFromKills(stats.totalKills, oldTier)
+
+    if (newTier > oldTier) {
+      await this.characterRepository.updateProgress(currentClass.id, newTier)
+      return { tierChanged: true, oldTier, newTier }
+    }
+
+    return { tierChanged: false, oldTier, newTier: oldTier }
+  }
+
+  /**
+   * Get tier progress info for displaying in the UI
+   */
+  async getTierProgressInfo(userId: string): Promise<TierProgressInfoResponse> {
+    const character = await this.characterRepository.findWithClasses(userId)
+    if (!character) {
+      return { currentTier: 1, progress: null }
+    }
+
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) {
+      return { currentTier: 1, progress: null }
+    }
+
+    const stats = await this.combatEnemyRepository.getKillStats(character.id)
+    const progress = getTierProgress(stats.totalKills, currentClass.tier)
+
+    return { currentTier: currentClass.tier, progress }
   }
 }

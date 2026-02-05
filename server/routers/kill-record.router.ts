@@ -17,5 +17,9 @@ export const killRecordRouter = t.router({
 
   getKillStats: protectedProcedure.query(async ({ ctx }) => {
     return ctx.services.killRecord.getKillStats(ctx.user.id)
+  }),
+
+  getTierProgress: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.services.killRecord.getTierProgressInfo(ctx.user.id)
   })
 })
