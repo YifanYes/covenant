@@ -4,7 +4,7 @@ import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import { generateEncounterSequence, getNextEncounterSlot, type ResolvedEncounterSlot } from '@shared/constants/encounter-patterns'
 import { generateMapTiles } from '@shared/constants/map-themes'
 import type { CombatLogEntry } from '@shared/types/gamification.types'
-import type { TacticalStateData } from '@shared/types/tactical-combat.types'
+import { TACTICAL_STATE_VERSION, type TacticalStateData } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import { ActivityDifficulty, getActivityById } from '../../shared/constants/activities'
 import type { ActivityRepository } from '../repositories/activity.repository'
@@ -77,6 +77,7 @@ export class ActivityService {
     const turnOrder = [playerUnitId, enemyUnitId]
 
     return {
+      stateVersion: TACTICAL_STATE_VERSION,
       mapTemplateId: mapId,
       gridWidth,
       gridHeight,

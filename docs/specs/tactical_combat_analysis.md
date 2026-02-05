@@ -565,12 +565,12 @@ const newStatusEffect: ActiveStatusEffect = {
 
 ### 8.1 Priority 1: State Synchronization (HIGH)
 
-| Issue | Fix | Effort |
-|-------|-----|--------|
-| Unit template mismatch | Add version field to `TacticalStateData`, reject stale hydration | Medium |
-| Turn queue desync | Backend returns `updatedTurnQueue` in all mutation responses; frontend trusts it | Low |
-| Mana deduction | Return `newMana` from server; frontend uses response value only | Low |
-| Grid theme mismatch | Pass `mapTemplateId` to frontend spawn logic; use shared generation | Medium |
+| Issue | Fix | Effort | Status |
+|-------|-----|--------|--------|
+| Unit template mismatch | Add version field to `TacticalStateData`, reject stale hydration | Medium | ⚠️ **PARTIAL** - Version field added but strict validation reverted to graceful degradation |
+| Turn queue desync | Backend returns `updatedTurnQueue` in all mutation responses; frontend trusts it | Low | Deferred (low risk - frontend mirrors backend logic) |
+| Mana deduction | Return `newMana` from server; frontend uses response value only | Low | ✅ **FIXED** (2026-02-05) |
+| Grid theme mismatch | Pass `mapTemplateId` to frontend spawn logic; use shared generation | Medium | ✅ **FIXED** (2026-02-05) |
 
 ### 8.2 Priority 2: Memory Management (MEDIUM)
 

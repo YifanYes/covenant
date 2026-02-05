@@ -11,18 +11,20 @@ import {
 } from '@/lib/phaser/systems/pathfinding'
 import { DOCTRINES } from '@shared/constants/doctrines'
 import { getEnemy } from '@shared/constants/enemies'
+import { generateMapTiles } from '@shared/constants/map-themes'
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
-import type {
-  GridPosition,
-  HighlightedTile,
-  TacticalAction,
-  TacticalCombatState,
-  TacticalInitData,
-  TacticalPhase,
-  TacticalStateData,
-  TacticalUnit,
-  TerrainType,
-  TileState
+import {
+  TACTICAL_STATE_VERSION,
+  type GridPosition,
+  type HighlightedTile,
+  type TacticalAction,
+  type TacticalCombatState,
+  type TacticalInitData,
+  type TacticalPhase,
+  type TacticalStateData,
+  type TacticalUnit,
+  type TerrainType,
+  type TileState
 } from '@shared/types/tactical-combat.types'
 import { create } from 'zustand'
 
@@ -90,6 +92,7 @@ interface TacticalCombatStore extends TacticalCombatState {
   animatingUnitId: string | null
   animationPath: GridPosition[] | null
   participationId: string | null
+  mapTemplateId: string
 
   // Attack state
   attackAnimationData: AttackAnimationData | null
@@ -289,6 +292,7 @@ const initialState = (() => {
     animatingUnitId: null,
     animationPath: null,
     participationId: null,
+    mapTemplateId: 'default',
     attackAnimationData: null,
     isAttackAnimating: false,
     pendingEnemyAttack: null,
@@ -325,18 +329,44 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       highlightedTiles: [],
       pendingAction: null,
       isInitialized: true,
-      participationId: participationId ?? null
+      participationId: participationId ?? null,
+      mapTemplateId: data.mapTemplateId || 'default'
     })
   },
 
   hydrateFromState: (persistedState: TacticalStateData, unitTemplates: TacticalUnit[], participationId: string) => {
+    // Helper to fall back to fresh combat state
+    const fallbackToFresh = (reason: string) => {
+      console.warn(`[hydrateFromState] ${reason}, falling back to fresh combat`)
+      get().initializeCombat(
+        {
+          mapTemplateId: persistedState.mapTemplateId,
+          gridWidth: persistedState.gridWidth,
+          gridHeight: persistedState.gridHeight,
+          tiles: persistedState.tiles,
+          playerUnits: unitTemplates.filter((u) => u.isPlayer),
+          enemyUnits: unitTemplates.filter((u) => !u.isPlayer),
+          turnQueue: unitTemplates
+        },
+        participationId
+      )
+    }
+
+    // Check state version - reject stale state from incompatible versions
+    // Allow undefined (legacy data) - only reject explicit version mismatches
+    const stateVersion = persistedState.stateVersion ?? TACTICAL_STATE_VERSION
+    if (stateVersion !== TACTICAL_STATE_VERSION) {
+      fallbackToFresh(`State version mismatch (got ${stateVersion}, expected ${TACTICAL_STATE_VERSION})`)
+      return
+    }
+
     // Merge persisted unit state with full unit templates
-    // Filter out units that don't have a matching template (graceful degradation)
+    // Gracefully skip units without matching templates (they may have been removed)
     const hydratedUnits: TacticalUnit[] = []
     for (const persistedUnit of persistedState.units) {
       const template = unitTemplates.find((t) => t.id === persistedUnit.id)
       if (!template) {
-        console.warn(`Unit template not found for id: ${persistedUnit.id}, skipping unit`)
+        console.warn(`[hydrateFromState] Unit template not found for id: ${persistedUnit.id}, skipping unit`)
         continue
       }
       hydratedUnits.push({
@@ -352,19 +382,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
 
     // If no units could be hydrated, fall back to fresh state
     if (hydratedUnits.length === 0) {
-      console.error('No units could be hydrated from persisted state, falling back to fresh combat')
-      get().initializeCombat(
-        {
-          mapTemplateId: persistedState.mapTemplateId,
-          gridWidth: persistedState.gridWidth,
-          gridHeight: persistedState.gridHeight,
-          tiles: persistedState.tiles,
-          playerUnits: unitTemplates.filter((u) => u.isPlayer),
-          enemyUnits: unitTemplates.filter((u) => !u.isPlayer),
-          turnQueue: unitTemplates
-        },
-        participationId
-      )
+      fallbackToFresh('No units could be hydrated from persisted state')
       return
     }
 
@@ -398,7 +416,8 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       highlightedTiles: [],
       pendingAction: null,
       isInitialized: true,
-      participationId
+      participationId,
+      mapTemplateId: persistedState.mapTemplateId || 'default'
     })
   },
 
@@ -1021,23 +1040,9 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
         const playerPosition = playerUnit.position
         const enemyPosition = { x: 6, y: 3 }
 
-        // Create fresh grid
-        const freshTiles: TileState[][] = []
-        for (let y = 0; y < gridHeight; y++) {
-          freshTiles[y] = []
-          for (let x = 0; x < gridWidth; x++) {
-            let terrain: TerrainType = 'GRASS'
-            if (x === 0 || x === gridWidth - 1 || y === 0 || y === gridHeight - 1) {
-              terrain = 'STONE'
-            }
-            freshTiles[y][x] = {
-              position: { x, y },
-              terrain,
-              occupantId: null,
-              isWalkable: true
-            }
-          }
-        }
+        // Create fresh grid using the map template (fixes state mismatch with backend)
+        const { mapTemplateId } = get()
+        const freshTiles = generateMapTiles(mapTemplateId, gridWidth, gridHeight)
 
         // Set occupants
         freshTiles[playerPosition.y][playerPosition.x].occupantId = playerUnit.id
@@ -1295,6 +1300,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       animatingUnitId: null,
       animationPath: null,
       participationId: null,
+      mapTemplateId: 'default',
       attackAnimationData: null,
       isAttackAnimating: false,
       pendingEnemyAttack: null,
@@ -1449,23 +1455,9 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
         const playerPosition = playerUnit.position
         const enemyPosition = { x: 6, y: 3 }
 
-        // Create fresh grid
-        const freshTiles: TileState[][] = []
-        for (let y = 0; y < gridHeight; y++) {
-          freshTiles[y] = []
-          for (let x = 0; x < gridWidth; x++) {
-            let terrain: TerrainType = 'GRASS'
-            if (x === 0 || x === gridWidth - 1 || y === 0 || y === gridHeight - 1) {
-              terrain = 'STONE'
-            }
-            freshTiles[y][x] = {
-              position: { x, y },
-              terrain,
-              occupantId: null,
-              isWalkable: true
-            }
-          }
-        }
+        // Create fresh grid using the map template (fixes state mismatch with backend)
+        const { mapTemplateId } = get()
+        const freshTiles = generateMapTiles(mapTemplateId, gridWidth, gridHeight)
 
         // Set occupants
         freshTiles[playerPosition.y][playerPosition.x].occupantId = playerUnit.id

@@ -200,11 +200,14 @@ export const activityRouter = t.router({
 
       // Deduct mana from the character's class after successful doctrine use
       if (result.success) {
+        const newMana = currentClass.mana - result.manaCost
         await ctx.services.character.updateHealth(
           currentClass.id,
           currentClass.health,
-          currentClass.mana - result.manaCost
+          newMana
         )
+        // Return newMana so frontend uses authoritative server value
+        return { ...result, newMana }
       }
 
       return result
@@ -253,11 +256,14 @@ export const activityRouter = t.router({
 
       // Deduct mana from the character's class after successful doctrine use
       if (result.success) {
+        const newMana = currentClass.mana - result.manaCost
         await ctx.services.character.updateHealth(
           currentClass.id,
           currentClass.health,
-          currentClass.mana - result.manaCost
+          newMana
         )
+        // Return newMana so frontend uses authoritative server value
+        return { ...result, newMana }
       }
 
       return result
