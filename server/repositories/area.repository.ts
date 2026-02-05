@@ -53,7 +53,12 @@ export class AreaRepository {
     })
   }
 
-  async update(id: string, input: UpdateAreaBodyType): Promise<Area> {
+  async update(id: string, userId: string, input: UpdateAreaBodyType): Promise<Area> {
+    const area = await this.prisma.area.findUnique({ where: { id } })
+    if (!area || area.userId !== userId) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Area ${id} not found` })
+    }
+
     return this.prisma.area.update({
       where: { id },
       data: {
@@ -64,7 +69,12 @@ export class AreaRepository {
     })
   }
 
-  async delete(id: string): Promise<Area> {
+  async delete(id: string, userId: string): Promise<Area> {
+    const area = await this.prisma.area.findUnique({ where: { id } })
+    if (!area || area.userId !== userId) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Area ${id} not found` })
+    }
+
     return this.prisma.area.delete({
       where: { id }
     })

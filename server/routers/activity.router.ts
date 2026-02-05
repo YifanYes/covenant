@@ -33,12 +33,22 @@ export const activityRouter = t.router({
   list: protectedProcedure
     .input(z.object({ characterId: z.string().optional() }).optional())
     .query(async ({ ctx, input }) => {
+      if (input?.characterId) {
+        const isOwner = await ctx.services.character.verifyCharacterOwnership(input.characterId, ctx.user.id)
+        if (!isOwner) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
+        }
+      }
       return ctx.services.activity.getActivities(input?.characterId)
     }),
 
   join: protectedProcedure
     .input(z.object({ activityId: z.string(), characterId: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      const isOwner = await ctx.services.character.verifyCharacterOwnership(input.characterId, ctx.user.id)
+      if (!isOwner) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
+      }
       return ctx.services.activity.joinActivity(input.activityId, input.characterId)
     }),
 

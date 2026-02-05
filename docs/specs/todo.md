@@ -2,27 +2,25 @@
 
 ## Critical Priority
 
-### Security: Missing Authorization in Repositories
+[x] Security: Missing Authorization in Repositories
 
 - `server/repositories/area.repository.ts` (lines 56-71)
 - `server/repositories/objective.repository.ts` (lines 44-70)
 - **Issue:** `update()` and `delete()` methods don't verify userId ownership
-- **Fix:** Add userId parameter to update/delete methods with ownership check
+- **Fix:** Added userId parameter to update/delete methods with ownership check
 
-### Security: Character Ownership Not Validated
+[x] Security: Character Ownership Not Validated
 
 - `server/routers/investment.router.ts` - contribute endpoint
 - `server/routers/activity.router.ts` (line 35-39) - join endpoint
 - **Issue:** Endpoints accept characterId without verifying user owns it
-- **Fix:** Add `await verifyCharacterOwnership(input.characterId, ctx.user.id)` before service calls
+- **Fix:** Added `await verifyCharacterOwnership(input.characterId, ctx.user.id)` before service calls
 
-### Security: getCharacterById Missing Ownership Check
+[x] Security: getCharacterById Missing Ownership Check
 
 - `server/services/character.service.ts` (lines 26-28)
 - **Issue:** Returns any character by ID without ownership verification
-- **Fix:** Add optional userId parameter for ownership check
-
----
+- **Fix:** Added optional userId parameter for ownership check
 
 ## High Priority
 
@@ -51,8 +49,6 @@
 - **Issue:** Missing template silently drops unit, corrupts turn queue
 - **Status:** PARTIAL - version field added but strict validation reverted
 - **Fix:** Complete strict validation or add recovery mechanism
-
----
 
 ## Medium Priority
 
@@ -96,8 +92,6 @@
 
 - `combat-scene.ts:24-27`
 - **Fix:** Replace 4 booleans with single `animationType: 'movement' | 'attack' | 'doctrine' | 'status' | null`
-
----
 
 ## Low Priority
 
@@ -143,23 +137,21 @@
 - `use-tactical-enemy-turn.hook.ts:34`
 - **Fix:** Refresh state after each await in critical paths
 
----
-
 ## Files to Modify Summary
 
-| File                                          | Changes                                          |
-| --------------------------------------------- | ------------------------------------------------ |
-| `server/repositories/area.repository.ts`      | Add userId to update/delete                      |
-| `server/repositories/objective.repository.ts` | Add userId to update/delete                      |
-| `server/routers/investment.router.ts`         | Add character ownership check                    |
-| `server/routers/activity.router.ts`           | Add character ownership check                    |
-| `server/services/character.service.ts`        | Add userId param to getCharacterById             |
-| `server/lib/prisma.ts`                        | Fix SSL validation                               |
-| `server/lib/auth.ts`                          | Apply cookie security all envs                   |
-| `shared/schemas/auth.schemas.ts`              | Enum for theme validation                        |
-| `server/prisma/schema.prisma`                 | Add userId indexes                               |
-| `front/hooks/use-faction-theme.ts`            | Add Secure flag                                  |
-| `server/server.ts`                            | Add rate limiting                                |
-| `front/stores/tactical-combat.store.ts`       | Fix unit template validation, extract grid utils |
-| `front/lib/phaser/scenes/combat-scene.ts`     | Fix memory/animation issues                      |
-| `server/services/combat.service.ts`           | Split into focused services                      |
+| File                                              | Changes                                          |
+| ------------------------------------------------- | ------------------------------------------------ |
+| ~~`server/repositories/area.repository.ts`~~      | ✅ Added userId to update/delete                 |
+| ~~`server/repositories/objective.repository.ts`~~ | ✅ Added userId to update/delete                 |
+| ~~`server/routers/investment.router.ts`~~         | ✅ Added character ownership check               |
+| ~~`server/routers/activity.router.ts`~~           | ✅ Added character ownership check               |
+| ~~`server/services/character.service.ts`~~        | ✅ Added userId param to getCharacterById        |
+| `server/lib/prisma.ts`                            | Fix SSL validation                               |
+| `server/lib/auth.ts`                              | Apply cookie security all envs                   |
+| `shared/schemas/auth.schemas.ts`                  | Enum for theme validation                        |
+| `server/prisma/schema.prisma`                     | Add userId indexes                               |
+| `front/hooks/use-faction-theme.ts`                | Add Secure flag                                  |
+| `server/server.ts`                                | Add rate limiting                                |
+| `front/stores/tactical-combat.store.ts`           | Fix unit template validation, extract grid utils |
+| `front/lib/phaser/scenes/combat-scene.ts`         | Fix memory/animation issues                      |
+| `server/services/combat.service.ts`               | Split into focused services                      |

@@ -49,12 +49,23 @@ export class CharacterRepository {
     return character as unknown as CharacterWithClasses | null
   }
 
-  async findByIdWithClassesOrThrow(id: string): Promise<CharacterWithClasses> {
+  async findByIdWithClassesOrThrow(id: string, userId?: string): Promise<CharacterWithClasses> {
     const character = await this.findByIdWithClasses(id)
     if (!character) {
       throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${id} not found` })
     }
+    if (userId && character.userId !== userId) {
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
+    }
     return character
+  }
+
+  async verifyOwnership(characterId: string, userId: string): Promise<boolean> {
+    const character = await this.prisma.character.findUnique({
+      where: { id: characterId },
+      select: { userId: true }
+    })
+    return character?.userId === userId
   }
 
   async updateDiceBank(characterId: string, characterData: Record<string, unknown>, newDice: number): Promise<void> {
