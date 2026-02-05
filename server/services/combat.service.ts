@@ -26,17 +26,18 @@ import type {
   InventoryItem
 } from '@shared/types/gamification.types'
 import { CombatLogType, ItemType } from '@shared/types/gamification.types'
-import type {
-  GridPosition,
-  TacticalStateData,
-  TileState,
-  MovementValidationResult,
-  MovementExecutionResult,
-  AttackValidationResult,
-  TacticalAttackResult,
-  TacticalUnitState,
-  EnemyTurnResult,
-  TacticalDoctrineResult
+import {
+  TACTICAL_STATE_VERSION,
+  type GridPosition,
+  type TacticalStateData,
+  type TileState,
+  type MovementValidationResult,
+  type MovementExecutionResult,
+  type AttackValidationResult,
+  type TacticalAttackResult,
+  type TacticalUnitState,
+  type EnemyTurnResult,
+  type TacticalDoctrineResult
 } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
@@ -1049,6 +1050,7 @@ export class CombatService {
     const turnOrder = [playerUnit.id, newEnemyId]
 
     return {
+      stateVersion: TACTICAL_STATE_VERSION,
       mapTemplateId: currentState.mapTemplateId,
       gridWidth,
       gridHeight,
