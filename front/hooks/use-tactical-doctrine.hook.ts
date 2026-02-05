@@ -7,6 +7,7 @@ import { trpc, trpcOptions, queryClient } from '@/utils/trpc.utils'
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
 import { DOCTRINES } from '@shared/constants/doctrines'
 import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
+import type { DoctrineEffectResult } from '@shared/types/tactical-combat.types'
 import { calculateAoEArea, findUnitsInAoE } from '@/lib/phaser/systems/pathfinding'
 import { getMaterialById } from '@shared/constants/materials'
 
@@ -110,7 +111,7 @@ export function useTacticalDoctrine() {
         // Show toast when enemy is defeated with gold reward
         if (result.goldReward) {
           // Find the killed enemy's name
-          const killedEffect = result.effects.find((e) => e.killed)
+          const killedEffect = result.effects.find((e: DoctrineEffectResult) => e.killed)
           if (killedEffect) {
             const target = enemyUnits.find((u) => u.id === killedEffect.unitId)
             if (target) {
@@ -121,7 +122,7 @@ export function useTacticalDoctrine() {
               // Build material drops description if any
               let materialDescription: string | undefined
               if (result.materialDrops && result.materialDrops.length > 0) {
-                const materialNames = result.materialDrops.map((drop) => {
+                const materialNames = result.materialDrops.map((drop: { materialId: string; quantity: number }) => {
                   const material = getMaterialById(drop.materialId)
                   const name = material ? t(material.nameKey) : drop.materialId
                   return `+${drop.quantity} ${name}`

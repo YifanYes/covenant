@@ -268,37 +268,31 @@ export interface EnemyTurnResult {
   diedFromStatusEffect?: boolean
 }
 
-// Tactical doctrine execution result
-export interface TacticalDoctrineResult {
-  success: boolean
+// Doctrine effect result per unit
+export interface DoctrineEffectResult {
+  unitId: string
+  damageDealt?: number
+  healthRestored?: number
+  statusApplied?: string
+  killed?: boolean
+  bonusDice?: number // For inspiration doctrine (scales with enemy tier)
+}
+
+// Base tactical doctrine result (without success discriminant)
+export interface TacticalDoctrineResultBase {
   casterId: string
   doctrineId: string
   targetPosition: GridPosition
   affectedTiles: GridPosition[]
   affectedUnitIds: string[]
-  // Effect results per unit
-  effects: {
-    unitId: string
-    damageDealt?: number
-    healthRestored?: number
-    statusApplied?: string
-    killed?: boolean
-    bonusDice?: number // For inspiration doctrine (scales with enemy tier)
-  }[]
-  // Mana spent
+  effects: DoctrineEffectResult[]
   manaCost: number
-  // Updated state
   updatedState: TacticalStateData
-  // Combat log entries
   logEntries: CombatLogEntry[]
-  // Mana restored (for doctrines like transfusion, disintegration_ray on kill)
   manaRestored?: number
-  // Self-damage dealt (for doctrines like transfusion that sacrifice health)
   selfDamage?: number
-  // Enemy defeat rewards
   goldReward?: number
   materialDrops?: { materialId: string; quantity: number }[]
-  // Next enemy spawned after defeat
   nextEnemy?: {
     id: string
     templateId: string
@@ -306,15 +300,53 @@ export interface TacticalDoctrineResult {
     currentHealth: number
     maxHealth: number
   }
-  // Tier progression if player leveled up from this kill
   tierProgression?: { oldTier: number; newTier: number }
 }
 
-// Self-buff doctrine result
-export interface SelfBuffDoctrineResult {
+// Tactical doctrine execution result
+export interface TacticalDoctrineResult extends TacticalDoctrineResultBase {
   success: boolean
+}
+
+// Self-buff doctrine result base (without success discriminant)
+export interface SelfBuffDoctrineResultBase {
   doctrineId: string
   manaCost: number
   bonusDice: number
   updatedState: TacticalStateData
 }
+
+// Self-buff doctrine result
+export interface SelfBuffDoctrineResult extends SelfBuffDoctrineResultBase {
+  success: boolean
+}
+
+// Discriminated union types for router returns (with newMana on success)
+
+// Success variant for TacticalDoctrineResult - includes newMana
+export interface TacticalDoctrineResultSuccess extends TacticalDoctrineResultBase {
+  success: true
+  newMana: number
+}
+
+// Failure variant for TacticalDoctrineResult - no newMana
+export interface TacticalDoctrineResultFailure extends TacticalDoctrineResultBase {
+  success: false
+}
+
+// Union type for executeTacticalDoctrine router return
+export type TacticalDoctrineResultWithMana = TacticalDoctrineResultSuccess | TacticalDoctrineResultFailure
+
+// Success variant for SelfBuffDoctrineResult - includes newMana
+export interface SelfBuffDoctrineResultSuccess extends SelfBuffDoctrineResultBase {
+  success: true
+  newMana: number
+}
+
+// Failure variant for SelfBuffDoctrineResult - no newMana
+export interface SelfBuffDoctrineResultFailure extends SelfBuffDoctrineResultBase {
+  success: false
+}
+
+// Union type for useSelfBuffDoctrine router return
+export type SelfBuffDoctrineResultWithMana = SelfBuffDoctrineResultSuccess | SelfBuffDoctrineResultFailure

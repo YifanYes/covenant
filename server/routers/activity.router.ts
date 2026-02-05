@@ -1,6 +1,10 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { protectedProcedure, t } from '../trpc'
+import type {
+  TacticalDoctrineResultWithMana,
+  SelfBuffDoctrineResultWithMana
+} from '@shared/types/tactical-combat.types'
 
 // Schema for grid position
 const gridPositionSchema = z.object({
@@ -165,7 +169,7 @@ export const activityRouter = t.router({
         targetPosition: gridPositionSchema
       })
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }): Promise<TacticalDoctrineResultWithMana> => {
       // Verify the user owns this participation
       const isOwner = await ctx.services.activityParticipation.verifyOwnership(
         input.participationId,
@@ -207,10 +211,10 @@ export const activityRouter = t.router({
           newMana
         )
         // Return newMana so frontend uses authoritative server value
-        return { ...result, newMana }
+        return { ...result, success: true as const, newMana }
       }
 
-      return result
+      return { ...result, success: false as const }
     }),
 
   // Tactical combat: Use self-buff doctrine (no targeting required)
@@ -222,7 +226,7 @@ export const activityRouter = t.router({
         doctrineId: z.string()
       })
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }): Promise<SelfBuffDoctrineResultWithMana> => {
       // Verify the user owns this participation
       const isOwner = await ctx.services.activityParticipation.verifyOwnership(
         input.participationId,
@@ -263,9 +267,9 @@ export const activityRouter = t.router({
           newMana
         )
         // Return newMana so frontend uses authoritative server value
-        return { ...result, newMana }
+        return { ...result, success: true as const, newMana }
       }
 
-      return result
+      return { ...result, success: false as const }
     })
 })
