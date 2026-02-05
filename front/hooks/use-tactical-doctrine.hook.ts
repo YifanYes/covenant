@@ -88,6 +88,12 @@ export function useTacticalDoctrine() {
       })
 
       if (result.success) {
+        // Update mana immediately using server's authoritative value
+        const { updateUnit } = useTacticalCombatStore.getState()
+        updateUnit(activeUnitId, {
+          currentMana: result.newMana
+        })
+
         // Server confirmed - trigger the doctrine animation
         // Include nextEnemy data so the store can spawn the new enemy after animation completes
         startDoctrineAnimation({
@@ -286,10 +292,10 @@ export function useTacticalDoctrine() {
         const { applySelfBuffDoctrine } = useTacticalCombatStore.getState()
         applySelfBuffDoctrine(activeUnitId, doctrineId)
 
-        // Update mana in the store
+        // Update mana in the store using server's authoritative value
         const { updateUnit } = useTacticalCombatStore.getState()
         updateUnit(activeUnitId, {
-          currentMana: caster.currentMana - doctrine.manaCost
+          currentMana: result.newMana
         })
 
         // Show success message based on doctrine effect type

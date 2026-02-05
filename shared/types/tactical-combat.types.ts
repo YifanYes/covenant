@@ -162,7 +162,12 @@ export interface TacticalUnitState {
 }
 
 // Tactical state stored in database (JSON field)
+// Version for tactical state schema - increment when unit templates or state structure changes
+// This prevents hydrating stale state that may reference deleted/changed templates
+export const TACTICAL_STATE_VERSION = 1
+
 export interface TacticalStateData {
+  stateVersion: number // Must match TACTICAL_STATE_VERSION for hydration to succeed
   mapTemplateId: string
   gridWidth: number
   gridHeight: number

@@ -1,5 +1,5 @@
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
-import { TerrainType, type TacticalStateData, type TileState } from '@shared/types/tactical-combat.types'
+import { TACTICAL_STATE_VERSION, TerrainType, type TacticalStateData, type TileState } from '@shared/types/tactical-combat.types'
 import { ItemType } from '@shared/types/gamification.types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CombatService } from '../../services/combat.service'
@@ -89,6 +89,7 @@ describe('CombatService', () => {
       tiles[1][2].occupantId = 'enemy-1'
 
       return {
+        stateVersion: TACTICAL_STATE_VERSION,
         mapTemplateId: 'test-map',
         gridWidth: 5,
         gridHeight: 5,
@@ -442,6 +443,7 @@ describe('CombatService', () => {
       tiles[1][2].occupantId = 'enemy-1'
 
       return {
+        stateVersion: TACTICAL_STATE_VERSION,
         mapTemplateId: 'test-map',
         gridWidth: 5,
         gridHeight: 5,
@@ -671,6 +673,7 @@ describe('CombatService', () => {
       tiles[1][2].occupantId = 'enemy-1'
 
       return {
+        stateVersion: TACTICAL_STATE_VERSION,
         mapTemplateId: 'test-map',
         gridWidth: 5,
         gridHeight: 5,
@@ -938,6 +941,7 @@ describe('CombatService', () => {
       tiles[1][2].occupantId = 'enemy-1'
 
       return {
+        stateVersion: TACTICAL_STATE_VERSION,
         mapTemplateId: 'test-map',
         gridWidth: 5,
         gridHeight: 5,
