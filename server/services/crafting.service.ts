@@ -1,6 +1,6 @@
 import { ALL_MATERIALS, getMaterialById, type MaterialDefinition } from '@shared/constants/materials'
 import { ALL_RECIPES, canCraftRecipe, getRecipeById, type RecipeDefinition } from '@shared/constants/recipes'
-import { CONSUMABLES, createInventoryItem, createInventoryItemWithRandomRarity, getItemById } from '@shared/constants/items'
+import { CONSUMABLES, createInventoryItem, getItemById } from '@shared/constants/items'
 import type {
   CraftResult,
   MaterialListResult,
@@ -137,7 +137,7 @@ export class CraftingService {
       if (resultItem.type === ItemType.CONSUMABLE) {
         craftedItems.push(createInventoryItem(resultItem))
       } else {
-        craftedItems.push(createInventoryItemWithRandomRarity(resultItem))
+        craftedItems.push(createInventoryItem(resultItem))
       }
     }
 

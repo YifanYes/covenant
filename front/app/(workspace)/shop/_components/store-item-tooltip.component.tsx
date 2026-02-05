@@ -1,8 +1,8 @@
 'use client'
+import ItemStatsDisplay from '@/components/common/item-stats-display.component'
 import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import type { ItemDefinition } from '@shared/constants/items'
 import Image from 'next/image'
-import { ItemRarity, ItemType } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 
 interface StoreItemTooltipProps {
@@ -24,16 +24,6 @@ export default function StoreItemTooltip({
   const itemDescription = t(item.descriptionKey)
   const itemImagePath = `/assets/items/${item.id}.png`
 
-  const isConsumable = item.type === ItemType.CONSUMABLE
-
-  const rarityColor = isConsumable
-    ? item.rarity === ItemRarity.LEGENDARY
-      ? 'text-yellow-400'
-      : item.rarity === ItemRarity.RARE
-        ? 'text-purple-400'
-        : 'text-zinc-400'
-    : 'text-zinc-500 italic'
-
   return (
     <Tooltip delayDuration={500}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
@@ -50,40 +40,11 @@ export default function StoreItemTooltip({
             </div>
           )}
           <div className='border-t border-zinc-700 pt-2'>
-            <div className='flex flex-wrap gap-x-4 gap-y-1 text-xs'>
-              {item.stats.attackDice && (
-                <div className='flex gap-1'>
-                  <span className='text-zinc-400'>{t('inventory.stats.attack_dice')}</span>
-                  <span className='font-medium text-red-400'>{item.stats.attackDice}</span>
-                </div>
-              )}
-              {item.stats.damageType && (
-                <div className='flex gap-1'>
-                  <span className='text-zinc-400'>{t('inventory.stats.damage_type')}</span>
-                  <span className='font-medium text-zinc-200'>
-                    {t(`inventory.damage_type.${item.stats.damageType}`)}
-                  </span>
-                </div>
-              )}
-              {item.stats.physicalDefDice && (
-                <div className='flex gap-1'>
-                  <span className='text-zinc-400'>{t('inventory.stats.phys_def')}</span>
-                  <span className='font-medium text-orange-400'>{item.stats.physicalDefDice}</span>
-                </div>
-              )}
-              {item.stats.magicDefDice && (
-                <div className='flex gap-1'>
-                  <span className='text-zinc-400'>{t('inventory.stats.magic_def')}</span>
-                  <span className='font-medium text-blue-400'>{item.stats.magicDefDice}</span>
-                </div>
-              )}
-            </div>
+            <ItemStatsDisplay stats={item.stats} />
           </div>
           <div className='flex items-center justify-between text-xs'>
             <span className='text-zinc-400'>Tier {item.tier}</span>
-            <span className={`font-medium ${rarityColor}`}>
-              {isConsumable ? t(`item_categories.rarity.${item.rarity.toLowerCase()}`) : t('store.random_rarity')}
-            </span>
+            <span className='font-medium text-zinc-500 italic'>{t('store.random_rarity')}</span>
           </div>
         </div>
       </TooltipContent>
