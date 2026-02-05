@@ -49,7 +49,7 @@
   - [ ] Renderizar el personaje con los items equipados.
   - [ ] Definir accesorios
   - [ ] Definir decisiones de la historia
-  - [ ] Sistema de crafteo
+  - [x] Sistema de crafteo
   - [ ] Sistema de moralidad
   - [x] Añadir tests
   - [x] Landing page
