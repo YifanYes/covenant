@@ -43,13 +43,15 @@ import type { ActivityParticipationRepository } from '../repositories/activity-p
 import type { ActivityRepository } from '../repositories/activity.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
+import type { KillRecordService } from './kill-record.service'
 
 export class CombatService {
   constructor(
     private characterRepository: CharacterRepository,
     private activityParticipationRepository: ActivityParticipationRepository,
     private combatEnemyRepository?: CombatEnemyRepository,
-    private activityRepository?: ActivityRepository
+    private activityRepository?: ActivityRepository,
+    private killRecordService?: KillRecordService
   ) {}
 
   rollDice(count: number): number[] {
@@ -797,6 +799,7 @@ export class CombatService {
     let goldReward = 0
     let materialDrops: MaterialDrop[] = []
     let nextEnemy: { id: string; templateId: string; name: string; currentHealth: number; maxHealth: number } | undefined
+    let tierProgression: { oldTier: number; newTier: number } | undefined
 
     if (this.combatEnemyRepository) {
       const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
@@ -851,6 +854,16 @@ export class CombatService {
                   materialsToAdd[drop.materialId] = (materialsToAdd[drop.materialId] || 0) + drop.quantity
                 }
                 await this.characterRepository.addMaterials(participation.characterId, materialsToAdd)
+              }
+            }
+
+            // Check tier progression after enemy defeat
+            if (participation?.characterId && this.killRecordService) {
+              const tierResult = await this.killRecordService.checkAndApplyTierProgressionByCharacterId(
+                participation.characterId
+              )
+              if (tierResult.tierChanged) {
+                tierProgression = { oldTier: tierResult.oldTier, newTier: tierResult.newTier }
               }
             }
 
@@ -974,7 +987,8 @@ export class CombatService {
       goldReward,
       materialDrops: materialDrops.length > 0 ? materialDrops : undefined,
       nextEnemy,
-      selfDamageFromOnes: selfDamageFromOnes > 0 ? selfDamageFromOnes : undefined
+      selfDamageFromOnes: selfDamageFromOnes > 0 ? selfDamageFromOnes : undefined,
+      tierProgression
     }
   }
 
@@ -994,8 +1008,8 @@ export class CombatService {
     const gridHeight = currentState.gridHeight
     const tiles = generateMapTiles(currentState.mapTemplateId, gridWidth, gridHeight)
 
-    // Reset player to starting position
-    const playerPosition = { x: 1, y: 3 }
+    // Preserve player's current position
+    const playerPosition = playerUnit.position
     // Enemy spawns on the right side
     const enemyPosition = { x: 6, y: 3 }
 
@@ -2354,6 +2368,7 @@ export class CombatService {
     let goldReward = 0
     let materialDrops: MaterialDrop[] = []
     let nextEnemy: { id: string; templateId: string; name: string; currentHealth: number; maxHealth: number } | undefined
+    let tierProgression: { oldTier: number; newTier: number } | undefined
 
     // Check if any enemy was killed
     const killedEnemyEffects = effects.filter((e) => e.killed && !e.unitId.startsWith('player-'))
@@ -2409,6 +2424,16 @@ export class CombatService {
                   materialsToAdd[drop.materialId] = (materialsToAdd[drop.materialId] || 0) + drop.quantity
                 }
                 await this.characterRepository.addMaterials(fullParticipation.characterId, materialsToAdd)
+              }
+            }
+
+            // Check tier progression after enemy defeat
+            if (fullParticipation?.characterId && this.killRecordService) {
+              const tierResult = await this.killRecordService.checkAndApplyTierProgressionByCharacterId(
+                fullParticipation.characterId
+              )
+              if (tierResult.tierChanged) {
+                tierProgression = { oldTier: tierResult.oldTier, newTier: tierResult.newTier }
               }
             }
 
@@ -2526,7 +2551,8 @@ export class CombatService {
       selfDamage: selfDamage > 0 ? selfDamage : undefined,
       goldReward: goldReward > 0 ? goldReward : undefined,
       materialDrops: materialDrops.length > 0 ? materialDrops : undefined,
-      nextEnemy
+      nextEnemy,
+      tierProgression
     }
   }
 
@@ -2546,6 +2572,7 @@ export class CombatService {
     manaCost: number
     bonusDice: number
     logEntries: CombatLogEntry[]
+    updatedState: TacticalStateData
   }> {
     // Get doctrine definition
     const doctrine = DOCTRINES[doctrineId]
@@ -2705,7 +2732,8 @@ export class CombatService {
       doctrineId,
       manaCost: doctrine.manaCost,
       bonusDice,
-      logEntries
+      logEntries,
+      updatedState
     }
   }
 

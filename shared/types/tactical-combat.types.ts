@@ -225,6 +225,8 @@ export interface TacticalAttackResult {
   }
   // Self-damage from rolling 1s (plasma_missile, audacity)
   selfDamageFromOnes?: number
+  // Tier progression if player leveled up from this kill
+  tierProgression?: { oldTier: number; newTier: number }
 }
 
 // Enemy AI turn result
@@ -299,4 +301,15 @@ export interface TacticalDoctrineResult {
     currentHealth: number
     maxHealth: number
   }
+  // Tier progression if player leveled up from this kill
+  tierProgression?: { oldTier: number; newTier: number }
+}
+
+// Self-buff doctrine result
+export interface SelfBuffDoctrineResult {
+  success: boolean
+  doctrineId: string
+  manaCost: number
+  bonusDice: number
+  updatedState: TacticalStateData
 }
