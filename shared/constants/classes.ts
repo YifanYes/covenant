@@ -56,3 +56,20 @@ export const CLASS_INITIAL_STATS = {
     manaRegen: 1
   }
 }
+
+// Base stats (without tier bonuses) - derived from tier 1 values
+// Formula: maxHealth = baseHealth + (tier * 2), maxMana = baseMana + tier
+export const CLASS_BASE_STATS = {
+  [CharacterClassName.TEMPLAR]: { baseHealth: 6, baseMana: 4 },
+  [CharacterClassName.HERALD]: { baseHealth: 3, baseMana: 10 },
+  [CharacterClassName.INQUISITOR]: { baseHealth: 6, baseMana: 6 },
+  [CharacterClassName.DEMON_HUNTER]: { baseHealth: 4, baseMana: 6 }
+}
+
+export function calculateMaxStats(className: CharacterClassName, tier: number) {
+  const base = CLASS_BASE_STATS[className]
+  return {
+    maxHealth: base.baseHealth + (tier * 2),
+    maxMana: base.baseMana + tier
+  }
+}

@@ -178,8 +178,8 @@ export class CharacterService {
     await this.characterRepository.updateHealth(classId, health, mana)
   }
 
-  async updateProgress(classId: string, tier: number): Promise<void> {
-    await this.characterRepository.updateProgress(classId, tier)
+  async updateProgress(classId: string, tier: number, maxHealth: number, maxMana: number): Promise<void> {
+    await this.characterRepository.updateProgress(classId, tier, maxHealth, maxMana)
   }
 
   async updateData(characterId: string, data: any): Promise<void> {

@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { calculateTierFromKills, getTierProgress, type TierProgressInfo } from '@shared/constants/tier-progression'
+import { CharacterClassName, calculateMaxStats } from '@shared/constants/classes'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 
@@ -100,7 +101,11 @@ export class KillRecordService {
     const newTier = calculateTierFromKills(stats.totalKills, oldTier)
 
     if (newTier > oldTier) {
-      await this.characterRepository.updateProgress(currentClass.id, newTier)
+      const { maxHealth, maxMana } = calculateMaxStats(
+        character.currentClass as CharacterClassName,
+        newTier
+      )
+      await this.characterRepository.updateProgress(currentClass.id, newTier, maxHealth, maxMana)
       return { tierChanged: true, oldTier, newTier }
     }
 
