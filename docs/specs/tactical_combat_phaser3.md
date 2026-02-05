@@ -280,6 +280,26 @@ interface TacticalStateData {
 
 This allows combat to be resumed if the player closes the browser.
 
+### Health Synchronization
+
+The player's health is tracked in two places:
+
+1. **`CharacterClass.health`** - The canonical health value stored in the database
+2. **`TacticalStateData.units[player].currentHealth`** - Combat health in the tactical state
+
+These values are kept in sync:
+
+| Event | Sync Behavior |
+|-------|---------------|
+| Combat starts | `currentHealth` is initialized to `min(CharacterClass.health, CharacterClass.maxHealth)` |
+| Player takes damage (enemy attack) | `CharacterClass.health` is updated to match `currentHealth` |
+| Player takes self-damage (thorns, rolling 1s) | `CharacterClass.health` is updated to match `currentHealth` |
+| Player uses health potion | Both values are updated, capped at `maxHealth` |
+| Player uses healing doctrine | `CharacterClass.health` is updated to match `currentHealth` |
+| Player uses self-damage doctrine | `CharacterClass.health` is updated to match `currentHealth` |
+
+**Important**: `CharacterClass.health` is always bounded by `CharacterClass.maxHealth`. The `maxHealth` field represents the player's HP pool for tactical combat (default: 5), while `health` is their current HP within that pool.
+
 ---
 
 ## Enemy Scaling System

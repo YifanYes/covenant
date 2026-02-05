@@ -217,10 +217,13 @@ export class ActivityService {
 
       // Build enemy name from prefix + suffix (stored as translation keys)
       const enemyName = `${activeEnemy.namePrefix}|${activeEnemy.nameSuffix}`
+      // Clamp health to maxHealth when initializing combat
+      // (health may exceed maxHealth from accumulated healing, but combat HP is bounded)
+      const initialHealth = Math.min(currentClass.health, currentClass.maxHealth)
       const tacticalState = this.createInitialTacticalState(
         'player-1', // Player unit ID
         character.name, // Player name
-        { current: currentClass.health, max: currentClass.maxHealth },
+        { current: initialHealth, max: currentClass.maxHealth },
         activeEnemy.id, // Use enemy's DB ID as unit ID
         enemyName,
         { current: activeEnemy.currentHealth, max: activeEnemy.maxHealth },

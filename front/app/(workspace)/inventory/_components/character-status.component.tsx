@@ -59,7 +59,9 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
             <Heart className="h-4 w-4 text-emerald-500" />
             <span className="text-sm font-medium">{t('inventory.health')}</span>
           </div>
-          <span className="text-sm font-bold text-emerald-500/90">{currentClass.health}</span>
+          <span className="text-sm font-bold text-emerald-500/90">
+            {currentClass.health} / {currentClass.maxHealth}
+          </span>
         </div>
 
         <div className="flex items-center justify-between">
@@ -67,7 +69,9 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
             <Zap className="h-4 w-4 text-blue-400" />
             <span className="text-sm font-medium">{t('inventory.mana')}</span>
           </div>
-          <span className="text-sm font-bold text-blue-400/90">{currentClass.mana}</span>
+          <span className="text-sm font-bold text-blue-400/90">
+            {currentClass.mana} / {currentClass.maxMana}
+          </span>
         </div>
 
         <div className="flex items-center justify-between">

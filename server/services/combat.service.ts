@@ -145,8 +145,8 @@ export class CombatService {
       manaRestored = Math.min(consumable.effect.healMana, currentClass.maxMana - currentClass.mana)
     }
 
-    // Update database health (add to existing DB health, not tactical health)
-    const newDbHealth = currentClass.health + healthRestored
+    // Update database health to match tactical state (capped at maxHealth)
+    const newDbHealth = Math.min(currentHealth + healthRestored, maxHealth)
     const newMana = currentClass.mana + manaRestored
     await this.characterRepository.updateHealth(currentClass.id, newDbHealth, newMana)
 
@@ -794,6 +794,15 @@ export class CombatService {
 
     // Save tactical state to database
     await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
+
+    // Sync player health to CharacterClass if player took damage (thorns, self-damage from 1s)
+    if (damageToAttacker > 0 && attackerUnit.id.startsWith('player-') && participation.characterId) {
+      const character = await this.characterRepository.findByIdWithClasses(participation.characterId)
+      if (character) {
+        const currentClass = this.getCurrentClassOrThrow(character)
+        await this.characterRepository.updateHealth(currentClass.id, newAttackerHealth, currentClass.mana)
+      }
+    }
 
     // Sync CombatEnemy record and handle defeat
     let goldReward = 0
@@ -1743,6 +1752,18 @@ export class CombatService {
     // Save state to database
     await this.activityParticipationRepository.updateTacticalState(participationId, state)
 
+    // Sync player health to CharacterClass if player took damage from enemy attack
+    if (attacked && damageDealt && damageDealt > 0 && participation.characterId) {
+      const playerUnit = state.units.find((u) => u.id.startsWith('player-'))
+      if (playerUnit) {
+        const character = await this.characterRepository.findByIdWithClasses(participation.characterId)
+        if (character) {
+          const currentClass = this.getCurrentClassOrThrow(character)
+          await this.characterRepository.updateHealth(currentClass.id, playerUnit.currentHealth, currentClass.mana)
+        }
+      }
+    }
+
     // Save combat log entries and update stats
     if (this.combatEnemyRepository) {
       const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(participationId)
@@ -2367,6 +2388,19 @@ export class CombatService {
 
     // Save tactical state to database
     await this.activityParticipationRepository.updateTacticalState(participationId, updatedState)
+
+    // Sync player health to CharacterClass if player's health changed (self-damage or healing)
+    const playerHealthChanged = selfDamage > 0 || effects.some((e) => e.unitId === casterId && (e.damageDealt || e.healthRestored))
+    if (playerHealthChanged && casterId.startsWith('player-') && participation.characterId) {
+      const playerUnit = updatedState.units.find((u) => u.id === casterId)
+      if (playerUnit) {
+        const character = await this.characterRepository.findByIdWithClasses(participation.characterId)
+        if (character) {
+          const currentClass = this.getCurrentClassOrThrow(character)
+          await this.characterRepository.updateHealth(currentClass.id, playerUnit.currentHealth, currentClass.mana)
+        }
+      }
+    }
 
     // Handle enemy defeats and spawn next enemy
     let goldReward = 0
