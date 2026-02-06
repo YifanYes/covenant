@@ -1,4 +1,5 @@
 import cors from '@fastify/cors'
+import rateLimit from '@fastify/rate-limit'
 import { fastifyTRPCPlugin, type FastifyTRPCPluginOptions } from '@trpc/server/adapters/fastify'
 import fastify from 'fastify'
 import cron from 'node-cron'
@@ -23,8 +24,13 @@ async function startServer() {
       credentials: true
     })
 
+    await server.register(rateLimit, {
+      max: 150,
+      timeWindow: '1 minute'
+    })
+
     // Health check route
-    server.get('/health', async () => {
+    server.get('/health', { config: { rateLimit: false } }, async () => {
       return { status: 'ok', timestamp: new Date().toISOString() }
     })
 
@@ -32,6 +38,12 @@ async function startServer() {
     server.route({
       method: ['GET', 'POST'],
       url: '/api/auth/*',
+      config: {
+        rateLimit: {
+          max: 20,
+          timeWindow: '1 minute'
+        }
+      },
       async handler(request, reply) {
         try {
           const url = new URL(request.url, `${request.protocol}://${request.headers.host}`)
