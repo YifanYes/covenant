@@ -21,10 +21,8 @@ export class CombatScene extends Phaser.Scene {
   private units: Map<string, Unit> = new Map()
   private loadingTextures: Set<string> = new Set()
   private unsubscribe?: () => void
-  private isAnimating = false
-  private isAttackAnimating = false
-  private isDoctrineAnimating = false
-  private isStatusEffectAnimating = false
+  private animationType: 'movement' | 'attack' | 'doctrine' | 'status' | null = null
+  private activeTweens: Set<Phaser.Tweens.Tween> = new Set()
   private floatingTexts: Phaser.GameObjects.Text[] = []
   private spellEffects: Phaser.GameObjects.Graphics[] = []
 
@@ -190,6 +188,16 @@ export class CombatScene extends Phaser.Scene {
     return !!(this.sys && this.tweens && this.scene?.manager && this.scene.isActive())
   }
 
+  /**
+   * Create a tween tracked for cleanup on scene shutdown.
+   */
+  private trackTween(config: Phaser.Types.Tweens.TweenBuilderConfig): Phaser.Tweens.Tween {
+    const tween = this.tweens.add(config)
+    this.activeTweens.add(tween)
+    tween.once('complete', () => this.activeTweens.delete(tween))
+    return tween
+  }
+
   private syncWithState(
     state: ReturnType<typeof useTacticalCombatStore.getState>
   ): void {
@@ -222,31 +230,31 @@ export class CombatScene extends Phaser.Scene {
     }
 
     // Check for movement animation state
-    if (state.phase === 'animating' && state.animatingUnitId && state.animationPath && !this.isAnimating) {
+    if (state.phase === 'animating' && state.animatingUnitId && state.animationPath && this.animationType === null) {
       this.handleMovementAnimation(state.animatingUnitId, state.animationPath)
       return // Don't sync units during animation - unit will update itself
     }
 
     // Check for attack animation state
-    if (state.phase === 'animating' && state.isAttackAnimating && state.attackAnimationData && !this.isAttackAnimating) {
+    if (state.phase === 'animating' && state.isAttackAnimating && state.attackAnimationData && this.animationType === null) {
       this.handleAttackAnimation(state.attackAnimationData)
       return // Don't sync units during animation
     }
 
     // Check for doctrine animation state
-    if (state.phase === 'animating' && state.isDoctrineAnimating && state.doctrineAnimationData && !this.isDoctrineAnimating) {
+    if (state.phase === 'animating' && state.isDoctrineAnimating && state.doctrineAnimationData && this.animationType === null) {
       this.handleDoctrineAnimation(state.doctrineAnimationData)
       return // Don't sync units during animation
     }
 
     // Check for status effect damage animation (doesn't require animating phase)
-    if (state.pendingStatusEffectDamage && !this.isStatusEffectAnimating) {
+    if (state.pendingStatusEffectDamage && this.animationType === null) {
       this.handleStatusEffectDamage(state.pendingStatusEffectDamage)
       // Continue to sync units - status effect animation runs independently
     }
 
     // Update units (skip during animation as the unit is updating itself)
-    if (!this.isAnimating && !this.isAttackAnimating && !this.isDoctrineAnimating) {
+    if (this.animationType === null || this.animationType === 'status') {
       this.syncUnits([...state.playerUnits, ...state.enemyUnits])
     }
 
@@ -265,13 +273,13 @@ export class CombatScene extends Phaser.Scene {
       return
     }
 
-    this.isAnimating = true
+    this.animationType = 'movement'
 
     try {
       // Perform the animation
       await unit.animateMovement(path, (x, y) => this.gridSystem.gridToScreen(x, y))
     } finally {
-      this.isAnimating = false
+      this.animationType = null
       // Signal animation complete to store
       useTacticalCombatStore.getState().completeAnimation()
     }
@@ -294,7 +302,7 @@ export class CombatScene extends Phaser.Scene {
       return
     }
 
-    this.isAttackAnimating = true
+    this.animationType = 'attack'
 
     try {
       // Get target position for attack animation
@@ -333,7 +341,7 @@ export class CombatScene extends Phaser.Scene {
         }
       }
     } finally {
-      this.isAttackAnimating = false
+      this.animationType = null
       // Signal animation complete to store
       useTacticalCombatStore.getState().completeAttackAnimation()
     }
@@ -356,14 +364,13 @@ export class CombatScene extends Phaser.Scene {
     const caster = this.units.get(data.casterId)
 
     if (!caster) {
-      // Caster not found - log warning and ensure animation state is reset
+      // Caster not found - log warning and complete animation immediately
       console.warn(`[CombatScene] Caster unit not found for doctrine animation: ${data.casterId}`)
-      this.isDoctrineAnimating = false
       useTacticalCombatStore.getState().completeDoctrineAnimation()
       return
     }
 
-    this.isDoctrineAnimating = true
+    this.animationType = 'doctrine'
 
     try {
       // Play cast animation on caster (flash effect with element-specific particles)
@@ -410,7 +417,7 @@ export class CombatScene extends Phaser.Scene {
         this.shakeCamera(this.getShakeIntensity(maxDamage, anyKilled))
       }
     } finally {
-      this.isDoctrineAnimating = false
+      this.animationType = null
       // Signal animation complete to store
       useTacticalCombatStore.getState().completeDoctrineAnimation()
     }
@@ -432,7 +439,7 @@ export class CombatScene extends Phaser.Scene {
       return
     }
 
-    this.isStatusEffectAnimating = true
+    this.animationType = 'status'
 
     try {
       // Show damage number with fire/poison color (orange for burn)
@@ -446,7 +453,7 @@ export class CombatScene extends Phaser.Scene {
         await targetUnit.animateDeath()
       }
     } finally {
-      this.isStatusEffectAnimating = false
+      this.animationType = null
       useTacticalCombatStore.getState().completeStatusEffectAnimation()
     }
   }
@@ -506,8 +513,8 @@ export class CombatScene extends Phaser.Scene {
     // Emit burst of particles
     particles.explode(particleCount)
 
-    // Clean up after particles fade
-    this.time.delayedCall(500, () => {
+    // Clean up after particles complete
+    particles.once('complete', () => {
       particles.destroy()
     })
   }
@@ -560,7 +567,7 @@ export class CombatScene extends Phaser.Scene {
       castParticles.explode(8)
 
       // Animate the flash expanding and fading
-      this.tweens.add({
+      this.trackTween({
         targets: flash,
         alpha: 0,
         scaleX: 2,
@@ -639,7 +646,7 @@ export class CombatScene extends Phaser.Scene {
       graphics.setDepth(DEPTH_LAYERS.EFFECTS - 1) // Behind particles
 
       // Animate and fade
-      this.tweens.add({
+      this.trackTween({
         targets: graphics,
         alpha: 0,
         duration: 600,
@@ -719,11 +726,9 @@ export class CombatScene extends Phaser.Scene {
       flames.setDepth(DEPTH_LAYERS.EFFECTS)
       flames.explode(8)
 
-      // Cleanup
-      this.time.delayedCall(900, () => {
-        embers.destroy()
-        flames.destroy()
-      })
+      // Cleanup after particles complete
+      embers.once('complete', () => embers.destroy())
+      flames.once('complete', () => flames.destroy())
     }
   }
 
@@ -765,7 +770,7 @@ export class CombatScene extends Phaser.Scene {
       ring.strokeCircle(pos.x, pos.y - 16, 5)
       ring.setDepth(DEPTH_LAYERS.EFFECTS)
 
-      this.tweens.add({
+      this.trackTween({
         targets: ring,
         scaleX: 6,
         scaleY: 6,
@@ -775,11 +780,9 @@ export class CombatScene extends Phaser.Scene {
         onComplete: () => ring.destroy()
       })
 
-      // Cleanup particles
-      this.time.delayedCall(1000, () => {
-        shards.destroy()
-        crystals.destroy()
-      })
+      // Cleanup after particles complete
+      shards.once('complete', () => shards.destroy())
+      crystals.once('complete', () => crystals.destroy())
     }
   }
 
@@ -794,7 +797,7 @@ export class CombatScene extends Phaser.Scene {
       flash.fillCircle(pos.x, pos.y - 16, 35)
       flash.setDepth(DEPTH_LAYERS.EFFECTS + 1)
 
-      this.tweens.add({
+      this.trackTween({
         targets: flash,
         alpha: 0,
         duration: 100,
@@ -817,6 +820,7 @@ export class CombatScene extends Phaser.Scene {
 
       // Secondary delayed burst
       this.time.delayedCall(80, () => {
+        if (!this.isSceneActive()) return
         const sparks2 = this.add.particles(pos.x, pos.y - 16, 'particle_spark', {
           lifespan: { min: 100, max: 200 },
           speed: { min: 100, max: 200 },
@@ -829,13 +833,11 @@ export class CombatScene extends Phaser.Scene {
         sparks2.setDepth(DEPTH_LAYERS.EFFECTS)
         sparks2.explode(8)
 
-        this.time.delayedCall(300, () => sparks2.destroy())
+        sparks2.once('complete', () => sparks2.destroy())
       })
 
-      // Cleanup
-      this.time.delayedCall(400, () => {
-        sparks.destroy()
-      })
+      // Cleanup after particles complete
+      sparks.once('complete', () => sparks.destroy())
     }
   }
 
@@ -877,7 +879,7 @@ export class CombatScene extends Phaser.Scene {
       glow.fillCircle(pos.x, pos.y - 16, 15)
       glow.setDepth(DEPTH_LAYERS.EFFECTS - 1)
 
-      this.tweens.add({
+      this.trackTween({
         targets: glow,
         scaleX: 3,
         scaleY: 3,
@@ -887,11 +889,9 @@ export class CombatScene extends Phaser.Scene {
         onComplete: () => glow.destroy()
       })
 
-      // Cleanup particles
-      this.time.delayedCall(900, () => {
-        sparkles.destroy()
-        rays.destroy()
-      })
+      // Cleanup after particles complete
+      sparkles.once('complete', () => sparkles.destroy())
+      rays.once('complete', () => rays.destroy())
     }
   }
 
@@ -925,7 +925,7 @@ export class CombatScene extends Phaser.Scene {
       core.fillCircle(pos.x, pos.y - 16, 20)
       core.setDepth(DEPTH_LAYERS.EFFECTS - 1)
 
-      this.tweens.add({
+      this.trackTween({
         targets: core,
         scaleX: 0.3,
         scaleY: 0.3,
@@ -937,6 +937,7 @@ export class CombatScene extends Phaser.Scene {
 
       // Void sparks at the end
       this.time.delayedCall(400, () => {
+        if (!this.isSceneActive()) return
         const sparks = this.add.particles(pos.x, pos.y - 16, 'particle_spark', {
           lifespan: { min: 200, max: 400 },
           speed: { min: 80, max: 150 },
@@ -949,13 +950,11 @@ export class CombatScene extends Phaser.Scene {
         sparks.setDepth(DEPTH_LAYERS.EFFECTS)
         sparks.explode(10)
 
-        this.time.delayedCall(500, () => sparks.destroy())
+        sparks.once('complete', () => sparks.destroy())
       })
 
-      // Cleanup
-      this.time.delayedCall(900, () => {
-        tendrils.destroy()
-      })
+      // Cleanup after particles complete
+      tendrils.once('complete', () => tendrils.destroy())
     }
   }
 
@@ -977,10 +976,8 @@ export class CombatScene extends Phaser.Scene {
       sparkles.setDepth(DEPTH_LAYERS.EFFECTS)
       sparkles.explode(10)
 
-      // Cleanup
-      this.time.delayedCall(800, () => {
-        sparkles.destroy()
-      })
+      // Cleanup after particles complete
+      sparkles.once('complete', () => sparkles.destroy())
     }
   }
 
@@ -1012,7 +1009,7 @@ export class CombatScene extends Phaser.Scene {
     this.floatingTexts.push(text)
 
     // Animate the text floating up and fading
-    this.tweens.add({
+    this.trackTween({
       targets: text,
       y: text.y - 30,
       alpha: 0,
@@ -1056,7 +1053,7 @@ export class CombatScene extends Phaser.Scene {
     this.floatingTexts.push(text)
 
     // Animate the text floating up and fading
-    this.tweens.add({
+    this.trackTween({
       targets: text,
       y: text.y - 40,
       alpha: 0,
@@ -1100,7 +1097,7 @@ export class CombatScene extends Phaser.Scene {
     this.floatingTexts.push(text)
 
     // Animate the text floating up and fading
-    this.tweens.add({
+    this.trackTween({
       targets: text,
       y: text.y - 40,
       alpha: 0,
@@ -1192,7 +1189,16 @@ export class CombatScene extends Phaser.Scene {
       if (!hasTexture && !isLoading) {
         this.loadingTextures.add(customTextureKey)
         this.load.image(customTextureKey, unitData.spriteUrl)
+        const onLoadError = (file: Phaser.Loader.File) => {
+          if (file.key === customTextureKey) {
+            this.loadingTextures.delete(customTextureKey)
+            console.warn(`[CombatScene] Failed to load sprite: ${customTextureKey}`)
+            this.load.off('loaderror', onLoadError)
+          }
+        }
+        this.load.on('loaderror', onLoadError)
         this.load.once('complete', () => {
+          this.load.off('loaderror', onLoadError)
           this.loadingTextures.delete(customTextureKey)
           // Update sprite texture once loaded
           const existingUnit = this.units.get(unitData.id)
@@ -1227,6 +1233,15 @@ export class CombatScene extends Phaser.Scene {
     if (this.unsubscribe) {
       this.unsubscribe()
     }
+
+    // Destroy all tracked tweens
+    for (const tween of this.activeTweens) {
+      tween.destroy()
+    }
+    this.activeTweens.clear()
+
+    // Remove all delayed calls
+    this.time.removeAllEvents()
 
     // Cleanup grid
     this.gridSystem.destroy()
