@@ -61,19 +61,19 @@
   - `front/hooks/use-faction-theme.ts` (lines 51-52)
   - **Fix:** Add `Secure` flag to cookie
 
-- [ ] Combat: Memory - Tween Cleanup on Scene Destruction
+- [x] Combat: Memory - Tween Cleanup on Scene Destruction
   - `combat-scene.ts:270-277`, `unit.ts`
   - **Fix:** Create `activeTweens` registry; destroy all on scene shutdown
 
-- [ ] Combat: Memory - Particle Emitter Cleanup
+- [x] Combat: Memory - Particle Emitter Cleanup
   - `combat-scene.ts:510-512, 723-726`
   - **Fix:** Use `once('complete', cleanup)` instead of `delayedCall`
 
-- [ ] Combat: Memory - Texture Load Failure
+- [x] Combat: Memory - Texture Load Failure
   - `combat-scene.ts:1192-1210`
   - **Fix:** Add error handler `this.load.once('loaderror', ...)`
 
-- [ ] Combat: Race - Multiple Animation Flags
+- [x] Combat: Race - Multiple Animation Flags
   - `combat-scene.ts:24-27`
   - **Fix:** Replace 4 booleans with single `animationType: 'movement' | 'attack' | 'doctrine' | 'status' | null`
 
@@ -128,5 +128,5 @@
 | `front/hooks/use-faction-theme.ts`                | Add Secure flag                                  |
 | `server/server.ts`                                | Add rate limiting                                |
 | `front/stores/tactical-combat.store.ts`           | Fix unit template validation, extract grid utils |
-| `front/lib/phaser/scenes/combat-scene.ts`         | Fix memory/animation issues                      |
+| ~~`front/lib/phaser/scenes/combat-scene.ts`~~      | ✅ Fixed memory/animation issues                 |
 | `server/services/combat.service.ts`               | Split into focused services                      |
