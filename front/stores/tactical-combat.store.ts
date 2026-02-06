@@ -386,6 +386,13 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       return
     }
 
+    // Player unit is required for recovery — without it combat is unrecoverable
+    const hasPlayerUnit = hydratedUnits.some((u) => u.isPlayer)
+    if (!hasPlayerUnit) {
+      fallbackToFresh('Player unit template not found - cannot recover')
+      return
+    }
+
     const playerUnits = hydratedUnits.filter((u) => u.isPlayer)
     const enemyUnits = hydratedUnits.filter((u) => !u.isPlayer)
 
@@ -394,12 +401,23 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       .map((id) => hydratedUnits.find((u) => u.id === id))
       .filter((u): u is TacticalUnit => u !== undefined)
 
+    // Clamp index to valid range — dropped units may have shortened the queue
+    let adjustedTurnIndex = persistedState.currentTurnIndex
+    if (adjustedTurnIndex >= turnQueue.length) {
+      adjustedTurnIndex = 0
+    }
+
     // Determine active unit
-    const activeUnitId = turnQueue[persistedState.currentTurnIndex]?.id ?? null
+    const activeUnitId = turnQueue[adjustedTurnIndex]?.id ?? null
     const activeUnit = hydratedUnits.find((u) => u.id === activeUnitId)
 
+    if (!activeUnitId || !activeUnit) {
+      fallbackToFresh('Could not determine active unit after hydration')
+      return
+    }
+
     // Determine phase based on active unit
-    const phase: TacticalPhase = activeUnit?.isPlayer ? 'select_action' : 'enemy_turn'
+    const phase: TacticalPhase = activeUnit.isPlayer ? 'select_action' : 'enemy_turn'
 
     set({
       gridWidth: persistedState.gridWidth,
@@ -408,7 +426,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
       playerUnits,
       enemyUnits,
       turnQueue,
-      currentTurnIndex: persistedState.currentTurnIndex,
+      currentTurnIndex: adjustedTurnIndex,
       activeUnitId,
       turnNumber: persistedState.turnNumber,
       phase,
