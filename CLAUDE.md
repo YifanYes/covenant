@@ -10,6 +10,10 @@ ARQ is a gamified productivity platform combining task management, habit trackin
 
 ### Development
 
+This project uses TypeScript throughout. When modifying types or interfaces, always verify downstream tRPC type inference and avoid Omit<> patterns that break implicit type resolution. Run `tsc --noEmit` after type changes.
+
+Always run the full test suite (`pnpm run test`) after making changes, especially for auth, combat, tier progression, and crafting systems. Do not consider a task complete until tests pass.
+
 ```bash
 # Backend (Terminal 1)
 cd server && pnpm dev
@@ -19,6 +23,8 @@ cd front && pnpm dev
 ```
 
 ### Testing
+
+Uses Vitest. Test files go in `server/__tests__/` mirroring the source structure. Mock fixture factories live in `__tests__/fixtures/` using the override pattern (e.g., `mockCharacter(overrides)`). Services are tested by mocking repositories via constructor injection.
 
 ```bash
 cd server && pnpm test           # Run tests
@@ -55,18 +61,20 @@ npx prisma migrate dev  # Create migration
 Request → Router (validation) → Service (business logic) → Repository (data access)
 ```
 
-- **Routers**: Thin layer, input validation only, delegates to services
+- **Routers**: Thin layer, input validation only, delegates to services. Use `protectedProcedure` for authenticated routes, `publicProcedure` for public routes
 - **Services**: Class-based with constructor injection, accessed via `ctx.services`
-- **Repositories**: Prisma queries, one per entity, no business logic
+- **Repositories**: Prisma queries, one per entity, no business logic. Extend `BaseRepository<T>` or `UserScopedRepository<T>` from `base.repository.ts`
+- **Service Factory**: `server/services/service.factory.ts` registers all services with lazy initialization (`??=`). Services are layered — Layer 1: repo-only deps, Layer 2: repo + L1 services, Layer 3: complex deps. New services must be registered here to be available via `ctx.services`
 
 ### Frontend Architecture
 
-- **Route Groups**: `(auth)` for authentication, `(workspace)` for main app
+- **Route Groups**: `(auth)` for authentication, `(workspace)` for main app, `(landing)` for landing pages
 - **Page Components**: `app/[route]/page.tsx`
 - **Page-specific Components**: `app/[route]/_components/`
 - **Shared Components**: `components/` (ui primitives in `components/ui/`) from shadcn ui
 - **Static Pages**: MDX files in `app/` for static content pages (e.g., news, mechanics)
 - **State**: Server state via TanStack Query/tRPC, client state via Zustand with slice pattern
+- **Dual Layout**: Workspace dynamically selects RPGLayout vs ProductivityLayout based on route (`/map`, `/inventory`, `/shop` → RPG)
 
 ### tRPC Usage
 
@@ -105,8 +113,11 @@ const mutation = useMutation(
 - No semicolons
 - Single quotes
 - No trailing commas
+- `printWidth: 120`
+- Formatting source of truth: `.prettierrc` at repo root
 - Never use `any` - use `unknown` with type guards if needed
 - Use `z.infer<typeof schema>` for TypeScript types from Zod schemas
+- Use path aliases (`@/*`, `@shared/*`, `@ui/*`) instead of relative imports
 
 ### Components
 
@@ -123,15 +134,27 @@ const mutation = useMutation(
 - Add keys to BOTH locale files when adding new strings
 - Use `t('key')` for translations, never raw strings like `"Range"` or `"Pattern"`
 
+### Git Commits
+
+- Conventional format: `<type>: <description>` (e.g., `fix:`, `feat:`, `docs:`, `test:`, `build:`)
+- Lowercase description, no period at end
+- PRs squash-merge with `(#N)` suffix
+
+### Environment
+
+- `server/.env.example` has all required variables (DATABASE_URL, JWT_SECRET, GOOGLE_CLIENT_ID, etc.)
+
 ## Adding Features
 
 1. Check `roadmap.md` for current phase priorities
 2. Create spec in `docs/specs/` to document the implementation
 3. Add Zod schema in `shared/schemas/`
-4. Backend: Repository → Service → Router
+4. Backend: Repository → Service → Register in ServiceFactory → Router
 5. Frontend: Component → Hook → View
 6. Add i18n keys to both locales
 
-## PR Title Format
+## Debugging
 
-`[<workspace>] Description` - e.g., `[front] Add task completion animation`
+When fixing bugs, identify ALL code paths affected before applying changes. Never fix only 1-2 of 3+ paths — trace every caller/reference to the affected logic and fix comprehensively in one pass.
+
+Apply minimal, targeted fixes. Do NOT add strict validation that rejects existing/legacy state. Do NOT refactor adjacent code unless explicitly asked. When fixing one behavior, verify that all existing features still work before committing.
