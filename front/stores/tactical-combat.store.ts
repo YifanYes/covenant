@@ -9,7 +9,7 @@ import {
   findUnitsInAoE,
   getPathCost
 } from '@/lib/phaser/systems/pathfinding'
-import { DOCTRINES } from '@shared/constants/doctrines'
+import { DOCTRINES, SELF_BUFF_EFFECT_TYPES } from '@shared/constants/doctrines'
 import { getEnemy } from '@shared/constants/enemies'
 import { generateMapTiles } from '@shared/constants/map-themes'
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
@@ -369,6 +369,18 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
         console.warn(`[hydrateFromState] Unit template not found for id: ${persistedUnit.id}, skipping unit`)
         continue
       }
+      // Merge activeEffects and activeDoctrines into a single activeEffects array
+      const baseEffects = persistedUnit.activeEffects ?? []
+      const doctrineEffects = persistedUnit.activeDoctrines
+        ? Object.values(persistedUnit.activeDoctrines)
+        : []
+      // Avoid duplicates: only add doctrine effects whose sourceDoctrineId isn't already in baseEffects
+      const existingDoctrineIds = new Set(baseEffects.map((e) => e.sourceDoctrineId))
+      const mergedEffects = [
+        ...baseEffects,
+        ...doctrineEffects.filter((e) => !existingDoctrineIds.has(e.sourceDoctrineId))
+      ]
+
       hydratedUnits.push({
         ...template,
         position: persistedUnit.position,
@@ -376,7 +388,7 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
         maxHealth: persistedUnit.maxHealth,
         hasMoved: persistedUnit.hasMoved,
         hasActed: persistedUnit.hasActed,
-        activeEffects: persistedUnit.activeEffects ?? []
+        activeEffects: mergedEffects
       })
     }
 
@@ -1628,15 +1640,15 @@ export const useTacticalCombatStore = create<TacticalCombatStore>((set, get) => 
 
     const updatedPlayerUnits = playerUnits.map((unit) => {
       if (unit.id === activeUnitId) {
-        // Filter out consumed self-buff doctrines
+        // Filter out consumed self-buff doctrines (all self-buff types, not just POWER_MODIFIER)
         const remainingEffects = unit.activeEffects.filter((effect) => {
           const doctrine = DOCTRINES[effect.sourceDoctrineId]
           if (!doctrine) return false
 
-          // Check if this is a self-buff POWER_MODIFIER - these get consumed on attack
+          // Check if this is a self-buff doctrine - these get consumed on attack
           const isSelfBuff =
             doctrine.effects.some(
-              (e) => e.type === DoctrineEffectType.POWER_MODIFIER && e.target === DoctrineTarget.SELF
+              (e) => SELF_BUFF_EFFECT_TYPES.includes(e.type) && e.target === DoctrineTarget.SELF
             ) && !doctrine.aoePattern
 
           // Keep non-self-buff effects
