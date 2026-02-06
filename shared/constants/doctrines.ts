@@ -4,6 +4,17 @@ import { AoEPatternType } from './aoe-patterns'
 
 export const MAX_EQUIPPED_DOCTRINES = 2
 
+/** Effect types that qualify a doctrine as a self-buff (no targeting required) */
+export const SELF_BUFF_EFFECT_TYPES: DoctrineEffectType[] = [
+  DoctrineEffectType.POWER_MODIFIER,
+  DoctrineEffectType.THRESHOLD_MODIFIER,
+  DoctrineEffectType.NEGATE_HITS,
+  DoctrineEffectType.GUARANTEED_CRITICAL
+]
+
+/** Doctrines that are self-buffs but don't match the standard effect-type + SELF target pattern */
+export const SPECIAL_SELF_BUFF_DOCTRINES = ['karmic_retribution', 'nullify', 'flaming_apotheosis']
+
 export const DOCTRINES: Record<string, DoctrineDefinition> = {
   // TEMPLAR - TIER 1 - FORM
   truth_blade: {
@@ -52,12 +63,15 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.ENEMY,
         value: -1, // Enemy -1 defense die
-        duration: 1
+        duration: 1,
+        debuffType: 'defense'
       }
     ]
   },
@@ -71,12 +85,15 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 2,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.ENEMY,
         value: -2, // Enemy -2 attack if targeting others
-        duration: 1
+        duration: 1,
+        debuffType: 'attack'
       }
     ]
   },
@@ -498,6 +515,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 3,
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -575,6 +594,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 4,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 2,
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -724,6 +745,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 3,
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -787,12 +810,15 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 3,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.ENEMY,
         value: -2, // Enemy -2 defense dice
-        duration: 2
+        duration: 2,
+        debuffType: 'defense'
       }
     ]
   },
@@ -826,6 +852,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 9,
     isUltimate: true,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 4,
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -852,7 +880,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.ALL_ENEMIES,
         value: -2, // All enemies -2 attack power
-        duration: 1
+        duration: 1,
+        debuffType: 'attack'
       }
     ]
   },
@@ -936,15 +965,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     isUltimate: false,
     effects: [
       {
-        type: DoctrineEffectType.DIRECT_DAMAGE,
-        target: DoctrineTarget.ENEMY,
-        value: 2 // If attacker hits you, they take 2 damage
-      },
-      {
-        type: DoctrineEffectType.APPLY_STATUS,
-        target: DoctrineTarget.ENEMY,
-        statusEffect: StatusEffect.BURNING,
-        duration: 2
+        type: DoctrineEffectType.NEGATE_HITS,
+        target: DoctrineTarget.SELF,
+        value: 0, // No hit negation, but triggers thorns + burn
+        duration: 2,
+        thornsDamage: 2, // Deal 2 damage to attackers when hit
+        thornsBurnDuration: 2 // Also apply BURNING for 2 turns to attacker
       }
     ]
   },

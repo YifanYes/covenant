@@ -1,4 +1,4 @@
-import { DOCTRINES } from '@shared/constants/doctrines'
+import { DOCTRINES, SELF_BUFF_EFFECT_TYPES, SPECIAL_SELF_BUFF_DOCTRINES } from '@shared/constants/doctrines'
 import {
   getAoETilesWithRotation,
   getDoctrineAoEPattern,
@@ -19,7 +19,7 @@ interface EncounterState {
 }
 import { generateMapTiles } from '@shared/constants/map-themes'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
-import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
+import { DoctrineEffectType, DoctrineTarget, NEGATIVE_STATUSES, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 import type {
   CombatLogEntry,
   DiceRollResult,
@@ -613,9 +613,22 @@ export class CombatService {
       }
     })
 
+    // Bug 2 fix: Check defender for WEAKENED(defense) debuff — truncate effective defense rolls
+    // Multiple WEAKENED(defense) effects stack additively (each reduces dice further)
+    const defenderActiveEffects = state.units[targetIndex].activeEffects
+    let effectiveDefenderRolls = defenderRolls
+    if (defenderActiveEffects) {
+      for (const statusEff of defenderActiveEffects) {
+        if (statusEff.effect === StatusEffect.WEAKENED && statusEff.debuffType === 'defense' && statusEff.debuffValue != null && statusEff.remainingTurns > 0) {
+          const reducedCount = Math.max(0, effectiveDefenderRolls.length + statusEff.debuffValue) // debuffValue is negative
+          effectiveDefenderRolls = effectiveDefenderRolls.slice(0, reducedCount)
+        }
+      }
+    }
+
     // Resolve defender's defense first to know total incoming hits
     const { results: defenderResults, count: defenderBlocks } = this.calculateHitsWithCount(
-      defenderRolls,
+      effectiveDefenderRolls,
       defenseThreshold
     )
 
@@ -669,6 +682,31 @@ export class CombatService {
           source: 'karmic_retribution'
         }
       })
+    }
+
+    // Bug 1 fix: Collect pending enemy statuses from attacker's mixed SELF+ENEMY doctrines
+    // Design: pending statuses only apply when the attack deals damage (must land a hit to stun, etc.)
+    const pendingEnemyStatuses: ActiveStatusEffect[] = []
+    if (damageToTarget > 0 && attackerUnit.activeDoctrines) {
+      for (const [, docEffect] of Object.entries(attackerUnit.activeDoctrines)) {
+        if (docEffect.pendingEnemyStatus && docEffect.remainingTurns > 0) {
+          pendingEnemyStatuses.push({
+            effect: docEffect.pendingEnemyStatus,
+            remainingTurns: docEffect.pendingEnemyStatusDuration || 1,
+            sourceDoctrineId: docEffect.sourceDoctrineId
+          })
+          logEntries.push({
+            timestamp: timestamp + 3.7,
+            type: CombatLogType.DOCTRINE_EFFECT,
+            data: {
+              effect: 'status_applied',
+              status: docEffect.pendingEnemyStatus,
+              target: enemyName,
+              source: docEffect.sourceDoctrineId
+            }
+          })
+        }
+      }
     }
 
     // Log damage to enemy
@@ -739,9 +777,14 @@ export class CombatService {
         }
       }
       if (i === targetIndex) {
+        // Bug 1 fix: Apply pending enemy statuses (e.g. STUNNED from shoulder_charge)
+        const updatedEffects = pendingEnemyStatuses.length > 0
+          ? [...(unit.activeEffects || []), ...pendingEnemyStatuses]
+          : unit.activeEffects
         return {
           ...unit,
           currentHealth: newTargetHealth,
+          activeEffects: updatedEffects,
           // Clear defense buffs (NEGATE_HITS) from defender after they take damage
           activeDoctrines: damageToTarget > 0 || defenderBuffs.negateHits > 0
             ? this.clearConsumedDefenseDoctrines(unit.activeDoctrines)
@@ -1619,16 +1662,28 @@ export class CombatService {
       attacked = true
       targetId = targetPlayer.id
 
+      // Bug 2 fix: Check enemy's activeEffects for WEAKENED(attack) debuff
+      // Multiple WEAKENED(attack) effects stack additively (each reduces dice further)
+      let effectiveEnemyAttackDice = enemyAttackDice
+      if (currentEnemy.activeEffects) {
+        for (const statusEff of currentEnemy.activeEffects) {
+          if (statusEff.effect === StatusEffect.WEAKENED && statusEff.debuffType === 'attack' && statusEff.debuffValue != null && statusEff.remainingTurns > 0) {
+            effectiveEnemyAttackDice = Math.max(0, effectiveEnemyAttackDice + statusEff.debuffValue) // debuffValue is negative
+          }
+        }
+      }
+
       // Roll attack dice
-      const attackRolls = this.rollDice(enemyAttackDice)
+      const attackRolls = this.rollDice(effectiveEnemyAttackDice)
       const { results: attackResults, count: attackHits } = this.calculateHitsWithCount(
         attackRolls,
         enemyAttackThreshold
       )
       attackerRolls = attackResults
 
-      // Roll defense dice for player (use a standard 2 defense dice)
-      const playerDefenseDice = 2
+      // Bug 6 fix: Check player's doctrine buffs for defenseZero
+      const playerBuffs = this.getActiveDoctrineBuffs(currentTarget.activeDoctrines)
+      const playerDefenseDice = playerBuffs.defenseZero ? 0 : 2
       const defenseRollValues = this.rollDice(playerDefenseDice)
       const { results: defenseResults, count: defenseBlocks } = this.calculateHitsWithCount(
         defenseRollValues,
@@ -1636,21 +1691,26 @@ export class CombatService {
       )
       defenderRolls = defenseResults
 
+      // Check for NEGATE_HITS on the player (pass raw damage for percentage-based negation)
+      const rawPlayerDamage = Math.max(0, attackHits - defenseBlocks)
+      const playerDefenseBuffs = this.getActiveDoctrineBuffs(currentTarget.activeDoctrines, rawPlayerDamage)
+      const totalPlayerBlocks = defenseBlocks + playerDefenseBuffs.negateHits
+
       // Calculate damage
-      damageDealt = Math.max(0, attackHits - defenseBlocks)
+      damageDealt = Math.max(0, attackHits - totalPlayerBlocks)
       const newTargetHealth = Math.max(0, currentTarget.currentHealth - damageDealt)
       targetKilled = newTargetHealth <= 0
 
       logEntries.push({
         timestamp: timestamp + 2,
         type: CombatLogType.ENEMY_ATTACKS,
-        data: { enemy: enemy.name, hits: attackHits, dice: enemyAttackDice }
+        data: { enemy: enemy.name, hits: attackHits, dice: effectiveEnemyAttackDice }
       })
 
       logEntries.push({
         timestamp: timestamp + 3,
         type: CombatLogType.PLAYER_DEFENDS,
-        data: { blocks: defenseBlocks, rolls: defenseRollValues }
+        data: { blocks: defenseBlocks, rolls: defenseRollValues, negatedHits: playerDefenseBuffs.negateHits > 0 ? playerDefenseBuffs.negateHits : undefined }
       })
 
       logEntries.push({
@@ -1659,13 +1719,59 @@ export class CombatService {
         data: { damage: damageDealt }
       })
 
+      // Bug 6 fix: Apply thorns damage from player's doctrines back to enemy
+      let thornsDamageToEnemy = 0
+      if (damageDealt > 0 && playerBuffs.thornsDamage > 0) {
+        thornsDamageToEnemy = playerBuffs.thornsDamage
+        logEntries.push({
+          timestamp: timestamp + 4.5,
+          type: CombatLogType.DOCTRINE_EFFECT,
+          data: {
+            effect: 'thorns',
+            damage: thornsDamageToEnemy,
+            source: 'thorns_retaliation'
+          }
+        })
+      }
+
+      // Calculate new enemy health after thorns
+      const newEnemyHealthAfterThorns = Math.max(0, currentEnemy.currentHealth - thornsDamageToEnemy)
+      const enemyKilledByThorns = newEnemyHealthAfterThorns <= 0
+
+      // Bug 6 fix: Apply BURNING to enemy from thornsBurnDuration (flaming_apotheosis)
+      let enemyBurnApplied = false
+      if (damageDealt > 0 && playerBuffs.thornsBurnDuration > 0) {
+        enemyBurnApplied = true
+      }
+
       // Update state with attack result
       let updatedUnits = state.units.map((unit) => {
         if (unit.id === enemyId) {
-          return { ...unit, hasActed: true }
+          let enemyEffects = [...(unit.activeEffects || [])]
+          // Apply BURNING from thorns if applicable
+          if (enemyBurnApplied) {
+            enemyEffects.push({
+              effect: StatusEffect.BURNING,
+              remainingTurns: playerBuffs.thornsBurnDuration,
+              sourceDoctrineId: 'flaming_apotheosis'
+            })
+          }
+          return {
+            ...unit,
+            hasActed: true,
+            currentHealth: newEnemyHealthAfterThorns,
+            activeEffects: enemyEffects
+          }
         }
         if (unit.id === targetId) {
-          return { ...unit, currentHealth: newTargetHealth }
+          return {
+            ...unit,
+            currentHealth: newTargetHealth,
+            // Clear consumed defense buffs after taking damage
+            activeDoctrines: (damageDealt ?? 0) > 0 || playerDefenseBuffs.negateHits > 0
+              ? this.clearConsumedDefenseDoctrines(unit.activeDoctrines)
+              : unit.activeDoctrines
+          }
         }
         return unit
       })
@@ -1684,6 +1790,21 @@ export class CombatService {
           timestamp: timestamp + 5,
           type: CombatLogType.PLAYER_DEFEATED,
           data: { player: currentTarget.name }
+        })
+      }
+
+      // Handle enemy killed by thorns
+      if (enemyKilledByThorns) {
+        const enemyPos = currentEnemy.position
+        if (updatedTiles[enemyPos.y]?.[enemyPos.x]) {
+          updatedTiles[enemyPos.y][enemyPos.x].occupantId = null
+        }
+        // Remove the killed enemy (health already set to 0 above via newEnemyHealthAfterThorns)
+        updatedUnits = updatedUnits.filter((u) => u.id !== enemyId)
+        logEntries.push({
+          timestamp: timestamp + 5.5,
+          type: CombatLogType.ENEMY_DEFEATED,
+          data: { enemy: enemy.name }
         })
       }
 
@@ -2236,8 +2357,23 @@ export class CombatService {
               }
             }
           } else if (effect.target === DoctrineTarget.ALL_ENEMIES || effect.target === DoctrineTarget.ENEMY) {
-            // For enemy-targeted power modifiers, apply WEAKENED status
+            // Bug 2 fix: Create real WEAKENED status effect on targets
             for (const targetId of affectedUnitIds) {
+              const targetIdx = updatedUnits.findIndex((u) => u.id === targetId)
+              if (targetIdx !== -1) {
+                const targetUnit = updatedUnits[targetIdx]
+                const weakenedEffect: ActiveStatusEffect = {
+                  effect: StatusEffect.WEAKENED,
+                  remainingTurns: effect.duration ?? 1,
+                  sourceDoctrineId: doctrineId,
+                  debuffType: effect.debuffType ?? 'defense',
+                  debuffValue: effect.value ?? 0
+                }
+                updatedUnits[targetIdx] = {
+                  ...targetUnit,
+                  activeEffects: [...(targetUnit.activeEffects || []), weakenedEffect]
+                }
+              }
               effects.push({
                 unitId: targetId,
                 statusApplied: 'WEAKENED'
@@ -2620,20 +2756,10 @@ export class CombatService {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Doctrine not found' })
     }
 
-    // Validate this is a self-buff doctrine (POWER_MODIFIER, THRESHOLD_MODIFIER, NEGATE_HITS, or GUARANTEED_CRITICAL with SELF target, no aoePattern)
-    // Special cases: karmic_retribution is a thorns buff (applied to self, triggers on being hit)
-    const selfBuffEffectTypes: DoctrineEffectType[] = [
-      DoctrineEffectType.POWER_MODIFIER,
-      DoctrineEffectType.THRESHOLD_MODIFIER,
-      DoctrineEffectType.NEGATE_HITS,
-      DoctrineEffectType.GUARANTEED_CRITICAL
-    ]
-    // Doctrines that are self-buffs but don't fit the standard pattern
-    const specialSelfBuffDoctrines = ['karmic_retribution']
-
+    // Validate this is a self-buff doctrine
     const isSelfBuff = (doctrine.effects.some(
-      (e) => selfBuffEffectTypes.includes(e.type) && e.target === DoctrineTarget.SELF
-    ) && !doctrine.aoePattern) || specialSelfBuffDoctrines.includes(doctrineId)
+      (e) => SELF_BUFF_EFFECT_TYPES.includes(e.type) && e.target === DoctrineTarget.SELF
+    ) && !doctrine.aoePattern) || SPECIAL_SELF_BUFF_DOCTRINES.includes(doctrineId)
 
     if (!isSelfBuff) {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'This doctrine requires targeting' })
@@ -2701,19 +2827,40 @@ export class CombatService {
       }
     }
 
+    // Determine duration from doctrine effects (default 1 for single-use buffs)
+    const effectDuration = doctrine.effects.reduce((max, e) => Math.max(max, e.duration || 0), 0) || 1
+
     // Create the active doctrine effect
     const activeEffect: ActiveStatusEffect = {
       effect: StatusEffect.DOCTRINE_ACTIVE,
-      remainingTurns: 1, // Lasts until next attack
+      remainingTurns: effectDuration,
       sourceDoctrineId: doctrineId
     }
+
+    // Bug 1 fix: For mixed SELF+ENEMY doctrines (shoulder_charge, righteous_charge, law_hammer),
+    // scan for APPLY_STATUS(ENEMY) effects and store as pending enemy status
+    for (const docEffect of doctrine.effects) {
+      if (docEffect.target === DoctrineTarget.ENEMY && docEffect.type === DoctrineEffectType.APPLY_STATUS && docEffect.statusEffect) {
+        activeEffect.pendingEnemyStatus = docEffect.statusEffect
+        activeEffect.pendingEnemyStatusDuration = docEffect.duration || 1
+        break
+      }
+    }
+
+    // Bug 4 fix: nullify — prepare cleansed effects for caster
+    const shouldCleanse = doctrineId === 'nullify'
 
     // Update unit's active doctrines
     const updatedUnits = state.units.map((unit, i) => {
       if (i === casterIndex) {
         const existingDoctrines = unit.activeDoctrines || {}
+        // Apply nullify cleanse if applicable
+        const cleansedEffects = shouldCleanse
+          ? (unit.activeEffects || []).filter((eff) => !NEGATIVE_STATUSES.includes(eff.effect))
+          : unit.activeEffects
         return {
           ...unit,
+          activeEffects: cleansedEffects,
           activeDoctrines: {
             ...existingDoctrines,
             [doctrineId]: activeEffect
@@ -2793,7 +2940,8 @@ export class CombatService {
     criticalThresholdMod: number
     defenseZero: boolean
     onesHurtSelf: boolean
-    thornsDamage: number // karmic_retribution: damage reflected to attacker
+    thornsDamage: number // karmic_retribution/flaming_apotheosis: damage reflected to attacker
+    thornsBurnDuration: number // flaming_apotheosis: burn duration applied to attacker
   } {
     if (!unitActiveDoctrines) {
       return {
@@ -2805,7 +2953,8 @@ export class CombatService {
         criticalThresholdMod: 0,
         defenseZero: false,
         onesHurtSelf: false,
-        thornsDamage: 0
+        thornsDamage: 0,
+        thornsBurnDuration: 0
       }
     }
 
@@ -2818,6 +2967,7 @@ export class CombatService {
     let defenseZero = false
     let onesHurtSelf = false
     let thornsDamage = 0
+    let thornsBurnDuration = 0
 
     // Doctrines that set defense to 0
     const defenseZeroDoctrines = ['reckless_strike', 'audacity']
@@ -2838,11 +2988,12 @@ export class CombatService {
         onesHurtSelf = true
       }
 
-      // KARMIC_RETRIBUTION: Thorns - deal flat damage to attacker
-      if (doctrineId === 'karmic_retribution') {
-        const thornEffect = doctrine.effects.find(e => e.thornsDamage !== undefined)
-        if (thornEffect?.thornsDamage) {
-          thornsDamage = thornEffect.thornsDamage
+      // Thorns - deal flat damage to attacker (karmic_retribution, flaming_apotheosis)
+      const thornEffect = doctrine.effects.find(e => e.thornsDamage !== undefined)
+      if (thornEffect?.thornsDamage) {
+        thornsDamage = Math.max(thornsDamage, thornEffect.thornsDamage)
+        if (thornEffect.thornsBurnDuration) {
+          thornsBurnDuration = Math.max(thornsBurnDuration, thornEffect.thornsBurnDuration)
         }
       }
 
@@ -2906,7 +3057,8 @@ export class CombatService {
       criticalThresholdMod,
       defenseZero,
       onesHurtSelf,
-      thornsDamage
+      thornsDamage,
+      thornsBurnDuration
     }
   }
 
@@ -2959,12 +3111,19 @@ export class CombatService {
       ) && !doctrine.aoePattern
 
       if (isAttackSelfBuff) {
-        // Attack self-buffs are consumed after attack
+        // Multi-turn attack buffs: decrement instead of removing
+        if (effect.remainingTurns > 1) {
+          remaining[doctrineId] = { ...effect, remainingTurns: effect.remainingTurns - 1 }
+        }
+        // Single-turn or expired: consumed (not added to remaining)
         continue
       }
 
       if (clearDefenseBuffs && isDefenseSelfBuff) {
-        // Defense self-buffs are consumed after taking damage
+        // Multi-turn defense buffs: decrement instead of removing
+        if (effect.remainingTurns > 1) {
+          remaining[doctrineId] = { ...effect, remainingTurns: effect.remainingTurns - 1 }
+        }
         continue
       }
 

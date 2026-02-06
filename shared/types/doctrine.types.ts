@@ -30,10 +30,22 @@ export const StatusEffect = {
   PURIFIED: 'PURIFIED',
   // Target takes 2 damage at start of turn
   POISONED: 'POISONED',
+  // Target has reduced attack or defense dice
+  WEAKENED: 'WEAKENED',
   // Placeholder for active doctrines with immediate effects
   DOCTRINE_ACTIVE: 'DOCTRINE_ACTIVE'
 } as const
 export type StatusEffect = (typeof StatusEffect)[keyof typeof StatusEffect]
+
+/** Canonical list of negative/debuff statuses that can be cleansed */
+export const NEGATIVE_STATUSES: StatusEffect[] = [
+  StatusEffect.BURNING,
+  StatusEffect.STUNNED,
+  StatusEffect.IMMOBILIZED,
+  StatusEffect.POISONED,
+  StatusEffect.PURIFIED,
+  StatusEffect.WEAKENED
+]
 
 export const DoctrineTarget = {
   SELF: 'SELF',
@@ -57,6 +69,10 @@ export interface DoctrineEffect {
   scalesWithEnemyTier?: boolean
   // Thorns damage: flat damage dealt to attackers when the buff holder is hit (karmic_retribution)
   thornsDamage?: number
+  // Duration of BURNING applied to attacker by thorns (flaming_apotheosis)
+  thornsBurnDuration?: number
+  // Whether this debuff reduces 'attack' or 'defense' dice (for WEAKENED status)
+  debuffType?: 'attack' | 'defense'
   // Extra hits generated per 6 rolled (stellar_collapse)
   sixesGenerateExtraHits?: number
 }
@@ -78,10 +94,22 @@ export interface DoctrineDefinition {
   castRange?: number
 }
 
+/**
+ * Represents an active status effect on a combat unit.
+ * NOTE: This type serves double duty — it stores both simple statuses (BURNING, STUNNED)
+ * and doctrine-specific metadata (pending enemy status, WEAKENED params). Consider splitting
+ * into discriminated union types if more variants are added.
+ */
 export interface ActiveStatusEffect {
   effect: StatusEffect
   remainingTurns: number
   sourceDoctrineId: string
+  // For mixed SELF+ENEMY doctrines: enemy status to apply on next attack hit
+  pendingEnemyStatus?: StatusEffect
+  pendingEnemyStatusDuration?: number
+  // For WEAKENED status: whether it reduces attack or defense, and by how much
+  debuffType?: 'attack' | 'defense'
+  debuffValue?: number
 }
 
 export interface CombatDoctrineState {

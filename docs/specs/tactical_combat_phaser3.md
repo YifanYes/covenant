@@ -119,6 +119,8 @@ We chose a hybrid approach because:
 | [`shared/types/tactical-combat.types.ts`](../../shared/types/tactical-combat.types.ts) | All TypeScript types: `TacticalUnit`, `TileState`, `TacticalCombatState`, result types |
 | [`shared/constants/terrain.ts`](../../shared/constants/terrain.ts)                     | Terrain movement costs and effects                                                     |
 | [`shared/constants/aoe-patterns.ts`](../../shared/constants/aoe-patterns.ts)           | AoE pattern definitions for doctrines                                                  |
+| [`shared/constants/doctrines.ts`](../../shared/constants/doctrines.ts)                 | Doctrine definitions, self-buff classification constants (`SELF_BUFF_EFFECT_TYPES`, `SPECIAL_SELF_BUFF_DOCTRINES`) |
+| [`shared/types/doctrine.types.ts`](../../shared/types/doctrine.types.ts)               | Doctrine types, status effects, `NEGATIVE_STATUSES`, `ActiveStatusEffect`              |
 
 ---
 

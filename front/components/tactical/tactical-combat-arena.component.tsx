@@ -27,7 +27,7 @@ import { Zap } from '@nsmr/pixelart-react'
 import { DOCTRINES } from '@shared/constants/doctrines'
 import { getEnemy } from '@shared/constants/enemies'
 import { getConsumableById } from '@shared/constants/items'
-import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
+import { DoctrineEffectType, DoctrineTarget, StatusEffect } from '@shared/types/doctrine.types'
 import {
   ItemType,
   type CombatLogEntry,
@@ -40,7 +40,7 @@ import { useMutation } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import ActionMenu from './action-menu.component'
@@ -161,7 +161,43 @@ export default function TacticalCombatArena({
     return bonusDice
   }, [activeUnitId, playerUnits])
 
+  // Calculate effective attack/critical thresholds from active doctrine effects
+  const { effectiveAttackThreshold, effectiveCriticalThreshold } = useMemo(() => {
+    const activeUnit = playerUnits.find((u) => u.id === activeUnitId)
+    if (!activeUnit) return { effectiveAttackThreshold: 4, effectiveCriticalThreshold: 6 }
+
+    let thresholdMod = 0
+    let hasGuaranteedCritical = false
+    let guaranteedCriticalValue = 6
+
+    for (const effect of activeUnit.activeEffects) {
+      if (effect.remainingTurns <= 0) continue
+      const doctrine = DOCTRINES[effect.sourceDoctrineId]
+      if (!doctrine) continue
+
+      for (const doctrineEffect of doctrine.effects) {
+        if (doctrineEffect.target !== DoctrineTarget.SELF) continue
+
+        if (doctrineEffect.type === DoctrineEffectType.THRESHOLD_MODIFIER) {
+          thresholdMod += doctrineEffect.value || 0
+        }
+        if (doctrineEffect.type === DoctrineEffectType.GUARANTEED_CRITICAL) {
+          hasGuaranteedCritical = true
+          guaranteedCriticalValue = Math.min(guaranteedCriticalValue, doctrineEffect.value || 6)
+        }
+      }
+    }
+
+    return {
+      effectiveAttackThreshold: Math.max(1, 4 + thresholdMod),
+      effectiveCriticalThreshold: hasGuaranteedCritical ? guaranteedCriticalValue : 6
+    }
+  }, [activeUnitId, playerUnits])
+
   const weaponDice = baseWeaponDice + doctrineBonusDice
+
+  // Snapshot thresholds at roll time so they survive doctrine clearing
+  const rolledThresholdsRef = useRef({ attackThreshold: 4, criticalThreshold: 6 })
 
   // Tactical attack hook
   const { confirmAttack, getPendingAttackInfo, isLoading: isTacticalAttackLoading } = useTacticalAttack()
@@ -173,23 +209,36 @@ export default function TacticalCombatArena({
   const { isExecuting: isEnemyTurnExecuting } = useTacticalEnemyTurn()
 
   // Handler for when dice rolling completes - executes tactical combat
+  // Check if the active unit has any doctrine self-buff effects active
+  const hasActiveDoctrineEffects = useMemo(() => {
+    const unit = playerUnits.find((u) => u.id === activeUnitId)
+    if (!unit) return false
+    return unit.activeEffects.some((e) => e.effect === StatusEffect.DOCTRINE_ACTIVE && e.remainingTurns > 0)
+  }, [activeUnitId, playerUnits])
+
   const handleTacticalAttack = useCallback(
     async (rolls: { attackRolls: number[]; defenseRolls: number[] }) => {
       const attackInfo = getPendingAttackInfo()
 
       if (attackInfo) {
+        // Snapshot current thresholds before clearing doctrines
+        rolledThresholdsRef.current = {
+          attackThreshold: effectiveAttackThreshold,
+          criticalThreshold: effectiveCriticalThreshold
+        }
+
         await confirmAttack({
           attackRolls: rolls.attackRolls,
           defenseRolls: rolls.defenseRolls
         })
 
         // Clear consumed doctrine buffs after attack
-        if (doctrineBonusDice > 0) {
+        if (hasActiveDoctrineEffects) {
           clearActiveUnitDoctrines()
         }
       }
     },
-    [confirmAttack, getPendingAttackInfo, doctrineBonusDice, clearActiveUnitDoctrines]
+    [confirmAttack, getPendingAttackInfo, hasActiveDoctrineEffects, clearActiveUnitDoctrines, effectiveAttackThreshold, effectiveCriticalThreshold]
   )
 
   // Combat turn hook for dice rolling
@@ -393,14 +442,16 @@ export default function TacticalCombatArena({
       ))
     }
     // Show submitted dice while waiting for results or as fallback
-    // Calculate success/critical based on standard thresholds (4+ success, 6 critical)
+    // Use snapshotted thresholds (captured at roll time) so they survive doctrine clearing
     if (submitted) {
+      const threshold = prefix === 'atk' ? rolledThresholdsRef.current.attackThreshold : 4
+      const critThreshold = prefix === 'atk' ? rolledThresholdsRef.current.criticalThreshold : 6
       return submitted.map((v, i) => (
         <DiceResult
           key={`${prefix}-s-${i}`}
           value={v}
-          isSuccess={v >= 4}
-          isCritical={v === 6}
+          isSuccess={v >= threshold}
+          isCritical={v >= critThreshold}
           className={isTacticalAttackLoading ? "animate-pulse opacity-70" : ""}
         />
       ))

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { trpc, trpcOptions, queryClient } from '@/utils/trpc.utils'
 import { useTacticalCombatStore } from '@/stores/tactical-combat.store'
-import { DOCTRINES } from '@shared/constants/doctrines'
+import { DOCTRINES, SELF_BUFF_EFFECT_TYPES, SPECIAL_SELF_BUFF_DOCTRINES } from '@shared/constants/doctrines'
 import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
 import type { DoctrineEffectResult } from '@shared/types/tactical-combat.types'
 import { calculateAoEArea, findUnitsInAoE } from '@/lib/phaser/systems/pathfinding'
@@ -227,11 +227,11 @@ export function useTacticalDoctrine() {
     const doctrine = DOCTRINES[doctrineId]
     if (!doctrine) return false
 
+    if (SPECIAL_SELF_BUFF_DOCTRINES.includes(doctrineId)) return true
+
     // Self-buff doctrines are those that target SELF and don't have an AoE pattern
-    // This includes POWER_MODIFIER (bonus dice) and GUARANTEED_CRITICAL (ignores defense)
     const isSelfBuff = doctrine.effects.some(
-      (e) => (e.type === DoctrineEffectType.POWER_MODIFIER || e.type === DoctrineEffectType.GUARANTEED_CRITICAL) &&
-             e.target === DoctrineTarget.SELF
+      (e) => SELF_BUFF_EFFECT_TYPES.includes(e.type) && e.target === DoctrineTarget.SELF
     )
 
     return isSelfBuff && !doctrine.aoePattern
