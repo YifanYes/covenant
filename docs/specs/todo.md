@@ -2,140 +2,115 @@
 
 ## Critical Priority
 
-[x] Security: Missing Authorization in Repositories
+- [x] Security: Missing Authorization in Repositories
+  - `server/repositories/area.repository.ts` (lines 56-71)
+  - `server/repositories/objective.repository.ts` (lines 44-70)
+  - **Issue:** `update()` and `delete()` methods don't verify userId ownership
+  - **Fix:** Added userId parameter to update/delete methods with ownership check
 
-- `server/repositories/area.repository.ts` (lines 56-71)
-- `server/repositories/objective.repository.ts` (lines 44-70)
-- **Issue:** `update()` and `delete()` methods don't verify userId ownership
-- **Fix:** Added userId parameter to update/delete methods with ownership check
+- [x] Security: Character Ownership Not Validated
+  - `server/routers/investment.router.ts` - contribute endpoint
+  - `server/routers/activity.router.ts` (line 35-39) - join endpoint
+  - **Issue:** Endpoints accept characterId without verifying user owns it
+  - **Fix:** Added `await verifyCharacterOwnership(input.characterId, ctx.user.id)` before service calls
 
-[x] Security: Character Ownership Not Validated
-
-- `server/routers/investment.router.ts` - contribute endpoint
-- `server/routers/activity.router.ts` (line 35-39) - join endpoint
-- **Issue:** Endpoints accept characterId without verifying user owns it
-- **Fix:** Added `await verifyCharacterOwnership(input.characterId, ctx.user.id)` before service calls
-
-[x] Security: getCharacterById Missing Ownership Check
-
-- `server/services/character.service.ts` (lines 26-28)
-- **Issue:** Returns any character by ID without ownership verification
-- **Fix:** Added optional userId parameter for ownership check
+- [x] Security: getCharacterById Missing Ownership Check
+  - `server/services/character.service.ts` (lines 26-28)
+  - **Issue:** Returns any character by ID without ownership verification
+  - **Fix:** Added optional userId parameter for ownership check
 
 ## High Priority
 
-### Security: No Rate Limiting
+- [x] Security: No Rate Limiting
+  - **Fix:** Install `@fastify/rate-limit`, configure for auth (strict) and tRPC (moderate)
 
-- **Fix:** Install `@fastify/rate-limit`, configure for auth (strict) and tRPC (moderate)
+- [ ] Security: Database SSL Disabled
+  - `server/lib/prisma.ts` (line 14)
+  - **Fix:** Change `rejectUnauthorized: false` to `true` in production
 
-### Security: Database SSL Disabled
+- [ ] Security: Cookie Security Production-Only
+  - `server/lib/auth.ts` (lines 42-52)
+  - **Fix:** Apply secure/sameSite/httpOnly in all environments
 
-- `server/lib/prisma.ts` (line 14)
-- **Fix:** Change `rejectUnauthorized: false` to `true` in production
+- [ ] Security: Session Tokens in Plaintext
+  - Prisma schema - Session model
+  - **Fix:** Hash tokens with bcrypt before storage
 
-### Security: Cookie Security Production-Only
-
-- `server/lib/auth.ts` (lines 42-52)
-- **Fix:** Apply secure/sameSite/httpOnly in all environments
-
-### Security: Session Tokens in Plaintext
-
-- Prisma schema - Session model
-- **Fix:** Hash tokens with bcrypt before storage
-
-### Combat: Unit Template Mismatch During Hydration
-
-- `tactical-combat.store.ts:337-341`
-- **Issue:** Missing template silently drops unit, corrupts turn queue
-- **Status:** PARTIAL - version field added but strict validation reverted
-- **Fix:** Complete strict validation or add recovery mechanism
+- [x] Combat: Unit Template Mismatch During Hydration
+  - `tactical-combat.store.ts:337-341`
+  - **Issue:** Missing template silently drops unit, corrupts turn queue
+  - **Status:** FIXED - hybrid recovery: player missing → fresh combat, enemy missing → clamp turn index
+  - **Fix:** Added player unit guard, turn index clamping, and active unit null guard
 
 ## Medium Priority
 
-### Security: Theme Validation Too Permissive
+- [ ] Security: Theme Validation Too Permissive
+  - `shared/schemas/auth.schemas.ts` (line 37-39)
+  - **Fix:** Use enum validation with valid faction names
 
-- `shared/schemas/auth.schemas.ts` (line 37-39)
-- **Fix:** Use enum validation with valid faction names
+- [ ] Security: Error Messages Leak Resource Existence
+  - Multiple service files
+  - **Fix:** Use generic "Resource not found or access denied" messages
 
-### Security: Error Messages Leak Resource Existence
+- [ ] Security: Missing DB Indexes
+  - `server/prisma/schema.prisma`
+  - Tables: Task, Habit, Objective, Area, HabitCompletion
+  - **Fix:** Add `@@index([userId])` to these models
 
-- Multiple service files
-- **Fix:** Use generic "Resource not found or access denied" messages
+- [ ] Security: Client Cookie Missing Secure Flag
+  - `front/hooks/use-faction-theme.ts` (lines 51-52)
+  - **Fix:** Add `Secure` flag to cookie
 
-### Security: Missing DB Indexes
+- [ ] Combat: Memory - Tween Cleanup on Scene Destruction
+  - `combat-scene.ts:270-277`, `unit.ts`
+  - **Fix:** Create `activeTweens` registry; destroy all on scene shutdown
 
-- `server/prisma/schema.prisma`
-- Tables: Task, Habit, Objective, Area, HabitCompletion
-- **Fix:** Add `@@index([userId])` to these models
+- [ ] Combat: Memory - Particle Emitter Cleanup
+  - `combat-scene.ts:510-512, 723-726`
+  - **Fix:** Use `once('complete', cleanup)` instead of `delayedCall`
 
-### Security: Client Cookie Missing Secure Flag
+- [ ] Combat: Memory - Texture Load Failure
+  - `combat-scene.ts:1192-1210`
+  - **Fix:** Add error handler `this.load.once('loaderror', ...)`
 
-- `front/hooks/use-faction-theme.ts` (lines 51-52)
-- **Fix:** Add `Secure` flag to cookie
-
-### Combat: Memory - Tween Cleanup on Scene Destruction
-
-- `combat-scene.ts:270-277`, `unit.ts`
-- **Fix:** Create `activeTweens` registry; destroy all on scene shutdown
-
-### Combat: Memory - Particle Emitter Cleanup
-
-- `combat-scene.ts:510-512, 723-726`
-- **Fix:** Use `once('complete', cleanup)` instead of `delayedCall`
-
-### Combat: Memory - Texture Load Failure
-
-- `combat-scene.ts:1192-1210`
-- **Fix:** Add error handler `this.load.once('loaderror', ...)`
-
-### Combat: Race - Multiple Animation Flags
-
-- `combat-scene.ts:24-27`
-- **Fix:** Replace 4 booleans with single `animationType: 'movement' | 'attack' | 'doctrine' | 'status' | null`
+- [ ] Combat: Race - Multiple Animation Flags
+  - `combat-scene.ts:24-27`
+  - **Fix:** Replace 4 booleans with single `animationType: 'movement' | 'attack' | 'doctrine' | 'status' | null`
 
 ## Low Priority
 
-### Security: No Audit Logging
+- [ ] Security: No Audit Logging
+  - **Fix:** Log auth events (login, session, account changes)
 
-- **Fix:** Log auth events (login, session, account changes)
+- [ ] Security: No Account Lockout
+  - **Fix:** Implement exponential backoff on failed logins
 
-### Security: No Account Lockout
+- [ ] Security: Type Safety Issues
+  - Multiple `as any` usages
+  - **Fix:** Replace with proper types
 
-- **Fix:** Implement exponential backoff on failed logins
+- [ ] Security: Excessive Console Logging
+  - **Fix:** Use structured logging in production
 
-### Security: Type Safety Issues
+- [ ] Combat: God Object CombatService
+  - `server/services/combat.service.ts` (2800+ lines)
+  - **Fix:** Split into focused services (Dice, Movement, Resolution, Doctrine, EnemyAI, Reward)
 
-- Multiple `as any` usages
-- **Fix:** Replace with proper types
+- [ ] Combat: Duplicated Grid Logic
+  - `tactical-combat.store.ts:1025-1040, 1453-1468, 156-180`
+  - **Fix:** Extract to `shared/utils/grid.utils.ts`
 
-### Security: Excessive Console Logging
+- [ ] Combat: Magic Numbers
+  - Various files with hardcoded dice values
+  - **Fix:** Move to `shared/constants/combat-rules.ts`
 
-- **Fix:** Use structured logging in production
+- [ ] Combat: Race - Enemy Turn Guard
+  - `use-tactical-enemy-turn.hook.ts:29-31`
+  - **Fix:** Use state flag + ref together; debounce effect
 
-### Combat: God Object CombatService
-
-- `server/services/combat.service.ts` (2800+ lines)
-- **Fix:** Split into focused services (Dice, Movement, Resolution, Doctrine, EnemyAI, Reward)
-
-### Combat: Duplicated Grid Logic
-
-- `tactical-combat.store.ts:1025-1040, 1453-1468, 156-180`
-- **Fix:** Extract to `shared/utils/grid.utils.ts`
-
-### Combat: Magic Numbers
-
-- Various files with hardcoded dice values
-- **Fix:** Move to `shared/constants/combat-rules.ts`
-
-### Combat: Race - Enemy Turn Guard
-
-- `use-tactical-enemy-turn.hook.ts:29-31`
-- **Fix:** Use state flag + ref together; debounce effect
-
-### Combat: Race - Async State Access
-
-- `use-tactical-enemy-turn.hook.ts:34`
-- **Fix:** Refresh state after each await in critical paths
+- [ ] Combat: Race - Async State Access
+  - `use-tactical-enemy-turn.hook.ts:34`
+  - **Fix:** Refresh state after each await in critical paths
 
 ## Files to Modify Summary
 
