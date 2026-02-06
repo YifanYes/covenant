@@ -19,6 +19,7 @@ export class Unit extends Phaser.GameObjects.Container {
   // Animation
   private bounceTween: Phaser.Tweens.Tween | null = null
   private breathingTween: Phaser.Tweens.Tween | null = null
+  private activeTweens: Set<Phaser.Tweens.Tween> = new Set()
   private spriteBaseY: number = 0
   private spriteBaseScaleX: number = 1
   private spriteBaseScaleY: number = 1
@@ -112,7 +113,7 @@ export class Unit extends Phaser.GameObjects.Container {
 
   private stopBounce(): void {
     if (this.bounceTween) {
-      this.bounceTween.stop()
+      this.bounceTween.destroy()
       this.bounceTween = null
       // Reset sprite to base position
       this.sprite.setY(this.spriteBaseY)
@@ -138,11 +139,21 @@ export class Unit extends Phaser.GameObjects.Container {
 
   private stopBreathing(): void {
     if (this.breathingTween) {
-      this.breathingTween.stop()
+      this.breathingTween.destroy()
       this.breathingTween = null
       // Reset sprite to base scale
       this.sprite.setScale(this.spriteBaseScaleX, this.spriteBaseScaleY)
     }
+  }
+
+  /**
+   * Create a tween tracked for cleanup on unit destruction.
+   */
+  private trackTween(config: Phaser.Types.Tweens.TweenBuilderConfig): Phaser.Tweens.Tween {
+    const tween = this.scene.tweens.add(config)
+    this.activeTweens.add(tween)
+    tween.once('complete', () => this.activeTweens.delete(tween))
+    return tween
   }
 
   private updateHealthBar(): void {
@@ -276,7 +287,7 @@ export class Unit extends Phaser.GameObjects.Container {
       const newDepth = DEPTH_LAYERS.UNIT + (gridPos.x + gridPos.y) * 0.01
 
       await new Promise<void>((resolve) => {
-        this.scene.tweens.add({
+        this.trackTween({
           targets: this,
           x: screenPos.x,
           y: screenPos.y - 8, // Apply vertical offset
@@ -327,7 +338,7 @@ export class Unit extends Phaser.GameObjects.Container {
 
     // Lunge forward
     await new Promise<void>((resolve) => {
-      this.scene.tweens.add({
+      this.trackTween({
         targets: this,
         x: originalX + normalizedDx,
         y: originalY + normalizedDy,
@@ -340,7 +351,7 @@ export class Unit extends Phaser.GameObjects.Container {
 
     // Return to original position
     await new Promise<void>((resolve) => {
-      this.scene.tweens.add({
+      this.trackTween({
         targets: this,
         x: originalX,
         y: originalY,
@@ -367,7 +378,7 @@ export class Unit extends Phaser.GameObjects.Container {
     const originalX = this.sprite.x
 
     await new Promise<void>((resolve) => {
-      this.scene.tweens.add({
+      this.trackTween({
         targets: this.sprite,
         x: [originalX - 3, originalX + 3, originalX - 2, originalX + 2, originalX],
         duration: 200,
@@ -387,7 +398,7 @@ export class Unit extends Phaser.GameObjects.Container {
    */
   async animateDeath(): Promise<void> {
     await new Promise<void>((resolve) => {
-      this.scene.tweens.add({
+      this.trackTween({
         targets: this,
         alpha: 0,
         y: this.y + 10,
@@ -619,6 +630,11 @@ export class Unit extends Phaser.GameObjects.Container {
   destroy(fromScene?: boolean): void {
     this.stopBounce()
     this.stopBreathing()
+    // Destroy all tracked animation tweens
+    for (const tween of this.activeTweens) {
+      tween.destroy()
+    }
+    this.activeTweens.clear()
     this.clearAllStatusEffects()
     this.sprite.destroy()
     this.healthBarBg.destroy()
