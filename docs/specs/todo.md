@@ -92,9 +92,9 @@
 - [ ] Security: Excessive Console Logging
   - **Fix:** Use structured logging in production
 
-- [ ] Combat: God Object CombatService
-  - `server/services/combat.service.ts` (2800+ lines)
-  - **Fix:** Split into focused services (Dice, Movement, Resolution, Doctrine, EnemyAI, Reward)
+- [x] Combat: God Object CombatService
+  - `server/services/combat.service.ts` (was 3100+ lines, now ~380 lines)
+  - **Fix:** Split into functional modules in `server/utils/combat/` (dice, movement, doctrine-buffs, attack-resolution, enemy-ai, tactical-doctrine, rewards). CombatService is now a thin orchestrator.
 
 - [ ] Combat: Duplicated Grid Logic
   - `tactical-combat.store.ts:1025-1040, 1453-1468, 156-180`
@@ -129,4 +129,4 @@
 | `server/server.ts`                                | Add rate limiting                                |
 | `front/stores/tactical-combat.store.ts`           | Fix unit template validation, extract grid utils |
 | ~~`front/lib/phaser/scenes/combat-scene.ts`~~      | ✅ Fixed memory/animation issues                 |
-| `server/services/combat.service.ts`               | Split into focused services                      |
+| ~~`server/services/combat.service.ts`~~            | ✅ Split into `server/utils/combat/` modules     |

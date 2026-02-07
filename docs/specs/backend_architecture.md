@@ -51,24 +51,29 @@ Evolve the current backend towards a cleaner architecture **without adding unnec
 server/
 ├── routers/                # Input/output only
 │   ├── character.router.ts
-│   ├── mission.router.ts
+│   ├── activity.router.ts
 │   └── ...
 │
-├── services/               # Business logic
-│   ├── combat/
-│   │   ├── combat.service.ts
-│   │   └── dice.service.ts
-│   ├── character/
-│   │   ├── character.service.ts
-│   │   └── inventory.service.ts
-│   └── mission/
-│       ├── mission.service.ts
-│       └── phase.service.ts
+├── services/               # Business logic (thin orchestrators)
+│   ├── combat.service.ts   # Delegates to utils/combat/ modules
+│   ├── character.service.ts
+│   ├── activity.service.ts
+│   └── ...
+│
+├── utils/
+│   └── combat/             # Pure + async combat logic modules
+│       ├── dice.ts             # rollDice, calculateHitsWithCount
+│       ├── movement.ts         # Pathfinding, movement validation/execution
+│       ├── doctrine-buffs.ts   # Doctrine buff calculation, AoE, validation
+│       ├── attack-resolution.ts # Attack validation and execution
+│       ├── enemy-ai.ts         # Enemy turn AI logic
+│       ├── tactical-doctrine.ts # Doctrine casting and self-buff logic
+│       └── rewards.ts          # Enemy defeat rewards, next enemy spawning
 │
 ├── repositories/           # Reusable queries
 │   ├── character.repository.ts
-│   ├── mission.repository.ts
-│   └── party.repository.ts
+│   ├── activity.repository.ts
+│   └── ...
 │
 ├── lib/
 │   └──  prisma.ts
@@ -77,7 +82,8 @@ server/
 
 shared/                     # Already exists
 ├── types/
-│   ├── combat.types.ts     # CombatParams, CombatResult, etc.
+│   ├── combat.types.ts     # EncounterState, shared combat types
+│   ├── tactical-combat.types.ts # Tactical grid types
 │   └── ...
 └── ...
 ```

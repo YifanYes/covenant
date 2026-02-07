@@ -1,3 +1,4 @@
+import type { ResolvedEncounterSlot } from '@shared/constants/encounter-patterns'
 import type { CombatTurnResult, EnemyState } from './gamification.types'
 
 export interface AttackResult extends CombatTurnResult {
@@ -5,4 +6,10 @@ export interface AttackResult extends CombatTurnResult {
   allEnemiesDefeated: boolean
   newDiceBank: number
   characterDead: boolean
+}
+
+export interface EncounterState {
+  encounterPattern: ResolvedEncounterSlot[]
+  encounterIndex: number
+  sessionStartedAt: string
 }
