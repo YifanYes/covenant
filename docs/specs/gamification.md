@@ -765,6 +765,7 @@ Add new i18n keys for:
 
 - **Manual Interaction**: Combat is not automated. Users must manually spend dice in the "Adventure" tab.
 - **No Migration**: Since the project is in early development, no database migration for existing user data is required. Global state can be reset.
+- **Combat Logic Location**: Core combat logic lives in `server/utils/combat/` as pure functions and async modules. `CombatService` (`server/services/combat.service.ts`) is a thin orchestrator that delegates to these modules.
 
 ## Morality System
 

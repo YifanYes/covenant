@@ -1,7 +1,8 @@
 import { selectEnemyWithFallback } from '@shared/constants/activities'
 import { applyStatScaling, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
-import { generateEncounterSequence, getNextEncounterSlot, type ResolvedEncounterSlot } from '@shared/constants/encounter-patterns'
+import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
+import type { EncounterState } from '@shared/types/combat.types'
 import { generateMapTiles } from '@shared/constants/map-themes'
 import type { CombatLogEntry } from '@shared/types/gamification.types'
 import { TACTICAL_STATE_VERSION, type TacticalStateData } from '@shared/types/tactical-combat.types'
@@ -12,11 +13,6 @@ import type { ActivityParticipationRepository } from '../repositories/activity-p
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { CharacterService } from './character.service'
 
-export interface EncounterState {
-  encounterPattern: ResolvedEncounterSlot[]
-  encounterIndex: number
-  sessionStartedAt: string
-}
 
 export class ActivityService {
   constructor(
