@@ -50,7 +50,7 @@
   - [ ] Definir accesorios
   - [ ] Definir decisiones de la historia
   - [x] Sistema de crafteo
-  - [ ] Sistema de moralidad
+  - [x] Sistema de moralidad
   - [x] Añadir tests
   - [x] Landing page
 

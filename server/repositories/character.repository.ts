@@ -261,6 +261,13 @@ export class CharacterRepository {
     })
   }
 
+  async updateMorality(classId: string, morality: number): Promise<void> {
+    await this.prisma.characterClass.update({
+      where: { id: classId },
+      data: { morality }
+    })
+  }
+
   async updateMaterialsAndGold(characterId: string, materials: Record<string, number>, gold: number): Promise<Character> {
     return this.prisma.character.update({
       where: { id: characterId },
