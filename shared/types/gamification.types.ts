@@ -166,6 +166,7 @@ export interface InventoryCharacterClass {
   magicAtk: number
   magicDef: number
   manaRegen: number
+  morality: number
   equippedDoctrines: string[]
 }
 

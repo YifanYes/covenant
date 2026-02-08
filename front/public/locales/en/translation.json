@@ -1357,6 +1357,22 @@
     ],
     "verifying_title": "Verifying..."
   },
+  "morality": {
+    "title": "Morality",
+    "status": {
+      "saint": "Saint",
+      "neutral": "Neutral",
+      "demon": "Demon"
+    },
+    "change": {
+      "increased": "+{{amount}} Morality",
+      "decreased": "-{{amount}} Morality",
+      "became_saint": "You have ascended to Sainthood!",
+      "became_demon": "Darkness has consumed your soul...",
+      "left_saint": "You have fallen from grace...",
+      "left_demon": "A spark of light returns to your soul..."
+    }
+  },
   "map": {
     "lore": "The Six Infernal Powers have launched a lightning attack on Santa Cruz, the Silver Seat. The Order of Sacred Knights defends every wall while reinforcements are on the way. If the Silver Seat falls, the leadership of the Faithful falls.",
     "no_activities": "No active occurrences found.",

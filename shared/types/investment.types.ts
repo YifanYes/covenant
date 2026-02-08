@@ -24,4 +24,5 @@ export interface ContributeResult {
   newTotal: number
   characterGold: number
   investmentCompleted: boolean
+  moralityDelta?: number
 }

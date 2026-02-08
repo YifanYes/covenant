@@ -1,54 +1,55 @@
-# Sistema de Moralidad - Especificación Técnica
+# Sistema de Moralidad - Especificacion Tecnica
 
 ## Resumen
 
-El Sistema de Moralidad añade un atributo de alineamiento ético al personaje que registra sus decisiones narrativas. Este sistema influye en cómo el mundo reacciona al jugador y desbloquea caminos únicos de juego.
+El Sistema de Moralidad anade un atributo de alineamiento etico por clase de personaje que registra sus decisiones narrativas. Este sistema influye en como el mundo reacciona al jugador y desbloquea caminos unicos de juego.
 
 ## Atributo de Moralidad
 
-### Especificación Base
+### Especificacion Base
 
-| Campo         | Valor                                 |
-| ------------- | ------------------------------------- |
-| Nombre        | `morality`                            |
-| Tipo          | `Int`                                 |
-| Rango         | 0 - 100                               |
-| Valor Inicial | 50 (Neutral)                          |
-| Ubicación     | Columna directa en modelo `Character` |
+| Campo         | Valor                                              |
+| ------------- | -------------------------------------------------- |
+| Nombre        | `morality`                                         |
+| Tipo          | `Int`                                              |
+| Rango         | 0 - 100                                            |
+| Valor Inicial | 50 (Neutral)                                       |
+| Ubicacion     | Columna en modelo `CharacterClass` (por clase)     |
 
 ### Umbrales de Alineamiento
 
-| Estado      | Rango    | Descripción                                                      |
+| Estado      | Rango    | Descripcion                                                      |
 | ----------- | -------- | ---------------------------------------------------------------- |
 | **Santo**   | 75 - 100 | Personajes que consistentemente eligen el camino de la rectitud  |
-| **Neutral** | 26 - 74  | La mayoría de personajes residen aquí, manteniendo un equilibrio |
-| **Demonio** | 0 - 25   | Personajes corruptos, egoístas y viciosos                        |
+| **Neutral** | 26 - 74  | La mayoria de personajes residen aqui, manteniendo un equilibrio |
+| **Demonio** | 0 - 25   | Personajes corruptos, egoistas y viciosos                        |
 
 ## Cambios en Base de Datos
 
-### Migración Prisma
+### Migracion Prisma
 
 ```prisma
 // server/prisma/schema.prisma
-model Character {
-  // ... campos existentes ...
-  morality  Int  @default(50)  // Añadir después de magicNature
+model CharacterClass {
+  // ... campos existentes hasta maxMana ...
+  morality          Int       @default(50)
+  equippedDoctrines String[]  @default([])
   // ... resto de campos ...
 }
 ```
 
-### Comando de Migración
+### Comando de Migracion
 
 ```bash
 cd server
 npx prisma db push && npx prisma generate
 ```
 
-## Cambios en Backend
+## Cambios en Tipos Compartidos
 
-### 1. Constantes Compartidas
+### 1. Constantes de Moralidad
 
-**Archivo:** `shared/constants/morality.ts`
+**Archivo:** `shared/constants/morality.ts` (nuevo)
 
 ```typescript
 export const MORALITY_THRESHOLDS = {
@@ -77,9 +78,9 @@ export function clampMorality(value: number): number {
 }
 ```
 
-### 2. Tipos Compartidos
+### 2. Tipos de Moralidad
 
-**Archivo:** `shared/types/morality.types.ts`
+**Archivo:** `shared/types/morality.types.ts` (nuevo)
 
 ```typescript
 import type { MoralityStatus } from '../constants/morality'
@@ -94,111 +95,174 @@ export interface MoralityChange {
 }
 ```
 
-### 3. Character Repository
+### 3. Actualizar CharacterClassType
+
+**Archivo:** `shared/types/character.types.ts`
+
+Anadir `morality` al tipo `CharacterClassType`:
+
+```typescript
+export interface CharacterClassType {
+  // ... campos existentes ...
+  morality: number
+  // ...
+}
+```
+
+### 4. Actualizar InventoryCharacterClass
+
+**Archivo:** `shared/types/gamification.types.ts`
+
+Anadir `morality` al tipo `InventoryCharacterClass`:
+
+```typescript
+export interface InventoryCharacterClass {
+  // ... campos existentes ...
+  morality: number
+  // ...
+}
+```
+
+## Cambios en Backend
+
+### 1. Character Repository
 
 **Archivo:** `server/repositories/character.repository.ts`
 
-Añadir métodos:
+Anadir un solo metodo. Actualiza morality en `CharacterClass` por `classId`. La logica de clamping vive en el servicio, no en el repositorio:
 
 ```typescript
-async updateMorality(characterId: string, morality: number): Promise<Character> {
-  return this.prisma.character.update({
-    where: { id: characterId },
+async updateMorality(classId: string, morality: number): Promise<void> {
+  await this.prisma.characterClass.update({
+    where: { id: classId },
     data: { morality }
   })
 }
-
-async adjustMorality(characterId: string, delta: number): Promise<Character> {
-  const character = await this.findByIdWithClassesOrThrow(characterId)
-  const newMorality = clampMorality((character.morality ?? 50) + delta)
-  return this.updateMorality(characterId, newMorality)
-}
 ```
 
-### 4. Morality Service
+### 2. Character Service
 
-**Archivo:** `server/services/morality.service.ts`
+**Archivo:** `server/services/character.service.ts`
+
+La logica de moralidad vive directamente en `CharacterService` (no en un servicio separado), ya que solo depende de `CharacterRepository`:
 
 ```typescript
-import { getMoralityStatus, clampMorality, MORALITY_THRESHOLDS } from '@shared/constants/morality'
+import { clampMorality, getMoralityStatus } from '@shared/constants/morality'
 import type { MoralityChange } from '@shared/types/morality.types'
-import type { CharacterRepository } from '../repositories/character.repository'
 
-export class MoralityService {
-  constructor(private characterRepository: CharacterRepository) {}
+// En el metodo getCurrentClass, incluir morality en el mapeo de clases:
+classes: character.classes.map((c) => ({
+  // ... campos existentes ...
+  morality: c.morality,
+  // ...
+}))
 
-  async getMorality(characterId: string) {
-    const character = await this.characterRepository.findByIdWithClassesOrThrow(characterId)
-    const morality = character.morality ?? 50
-    return {
-      morality,
-      status: getMoralityStatus(morality)
-    }
+// Nuevo metodo:
+async adjustMorality(characterId: string, delta: number): Promise<MoralityChange> {
+  const character = await this.characterRepository.findByIdWithClassesOrThrow(characterId)
+  const currentClass = character.classes.find((c) => c.className === character.currentClass)
+  if (!currentClass) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Current class not found for character ${characterId}`
+    })
   }
 
-  async adjustMorality(characterId: string, delta: number): Promise<MoralityChange> {
-    const character = await this.characterRepository.findByIdWithClassesOrThrow(characterId)
-    const previousValue = character.morality ?? 50
-    const previousStatus = getMoralityStatus(previousValue)
+  const previousValue = currentClass.morality
+  const previousStatus = getMoralityStatus(previousValue)
 
-    const newValue = clampMorality(previousValue + delta)
-    const newStatus = getMoralityStatus(newValue)
+  const newValue = clampMorality(previousValue + delta)
+  const newStatus = getMoralityStatus(newValue)
 
-    await this.characterRepository.updateMorality(characterId, newValue)
+  await this.characterRepository.updateMorality(currentClass.id, newValue)
 
-    return {
-      previousValue,
-      newValue,
-      previousStatus,
-      newStatus,
-      delta: newValue - previousValue,
-      statusChanged: previousStatus !== newStatus
-    }
+  return {
+    previousValue,
+    newValue,
+    previousStatus,
+    newStatus,
+    delta: newValue - previousValue,
+    statusChanged: previousStatus !== newStatus
   }
 }
 ```
 
-### 5. Service Factory
+### 3. Service Factory
 
 **Archivo:** `server/services/service.factory.ts`
 
-Añadir MoralityService al factory con el patrón de inicialización lazy existente.
+`InvestmentService` sube a Layer 2 al depender de `CharacterService`:
 
-## Integración con Sistema de Inversiones
+```typescript
+get investment(): InvestmentService {
+  return (this._investmentService ??= new InvestmentService(
+    this.investmentRepository,
+    this.characterRepository,
+    this.character
+  ))
+}
+```
+
+## Integracion con Sistema de Inversiones
 
 ### Actualizar InvestmentTemplate
 
 **Archivo:** `shared/constants/investments.ts`
 
+Anadir campo requerido de impacto moral por contribucion:
+
 ```typescript
 export interface InvestmentTemplate {
   // ... campos existentes ...
-  moralityImpact?: number // Cambio de moralidad por contribución
-  successMoralityBonus?: number // Bonus al completar exitosamente
-  failureMoralityPenalty?: number // Penalización si falla
+  moralityImpact: number // Cambio de moralidad por contribucion (0 = sin cambio)
 }
 ```
 
-### Valores de Impacto por Inversión
+### Valores de Impacto por Inversion
 
-| Inversión               | moralityImpact | successMoralityBonus | Justificación                  |
-| ----------------------- | -------------- | -------------------- | ------------------------------ |
-| anti_demon_barrier      | +1             | +3                   | Acción defensiva y protectora  |
-| providence_purification | +2             | +5                   | Acto de fe y purificación      |
-| dark_heart_operation    | 0              | +2                   | Acción moralmente ambigua      |
-| gen2_armament_program   | 0              | +1                   | Neutral - progreso tecnológico |
+| Inversion               | moralityImpact | Justificacion                  |
+| ----------------------- | -------------- | ------------------------------ |
+| anti_demon_barrier      | +20            | Accion defensiva y protectora  |
+| providence_purification | +20            | Acto de fe y purificacion      |
+| dark_heart_operation    | +20            | Accion moralmente ambigua      |
+| gen2_armament_program   | +20            | Neutral - progreso tecnologico |
 
 ### Actualizar Investment Service
 
 **Archivo:** `server/services/investment.service.ts`
 
-En el método `contribute()`, después de registrar la contribución:
+Anadir `CharacterService` como dependencia via constructor:
+
+```typescript
+export class InvestmentService {
+  constructor(
+    private investmentRepository: InvestmentRepository,
+    private characterRepository: CharacterRepository,
+    private characterService: CharacterService
+  ) {}
+```
+
+En el metodo `contribute()`, despues de `this.investmentRepository.contribute(...)`:
 
 ```typescript
 // Aplicar impacto de moralidad si existe
+let moralityDelta: number | undefined
 const template = getInvestmentById(investment.investmentId)
-if (template?.moralityImpact) {
-  await this.moralityService.adjustMorality(character.id, template.moralityImpact)
+if (template && template.moralityImpact !== 0) {
+  const change = await this.characterService.adjustMorality(characterId, template.moralityImpact)
+  moralityDelta = change.delta
+}
+```
+
+Actualizar `ContributeResult` en `shared/types/investment.types.ts`:
+
+```typescript
+export interface ContributeResult {
+  success: boolean
+  newTotal: number
+  characterGold: number
+  investmentCompleted: boolean
+  moralityDelta?: number // Cambio de moralidad aplicado
 }
 ```
 
@@ -206,7 +270,7 @@ if (template?.moralityImpact) {
 
 ### 1. Componente MoralityBar
 
-**Archivo:** `front/app/(workspace)/inventory/_components/morality-bar.component.tsx`
+**Archivo:** `front/app/(workspace)/inventory/_components/morality-bar.component.tsx` (nuevo)
 
 Barra visual con gradiente de color:
 
@@ -248,28 +312,30 @@ export default function MoralityBar({ value }: MoralityBarProps) {
 }
 ```
 
-### 2. Componente MoralityBadge
-
-**Archivo:** `front/app/(workspace)/inventory/_components/morality-badge.component.tsx`
-
-Badge que muestra el estado actual con icono apropiado.
-
-### 3. Integrar en Character Status
+### 2. Integrar en Character Status
 
 **Archivo:** `front/app/(workspace)/inventory/_components/character-status.component.tsx`
 
-Añadir sección de moralidad después de los otros stats del personaje.
+Anadir `MoralityBar` despues de la seccion de Dice Bank, antes de `CharacterDeathOverlay`:
 
-### 4. Mostrar en Inversiones
+```tsx
+import MoralityBar from './morality-bar.component'
+
+// Dentro del CardContent, despues del bloque de dice bank:
+<Separator className="bg-sidebar-border my-1 w-auto" />
+<MoralityBar value={character.morality} />
+```
+
+### 3. Mostrar en Inversiones
 
 **Archivo:** `front/app/(workspace)/investments/page.tsx`
 
-- Mostrar `+X moralidad` en el modal de contribución cuando la inversión tiene impacto
-- Mostrar notificación toast después de contribuir si hubo cambio de moralidad
+- Mostrar `+X moralidad` en el modal de contribucion cuando la inversion tiene `moralityImpact`
+- Mostrar notificacion toast despues de contribuir si `result.moralityDelta` existe
 
 ## Traducciones i18n
 
-### Inglés (`front/public/locales/en/translation.json`)
+### Ingles (`front/public/locales/en/translation.json`)
 
 ```json
 {
@@ -292,7 +358,7 @@ Añadir sección de moralidad después de los otros stats del personaje.
 }
 ```
 
-### Español (`front/public/locales/es/translation.json`)
+### Espanol (`front/public/locales/es/translation.json`)
 
 ```json
 {
@@ -308,71 +374,63 @@ Añadir sección de moralidad después de los otros stats del personaje.
       "decreased": "-{{amount}} Moralidad",
       "became_saint": "Has ascendido a la Santidad!",
       "became_demon": "La oscuridad ha consumido tu alma...",
-      "left_saint": "Has caído en desgracia...",
+      "left_saint": "Has caido en desgracia...",
       "left_demon": "Una chispa de luz regresa a tu alma..."
     }
   }
 }
 ```
 
-## Efectos Visuales por Estado
+## Mecanicas Futuras (Post-MVP)
 
-### Santo (75-100)
+Estas mecanicas se implementaran despues del sistema base:
 
-- Elementos de UI con resplandor dorado
-- Título "Santo/a" junto al nombre
-- Icono de halo o luz
+1. **Bonus por Completion de Inversiones**: `successMoralityBonus` / `failureMoralityPenalty` al completarse una inversion (requiere cambios en DeadlineService)
+2. **Diferenciacion de Impacto Moral**: Valores distintos de `moralityImpact` por inversion segun su naturaleza narrativa
+3. **Doctrinas Exclusivas**: Algunas doctrinas requieren estado Santo o Demonio
+4. **Items de Tienda**: Equipamiento exclusivo por alineamiento
+5. **Actividades Exclusivas**: Misiones solo para Santos o solo para Demonios
+6. **Ramas Narrativas**: Diferentes outcomes de historia basados en moralidad
+7. **Decisiones de Historia**: Sistema dedicado de decisiones narrativas que afectan moralidad
+8. **Efectos Visuales por Estado**: Resplandor dorado para Santos, acentos rojos para Demonios, titulos junto al nombre
 
-### Demonio (0-25)
+## Archivos Modificados
 
-- Elementos de UI con acentos oscuros/rojos
-- Título "Demonio" junto al nombre
-- Icono de llamas o cuernos
+| Archivo                                                                      | Cambio                                                    |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `server/prisma/schema.prisma`                                                | Anadir campo `morality` a CharacterClass                  |
+| `shared/constants/morality.ts`                                               | Nuevo archivo con constantes y helpers                    |
+| `shared/types/morality.types.ts`                                             | Nuevo archivo con tipo MoralityChange                     |
+| `shared/types/character.types.ts`                                            | Anadir `morality` a CharacterClassType                    |
+| `shared/types/gamification.types.ts`                                         | Anadir `morality` a InventoryCharacterClass               |
+| `shared/types/investment.types.ts`                                           | Anadir `moralityDelta` a ContributeResult                 |
+| `shared/constants/investments.ts`                                            | Anadir `moralityImpact` a InvestmentTemplate              |
+| `server/repositories/character.repository.ts`                                | Metodo updateMorality (por classId)                       |
+| `server/services/character.service.ts`                                       | Metodo adjustMorality + morality en getCurrentClass       |
+| `server/services/service.factory.ts`                                         | InvestmentService sube a Layer 2 (depende de character)   |
+| `server/services/investment.service.ts`                                      | Anadir CharacterService dep, aplicar en contribute        |
+| `front/app/(workspace)/inventory/_components/morality-bar.component.tsx`     | Nuevo componente                                          |
+| `front/app/(workspace)/inventory/_components/character-status.component.tsx` | Integrar MoralityBar                                      |
+| `front/app/(workspace)/investments/page.tsx`                                 | Mostrar impacto moral y toast                             |
+| `front/public/locales/en/translation.json`                                   | Claves de morality                                        |
+| `front/public/locales/es/translation.json`                                   | Claves de moralidad                                       |
 
-### Neutral (26-74)
+## Verificacion
 
-- UI estándar sin modificaciones especiales
+### Tests Unitarios
 
-## Mecánicas Futuras (Post-MVP)
+En `server/__tests__/services/character.service.test.ts`:
 
-Estas mecánicas se implementarán después del sistema base:
-
-1. **Doctrinas Exclusivas**: Algunas doctrinas requieren estado Santo o Demonio
-2. **Items de Tienda**: Equipamiento exclusivo por alineamiento
-3. **Actividades Exclusivas**: Misiones solo para Santos o solo para Demonios
-4. **Ramas Narrativas**: Diferentes outcomes de historia basados en moralidad
-5. **Decisiones de Historia**: Sistema dedicado de decisiones narrativas que afectan moralidad
-
-## Archivos a Modificar
-
-| Archivo                                                                      | Cambio                                 |
-| ---------------------------------------------------------------------------- | -------------------------------------- |
-| `server/prisma/schema.prisma`                                                | Añadir campo `morality` a Character    |
-| `shared/constants/morality.ts`                                               | Nuevo archivo con constantes           |
-| `shared/types/morality.types.ts`                                             | Nuevo archivo con tipos                |
-| `shared/constants/investments.ts`                                            | Añadir campos de impacto moral         |
-| `server/repositories/character.repository.ts`                                | Métodos updateMorality, adjustMorality |
-| `server/services/morality.service.ts`                                        | Nuevo servicio                         |
-| `server/services/service.factory.ts`                                         | Registrar MoralityService              |
-| `server/services/investment.service.ts`                                      | Integrar cambios de moralidad          |
-| `front/app/(workspace)/inventory/_components/morality-bar.component.tsx`     | Nuevo componente                       |
-| `front/app/(workspace)/inventory/_components/morality-badge.component.tsx`   | Nuevo componente                       |
-| `front/app/(workspace)/inventory/_components/character-status.component.tsx` | Integrar moralidad                     |
-| `front/public/locales/en/translation.json`                                   | Claves de moralidad                    |
-| `front/public/locales/es/translation.json`                                   | Claves de moralidad                    |
-
-## Verificación
+- `CharacterService.adjustMorality()` — clamp correcto en limites 0 y 100
+- `CharacterService.adjustMorality()` — detecta cambio de status al cruzar umbrales
+- `CharacterService.adjustMorality()` — delta calculado correctamente tras clamping
+- `getMoralityStatus()` — retorna estado correcto por valor
+- `clampMorality()` — no excede 0-100
 
 ### Tests Manuales
 
 1. Crear personaje nuevo → verificar morality = 50
-2. Contribuir a inversión con moralityImpact → verificar cambio
+2. Contribuir a inversion con moralityImpact → verificar cambio
 3. Verificar UI muestra estado correcto (Santo/Neutral/Demonio)
-4. Cruzar umbral 75 → verificar notificación "ascendido a Santo"
-5. Cruzar umbral 25 → verificar notificación "demonio"
-
-### Tests Unitarios
-
-- `MoralityService.adjustMorality()` - clamp correcto en límites
-- `getMoralityStatus()` - retorna estado correcto por valor
-- `clampMorality()` - no excede 0-100
+4. Cruzar umbral 75 → verificar notificacion "ascendido a Santo"
+5. Cruzar umbral 25 → verificar notificacion "demonio"
