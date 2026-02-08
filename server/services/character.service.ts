@@ -1,10 +1,12 @@
 import type { CharacterClassName, MagicNature } from '@shared/constants/classes'
 import { getAvailableDoctrines, getDoctrineById, MAX_EQUIPPED_DOCTRINES } from '@shared/constants/doctrines'
 import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
+import { clampMorality, getMoralityStatus } from '@shared/constants/morality'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import type { CharacterWithClasses } from '@shared/types/character.types'
 import type { DoctrineDefinition } from '@shared/types/doctrine.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
+import type { MoralityChange } from '@shared/types/morality.types'
 import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
 import { getCharacterProgress } from '../utils/character.utils'
@@ -63,6 +65,7 @@ export class CharacterService {
         magicAtk: c.magicAtk,
         magicDef: c.magicDef,
         manaRegen: c.manaRegen,
+        morality: c.morality,
         equippedDoctrines: (c as any).equippedDoctrines || []
       }))
     }
@@ -302,5 +305,33 @@ export class CharacterService {
     })
 
     return { success: true, equippedDoctrines: newEquippedDoctrines }
+  }
+
+  async adjustMorality(characterId: string, delta: number): Promise<MoralityChange> {
+    const character = await this.characterRepository.findByIdWithClassesOrThrow(characterId)
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `Current class not found for character ${characterId}`
+      })
+    }
+
+    const previousValue = currentClass.morality
+    const previousStatus = getMoralityStatus(previousValue)
+
+    const newValue = clampMorality(previousValue + delta)
+    const newStatus = getMoralityStatus(newValue)
+
+    await this.characterRepository.updateMorality(currentClass.id, newValue)
+
+    return {
+      previousValue,
+      newValue,
+      previousStatus,
+      newStatus,
+      delta: newValue - previousValue,
+      statusChanged: previousStatus !== newStatus
+    }
   }
 }

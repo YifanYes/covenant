@@ -4,11 +4,13 @@ import { InvestmentStatus } from '@shared/types/investment.types'
 import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { InvestmentRepository } from '../repositories/investment.repository'
+import type { CharacterService } from './character.service'
 
 export class InvestmentService {
   constructor(
     private investmentRepository: InvestmentRepository,
-    private characterRepository: CharacterRepository
+    private characterRepository: CharacterRepository,
+    private characterService: CharacterService
   ) {}
 
   async getInvestments(characterId: string): Promise<InvestmentWithProgress[]> {
@@ -95,9 +97,17 @@ export class InvestmentService {
       character.gold
     )
 
+    let moralityDelta: number | undefined
+    const template = getInvestmentById(investment.investmentId)
+    if (template && template.moralityImpact !== 0) {
+      const change = await this.characterService.adjustMorality(characterId, template.moralityImpact)
+      moralityDelta = change.delta
+    }
+
     return {
       success: true,
-      ...result
+      ...result,
+      moralityDelta
     }
   }
 

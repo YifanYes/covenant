@@ -1357,6 +1357,22 @@
     ],
     "verifying_title": "Verificando..."
   },
+  "morality": {
+    "title": "Moralidad",
+    "status": {
+      "saint": "Santo",
+      "neutral": "Neutral",
+      "demon": "Demonio"
+    },
+    "change": {
+      "increased": "+{{amount}} Moralidad",
+      "decreased": "-{{amount}} Moralidad",
+      "became_saint": "Has ascendido a la Santidad!",
+      "became_demon": "La oscuridad ha consumido tu alma...",
+      "left_saint": "Has caído en desgracia...",
+      "left_demon": "Una chispa de luz regresa a tu alma..."
+    }
+  },
   "map": {
     "lore": "Los Seis Poderes Infernales han lanzado un ataque relámpago a Santa Cruz, la Sede Plateada. La Orden de los Caballeros Sagrados defiende cada muralla mientras los refuerzos vienen en camino. Si cae la Sede Plateada, cae el liderazgo de los Fieles.",
     "no_activities": "No se encontraron actividades activas.",
