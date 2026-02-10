@@ -45,7 +45,7 @@
   - [x] Usar dependency injection en los servicios del backend.
   - [x] Añadir más variantes de nombres a los enemigos.
   - [x] Cron job para caducar las actividades y las inversiones.
-  - [ ] Foro por facción.
+  - [x] Foro por facción.
   - [ ] Renderizar el personaje con los items equipados.
   - [ ] Definir accesorios
   - [ ] Definir decisiones de la historia

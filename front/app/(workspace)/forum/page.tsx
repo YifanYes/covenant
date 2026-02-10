@@ -1,6 +1,17 @@
 'use client'
 import LoaderButton from '@/common/loader-button.component'
 import OnboardingRedirect from '@/components/shared/onboarding-redirect'
+import AlertDialog, {
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/ui/alert-dialog.component'
+import Button from '@/ui/button.component'
 import Card, { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/ui/card.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Loader } from '@nsmr/pixelart-react'
@@ -62,12 +73,27 @@ export default function ForumFactionsPage() {
             </CardHeader>
             <CardContent className='flex-1' />
             <CardFooter>
-              <LoaderButton
-                className='w-full cursor-pointer'
-                onClick={() => joinMutation.mutate({ faction: faction as Faction })}
-                isLoading={joinMutation.isPending}
-                label={t('forum.join_faction')}
-              />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button className='w-full cursor-pointer'>{t('forum.join_faction')}</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t('forum.join_faction_confirm')}</AlertDialogTitle>
+                    <AlertDialogDescription>{t('forum.join_faction_description')}</AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                    <AlertDialogAction asChild>
+                      <LoaderButton
+                        onClick={() => joinMutation.mutate({ faction: faction as Faction })}
+                        isLoading={joinMutation.isPending}
+                        label={t('forum.join_faction')}
+                      />
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardFooter>
           </Card>
         ))}
