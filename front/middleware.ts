@@ -3,8 +3,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Check for Better Auth session cookie
-  const sessionToken = request.cookies.get('better-auth.session_token')?.value
+  // Check for Better Auth session cookie (crossSubDomainCookies adds __Secure- prefix)
+  const sessionToken =
+    request.cookies.get('__Secure-better-auth.session_token')?.value ||
+    request.cookies.get('better-auth.session_token')?.value
   const hasSession = Boolean(sessionToken)
 
   // Public routes
