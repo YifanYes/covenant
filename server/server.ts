@@ -64,7 +64,17 @@ async function startServer() {
           const response = await auth.handler(req)
 
           reply.status(response.status)
-          response.headers.forEach((value, key) => reply.header(key, value))
+
+          // Forward Set-Cookie headers individually (Headers.forEach combines them incorrectly)
+          const setCookies = response.headers.getSetCookie()
+          for (const cookie of setCookies) {
+            reply.header('set-cookie', cookie)
+          }
+          response.headers.forEach((value, key) => {
+            if (key !== 'set-cookie') {
+              reply.header(key, value)
+            }
+          })
 
           const responseBody = await response.text()
           reply.send(responseBody || null)

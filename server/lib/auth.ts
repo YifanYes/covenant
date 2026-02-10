@@ -42,10 +42,9 @@ export const auth = betterAuth({
   advanced: {
     ...(env.NODE_ENV === 'prod'
       ? {
-          defaultCookieAttributes: {
-            domain: '.arq-game.com',
-            sameSite: 'none',
-            secure: true
+          crossSubDomainCookies: {
+            enabled: true,
+            domain: '.arq-game.com'
           },
           trustProxy: true
         }
