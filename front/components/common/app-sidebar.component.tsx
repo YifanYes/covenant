@@ -13,7 +13,7 @@ import Sidebar, {
   SidebarMenuItem,
   SidebarTrigger
 } from '@/ui/sidebar.component'
-import { BookOpen, Coin, Dashboard, Dice, List, Luggage, Map, Sliders, Store, Trophy } from '@nsmr/pixelart-react'
+import { BookOpen, Chat, Coin, Dashboard, Dice, List, Luggage, Map, Sliders, Store, Trophy } from '@nsmr/pixelart-react'
 import Link from 'next/link'
 import { useSyncExternalStore, type ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -112,6 +112,11 @@ export default function AppSidebar() {
         title: t('sidebar.crafting'),
         url: '/crafting',
         icon: Dice
+      },
+      {
+        title: t('sidebar.forum'),
+        url: '/forum',
+        icon: Chat
       }
     ],
     settings: [

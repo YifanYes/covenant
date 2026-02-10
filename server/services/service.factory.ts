@@ -8,6 +8,7 @@ import { HabitRepository } from '../repositories/habit.repository'
 import { InvestmentRepository } from '../repositories/investment.repository'
 import { ObjectiveRepository } from '../repositories/objective.repository'
 import { TaskRepository } from '../repositories/task.repository'
+import { ForumRepository } from '../repositories/forum.repository'
 import { UserRepository } from '../repositories/user.repository'
 import { ActivityService } from './activity.service'
 import { AreaService } from './area.service'
@@ -18,6 +19,7 @@ import { CraftingService } from './crafting.service'
 import { DashboardService } from './dashboard.service'
 import { DeadlineService } from './deadline.service'
 import { DiceService } from './dice.service'
+import { ForumService } from './forum.service'
 import { HabitService } from './habit.service'
 import { InvestmentService } from './investment.service'
 import { KillRecordService } from './kill-record.service'
@@ -38,6 +40,7 @@ export class ServiceFactory {
   private _areaRepository?: AreaRepository
   private _characterRepository?: CharacterRepository
   private _combatEnemyRepository?: CombatEnemyRepository
+  private _forumRepository?: ForumRepository
   private _habitRepository?: HabitRepository
   private _investmentRepository?: InvestmentRepository
   private _objectiveRepository?: ObjectiveRepository
@@ -54,6 +57,7 @@ export class ServiceFactory {
   private _dashboardService?: DashboardService
   private _deadlineService?: DeadlineService
   private _diceService?: DiceService
+  private _forumService?: ForumService
   private _habitService?: HabitService
   private _investmentService?: InvestmentService
   private _killRecordService?: KillRecordService
@@ -83,6 +87,10 @@ export class ServiceFactory {
 
   private get combatEnemyRepository(): CombatEnemyRepository {
     return (this._combatEnemyRepository ??= new CombatEnemyRepository(this.prisma))
+  }
+
+  private get forumRepository(): ForumRepository {
+    return (this._forumRepository ??= new ForumRepository(this.prisma))
   }
 
   private get habitRepository(): HabitRepository {
@@ -123,6 +131,10 @@ export class ServiceFactory {
 
   get dice(): DiceService {
     return (this._diceService ??= new DiceService(this.characterRepository))
+  }
+
+  get forum(): ForumService {
+    return (this._forumService ??= new ForumService(this.forumRepository, this.characterRepository))
   }
 
   // Layer 2: Repository + Layer 1 service dependencies
