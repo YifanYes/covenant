@@ -1037,6 +1037,8 @@
     "go_to_forum": "Go to forum",
     "go_to_your_forum": "Go to your forum",
     "join_faction": "Join Faction",
+    "join_faction_confirm": "Are you sure you want to join this faction?",
+    "join_faction_description": "Once you join, you will have access to this faction's forum and community. You won't be able to join another faction, so choose wisely.",
     "leave_faction": "Leave Faction",
     "leave_faction_confirm": "Are you sure you want to leave this faction?",
     "leave_faction_description": "You will lose access to this faction's forum until you rejoin.",
