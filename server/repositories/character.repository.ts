@@ -274,4 +274,11 @@ export class CharacterRepository {
       data: { materials, gold }
     })
   }
+
+  async updateFaction(characterId: string, faction: string): Promise<Character> {
+    return this.prisma.character.update({
+      where: { id: characterId },
+      data: { factionName: faction }
+    })
+  }
 }

@@ -88,6 +88,7 @@ model Character {
   activityParticipations  ActivityParticipation[]
   classes                 CharacterClass[]
   investmentContributions InvestmentContribution[]
+  forumComments           ForumComment[]
 
   @@map("characters")
 }
@@ -274,4 +275,26 @@ model InvestmentContribution {
   character     Character  @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("investment_contributions")
+}
+
+model ForumComment {
+  id        String         @id @default(uuid()) @db.Uuid
+  parentId  String?        @db.Uuid
+  rootId    String         @db.Uuid
+  title     String?        @db.VarChar(255)
+  content   String         @db.Text
+  faction   String         @db.VarChar(100)
+  authorId  String         @db.Uuid
+  depth     Int            @default(0)
+  createdAt DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt DateTime       @updatedAt @db.Timestamp(6)
+  parent    ForumComment?  @relation("CommentTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  ForumComment[] @relation("CommentTree")
+  author    Character      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([parentId])
+  @@index([rootId])
+  @@index([authorId])
+  @@index([faction])
+  @@map("forum_comments")
 }
