@@ -17,7 +17,6 @@ export interface DoctrineBuffs {
   defenseZero: boolean
   onesHurtSelf: boolean
   thornsDamage: number
-  thornsBurnDuration: number
 }
 
 /**
@@ -38,8 +37,7 @@ export function getActiveDoctrineBuffs(
       criticalThresholdMod: 0,
       defenseZero: false,
       onesHurtSelf: false,
-      thornsDamage: 0,
-      thornsBurnDuration: 0
+      thornsDamage: 0
     }
   }
 
@@ -52,7 +50,6 @@ export function getActiveDoctrineBuffs(
   let defenseZero = false
   let onesHurtSelf = false
   let thornsDamage = 0
-  let thornsBurnDuration = 0
 
   // Doctrines that set defense to 0
   const defenseZeroDoctrines = ['reckless_strike', 'audacity']
@@ -73,13 +70,10 @@ export function getActiveDoctrineBuffs(
       onesHurtSelf = true
     }
 
-    // Thorns - deal flat damage to attacker (karmic_retribution, flaming_apotheosis)
+    // Thorns - deal flat damage to attacker (karmic_retribution, retaliation)
     const thornEffect = doctrine.effects.find(e => e.thornsDamage !== undefined)
     if (thornEffect?.thornsDamage) {
       thornsDamage = Math.max(thornsDamage, thornEffect.thornsDamage)
-      if (thornEffect.thornsBurnDuration) {
-        thornsBurnDuration = Math.max(thornsBurnDuration, thornEffect.thornsBurnDuration)
-      }
     }
 
     // INSPIRATION: Check for pre-calculated bonus dice from scalesWithEnemyTier
@@ -142,8 +136,7 @@ export function getActiveDoctrineBuffs(
     criticalThresholdMod,
     defenseZero,
     onesHurtSelf,
-    thornsDamage,
-    thornsBurnDuration
+    thornsDamage
   }
 }
 

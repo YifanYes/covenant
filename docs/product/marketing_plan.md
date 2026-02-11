@@ -6,25 +6,17 @@
 
 > **Presupuesto:** 200€/mes
 
-> **Filosofía:** Ganar antes de luchar. Conocer el terreno. Atacar donde no hay defensa.
+> **Principio operativo:** No competimos en mercados saturados. Ocupamos el cuadrante vacío con disciplina, comunidad propia, y ejecución concentrada en 2 canales.
 
 ---
 
-## 🎯 Principio Estratégico Fundamental
+## Posicionamiento: El Cuadrante Vacío
 
-> "Los guerreros victoriosos primero ganan y luego van a la guerra, mientras que los guerreros derrotados primero van a la guerra y luego buscan ganar."
+> "Los guerreros victoriosos primero ganan y luego van a la guerra."
 
-**Traducción para ARQ:** No competimos con Habitica, Forest o Todoist. Ocupamos un territorio que ellos no pueden defender: el "gamer disciplinado" que busca épica, no ternura.
+**ARQ no compite con Habitica, Forest o Todoist.** Ocupamos un territorio que ninguno de ellos puede defender: el "gamer disciplinado" que busca épica, no ternura.
 
-**Victoria sin batalla:** No gastamos recursos atacando mercados saturados. Encontramos el vacío y lo llenamos.
-
----
-
-## 📊 Inteligencia: Conoce a Tu Enemigo
-
-> "Si conoces al enemigo y te conoces a ti mismo, no debes temer el resultado de cien batallas."
-
-### Análisis del Campo de Batalla
+### Análisis Competitivo
 
 | Competidor         | Territorio                | Fortaleza                       | Debilidad Explotable                        |
 | ------------------ | ------------------------- | ------------------------------- | ------------------------------------------- |
@@ -33,7 +25,7 @@
 | **Finch**          | Wellness emocional        | Cute, accesible                 | Demasiado "soft", sin desafío               |
 | **Todoist/Notion** | Productividad profesional | Potentes, establecidos          | Aburridos, "trabajo", sin alma              |
 
-### El Terreno No Defendido (Nuestro Territorio)
+### Mapa del Mercado
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -55,462 +47,413 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Insight estratégico:** El cuadrante "Dark Fantasy + Hardcore" está completamente vacío. No hay enemigo que defender. Ocupamos sin luchar.
+**Insight:** El cuadrante "Dark Fantasy + Hardcore" está completamente vacío. No hay competidor que lo defienda. Entramos sin fricción.
 
 ---
 
-## ⚔️ Los 5 Pilares de la Estrategia
+## Priorización de Canales
 
-> "Quien los conoce será victorioso; quien no los conoce, fracasará."
+La regla fundamental: **máximo 2 canales primarios en cualquier momento.** Un indie con 200€/mes no puede estar en 4+ canales y hacer cada uno bien. Es mejor dominar 2 que ser mediocre en 5.
 
-### 1. 道 La Ley Moral (Cultura/Propósito)
+### Ranking por Impacto / Coste
 
-**¿Están nuestros usuarios en completo acuerdo con nosotros?**
+| Prioridad | Canal                          | Coste    | Por qué                                                      |
+| --------- | ------------------------------ | -------- | ------------------------------------------------------------ |
+| **#1**    | Discord propio + Email capture | 0€       | Comunidad propia, no dependes de algoritmos, retención alta  |
+| **#2**    | Reddit + Twitter (auténtico)   | 0€       | Acceso a audiencia exacta, pero en terreno ajeno             |
+| **#3**    | Contenido (1/semana calidad)   | 0€       | SEO y descubrimiento a medio plazo                           |
+| **#4**    | Micro-influencer (1 bueno)     | 150€/mes | Amplificación puntual cuando hay producto sólido que mostrar |
+| Opcional  | Eventos presenciales           | Tiempo   | Alto coste en tiempo, útil solo si hay eventos relevantes    |
 
-| Elemento                 | Aplicación ARQ                               |
-| ------------------------ | -------------------------------------------- |
-| **Propósito compartido** | "Tu disciplina real forja tu leyenda divina" |
-| **Identidad tribal**     | Somos los que elegimos el camino difícil     |
-| **Enemigo común**        | El caos, la procrastinación, la mediocridad  |
-| **Narrativa épica**      | No usas una app, luchas en una guerra santa  |
-
-**Táctica:** Cada comunicación refuerza que somos una orden de guerreros, no usuarios de una app.
-
-### 2. 天 El Cielo (Condiciones Externas/Timing)
-
-**¿Cuándo atacar?**
-
-| Condición      | Momento Óptimo                            |
-| -------------- | ----------------------------------------- |
-| **Enero**      | Propósitos de año nuevo, alta motivación  |
-| **Septiembre** | Vuelta al trabajo/estudios                |
-| **Lunes**      | Inicio de semana, mentalidad de "empezar" |
-| **Noche**      | Gamers activos, reflexión sobre el día    |
-
-**Táctica:** Lanzar campañas fuertes en enero y septiembre. Publicar contenido los domingos/lunes.
-
-### 3. 地 La Tierra (Terreno/Canales)
-
-**¿Dónde luchar?**
-
-| Terreno                  | Tipo                | Estrategia                           |
-| ------------------------ | ------------------- | ------------------------------------ |
-| **Reddit gaming**        | Terreno accesible   | Ocupar primero, establecer presencia |
-| **Eventos presenciales** | Pasos estrechos     | Dominar con presencia física         |
-| **TikTok/Reels**         | Terreno abierto     | Movimiento rápido, golpes virales    |
-| **Facebook Ads**         | Terreno disputado   | EVITAR - demasiado caro, competido   |
-| **SEO**                  | Terreno temporizado | Sembrar ahora, cosechar después      |
-
-### 4. 將 El Comandante (Liderazgo)
-
-**Las 5 virtudes del líder de marketing:**
-
-| Virtud           | Aplicación                                   |
-| ---------------- | -------------------------------------------- |
-| **Sabiduría**    | Medir antes de actuar, datos sobre intuición |
-| **Sinceridad**   | Comunicación auténtica, no marketing vacío   |
-| **Benevolencia** | Cuidar a los beta testers como aliados       |
-| **Coraje**       | Diferenciarse radicalmente, no copiar        |
-| **Disciplina**   | Consistencia > intensidad esporádica         |
-
-### 5. 法 Método y Disciplina (Sistemas)
-
-**Estructura operativa:**
-
-| Sistema           | Implementación                           |
-| ----------------- | ---------------------------------------- |
-| **Métricas**      | Dashboard semanal de KPIs                |
-| **Calendario**    | Contenido planificado 2 semanas adelante |
-| **Feedback loop** | Revisión semanal de qué funciona         |
-| **Presupuesto**   | Control estricto, sin desviaciones       |
+**Canales primarios Fase Beta:** Discord (#1) + Reddit/Twitter (#2).
+Todo lo demás es secundario hasta que estos dos estén funcionando.
 
 ---
 
-## 🗡️ Las 4 Acciones Pareto (20% → 80%)
+## #1: Discord + Email — Tu Base de Operaciones
 
-> "La rapidez es la esencia de la guerra. Aprovecha la falta de preparación del enemigo."
+### Por qué Discord es el Canal #1
 
-### Priorización Estratégica
+Discord es **el único canal que controlas completamente.** Reddit puede banearte, Twitter puede cambiar el algoritmo, un influencer puede cancelar. Tu Discord y tu lista de email son tuyos.
 
-| #   | Acción                   | Impacto | Coste  | Tipo de Terreno            |
-| --- | ------------------------ | ------- | ------ | -------------------------- |
-| 🥇  | **Eventos presenciales** | 40%     | Tiempo | Pasos estrechos (dominar)  |
-| 🥈  | **Reddit/Discord**       | 30%     | 0€     | Accesible (ocupar primero) |
-| 🥉  | **Contenido viral**      | 20%     | 0€     | Abierto (golpes rápidos)   |
-| 4️⃣  | **Micro-influencers**    | 10%     | 150€   | Alianzas estratégicas      |
+Para un producto de nicho gaming/dark fantasy, Discord es el habitat natural del público objetivo. No estás forzando a tu audiencia a un canal incómodo — ya viven ahí.
 
----
+### Estructura del Discord
 
-## 🥇 1. Eventos Presenciales: Dominar los Pasos Estrechos
+| Canal               | Propósito                                          |
+| ------------------- | -------------------------------------------------- |
+| `#announcements`    | Updates del producto, parches, nuevas features     |
+| `#feedback`         | Canal principal de input de beta testers           |
+| `#bug-reports`      | Reporte estructurado de bugs                       |
+| `#general`          | Conversación libre, comunidad                      |
+| `#lore`             | Discusión del mundo, narrativa, teorías            |
+| `#builds`           | Compartir builds de personajes, estrategias        |
+| `#off-topic`        | Mantener la comunidad humana                       |
 
-> "Ocupa los pasos estrechos primero y espera al enemigo."
+### Tácticas para Hacer el Discord Vivo
 
-### Por qué funciona (Principio Sun Tzu)
+- **Participación del fundador diaria:** Responder en 24h, compartir progreso, pedir opiniones reales
+- **Building in public:** Screenshots de desarrollo, decisiones de diseño abiertas a votación
+- **Roles con significado:** Beta Tester, Early Adopter, Bug Hunter — que se sientan parte del equipo
+- **Weekly update post:** Cada viernes, qué se hizo esta semana, qué viene la próxima
 
-Los eventos son **pasos estrechos**: espacios limitados donde quien llega primero tiene ventaja absoluta. Habitica no está ahí. Forest no está ahí. El terreno está vacío.
+### Email Capture y Funnel
 
-**Ventaja táctica:**
+El email es el seguro contra la caída de cualquier plataforma. Cada persona que entra al Discord o a la waitlist debe dejar un email.
 
-- Contacto directo = conversión alta
-- Demostración en vivo = prueba irrefutable
-- Feedback inmediato = inteligencia de campo
-- Genera contenido = munición para otras batallas
-
-### Tipos de Eventos (Clasificación por Terreno)
-
-| Evento                  | Tipo                 | Frecuencia | Táctica                       |
-| ----------------------- | -------------------- | ---------- | ----------------------------- |
-| **Convenciones gaming** | Terreno fértil       | Mensual    | Forrajear (capturar usuarios) |
-| **Tiendas juegos mesa** | Pasos estrechos      | Semanal    | Ocupar y defender             |
-| **Meetups tech**        | Terreno intersección | Quincenal  | Consolidar alianzas           |
-| **Universidades**       | Terreno serio        | Mensual    | Penetrar profundo             |
-
-### Kit de Batalla (Inversión inicial ~50€)
-
-- [ ] **Tarjetas QR** - Tu estandarte de batalla
-- [ ] **Pitch de 30 segundos** - Tu arma principal
-- [ ] **Demo en tablet** - Prueba irrefutable
-- [ ] **Camiseta ARQ** - Identificación tribal
-
-### El Pitch (El Arte del Engaño Aplicado)
-
-> "Cuando seas capaz, aparenta incapacidad. Cuando estés activo, aparenta inactividad."
-
-**No vendemos una app. Reclutamos guerreros.**
+**Funnel de captura:**
 
 ```
-"¿Conoces Habitica? [Pausa] Imagina eso, pero para adultos.
-Dark Souls mezclado con gestión de hábitos.
-Tus tareas reales son misiones. Tu disciplina sube tus stats.
-Estamos reclutando beta testers. ¿Te interesa el rollo dark fantasy?"
+Landing page / Reddit post / Twitter
+         ↓
+   Waitlist signup (email)
+         ↓
+   Email de bienvenida + invitación Discord
+         ↓
+   Onboarding en Discord
+         ↓
+   Beta access cuando esté listo
 ```
 
-**Principio aplicado:** Aparentamos ser "solo otra app" hasta que revelamos la profundidad. El enemigo (su escepticismo) baja la guardia.
+**Secuencia de emails:**
 
-### Métricas de Batalla
+| Email | Timing            | Contenido                                           |
+| ----- | ----------------- | --------------------------------------------------- |
+| #1    | Inmediato         | Bienvenida + link Discord + qué esperar             |
+| #2    | +3 días           | La visión de ARQ: por qué existe, qué lo diferencia |
+| #3    | +7 días           | Preview de gameplay / screenshots                   |
+| #4    | Cuando hay acceso | Invitación a beta con instrucciones                 |
 
-| Métrica        | Objetivo     | Victoria               |
-| -------------- | ------------ | ---------------------- |
-| Conversaciones | 20-30/evento | Terreno explorado      |
-| QRs escaneados | 10-15/evento | Posiciones tomadas     |
-| Sign-ups       | 5-8/evento   | Territorio conquistado |
+**Herramientas:** Buttondown (gratis hasta 100 suscriptores) o Resend (gratis hasta 3k emails/mes).
+
+### Métricas Discord + Email
+
+| Métrica                     | Objetivo Semana 6 | Objetivo Semana 12 |
+| --------------------------- | ----------------- | ------------------ |
+| Miembros Discord            | 30                | 80                 |
+| Miembros activos/semana     | 15                | 40                 |
+| Emails en lista             | 50                | 150                |
+| Tasa apertura emails        | >40%              | >40%               |
 
 ---
 
-## 🥈 2. Reddit/Discord: Ocupar Terreno Accesible
+## #2: Reddit + Twitter — Presencia Auténtica
 
-> "Sé el primero en ocupar el terreno elevado y soleado."
+> "Sé el primero en ocupar el terreno elevado."
 
-### Estrategia de Infiltración
+### Principio Fundamental: Autenticidad, No Infiltración
 
-> "Los espías convertidos son aquellos a través de los cuales podemos adquirir y emplear espías locales."
+El enfoque correcto en Reddit y Twitter es **ser un miembro genuino de la comunidad que también está construyendo algo.** No "infiltrarse", no tener una fase secreta de espionaje. La gente detecta el marketing disfrazado inmediatamente, y Reddit en particular lo castiga con dureza.
 
-**Fase 1: Reconocimiento (Semana 1-2)**
+**Qué funciona:**
+- Ser transparente: "Estoy construyendo X, esto es lo que aprendí"
+- Aportar valor sin pedir nada: responder preguntas, compartir conocimiento
+- Building in public: compartir progreso real, incluyendo fracasos
+- Pedir feedback honesto, no validación
 
-- Observar sin actuar
-- Identificar líderes de opinión
-- Mapear reglas y cultura de cada comunidad
+**Qué NO funciona (y hay que evitar):**
+- Crear cuentas falsas o "de apoyo"
+- Posts que parecen orgánicos pero son promoción encubierta
+- Postear en r/habitica para "convertir descontentos"
+- Cualquier cosa que te dé vergüenza si alguien descubre que es marketing
 
-**Fase 2: Infiltración (Semana 3-4)**
+### Reddit: Subreddits Objetivo
 
-- Aportar valor sin mencionar ARQ
-- Responder preguntas, ayudar genuinamente
-- Construir reputación
+| Subreddit         | Audiencia | Enfoque                                           |
+| ----------------- | --------- | ------------------------------------------------- |
+| r/gamification    | 15k       | Audiencia exacta, compartir learnings de producto  |
+| r/productivity    | 2M        | Posts de alto valor sobre gamificación + hábitos   |
+| r/IndieGaming     | 500k+     | Devlogs, arte, progreso de desarrollo             |
+| r/ADHD            | 1.5M      | Contenido útil sobre sistemas de productividad     |
 
-**Fase 3: Revelación (Semana 5+)**
+**Cadencia:** 2-3 participaciones por semana (comentarios valiosos + 1 post propio máximo).
 
-- "Building in public" posts
-- Pedir feedback, no vender
-- Convertir curiosos en aliados
+### Twitter: Building in Public
 
-### Subreddits Objetivo (Clasificados por Terreno)
+Twitter es el mejor canal para "building in public" porque el formato favorece updates cortos y frecuentes.
 
-| Subreddit      | Miembros | Tipo Terreno    | Táctica                   |
-| -------------- | -------- | --------------- | ------------------------- |
-| r/gamification | 15k      | Paso estrecho   | Dominar con expertise     |
-| r/productivity | 2M       | Terreno abierto | Golpes virales            |
-| r/ADHD         | 1.5M     | Terreno fértil  | Mensaje resonante         |
-| r/DarkSouls    | 1M+      | Aliado natural  | Memes, cultura compartida |
-| r/habitica     | 50k      | Terreno enemigo | Convertir descontentos    |
+**Tipos de contenido:**
 
-### Regla de Oro: 80/20 Invertido
+| Tipo              | Frecuencia  | Ejemplo                                              |
+| ----------------- | ----------- | ---------------------------------------------------- |
+| Devlog update     | 2x/semana   | "Esta semana implementé el sistema de facciones..."  |
+| Screenshot/GIF    | 1x/semana   | UI, animaciones, gameplay                            |
+| Pregunta genuina  | 1x/semana   | "¿Qué prefieren: XP por tareas o por rachas?"       |
+| Hilo de insight   | 1x/2 semanas | Algo que aprendiste construyendo ARQ                |
 
-> "El arte supremo es someter sin luchar."
+**Regla 80/20:** 80% valor puro (insights, preguntas, compartir conocimiento), 20% mención directa de ARQ. Pero incluso el 20% debe ser interesante por sí mismo, no un "descarga mi app".
 
-- **80% valor puro** - Ayudar, educar, entretener
-- **20% mención ARQ** - Solo cuando sea natural
+### Métricas Reddit + Twitter
 
-**Ejemplo de post que funciona:**
-
-```
-Título: "Soy dev y estoy creando una app de productividad
-con estética Dark Souls. AMA sobre gamificación adulta."
-
-[No vende. Invita a conversación. Genera curiosidad.]
-```
-
----
-
-## 🥉 3. Contenido Viral: Golpes Rápidos en Terreno Abierto
-
-> "Aparece donde no te esperan. Ataca donde no hay defensa."
-
-### Por qué TikTok/Reels (Principio Sun Tzu)
-
-El contenido corto es **terreno abierto**: libertad de movimiento, pero también exposición. La táctica es **golpear y retirarse** - contenido viral que impacta y desaparece, dejando curiosidad.
-
-### Tipos de Contenido (Clasificados por Táctica)
-
-| Formato           | Táctica Sun Tzu    | Ejemplo                                         |
-| ----------------- | ------------------ | ----------------------------------------------- |
-| **Hook + Demo**   | Ataque sorpresa    | "POV: Tu app de hábitos es un RPG dark fantasy" |
-| **Memes gaming**  | Cebo para atraer   | "Gamers que grindean 8h pero no estudian 1h"    |
-| **Behind scenes** | Mostrar fuerza     | Desarrollo, lore, arte                          |
-| **Relatable**     | Dividir al enemigo | "Habitica es para niños, change my mind"        |
-
-### Calendario de Ataque
-
-| Día       | Contenido     | Objetivo                        |
-| --------- | ------------- | ------------------------------- |
-| Lunes     | Hook + Demo   | Capturar atención inicio semana |
-| Miércoles | Meme          | Mantener engagement             |
-| Viernes   | Behind scenes | Construir comunidad             |
-| Domingo   | Relatable     | Reflexión pre-semana            |
-
-### Hashtags Estratégicos (Terreno a Ocupar)
-
-```
-#productividad #gamification #darkfantasy #rpg #habittracker
-#indiedev #soulslike #gaming #adhd #motivation #disciplina
-```
+| Métrica                 | Objetivo Semana 6 | Objetivo Semana 12 |
+| ----------------------- | ----------------- | ------------------ |
+| Seguidores Twitter      | 100               | 300                |
+| Impresiones/semana      | 5k                | 15k                |
+| Clicks a landing/Discord| 20/semana         | 50/semana          |
+| Posts Reddit con >20 upvotes | 2            | 5 acumulados       |
 
 ---
 
-## 4️⃣ 4. Micro-Influencers: Alianzas Estratégicas
+## #3: Contenido — 1 Pieza de Calidad por Semana
 
-> "No entres en alianzas hasta conocer los designios de tus vecinos."
+### Por qué 1 y No 4
 
-### Selección de Aliados (Los 7 Criterios)
+Con recursos limitados, **1 pieza excelente por semana genera más impacto que 4 mediocres.** Un buen post en Reddit o un hilo en Twitter bien pensado llega más lejos que 4 posts genéricos que nadie comparte.
 
-| Criterio         | Requisito              | Por qué              |
-| ---------------- | ---------------------- | -------------------- |
-| **Seguidores**   | 1k-50k                 | Engagement > alcance |
-| **Nicho**        | Gaming + productividad | Audiencia exacta     |
-| **Engagement**   | >5%                    | Influencia real      |
-| **Autenticidad** | Contenido genuino      | Credibilidad         |
-| **Estética**     | Compatible dark/adulta | Coherencia de marca  |
+### Calendario Semanal
 
-### Tipos de Colaboración
+| Día     | Actividad                                                  |
+| ------- | ---------------------------------------------------------- |
+| Lunes   | Elegir tema de la semana basado en lo que resonó antes     |
+| Martes-Jueves | Crear la pieza (post, hilo, video corto, devlog)    |
+| Viernes | Publicar + compartir en canales relevantes                 |
+| Weekend | Responder comentarios, engagement con la comunidad         |
 
-| Tipo           | Coste            | Táctica Sun Tzu    |
-| -------------- | ---------------- | ------------------ |
-| **Gifted**     | 0€ (acceso beta) | Espía convertido   |
-| **Micro-pago** | 30-50€           | Alianza temporal   |
-| **Affiliate**  | % conversiones   | Alianza permanente |
+### Formatos que Funcionan para Indie Games / Productivity
 
-### Presupuesto de Alianzas (150€/mes)
+| Formato                 | Plataforma     | Ejemplo                                                |
+| ----------------------- | -------------- | ------------------------------------------------------ |
+| Devlog con screenshots  | Reddit + Twitter | "Cómo diseñé el sistema de combate basado en hábitos" |
+| GIF/video corto (30s)   | Twitter + TikTok | Demo de una feature en acción                         |
+| Hilo de decisiones      | Twitter         | "5 decisiones de diseño que tomé esta semana y por qué"|
+| Post de valor           | Reddit          | Insight genuino sobre gamificación / productividad     |
+
+---
+
+## #4: Micro-Influencers — 1 Colaboración de Calidad
+
+### Cambio de Enfoque: Calidad sobre Cantidad
+
+En lugar de 3 micro-influencers a 50€ cada uno (que probablemente hagan un post genérico y se olviden), **invertir 150€ en 1 colaboración más profunda** con alguien que realmente conecte con el producto.
+
+### Perfil del Influencer Ideal
+
+| Criterio         | Requisito                                            |
+| ---------------- | ---------------------------------------------------- |
+| Seguidores       | 5k-50k (engagement real > alcance masivo)            |
+| Nicho            | Gaming + productividad, o dark fantasy + lifestyle   |
+| Engagement rate  | >5%                                                  |
+| Formato          | Video (YouTube/TikTok) o hilos Twitter               |
+| Autenticidad     | Que use el producto de verdad, no un read de script   |
+
+### Estructura de Colaboración
 
 ```
-3 micro-influencers × 50€ = 150€
+1. Identificar candidato que ya hable de temas afines
+2. Darle acceso beta real (no una demo limitada)
+3. Dejarle usar el producto 1-2 semanas
+4. Colaboración: review honesto, no script forzado
+5. Presupuesto: 150€ por 1 pieza de contenido de calidad
 ```
 
-**Principio:** "Trata a tus hombres con benevolencia, justicia y rectitud, y deposita confianza en ellos."
+### Timing
+
+No gastar en influencers hasta tener **producto mostrable y comunidad base.** Un influencer enviando tráfico a un Discord vacío o un producto con bugs es dinero desperdiciado. Activar en Fase 3 del timeline.
 
 ---
 
-## 📅 Campaña: Las 9 Semanas de Conquista
+## Mecanismo de Referral
 
-> "El general que gana una batalla hace muchos cálculos antes de que se libre la batalla."
+### Sistema Integrado en el Producto
 
-### Fase 1: Preparación (Semanas 1-2)
+El mejor canal de adquisición a largo plazo es que los propios usuarios traigan a otros. Diseñar un sistema de referral que se integre con la narrativa del juego.
 
-> "Primero ponte más allá de la derrota, luego espera la oportunidad de derrotar al enemigo."
+**Mecánica propuesta:**
 
-| Día   | Acción                           | Objetivo             |
-| ----- | -------------------------------- | -------------------- |
-| S1-D1 | Landing page + waitlist          | Base de operaciones  |
-| S1-D2 | Kit de eventos preparado         | Armamento            |
-| S1-D3 | Cuentas redes creadas            | Posiciones avanzadas |
-| S1-D4 | Reconocimiento Reddit            | Inteligencia         |
-| S2-D1 | Primer post "building in public" | Primer contacto      |
-| S2-D3 | Primeros 5 videos grabados       | Munición             |
-| S2-D5 | Lista de 20 influencers          | Aliados potenciales  |
+| Elemento           | Implementación                                              |
+| ------------------ | ----------------------------------------------------------- |
+| Invitación         | "Recluta un aliado para tu facción" — link único por usuario|
+| Incentivo invitador| XP bonus, item exclusivo, o título cosmético                |
+| Incentivo invitado | Bonus de inicio (XP o item de bienvenida)                   |
+| Tracking           | Dashboard para ver cuántos aliados has reclutado            |
 
-### Fase 2: Infiltración (Semanas 3-4)
-
-> "Sé extremadamente sutil, hasta el punto de no tener forma. Sé extremadamente misterioso, hasta el punto de no tener sonido."
-
-| Semana | Acción                       | Táctica                |
-| ------ | ---------------------------- | ---------------------- |
-| S3     | Engagement Reddit sin vender | Construir reputación   |
-| S3     | Primer evento presencial     | Reconocimiento terreno |
-| S4     | Publicar contenido diario    | Establecer presencia   |
-| S4     | Contactar 10 influencers     | Proponer alianzas      |
-
-### Fase 3: Ataque (Semanas 5-7)
-
-> "Ataca como el fuego, sé inmóvil como una montaña."
-
-| Semana | Acción                       | Intensidad |
-| ------ | ---------------------------- | ---------- |
-| S5     | 2 eventos + contenido viral  | Alta       |
-| S6     | Primeras collabs influencers | Alta       |
-| S7     | Push fuerte en Reddit        | Máxima     |
-
-### Fase 4: Consolidación (Semanas 8-9)
-
-> "Después de cruzar un río, aléjate de él."
-
-| Semana | Acción                      | Objetivo             |
-| ------ | --------------------------- | -------------------- |
-| S8     | Analizar métricas           | Evaluar victoria     |
-| S8     | Doblar lo que funciona      | Reforzar posiciones  |
-| S9     | Eliminar lo que no funciona | Retirada táctica     |
-| S9     | Preparar siguiente fase     | Planificar expansión |
+**Importante:** El sistema de referral no sustituye al marketing — lo complementa. Funciona cuando ya tienes usuarios satisfechos. Implementar cuando haya al menos 30 usuarios activos.
 
 ---
 
-## 📈 Inteligencia y Métricas
+## Timeline: 12 Semanas Realistas
 
-> "Lo que permite al soberano sabio y al buen general conquistar es el conocimiento previo."
+### Fase 1: Infraestructura (Semanas 1-3)
 
-### Dashboard de Guerra
+**Objetivo:** Tener la base lista antes de buscar usuarios.
 
-| KPI                  | Objetivo S4 | Objetivo S9 | Victoria               |
-| -------------------- | ----------- | ----------- | ---------------------- |
-| **Sign-ups beta**    | 30          | 100         | Territorio conquistado |
-| **Usuarios activos** | 15          | 50          | Posiciones mantenidas  |
-| **Retention D7**     | 40%         | 50%         | Lealtad de tropas      |
-| **NPS**              | >30         | >50         | Moral del ejército     |
+| Semana | Acción                                   | Resultado esperado                |
+| ------ | ---------------------------------------- | --------------------------------- |
+| S1     | Crear Discord con estructura de canales  | Servidor listo para recibir gente |
+| S1     | Landing page con waitlist + email capture| Punto de entrada funcional        |
+| S2     | Configurar email (bienvenida automática) | Funnel básico operativo           |
+| S2     | Crear cuentas Twitter y Reddit           | Presencia mínima establecida      |
+| S3     | Primeros 3 posts "building in public"    | Contenido inicial publicado       |
+| S3     | Identificar 10 subreddits/cuentas afines | Mapa de dónde participar          |
 
-### Métricas por Canal (Espías en Cada Frente)
+### Fase 2: Presencia y Comunidad (Semanas 4-7)
 
-| Canal       | Métrica               | Objetivo | Tipo de Inteligencia |
-| ----------- | --------------------- | -------- | -------------------- |
-| Eventos     | Sign-ups/evento       | 5-8      | Espía local          |
-| Reddit      | Upvotes + comentarios | 50+/post | Espía interno        |
-| TikTok      | Views promedio        | 1k+      | Espía superviviente  |
-| Influencers | Conversiones/collab   | 10+      | Espía convertido     |
+**Objetivo:** Construir presencia auténtica y primeros miembros de comunidad.
 
-### Herramientas de Inteligencia
+| Semana | Acción                                      | Resultado esperado                |
+| ------ | ------------------------------------------- | --------------------------------- |
+| S4-S5  | Participar activamente en Reddit (3x/semana)| Reputación en comunidades clave   |
+| S4-S5  | Twitter: devlogs 2x/semana                  | Primeros seguidores orgánicos     |
+| S6     | Primer post propio en Reddit con substance  | 20+ upvotes, primeros signups     |
+| S6-S7  | Contenido semanal de calidad (1/semana)     | Pipeline de contenido establecido |
+| S7     | Invitar primeros 10-15 beta testers         | Discord con vida real             |
 
-| Herramienta          | Uso                                 | Coste  |
-| -------------------- | ----------------------------------- | ------ |
-| **Google Analytics** | Movimientos del enemigo (tráfico)   | Gratis |
-| **Mixpanel**         | Comportamiento de tropas (usuarios) | Gratis |
-| **Notion**           | Centro de comando (CRM)             | Gratis |
-| **UTM parameters**   | Rastreo de operaciones              | Gratis |
+### Fase 3: Amplificación (Semanas 8-10)
+
+**Objetivo:** Escalar lo que funciona con apoyo de presupuesto.
+
+| Semana | Acción                                     | Resultado esperado                  |
+| ------ | ------------------------------------------ | ----------------------------------- |
+| S8     | Activar colaboración con micro-influencer  | Amplificación de alcance            |
+| S8-S9  | Push de contenido en canales que funcionan  | Duplicar esfuerzo donde hay tracción|
+| S9-S10 | Activar sistema de referral                | Crecimiento orgánico comienza       |
+
+### Fase 4: Evaluación y Ajuste (Semanas 11-12)
+
+**Objetivo:** Medir resultados, cortar lo que no funciona, reforzar lo que sí.
+
+| Semana  | Acción                                    | Resultado esperado                |
+| ------- | ----------------------------------------- | --------------------------------- |
+| S11     | Análisis completo de métricas por canal   | Saber qué funciona y qué no      |
+| S11     | Encuesta a beta testers (NPS + feedback)  | Datos cualitativos reales         |
+| S12     | Doblar inversión en canales ganadores     | Recursos concentrados             |
+| S12     | Eliminar canales con bajo retorno         | Menos dispersión                  |
+| S12     | Documentar aprendizajes para siguiente fase| Base para el plan post-beta      |
 
 ---
 
-## 💰 Asignación de Recursos
+## Presupuesto: 200€/mes
 
 > "No hay instancia de un país que se haya beneficiado de una guerra prolongada."
 
-### Presupuesto Mensual (200€)
+### Distribución Mensual
 
-```
-┌─────────────────────────────────────────┐
-│         DISTRIBUCIÓN DE RECURSOS        │
-├─────────────────────────────────────────┤
-│ Micro-influencers    ████████████ 150€  │
-│ Materiales eventos   ███          30€   │
-│ Contingencia         ██           20€   │
-└─────────────────────────────────────────┘
-```
+| Partida                         | Monto | Notas                                      |
+| ------------------------------- | ----- | ------------------------------------------ |
+| Micro-influencer (1 bueno)      | 150€  | Activar en Fase 3, no antes                |
+| Herramientas / contingencia     | 50€   | Dominio, email tool si se necesita upgrade |
 
-### Distribución de Tiempo (12-16h/semana)
+**Meses 1-2 (Fases 1-2):** Gastar ~0€. Todo el trabajo es orgánico: Discord, Reddit, Twitter, contenido.
+**Mes 3 (Fase 3):** Activar los 200€ cuando haya producto y comunidad base.
 
-| Actividad            | Horas | Prioridad |
-| -------------------- | ----- | --------- |
-| Eventos presenciales | 4-6h  | 🥇        |
-| Reddit + Discord     | 3-4h  | 🥈        |
-| Crear contenido      | 3-4h  | 🥉        |
-| Gestión influencers  | 1-2h  | 4️⃣        |
+### Distribución de Tiempo (10-12h/semana)
+
+| Actividad                          | Horas  | Prioridad |
+| ---------------------------------- | ------ | --------- |
+| Discord: participar + moderar      | 3-4h   | #1        |
+| Reddit + Twitter: crear + participar | 3-4h | #2        |
+| Contenido semanal: crear + publicar| 2-3h   | #3        |
+| Gestión influencer + admin         | 1-2h   | #4        |
 
 ---
 
-## ⚠️ Los 6 Caminos a la Derrota (Y Cómo Evitarlos)
+## Métricas y KPIs
+
+### Dashboard Principal
+
+| KPI                  | Objetivo S6 | Objetivo S12 | Cómo medirlo               |
+| -------------------- | ----------- | ------------ | --------------------------- |
+| Emails en waitlist   | 50          | 150          | Email tool dashboard        |
+| Miembros Discord     | 30          | 80           | Discord server stats        |
+| Beta testers activos | 15          | 50           | Analytics del producto      |
+| Retention D7         | 40%         | 50%          | Mixpanel / analytics propio |
+| NPS                  | >30         | >50          | Encuesta in-app o Discord   |
+
+### Métricas por Canal
+
+| Canal          | Métrica principal          | Objetivo S12  |
+| -------------- | -------------------------- | ------------- |
+| Discord        | Miembros activos/semana    | 40            |
+| Email          | Tasa de apertura           | >40%          |
+| Reddit         | Clicks a landing/Discord   | 50/semana     |
+| Twitter        | Impresiones/semana         | 15k           |
+| Influencer     | Signups por colaboración   | 15+           |
+| Referral       | Usuarios traídos por otros | 10% del total |
+
+### Herramientas de Medición
+
+| Herramienta          | Uso                              | Coste  |
+| -------------------- | -------------------------------- | ------ |
+| **Google Analytics** | Tráfico web, fuentes, conversión | Gratis |
+| **Mixpanel**         | Comportamiento de usuarios       | Gratis |
+| **UTM parameters**   | Atribución por canal y campaña   | Gratis |
+| **Discord Insights** | Actividad del servidor           | Gratis |
+
+---
+
+## Los 6 Caminos a la Derrota (Y Cómo Evitarlos)
 
 > "Conoce al enemigo y conócete a ti mismo; en cien batallas nunca estarás en peligro."
 
-| Derrota             | Causa                           | Prevención                                  |
-| ------------------- | ------------------------------- | ------------------------------------------- |
-| **Huida**           | Atacar mercados 10x más grandes | No competir con Todoist/Notion directamente |
-| **Insubordinación** | Mensajes inconsistentes         | Una voz, una narrativa                      |
-| **Colapso**         | Estrategia sin ejecución        | Calendario estricto                         |
-| **Ruina**           | Actuar sin datos                | Medir antes de escalar                      |
-| **Desorganización** | Sin sistema de seguimiento      | Dashboard semanal                           |
-| **Derrota**         | Gastar más de lo que tenemos    | Presupuesto estricto 200€                   |
+| Derrota              | Causa                              | Prevención                                     |
+| -------------------- | ---------------------------------- | ---------------------------------------------- |
+| **Dispersión**       | Estar en 5 canales a la vez       | Máximo 2 canales primarios hasta validar        |
+| **Artificialidad**   | Marketing disfrazado de comunidad | Autenticidad siempre, building in public real   |
+| **Insubordinación**  | Mensajes inconsistentes            | Una voz, una narrativa, un posicionamiento     |
+| **Ruina financiera** | Gastar antes de validar            | 0€ hasta tener tracción, luego 200€ con cuidado|
+| **Colapso**          | Estrategia sin ejecución constante | Calendario semanal estricto, no "cuando pueda" |
+| **Impaciencia**      | Esperar resultados en 2 semanas   | 12 semanas mínimo, medir tendencias no picos   |
 
 ---
 
-## 🏆 Definición de Victoria
+## Señales de Victoria
 
-> "En la guerra, que tu gran objetivo sea la victoria, no campañas prolongadas."
+### Fase Beta Exitosa
 
-### Victoria Fase Beta
+| Métrica                  | Target              |
+| ------------------------ | ------------------- |
+| 50-100 usuarios beta     | Masa crítica        |
+| 50% retention D7         | Producto funciona   |
+| NPS >50                  | Usuarios satisfechos|
+| 2 canales validados      | Marketing funciona  |
 
-| Métrica                  | Número                 | Significado |
-| ------------------------ | ---------------------- | ----------- |
-| **50-100 usuarios beta** | Ejército mínimo viable |
-| **50% retention D7**     | Tropas leales          |
-| **NPS >50**              | Moral alta             |
-| **3 canales validados**  | Terreno conquistado    |
+### Señales Cualitativas de que Va Bien
 
-### Señales de Victoria Inminente
-
-- [ ] Usuarios refiriendo sin incentivo
-- [ ] Contenido compartido orgánicamente
-- [ ] Solicitudes de acceso beta sin promoción
-- [ ] Comunidad formándose espontáneamente
+- Usuarios refiriendo amigos sin que se lo pidas
+- Contenido compartido orgánicamente por usuarios
+- Solicitudes de acceso beta que llegan sin promoción activa
+- Conversaciones espontáneas en el Discord sin intervención del fundador
+- Alguien escribe sobre ARQ sin que se lo hayas pedido
 
 ---
 
-## 📝 Checklist Pre-Batalla
+## Checklist Pre-Lanzamiento
 
-> "El general que gana hace muchos cálculos antes de la batalla."
+### Infraestructura
 
-### Infraestructura (Base de Operaciones)
-
-- [ ] Landing page con waitlist
-- [ ] Sistema de onboarding beta
-- [ ] Canal de feedback (Discord privado)
-- [ ] Métricas implementadas
+- [ ] Landing page con waitlist (email capture)
+- [ ] Discord servidor configurado con canales
 - [ ] Email de bienvenida automatizado
+- [ ] Sistema de onboarding para beta testers
+- [ ] Analytics implementado (GA + Mixpanel)
+- [ ] UTM parameters definidos por canal
 
-### Armamento (Materiales)
+### Contenido Inicial
 
-- [ ] Kit de eventos (tarjetas QR, pitch)
-- [ ] 10 videos/posts programados
-- [ ] Press kit básico
-- [ ] Cuentas redes sociales configuradas
+- [ ] 3 posts/hilos preparados para semana 1
+- [ ] Bio y branding consistente en Twitter + Reddit
+- [ ] Press kit básico (screenshots, descripción, logo)
+- [ ] Pitch de 2 líneas definido y testeado
 
-### Inteligencia (Preparación)
+### Comunidad
 
-- [ ] Lista de 20 eventos próximos 2 meses
-- [ ] Lista de 20 micro-influencers
-- [ ] Mapa de subreddits/discords target
-- [ ] Calendario de contenido 2 semanas
+- [ ] Roles de Discord configurados (Beta Tester, Early Adopter, etc.)
+- [ ] Reglas del servidor escritas
+- [ ] Bot de bienvenida configurado
+- [ ] Template para weekly update
 
 ---
 
-## 🔥 Principio Final
+## Principio Final
 
 > "La excelencia suprema consiste en romper la resistencia del enemigo sin luchar."
 
-**ARQ no compite. ARQ ocupa el vacío.**
+ARQ no compite. ARQ ocupa el vacío.
 
-No luchamos contra Habitica por sus usuarios. Atraemos a los que Habitica nunca pudo satisfacer.
+No luchamos contra Habitica por sus usuarios. Atraemos a los que Habitica nunca pudo satisfacer. No gastamos en ads compitiendo con Forest. Aparecemos donde Forest no existe. No intentamos ser mejores que Todoist. Somos algo completamente diferente.
 
-No gastamos en ads compitiendo con Forest. Aparecemos donde Forest no existe.
-
-No intentamos ser mejores que Todoist. Somos algo completamente diferente.
-
-**La victoria ya está ganada. Solo falta ejecutar.**
+La estrategia es simple: **construir una comunidad propia (Discord + Email), ser auténticos en comunidades ajenas (Reddit + Twitter), y concentrar recursos en lo que funciona.** Sin dispersión, sin artificialidad, sin prisa.
 
 ---
 
-_"Conoce al enemigo y conócete a ti mismo; en cien batallas nunca estarás en peligro."_
-
-_Última actualización: Enero 2026_
+_Última actualización: Febrero 2026_

@@ -2,7 +2,7 @@
 import DoctrinePanel from '@/components/doctrine-panel.component'
 import OnboardingRedirect from '@/components/shared/onboarding-redirect'
 import Tabs, { TabsContent, TabsList, TabsTrigger } from '@/ui/tabs.component'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { SlotType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -39,7 +39,7 @@ export default function Inventory() {
 
   if (!characterData) {
     return (
-      <div className='flex h-[calc(100vh-6rem)] items-center justify-center'>
+      <div className="flex h-[calc(100vh-6rem)] items-center justify-center">
         <OnboardingRedirect />
       </div>
     )
@@ -56,34 +56,34 @@ export default function Inventory() {
   }
 
   return (
-    <div className='flex h-full w-full flex-col gap-4 overflow-hidden p-4'>
+    <div className="flex h-full w-full flex-col gap-4 overflow-hidden p-4">
       {/* Header */}
-      <div className='shrink-0'>
-        <h1 className='text-2xl font-bold text-white'>{t('inventory.title')}</h1>
+      <div className="shrink-0">
+        <h1 className="text-2xl font-bold text-white">{t('inventory.title')}</h1>
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue='character' className='flex min-h-0 flex-1 flex-col'>
-        <TabsList className='shrink-0'>
-          <TabsTrigger value='character'>{t('inventory.tabs.character')}</TabsTrigger>
-          <TabsTrigger value='armory'>{t('inventory.tabs.armory')}</TabsTrigger>
-          <TabsTrigger value='doctrines'>{t('inventory.tabs.doctrines')}</TabsTrigger>
-          <TabsTrigger value='kill_record'>{t('inventory.tabs.kill_record')}</TabsTrigger>
+      <Tabs defaultValue="character" className="flex min-h-0 flex-1 flex-col">
+        <TabsList className="shrink-0">
+          <TabsTrigger value="character">{t('inventory.tabs.character')}</TabsTrigger>
+          <TabsTrigger value="armory">{t('inventory.tabs.armory')}</TabsTrigger>
+          <TabsTrigger value="doctrines">{t('inventory.tabs.doctrines')}</TabsTrigger>
+          <TabsTrigger value="kill_record">{t('inventory.tabs.kill_record')}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value='character' className='mt-4 flex-1 overflow-auto'>
+        <TabsContent value="character" className="mt-4 flex-1 overflow-auto">
           <CharacterTab character={character} />
         </TabsContent>
 
-        <TabsContent value='armory' className='mt-4 flex-1 overflow-auto'>
+        <TabsContent value="armory" className="mt-4 flex-1 overflow-auto">
           <ArmoryTab character={character} onEquipItem={handleEquipItem} onUnequipItem={handleUnequipItem} />
         </TabsContent>
 
-        <TabsContent value='doctrines' className='mt-4 flex-1 overflow-auto'>
+        <TabsContent value="doctrines" className="mt-4 flex-1 overflow-auto">
           <DoctrinePanel showEquipControls />
         </TabsContent>
 
-        <TabsContent value='kill_record' className='mt-4 flex-1 overflow-auto'>
+        <TabsContent value="kill_record" className="mt-4 flex-1 overflow-auto">
           <KillRecordTab />
         </TabsContent>
       </Tabs>
