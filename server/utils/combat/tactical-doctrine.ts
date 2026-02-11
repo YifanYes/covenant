@@ -334,15 +334,7 @@ export async function executeTacticalDoctrine(
               }
             }
 
-            // DISINTEGRATION_RAY: Refund mana on kill
-            if (doctrineId === 'disintegration_ray' && killCount > 0) {
-              manaRestored = doctrine.manaCost
-              logEntries.push({
-                timestamp: timestamp + 0.3,
-                type: CombatLogType.DOCTRINE_EFFECT,
-                data: { effect: 'mana_refund', manaRestored: manaRestored, reason: 'kill' }
-              })
-            }
+            // (disintegration_ray mana refund removed — now uses DIRECT_DAMAGE instant kill)
           }
         } else if (effect.target === DoctrineTarget.ALL_ENEMIES || effect.target === DoctrineTarget.ENEMY) {
           // Bug 2 fix: Create real WEAKENED status effect on targets

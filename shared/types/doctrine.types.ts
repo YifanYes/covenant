@@ -47,6 +47,20 @@ export const NEGATIVE_STATUSES: StatusEffect[] = [
   StatusEffect.WEAKENED
 ]
 
+export const DoctrineAttributeType = {
+  LIGHT: 'LIGHT',
+  FIRE: 'FIRE',
+  METAL: 'METAL',
+  WATER: 'WATER',
+  EARTH: 'EARTH',
+  AIR: 'AIR',
+  LIGHTNING: 'LIGHTNING',
+  DARKNESS: 'DARKNESS',
+  ICE: 'ICE',
+  MIND: 'MIND'
+} as const
+export type DoctrineAttributeType = (typeof DoctrineAttributeType)[keyof typeof DoctrineAttributeType]
+
 export const DoctrineTarget = {
   SELF: 'SELF',
   ENEMY: 'ENEMY',
@@ -69,7 +83,7 @@ export interface DoctrineEffect {
   scalesWithEnemyTier?: boolean
   // Thorns damage: flat damage dealt to attackers when the buff holder is hit (karmic_retribution)
   thornsDamage?: number
-  // Duration of BURNING applied to attacker by thorns (flaming_apotheosis)
+  // Duration of BURNING applied to attacker by thorns (retaliation)
   thornsBurnDuration?: number
   // Whether this debuff reduces 'attack' or 'defense' dice (for WEAKENED status)
   debuffType?: 'attack' | 'defense'
@@ -84,6 +98,7 @@ export interface DoctrineDefinition {
   flavorTextKey: string
   className: CharacterClassName
   magicNature: MagicNature
+  attribute: DoctrineAttributeType
   tier: number
   manaCost: number
   isUltimate: boolean

@@ -369,29 +369,13 @@ export async function executeEnemyTurn(
     const newEnemyHealthAfterThorns = Math.max(0, currentEnemy.currentHealth - thornsDamageToEnemy)
     const enemyKilledByThorns = newEnemyHealthAfterThorns <= 0
 
-    // Bug 6 fix: Apply BURNING to enemy from thornsBurnDuration (flaming_apotheosis)
-    let enemyBurnApplied = false
-    if (damageDealt > 0 && playerBuffs.thornsBurnDuration > 0) {
-      enemyBurnApplied = true
-    }
-
     // Update state with attack result
     let updatedUnits = state.units.map((unit) => {
       if (unit.id === enemyId) {
-        let enemyEffects = [...(unit.activeEffects || [])]
-        // Apply BURNING from thorns if applicable
-        if (enemyBurnApplied) {
-          enemyEffects.push({
-            effect: StatusEffect.BURNING,
-            remainingTurns: playerBuffs.thornsBurnDuration,
-            sourceDoctrineId: 'flaming_apotheosis'
-          })
-        }
         return {
           ...unit,
           hasActed: true,
-          currentHealth: newEnemyHealthAfterThorns,
-          activeEffects: enemyEffects
+          currentHealth: newEnemyHealthAfterThorns
         }
       }
       if (unit.id === targetId) {
