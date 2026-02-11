@@ -666,9 +666,9 @@
       "flavor": "Classic, simple, and devastating.",
       "name": "Rain of Fire"
     },
-    "flaming_apotheosis": {
-      "description": "If you take damage, attacker takes 2 Wounds.",
-      "flavor": "Come closer and know hell.",
+    "retaliation": {
+      "description": "For 2 turns, deal 2 Wounds to any attacker that hits you.",
+      "flavor": "Every wound you inflict on me will be yours too.",
       "name": "Retaliation"
     },
     "fractal_invocation": {
@@ -736,6 +736,19 @@
       "flavor": "The sky is not the only one that can punish.",
       "name": "Lightning Burst"
     },
+    "attribute": {
+      "label": "Attribute",
+      "LIGHT": "Light",
+      "FIRE": "Fire",
+      "METAL": "Metal",
+      "WATER": "Water",
+      "EARTH": "Earth",
+      "AIR": "Air",
+      "LIGHTNING": "Lightning",
+      "DARKNESS": "Darkness",
+      "ICE": "Ice",
+      "MIND": "Mind"
+    },
     "magic_nature": {
       "void": "Void",
       "form": "Form"
@@ -746,6 +759,7 @@
       "name": "Miraculous Barrier"
     },
     "mana_cost": "Cost: {{cost}} Mana",
+    "tier": "Tier {{tier}}",
     "max_equipped": "You can only equip 2 doctrines",
     "miraculous_protection": {
       "description": "Negate 1 hit received this turn.",

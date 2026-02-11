@@ -8,7 +8,7 @@ const DEFENSE_ZERO_DOCTRINES = ['reckless_strike', 'audacity'] as const
 const ONES_HURT_SELF_DOCTRINES = ['plasma_missile', 'audacity'] as const
 
 /** Doctrines that provide thorns damage */
-const THORNS_DOCTRINES = ['karmic_retribution', 'flaming_apotheosis'] as const
+const THORNS_DOCTRINES = ['karmic_retribution', 'retaliation'] as const
 
 /** Doctrine that provides dynamic bonus dice based on context */
 const DYNAMIC_BONUS_DOCTRINE = 'inspiration' as const

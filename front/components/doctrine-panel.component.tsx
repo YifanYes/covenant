@@ -4,10 +4,29 @@ import { cn } from '@/lib/cn.lib'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Loader, Trophy, Zap } from '@nsmr/pixelart-react'
 import Image from 'next/image'
-import type { DoctrineDefinition } from '@shared/types/doctrine.types'
+import { MagicNature } from '@shared/constants/classes'
+import type { DoctrineAttributeType, DoctrineDefinition } from '@shared/types/doctrine.types'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+
+const MAGIC_NATURE_COLORS: Record<MagicNature, string> = {
+  [MagicNature.FORM]: 'bg-blue-400/10 text-blue-400',
+  [MagicNature.VOID]: 'bg-red-400/10 text-red-400'
+}
+
+const ATTRIBUTE_COLORS: Record<DoctrineAttributeType, string> = {
+  LIGHT: 'bg-yellow-400/10 text-yellow-400',
+  FIRE: 'bg-orange-400/10 text-orange-400',
+  METAL: 'bg-zinc-400/10 text-zinc-400',
+  WATER: 'bg-cyan-400/10 text-cyan-400',
+  EARTH: 'bg-amber-600/10 text-amber-600',
+  AIR: 'bg-teal-400/10 text-teal-400',
+  LIGHTNING: 'bg-violet-400/10 text-violet-400',
+  DARKNESS: 'bg-purple-400/10 text-purple-400',
+  ICE: 'bg-sky-300/10 text-sky-300',
+  MIND: 'bg-pink-400/10 text-pink-400'
+}
 
 interface DoctrinePanelProps {
   // Show equip/unequip controls (for inventory page)
@@ -124,7 +143,17 @@ export default function DoctrinePanel({
               <Zap className='h-3 w-3' />
               {t('doctrines.mana_cost', { cost: doctrine.manaCost })}
             </span>
-            <span className='text-muted-foreground'>{t(`doctrines.magic_nature.${doctrine.magicNature}`)}</span>
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-bold capitalize ${MAGIC_NATURE_COLORS[doctrine.magicNature]}`}
+            >
+              {t(`doctrines.magic_nature.${doctrine.magicNature}`)}
+            </span>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-bold capitalize ${ATTRIBUTE_COLORS[doctrine.attribute]}`}>
+              {t(`doctrines.attribute.${doctrine.attribute}`)}
+            </span>
+            <span className='rounded-full bg-white/10 px-2 py-0.5 text-xs font-bold text-white/70'>
+              {t('doctrines.tier', { tier: doctrine.tier })}
+            </span>
           </div>
         </div>
         <div className='flex shrink-0 flex-col gap-1'>

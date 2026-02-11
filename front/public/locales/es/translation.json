@@ -666,9 +666,9 @@
       "flavor": "Clásico, simple y devastador.",
       "name": "Lluvia de Fuego"
     },
-    "flaming_apotheosis": {
-      "description": "Si recibes daño, el atacante sufre 2 Heridas.",
-      "flavor": "Acércate y conoce el infierno.",
+    "retaliation": {
+      "description": "Durante 2 turnos, cualquier enemigo que te inflija daño recibe automáticamente 2 Heridas de retroceso.",
+      "flavor": "Cada herida que me inflijas será tuya también.",
       "name": "Represalia"
     },
     "fractal_invocation": {
@@ -736,6 +736,19 @@
       "flavor": "El cielo no es el único que puede castigar.",
       "name": "Estallido de Relámpagos"
     },
+    "attribute": {
+      "label": "Atributo",
+      "LIGHT": "Luz",
+      "FIRE": "Fuego",
+      "METAL": "Metal",
+      "WATER": "Agua",
+      "EARTH": "Tierra",
+      "AIR": "Aire",
+      "LIGHTNING": "Rayo",
+      "DARKNESS": "Oscuridad",
+      "ICE": "Hielo",
+      "MIND": "Mente"
+    },
     "magic_nature": {
       "void": "Vacío",
       "form": "Forma"
@@ -746,6 +759,7 @@
       "name": "Protección Milagrosa"
     },
     "mana_cost": "Coste: {{cost}} Maná",
+    "tier": "Tier {{tier}}",
     "max_equipped": "Solo puedes equipar 2 doctrinas",
     "miraculous_protection": {
       "description": "Anula 1 Impacto recibido en el turno actual.",

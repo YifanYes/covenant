@@ -70,7 +70,7 @@ export function getActiveDoctrineBuffs(
       onesHurtSelf = true
     }
 
-    // Thorns - deal flat damage to attacker (karmic_retribution, flaming_apotheosis)
+    // Thorns - deal flat damage to attacker (karmic_retribution, retaliation)
     const thornEffect = doctrine.effects.find(e => e.thornsDamage !== undefined)
     if (thornEffect?.thornsDamage) {
       thornsDamage = Math.max(thornsDamage, thornEffect.thornsDamage)
