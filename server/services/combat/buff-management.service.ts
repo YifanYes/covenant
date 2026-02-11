@@ -7,8 +7,8 @@ const DEFENSE_ZERO_DOCTRINES = ['reckless_strike', 'audacity'] as const
 /** Doctrines where rolling 1s hurts the caster */
 const ONES_HURT_SELF_DOCTRINES = ['plasma_missile', 'audacity'] as const
 
-/** Doctrine that provides thorns damage */
-const THORNS_DOCTRINE = 'karmic_retribution' as const
+/** Doctrines that provide thorns damage */
+const THORNS_DOCTRINES = ['karmic_retribution', 'flaming_apotheosis'] as const
 
 /** Doctrine that provides dynamic bonus dice based on context */
 const DYNAMIC_BONUS_DOCTRINE = 'inspiration' as const
@@ -69,10 +69,10 @@ export class BuffManagementService {
         onesHurtSelf = true
       }
 
-      if (doctrineId === THORNS_DOCTRINE) {
+      if ((THORNS_DOCTRINES as readonly string[]).includes(doctrineId)) {
         const thornEffect = doctrine.effects.find(e => e.thornsDamage !== undefined)
         if (thornEffect?.thornsDamage) {
-          thornsDamage = thornEffect.thornsDamage
+          thornsDamage = Math.max(thornsDamage, thornEffect.thornsDamage)
         }
       }
 

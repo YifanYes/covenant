@@ -34,7 +34,6 @@ describe('doctrine-buffs utilities', () => {
       expect(buffs.defenseZero).toBe(false)
       expect(buffs.onesHurtSelf).toBe(false)
       expect(buffs.thornsDamage).toBe(0)
-      expect(buffs.thornsBurnDuration).toBe(0)
     })
 
     it('should return zeroed buffs for empty doctrines', () => {
@@ -42,8 +41,8 @@ describe('doctrine-buffs utilities', () => {
       expect(buffs.bonusDice).toBe(0)
     })
 
-    it('should detect POWER_MODIFIER (truth_blade: +1 dice)', () => {
-      const doctrines = { truth_blade: makeDoctrineEffect('truth_blade') }
+    it('should detect POWER_MODIFIER (shoulder_charge: +1 dice)', () => {
+      const doctrines = { shoulder_charge: makeDoctrineEffect('shoulder_charge') }
       const buffs = getActiveDoctrineBuffs(doctrines)
       expect(buffs.bonusDice).toBe(1)
     })
@@ -106,14 +105,14 @@ describe('doctrine-buffs utilities', () => {
     })
 
     it('should ignore expired doctrines (remainingTurns <= 0)', () => {
-      const doctrines = { truth_blade: makeDoctrineEffect('truth_blade', 0) }
+      const doctrines = { shoulder_charge: makeDoctrineEffect('shoulder_charge', 0) }
       const buffs = getActiveDoctrineBuffs(doctrines)
       expect(buffs.bonusDice).toBe(0)
     })
 
     it('should combine multiple doctrines', () => {
       const doctrines = {
-        truth_blade: makeDoctrineEffect('truth_blade'), // +1 dice
+        shoulder_charge: makeDoctrineEffect('shoulder_charge'), // +1 dice
         miraculous_protection: makeDoctrineEffect('miraculous_protection') // negate 1
       }
       const buffs = getActiveDoctrineBuffs(doctrines)
@@ -138,16 +137,16 @@ describe('doctrine-buffs utilities', () => {
     })
 
     it('should clear single-turn POWER_MODIFIER buffs', () => {
-      const doctrines = { truth_blade: makeDoctrineEffect('truth_blade', 1) }
+      const doctrines = { shoulder_charge: makeDoctrineEffect('shoulder_charge', 1) }
       const result = clearConsumedDoctrines(doctrines)
-      expect(result.truth_blade).toBeUndefined()
+      expect(result.shoulder_charge).toBeUndefined()
     })
 
     it('should decrement multi-turn attack buffs instead of removing', () => {
-      const doctrines = { truth_blade: makeDoctrineEffect('truth_blade', 3) }
+      const doctrines = { shoulder_charge: makeDoctrineEffect('shoulder_charge', 3) }
       const result = clearConsumedDoctrines(doctrines)
-      expect(result.truth_blade).toBeDefined()
-      expect(result.truth_blade.remainingTurns).toBe(2)
+      expect(result.shoulder_charge).toBeDefined()
+      expect(result.shoulder_charge.remainingTurns).toBe(2)
     })
 
     it('should clear THRESHOLD_MODIFIER buffs', () => {
@@ -203,11 +202,11 @@ describe('doctrine-buffs utilities', () => {
   describe('clearConsumedDefenseDoctrines', () => {
     it('should clear both attack and defense buffs', () => {
       const doctrines = {
-        truth_blade: makeDoctrineEffect('truth_blade', 1),
+        shoulder_charge: makeDoctrineEffect('shoulder_charge', 1),
         miraculous_protection: makeDoctrineEffect('miraculous_protection', 1)
       }
       const result = clearConsumedDefenseDoctrines(doctrines)
-      expect(result.truth_blade).toBeUndefined()
+      expect(result.shoulder_charge).toBeUndefined()
       expect(result.miraculous_protection).toBeUndefined()
     })
   })

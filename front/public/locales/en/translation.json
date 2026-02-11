@@ -601,25 +601,20 @@
   "delete": "Delete",
   "doctrines": {
     "arcane_push": {
-      "description": "Negate the next attack you receive this turn.",
+      "description": "Push enemy 3 tiles away.",
       "flavor": "I need to concentrate, step back.",
       "name": "Arcane Push"
     },
     "audacity": {
-      "description": "+2 Power dice. Your defense becomes 0.",
+      "description": "+2 Power dice. Your defense becomes 0. 1s hurt you.",
       "flavor": "Only those willing to die deserve victory.",
-      "name": "Audacity"
+      "name": "Meteor Strike"
     },
     "available": "Available Doctrines",
     "battle_fervor": {
       "description": "Recover 1 Wound per hit caused (max 3).",
       "flavor": "Your pain is my strength.",
-      "name": "Battle Fervor"
-    },
-    "bite": {
-      "description": "Adds +1 guaranteed hit if the attack succeeds.",
-      "flavor": "Steel also knows how to bite.",
-      "name": "Bite"
+      "name": "Shadow Slash"
     },
     "black_hole": {
       "description": "Ultimate. All enemies are Stunned and take 2 Wounds.",
@@ -627,41 +622,31 @@
       "name": "Black Hole"
     },
     "blinding_faith": {
-      "description": "All enemies lose -2 Power dice.",
+      "description": "+7 Power dice. Target is Immobilized for 2 turns.",
       "flavor": "Before absolute light, evil cannot find its target.",
-      "name": "Blinding Faith"
+      "name": "Electrocannon"
     },
     "blink": {
-      "description": "Avoid all damage from one attack this turn.",
+      "description": "Teleport 4 tiles. Avoid all damage this turn.",
       "flavor": "Being here is just a suggestion.",
-      "name": "Blink"
-    },
-    "bulwark": {
-      "description": "+1 Defense die until your next turn.",
-      "flavor": "Here we draw the line.",
-      "name": "Bulwark"
-    },
-    "challenge": {
-      "description": "Enemy suffers -2 dice if attacking others.",
-      "flavor": "Face me, coward!",
-      "name": "Challenge"
-    },
-    "combustion": {
-      "description": "Apply Burning to target (1 damage at turn start).",
-      "flavor": "The inner fire always comes out.",
-      "name": "Combustion"
+      "name": "Ethereal Blink"
     },
     "disintegration_ray": {
-      "description": "+5 Power. If it kills target, refund mana.",
+      "description": "Destroy a non-boss target instantly.",
       "flavor": "Only ash remains where there was life.",
-      "name": "Disintegration Ray"
+      "name": "Atomic Disintegration"
     },
     "disruption_storm": {
-      "description": "Ultimate. Roll 4 Power dice against up to 2 enemies.",
+      "description": "Ultimate. Roll 4 Power dice against up to 2 enemies. Costs 1 Wound.",
       "flavor": "A whirlwind of steel and determination.",
       "name": "Disruption Storm"
     },
     "empty_equipped": "No doctrines equipped",
+    "entropic_acceleration": {
+      "description": "Apply Burning for 2 turns to target.",
+      "flavor": "Time accelerates where entropy reigns.",
+      "name": "Entropic Acceleration"
+    },
     "equip": "Equip",
     "equipped": "Equipped Doctrines",
     "error": {
@@ -672,19 +657,19 @@
       "use": "Failed to use doctrine"
     },
     "fan_cut": {
-      "description": "Attack up to 2 enemies with your current strength.",
+      "description": "Attack up to 2 enemies. Pushes targets.",
       "flavor": "Surrounded is just another way of saying target-rich.",
-      "name": "Fan Cut"
+      "name": "Shredding Gale"
     },
     "fireball": {
-      "description": "Attack all enemies and apply Burning.",
+      "description": "Roll 3 dice in area. Apply Burning to all enemies.",
       "flavor": "Classic, simple, and devastating.",
-      "name": "Fireball"
+      "name": "Rain of Fire"
     },
     "flaming_apotheosis": {
-      "description": "If you take damage, attacker takes 2 Wounds and Burning.",
+      "description": "If you take damage, attacker takes 2 Wounds.",
       "flavor": "Come closer and know hell.",
-      "name": "Flaming Apotheosis"
+      "name": "Retaliation"
     },
     "fractal_invocation": {
       "description": "50% chance to receive no damage.",
@@ -692,44 +677,44 @@
       "name": "Fractal Invocation"
     },
     "fragility_curse": {
-      "description": "Target reduces Defense dice by -2 for 2 turns.",
-      "flavor": "Your steel becomes glass.",
-      "name": "Fragility Curse"
+      "description": "+3 Power dice ranged attack at range 4.",
+      "flavor": "The wind cuts deeper than steel.",
+      "name": "Wind Blade"
     },
-    "glory_banner": {
-      "description": "+2 Defense dice for 2 turns.",
-      "flavor": "Under this symbol, we are invincible.",
-      "name": "Glory Banner"
+    "frost_bite": {
+      "description": "Enemy loses -2 Power dice for 1 turn.",
+      "flavor": "The cold numbs everything, even the will to fight.",
+      "name": "Frost Bite"
     },
     "ice_lance": {
-      "description": "If it hits, target is Immobilized.",
-      "flavor": "Time stops under absolute cold.",
-      "name": "Ice Lance"
+      "description": "Target is Immobilized for 1 turn.",
+      "flavor": "Stone holds what flesh cannot.",
+      "name": "Petrification"
     },
     "igneous_cut": {
-      "description": "Attack applies Burning (1 damage for 2 turns).",
+      "description": "+1 Power die. Apply Burning for 1 turn.",
       "flavor": "A wound the soul cannot close.",
-      "name": "Igneous Cut"
+      "name": "Searing Cut"
     },
     "inspiration": {
-      "description": "Copy the enemy's Attack or Defense value.",
+      "description": "Gain +2 Power dice per enemy tier.",
       "flavor": "Your strength is my best teacher.",
-      "name": "Inspiration"
+      "name": "Perfect Replication"
     },
     "iron_bastion": {
-      "description": "Ultimate. Negate all hits received this turn.",
+      "description": "Ultimate. Negate all hits received this turn. Costs 1 Wound.",
       "flavor": "I am the wall against which the sea breaks.",
-      "name": "Iron Bastion"
+      "name": "Tidal Mantle"
     },
     "judgment_aurora": {
-      "description": "Ultimate. All successes count as Criticals.",
+      "description": "Ultimate. All successes count as Criticals. Costs 1 Wound.",
       "flavor": "Light leaves no shadows to hide in.",
       "name": "Judgment Aurora"
     },
     "karmic_retribution": {
-      "description": "The next attack received is reflected to the enemy.",
+      "description": "For 2 turns, deal 2 Wounds to any attacker that hits you.",
       "flavor": "An eye for an eye, a tooth for a tooth.",
-      "name": "Karmic Retribution"
+      "name": "Reprisal"
     },
     "kings_sword": {
       "description": "Ultimate. Reduce Attack Threshold to 2+ this turn.",
@@ -756,9 +741,9 @@
       "form": "Form"
     },
     "mana_barrier": {
-      "description": "Negate the first magic hit received.",
+      "description": "Negate the first hit received.",
       "flavor": "Will is an impenetrable weave.",
-      "name": "Mana Barrier"
+      "name": "Miraculous Barrier"
     },
     "mana_cost": "Cost: {{cost}} Mana",
     "max_equipped": "You can only equip 2 doctrines",
@@ -771,7 +756,7 @@
     "nullify": {
       "description": "Remove all negative status effects.",
       "flavor": "Logic dispels chaos.",
-      "name": "Nullify"
+      "name": "Aquatic Purification"
     },
     "oracle_eye": {
       "description": "Reduce Magic Threshold by 1 for your next doctrine.",
@@ -781,45 +766,45 @@
     "plasma_missile": {
       "description": "Gain +4 Power dice. Natural 1s hurt you.",
       "flavor": "Pure power, hard to contain.",
-      "name": "Plasma Missile"
+      "name": "Dragonbreath"
     },
     "precise_strike": {
       "description": "Results of 5 and 6 count as Criticals.",
       "flavor": "Look for the crack, not the heavy blow.",
-      "name": "Precise Strike"
+      "name": "Gigalithic Fist"
     },
     "reckless_strike": {
       "description": "Gain +2 Power dice, but your Defense becomes 0.",
       "flavor": "Attacking without fear is the only way to win.",
-      "name": "Reckless Strike"
+      "name": "Zornhau"
     },
     "righteous_charge": {
       "description": "+2 Power dice. If you hit, enemy is Stunned.",
       "flavor": "Make way for the King's sentence.",
-      "name": "Righteous Charge"
+      "name": "Lightning Charge"
     },
     "shadow_step": {
-      "description": "Your next attack ignores enemy Defense.",
+      "description": "Teleport to target. Your next attack ignores enemy Defense.",
       "flavor": "I'm here, now I'm there.",
       "name": "Shadow Step"
     },
     "shield_bash": {
-      "description": "Enemy suffers -1 Defense die until their next turn.",
+      "description": "Enemy suffers -1 Defense die. Pushes target 1 tile.",
       "flavor": "Back, foul beast.",
-      "name": "Shield Bash"
+      "name": "Steel Charge"
     },
     "shoulder_charge": {
-      "description": "+1 Power die. If you hit, enemy is Stunned.",
+      "description": "+1 Power die. Pushes enemy 1 tile.",
       "flavor": "Get out of my way.",
-      "name": "Shoulder Charge"
+      "name": "Seismic Rush"
     },
     "silence_vortex": {
       "description": "Target is Stunned.",
       "flavor": "Your words are lost in the void.",
-      "name": "Silence Vortex"
+      "name": "Vow of Silence"
     },
     "stellar_collapse": {
-      "description": "Ultimate. Roll 10 Power dice. 6s generate extra hits.",
+      "description": "Ultimate. Roll 10 Power dice. 6s generate extra hits. Costs 1 Wound.",
       "flavor": "The weight of a dead star on your shoulders.",
       "name": "Stellar Collapse"
     },
@@ -830,14 +815,24 @@
       "used": "Doctrine activated!"
     },
     "summary_execution": {
-      "description": "Instantly kill an enemy with 4 Wounds or less.",
+      "description": "Instantly kill an enemy below 25% health.",
       "flavor": "Your sentence has been passed.",
-      "name": "Summary Execution"
+      "name": "Execution"
+    },
+    "templar_burst": {
+      "description": "+2 Power dice. Apply Burning for 2 turns on hit.",
+      "flavor": "Light explodes from within, consuming all in its path.",
+      "name": "Templar Burst"
     },
     "temporal_prison": {
-      "description": "Ultimate. Target is Stunned.",
+      "description": "Ultimate. Roll 5 Power dice in area. All enemies Stunned.",
       "flavor": "An eternal moment of absolute nothing.",
-      "name": "Temporal Prison"
+      "name": "Maelstrom"
+    },
+    "tidal_strike": {
+      "description": "Deal 1 guaranteed Wound ignoring defense.",
+      "flavor": "Like the tide — inevitable, unstoppable.",
+      "name": "Tidal Strike"
     },
     "tier_required": "Requires Tier {{tier}}",
     "title": "Doctrines",
@@ -847,9 +842,9 @@
       "name": "Transfusion"
     },
     "truth_blade": {
-      "description": "Your next attack gains +1 Power dice.",
+      "description": "Apply Purified for 2 turns (holy damage each turn).",
       "flavor": "Lies crumble before blessed steel.",
-      "name": "Truth Blade"
+      "name": "Blade of Light"
     },
     "ultimate": "Ultimate",
     "unbreakable_formation": {
@@ -859,15 +854,20 @@
     },
     "unequip": "Unequip",
     "unerring_dart": {
-      "description": "Cause 1 automatic Wound ignoring defense.",
+      "description": "Destroy a non-boss demon instantly.",
       "flavor": "You cannot dodge the inevitable.",
-      "name": "Unerring Dart"
+      "name": "Malleus"
     },
     "use": "Use",
+    "war_pyre": {
+      "description": "Create a fire zone. All enemies in area Burning for 2 turns.",
+      "flavor": "The pyre burns for the living, not the dead.",
+      "name": "War Pyre"
+    },
     "wrath_avatar": {
-      "description": "Ultimate. All attacks are automatic Criticals.",
+      "description": "Ultimate. All attacks are automatic Criticals. Costs 1 Wound.",
       "flavor": "I am no longer a man, I am the tempest.",
-      "name": "Avatar of Wrath"
+      "name": "Thunder Swarm"
     }
   },
   "enemies": {

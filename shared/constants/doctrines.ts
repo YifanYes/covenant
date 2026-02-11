@@ -16,7 +16,9 @@ export const SELF_BUFF_EFFECT_TYPES: DoctrineEffectType[] = [
 export const SPECIAL_SELF_BUFF_DOCTRINES = ['karmic_retribution', 'nullify', 'flaming_apotheosis']
 
 export const DOCTRINES: Record<string, DoctrineDefinition> = {
+  // ═══════════════════════════════════════
   // TEMPLAR - TIER 1 - FORM
+  // ═══════════════════════════════════════
   truth_blade: {
     id: 'truth_blade',
     nameKey: 'doctrines.truth_blade.name',
@@ -27,11 +29,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 1,
     effects: [
       {
-        type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.SELF,
-        value: 1 // +1 power dice to next attack
+        type: DoctrineEffectType.APPLY_STATUS,
+        target: DoctrineTarget.ENEMY,
+        statusEffect: StatusEffect.PURIFIED,
+        duration: 2 // Apply PURIFIED for 2 turns (holy damage, affects demons)
       }
     ]
   },
@@ -72,38 +77,46 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
         value: -1, // Enemy -1 defense die
         duration: 1,
         debuffType: 'defense'
+        // Also pushes enemy 1 tile (push not yet implemented in effect system)
       }
     ]
   },
-  challenge: {
-    id: 'challenge',
-    nameKey: 'doctrines.challenge.name',
-    descriptionKey: 'doctrines.challenge.description',
-    flavorTextKey: 'doctrines.challenge.flavor',
+  // igneous_cut moved from Void to Form — now melee strike + burn
+  igneous_cut: {
+    id: 'igneous_cut',
+    nameKey: 'doctrines.igneous_cut.name',
+    descriptionKey: 'doctrines.igneous_cut.description',
+    flavorTextKey: 'doctrines.igneous_cut.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.FORM,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
     aoePattern: AoEPatternType.SINGLE,
-    castRange: 2,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
+        target: DoctrineTarget.SELF,
+        value: 1 // +1 power die
+      },
+      {
+        type: DoctrineEffectType.APPLY_STATUS,
         target: DoctrineTarget.ENEMY,
-        value: -2, // Enemy -2 attack if targeting others
-        duration: 1,
-        debuffType: 'attack'
+        statusEffect: StatusEffect.BURNING,
+        duration: 1 // Apply BURNING for 1 turn
       }
     ]
   },
 
+  // ═══════════════════════════════════════
   // TEMPLAR - TIER 1 - VOID
-  igneous_cut: {
-    id: 'igneous_cut',
-    nameKey: 'doctrines.igneous_cut.name',
-    descriptionKey: 'doctrines.igneous_cut.description',
-    flavorTextKey: 'doctrines.igneous_cut.flavor',
+  // ═══════════════════════════════════════
+  entropic_acceleration: {
+    id: 'entropic_acceleration',
+    nameKey: 'doctrines.entropic_acceleration.name',
+    descriptionKey: 'doctrines.entropic_acceleration.description',
+    flavorTextKey: 'doctrines.entropic_acceleration.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.VOID,
     tier: 1,
@@ -116,7 +129,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
         type: DoctrineEffectType.APPLY_STATUS,
         target: DoctrineTarget.ENEMY,
         statusEffect: StatusEffect.BURNING,
-        duration: 2
+        duration: 2 // Apply BURNING for 2 turns
       }
     ]
   },
@@ -138,11 +151,11 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       }
     ]
   },
-  bite: {
-    id: 'bite',
-    nameKey: 'doctrines.bite.name',
-    descriptionKey: 'doctrines.bite.description',
-    flavorTextKey: 'doctrines.bite.flavor',
+  tidal_strike: {
+    id: 'tidal_strike',
+    nameKey: 'doctrines.tidal_strike.name',
+    descriptionKey: 'doctrines.tidal_strike.description',
+    flavorTextKey: 'doctrines.tidal_strike.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.VOID,
     tier: 1,
@@ -154,7 +167,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
         target: DoctrineTarget.ENEMY,
-        value: 1 // +1 guaranteed hit
+        value: 1 // 1 guaranteed hit (ignores defense)
       }
     ]
   },
@@ -172,18 +185,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.SELF,
-        value: 1
-      },
-      {
-        type: DoctrineEffectType.APPLY_STATUS,
-        target: DoctrineTarget.ENEMY,
-        statusEffect: StatusEffect.STUNNED,
-        duration: 1
+        value: 1 // +1 power die. Also pushes enemy 1 tile (push not yet implemented)
       }
     ]
   },
 
+  // ═══════════════════════════════════════
   // TEMPLAR - TIER 2 - FORM
+  // ═══════════════════════════════════════
   light_shield: {
     id: 'light_shield',
     nameKey: 'doctrines.light_shield.name',
@@ -246,11 +255,11 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       }
     ]
   },
-  bulwark: {
-    id: 'bulwark',
-    nameKey: 'doctrines.bulwark.name',
-    descriptionKey: 'doctrines.bulwark.description',
-    flavorTextKey: 'doctrines.bulwark.flavor',
+  templar_burst: {
+    id: 'templar_burst',
+    nameKey: 'doctrines.templar_burst.name',
+    descriptionKey: 'doctrines.templar_burst.description',
+    flavorTextKey: 'doctrines.templar_burst.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.FORM,
     tier: 2,
@@ -260,13 +269,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.SELF,
-        value: 1, // +1 defense die
-        duration: 1
+        value: 2 // +2 power dice
+      },
+      {
+        type: DoctrineEffectType.APPLY_STATUS,
+        target: DoctrineTarget.ENEMY,
+        statusEffect: StatusEffect.BURNING,
+        duration: 2 // Apply BURNING for 2 turns on hit
       }
     ]
   },
 
+  // ═══════════════════════════════════════
   // TEMPLAR - TIER 2 - VOID
+  // ═══════════════════════════════════════
   precise_strike: {
     id: 'precise_strike',
     nameKey: 'doctrines.precise_strike.name',
@@ -337,12 +353,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
         target: DoctrineTarget.ALL_ENEMIES,
-        value: 2 // Attack up to 2 enemies
+        value: 2 // Attack up to 2 enemies. Also pushes (push not yet implemented)
       }
     ]
   },
 
-  // TEMPLAR - TIER 3 - FORM (ULTIMATES)
+  // ═══════════════════════════════════════
+  // TEMPLAR - TIER 3 - FORM
+  // ═══════════════════════════════════════
   iron_bastion: {
     id: 'iron_bastion',
     nameKey: 'doctrines.iron_bastion.name',
@@ -353,6 +371,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: true,
+    // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
         type: DoctrineEffectType.NEGATE_HITS,
@@ -403,27 +422,32 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       }
     ]
   },
-  glory_banner: {
-    id: 'glory_banner',
-    nameKey: 'doctrines.glory_banner.name',
-    descriptionKey: 'doctrines.glory_banner.description',
-    flavorTextKey: 'doctrines.glory_banner.flavor',
+  war_pyre: {
+    id: 'war_pyre',
+    nameKey: 'doctrines.war_pyre.name',
+    descriptionKey: 'doctrines.war_pyre.description',
+    flavorTextKey: 'doctrines.war_pyre.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.FORM,
     tier: 3,
-    manaCost: 7,
+    manaCost: 6,
     isUltimate: false,
+    aoePattern: AoEPatternType.CROSS,
+    castRange: 2,
+    // Area fire DOT zone — approximated as AoE BURNING application
     effects: [
       {
-        type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.SELF,
-        value: 2, // +2 defense dice
-        duration: 2
+        type: DoctrineEffectType.APPLY_STATUS,
+        target: DoctrineTarget.ALL_ENEMIES,
+        statusEffect: StatusEffect.BURNING,
+        duration: 2 // BURNING for 2 turns to all enemies in area
       }
     ]
   },
 
-  // TEMPLAR - TIER 3 - VOID (ULTIMATES)
+  // ═══════════════════════════════════════
+  // TEMPLAR - TIER 3 - VOID
+  // ═══════════════════════════════════════
   disruption_storm: {
     id: 'disruption_storm',
     nameKey: 'doctrines.disruption_storm.name',
@@ -436,6 +460,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     isUltimate: true,
     aoePattern: AoEPatternType.CROSS,
     castRange: 2,
+    // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -454,6 +479,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 8,
     isUltimate: true,
+    // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
         type: DoctrineEffectType.GUARANTEED_CRITICAL,
@@ -504,7 +530,9 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
+  // ═══════════════════════════════════════
   // HERALD - TIER 1 - FORM
+  // ═══════════════════════════════════════
   ice_lance: {
     id: 'ice_lance',
     nameKey: 'doctrines.ice_lance.name',
@@ -516,7 +544,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     manaCost: 3,
     isUltimate: false,
     aoePattern: AoEPatternType.SINGLE,
-    castRange: 3,
+    castRange: 1,
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -554,11 +582,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 2,
     isUltimate: false,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 3,
+    // Pushes enemy 3 tiles away — approximated as targeted DIRECT_DAMAGE 0 (no damage, displacement only)
     effects: [
       {
-        type: DoctrineEffectType.NEGATE_HITS,
-        target: DoctrineTarget.SELF,
-        value: 99 // Negate next attack this turn
+        type: DoctrineEffectType.DIRECT_DAMAGE,
+        target: DoctrineTarget.ENEMY,
+        value: 0 // Push only, no damage (push not yet implemented in effect system)
       }
     ]
   },
@@ -570,38 +601,42 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     className: CharacterClassName.HERALD,
     magicNature: MagicNature.FORM,
     tier: 1,
-    manaCost: 3,
+    manaCost: 7,
     isUltimate: false,
     aoePattern: AoEPatternType.SINGLE,
     castRange: 4,
+    // Destroys non-boss demon instantly — approximated as massive direct damage
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
         target: DoctrineTarget.ENEMY,
-        value: 1 // 1 automatic damage ignoring defense
+        value: 99 // Destroy non-boss demon (instant kill)
       }
     ]
   },
 
+  // ═══════════════════════════════════════
   // HERALD - TIER 1 - VOID
-  combustion: {
-    id: 'combustion',
-    nameKey: 'doctrines.combustion.name',
-    descriptionKey: 'doctrines.combustion.description',
-    flavorTextKey: 'doctrines.combustion.flavor',
+  // ═══════════════════════════════════════
+  frost_bite: {
+    id: 'frost_bite',
+    nameKey: 'doctrines.frost_bite.name',
+    descriptionKey: 'doctrines.frost_bite.description',
+    flavorTextKey: 'doctrines.frost_bite.flavor',
     className: CharacterClassName.HERALD,
     magicNature: MagicNature.VOID,
     tier: 1,
-    manaCost: 4,
+    manaCost: 3,
     isUltimate: false,
     aoePattern: AoEPatternType.SINGLE,
-    castRange: 2,
+    castRange: 3,
     effects: [
       {
-        type: DoctrineEffectType.APPLY_STATUS,
+        type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.ENEMY,
-        statusEffect: StatusEffect.BURNING,
-        duration: 1
+        value: -2, // Enemy -2 power dice
+        duration: 1,
+        debuffType: 'attack'
       }
     ]
   },
@@ -637,7 +672,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.SELF,
-        value: 2 // +2 power to next attack doctrine
+        value: 2 // +2 power to next attack
       }
     ]
   },
@@ -651,6 +686,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    // Also teleports caster to target (teleport not yet implemented in effect system)
     effects: [
       {
         type: DoctrineEffectType.GUARANTEED_CRITICAL,
@@ -660,7 +696,9 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
+  // ═══════════════════════════════════════
   // HERALD - TIER 2 - FORM
+  // ═══════════════════════════════════════
   oracle_eye: {
     id: 'oracle_eye',
     nameKey: 'doctrines.oracle_eye.name',
@@ -689,11 +727,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    // Teleports caster 4 tiles — approximated as NEGATE_HITS 99 (avoid all damage)
     effects: [
       {
         type: DoctrineEffectType.NEGATE_HITS,
         target: DoctrineTarget.SELF,
-        value: 99 // Avoid all damage this turn
+        value: 99 // Avoid all damage this turn (teleport approximation)
       }
     ]
   },
@@ -734,7 +773,9 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
+  // ═══════════════════════════════════════
   // HERALD - TIER 2 - VOID
+  // ═══════════════════════════════════════
   silence_vortex: {
     id: 'silence_vortex',
     nameKey: 'doctrines.silence_vortex.name',
@@ -790,7 +831,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.SELF,
-        value: 4 // Force 4 attack against all enemies
+        value: 3 // Roll 3 dice against all enemies in area (2x2)
       },
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -811,19 +852,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     manaCost: 4,
     isUltimate: false,
     aoePattern: AoEPatternType.SINGLE,
-    castRange: 3,
+    castRange: 4,
+    // Ranged attack: +3 power dice at range 4
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.ENEMY,
-        value: -2, // Enemy -2 defense dice
-        duration: 2,
-        debuffType: 'defense'
+        target: DoctrineTarget.SELF,
+        value: 3 // +3 power dice ranged attack
       }
     ]
   },
 
-  // HERALD - TIER 3 - FORM (ULTIMATES)
+  // ═══════════════════════════════════════
+  // HERALD - TIER 3 - FORM
+  // ═══════════════════════════════════════
   judgment_aurora: {
     id: 'judgment_aurora',
     nameKey: 'doctrines.judgment_aurora.name',
@@ -834,6 +876,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 9,
     isUltimate: true,
+    // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
         type: DoctrineEffectType.GUARANTEED_CRITICAL,
@@ -852,12 +895,18 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 9,
     isUltimate: true,
-    aoePattern: AoEPatternType.SINGLE,
+    aoePattern: AoEPatternType.DIAMOND,
     castRange: 4,
+    // Ultimate: 5 dice area 3x3 + stun
     effects: [
       {
+        type: DoctrineEffectType.POWER_MODIFIER,
+        target: DoctrineTarget.SELF,
+        value: 5 // Roll 5 dice against all enemies in area (3x3)
+      },
+      {
         type: DoctrineEffectType.APPLY_STATUS,
-        target: DoctrineTarget.ENEMY,
+        target: DoctrineTarget.ALL_ENEMIES,
         statusEffect: StatusEffect.STUNNED,
         duration: 1
       }
@@ -873,15 +922,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: false,
-    aoePattern: AoEPatternType.DIAMOND,
-    castRange: 3,
+    aoePattern: AoEPatternType.SINGLE,
+    castRange: 4,
+    // Single target: +7 power + IMMOBILIZED 2t
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.ALL_ENEMIES,
-        value: -2, // All enemies -2 attack power
-        duration: 1,
-        debuffType: 'attack'
+        target: DoctrineTarget.SELF,
+        value: 7 // +7 power dice single target
+      },
+      {
+        type: DoctrineEffectType.APPLY_STATUS,
+        target: DoctrineTarget.ENEMY,
+        statusEffect: StatusEffect.IMMOBILIZED,
+        duration: 2
       }
     ]
   },
@@ -907,7 +961,9 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     ]
   },
 
-  // HERALD - TIER 3 - VOID (ULTIMATES)
+  // ═══════════════════════════════════════
+  // HERALD - TIER 3 - VOID
+  // ═══════════════════════════════════════
   stellar_collapse: {
     id: 'stellar_collapse',
     nameKey: 'doctrines.stellar_collapse.name',
@@ -918,6 +974,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 10,
     isUltimate: true,
+    // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -939,6 +996,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     isUltimate: true,
     aoePattern: AoEPatternType.CIRCLE_2,
     castRange: 4,
+    // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -967,10 +1025,9 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.NEGATE_HITS,
         target: DoctrineTarget.SELF,
-        value: 0, // No hit negation, but triggers thorns + burn
+        value: 0, // No hit negation, but triggers thorns
         duration: 2,
-        thornsDamage: 2, // Deal 2 damage to attackers when hit
-        thornsBurnDuration: 2 // Also apply BURNING for 2 turns to attacker
+        thornsDamage: 2 // Deal 2 damage to attackers when hit (thorns only, no burn)
       }
     ]
   },
@@ -986,11 +1043,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     isUltimate: false,
     aoePattern: AoEPatternType.SINGLE,
     castRange: 5,
+    // Destroy non-boss target — approximated as massive direct damage
     effects: [
       {
-        type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.SELF,
-        value: 5 // +5 power, refund mana on kill
+        type: DoctrineEffectType.DIRECT_DAMAGE,
+        target: DoctrineTarget.ENEMY,
+        value: 99 // Instant destroy non-boss target
       }
     ]
   }

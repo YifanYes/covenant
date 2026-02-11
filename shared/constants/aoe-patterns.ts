@@ -66,24 +66,31 @@ export const AOE_PATTERNS: Record<AoEPatternType, [number, number][]> = {
 
 // Doctrine to AoE pattern mapping
 export const DOCTRINE_AOE_PATTERNS: Record<string, AoEPatternType> = {
-  // Templar - VOID
+  // Templar - FORM
   igneous_cut: 'SINGLE',
-  fan_cut: 'CROSS',           // Attacks up to 2 enemies in cross pattern
-  disruption_storm: 'CROSS',  // Ultimate - 4 power dice split between enemies
+  war_pyre: 'CROSS',           // Area fire DOT zone
+  // Templar - VOID
+  fan_cut: 'CROSS',            // Attacks up to 2 enemies in cross pattern
+  disruption_storm: 'CROSS',   // Ultimate - 4 power dice split between enemies
 
   // Herald - VOID
-  fireball: 'DIAMOND',        // Force 4 attack against all enemies + burning
-  black_hole: 'CIRCLE_2',     // Ultimate - stun all enemies + 2 direct damage
+  fireball: 'DIAMOND',         // 3 dice area + burning
+  black_hole: 'CIRCLE_2',      // Ultimate - stun all enemies + 2 direct damage
 
   // Herald - FORM
-  blinding_faith: 'DIAMOND',  // All enemies -2 attack power
+  temporal_prison: 'DIAMOND',  // Ultimate - 5 dice area 3x3 + stun
+  blinding_faith: 'SINGLE',   // +7 power single target + IMMOBILIZED
 
   // Single target doctrines (for completeness)
-  bite: 'SINGLE',
+  truth_blade: 'SINGLE',
+  entropic_acceleration: 'SINGLE',
+  tidal_strike: 'SINGLE',
   unerring_dart: 'SINGLE',
   disintegration_ray: 'SINGLE',
   summary_execution: 'SINGLE',
-  karmic_retribution: 'SINGLE'
+  arcane_push: 'SINGLE',
+  frost_bite: 'SINGLE',
+  fragility_curse: 'SINGLE'
 }
 
 // Default casting range for doctrines (can be overridden per doctrine)
@@ -91,18 +98,29 @@ export const DEFAULT_DOCTRINE_RANGE = 3
 
 // Doctrine-specific ranges
 export const DOCTRINE_RANGES: Record<string, number> = {
-  // Short range (melee-ish)
+  // Short range (melee)
+  truth_blade: 1,
   igneous_cut: 1,
-  bite: 1,
+  entropic_acceleration: 1,
+  tidal_strike: 1,
   fan_cut: 1,
-  disruption_storm: 2,
+  summary_execution: 1,
+  ice_lance: 1,
 
   // Medium range
+  war_pyre: 2,
+  disruption_storm: 2,
+  arcane_push: 3,
   fireball: 3,
-  blinding_faith: 3,
+  silence_vortex: 3,
+  frost_bite: 3,
 
   // Long range
   unerring_dart: 4,
+  temporal_prison: 4,
+  blinding_faith: 4,
+  fragility_curse: 4,
+  inspiration: 4,
   black_hole: 4,
   disintegration_ray: 5
 }

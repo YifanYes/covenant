@@ -195,10 +195,10 @@ describe('CombatService', () => {
 
     it('should handle POWER_MODIFIER effects', () => {
       const doctrines: Record<string, ActiveStatusEffect> = {
-        truth_blade: {
+        shoulder_charge: {
           effect: StatusEffect.DOCTRINE_ACTIVE,
           remainingTurns: 1,
-          sourceDoctrineId: 'truth_blade' // +1 power
+          sourceDoctrineId: 'shoulder_charge' // +1 power
         }
       }
 
@@ -301,10 +301,10 @@ describe('CombatService', () => {
 
     it('should combine multiple doctrine effects', () => {
       const doctrines: Record<string, ActiveStatusEffect> = {
-        truth_blade: {
+        shoulder_charge: {
           effect: StatusEffect.DOCTRINE_ACTIVE,
           remainingTurns: 1,
-          sourceDoctrineId: 'truth_blade' // +1 power
+          sourceDoctrineId: 'shoulder_charge' // +1 power
         },
         miraculous_protection: {
           effect: StatusEffect.DOCTRINE_ACTIVE,
@@ -321,10 +321,10 @@ describe('CombatService', () => {
 
     it('should ignore expired doctrines', () => {
       const doctrines: Record<string, ActiveStatusEffect> = {
-        truth_blade: {
+        shoulder_charge: {
           effect: StatusEffect.DOCTRINE_ACTIVE,
           remainingTurns: 0, // Expired
-          sourceDoctrineId: 'truth_blade'
+          sourceDoctrineId: 'shoulder_charge'
         }
       }
 
@@ -337,16 +337,16 @@ describe('CombatService', () => {
   describe('clearConsumedDoctrines', () => {
     it('should clear POWER_MODIFIER self-buffs after attack', () => {
       const doctrines: Record<string, ActiveStatusEffect> = {
-        truth_blade: {
+        shoulder_charge: {
           effect: StatusEffect.DOCTRINE_ACTIVE,
           remainingTurns: 1,
-          sourceDoctrineId: 'truth_blade' // POWER_MODIFIER
+          sourceDoctrineId: 'shoulder_charge' // POWER_MODIFIER
         }
       }
 
       const result = combatService.clearConsumedDoctrines(doctrines)
 
-      expect(result.truth_blade).toBeUndefined()
+      expect(result.shoulder_charge).toBeUndefined()
     })
 
     it('should clear THRESHOLD_MODIFIER self-buffs after attack', () => {
