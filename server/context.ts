@@ -21,8 +21,9 @@ export async function createContext({ req }: CreateFastifyContextOptions) {
   }
 
   const services = new ServiceFactory(prisma)
+  const log = user ? req.log.child({ userId: user.id }) : req.log
 
-  return { user, prisma, services }
+  return { user, prisma, services, log }
 }
 
 export type Context = Awaited<ReturnType<typeof createContext>>

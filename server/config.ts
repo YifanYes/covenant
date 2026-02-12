@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import { z } from 'zod'
+import { logger } from './lib/logger'
 
 dotenv.config()
 
@@ -19,16 +20,14 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().min(1),
   FROM_EMAIL: z.string().email(),
   GOOGLE_CLIENT_ID: z.string().min(1),
-  GOOGLE_CLIENT_SECRET: z.string().min(1)
+  GOOGLE_CLIENT_SECRET: z.string().min(1),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).optional()
 })
 
 const _env = envSchema.safeParse(process.env)
 
 if (_env.success === false) {
-  console.error('❌ Invalid environment variables:')
-  _env.error.issues.forEach((issue) => {
-    console.error(`   - ${issue.path.join('.')}: ${issue.message}`)
-  })
+  logger.fatal({ issues: _env.error.issues }, 'Invalid environment variables')
   process.exit(1)
 }
 
