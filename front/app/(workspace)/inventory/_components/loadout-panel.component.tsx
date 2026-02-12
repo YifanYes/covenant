@@ -18,8 +18,7 @@ export default function LoadoutPanel({ character, onUnequip }: LoadoutPanelProps
   const loadoutItems = useMemo(
     () => ({
       weapon: character?.loadout?.find((item) => item.type.startsWith('WEAPON_')),
-      armor: character?.loadout?.find((item) => item.type === SlotTypeEnum.ARMOR),
-      accessory: character?.loadout?.find((item) => item.type === SlotTypeEnum.ACCESSORY)
+      armor: character?.loadout?.find((item) => item.type === SlotTypeEnum.ARMOR)
     }),
     [character?.loadout]
   )
@@ -44,11 +43,6 @@ export default function LoadoutPanel({ character, onUnequip }: LoadoutPanelProps
               type={SlotTypeEnum.ARMOR}
               item={loadoutItems.armor}
               onUnequip={() => onUnequip?.(SlotTypeEnum.ARMOR)}
-            />
-            <EquipmentSlot
-              type={SlotTypeEnum.ACCESSORY}
-              item={loadoutItems.accessory}
-              onUnequip={() => onUnequip?.(SlotTypeEnum.ACCESSORY)}
             />
           </div>
         </div>

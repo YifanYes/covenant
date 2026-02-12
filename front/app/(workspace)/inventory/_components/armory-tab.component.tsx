@@ -63,7 +63,6 @@ export default function ArmoryTab({ character, onEquipItem, onUnequipItem }: Arm
             <SelectItem value='all'>{t('inventory.filter.all_types')}</SelectItem>
             <SelectItem value='weapon'>{t('inventory.filter.weapon')}</SelectItem>
             <SelectItem value='armor'>{t('inventory.filter.armor')}</SelectItem>
-            <SelectItem value='accessory'>{t('inventory.filter.accessory')}</SelectItem>
             <SelectItem value='consumable'>{t('inventory.filter.consumable')}</SelectItem>
           </SelectContent>
         </Select>

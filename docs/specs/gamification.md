@@ -523,7 +523,7 @@ Based on `Mecanicas/Equipamiento.md`.
 - **Slots**:
   - Main Weapon
   - Armor
-  - Accessory (Ring/Amulet)
+  - Accessory (Ring/Amulet) — deferred to post-beta; no ACCESSORY items defined yet, slot hidden from UI
 
 ## Frontend Changes
 
