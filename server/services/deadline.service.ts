@@ -1,5 +1,8 @@
 import type { ActivityRepository } from '../repositories/activity.repository'
 import type { InvestmentRepository } from '../repositories/investment.repository'
+import { logger } from '../lib/logger'
+
+const log = logger.child({ service: 'deadline' })
 
 export interface DeadlineValidationResult {
   activitiesProcessed: number
@@ -62,12 +65,14 @@ export class DeadlineService {
       }
     }
 
-    console.log(
-      `[DeadlineService] Processed ${result.activitiesProcessed} activities ` +
-        `(${result.activitiesCompleted.length} completed, ${result.activitiesFailed.length} failed) and ` +
-        `${result.investmentsProcessed} investments ` +
-        `(${result.investmentsCompleted.length} completed, ${result.investmentsFailed.length} failed)`
-    )
+    log.info({
+      activitiesProcessed: result.activitiesProcessed,
+      activitiesCompleted: result.activitiesCompleted.length,
+      activitiesFailed: result.activitiesFailed.length,
+      investmentsProcessed: result.investmentsProcessed,
+      investmentsCompleted: result.investmentsCompleted.length,
+      investmentsFailed: result.investmentsFailed.length
+    }, 'Deadline validation processed')
 
     return result
   }

@@ -6,11 +6,13 @@ import cron from 'node-cron'
 import { env } from './config'
 import { createContext } from './context'
 import { auth } from './lib/auth'
+import { logger } from './lib/logger'
 import { prisma } from './lib/prisma'
 import { appRouter, type AppRouter } from './router'
 import { ServiceFactory } from './services/service.factory'
 
 const server = fastify({
+  loggerInstance: logger,
   routerOptions: {
     maxParamLength: 5000
   },
@@ -79,7 +81,7 @@ async function startServer() {
           const responseBody = await response.text()
           reply.send(responseBody || null)
         } catch (error) {
-          console.error('Authentication Error:', error)
+          request.log.error({ err: error }, 'Authentication error')
           reply.status(500).send({ error: 'Internal authentication error' })
         }
       }
@@ -91,30 +93,31 @@ async function startServer() {
       trpcOptions: {
         router: appRouter,
         createContext,
-        onError({ path, error }) {
-          console.error(`Error in tRPC handler on path '${path}':`, error)
+        onError({ path, error, ctx }) {
+          const log = ctx?.log ?? logger
+          log.error({ trpcPath: path, code: error.code, err: error }, 'tRPC handler error')
         }
       } satisfies FastifyTRPCPluginOptions<AppRouter>['trpcOptions']
     })
 
     await server.listen({ port: env.PORT, host: '0.0.0.0' })
-    console.log(`Server is running at port ${env.PORT}`)
+    logger.info({ port: env.PORT }, 'Server started')
 
     // Schedule deadline validation cron job to run daily at 00:00
+    const cronLog = logger.child({ context: 'cron', job: 'deadline-validation' })
     cron.schedule('0 0 * * *', async () => {
-      console.log('[Cron] Running deadline validation...')
+      cronLog.info('Running deadline validation')
       try {
         const services = new ServiceFactory(prisma)
-        const result = await services.deadline.validateDeadlines()
-        console.log('[Cron] Deadline validation completed:', result)
+        await services.deadline.validateDeadlines()
+        cronLog.info('Deadline validation completed')
       } catch (error) {
-        console.error('[Cron] Deadline validation failed:', error)
+        cronLog.error({ err: error }, 'Deadline validation failed')
       }
     })
-    console.log('[Cron] Deadline validation scheduled for 00:00 daily')
+    cronLog.info('Deadline validation scheduled for 00:00 daily')
   } catch (err) {
-    console.error('Failed to start server:', err)
-    server.log.error(err)
+    logger.fatal({ err }, 'Failed to start server')
     process.exit(1)
   }
 }

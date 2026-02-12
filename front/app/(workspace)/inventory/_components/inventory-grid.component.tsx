@@ -30,8 +30,6 @@ function matchesTypeFilter(itemType: ItemType, filter: EquipmentTypeFilter | nul
       )
     case 'armor':
       return itemType === ItemType.ARMOR
-    case 'accessory':
-      return itemType === ItemType.ACCESSORY
     case 'consumable':
       return itemType === ItemType.CONSUMABLE
     default:
