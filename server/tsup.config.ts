@@ -8,5 +8,15 @@ export default defineConfig({
   clean: true,
   splitting: false,
   skipNodeModulesBundle: true,
-  external: [/generated\/prisma/],
+  esbuildPlugins: [
+    {
+      name: 'fix-prisma-imports',
+      setup(build) {
+        build.onResolve({ filter: /generated\/prisma/ }, (args) => {
+          const path = args.path.endsWith('/index.js') ? args.path : args.path + '/index.js'
+          return { path, external: true }
+        })
+      }
+    }
+  ]
 })
