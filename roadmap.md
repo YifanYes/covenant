@@ -65,7 +65,7 @@ _Validar si el sistema se sostiene bajo uso real._
 
 ### Telemetría y Control
 
-- [ ] **Logging:** Registro de eventos clave (progreso, abandono, errores críticos).
+- [x] **Logging:** Registro de eventos clave (progreso, abandono, errores críticos).
 - [ ] **Wipe Tools:** Herramientas para resetear el progreso de usuarios beta.
 - [ ] **Rollback:** Capacidad de rollback o wipe controlado ante fallos graves.
 

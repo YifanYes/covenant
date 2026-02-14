@@ -9,9 +9,10 @@ import Button from '@/ui/button.component'
 import Input from '@/ui/input.component'
 import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select.component'
 import Table, { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table.component'
+import { invalidators } from '@/utils/query-invalidation.utils'
 import { getRewardText } from '@/utils/text.utils'
 import { getPriorityStyles } from '@/utils/theme.utils'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { ChevronLeft, ChevronRight, Close } from '@nsmr/pixelart-react'
 import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -58,9 +59,9 @@ const TaskRow = memo(function TaskRow({ task, onSelect, onStatusChange, isUpdati
   const { t } = useTranslation()
 
   return (
-    <TableRow className='hover:bg-muted/50 cursor-pointer' onClick={() => !isUpdating && onSelect()}>
-      <TableCell className='py-2 pr-4 font-medium wrap-break-word whitespace-normal'>{task.title}</TableCell>
-      <TableCell className='py-2'>
+    <TableRow className="hover:bg-muted/50 cursor-pointer" onClick={() => !isUpdating && onSelect()}>
+      <TableCell className="py-2 pr-4 font-medium wrap-break-word whitespace-normal">{task.title}</TableCell>
+      <TableCell className="py-2">
         <span
           className={cn(
             'rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase',
@@ -70,9 +71,9 @@ const TaskRow = memo(function TaskRow({ task, onSelect, onStatusChange, isUpdati
           {getTaskType(t, task.effort, task.impact)}
         </span>
       </TableCell>
-      <TableCell className='py-2' onClick={(e) => e.stopPropagation()}>
+      <TableCell className="py-2" onClick={(e) => e.stopPropagation()}>
         <Select value={task.status} disabled={isUpdating} onValueChange={(value) => onStatusChange(task.id, value)}>
-          <SelectTrigger className='w-[130px]'>
+          <SelectTrigger className="w-32.5">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -84,7 +85,7 @@ const TaskRow = memo(function TaskRow({ task, onSelect, onStatusChange, isUpdati
           </SelectContent>
         </Select>
       </TableCell>
-      <TableCell className='py-2 text-sm whitespace-nowrap'>
+      <TableCell className="py-2 text-sm whitespace-nowrap">
         {task.dueDate ? dayjs(task.dueDate).format('L') : '-'}
       </TableCell>
     </TableRow>
@@ -165,9 +166,10 @@ export default function TaskTable() {
 
   const updateTaskMutation = useMutation(
     trpcOptions.tasks.update.mutationOptions({
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getFiltered.queryKey(queryParams) })
-        queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getFiltered.queryKey(queryParams) })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
+        await invalidators.character()
         toast.success(t('tasks.success.update', { diceReward: getRewardText(data.diceEarned) }))
       },
       onError: (error) => toast.error(t('tasks.error.internal.update'), { description: error.message })
@@ -226,29 +228,29 @@ export default function TaskTable() {
   )
 
   return (
-    <div className='flex h-full flex-col'>
-      <div className='mb-4 flex flex-col gap-4'>
-        <div className='flex items-center gap-4'>
+    <div className="flex h-full flex-col">
+      <div className="mb-4 flex flex-col gap-4">
+        <div className="flex items-center gap-4">
           <Input
             placeholder={t('tasks.filters.search_placeholder')}
             {...form.register('searchQuery')}
-            className='w-[300px] flex-none'
+            className="w-75 flex-none"
           />
-          <div className='w-[200px] shrink-0'>
+          <div className="w-50 shrink-0">
             <MultiSelect
               control={form.control}
-              name='statusFilter'
+              name="statusFilter"
               placeholder={t('tasks.filters.status_placeholder')}
-              exclusiveValue='all'
+              exclusiveValue="all"
               items={statusFilterItems}
             />
           </div>
-          <div className='w-[200px] shrink-0'>
+          <div className="w-50 shrink-0">
             <MultiSelect
               control={form.control}
-              name='effortImpactFilter'
+              name="effortImpactFilter"
               placeholder={t('tasks.filters.effort_placeholder')}
-              exclusiveValue='all'
+              exclusiveValue="all"
               items={effortImpactFilterItems}
             />
           </div>
@@ -256,45 +258,45 @@ export default function TaskTable() {
             value={dateFilter}
             onChange={(date) => form.setValue('dateFilter', date)}
             placeholder={t('tasks.filters.date_placeholder')}
-            className='w-[210px]'
+            className="w-52.5"
           />
           {hasActiveFilters && (
-            <Button variant='outline' size='sm' onClick={clearFilters}>
-              <Close className='mr-2 h-4 w-4' />
+            <Button variant="outline" size="sm" onClick={clearFilters}>
+              <Close className="mr-2 h-4 w-4" />
               {t('tasks.filters.clear')}
             </Button>
           )}
         </div>
       </div>
-      <div className='relative min-h-0 flex-1 overflow-hidden rounded-md border'>
-        <div className='absolute inset-0'>
-          <Table className='table-fixed'>
+      <div className="relative min-h-0 flex-1 overflow-hidden rounded-md border">
+        <div className="absolute inset-0">
+          <Table className="table-fixed">
             <TableHeader>
               <TableRow>
-                <TableHead className='w-[300px]'>{t('tasks.table.title')}</TableHead>
-                <TableHead className='w-[120px]'>{t('tasks.table.type')}</TableHead>
-                <TableHead className='w-[200px]'>{t('tasks.table.status')}</TableHead>
-                <TableHead className='w-[150px]'>{t('tasks.table.dueDate')}</TableHead>
+                <TableHead className="w-75">{t('tasks.table.title')}</TableHead>
+                <TableHead className="w-30">{t('tasks.table.type')}</TableHead>
+                <TableHead className="w-50">{t('tasks.table.status')}</TableHead>
+                <TableHead className="w-37.5">{t('tasks.table.dueDate')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className='h-[300px]'>
-                    <div className='flex h-full items-center justify-center'>
-                      <p className='text-muted-foreground text-sm italic'>{t('common.loading')}</p>
+                  <TableCell colSpan={4} className="h-75">
+                    <div className="flex h-full items-center justify-center">
+                      <p className="text-muted-foreground text-sm italic">{t('common.loading')}</p>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : tasks.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className='h-[300px]'>
-                    <div className='flex h-full flex-col items-center justify-center gap-2'>
-                      <p className='text-muted-foreground text-sm italic'>
+                  <TableCell colSpan={4} className="h-75">
+                    <div className="flex h-full flex-col items-center justify-center gap-2">
+                      <p className="text-muted-foreground text-sm italic">
                         {hasActiveFilters ? t('tasks.table.no_matching_tasks') : t('tasks.table.empty')}
                       </p>
                       {hasActiveFilters && (
-                        <Button variant='outline' size='sm' onClick={clearFilters}>
+                        <Button variant="outline" size="sm" onClick={clearFilters}>
                           {t('tasks.filters.clear')}
                         </Button>
                       )}
@@ -319,26 +321,26 @@ export default function TaskTable() {
 
       {/* Pagination controls */}
       {totalPages > 1 && (
-        <div className='mt-4 flex items-center justify-between'>
-          <p className='text-muted-foreground text-sm'>
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-muted-foreground text-sm">
             {t('tasks.table.pagination_info', {
               start: (page - 1) * PAGE_SIZE + 1,
               end: Math.min(page * PAGE_SIZE, totalCount),
               total: totalCount
             })}
           </p>
-          <div className='flex items-center gap-2'>
-            <Button variant='outline' size='sm' onClick={() => form.setValue('page', page - 1)} disabled={page <= 1}>
-              <ChevronLeft className='h-4 w-4' />
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => form.setValue('page', page - 1)} disabled={page <= 1}>
+              <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className='text-sm'>{t('tasks.table.page_info', { page, totalPages })}</span>
+            <span className="text-sm">{t('tasks.table.page_info', { page, totalPages })}</span>
             <Button
-              variant='outline'
-              size='sm'
+              variant="outline"
+              size="sm"
               onClick={() => form.setValue('page', page + 1)}
               disabled={page >= totalPages}
             >
-              <ChevronRight className='h-4 w-4' />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
