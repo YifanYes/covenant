@@ -2,8 +2,9 @@
 import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
 import type { Objective } from '@/types/models.types'
 import Button from '@/ui/button.component'
+import { invalidators } from '@/utils/query-invalidation.utils'
 import { getRewardText } from '@/utils/text.utils'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Check } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -21,9 +22,10 @@ export default function ConfirmCompleteObjectiveDialog({ objective, onCompleteSu
 
   const completeMutation = useMutation(
     trpcOptions.objectives.complete.mutationOptions({
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         toast.success(t('objectives.complete.success', { diceReward: getRewardText(data.diceEarned) }))
-        queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() })
+        await invalidators.character()
         setOpen(false)
         onCompleteSuccess()
       },
@@ -37,19 +39,19 @@ export default function ConfirmCompleteObjectiveDialog({ objective, onCompleteSu
     <BaseConfirmDialog
       open={open}
       onOpenChange={setOpen}
-      title='objectives.complete.title'
-      description='objectives.complete.description'
+      title="objectives.complete.title"
+      description="objectives.complete.description"
       onConfirm={handleComplete}
-      confirmLabel='objectives.complete.button'
-      confirmClassName='hover:bg-foreground/10 bg-transparent text-green-400 hover:text-green-400 cursor-pointer'
+      confirmLabel="objectives.complete.button"
+      confirmClassName="hover:bg-foreground/10 bg-transparent text-green-400 hover:text-green-400 cursor-pointer"
       isLoading={completeMutation.isPending}
       trigger={
         <Button
-          variant='outline'
+          variant="outline"
           disabled={completeMutation.isPending}
-          className='hover:text-foreground hover:bg-foreground/10 mr-auto text-green-400'
+          className="hover:text-foreground hover:bg-foreground/10 mr-auto text-green-400"
         >
-          <Check className='h-4 w-4' />
+          <Check className="h-4 w-4" />
           {t('objectives.complete.button')}
         </Button>
       }
