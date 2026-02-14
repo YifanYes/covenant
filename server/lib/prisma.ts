@@ -11,7 +11,11 @@ const pool = new Pool({
   user: url.username,
   password: decodeURIComponent(url.password),
   database: url.pathname.slice(1),
-  ssl: env.NODE_ENV === 'prod' ? { rejectUnauthorized: false } : false
+  ssl: env.NODE_ENV === 'prod' ? { rejectUnauthorized: false } : false,
+  max: 20,
+  min: 2,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
 })
 const adapter = new PrismaPg(pool)
 

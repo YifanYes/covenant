@@ -35,6 +35,7 @@ model Session {
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("sessions")
 }
 
@@ -55,6 +56,7 @@ model Account {
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([providerId, accountId])
+  @@index([userId])
   @@map("accounts")
 }
 
@@ -128,6 +130,7 @@ model MapActivity {
   completedAt    DateTime?               @db.Timestamp(6)
   participations ActivityParticipation[]
 
+  @@index([status])
   @@map("map_activities")
 }
 
@@ -149,6 +152,7 @@ model CombatEnemy {
   combatLog       Json?                 @default("[]")
   participation   ActivityParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
 
+  @@index([participationId])
   @@map("combat_enemies")
 }
 
@@ -169,6 +173,7 @@ model ActivityParticipation {
   character            Character     @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@unique([activityId, characterId])
+  @@index([characterId])
   @@map("activity_participations")
 }
 
@@ -185,6 +190,7 @@ model Objective {
   habits      Habit[]   @relation("HabitToObjective")
   tasks       Task[]    @relation("ObjectiveToTask")
 
+  @@index([userId])
   @@map("objectives")
 }
 
@@ -200,6 +206,7 @@ model Area {
   tasks      Task[]      @relation("AreaToTask")
   habits     Habit[]     @relation("AreaToHabit")
 
+  @@index([userId])
   @@map("areas")
 }
 
@@ -220,6 +227,7 @@ model Task {
   objectives  Objective[] @relation("ObjectiveToTask")
   areas       Area[]      @relation("AreaToTask")
 
+  @@index([userId])
   @@map("tasks")
 }
 
@@ -237,6 +245,7 @@ model Habit {
   objectives  Objective[]       @relation("HabitToObjective")
   areas       Area[]            @relation("AreaToHabit")
 
+  @@index([userId])
   @@map("habits")
 }
 
@@ -247,6 +256,8 @@ model HabitCompletion {
   completedAt DateTime @default(now()) @db.Timestamp(6)
   habit       Habit    @relation(fields: [habitId], references: [id])
 
+  @@index([habitId])
+  @@index([userId])
   @@map("habit_completions")
 }
 
@@ -262,6 +273,7 @@ model Investment {
   completedAt   DateTime?                @db.Timestamp(6)
   contributions InvestmentContribution[]
 
+  @@index([factionName, status])
   @@map("investments")
 }
 
@@ -274,6 +286,8 @@ model InvestmentContribution {
   investment    Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
   character     Character  @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
+  @@index([investmentId])
+  @@index([characterId])
   @@map("investment_contributions")
 }
 

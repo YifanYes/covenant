@@ -1,6 +1,6 @@
 [build]
 builder = "railpack"
-buildCommand = "pnpm install && pnpm --filter server run postinstall"
+buildCommand = "pnpm install && pnpm --filter server run postinstall && pnpm --filter server run build"
 
 [deploy]
 startCommand = "pnpm --filter server run db:push && pnpm --filter server start"
