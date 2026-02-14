@@ -2,8 +2,9 @@
 import type { Habit } from '@/types/models.types'
 import Button from '@/ui/button.component'
 import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/tooltip.component'
+import { invalidators } from '@/utils/query-invalidation.utils'
 import { getRewardText } from '@/utils/text.utils'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Check, Code, Loader } from '@nsmr/pixelart-react'
 import { HabitTimespan } from '@shared/schemas/habits.schemas'
 import { useMutation } from '@tanstack/react-query'
@@ -36,6 +37,7 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
             })
           )
           await queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })
+          await invalidators.character()
         },
         onError: () => toast.error(t('habits.error.complete'))
       })
@@ -76,25 +78,25 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
     }
 
     return (
-      <div ref={ref} {...props} className='flex cursor-pointer flex-col rounded-lg border p-3'>
-        <div className='flex items-center justify-between gap-3'>
-          <div className='flex min-w-0 flex-1 items-center gap-2'>
-            <div className='bg-primary/10 text-primary rounded-md p-1.5'>
-              <Code className='h-4 w-4' />
+      <div ref={ref} {...props} className="flex cursor-pointer flex-col rounded-lg border p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <div className="bg-primary/10 text-primary rounded-md p-1.5">
+              <Code className="h-4 w-4" />
             </div>
-            <div className='min-w-0 flex-1'>
+            <div className="min-w-0 flex-1">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <h3 className='max-w-full truncate text-base font-semibold'>{name}</h3>
+                    <h3 className="max-w-full truncate text-base font-semibold">{name}</h3>
                   </TooltipTrigger>
                   <TooltipContent
                     arrow={false}
-                    className='bg-background border-primary/50 text-card-foreground rounded-md border shadow-none'
+                    className="bg-background border-primary/50 text-card-foreground rounded-md border shadow-none"
                   >
-                    <div className='flex max-w-[200px] flex-col gap-1'>
-                      <p className='font-semibold'>{name}</p>
-                      {description && <p className='text-muted-foreground text-xs'>{description}</p>}
+                    <div className="flex max-w-50 flex-col gap-1">
+                      <p className="font-semibold">{name}</p>
+                      {description && <p className="text-muted-foreground text-xs">{description}</p>}
                     </div>
                   </TooltipContent>
                 </Tooltip>
@@ -102,32 +104,32 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
             </div>
           </div>
           <Button
-            size='icon'
+            size="icon"
             variant={isPeriodCompleted ? 'default' : 'outline'}
             onClick={handleMarkComplete}
             disabled={createCompletion.isPending || periodCompletions >= recurrence}
-            className='h-8 w-8 shrink-0'
+            className="h-8 w-8 shrink-0"
           >
             {createCompletion.isPending ? (
-              <Loader className='h-3.5 w-3.5 animate-spin' />
+              <Loader className="h-3.5 w-3.5 animate-spin" />
             ) : recurrence > 1 && periodCompletions + 1 < recurrence ? (
-              <span className='text-xs font-bold'>+1</span>
+              <span className="text-xs font-bold">+1</span>
             ) : (
-              <Check className='h-3.5 w-3.5' />
+              <Check className="h-3.5 w-3.5" />
             )}
           </Button>
         </div>
 
-        <div className='mt-4 flex flex-1 flex-col'>
-          <div className='grid flex-1 grid-cols-[repeat(9,1fr)] grid-rows-[repeat(4,1fr)] gap-1'>
+        <div className="mt-4 flex flex-1 flex-col">
+          <div className="grid flex-1 grid-cols-[repeat(9,1fr)] grid-rows-[repeat(4,1fr)] gap-1">
             {calendarDays.map(({ date, count, background, style }, index) => (
               <div
                 key={index}
-                className='relative flex aspect-square items-center justify-center overflow-hidden rounded-sm'
+                className="relative flex aspect-square items-center justify-center overflow-hidden rounded-sm"
                 title={`${date}: ${count}`}
               >
                 <div className={`absolute inset-0 ${background}`} style={style} />
-                {count > 1 && <span className='text-background relative z-10 text-xs font-bold'>+{count}</span>}
+                {count > 1 && <span className="text-background relative z-10 text-xs font-bold">+{count}</span>}
               </div>
             ))}
           </div>

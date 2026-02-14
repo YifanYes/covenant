@@ -10,8 +10,9 @@ import TextInput from '@/forms/text-input.component'
 import { useCalendarStore } from '@/stores/calendar.store'
 import { useTasksStore } from '@/stores/tasks.store'
 import Textarea from '@/ui/textarea.component'
+import { invalidators } from '@/utils/query-invalidation.utils'
 import { getRewardText } from '@/utils/text.utils'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import {
   TaskEffort,
@@ -46,6 +47,7 @@ export default function UpdateTaskDialog() {
           })
         })
         await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
+        await invalidators.character()
         setSelectedTask(undefined)
       },
       onError: (error) => toast.error(t('tasks.error.internal.update'), { description: error.message })
@@ -124,24 +126,24 @@ export default function UpdateTaskDialog() {
     <BaseFormDialog
       open={!isUndefined(selectedTask)}
       onOpenChange={handleOpenChange}
-      title='update_task_dialog.title'
-      description='update_task_dialog.description'
+      title="update_task_dialog.title"
+      description="update_task_dialog.description"
       onSubmit={handleSubmit(onUpdate)}
-      submitLabel='update'
+      submitLabel="update"
       isLoading={updateMutation.isPending}
       isSubmitDisabled={!isValid || !isDirty || updateMutation.isPending}
-      className='md:max-w-fit md:min-w-150'
+      className="md:max-w-fit md:min-w-150"
       extraFooterActions={
-        <div className='mr-auto flex gap-2'>
+        <div className="mr-auto flex gap-2">
           <LoaderButton
-            className='text-destructive border-destructive hover:text-background hover:bg-destructive cursor-pointer border bg-transparent'
+            className="text-destructive border-destructive hover:text-background hover:bg-destructive cursor-pointer border bg-transparent"
             isLoading={deleteMutation.isPending}
             disabled={isUndefined(selectedTask)}
             onClick={onDelete}
             label={t('tasks.delete')}
           />
           <LoaderButton
-            className='text-accent border-accent hover:text-background hover:bg-accent cursor-pointer border bg-transparent'
+            className="text-accent border-accent hover:text-background hover:bg-accent cursor-pointer border bg-transparent"
             isLoading={duplicateMutation.isPending}
             disabled={isUndefined(selectedTask)}
             onClick={onDuplicate}
@@ -150,28 +152,28 @@ export default function UpdateTaskDialog() {
         </div>
       }
     >
-      <div className='grid gap-4'>
-        <div className='grid gap-3'>
+      <div className="grid gap-4">
+        <div className="grid gap-3">
           <TextInput
-            type='text'
+            type="text"
             placeholder={t('update_task_dialog.title_placeholder')}
-            className='h-9'
+            className="h-9"
             {...register('title')}
             {...(errors.title?.message && { errorMessage: t(errors.title.message.toString()) })}
             required
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Textarea
             placeholder={t('update_task_dialog.description_placeholder')}
-            className='h-20 resize-none overflow-y-auto'
+            className="h-20 resize-none overflow-y-auto"
             {...register('description')}
             {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='status'
+            name="status"
             control={control}
             render={({ field }) => (
               <SingleSelect
@@ -183,13 +185,13 @@ export default function UpdateTaskDialog() {
             )}
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='dueDate'
+            name="dueDate"
             control={control}
             render={({ field }) => (
               <DatePicker
-                className='w-full'
+                className="w-full"
                 value={typeof field.value === 'string' ? new Date(field.value) : field.value}
                 onChange={field.onChange}
                 placeholder={t('update_task_dialog.due_date_placeholder')}
@@ -197,32 +199,32 @@ export default function UpdateTaskDialog() {
             )}
           />
         </div>
-        <div className='grid min-w-0 gap-3'>
+        <div className="grid min-w-0 gap-3">
           <ObjectivesSelector
             control={control}
             objectives={objectivesData?.objectives || []}
             placeholder={t('update_task_dialog.objectives_placeholder')}
           />
         </div>
-        <div className='grid min-w-0 gap-3'>
+        <div className="grid min-w-0 gap-3">
           <AreasSelector
             control={control}
             areas={areasData?.areas || []}
             placeholder={t('update_task_dialog.areas_placeholder')}
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='color'
+            name="color"
             control={control}
             render={({ field }) => (
               <ColorSelector label={t('tasks.color')} value={field.value ?? undefined} onChange={field.onChange} />
             )}
           />
         </div>
-        <div className='grid grid-cols-2 gap-3'>
+        <div className="grid grid-cols-2 gap-3">
           <Controller
-            name='effort'
+            name="effort"
             control={control}
             render={({ field }) => (
               <SingleSelect
@@ -238,7 +240,7 @@ export default function UpdateTaskDialog() {
             )}
           />
           <Controller
-            name='impact'
+            name="impact"
             control={control}
             render={({ field }) => (
               <SingleSelect
