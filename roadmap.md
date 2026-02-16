@@ -76,7 +76,6 @@ _Validar si el sistema se sostiene bajo uso real._
 
 ### Infraestructura
 
-- [ ] Landing page con waitlist (email capture)
 - [ ] Discord servidor configurado con canales
 - [ ] Email de bienvenida automatizado
 - [ ] Sistema de onboarding para beta testers

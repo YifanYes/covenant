@@ -1,3 +1,4 @@
+import compress from '@fastify/compress'
 import cors from '@fastify/cors'
 import rateLimit from '@fastify/rate-limit'
 import { fastifyTRPCPlugin, type FastifyTRPCPluginOptions } from '@trpc/server/adapters/fastify'
@@ -29,6 +30,10 @@ async function startServer() {
     await server.register(rateLimit, {
       max: 150,
       timeWindow: '1 minute'
+    })
+
+    await server.register(compress, {
+      global: true
     })
 
     // Health check route

@@ -5,11 +5,11 @@ const validLevels = ['fatal', 'error', 'warn', 'info', 'debug', 'trace'] as cons
 const envLevel = process.env.LOG_LEVEL
 const level = envLevel && validLevels.includes(envLevel as (typeof validLevels)[number])
   ? envLevel
-  : process.env.NODE_ENV === 'production' ? 'info' : 'debug'
+  : process.env.NODE_ENV === 'prod' ? 'info' : 'debug'
 
 export const logger = pino({
   level,
-  ...(process.env.NODE_ENV !== 'production'
+  ...(process.env.NODE_ENV !== 'prod'
     ? { transport: { target: 'pino-pretty', options: { colorize: true, translateTime: 'SYS:HH:mm:ss.l', ignore: 'pid,hostname' } } }
     : {})
 })
