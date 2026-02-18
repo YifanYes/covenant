@@ -8,10 +8,13 @@ import Button from '@/ui/button.component'
 import Input from '@/ui/input.component'
 import Label from '@/ui/label.component'
 import { ConfirmDeleteAccountDialog } from './_components/confirm-delete-account-dialog.component'
+import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 
 export default function Settings() {
   const { t, i18n } = useTranslation()
+  const router = useRouter()
   const { email, signOut } = useAuthStore()
   const { language, defaultTasksView, setDefaultTasksView, setLanguage } = useUserPreferencesStore()
 
@@ -62,7 +65,7 @@ export default function Settings() {
         </div>
         <div className="pt-4">
           <Button
-            onClick={() => signOut()}
+            onClick={() => signOut().then(() => router.push('/login')).catch(() => toast.error(t('settings.logout_error')))}
             className="w-fit text-muted-foreground border-muted-foreground hover:text-background hover:bg-muted-foreground cursor-pointer border bg-transparent"
           >
             {t('settings.logout_button')}

@@ -1538,6 +1538,7 @@
     "language_label": "Language",
     "language_placeholder": "Select language",
     "logout_button": "Logout",
+    "logout_error": "Failed to log out. Please try again.",
     "theme_dark": "Dark",
     "mode_label": "Mode",
     "theme_light": "Light",
@@ -1781,5 +1782,28 @@
       "tile": "Tile"
     },
     "tiles": "tiles"
+  },
+  "card": {
+    "denis": {
+      "name": "Denis Gudina",
+      "quote": "Deuteronomy 20, 1-4"
+    },
+    "links": {
+      "app": "ARQ - Gamified Productivity",
+      "email": "Email",
+      "x": "X",
+      "github": "GitHub",
+      "linkedin": "LinkedIn"
+    },
+    "actions": {
+      "show_qr": "Show QR Code",
+      "share": "Share Card",
+      "copied": "Link copied to clipboard"
+    },
+    "project": "ARQ",
+    "yifan": {
+      "name": "Yifan Ye",
+      "quote": "Ephesians 6, 10-17"
+    }
   }
 }

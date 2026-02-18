@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   // Public routes
   const authRoutes = ['/login', '/sign-up', '/auth/callback']
   const landingRoutes = ['/', '/news', '/mechanics', '/magic-nature', '/roadmap']
-  const landingPrefixRoutes = ['/story']
+  const landingPrefixRoutes = ['/story', '/card']
   const isPublicRoute =
     authRoutes.some((r) => pathname.startsWith(r)) ||
     landingRoutes.includes(pathname) ||
