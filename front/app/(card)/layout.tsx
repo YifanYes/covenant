@@ -6,5 +6,10 @@ export const metadata: Metadata = {
 }
 
 export default function CardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <div className="min-h-screen bg-[#363329] text-[#d4b346]">{children}</div>
+  return (
+    <>
+      <style>{`html, body { background-color: #363329 !important; }`}</style>
+      <div className="min-h-screen bg-[#363329] text-[#d4b346]">{children}</div>
+    </>
+  )
 }
