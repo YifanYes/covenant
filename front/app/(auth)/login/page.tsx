@@ -105,15 +105,14 @@ export default function Login() {
     [searchParams]
   )
 
-  const [randomQuoteIndex] = useState(() => Math.random())
+  const [verifyingMessage, setVerifyingMessage] = useState(() => t('login.verifying_title'))
 
-  const verifyingMessage = useMemo(() => {
+  useEffect(() => {
     const messages = t('login.verifying_messages', { returnObjects: true }) as string[]
     if (Array.isArray(messages) && messages.length > 0) {
-      return messages[Math.floor(randomQuoteIndex * messages.length)]
+      setVerifyingMessage(messages[Math.floor(Math.random() * messages.length)])
     }
-    return t('login.verifying_title')
-  }, [t, randomQuoteIndex])
+  }, [t])
 
   // Show loading while checking session or redirecting
   if (isSessionPending || isRedirecting) {
