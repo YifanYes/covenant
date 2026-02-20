@@ -157,12 +157,13 @@ describe('CombatService', () => {
         mockCombatEnemyRepo as any
       )
 
-      // Execute stellar_collapse targeting the enemy position
+      // Execute stellar_collapse targeting the enemy
       const result = await combatServiceWithEnemyRepo.executeTacticalDoctrine(
         'test-participation',
         'player-1',
         'stellar_collapse',
-        { x: 2, y: 1 }, // Enemy position
+        'single',
+        ['enemy-1'],
         100 // Enough mana
       )
 
@@ -506,7 +507,6 @@ describe('CombatService', () => {
         'enemy-1',
         [5, 5, 5], // All 5s
         [1, 1, 1], // Enemy fails all defense
-        1, // attack range
         4, // attack threshold
         4, // defense threshold
         6  // base critical threshold (will be reduced to 5)
@@ -553,7 +553,6 @@ describe('CombatService', () => {
         'enemy-1',
         [6, 6], // 2 hits
         [1, 1], // Enemy fails defense dice
-        1,
         4,
         4,
         6
@@ -599,7 +598,6 @@ describe('CombatService', () => {
         'enemy-1',
         [2, 3], // At threshold 4: 0 hits. At threshold 2: 2 hits
         [1, 1], // Enemy fails defense
-        1,
         4, // Base threshold
         4,
         6
@@ -635,7 +633,6 @@ describe('CombatService', () => {
         'enemy-1',
         [6],
         [1],
-        1,
         4,
         4,
         6
@@ -727,7 +724,8 @@ describe('CombatService', () => {
         'test-participation',
         'player-1',
         'stellar_collapse',
-        { x: 2, y: 1 },
+        'single',
+        ['enemy-1'],
         0 // Zero mana
       )).rejects.toThrow('Not enough mana')
     })
@@ -759,7 +757,8 @@ describe('CombatService', () => {
         'test-participation',
         'player-1',
         'stellar_collapse',
-        { x: 2, y: 1 },
+        'single',
+        ['enemy-1'],
         exactMana
       )
 
@@ -802,7 +801,8 @@ describe('CombatService', () => {
         'test-participation',
         'player-1',
         'stellar_collapse',
-        { x: 2, y: 1 }, // Target living enemy
+        'single',
+        ['enemy-1'],
         100
       )
 
@@ -843,7 +843,8 @@ describe('CombatService', () => {
         'test-participation',
         'player-1',
         'stellar_collapse',
-        { x: 2, y: 1 },
+        'single',
+        ['enemy-1'],
         100
       )
 
@@ -885,7 +886,8 @@ describe('CombatService', () => {
         'test-participation',
         'player-1',
         'stellar_collapse',
-        { x: 2, y: 1 },
+        'single',
+        ['enemy-1'],
         100
       )
 

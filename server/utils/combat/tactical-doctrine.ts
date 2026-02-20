@@ -5,14 +5,13 @@ import { DoctrineEffectType, DoctrineTarget, NEGATIVE_STATUSES, StatusEffect, ty
 import type { CombatLogEntry } from '@shared/types/gamification.types'
 import { CombatLogType } from '@shared/types/gamification.types'
 import type {
-  GridPosition,
   TacticalStateData,
   TacticalDoctrineResult
 } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 
 import { rollDice, calculateHitsWithCount, getCurrentClassOrThrow } from './dice'
-import { calculateAoETargets, validateTacticalDoctrine, getActiveDoctrineBuffs } from './doctrine-buffs'
+import { getActiveDoctrineBuffs } from './doctrine-buffs'
 import { processEnemyDefeat, type CombatRewardDeps, type CombatStateRepos } from './rewards'
 
 /**
@@ -23,7 +22,8 @@ export async function executeTacticalDoctrine(
   participationId: string,
   casterId: string,
   doctrineId: string,
-  targetPosition: GridPosition,
+  targeting: 'single' | 'all',
+  targetIds: string[],
   casterMana: number,
   repos: CombatRewardDeps
 ): Promise<TacticalDoctrineResult> {
@@ -41,26 +41,34 @@ export async function executeTacticalDoctrine(
   const state = participation.tacticalState
 
   // Validate the doctrine action
-  const validation = validateTacticalDoctrine(state, casterId, doctrineId, targetPosition, casterMana)
-
-  if (!validation.valid) {
-    throw new TRPCError({ code: 'BAD_REQUEST', message: validation.reason || 'Invalid doctrine use' })
+  const caster = state.units.find((u) => u.id === casterId)
+  if (!caster) {
+    throw new TRPCError({ code: 'NOT_FOUND', message: 'Caster not found in combat' })
   }
 
-  // Get doctrine definition
-  const doctrine = DOCTRINES[doctrineId]!
+  if (state.turnOrder[state.currentTurnIndex] !== casterId) {
+    throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not this unit\'s turn' })
+  }
 
-  // Find caster
+  if (caster.hasActed) {
+    throw new TRPCError({ code: 'BAD_REQUEST', message: 'Unit has already acted this turn' })
+  }
+
+  const doctrine = DOCTRINES[doctrineId]
+  if (!doctrine) {
+    throw new TRPCError({ code: 'NOT_FOUND', message: 'Doctrine not found' })
+  }
+
+  if (casterMana < doctrine.manaCost) {
+    throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not enough mana' })
+  }
+
+  // Find caster index
   const casterIndex = state.units.findIndex((u) => u.id === casterId)
-  const caster = state.units[casterIndex]
 
-  // Calculate AoE targets
-  const { tiles: affectedTiles, unitIds: affectedUnitIds } = calculateAoETargets(
-    targetPosition,
-    caster.position,
-    doctrineId,
-    state
-  )
+  // Use targetIds directly as affected units
+  const affectedUnitIds = targetIds
+  const affectedTiles: { x: number; y: number }[] = []
 
   const timestamp = Date.now()
   const logEntries: CombatLogEntry[] = []
@@ -91,6 +99,11 @@ export async function executeTacticalDoctrine(
 
           const target = updatedUnits[targetIndex]
           let damage = effect.value || 0
+
+          // Apply AoE damage reduction for 'all' targeting
+          if (targeting === 'all') {
+            damage = Math.floor(damage * 0.6)
+          }
 
           // SUMMARY_EXECUTION: Check healthThreshold - only execute if target is below threshold
           if (effect.healthThreshold !== undefined && effect.healthThreshold > 0) {
@@ -287,7 +300,12 @@ export async function executeTacticalDoctrine(
 
             // Count extra hits from criticals (6s)
             const criticalCount = rollResults.filter(r => r.isCritical).length
-            const totalHits = hits + criticalCount // Criticals generate extra hits
+            let totalHits = hits + criticalCount // Criticals generate extra hits
+
+            // Apply AoE damage reduction for 'all' targeting
+            if (targeting === 'all') {
+              totalHits = Math.floor(totalHits * 0.6)
+            }
 
             logEntries.push({
               timestamp: timestamp + 0.05,
@@ -468,20 +486,6 @@ export async function executeTacticalDoctrine(
     }
   }
 
-  // Update tiles to remove dead units
-  const updatedTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })))
-  for (const effect of effects) {
-    if (effect.killed) {
-      const killedUnit = updatedUnits.find((u) => u.id === effect.unitId)
-      if (killedUnit) {
-        const { x, y } = killedUnit.position
-        if (updatedTiles[y]?.[x]) {
-          updatedTiles[y][x].occupantId = null
-        }
-      }
-    }
-  }
-
   // Filter out dead enemies, but keep dead players (for death dialog)
   updatedUnits = updatedUnits.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0)
 
@@ -498,7 +502,6 @@ export async function executeTacticalDoctrine(
   // Create updated state
   const updatedState: TacticalStateData = {
     ...state,
-    tiles: updatedTiles,
     units: updatedUnits,
     turnOrder: updatedTurnOrder,
     currentTurnIndex: updatedCurrentTurnIndex
@@ -565,8 +568,7 @@ export async function executeTacticalDoctrine(
     success: true,
     casterId,
     doctrineId,
-    targetPosition,
-    affectedTiles,
+    targeting,
     affectedUnitIds,
     effects,
     manaCost: doctrine.manaCost,
@@ -609,7 +611,7 @@ export async function useSelfBuffDoctrine(
   // Validate this is a self-buff doctrine
   const isSelfBuff = (doctrine.effects.some(
     (e) => SELF_BUFF_EFFECT_TYPES.includes(e.type) && e.target === DoctrineTarget.SELF
-  ) && !doctrine.aoePattern) || SPECIAL_SELF_BUFF_DOCTRINES.includes(doctrineId)
+  ) && !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)) || SPECIAL_SELF_BUFF_DOCTRINES.includes(doctrineId)
 
   if (!isSelfBuff) {
     throw new TRPCError({ code: 'BAD_REQUEST', message: 'This doctrine requires targeting' })

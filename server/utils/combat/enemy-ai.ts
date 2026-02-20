@@ -5,7 +5,6 @@ import type {
 } from '@shared/types/gamification.types'
 import { CombatLogType } from '@shared/types/gamification.types'
 import type {
-  GridPosition,
   TacticalStateData,
   EnemyTurnResult
 } from '@shared/types/tactical-combat.types'
@@ -13,27 +12,18 @@ import { TRPCError } from '@trpc/server'
 
 import { rollDice, calculateHitsWithCount, getCurrentClassOrThrow } from './dice'
 import { getActiveDoctrineBuffs, clearConsumedDefenseDoctrines } from './doctrine-buffs'
-import {
-  getManhattanDistance,
-  findClosestPlayer,
-  calculateMovementRange,
-  findBestMoveTowardTarget
-} from './movement'
 import type { CombatStateRepos } from './rewards'
 
 /**
  * Execute an enemy AI turn.
  * Decision tree:
- * 1. If player in attack range -> attack
- * 2. Otherwise, move toward player
- * 3. After moving, if player in attack range -> attack
- * 4. End turn
+ * 1. Process status effects (BURNING, POISONED, PURIFIED)
+ * 2. If player exists and enemy hasn't acted -> attack
+ * 3. End turn
  */
 export async function executeEnemyTurn(
   participationId: string,
   enemyId: string,
-  enemyMovementRange: number,
-  enemyAttackRange: number,
   enemyAttackDice: number,
   enemyAttackThreshold: number,
   repos: CombatStateRepos
@@ -159,24 +149,36 @@ export async function executeEnemyTurn(
 
   // If enemy died from status effect, skip their turn
   if (diedFromStatusEffect) {
-    // Remove dead enemy from tiles and turn order
-    const deadEnemy = state.units[enemyIndex]
-    const updatedTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })))
-    if (updatedTiles[deadEnemy.position.y]?.[deadEnemy.position.x]) {
-      updatedTiles[deadEnemy.position.y][deadEnemy.position.x].occupantId = null
-    }
-
+    // Remove dead enemy from units and turn order
     const updatedUnits = state.units.filter((u) => u.currentHealth > 0)
     const updatedTurnOrder = state.turnOrder.filter((id) => {
       const unit = updatedUnits.find((u) => u.id === id)
       return unit && unit.currentHealth > 0
     })
 
+    // Advance turn to the next unit (same logic as normal turn end)
+    let nextTurnIndex = updatedTurnOrder.length > 0
+      ? (state.currentTurnIndex + 1) % updatedTurnOrder.length
+      : 0
+    // Safety: ensure index is within bounds after filtering
+    if (nextTurnIndex >= updatedTurnOrder.length) {
+      nextTurnIndex = 0
+    }
+
+    // Reset next unit's turn flags
+    const nextUnitId = updatedTurnOrder[nextTurnIndex]
+    const unitsWithReset = updatedUnits.map((unit) => {
+      if (unit.id === nextUnitId) {
+        return { ...unit, hasMoved: false, hasActed: false }
+      }
+      return unit
+    })
+
     state = {
       ...state,
-      tiles: updatedTiles,
-      units: updatedUnits,
-      turnOrder: updatedTurnOrder
+      units: unitsWithReset,
+      turnOrder: updatedTurnOrder,
+      currentTurnIndex: nextTurnIndex
     }
 
     // Save state to database
@@ -206,8 +208,8 @@ export async function executeEnemyTurn(
   // Update enemy reference after state change
   const enemy = state.units.find((u) => u.id === enemyId)!
 
-  // Find closest player
-  const targetPlayer = findClosestPlayer(enemy.position, state.units)
+  // Find the player unit
+  const targetPlayer = state.units.find((u) => u.id.startsWith('player-'))
   if (!targetPlayer) {
     // No players left - combat should end
     return {
@@ -220,76 +222,19 @@ export async function executeEnemyTurn(
     }
   }
 
-  let moved = false
+  const moved = false
   let attacked = false
-  let path: GridPosition[] | undefined
-  let newPosition: GridPosition | undefined
   let targetId: string | undefined
   let damageDealt: number | undefined
   let targetKilled: boolean | undefined
   let attackerRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] | undefined
   let defenderRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] | undefined
 
-  // Check if player is already in attack range
-  const initialDistance = getManhattanDistance(enemy.position, targetPlayer.position)
-  const inAttackRange = initialDistance <= enemyAttackRange
-
-  // If not in attack range and can move, move toward player
-  if (!inAttackRange && !enemy.hasMoved) {
-    const movementTiles = calculateMovementRange(
-      enemy.position,
-      enemyMovementRange,
-      state.tiles,
-      state.units,
-      false // enemy is not a player
-    )
-
-    const moveResult = findBestMoveTowardTarget(
-      enemy,
-      targetPlayer,
-      movementTiles,
-      state.tiles,
-      state.units,
-      enemyAttackRange
-    )
-
-    if (moveResult) {
-      // Execute the move
-      const oldPosition = enemy.position
-      path = moveResult.path
-      newPosition = moveResult.position
-      moved = true
-
-      // Update tiles
-      const updatedTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })))
-      if (updatedTiles[oldPosition.y]?.[oldPosition.x]) {
-        updatedTiles[oldPosition.y][oldPosition.x].occupantId = null
-      }
-      if (updatedTiles[newPosition.y]?.[newPosition.x]) {
-        updatedTiles[newPosition.y][newPosition.x].occupantId = enemyId
-      }
-
-      // Update unit state
-      const updatedUnits = state.units.map((unit, i) => {
-        if (i === enemyIndex) {
-          return { ...unit, position: newPosition!, hasMoved: true }
-        }
-        return unit
-      })
-
-      state = { ...state, tiles: updatedTiles, units: updatedUnits }
-    }
-  }
-
-  // Check attack range again after potential move
+  // Enemy always attacks the player directly (no movement or distance checks)
   const currentEnemy = state.units.find((u) => u.id === enemyId)!
   const currentTarget = state.units.find((u) => u.id === targetPlayer.id)
-  const distanceAfterMove = currentTarget
-    ? getManhattanDistance(currentEnemy.position, currentTarget.position)
-    : Infinity
 
-  // Attack if in range and haven't acted
-  if (distanceAfterMove <= enemyAttackRange && !currentEnemy.hasActed && currentTarget) {
+  if (!currentEnemy.hasActed && currentTarget) {
     attacked = true
     targetId = targetPlayer.id
 
@@ -391,13 +336,8 @@ export async function executeEnemyTurn(
       return unit
     })
 
-    // Update tiles and turn order if target killed
-    const updatedTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })))
+    // Update units if target killed
     if (targetKilled) {
-      const targetPos = currentTarget.position
-      if (updatedTiles[targetPos.y]?.[targetPos.x]) {
-        updatedTiles[targetPos.y][targetPos.x].occupantId = null
-      }
       // Keep dead players (for death dialog), but remove dead enemies
       updatedUnits = updatedUnits.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0)
 
@@ -410,10 +350,6 @@ export async function executeEnemyTurn(
 
     // Handle enemy killed by thorns
     if (enemyKilledByThorns) {
-      const enemyPos = currentEnemy.position
-      if (updatedTiles[enemyPos.y]?.[enemyPos.x]) {
-        updatedTiles[enemyPos.y][enemyPos.x].occupantId = null
-      }
       // Remove the killed enemy (health already set to 0 above via newEnemyHealthAfterThorns)
       updatedUnits = updatedUnits.filter((u) => u.id !== enemyId)
       logEntries.push({
@@ -436,7 +372,6 @@ export async function executeEnemyTurn(
 
     state = {
       ...state,
-      tiles: updatedTiles,
       units: updatedUnits,
       turnOrder: updatedTurnOrder,
       currentTurnIndex: updatedCurrentTurnIndex
@@ -521,22 +456,13 @@ export async function executeEnemyTurn(
   }
 
   // Determine action type
-  let action: 'move' | 'attack' | 'move_and_attack' | 'wait' = 'wait'
-  if (moved && attacked) {
-    action = 'move_and_attack'
-  } else if (moved) {
-    action = 'move'
-  } else if (attacked) {
-    action = 'attack'
-  }
+  const action: 'attack' | 'wait' = attacked ? 'attack' : 'wait'
 
   return {
     success: true,
     enemyId,
     action,
     moved,
-    path,
-    newPosition,
     attacked,
     targetId,
     damageDealt,

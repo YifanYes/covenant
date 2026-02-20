@@ -55,7 +55,7 @@ This document proposes migrating to a **Pokemon-style turn-based combat system**
 
 | File                                                            | Current Lines | Purpose           | Change                                                 |
 | --------------------------------------------------------------- | ------------- | ----------------- | ------------------------------------------------------ |
-| `front/stores/tactical-combat.store.ts`                         | 1,668         | Combat state      | Remove grid/tile/movement/animation state → ~400 lines |
+| `front/stores/tactical-combat.store.ts`                         | 1,668         | Combat state      | DELETE entirely — replaced by `useCombat` hook + TanStack Query |
 | `front/components/tactical/tactical-combat-arena.component.tsx` | ~800          | Main orchestrator | Rebuild as React-only combat view                      |
 | `front/components/tactical/action-menu.component.tsx`           | ~150          | Action buttons    | Simplify (no move action)                              |
 | `front/components/tactical/turn-order-display.component.tsx`    | ~100          | Turn queue        | Keep, minor adapts                                     |
@@ -126,7 +126,7 @@ This document proposes migrating to a **Pokemon-style turn-based combat system**
 │  └───────────────────────────────────────────┘   │
 │                                                  │
 │  ┌───────────────────────────────────────────┐   │
-│  │  ⚔ Atacar  │ 📖 Doctrina │ 🧪 Item │ 🏃 Huir │
+│  │  ⚔ Atacar  │ 📖 Doctrina │ 🧪 Item            │
 │  └───────────────────────────────────────────┘   │
 │                                                  │
 │  ┌───────────────────────────────────────────┐   │
@@ -139,22 +139,23 @@ This document proposes migrating to a **Pokemon-style turn-based combat system**
 
 ```
 PLAYER TURN:
-  1. Show action menu: Attack / Doctrine / Item / Flee
-  2. Player selects action
-     - Attack → select target enemy → dice roller → resolve
-     - Doctrine → select doctrine → select target(s) → resolve
-     - Item → select item → apply effect
-     - Flee → roll escape check
-  3. Animate result (CSS transitions + Framer Motion)
-  4. Check for enemy death → spawn next enemy or victory
-  5. Next turn
+  1. Reset potionUsedThisTurn = false
+  2. Show action menu: Attack / Doctrine / Potion
+  3. Player selects action
+     - Attack → select target enemy → dice roller → resolve → end turn
+     - Doctrine → select doctrine → select target(s) → resolve → end turn
+     - Potion → select potion type → apply effect → end turn
+  4. Animate result (CSS transitions + Framer Motion)
+  5. Check for enemy death → spawn next enemy or victory
+  6. Next turn (enemies)
 
 ENEMY TURN:
-  1. AI selects action (attack or use ability)
-  2. Animate enemy action
-  3. Apply damage/effects to player
-  4. Check for player death → game over
-  5. Next turn
+  1. Each living enemy acts sequentially (iterate enemyUnits)
+  2. AI selects action (attack or use ability)
+  3. Animate enemy action
+  4. Apply damage/effects to player
+  5. Check for player death → game over
+  6. After all enemies have acted → next turn (player)
 ```
 
 ### Animations (Framer Motion + CSS)
@@ -177,7 +178,7 @@ ENEMY TURN:
 Replace `shared/types/tactical-combat.types.ts` with simplified types:
 
 ```typescript
-// No grid positions, no tiles, no terrain
+// No grid positions, no tiles, no terrain, no melee/ranged distinction
 
 export interface CombatUnit {
   id: string
@@ -191,18 +192,15 @@ export interface CombatUnit {
   currentMana: number
   maxMana: number
 
-  attackRange: number // kept for melee vs ranged distinction
-  speed: number // turn order
+  speed: number // determines turn order
 
-  hasActed: boolean
   activeEffects: ActiveStatusEffect[]
 }
 
+// Only 5 phases — sub-selection state (which target, which doctrine, which potion)
+// is local UI state in the action bar component, NOT global store state.
 export const CombatPhase = {
-  SELECT_ACTION: 'select_action',
-  SELECT_TARGET: 'select_target',
-  SELECT_DOCTRINE: 'select_doctrine',
-  SELECT_ITEM: 'select_item',
+  PLAYER_INPUT: 'player_input',
   ANIMATING: 'animating',
   ENEMY_TURN: 'enemy_turn',
   VICTORY: 'victory',
@@ -211,35 +209,31 @@ export const CombatPhase = {
 
 export type CombatPhase = (typeof CombatPhase)[keyof typeof CombatPhase]
 
-export type CombatAction = 'attack' | 'doctrine' | 'item' | 'flee'
+export type CombatAction = 'attack' | 'doctrine' | 'item'
 
+// Single interface for runtime and persistence.
+// Transient fields (phase, combatLog) are initialized with defaults on hydration.
 export interface CombatState {
-  playerUnit: CombatUnit
-  enemyUnits: CombatUnit[]
-  turnOrder: string[]
-  currentTurnIndex: number
-  turnNumber: number
-  phase: CombatPhase
-  selectedAction: CombatAction | null
-  selectedTargetId: string | null
-  selectedDoctrineId: string | null
-  combatLog: CombatLogEntry[]
-}
-
-// Persistence (stored in ActivityParticipation.tacticalState)
-export interface CombatStateData {
   stateVersion: number
   playerUnit: CombatUnit
   enemyUnits: CombatUnit[]
-  turnOrder: string[]
-  currentTurnIndex: number
+  isPlayerTurn: boolean // simple alternation, no turnOrder array needed
   turnNumber: number
+  phase: CombatPhase
+  potionUsedThisTurn: boolean // max 1 potion per turn
+  combatLog: CombatLogEntry[]
 }
 ```
 
 ---
 
 ## Backend Changes
+
+### Defense Dice
+
+All attacks always roll defense dice. No melee/ranged distinction — without a spatial grid, the concept is artificial. If an enemy should be easier/harder to hit, adjust their defense dice count directly in their stats.
+
+In `attack-resolution.ts`, remove all range-based and attackType-based checks. Defense dice are always rolled.
 
 ### Simplified Enemy AI
 
@@ -263,8 +257,12 @@ Remove these endpoints:
 Simplify these endpoints:
 
 - `executeTacticalAttack` → remove range/position validation, keep dice resolution
-- `executeTacticalDoctrine` → remove AoE grid calculation, use target selection
-- `executeTacticalEnemyTurn` → remove movement phase
+- `executeTacticalDoctrine` → remove AoE grid calculation, use `single`/`all` targeting
+- `executeTacticalEnemyTurn` → remove movement phase, iterate all enemies sequentially
+
+Add endpoint:
+
+- `usePotion` → validate potion in inventory + `potionUsedThisTurn === false`, apply HP/MP restore, set flag
 
 Keep as-is:
 
@@ -273,16 +271,25 @@ Keep as-is:
 
 ### Doctrine Targeting Change
 
-Current AoE patterns (CROSS, DIAMOND, LINE_3) become:
+Collapse all AoE patterns into two simple targeting modes:
 
-| Old Pattern | New Behavior                                    |
-| ----------- | ----------------------------------------------- |
-| SINGLE      | Target 1 enemy                                  |
-| CROSS       | Target all enemies (reduced damage)             |
-| DIAMOND     | Target all enemies (reduced damage)             |
-| LINE_3      | Target 1 enemy + adjacent (if multiple enemies) |
+| Targeting | Behavior                                           |
+| --------- | -------------------------------------------------- |
+| `single`  | Target 1 enemy                                     |
+| `all`     | Target all enemies (reduced damage, e.g. 0.6x)     |
 
-This preserves the "some doctrines hit multiple targets" mechanic without a grid.
+All old patterns (SINGLE, CROSS, DIAMOND, LINE_3) map to one of these two. Update doctrine definitions in `shared/constants/doctrines.ts` directly.
+
+### Potion System
+
+Players can consume **1 potion per turn** as their action. Two potion types:
+
+| Potion       | Effect                    |
+| ------------ | ------------------------- |
+| Health Potion | Restores a fixed amount of HP |
+| Mana Potion   | Restores a fixed amount of MP |
+
+Using a potion consumes the player's action for that turn (no attack or doctrine). The `potionUsedThisTurn` flag resets at the start of each player turn. Backend validates that the player has the potion in inventory and hasn't already used one this turn.
 
 ---
 
@@ -295,21 +302,24 @@ This preserves the "some doctrines hit multiple targets" mechanic without a grid
 1. Create `front/components/combat/combat-arena.component.tsx` - main container
 2. Create `front/components/combat/enemy-display.component.tsx` - enemy side with sprites, HP bars, status effects
 3. Create `front/components/combat/player-display.component.tsx` - player side with stats
-4. Create `front/components/combat/combat-action-bar.component.tsx` - Attack/Doctrine/Item/Flee buttons
+4. Create `front/components/combat/combat-action-bar.component.tsx` - Attack/Doctrine/Item buttons
 5. Reuse existing `health-bar.component.tsx`, `combat-log.component.tsx`
 6. Add i18n keys for new UI strings
 
 ### Phase 2: New State Management
 
-**Goal:** Replace the 1,668-line Zustand store with a simplified version.
+**Goal:** Eliminate the 1,668-line Zustand store entirely. Combat state is server-authoritative — use TanStack Query as the single source of truth, with local `useState` for transient UI state.
 
-1. Create `front/stores/combat.store.ts` (~400 lines) with:
-   - `CombatState` (no grid, no tiles, no highlighting)
-   - `initializeCombat()` / `hydrateFromState()`
-   - `selectAction()` / `selectTarget()` / `selectDoctrine()`
-   - `nextTurn()` / `resolveAction()`
-   - Animation state (minimal: `isAnimating`, `animationType`, `animationTargetId`)
-2. Write new shared types in `shared/types/combat.types.ts`
+**No Zustand store.** The combat state lives on the server and is fetched/mutated via tRPC. There is no need for a client-side Zustand store that duplicates and synchronizes server state — this was the root cause of the complexity in the current system (React ↔ Phaser ↔ Zustand three-way sync).
+
+1. Create `front/hooks/use-combat.hook.ts` — custom hook that encapsulates all combat logic:
+   - Server state via `useSuspenseQuery(trpcOptions.activity.getTacticalState.queryOptions(...))`
+   - Mutations via `useMutation(trpcOptions.activity.executeTacticalAttack.mutationOptions(...))`
+   - Animation state as local `useState` (`animationType`, `animationTargetId`, `isAnimating`)
+   - On mutation success: trigger animation → after animation completes, invalidate query to refresh state
+   - Exposes: `{ combat, animation, attack, castDoctrine, usePotion, isAnimating }`
+2. Sub-selection state (selected action, target picker, doctrine picker) stays as local `useState` in `combat-action-bar.component.tsx`
+3. Write new shared types in `shared/types/combat.types.ts`
 
 ### Phase 3: Connect Backend
 
@@ -323,6 +333,7 @@ This preserves the "some doctrines hit multiple targets" mechanic without a grid
 6. Create new hooks:
    - `front/hooks/use-combat-attack.hook.ts`
    - `front/hooks/use-combat-doctrine.hook.ts`
+   - `front/hooks/use-combat-potion.hook.ts`
    - `front/hooks/use-combat-enemy-turn.hook.ts`
 7. Update tests in `server/__tests__/`
 
@@ -378,7 +389,7 @@ This preserves the "some doctrines hit multiple targets" mechanic without a grid
 | Backend combat lines         | ~1,500                         | ~1,200                            |
 | External dependencies        | phaser (~1MB)                  | framer-motion (already in use)    |
 | Files in `front/lib/phaser/` | 7                              | 0                                 |
-| Zustand store lines          | 1,668                          | ~400                              |
+| Zustand store lines          | 1,668                          | 0 (replaced by `useCombat` hook)  |
 | Time to add new ability      | Touch 3+ layers                | Touch React + backend             |
 | Mobile UX                    | Poor (tiny tiles, camera drag) | Good (large buttons, simple taps) |
 
@@ -391,15 +402,23 @@ This preserves the "some doctrines hit multiple targets" mechanic without a grid
 | Loss of visual spectacle             | Invest in Framer Motion animations; the grid was cool but underutilized                                                                            |
 | Active combats in DB break           | Bump `stateVersion`, auto-reset or migrate old states                                                                                              |
 | Doctrine AoE loses depth             | Multi-target selection preserves the "some hit all enemies" mechanic                                                                               |
-| Speed/range stats become meaningless | Speed still determines turn order; range distinguishes melee vs ranged (melee could get counter-attack immunity, ranged could have bonus accuracy) |
-| Movement range stat unused           | Repurpose as dodge chance or remove from weapons                                                                                                   |
+| Speed stat balance                   | Speed determines turn order; defense dice count per enemy provides stat variety                                                                     |
+| Movement range stat unused           | Remove from weapons (no longer relevant)                                                                                                           |
 
 ---
 
+## Decisions
+
+1. **1 player vs N enemies.** Combat is always 1 player unit against multiple enemies. No flee option — the player must fight to victory or defeat.
+2. **No melee/ranged distinction.** All attacks roll defense dice. Enemy difficulty is controlled via their defense dice count in stats, not via an attackType flag.
+3. **Simple turn alternation.** Player turn → all enemies act → player turn. No turn order array — just `isPlayerTurn` boolean + sequential enemy iteration.
+4. **5 combat phases.** `PLAYER_INPUT → ANIMATING → ENEMY_TURN → VICTORY → DEFEAT`. Sub-selection state (target, doctrine, potion) is local UI state via `useState`.
+5. **1 potion per turn.** Player can use a health or mana potion as their action. Using a potion ends the turn (no attack or doctrine that turn).
+6. **Two doctrine targeting modes.** `single` (1 enemy) and `all` (all enemies, 0.6x damage). No intermediate patterns.
+7. **Single state interface.** No separate `CombatState` / `CombatStateData` — one interface, transient fields get defaults on hydration.
+8. **No Zustand store.** Combat state is server-authoritative. TanStack Query (via tRPC) is the single source of truth. Animation and sub-selection state use local `useState`. This eliminates the React ↔ Store sync layer entirely.
+
 ## Open Questions
 
-1. **Multiple player units?** Current system supports multiple player units on the grid. Pokemon-style is typically 1v1 or 1vN. Do we keep 1 player unit vs N enemies?
-2. **Counter-attacks?** Current system has melee counter-attacks. Keep this? (Adds tactical depth without grid complexity)
-3. **Flee mechanic?** What determines flee success? Speed-based roll?
-4. **Item system?** Current system has consumables (potions). Keep the same interface or expand?
-5. **Enemy variety per encounter?** Single enemy type or mixed groups?
+1. **Counter-attacks?** Current system has melee counter-attacks. Keep this? (Adds tactical depth without grid complexity)
+2. **Enemy variety per encounter?** Single enemy type or mixed groups?

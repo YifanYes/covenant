@@ -76,7 +76,7 @@ describe('rewards utilities', () => {
       expect(player!.position).toEqual({ x: 3, y: 5 })
     })
 
-    it('should place enemy at default position (6,3)', () => {
+    it('should create enemy without position (no grid)', () => {
       const currentState = createTestTacticalState({
         gridWidth: 8,
         gridHeight: 7,
@@ -90,26 +90,8 @@ describe('rewards utilities', () => {
         { current: 6, max: 6 }
       )
       const enemy = result.units.find((u) => u.id === 'e3')
-      expect(enemy!.position).toEqual({ x: 6, y: 3 })
-    })
-
-    it('should set occupantIds on the tiles', () => {
-      const currentState = createTestTacticalState({
-        gridWidth: 8,
-        gridHeight: 7,
-        units: [createTestUnit({ id: 'player-1', position: { x: 2, y: 2 } })]
-      })
-      const result = createTacticalStateWithNewEnemy(
-        currentState,
-        currentState.units[0],
-        'e4',
-        'E|4',
-        { current: 8, max: 8 }
-      )
-      // Player tile
-      expect(result.tiles[2][2].occupantId).toBe('player-1')
-      // Enemy tile
-      expect(result.tiles[3][6].occupantId).toBe('e4')
+      expect(enemy).toBeDefined()
+      expect(enemy!.position).toBeUndefined()
     })
 
     it('should preserve grid dimensions and map template', () => {
@@ -129,7 +111,7 @@ describe('rewards utilities', () => {
       expect(result.mapTemplateId).toBe('test-map')
     })
 
-    it('should produce fresh tiles (no stale occupants from prior state)', () => {
+    it('should not include old enemy in units after new enemy spawn', () => {
       const currentState = createTestTacticalState({
         gridWidth: 8,
         gridHeight: 7,
@@ -145,12 +127,10 @@ describe('rewards utilities', () => {
         'New|Enemy',
         { current: 10, max: 10 }
       )
-      // Old enemy should not be an occupant anywhere
-      for (const row of result.tiles) {
-        for (const tile of row) {
-          expect(tile.occupantId).not.toBe('old-enemy')
-        }
-      }
+      // Old enemy should not be in units
+      expect(result.units.find((u) => u.id === 'old-enemy')).toBeUndefined()
+      // New enemy should be present
+      expect(result.units.find((u) => u.id === 'new-enemy')).toBeDefined()
     })
   })
 })

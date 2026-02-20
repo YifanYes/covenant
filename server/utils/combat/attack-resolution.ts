@@ -11,18 +11,16 @@ import type { MaterialDrop } from '@shared/constants/drop-tables'
 
 import { calculateHitsWithCount, getCurrentClassOrThrow } from './dice'
 import { getActiveDoctrineBuffs, clearConsumedDoctrines, clearConsumedDefenseDoctrines } from './doctrine-buffs'
-import { getManhattanDistance } from './movement'
 import { processEnemyDefeat, type CombatRewardDeps } from './rewards'
 
 /**
  * Validate a tactical attack action.
- * Checks attacker/target existence, turn order, acted status, and range.
+ * Checks attacker/target existence, turn order, and acted status.
  */
 export function validateTacticalAttack(
   state: TacticalStateData,
   attackerId: string,
-  targetId: string,
-  attackRange: number
+  targetId: string
 ): AttackValidationResult {
   // Find attacker
   const attackerState = state.units.find((u) => u.id === attackerId)
@@ -47,15 +45,7 @@ export function validateTacticalAttack(
     return { valid: false, reason: 'Unit has already acted this turn' }
   }
 
-  // Calculate Manhattan distance
-  const distance = getManhattanDistance(attackerState.position, targetState.position)
-
-  // Check range
-  if (distance > attackRange) {
-    return { valid: false, reason: 'Target out of range', distance }
-  }
-
-  return { valid: true, distance }
+  return { valid: true }
 }
 
 /**
@@ -68,7 +58,6 @@ export async function executeTacticalAttack(
   targetId: string,
   attackerRolls: number[],
   defenderRolls: number[],
-  attackRange: number,
   attackThreshold: number,
   defenseThreshold: number,
   attackCriticalThreshold: number = 6,
@@ -95,7 +84,7 @@ export async function executeTacticalAttack(
   const state = participation.tacticalState
 
   // Validate the attack
-  const validation = validateTacticalAttack(state, attackerId, targetId, attackRange)
+  const validation = validateTacticalAttack(state, attackerId, targetId)
 
   if (!validation.valid) {
     throw new TRPCError({ code: 'BAD_REQUEST', message: validation.reason || 'Invalid attack' })
@@ -304,14 +293,8 @@ export async function executeTacticalAttack(
     })
   }
 
-  // Counter-attack (if target survives and is in range)
-  let counterAttackRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] = []
-  let counterDefenseRolls: { value: number; isSuccess: boolean; isCritical: boolean }[] = []
   let damageToAttacker = 0
   let attackerKilled = false
-
-  // For now, skip counter-attacks to keep it simple
-  // Counter-attacks can be added in a future iteration
 
   // Calculate self-damage from rolling 1s (plasma_missile, audacity special behavior)
   let selfDamageFromOnes = 0
@@ -368,19 +351,7 @@ export async function executeTacticalAttack(
     return unit
   })
 
-  // Remove dead units from tiles
-  const updatedTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })))
-  if (targetKilled) {
-    const targetPos = targetUnit.position
-    if (updatedTiles[targetPos.y]?.[targetPos.x]) {
-      updatedTiles[targetPos.y][targetPos.x].occupantId = null
-    }
-  }
   if (attackerKilled) {
-    const attackerPos = attackerUnit.position
-    if (updatedTiles[attackerPos.y]?.[attackerPos.x]) {
-      updatedTiles[attackerPos.y][attackerPos.x].occupantId = null
-    }
     logEntries.push({
       timestamp: timestamp + 5.5,
       type: CombatLogType.PLAYER_DEFEATED,
@@ -404,7 +375,6 @@ export async function executeTacticalAttack(
   // Keep dead players (for death dialog), but remove dead enemies
   const updatedState: TacticalStateData = {
     ...state,
-    tiles: updatedTiles,
     units: updatedUnits.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0),
     turnOrder: updatedTurnOrder,
     currentTurnIndex: updatedCurrentTurnIndex
@@ -466,8 +436,6 @@ export async function executeTacticalAttack(
     updatedState,
     attackerRolls: attackerResults,
     defenderRolls: defenderResults,
-    counterAttackRolls,
-    counterDefenseRolls,
     logEntries,
     goldReward,
     materialDrops: materialDrops.length > 0 ? materialDrops : undefined,

@@ -150,7 +150,7 @@ export interface TacticalInitData {
 export interface TacticalUnitState {
   id: string
   name: string
-  position: GridPosition
+  position?: GridPosition
   hasMoved: boolean
   hasActed: boolean
   currentHealth: number
@@ -164,7 +164,7 @@ export interface TacticalUnitState {
 // Tactical state stored in database (JSON field)
 // Version for tactical state schema - increment when unit templates or state structure changes
 // This prevents hydrating stale state that may reference deleted/changed templates
-export const TACTICAL_STATE_VERSION = 1
+export const TACTICAL_STATE_VERSION = 2
 
 export interface TacticalStateData {
   stateVersion: number // Must match TACTICAL_STATE_VERSION for hydration to succeed
@@ -176,6 +176,7 @@ export interface TacticalStateData {
   turnOrder: string[] // Unit IDs in turn order
   currentTurnIndex: number
   turnNumber: number
+  potionUsedThisTurn?: boolean
 }
 
 // Movement validation result
@@ -212,8 +213,6 @@ export interface TacticalAttackResult {
   // Dice roll results for UI display
   attackerRolls: { value: number; isSuccess: boolean; isCritical: boolean }[]
   defenderRolls: { value: number; isSuccess: boolean; isCritical: boolean }[]
-  counterAttackRolls?: { value: number; isSuccess: boolean; isCritical: boolean }[]
-  counterDefenseRolls?: { value: number; isSuccess: boolean; isCritical: boolean }[]
   // Combat log entries generated from this attack
   logEntries: CombatLogEntry[]
   // Gold reward if enemy was defeated
@@ -238,12 +237,10 @@ export interface TacticalAttackResult {
 export interface EnemyTurnResult {
   success: boolean
   enemyId: string
-  action: 'move' | 'attack' | 'move_and_attack' | 'wait'
+  action: 'attack' | 'wait'
 
-  // Movement data (if moved)
+  // Movement (always false in Pokemon-style combat)
   moved: boolean
-  path?: GridPosition[]
-  newPosition?: GridPosition
 
   // Attack data (if attacked)
   attacked: boolean
@@ -282,8 +279,7 @@ export interface DoctrineEffectResult {
 export interface TacticalDoctrineResultBase {
   casterId: string
   doctrineId: string
-  targetPosition: GridPosition
-  affectedTiles: GridPosition[]
+  targeting: 'single' | 'all'
   affectedUnitIds: string[]
   effects: DoctrineEffectResult[]
   manaCost: number

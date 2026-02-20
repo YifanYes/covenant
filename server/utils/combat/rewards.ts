@@ -2,7 +2,6 @@ import { getActivityById, selectEnemyWithFallback } from '@shared/constants/acti
 import { applyStatScaling, calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
-import { generateMapTiles } from '@shared/constants/map-themes'
 import { getEnemyTypeFromTemplate, rollMaterialDrops, type MaterialDrop } from '@shared/constants/drop-tables'
 import type { WeaponDamageType } from '@shared/constants/items'
 import type { EncounterState } from '@shared/types/combat.types'
@@ -230,7 +229,7 @@ export async function processEnemyDefeat(
 
 /**
  * Create a new tactical state with a new enemy spawned.
- * Preserves player position and state.
+ * Preserves player state.
  */
 export function createTacticalStateWithNewEnemy(
   currentState: TacticalStateData,
@@ -239,33 +238,17 @@ export function createTacticalStateWithNewEnemy(
   newEnemyName: string,
   newEnemyHealth: { current: number; max: number }
 ): TacticalStateData {
-  // Create fresh grid using the map's theme
-  const gridWidth = currentState.gridWidth
-  const gridHeight = currentState.gridHeight
-  const tiles = generateMapTiles(currentState.mapTemplateId, gridWidth, gridHeight)
-
-  // Preserve player's current position
-  const playerPosition = playerUnit.position
-  // Enemy spawns on the right side
-  const enemyPosition = { x: 6, y: 3 }
-
-  // Set occupants
-  tiles[playerPosition.y][playerPosition.x].occupantId = playerUnit.id
-  tiles[enemyPosition.y][enemyPosition.x].occupantId = newEnemyId
-
-  // Create updated player unit with reset position
+  // Create updated player unit with reset turn flags
   const updatedPlayerUnit: TacticalUnitState = {
     ...playerUnit,
-    position: playerPosition,
     hasMoved: false,
     hasActed: false
   }
 
-  // Create new enemy unit
+  // Create new enemy unit (no position needed)
   const newEnemyUnit: TacticalUnitState = {
     id: newEnemyId,
     name: newEnemyName,
-    position: enemyPosition,
     hasMoved: false,
     hasActed: false,
     currentHealth: newEnemyHealth.current,
@@ -278,9 +261,9 @@ export function createTacticalStateWithNewEnemy(
   return {
     stateVersion: TACTICAL_STATE_VERSION,
     mapTemplateId: currentState.mapTemplateId,
-    gridWidth,
-    gridHeight,
-    tiles,
+    gridWidth: currentState.gridWidth,
+    gridHeight: currentState.gridHeight,
+    tiles: currentState.tiles,
     units,
     turnOrder,
     currentTurnIndex: 0,
