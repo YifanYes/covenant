@@ -286,7 +286,9 @@
       "not_enough_mana": "Maná insuficiente",
       "target_not_found": "Objetivo no encontrado",
       "unit_not_found": "Unidad no encontrada",
-      "unknown": "Ocurrió un error desconocido"
+      "unknown": "Ocurrió un error desconocido",
+      "enemy_turn_failed": "El turno enemigo falló",
+      "potion_failed": "Error al usar la poción"
     },
     "log": {
       "damage_to_enemy": "{{enemy}} recibe {{damage}} de daño",
@@ -312,7 +314,8 @@
     "result_dialog": {
       "continue": "Continuar",
       "failure_title": "Derrota",
-      "success_title": "¡Victoria!"
+      "success_title": "¡Victoria!",
+      "success_description": "¡Todos los enemigos han sido derrotados!"
     },
     "roll_attack": "Preparar Ataque",
     "roll_defense": "Preparar Defensa",
@@ -324,7 +327,23 @@
     "turn_summary": "Resumen del Turno",
     "use_dice_roller": "¡Usa el Lanzador de Dados para atacar!",
     "your_hits": "Tus Impactos",
-    "enemy_turn": "Turno enemigo..."
+    "enemy_turn": "Turno enemigo...",
+    "player_turn": "Tu turno",
+    "action": {
+      "attack": "Atacar",
+      "doctrine": "Doctrina",
+      "item": "Objeto",
+      "select_target": "Seleccionar objetivo"
+    },
+    "targeting": {
+      "single": "Selecciona un objetivo",
+      "all": "Atacando a todos los enemigos"
+    },
+    "potion_used": "Usada",
+    "potion_healed": "+{{amount}} PV restaurados",
+    "potion_mana": "+{{amount}} PM restaurados",
+    "doctrine_buff_applied": "¡Doctrina activa! +{{dice}} dados de bonificación",
+    "no_items": "Sin objetos disponibles"
   },
   "common": {
     "cancel": "Cancelar",

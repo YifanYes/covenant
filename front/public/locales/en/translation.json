@@ -286,7 +286,9 @@
       "not_enough_mana": "Not enough mana",
       "target_not_found": "Target not found",
       "unit_not_found": "Unit not found",
-      "unknown": "An unknown error occurred"
+      "unknown": "An unknown error occurred",
+      "enemy_turn_failed": "Enemy turn failed",
+      "potion_failed": "Failed to use potion"
     },
     "log": {
       "damage_to_enemy": "{{enemy}} takes {{damage}} damage",
@@ -312,7 +314,8 @@
     "result_dialog": {
       "continue": "Continue",
       "failure_title": "Defeat",
-      "success_title": "Victory!"
+      "success_title": "Victory!",
+      "success_description": "All enemies have been defeated!"
     },
     "roll_attack": "Prepare Attack",
     "roll_defense": "Prepare Defense",
@@ -324,7 +327,23 @@
     "turn_summary": "Turn Summary",
     "use_dice_roller": "Use the Dice Roller to attack!",
     "your_hits": "Your Hits",
-    "enemy_turn": "Enemy turn..."
+    "enemy_turn": "Enemy turn...",
+    "player_turn": "Your turn",
+    "action": {
+      "attack": "Attack",
+      "doctrine": "Doctrine",
+      "item": "Item",
+      "select_target": "Select target"
+    },
+    "targeting": {
+      "single": "Select a target",
+      "all": "Targeting all enemies"
+    },
+    "potion_used": "Used",
+    "potion_healed": "+{{amount}} HP restored",
+    "potion_mana": "+{{amount}} MP restored",
+    "doctrine_buff_applied": "Doctrine active! +{{dice}} bonus dice",
+    "no_items": "No items available"
   },
   "common": {
     "cancel": "Cancel",

@@ -3,9 +3,8 @@ import { applyStatScaling, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
 import type { EncounterState } from '@shared/types/combat.types'
-import { generateMapTiles } from '@shared/constants/map-themes'
 import type { CombatLogEntry } from '@shared/types/gamification.types'
-import { TACTICAL_STATE_VERSION, type TacticalStateData } from '@shared/types/tactical-combat.types'
+import { TACTICAL_STATE_VERSION, TerrainType, type TacticalStateData, type TileState } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import { ActivityDifficulty, getActivityById } from '../../shared/constants/activities'
 import type { ActivityRepository } from '../repositories/activity.repository'
@@ -34,25 +33,20 @@ export class ActivityService {
     enemyHealth: { current: number; max: number },
     mapId: string = 'default'
   ): TacticalStateData {
-    const gridWidth = 8
-    const gridHeight = 6
-    const tiles = generateMapTiles(mapId, gridWidth, gridHeight)
+    // Minimal grid (no longer used for gameplay, kept for state compatibility)
+    const gridWidth = 1
+    const gridHeight = 1
+    const tiles: TileState[][] = [[{
+      position: { x: 0, y: 0 },
+      terrain: TerrainType.GRASS,
+      occupantId: null,
+      isWalkable: true
+    }]]
 
-    // Player spawns on the left side
-    const playerPosition = { x: 1, y: 3 }
-    // Enemy spawns on the right side
-    const enemyPosition = { x: 6, y: 3 }
-
-    // Set occupants on tiles
-    tiles[playerPosition.y][playerPosition.x].occupantId = playerUnitId
-    tiles[enemyPosition.y][enemyPosition.x].occupantId = enemyUnitId
-
-    // Create unit state entries with health values
     const units = [
       {
         id: playerUnitId,
         name: playerName,
-        position: playerPosition,
         hasMoved: false,
         hasActed: false,
         currentHealth: playerHealth.current,
@@ -61,7 +55,6 @@ export class ActivityService {
       {
         id: enemyUnitId,
         name: enemyName,
-        position: enemyPosition,
         hasMoved: false,
         hasActed: false,
         currentHealth: enemyHealth.current,
@@ -69,7 +62,6 @@ export class ActivityService {
       }
     ]
 
-    // Player goes first (higher speed assumed)
     const turnOrder = [playerUnitId, enemyUnitId]
 
     return {

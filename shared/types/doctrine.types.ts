@@ -1,5 +1,4 @@
 import type { CharacterClassName, MagicNature } from '../constants/classes'
-import type { AoEPatternType } from '../constants/aoe-patterns'
 
 export const DoctrineEffectType = {
   // Adds extra power dice to attack or defense
@@ -103,10 +102,9 @@ export interface DoctrineDefinition {
   manaCost: number
   isUltimate: boolean
   effects: DoctrineEffect[]
-  // Tactical combat AoE settings (optional, defaults to SINGLE)
-  aoePattern?: AoEPatternType
-  // Casting range for tactical combat (optional, defaults to weapon range or 3)
-  castRange?: number
+  // Pokemon-style targeting: 'single' (1 enemy) or 'all' (all enemies, 0.6x damage)
+  // Omitted for pure self-buff doctrines
+  targeting?: 'single' | 'all'
 }
 
 /**

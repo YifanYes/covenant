@@ -6,7 +6,7 @@ import {
   type DoctrineDefinition
 } from '../types/doctrine.types'
 import { CharacterClassName, MagicNature } from './classes'
-import { AoEPatternType } from './aoe-patterns'
+
 
 export const MAX_EQUIPPED_DOCTRINES = 2
 
@@ -36,8 +36,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 1,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -58,6 +57,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.NEGATE_HITS,
@@ -77,8 +77,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 1,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -102,8 +101,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 1,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -133,8 +131,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 1,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -155,6 +152,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -174,8 +172,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 2,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 1,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -195,6 +192,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 2,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -218,6 +216,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 3,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.THRESHOLD_MODIFIER,
@@ -238,6 +237,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -263,6 +263,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.NEGATE_HITS,
@@ -283,6 +284,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -312,6 +314,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 3,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.GUARANTEED_CRITICAL,
@@ -331,6 +334,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.HEAL,
@@ -350,6 +354,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -369,8 +374,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 5,
     isUltimate: false,
-    aoePattern: AoEPatternType.CROSS,
-    castRange: 1,
+    targeting: 'all',
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -394,6 +398,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: true,
+    targeting: 'single',
     // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
@@ -414,6 +419,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 7,
     isUltimate: true,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.THRESHOLD_MODIFIER,
@@ -433,6 +439,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -458,8 +465,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: false,
-    aoePattern: AoEPatternType.CROSS,
-    castRange: 2,
+    targeting: 'all',
     // Area fire DOT zone — approximated as AoE BURNING application
     effects: [
       {
@@ -485,8 +491,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: true,
-    aoePattern: AoEPatternType.CROSS,
-    castRange: 2,
+    targeting: 'all',
     // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
@@ -507,6 +512,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 8,
     isUltimate: true,
+    targeting: 'single',
     // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
@@ -527,6 +533,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 8,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.NEGATE_HITS, // Using NEGATE_HITS to make it a valid self-buff
@@ -548,8 +555,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 7,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 1,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.DIRECT_DAMAGE,
@@ -574,8 +580,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 1,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -596,6 +601,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.NEGATE_HITS,
@@ -615,8 +621,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 2,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 3,
+    targeting: 'single',
     // Pushes enemy 3 tiles away — approximated as targeted DIRECT_DAMAGE 0 (no damage, displacement only)
     effects: [
       {
@@ -637,8 +642,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 7,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 4,
+    targeting: 'single',
     // Destroys non-boss demon instantly — approximated as massive direct damage
     effects: [
       {
@@ -663,8 +667,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 3,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -686,6 +689,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -705,6 +709,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -724,6 +729,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 1,
     manaCost: 3,
     isUltimate: false,
+    targeting: 'single',
     // Also teleports caster to target (teleport not yet implemented in effect system)
     effects: [
       {
@@ -748,6 +754,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.THRESHOLD_MODIFIER,
@@ -767,6 +774,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    targeting: 'single',
     // Teleports caster 4 tiles — approximated as NEGATE_HITS 99 (avoid all damage)
     effects: [
       {
@@ -787,6 +795,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.HEAL,
@@ -806,6 +815,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 5,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.NEGATE_HITS,
@@ -829,8 +839,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 3,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.APPLY_STATUS,
@@ -851,6 +860,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 5,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.HEAL,
@@ -870,8 +880,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 5,
     isUltimate: false,
-    aoePattern: AoEPatternType.DIAMOND,
-    castRange: 3,
+    targeting: 'all',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -897,8 +906,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 2,
     manaCost: 4,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 4,
+    targeting: 'single',
     // Ranged attack: +3 power dice at range 4
     effects: [
       {
@@ -923,6 +931,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 9,
     isUltimate: true,
+    targeting: 'single',
     // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
@@ -943,8 +952,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 9,
     isUltimate: true,
-    aoePattern: AoEPatternType.DIAMOND,
-    castRange: 4,
+    targeting: 'all',
     // Ultimate: 5 dice area 3x3 + stun
     effects: [
       {
@@ -971,8 +979,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 4,
+    targeting: 'single',
     // Single target: +7 power + IMMOBILIZED 2t
     effects: [
       {
@@ -999,8 +1006,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 6,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 4,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.POWER_MODIFIER,
@@ -1025,6 +1031,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 10,
     isUltimate: true,
+    targeting: 'single',
     // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
@@ -1046,8 +1053,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 10,
     isUltimate: true,
-    aoePattern: AoEPatternType.CIRCLE_2,
-    castRange: 4,
+    targeting: 'all',
     // Ultimate: requires sacrifice (1 Wound) to activate
     effects: [
       {
@@ -1074,6 +1080,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 8,
     isUltimate: false,
+    targeting: 'single',
     effects: [
       {
         type: DoctrineEffectType.NEGATE_HITS,
@@ -1095,8 +1102,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     tier: 3,
     manaCost: 8,
     isUltimate: false,
-    aoePattern: AoEPatternType.SINGLE,
-    castRange: 5,
+    targeting: 'single',
     // Destroy non-boss target — approximated as massive direct damage
     effects: [
       {

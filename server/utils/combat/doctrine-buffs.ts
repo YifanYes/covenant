@@ -1,11 +1,5 @@
 import { DOCTRINES } from '@shared/constants/doctrines'
-import {
-  getAoETilesWithRotation,
-  getDoctrineAoEPattern,
-  getDoctrineRange
-} from '@shared/constants/aoe-patterns'
 import { DoctrineEffectType, DoctrineTarget, type ActiveStatusEffect } from '@shared/types/doctrine.types'
-import type { GridPosition, TacticalStateData } from '@shared/types/tactical-combat.types'
 
 export interface DoctrineBuffs {
   bonusDice: number
@@ -181,12 +175,12 @@ export function clearConsumedDoctrines(
     // Check if this is an attack self-buff - these get consumed after attack
     const isAttackSelfBuff = doctrine.effects.some(
       (e) => attackBuffTypes.includes(e.type) && e.target === DoctrineTarget.SELF
-    ) && !doctrine.aoePattern
+    ) && !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)
 
     // Check if this is a defense self-buff - these get consumed after taking damage
     const isDefenseSelfBuff = doctrine.effects.some(
       (e) => defenseBuffTypes.includes(e.type) && e.target === DoctrineTarget.SELF
-    ) && !doctrine.aoePattern
+    ) && !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)
 
     if (isAttackSelfBuff) {
       // Multi-turn attack buffs: decrement instead of removing
@@ -221,92 +215,4 @@ export function clearConsumedDefenseDoctrines(
   unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined
 ): Record<string, ActiveStatusEffect> {
   return clearConsumedDoctrines(unitActiveDoctrines, true)
-}
-
-/**
- * Calculate tiles affected by an AoE doctrine.
- */
-export function calculateAoETargets(
-  targetPosition: GridPosition,
-  casterPosition: GridPosition,
-  doctrineId: string,
-  state: TacticalStateData
-): { tiles: GridPosition[]; unitIds: string[] } {
-  const pattern = getDoctrineAoEPattern(doctrineId)
-  const affectedTiles = getAoETilesWithRotation(
-    targetPosition,
-    casterPosition,
-    pattern,
-    state.gridWidth,
-    state.gridHeight
-  )
-
-  // Find units in affected tiles
-  const affectedSet = new Set(affectedTiles.map(t => `${t.x},${t.y}`))
-  const affectedUnitIds: string[] = []
-
-  for (const unit of state.units) {
-    const posKey = `${unit.position.x},${unit.position.y}`
-    if (affectedSet.has(posKey)) {
-      // Only include enemies for damage doctrines
-      // For now, assuming caster is player-unit (starts with 'player-')
-      if (!unit.id.startsWith('player-')) {
-        affectedUnitIds.push(unit.id)
-      }
-    }
-  }
-
-  return { tiles: affectedTiles, unitIds: affectedUnitIds }
-}
-
-/**
- * Validate a tactical doctrine action.
- * Checks if doctrine can be cast (equipped, mana, range).
- */
-export function validateTacticalDoctrine(
-  state: TacticalStateData,
-  casterId: string,
-  doctrineId: string,
-  targetPosition: GridPosition,
-  casterMana: number
-): { valid: boolean; reason?: string } {
-  // Find caster
-  const casterState = state.units.find((u) => u.id === casterId)
-  if (!casterState) {
-    return { valid: false, reason: 'Caster not found' }
-  }
-
-  // Check if it's the caster's turn
-  const currentUnitId = state.turnOrder[state.currentTurnIndex]
-  if (currentUnitId !== casterId) {
-    return { valid: false, reason: 'Not this unit\'s turn' }
-  }
-
-  // Check if caster has already acted
-  if (casterState.hasActed) {
-    return { valid: false, reason: 'Unit has already acted this turn' }
-  }
-
-  // Get doctrine
-  const doctrine = DOCTRINES[doctrineId]
-  if (!doctrine) {
-    return { valid: false, reason: 'Doctrine not found' }
-  }
-
-  // Check mana
-  if (casterMana < doctrine.manaCost) {
-    return { valid: false, reason: 'Not enough mana' }
-  }
-
-  // Check range
-  const castRange = getDoctrineRange(doctrineId)
-  const distance =
-    Math.abs(casterState.position.x - targetPosition.x) +
-    Math.abs(casterState.position.y - targetPosition.y)
-
-  if (distance > castRange) {
-    return { valid: false, reason: 'Target out of range' }
-  }
-
-  return { valid: true }
 }

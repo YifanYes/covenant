@@ -3,14 +3,9 @@ import { TRPCError } from '@trpc/server'
 import { protectedProcedure, t } from '../trpc'
 import type {
   TacticalDoctrineResultWithMana,
-  SelfBuffDoctrineResultWithMana
+  SelfBuffDoctrineResultWithMana,
+  TacticalStateData
 } from '@shared/types/tactical-combat.types'
-
-// Schema for grid position
-const gridPositionSchema = z.object({
-  x: z.number().int().min(0),
-  y: z.number().int().min(0)
-})
 
 export const activityRouter = t.router({
   // Get tactical combat state for a participation
@@ -27,7 +22,10 @@ export const activityRouter = t.router({
       }
 
       const result = await ctx.services.activityParticipation.findByIdWithTacticalState(input.participationId)
-      return result?.tacticalState ?? null
+      const state = result?.tacticalState as TacticalStateData | null
+      // Auto-reset old grid-based state — re-joining will re-initialize
+      if (state && state.stateVersion !== 2) return null
+      return state
     }),
 
   list: protectedProcedure
@@ -52,39 +50,6 @@ export const activityRouter = t.router({
       return ctx.services.activity.joinActivity(input.activityId, input.characterId)
     }),
 
-  // Tactical combat: Execute movement
-  executeTacticalMove: protectedProcedure
-    .input(
-      z.object({
-        participationId: z.string(),
-        unitId: z.string(),
-        path: z.array(gridPositionSchema).min(2),
-        movementRange: z.number().int().min(1)
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      // Verify the user owns this participation
-      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
-        input.participationId,
-        ctx.user.id
-      )
-      if (!isOwner) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
-      }
-
-      // Verify the unit being moved is a player unit (not an enemy)
-      if (!input.unitId.startsWith('player-')) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot move enemy units' })
-      }
-
-      return ctx.services.combat.executeTacticalMove(
-        input.participationId,
-        input.unitId,
-        input.path,
-        input.movementRange
-      )
-    }),
-
   // Tactical combat: Execute attack
   executeTacticalAttack: protectedProcedure
     .input(
@@ -94,7 +59,6 @@ export const activityRouter = t.router({
         targetId: z.string(),
         attackRolls: z.array(z.number().min(1).max(6)),
         defenseRolls: z.array(z.number().min(1).max(6)),
-        attackRange: z.number().int().min(1),
         attackThreshold: z.number().int().min(1).max(6),
         defenseThreshold: z.number().int().min(1).max(6),
         attackCriticalThreshold: z.number().int().min(1).max(6).optional()
@@ -125,7 +89,6 @@ export const activityRouter = t.router({
         input.targetId,
         input.attackRolls,
         input.defenseRolls,
-        input.attackRange,
         input.attackThreshold,
         input.defenseThreshold,
         input.attackCriticalThreshold ?? 6
@@ -138,8 +101,6 @@ export const activityRouter = t.router({
       z.object({
         participationId: z.string(),
         enemyId: z.string(),
-        enemyMovementRange: z.number().int().min(1),
-        enemyAttackRange: z.number().int().min(1),
         enemyAttackDice: z.number().int().min(1),
         enemyAttackThreshold: z.number().int().min(1).max(6)
       })
@@ -162,21 +123,20 @@ export const activityRouter = t.router({
       return ctx.services.combat.executeEnemyTurn(
         input.participationId,
         input.enemyId,
-        input.enemyMovementRange,
-        input.enemyAttackRange,
         input.enemyAttackDice,
         input.enemyAttackThreshold
       )
     }),
 
-  // Tactical combat: Execute doctrine with AoE targeting
+  // Tactical combat: Execute doctrine with targeting
   executeTacticalDoctrine: protectedProcedure
     .input(
       z.object({
         participationId: z.string(),
         casterId: z.string(),
         doctrineId: z.string(),
-        targetPosition: gridPositionSchema
+        targeting: z.enum(['single', 'all']),
+        targetIds: z.array(z.string())
       })
     )
     .mutation(async ({ input, ctx }): Promise<TacticalDoctrineResultWithMana> => {
@@ -208,7 +168,8 @@ export const activityRouter = t.router({
         input.participationId,
         input.casterId,
         input.doctrineId,
-        input.targetPosition,
+        input.targeting,
+        input.targetIds,
         currentClass.mana
       )
 
@@ -281,5 +242,43 @@ export const activityRouter = t.router({
       }
 
       return { ...result, success: false as const }
+    }),
+
+  // Tactical combat: Use potion during combat
+  usePotion: protectedProcedure
+    .input(
+      z.object({
+        participationId: z.string(),
+        consumableId: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Verify the user owns this participation
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
+        input.participationId,
+        ctx.user.id
+      )
+      if (!isOwner) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
+      }
+
+      // Check if potion already used this turn
+      const participation = await ctx.services.activityParticipation.findByIdWithTacticalState(input.participationId)
+      if (participation?.tacticalState?.potionUsedThisTurn) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Already used a potion this turn' })
+      }
+
+      // Use the consumable via existing CombatService
+      const result = await ctx.services.combat.useConsumable(ctx.user.id, input.consumableId)
+
+      // Set potionUsedThisTurn flag
+      if (result.success && participation?.tacticalState) {
+        await ctx.services.activityParticipation.updateTacticalState(input.participationId, {
+          ...participation.tacticalState,
+          potionUsedThisTurn: true
+        })
+      }
+
+      return result
     })
 })

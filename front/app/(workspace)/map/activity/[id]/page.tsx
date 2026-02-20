@@ -20,17 +20,12 @@ import { ActivityDifficulty, getActivityById } from '@shared/constants/activitie
 import { getEnemy } from '@shared/constants/enemies'
 import { type CombatLogEntry, type EnemyState, type InventoryCharacter } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-
-// Dynamic import for tactical combat (SSR-safe due to Phaser)
-const TacticalCombatArena = dynamic(() => import('@/components/tactical/tactical-combat-arena.component'), {
-  ssr: false
-})
+import CombatArena from '@/components/combat/combat-arena.component'
 
 export default function ActivityDetailPage() {
   const { id } = useParams()
@@ -235,18 +230,15 @@ export default function ActivityDetailPage() {
         </div>
       </div>
 
-      {/* Tactical Combat Area */}
+      {/* Combat Area */}
       {currentEnemy && participation?.id && (
-        <TacticalCombatArena
+        <CombatArena
           character={character}
           enemies={[currentEnemy]}
           combatLog={combatLog}
           diceBank={(character.data as any)?.diceBank ?? 0}
-          lastTurnResult={null}
           participationId={participation.id}
-          activeDoctrines={participation?.activeDoctrines as Record<string, any>}
           failureText={getActivityById(activity.id)?.failureText}
-          mapId={getActivityById(activity.id)?.mapId}
           className="min-h-0 flex-1"
         />
       )}

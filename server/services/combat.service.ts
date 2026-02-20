@@ -9,10 +9,7 @@ import type {
 } from '@shared/types/gamification.types'
 import { ItemType } from '@shared/types/gamification.types'
 import {
-  type GridPosition,
   type TacticalStateData,
-  type MovementValidationResult,
-  type MovementExecutionResult,
   type AttackValidationResult,
   type TacticalAttackResult,
   type EnemyTurnResult,
@@ -27,7 +24,6 @@ import type { KillRecordService } from './kill-record.service'
 
 import * as dice from '../utils/combat/dice'
 import * as doctrineBuffs from '../utils/combat/doctrine-buffs'
-import * as movement from '../utils/combat/movement'
 import * as attackResolution from '../utils/combat/attack-resolution'
 import * as enemyAI from '../utils/combat/enemy-ai'
 import * as tacticalDoctrine from '../utils/combat/tactical-doctrine'
@@ -230,30 +226,12 @@ export class CombatService {
   // TACTICAL COMBAT METHODS
   // ============================================================
 
-  validateTacticalMove(
-    state: TacticalStateData,
-    unitId: string,
-    path: GridPosition[]
-  ): MovementValidationResult {
-    return movement.validateTacticalMove(state, unitId, path)
-  }
-
-  async executeTacticalMove(
-    participationId: string,
-    unitId: string,
-    path: GridPosition[],
-    movementRange: number
-  ): Promise<MovementExecutionResult> {
-    return movement.executeTacticalMove(participationId, unitId, path, movementRange, this.activityParticipationRepository)
-  }
-
   validateTacticalAttack(
     state: TacticalStateData,
     attackerId: string,
-    targetId: string,
-    attackRange: number
+    targetId: string
   ): AttackValidationResult {
-    return attackResolution.validateTacticalAttack(state, attackerId, targetId, attackRange)
+    return attackResolution.validateTacticalAttack(state, attackerId, targetId)
   }
 
   async executeTacticalAttack(
@@ -262,14 +240,13 @@ export class CombatService {
     targetId: string,
     attackerRolls: number[],
     defenderRolls: number[],
-    attackRange: number,
     attackThreshold: number,
     defenseThreshold: number,
     attackCriticalThreshold: number = 6
   ): Promise<TacticalAttackResult> {
     return attackResolution.executeTacticalAttack(
       participationId, attackerId, targetId, attackerRolls, defenderRolls,
-      attackRange, attackThreshold, defenseThreshold, attackCriticalThreshold, this.repos
+      attackThreshold, defenseThreshold, attackCriticalThreshold, this.repos
     )
   }
 
@@ -280,13 +257,11 @@ export class CombatService {
   async executeEnemyTurn(
     participationId: string,
     enemyId: string,
-    enemyMovementRange: number,
-    enemyAttackRange: number,
     enemyAttackDice: number,
     enemyAttackThreshold: number
   ): Promise<EnemyTurnResult> {
     return enemyAI.executeEnemyTurn(
-      participationId, enemyId, enemyMovementRange, enemyAttackRange,
+      participationId, enemyId,
       enemyAttackDice, enemyAttackThreshold, this.repos
     )
   }
@@ -295,33 +270,15 @@ export class CombatService {
   // TACTICAL DOCTRINE METHODS
   // ============================================================
 
-  calculateAoETargets(
-    targetPosition: GridPosition,
-    casterPosition: GridPosition,
-    doctrineId: string,
-    state: TacticalStateData
-  ): { tiles: GridPosition[]; unitIds: string[] } {
-    return doctrineBuffs.calculateAoETargets(targetPosition, casterPosition, doctrineId, state)
-  }
-
-  validateTacticalDoctrine(
-    state: TacticalStateData,
-    casterId: string,
-    doctrineId: string,
-    targetPosition: GridPosition,
-    casterMana: number
-  ): { valid: boolean; reason?: string } {
-    return doctrineBuffs.validateTacticalDoctrine(state, casterId, doctrineId, targetPosition, casterMana)
-  }
-
   async executeTacticalDoctrine(
     participationId: string,
     casterId: string,
     doctrineId: string,
-    targetPosition: GridPosition,
+    targeting: 'single' | 'all',
+    targetIds: string[],
     casterMana: number
   ): Promise<TacticalDoctrineResult> {
-    return tacticalDoctrine.executeTacticalDoctrine(participationId, casterId, doctrineId, targetPosition, casterMana, this.repos)
+    return tacticalDoctrine.executeTacticalDoctrine(participationId, casterId, doctrineId, targeting, targetIds, casterMana, this.repos)
   }
 
   async useSelfBuffDoctrine(

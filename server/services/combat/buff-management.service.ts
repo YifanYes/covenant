@@ -170,11 +170,11 @@ export class BuffManagementService {
 
       const isAttackSelfBuff = doctrine.effects.some(
         (e) => attackBuffTypes.includes(e.type) && e.target === DoctrineTarget.SELF
-      ) && !doctrine.aoePattern
+      ) && !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)
 
       const isDefenseSelfBuff = doctrine.effects.some(
         (e) => defenseBuffTypes.includes(e.type) && e.target === DoctrineTarget.SELF
-      ) && !doctrine.aoePattern
+      ) && !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)
 
       if (isAttackSelfBuff) {
         continue

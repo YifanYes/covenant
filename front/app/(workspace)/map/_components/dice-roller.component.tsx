@@ -25,7 +25,7 @@ export default function DiceRoller({
   const canRoll = diceBank > 0 && !isRolling
 
   return (
-    <div className={cn('flex flex-col gap-4 rounded-lg border p-4', className)}>
+    <div className={cn('flex flex-col gap-4', className)}>
       <div className='flex items-center justify-between'>
         <span className='text-sm font-medium'>{t('combat.to_battle')}</span>
         <span className='text-muted-foreground text-xs'>

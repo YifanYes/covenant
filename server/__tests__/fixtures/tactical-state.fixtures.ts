@@ -53,9 +53,11 @@ export function createTestTacticalState(overrides?: Partial<TacticalStateData>):
 
   // Place units on the grid
   for (const unit of units) {
-    const { x, y } = unit.position
-    if (tiles[y]?.[x]) {
-      tiles[y][x].occupantId = unit.id
+    if (unit.position) {
+      const { x, y } = unit.position
+      if (tiles[y]?.[x]) {
+        tiles[y][x].occupantId = unit.id
+      }
     }
   }
 
