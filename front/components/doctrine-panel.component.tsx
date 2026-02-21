@@ -144,14 +144,14 @@ export default function DoctrinePanel({
               {t('doctrines.mana_cost', { cost: doctrine.manaCost })}
             </span>
             <span
-              className={`rounded-full px-2 py-0.5 text-xs font-bold capitalize ${MAGIC_NATURE_COLORS[doctrine.magicNature]}`}
+              className={`rounded-full border border-current/20 px-2 py-0.5 text-xs font-bold capitalize ${MAGIC_NATURE_COLORS[doctrine.magicNature]}`}
             >
               {t(`doctrines.magic_nature.${doctrine.magicNature}`)}
             </span>
-            <span className={`rounded-full px-2 py-0.5 text-xs font-bold capitalize ${ATTRIBUTE_COLORS[doctrine.attribute]}`}>
+            <span className={`rounded-full border border-current/20 px-2 py-0.5 text-xs font-bold capitalize ${ATTRIBUTE_COLORS[doctrine.attribute]}`}>
               {t(`doctrines.attribute.${doctrine.attribute}`)}
             </span>
-            <span className='rounded-full bg-white/10 px-2 py-0.5 text-xs font-bold text-white/70'>
+            <span className='rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-xs font-bold text-white/70'>
               {t('doctrines.tier', { tier: doctrine.tier })}
             </span>
           </div>
@@ -179,7 +179,7 @@ export default function DoctrinePanel({
             ))}
           {showUseControls && isEquippedDoctrine && (
             <Button
-              variant='secondary'
+              variant='outline'
               size='sm'
               onClick={() => handleUse(doctrine)}
               disabled={!canUse || isUsingDoctrine}
@@ -197,12 +197,9 @@ export default function DoctrinePanel({
   if (showUseControls && !showEquipControls) {
     if (horizontal) {
       return (
-        <div className={cn('p-3', className)}>
-          <div className='mb-2 text-xs font-medium tracking-wider text-purple-500/80 uppercase'>
-            {t('doctrines.title')}
-          </div>
+        <div className={cn('flex flex-1 flex-col gap-2', className)}>
           {equippedDoctrines.length === 0 ? (
-            <p className='text-muted-foreground text-sm'>{t('doctrines.empty_equipped')}</p>
+            <p className='text-muted-foreground flex flex-1 items-center justify-center text-sm'>{t('doctrines.empty_equipped')}</p>
           ) : (
             <div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
               {equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}

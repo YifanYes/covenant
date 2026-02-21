@@ -64,19 +64,9 @@ export default function EnemyDisplay({
           <div
             key={enemy.id}
             className={cn(
-              'flex items-center gap-3 transition-all',
-              isTargetable && 'cursor-pointer',
+              'flex items-start gap-3 transition-all',
               isDead && 'opacity-40 grayscale'
             )}
-            onClick={() => {
-              if (isTargetable && onSelectTarget) {
-                if (targetingMode === 'all') {
-                  onSelectTarget('all')
-                } else {
-                  onSelectTarget(enemy.id)
-                }
-              }
-            }}
           >
             {/* Left: Info panel */}
             <div className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-lg border p-3">
@@ -90,13 +80,23 @@ export default function EnemyDisplay({
               )}
             </div>
 
-            {/* Right: Sprite */}
+            {/* Right: Sprite (flipped to face player) */}
             <div
               className={cn(
-                'relative h-28 w-28 shrink-0 rounded-xl border p-2',
-                isTargetable && 'hover:ring-2 hover:ring-emerald-500/50',
-                targetingMode === 'all' && !isDead && 'ring-1 ring-amber-500/30'
+                'relative h-28 w-28 shrink-0 p-2',
+                isTargetable && 'cursor-pointer rounded-xl ring-2 ring-emerald-500/50 hover:ring-emerald-500',
+                targetingMode === 'all' && !isDead && 'ring-amber-500/50 hover:ring-amber-500'
               )}
+              style={{ transform: 'scaleX(-1)' }}
+              onClick={() => {
+                if (isTargetable && onSelectTarget) {
+                  if (targetingMode === 'all') {
+                    onSelectTarget('all')
+                  } else {
+                    onSelectTarget(enemy.id)
+                  }
+                }
+              }}
             >
               <CombatUnitSprite
                 imageUrl={template ? `/assets/enemies/${template.imageId}.png` : '/assets/enemies/default.png'}
