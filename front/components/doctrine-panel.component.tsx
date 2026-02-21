@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { MagicNature } from '@shared/constants/classes'
 import type { DoctrineAttributeType, DoctrineDefinition } from '@shared/types/doctrine.types'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -26,6 +27,26 @@ const ATTRIBUTE_COLORS: Record<DoctrineAttributeType, string> = {
   DARKNESS: 'bg-purple-400/10 text-purple-400',
   ICE: 'bg-sky-300/10 text-sky-300',
   MIND: 'bg-pink-400/10 text-pink-400'
+}
+
+function DoctrineImage({ doctrineId, alt }: { doctrineId: string; alt: string }) {
+  const [hasError, setHasError] = useState(false)
+
+  if (hasError) {
+    return <Zap className='h-6 w-6 text-muted-foreground' />
+  }
+
+  return (
+    <Image
+      src={`/assets/doctrines/${doctrineId}.png`}
+      alt={alt}
+      width={56}
+      height={56}
+      className='h-full w-full object-contain'
+      style={{ imageRendering: 'pixelated' }}
+      onError={() => setHasError(true)}
+    />
+  )
 }
 
 interface DoctrinePanelProps {
@@ -123,14 +144,7 @@ export default function DoctrinePanel({
         )}
       >
         <div className='bg-muted/50 relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded border p-1'>
-          <Image
-            src={`/assets/doctrines/${doctrine.id}.png`}
-            alt={t(doctrine.nameKey)}
-            width={56}
-            height={56}
-            className='h-full w-full object-contain'
-            style={{ imageRendering: 'pixelated' }}
-          />
+          <DoctrineImage doctrineId={doctrine.id} alt={t(doctrine.nameKey)} />
         </div>
         <div className='min-w-0 flex-1'>
           <div className='flex items-center gap-2'>
