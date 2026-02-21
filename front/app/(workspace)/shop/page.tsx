@@ -160,7 +160,7 @@ function StoreContent() {
   }
 
   return (
-    <Tabs defaultValue='items' className='flex h-full w-full flex-col overflow-hidden pr-4'>
+    <Tabs defaultValue='items' className='flex h-[calc(100dvh-3rem)] w-full flex-col overflow-hidden pr-4'>
       <div className='mb-4 flex items-center justify-between'>
         <TabsList>
           <TabsTrigger value='items'>{t('store.title')}</TabsTrigger>
@@ -170,7 +170,7 @@ function StoreContent() {
 
       <TabsContent value='items' className='mt-0 flex flex-1 gap-6 overflow-hidden'>
         {/* Left Panel - Store Items */}
-        <Card className='flex flex-1 flex-col gap-4 overflow-hidden py-4'>
+        <Card className='flex min-h-0 flex-1 flex-col gap-4 overflow-hidden py-4'>
           <CardHeader className='shrink-0'>
             <CardTitle>
               <StoreFilters
@@ -182,7 +182,7 @@ function StoreContent() {
               />
             </CardTitle>
           </CardHeader>
-          <CardContent className='flex-1 overflow-hidden p-0 pr-2'>
+          <CardContent className='min-h-0 flex-1 overflow-hidden p-0 pr-2'>
             <StoreItemGrid
               itemsByTier={itemsByTier}
               selectedIds={selectedIds}

@@ -88,7 +88,6 @@ export default function ActivityDetailPage() {
       toast.success(t('activities.success.start'))
       queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
       setHasJoined(true)
-      setIsSpawning(false)
     },
     onError: (error) => {
       toast.error(t('activities.error.start'), { description: error.message })
