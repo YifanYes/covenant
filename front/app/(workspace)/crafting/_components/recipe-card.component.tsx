@@ -22,7 +22,7 @@ export default function RecipeCard({ recipeStatus, onCraft, isCrafting }: Recipe
   return (
     <div
       className={cn(
-        'border-foreground/20 bg-background flex flex-col rounded-lg border-2 p-4 transition-all',
+        'border-border bg-background flex flex-col rounded-lg border-2 p-4 transition-all',
         !canCraft && 'opacity-60'
       )}
     >

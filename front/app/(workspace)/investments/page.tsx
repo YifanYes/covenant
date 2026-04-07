@@ -50,7 +50,7 @@ export default function InvestmentsPage() {
       <div className='flex items-center justify-between'>
         <div>
           <h1 className='text-2xl font-bold text-white'>{t('investments.title')}</h1>
-          <p className='text-sm text-slate-400'>{t('investments.subtitle')}</p>
+          <p className='text-sm text-muted-foreground'>{t('investments.subtitle')}</p>
         </div>
         {character && (
           <div className='flex items-center gap-2 rounded-lg px-4 py-2'>
@@ -72,7 +72,7 @@ export default function InvestmentsPage() {
         ))}
 
         {investments?.length === 0 && (
-          <div className='col-span-2 flex items-center justify-center text-slate-400'>
+          <div className='col-span-2 flex items-center justify-center text-muted-foreground'>
             {t('investments.no_investments')}
           </div>
         )}

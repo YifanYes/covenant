@@ -324,6 +324,8 @@
     "rolling": "Lanzando",
     "target": "Objetivo",
     "to_battle": "¡Al ataque!",
+    "results": "Resultados",
+    "roll_dice_prompt": "Lanza los dados para comenzar",
     "turn_summary": "Resumen del Turno",
     "use_dice_roller": "¡Usa el Lanzador de Dados para atacar!",
     "your_hits": "Tus Impactos",

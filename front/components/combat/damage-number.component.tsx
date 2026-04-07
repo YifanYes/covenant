@@ -40,7 +40,7 @@ export function DamageNumberContainer({ numbers, targetId }: DamageNumberContain
   const filtered = numbers.filter((n) => n.targetId === targetId)
 
   return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center" style={{ transform: 'scaleX(-1)' }}>
       <AnimatePresence>
         {filtered.map((n, i) => (
           <DamageNumber key={`${targetId}-${i}-${n.amount}`} amount={n.amount} type={n.type} />

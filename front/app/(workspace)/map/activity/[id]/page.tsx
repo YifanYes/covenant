@@ -26,10 +26,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import CombatArena from '@/components/combat/combat-arena.component'
+import { useSidebar } from '@/ui/sidebar.component'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { cn } from '@/lib/cn.lib'
 
 export default function ActivityDetailPage() {
   const { id } = useParams()
   const { t } = useTranslation()
+  const { state: sidebarState } = useSidebar()
+  const isMobile = useIsMobile()
 
   const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
   const character = characterData as InventoryCharacter
@@ -83,7 +88,6 @@ export default function ActivityDetailPage() {
       toast.success(t('activities.success.start'))
       queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
       setHasJoined(true)
-      setIsSpawning(false)
     },
     onError: (error) => {
       toast.error(t('activities.error.start'), { description: error.message })
@@ -127,11 +131,13 @@ export default function ActivityDetailPage() {
       return
     }
 
+    setIsSpawning(true)
     joinMutation.mutate({ activityId: activity.id, characterId: character.id })
   }
 
   const confirmJoin = () => {
     setShowConfirmModal(false)
+    setIsSpawning(true)
     joinMutation.mutate({ activityId: activity.id, characterId: character.id })
   }
 
@@ -206,7 +212,7 @@ export default function ActivityDetailPage() {
   }
 
   return (
-    <div className="bg-background fixed inset-0 left-(--sidebar-width) flex flex-col overflow-hidden transition-[left] duration-200 ease-linear peer-data-[state=collapsed]:left-(--sidebar-width-icon)">
+    <div className={cn('bg-background fixed inset-0 flex flex-col overflow-hidden transition-[left] duration-200 ease-linear', !isMobile && (sidebarState === 'collapsed' ? 'left-(--sidebar-width-icon)' : 'left-(--sidebar-width)'))}>
       {/* Header */}
       <div className="bg-card flex-none border-b px-4 py-2">
         <div className="flex items-center gap-4">
@@ -218,13 +224,13 @@ export default function ActivityDetailPage() {
           <div className="flex flex-1 items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold">{t(activity.name)}</h1>
-              <Badge variant="secondary">{t('activities.status.active')}</Badge>
+              <Badge className="border-emerald-600 bg-emerald-600/15 text-emerald-400">{t('activities.status.active')}</Badge>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground text-sm">
                 {activity.progress}/{activity.target}
               </span>
-              <Progress value={(activity.progress / activity.target) * 100} className="w-24" />
+              <Progress value={(activity.progress / activity.target) * 100} className="w-24 border bg-border" />
             </div>
           </div>
         </div>

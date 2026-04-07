@@ -324,6 +324,8 @@
     "rolling": "Rolling",
     "target": "Target",
     "to_battle": "To Battle!",
+    "results": "Results",
+    "roll_dice_prompt": "Roll the dice to begin",
     "turn_summary": "Turn Summary",
     "use_dice_roller": "Use the Dice Roller to attack!",
     "your_hits": "Your Hits",

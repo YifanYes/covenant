@@ -10,7 +10,7 @@ interface MaterialCardProps {
 }
 
 const tierColors: Record<number, string> = {
-  1: 'border-slate-400/50',
+  1: 'border-border',
   2: 'border-blue-400/50 bg-blue-400/5',
   3: 'border-purple-400/50 bg-purple-400/5'
 }
