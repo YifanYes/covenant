@@ -1,6 +1,6 @@
 'use client'
 
-import ArqLogo from '@/components/common/arq-logo.component'
+import CovenantLogo from '@/components/common/covenant-logo.component'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import type { CardData } from '../../_data/card-data'
@@ -45,7 +45,7 @@ export default function CardView({ data }: CardViewProps) {
       </p>
 
       {/* Logo */}
-      <ArqLogo className="mb-10 h-8 bg-[#d4b346]/70" />
+      <CovenantLogo className="mb-10 h-8 bg-[#d4b346]/70" />
 
       {/* Link buttons */}
       <div className="flex w-full flex-col gap-3">

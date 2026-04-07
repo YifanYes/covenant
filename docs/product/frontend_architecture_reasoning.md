@@ -1,12 +1,12 @@
 # Frontend Architecture Evolution: Deep Dive
 
-This document provides a detailed comparison of the frontend architectural shifts in Arq, moving from traditional React patterns to a highly structured, scalable approach.
+This document provides a detailed comparison of the frontend architectural shifts in Covenant, moving from traditional React patterns to a highly structured, scalable approach.
 
 ## 1. Component Structure & Subdomains
 
 ### Legacy vs. New Patterns
 
-| Feature          | Legacy (Before)     | New Arq (After)              | Rationale & Significance                                                                                                                                                                                         |
+| Feature          | Legacy (Before)     | New Covenant (After)              | Rationale & Significance                                                                                                                                                                                         |
 | :--------------- | :------------------ | :--------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Organization** | Unified Large Files | **4-Subdomain Pattern**      | **Reasoning**: Reduces cognitive load by separating presentation (`*.component`), logic (`*.utils`), types (`*.model`), and constants (`*.config`). This prevents "mega-files" and makes bugs easier to isolate. |
 | **Naming**       | Generic Naming      | **Subdomain Suffixes**       | **Reasoning**: Ensures unique file names in the global namespace. Typing `dashboard.page` or `auth.store` in an IDE allows for instant navigation without name collisions.                                       |

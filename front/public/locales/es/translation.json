@@ -9,7 +9,7 @@
       "enter": "Entrar"
     },
     "story": {
-      "title": "Las Cronicas de ARQ",
+      "title": "Las Cronicas de Covenant",
       "subtitle": "Novelas ligeras que se desarrollan segun la comunidad moldea el destino del mundo.",
       "episode": "Episodio",
       "episodes": {
@@ -26,7 +26,7 @@
       "roadmap": "Hoja de Ruta"
     },
     "meta": {
-      "title": "ARQ - Productividad Gamificada",
+      "title": "Covenant - Productividad Gamificada",
       "description": "Una app de productividad gamificada donde cada tarea, cada hábito y cada objetivo que completas forja a tu personaje. Sin atajos. Sin excusas. Solo resultados que puedes ver, medir y equipar."
     },
     "hero": {
@@ -121,12 +121,12 @@
         },
         "seasonal": {
           "title": "Lanzamiento del Juego de Mesa",
-          "description": "La versión física de ARQ llega a tu mesa."
+          "description": "La versión física de Covenant llega a tu mesa."
         }
       }
     },
     "closing": {
-      "line1": "ARQ no te empuja a hacer más.",
+      "line1": "Covenant no te empuja a hacer más.",
       "line2": "Te obliga a hacer lo que dices que importa.",
       "line3": "Cada tarea completada son dados. Cada dado es una tirada. Cada tirada es un impacto, tanto en la historia como en tu vida.",
       "line4": "Tu productividad tiene consecuencias. Hazlas contar.",
@@ -1426,7 +1426,7 @@
     "password": "Contraseña",
     "recover_password": "Recuperar contraseña",
     "success": "Se ha enviado un enlace de inicio de sesión a tu correo.",
-    "title": "Inicia sesión en ARQ",
+    "title": "Inicia sesión en Covenant",
     "verifying_messages": [
       "Afilando el acero sagrado...",
       "Bendiciendo el equipo de batalla...",
@@ -1595,7 +1595,7 @@
     "password": "Contraseña",
     "success_message": "Te hemos enviado un correo de vertificación. Comprueba tu bandeja de entrada.",
     "success_title": "¡Cuenta creada!",
-    "title": "Crear una cuenta en ARQ"
+    "title": "Crear una cuenta en Covenant"
   },
   "status_effects": {
     "burning": "Quemadura",
@@ -1808,7 +1808,7 @@
       "quote": "Deuteronomio 20, 1-4"
     },
     "links": {
-      "app": "ARQ - Productividad Gamificada",
+      "app": "Covenant - Productividad Gamificada",
       "email": "Email",
       "x": "X",
       "github": "GitHub",
@@ -1819,7 +1819,7 @@
       "share": "Compartir Tarjeta",
       "copied": "Enlace copiado al portapapeles"
     },
-    "project": "ARQ",
+    "project": "Covenant",
     "yifan": {
       "name": "Yifan Ye",
       "quote": "Efesios 6, 10-17"

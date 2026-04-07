@@ -64,7 +64,7 @@ export default function EnemyDisplay({
           <div
             key={enemy.id}
             className={cn(
-              'flex items-center gap-3 transition-all',
+              'flex items-start gap-3 transition-all',
               isTargetable && 'cursor-pointer',
               isDead && 'opacity-40 grayscale'
             )}
@@ -93,7 +93,7 @@ export default function EnemyDisplay({
             {/* Right: Sprite */}
             <div
               className={cn(
-                'relative h-28 w-28 shrink-0 rounded-xl border p-2',
+                'relative h-28 w-28 shrink-0 p-2',
                 isTargetable && 'hover:ring-2 hover:ring-emerald-500/50',
                 targetingMode === 'all' && !isDead && 'ring-1 ring-amber-500/30'
               )}

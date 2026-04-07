@@ -40,9 +40,9 @@ export default function PlayerDisplay({
   const manaPercentage = Math.max(0, Math.min(100, (mana / maxMana) * 100))
 
   return (
-    <div className={cn('flex items-start gap-4', className)}>
+    <div className={cn('flex items-end gap-4', className)}>
       {/* Left: Player sprite */}
-      <div className="relative h-28 w-28 shrink-0 rounded-xl border p-2">
+      <div className="relative h-28 w-28 shrink-0 p-2">
         <CombatUnitSprite
           imageUrl={`/assets/classes/${currentClass}.png`}
           alt={name}

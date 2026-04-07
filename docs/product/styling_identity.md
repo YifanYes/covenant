@@ -1,6 +1,6 @@
-# Guía de estilo: Ecosistema ARQ
+# Guía de estilo: Ecosistema Covenant
 
-ARQ es una infraestructura de productividad de alto rendimiento integrada en un entorno de fantasía oscura. El sistema equilibra la utilidad técnica con una narrativa de conflicto global donde las acciones individuales de cada usuario afectan al equilibrio de poder de su facción.
+Covenant es una infraestructura de productividad de alto rendimiento integrada en un entorno de fantasía oscura. El sistema equilibra la utilidad técnica con una narrativa de conflicto global donde las acciones individuales de cada usuario afectan al equilibrio de poder de su facción.
 
 ---
 

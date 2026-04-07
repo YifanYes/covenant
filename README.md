@@ -1,4 +1,4 @@
-# ARQ
+# Covenant
 
 A personal productivity app for managing tasks, habits, and objectives with an RPG-style gamification system.
 

@@ -1,6 +1,6 @@
 # Coding Standards & Best Practices
 
-> Complete coding conventions for the ARQ project. Referenced by [AGENTS.md](AGENTS.md).
+> Complete coding conventions for the Covenant project. Referenced by [AGENTS.md](AGENTS.md).
 
 ---
 

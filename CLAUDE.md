@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ARQ is a gamified productivity platform combining task management, habit tracking, and objective setting with RPG-style progression. It follows a biblical Apocalypse narrative theme in a dark fantasy setting.
+Covenant is a gamified productivity platform combining task management, habit tracking, and objective setting with RPG-style progression. It follows a biblical Apocalypse narrative theme in a dark fantasy setting.
 
 ## Commands
 

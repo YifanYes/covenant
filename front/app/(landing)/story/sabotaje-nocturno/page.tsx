@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 
 export const metadata = {
-  title: 'Sabotaje Nocturno - ARQ'
+  title: 'Sabotaje Nocturno - Covenant'
 }
 
 const SUPPORTED_LOCALES = ['en', 'es'] as const

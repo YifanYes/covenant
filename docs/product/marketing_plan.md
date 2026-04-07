@@ -1,4 +1,4 @@
-# Plan de Marketing ARQ - Beta Privada
+# Plan de Marketing Covenant - Beta Privada
 
 > **"El arte supremo de la guerra es someter al enemigo sin luchar."** — Sun Tzu
 
@@ -14,7 +14,7 @@
 
 > "Los guerreros victoriosos primero ganan y luego van a la guerra."
 
-**ARQ no compite con Habitica, Forest o Todoist.** Ocupamos un territorio que ninguno de ellos puede defender: el "gamer disciplinado" que busca épica, no ternura.
+**Covenant no compite con Habitica, Forest o Todoist.** Ocupamos un territorio que ninguno de ellos puede defender: el "gamer disciplinado" que busca épica, no ternura.
 
 ### Análisis Competitivo
 
@@ -38,7 +38,7 @@
 │   │                                                         │
 │   │             [Habitica]                                  │
 │   │                                                         │
-│   │                              ★ ARQ ★                    │
+│   │                           ★ Covenant ★                  │
 │   │                         (TERRITORIO VACÍO)              │
 │   │                                                         │
 │   ↓ DARK                                                    │
@@ -120,24 +120,24 @@ Landing page / Reddit post / Twitter
 | Email | Timing            | Contenido                                           |
 | ----- | ----------------- | --------------------------------------------------- |
 | #1    | Inmediato         | Bienvenida + link Discord + qué esperar             |
-| #2    | +3 días           | La visión de ARQ: por qué existe, qué lo diferencia |
+| #2    | +3 días           | La visión de Covenant: por qué existe, qué lo diferencia |
 | #3    | +7 días           | Preview de gameplay / screenshots                   |
 | #4    | Cuando hay acceso | Invitación a beta con instrucciones                 |
 
 **Herramientas:** Zoho Mail (contratado). Para el funnel de 4 emails de la secuencia de bienvenida, usarías Zoho Campaigns (incluido en varios planes de Zoho):
 
-1. Crear una lista de contactos - Una lista tipo "Waitlist ARQ" donde caen los suscriptores desde tu landing page.
+1. Crear una lista de contactos - Una lista tipo "Waitlist Covenant" donde caen los suscriptores desde tu landing page.
 2. Conectar el formulario de registro - Zoho Campaigns genera un formulario embebible o puedes usar su API para añadir contactos desde tu landing/Discord.
 3. Crear un workflow de automatización (Zoho Campaigns > Automation > Workflows):
-   - Trigger: "Cuando un contacto se une a la lista Waitlist ARQ"
+   - Trigger: "Cuando un contacto se une a la lista Waitlist Covenant"
    - Email #1 (inmediato): Bienvenida + link Discord + qué esperar
    - Wait 3 días
-   - Email #2: La visión de ARQ
+   - Email #2: La visión de Covenant
    - Wait 4 días
    - Email #3: Preview de gameplay / screenshots
    - Email #4: Se envía manualmente o con otro trigger cuando abran el acceso a beta
 
-4. Diseñar los emails - Usa el editor drag & drop de Zoho. Mantén un diseño oscuro/dark fantasy consistente con la marca de ARQ.
+4. Diseñar los emails - Usa el editor drag & drop de Zoho. Mantén un diseño oscuro/dark fantasy consistente con la marca de Covenant.
 5. Métricas - Zoho Campaigns te da open rate, click rate y unsubscribes por defecto, que cubren las métricas del plan.
 
 Si tu plan de Zoho es solo Zoho Mail (correo corporativo) sin Campaigns, necesitarías contratar Zoho Campaigns aparte o usar Zoho ZeptoMail para emails transaccionales vía API.
@@ -197,9 +197,9 @@ Twitter es el mejor canal para "building in public" porque el formato favorece u
 | Devlog update    | 2x/semana    | "Esta semana implementé el sistema de facciones..." |
 | Screenshot/GIF   | 1x/semana    | UI, animaciones, gameplay                           |
 | Pregunta genuina | 1x/semana    | "¿Qué prefieren: XP por tareas o por rachas?"       |
-| Hilo de insight  | 1x/2 semanas | Algo que aprendiste construyendo ARQ                |
+| Hilo de insight  | 1x/2 semanas | Algo que aprendiste construyendo Covenant                |
 
-**Regla 80/20:** 80% valor puro (insights, preguntas, compartir conocimiento), 20% mención directa de ARQ. Pero incluso el 20% debe ser interesante por sí mismo, no un "descarga mi app".
+**Regla 80/20:** 80% valor puro (insights, preguntas, compartir conocimiento), 20% mención directa de Covenant. Pero incluso el 20% debe ser interesante por sí mismo, no un "descarga mi app".
 
 ### Métricas Reddit + Twitter
 
@@ -431,7 +431,7 @@ El mejor canal de adquisición a largo plazo es que los propios usuarios traigan
 - Contenido compartido orgánicamente por usuarios
 - Solicitudes de acceso beta que llegan sin promoción activa
 - Conversaciones espontáneas en el Discord sin intervención del fundador
-- Alguien escribe sobre ARQ sin que se lo hayas pedido
+- Alguien escribe sobre Covenant sin que se lo hayas pedido
 
 ---
 
@@ -439,7 +439,7 @@ El mejor canal de adquisición a largo plazo es que los propios usuarios traigan
 
 > "La excelencia suprema consiste en romper la resistencia del enemigo sin luchar."
 
-ARQ no compite. ARQ ocupa el vacío.
+Covenant no compite. Covenant ocupa el vacío.
 
 No luchamos contra Habitica por sus usuarios. Atraemos a los que Habitica nunca pudo satisfacer. No gastamos en ads compitiendo con Forest. Aparecemos donde Forest no existe. No intentamos ser mejores que Todoist. Somos algo completamente diferente.
 

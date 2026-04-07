@@ -9,7 +9,7 @@
       "enter": "Enter"
     },
     "story": {
-      "title": "The Chronicles of ARQ",
+      "title": "The Chronicles of Covenant",
       "subtitle": "Light novels that unfold as the community shapes the world's destiny.",
       "episode": "Episode",
       "episodes": {
@@ -26,7 +26,7 @@
       "roadmap": "Roadmap"
     },
     "meta": {
-      "title": "ARQ - Gamified Productivity",
+      "title": "Covenant - Gamified Productivity",
       "description": "A gamified productivity app where every task, every habit, and every goal you complete forges your character. No shortcuts. No excuses. Only results you can see, measure, and equip."
     },
     "hero": {
@@ -121,12 +121,12 @@
         },
         "seasonal": {
           "title": "Board Game Release",
-          "description": "The physical version of ARQ arrives at your table."
+          "description": "The physical version of Covenant arrives at your table."
         }
       }
     },
     "closing": {
-      "line1": "ARQ doesn't push you to do more.",
+      "line1": "Covenant doesn't push you to do more.",
       "line2": "It forces you to do what you say matters.",
       "line3": "Every completed task is dice. Every die is a roll. Every roll is an impact, both in the story and in your life.",
       "line4": "Your productivity has consequences. Make them count.",
@@ -1426,7 +1426,7 @@
     "password": "Password",
     "recover_password": "Recover password",
     "success": "A login link has been sent to your email.",
-    "title": "Login to ARQ",
+    "title": "Login to Covenant",
     "verifying_messages": [
       "Sharpening sacred steel...",
       "Blessing battle gear...",
@@ -1595,7 +1595,7 @@
     "password": "Password",
     "success_message": "We have sent you a verification email. Please check your inbox.",
     "success_title": "Account created!",
-    "title": "Create an ARQ account"
+    "title": "Create a Covenant account"
   },
   "status_effects": {
     "burning": "Burning",
@@ -1808,7 +1808,7 @@
       "quote": "Deuteronomy 20, 1-4"
     },
     "links": {
-      "app": "ARQ - Gamified Productivity",
+      "app": "Covenant - Gamified Productivity",
       "email": "Email",
       "x": "X",
       "github": "GitHub",
@@ -1819,7 +1819,7 @@
       "share": "Share Card",
       "copied": "Link copied to clipboard"
     },
-    "project": "ARQ",
+    "project": "Covenant",
     "yifan": {
       "name": "Yifan Ye",
       "quote": "Ephesians 6, 10-17"

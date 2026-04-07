@@ -14,7 +14,7 @@ export default function ShareButton({ data }: ShareButtonProps) {
 
   const handleShare = async () => {
     const url = `${window.location.origin}/card/${data.slug}`
-    const title = `${t(data.nameKey)} - ARQ`
+    const title = `${t(data.nameKey)} - Covenant`
 
     if (navigator.share) {
       try {

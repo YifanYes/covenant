@@ -1,6 +1,6 @@
 'use client'
 
-import ArqLogo from '@/components/common/arq-logo.component'
+import CovenantLogo from '@/components/common/covenant-logo.component'
 import Dialog, { DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog.component'
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import Image from 'next/image'
@@ -58,7 +58,7 @@ export default function QrCodeDialog({ data }: QrCodeDialogProps) {
           <p className="text-center font-(family-name:--font-eb-garamond)! text-sm italic text-[#d4b346]/70">
             &ldquo;{t(data.quoteKey)}&rdquo;
           </p>
-          <ArqLogo className="h-6 bg-[#d4b346]/70 mt-4 mb-8" />
+          <CovenantLogo className="h-6 bg-[#d4b346]/70 mt-4 mb-8" />
           <QRCodeSVG value={cardUrl} size={200} bgColor="#363329" fgColor="#d4b346" level="M" />
         </div>
       </DialogContent>

@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 
 export const metadata = {
-  title: 'News - ARQ',
+  title: 'News - Covenant',
 }
 
 const SUPPORTED_LOCALES = ['en', 'es'] as const

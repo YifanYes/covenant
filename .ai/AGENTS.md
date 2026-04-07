@@ -16,7 +16,7 @@
 
 ## 1. Project Overview
 
-**ARQ** is a gamified productivity platform that combines task management, habit tracking, and goal setting with an RPG-style progression system. The app features a biblical Apocalypse narrative theme.
+**Covenant** is a gamified productivity platform that combines task management, habit tracking, and goal setting with an RPG-style progression system. The app features a biblical Apocalypse narrative theme.
 
 ### Tech Stack
 

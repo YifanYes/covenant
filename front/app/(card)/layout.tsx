@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'ARQ - Digital Card',
-  description: 'Digital business card for the ARQ team'
+  title: 'Covenant - Digital Card',
+  description: 'Digital business card for the Covenant team'
 }
 
 export default function CardLayout({ children }: Readonly<{ children: React.ReactNode }>) {

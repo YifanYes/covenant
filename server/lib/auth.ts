@@ -24,11 +24,11 @@ export const auth = betterAuth({
         await resend.emails.send({
           from: env.FROM_EMAIL,
           to: email,
-          subject: 'Sign in to ARQ',
+          subject: 'Sign in to Covenant',
           html: `
-            <h2>Welcome to ARQ</h2>
+            <h2>Welcome to Covenant</h2>
             <p>Click the link below to sign in:</p>
-            <a href="${url}">Sign in to ARQ</a>
+            <a href="${url}">Sign in to Covenant</a>
             <p>This link will expire in 10 minutes.</p>
           `
         })

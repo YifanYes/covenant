@@ -21,7 +21,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       setPreferences: (preferences: { language: string; defaultTasksView: string }) => set(preferences)
     }),
     {
-      name: 'arq-user-preferences',
+      name: 'covenant-user-preferences',
       skipHydration: typeof window === 'undefined',
     }
   )

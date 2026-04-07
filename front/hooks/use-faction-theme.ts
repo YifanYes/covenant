@@ -17,7 +17,7 @@ const FACTION_TO_CLASS: Record<Faction, string> = {
   [Faction.BLOOD_PACT]: 'faction-blood-pact'
 }
 
-export const STORAGE_KEY = 'arq-faction-theme'
+export const STORAGE_KEY = 'covenant-faction-theme'
 
 type FactionThemeContextType = {
   faction: Faction
