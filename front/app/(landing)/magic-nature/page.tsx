@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 
 export const metadata = {
-  title: 'Magic Nature - ARQ',
+  title: 'Magic Nature - Covenant',
 }
 
 const SUPPORTED_LOCALES = ['en', 'es'] as const

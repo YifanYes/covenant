@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the technical specification for implementing the initial gamification layer in ARQ. The goal is to transform the user's productivity (completing tasks/habits/objectives) into in-game progress (combat, leveling).
+This document outlines the technical specification for implementing the initial gamification layer in Covenant. The goal is to transform the user's productivity (completing tasks/habits/objectives) into in-game progress (combat, leveling).
 
 ## Progression Models
 

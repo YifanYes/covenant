@@ -11,7 +11,7 @@
 | [mission.md](mission.md)                           | Project purpose and vision     |
 | [roadmap.md](roadmap.md)                           | Current phase and priorities   |
 
-## Project: ARQ
+## Project: Covenant
 
 A gamified productivity platform combining task management, habit tracking, and goal setting with RPG-style progression.
 

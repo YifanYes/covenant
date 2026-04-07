@@ -38,9 +38,9 @@ function getParsedHeadersLang(acceptLang: string | null) {
 }
 
 export const metadata: Metadata = {
-  title: 'ARQ - Gamified Productivity',
-  description: 'Level up your productivity with ARQ',
-  icons: { icon: '/arq-logo.svg' }
+  title: 'Covenant - Gamified Productivity',
+  description: 'Level up your productivity with Covenant',
+  icons: { icon: '/covenant-logo.svg' }
 }
 
 export default async function RootLayout({
@@ -52,7 +52,7 @@ export default async function RootLayout({
   const headerStore = await headers()
 
   const theme = cookieStore.get('theme')?.value || 'light'
-  const faction = cookieStore.get('arq-faction-theme')?.value || Faction.HOLY_KNIGHTS
+  const faction = cookieStore.get('covenant-faction-theme')?.value || Faction.HOLY_KNIGHTS
   const lang = cookieStore.get('i18nextLng')?.value || getParsedHeadersLang(headerStore.get('accept-language'))
 
   const factionClass = `faction-${faction.toLowerCase().replace(/_/g, '-')}`

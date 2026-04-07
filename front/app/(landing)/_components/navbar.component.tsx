@@ -1,6 +1,6 @@
 'use client'
 
-import ArqLogo from '@/components/common/arq-logo.component'
+import CovenantLogo from '@/components/common/covenant-logo.component'
 import Button from '@/components/ui/button.component'
 import DropdownMenu, {
   DropdownMenuContent,
@@ -38,7 +38,7 @@ export default function Navbar() {
     <nav className="bg-background/80 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link href="/">
-          <ArqLogo className="h-12" />
+          <CovenantLogo className="h-12" />
         </Link>
 
         <div className="flex items-center gap-6">

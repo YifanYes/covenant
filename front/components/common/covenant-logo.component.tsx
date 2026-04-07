@@ -1,18 +1,18 @@
 import { cn } from '@/lib/cn.lib'
 
-interface ArqLogoProps {
+interface CovenantLogoProps {
   className?: string
 }
 
-export default function ArqLogo({ className }: ArqLogoProps) {
+export default function CovenantLogo({ className }: CovenantLogoProps) {
   return (
     <div
       style={{
-        maskImage: 'url(/arq-logo.svg)',
+        maskImage: 'url(/covenant-logo.svg)',
         maskRepeat: 'no-repeat',
         maskSize: 'contain',
         maskPosition: 'center',
-        WebkitMaskImage: 'url(/arq-logo.svg)',
+        WebkitMaskImage: 'url(/covenant-logo.svg)',
         WebkitMaskRepeat: 'no-repeat',
         WebkitMaskSize: 'contain',
         WebkitMaskPosition: 'center'

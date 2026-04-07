@@ -1,6 +1,6 @@
 # Landing Page: Especificación Completa
 
-Este documento combina la estructura visual, los elementos funcionales y el contenido de conversión de la landing page de ARQ.
+Este documento combina la estructura visual, los elementos funcionales y el contenido de conversión de la landing page de Covenant.
 
 ---
 
@@ -8,12 +8,12 @@ Este documento combina la estructura visual, los elementos funcionales y el cont
 
 **Estado:** ✅ Implementado
 
-**Visual:** Layout de dos columnas en desktop (contenido izquierda, espacio visual derecha). Gradiente sutil de fondo. Logo "Arq" como H1 con línea decorativa debajo.
+**Visual:** Layout de dos columnas en desktop (contenido izquierda, espacio visual derecha). Gradiente sutil de fondo. Logo "Covenant" como H1 con línea decorativa debajo.
 
 **Elementos:**
 
-- **Logo (H1):** "Arq" con línea decorativa primaria
-- **Titular (H2):** `landing.hero.title` - "ARQ transforma tu productividad en poder real."
+- **Logo (H1):** "Covenant" con línea decorativa primaria
+- **Titular (H2):** `landing.hero.title` - "Covenant transforma tu productividad en poder real."
 - **Subtítulo:** `landing.hero.subtitle` - "Tu disciplina diaria forja tu leyenda divina."
 - **Cuerpo:** `landing.hero.body` - Descripción de la app
 - **CTA Primario:** `landing.hero.cta` - Botón enlazando a `/sign-up`
@@ -28,7 +28,7 @@ Este documento combina la estructura visual, los elementos funcionales y el cont
 
 **Elementos:**
 
-- **Titular (H2):** `landing.value_proposition.title` - "ARQ no es otra app de to-dos."
+- **Titular (H2):** `landing.value_proposition.title` - "Covenant no es otra app de to-dos."
 - **Cuerpo:** `landing.value_proposition.body` - Descripción del sistema de progreso persistente
 
 ---
@@ -173,7 +173,7 @@ El loop de juego completo: dados → misiones → combate → recompensas.
 
 **Contenido:**
 
-- **Línea 1:** `landing.closing.line1` - "ARQ no te empuja a hacer más."
+- **Línea 1:** `landing.closing.line1` - "Covenant no te empuja a hacer más."
 - **Línea 2:** `landing.closing.line2` - "Te obliga a hacer lo que dices que importa." (destacado en primary)
 - **Línea 3:** `landing.closing.line3` - Descripción de dados y tiradas
 - **Línea 4:** `landing.closing.line4` - "Tu productividad tiene consecuencias. Hazlas contar."
@@ -189,7 +189,7 @@ El loop de juego completo: dados → misiones → combate → recompensas.
 **Visual:** Fondo card con borde superior. Contenido centrado.
 
 **Elementos:**
-- Logo "ARQ" en texto primario
+- Logo "Covenant" en texto primario
 - Separador decorativo
 - Copyright dinámico con año actual
 

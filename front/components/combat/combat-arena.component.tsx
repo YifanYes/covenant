@@ -62,7 +62,7 @@ export default function CombatArena({
       {/* Centered arena container */}
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-2 p-4">
         {/* Battlefield: enemy top-right, player bottom-left */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 rounded-lg border p-4">
           {/* Enemy: pushed to the right */}
           <div className="flex justify-end">
             <EnemyDisplay

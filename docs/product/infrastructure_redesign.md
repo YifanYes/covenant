@@ -1,4 +1,4 @@
-# Infrastructure Redesign - ARQ
+# Infrastructure Redesign - Covenant
 
 > **Version**: 1.0  
 > **Status**: Proposal  
@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-ARQ is a gamified productivity app with an RPG-style system. The current stack (React SPA + Bun/tRPC backend + Supabase) has a critical limitation: **zero SEO** for the landing page due to client-side rendering.
+Covenant is a gamified productivity app with an RPG-style system. The current stack (React SPA + Bun/tRPC backend + Supabase) has a critical limitation: **zero SEO** for the landing page due to client-side rendering.
 
 This document proposes an affordable, scalable infrastructure that solves the SEO problem while maintaining development velocity and keeping costs under control.
 
@@ -29,7 +29,7 @@ Supabase is justified when:
 - B2B project with <100 enterprise users paying $X00/month each
 - You need Realtime + Auth + Storage integrated NOW and have no backend developer
 
-**For ARQ**: We have a backend, we need SEO, and we want to scale affordably. Supabase becomes a liability.
+**For Covenant**: We have a backend, we need SEO, and we want to scale affordably. Supabase becomes a liability.
 
 ## Proposed Architecture
 
@@ -139,7 +139,7 @@ Two completely separate projects. Landing is a static site, app is the current S
 
 ## Recommended Path: Option A (Astro Hybrid)
 
-For ARQ's needs, Option A provides the best balance:
+For Covenant's needs, Option A provides the best balance:
 
 1. **SEO solved** with Astro SSG for landing/marketing
 2. **Minimal disruption** to existing React app

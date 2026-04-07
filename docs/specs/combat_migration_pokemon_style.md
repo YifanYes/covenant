@@ -12,7 +12,7 @@ This document proposes migrating to a **Pokemon-style turn-based combat system**
 
 ### Problems with the current approach
 
-1. **Phaser 3 is overkill.** ARQ is a gamified productivity app, not a tactics game. The isometric grid, pathfinding (Dijkstra + A\*), camera drag-to-pan, and sprite tween system add ~3,000 lines of rendering code for minimal gameplay value.
+1. **Phaser 3 is overkill.** Covenant is a gamified productivity app, not a tactics game. The isometric grid, pathfinding (Dijkstra + A\*), camera drag-to-pan, and sprite tween system add ~3,000 lines of rendering code for minimal gameplay value.
 
 2. **Fragile coupling.** The React ↔ Phaser ↔ Zustand bridge requires manual state synchronization. Every new feature touches 3 layers: Zustand store (1,668 lines), Phaser CombatScene (1,283 lines), and React components.
 
@@ -29,7 +29,7 @@ This document proposes migrating to a **Pokemon-style turn-based combat system**
 3. **Faster to extend** - new abilities, items, and enemies are just JSX + backend logic
 4. **~70% backend reuse** - dice system, damage resolution, doctrines, rewards all stay
 5. **Better mobile UX** - no camera dragging, no tiny tile tapping on small screens
-6. **Consistent with ARQ's UI** - uses the same design system as the rest of the app
+6. **Consistent with Covenant's UI** - uses the same design system as the rest of the app
 
 ---
 

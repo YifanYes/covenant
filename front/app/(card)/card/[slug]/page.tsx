@@ -17,10 +17,10 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
   if (!data) return {}
 
   return {
-    title: `ARQ - ${data.slug.charAt(0).toUpperCase() + data.slug.slice(1)}`,
-    description: 'Digital business card for the ARQ team',
+    title: `Covenant - ${data.slug.charAt(0).toUpperCase() + data.slug.slice(1)}`,
+    description: 'Digital business card for the Covenant team',
     openGraph: {
-      title: 'ARQ - Digital Card',
+      title: 'Covenant - Digital Card',
       type: 'profile',
       images: [data.photo]
     }

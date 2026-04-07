@@ -30,7 +30,7 @@ function HeroSection() {
       <div className="absolute inset-0 bg-linear-to-b from-secondary/10 to-transparent" />
       <div className="relative z-10 flex flex-col justify-center gap-6 px-4 py-16 lg:pl-[max(1rem,calc((100vw-72rem)/2+1rem))]">
         <div className="flex flex-col gap-2">
-          <h1 className="text-primary text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">Arq</h1>
+          <h1 className="text-primary text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">Covenant</h1>
           <div className="bg-primary/20 h-1 w-24 rounded-full" />
         </div>
 
@@ -341,10 +341,10 @@ function ClosingAndFooterSection() {
       <footer className="bg-card border-t px-4 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-primary text-2xl font-bold">ARQ</span>
+            <span className="text-primary text-2xl font-bold">Covenant</span>
           </div>
           <Separator className="w-24" />
-          <p className="text-muted-foreground text-sm">&copy; {new Date().getFullYear()} ARQ. All rights reserved.</p>
+          <p className="text-muted-foreground text-sm">&copy; {new Date().getFullYear()} Covenant. All rights reserved.</p>
         </div>
       </footer>
     </div>
