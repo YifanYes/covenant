@@ -41,8 +41,8 @@ export default function PlayerDisplay({
 
   return (
     <div className={cn('flex items-end gap-4', className)}>
-      {/* Left: Player sprite */}
-      <div className="relative h-28 w-28 shrink-0 p-2">
+      {/* Left: Player sprite (flipped to face enemy) */}
+      <div className="relative h-28 w-28 shrink-0 p-2" style={{ transform: 'scaleX(-1)' }}>
         <CombatUnitSprite
           imageUrl={`/assets/classes/${currentClass}.png`}
           alt={name}

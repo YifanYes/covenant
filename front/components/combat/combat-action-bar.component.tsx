@@ -4,14 +4,13 @@ import DiceRoller from '@/app/(workspace)/map/_components/dice-roller.component'
 import DiceResult from '@/app/(workspace)/map/_components/dice-result.component'
 import DoctrinePanel from '@/components/doctrine-panel.component'
 import Button from '@/ui/button.component'
-import { DOCTRINES } from '@shared/constants/doctrines'
 import { getConsumableById } from '@shared/constants/items'
 import { ItemType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
 import type { DoctrineDefinition } from '@shared/types/doctrine.types'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-type ActionTab = 'main' | 'doctrine' | 'item'
+type ActionTab = 'attack' | 'doctrine' | 'item'
 
 interface CombatActionBarProps {
   character: InventoryCharacter
@@ -53,7 +52,7 @@ export default function CombatActionBar({
   className
 }: CombatActionBarProps) {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<ActionTab>('main')
+  const [activeTab, setActiveTab] = useState<ActionTab>('attack')
 
   const currentClass = character.classes.find((c) => c.className === character.currentClass)!
 
@@ -73,7 +72,6 @@ export default function CombatActionBar({
 
   const handleDoctrineUse = (doctrine: DoctrineDefinition) => {
     onSelectDoctrine(doctrine.id)
-    setActiveTab('main')
   }
 
   // Auto-attack first enemy when only one target
@@ -85,41 +83,56 @@ export default function CombatActionBar({
   }
 
   return (
-    <div className={cn('flex min-h-0 flex-1 flex-col rounded-lg border', className)}>
-      {/* Tab buttons — fixed at top */}
-      <div className="flex shrink-0 gap-2 border-b px-4 py-2">
-        <Button
-          variant={activeTab === 'main' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setActiveTab('main')}
+    <div className={cn('flex h-64 shrink-0 gap-3', className)}>
+      {/* Left: Command list — always visible */}
+      <div className="flex w-36 shrink-0 flex-col overflow-hidden rounded-lg border">
+        <button
+          className={cn(
+            'flex items-center gap-2 px-4 py-3 text-left text-sm font-medium transition-colors',
+            activeTab === 'attack' ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50',
+            disabled && 'opacity-50'
+          )}
+          onClick={() => setActiveTab('attack')}
           disabled={disabled}
         >
+          {activeTab === 'attack' && <span className="text-primary">&#9656;</span>}
           {t('combat.action.attack')}
-        </Button>
-        <Button
-          variant={activeTab === 'doctrine' ? 'default' : 'outline'}
-          size="sm"
+        </button>
+        <button
+          className={cn(
+            'flex items-center gap-2 px-4 py-3 text-left text-sm font-medium transition-colors',
+            activeTab === 'doctrine' ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50',
+            disabled && 'opacity-50'
+          )}
           onClick={() => setActiveTab('doctrine')}
           disabled={disabled}
         >
+          {activeTab === 'doctrine' && <span className="text-primary">&#9656;</span>}
           {t('combat.action.doctrine')}
-        </Button>
-        <Button
-          variant={activeTab === 'item' ? 'default' : 'outline'}
-          size="sm"
+        </button>
+        <button
+          className={cn(
+            'flex items-center gap-2 px-4 py-3 text-left text-sm font-medium transition-colors',
+            activeTab === 'item' ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50',
+            (disabled || potionUsedThisTurn) && 'opacity-50'
+          )}
           onClick={() => setActiveTab('item')}
           disabled={disabled || potionUsedThisTurn}
         >
+          {activeTab === 'item' && <span className="text-primary">&#9656;</span>}
           {t('combat.action.item')}
-          {potionUsedThisTurn && <span className="text-muted-foreground ml-1 text-[10px]">({t('combat.potion_used')})</span>}
-        </Button>
+          {potionUsedThisTurn && <span className="text-muted-foreground text-[10px]">({t('combat.potion_used')})</span>}
+        </button>
+        <div className="text-muted-foreground mt-auto px-4 py-2 text-xs">
+          {t('inventory.dice_bank')}: {diceBank}
+        </div>
       </div>
 
-      {/* Scrollable content area */}
-      <div className="min-h-0 flex-1 overflow-y-auto p-4">
+      {/* Right: Content area */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border p-3">
         {/* Targeting mode indicator */}
         {targetingMode && selectedDoctrineId && (
-          <div className="mb-3 flex items-center justify-between rounded bg-amber-500/10 px-3 py-1.5 text-sm">
+          <div className="flex items-center justify-between rounded bg-amber-500/10 px-3 py-1.5 text-sm">
             <span className="text-amber-400">
               {targetingMode === 'all'
                 ? t('combat.targeting.all')
@@ -131,84 +144,87 @@ export default function CombatActionBar({
           </div>
         )}
 
-        {/* Main attack tab */}
-        {activeTab === 'main' && !targetingMode && (
-          <div className="flex flex-col gap-3">
-            {/* Dice roller */}
-            {!attackRolls && (
-              <DiceRoller
-                diceBank={diceBank}
-                attackDiceCount={currentClass.strengthAtk}
-                defenseDiceCount={currentClass.strengthDef}
-                onRoll={onRollDice}
-                isRolling={isRolling}
-              />
-            )}
-
-            {/* Dice results */}
-            {attackRolls && defenseRolls && (
-              <div className="space-y-3">
-                {/* Attack dice */}
-                <div>
-                  <span className="text-muted-foreground mb-1 block text-xs">{t('combat.attack_rolls')}</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {attackRolls.map((value, i) => (
-                      <DiceResult
-                        key={`atk-${i}`}
-                        value={value}
-                        isSuccess={value >= 4}
-                        isCritical={value === 6}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Defense dice */}
-                <div>
-                  <span className="text-muted-foreground mb-1 block text-xs">{t('combat.defense_rolls')}</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {defenseRolls.map((value, i) => (
-                      <DiceResult
-                        key={`def-${i}`}
-                        value={value}
-                        isSuccess={value >= 4}
-                        isCritical={value === 6}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Attack button */}
-                <Button
-                  onClick={handleQuickAttack}
-                  disabled={isLoading || disabled}
-                  className="w-full"
-                >
-                  {t('combat.action.attack')}
-                </Button>
-              </div>
-            )}
+        {/* Attack content — sequential: dice roller, then results */}
+        {activeTab === 'attack' && !targetingMode && !attackRolls && (
+          <div className="flex min-h-0 flex-1 flex-col gap-2">
+            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">{t('combat.to_battle')}</div>
+            <DiceRoller
+              diceBank={diceBank}
+              attackDiceCount={currentClass.strengthAtk}
+              defenseDiceCount={currentClass.strengthDef}
+              onRoll={onRollDice}
+              isRolling={isRolling}
+              compact
+            />
           </div>
         )}
 
-        {/* Doctrine tab */}
-        {activeTab === 'doctrine' && (
-          <DoctrinePanel
-            showUseControls
-            currentMana={currentClass.mana}
-            onUseDoctrine={handleDoctrineUse}
-            isUsingDoctrine={isLoading}
-            horizontal
-          />
+        {activeTab === 'attack' && !targetingMode && attackRolls && defenseRolls && (
+          <div className="flex min-h-0 flex-1 flex-col gap-2">
+            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">{t('combat.results')}</div>
+            <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
+              <div>
+                <span className="text-muted-foreground mb-1 block text-xs">{t('combat.attack_rolls')}</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {attackRolls.map((value, i) => (
+                    <DiceResult
+                      key={`atk-${i}`}
+                      value={value}
+                      isSuccess={value >= 4}
+                      isCritical={value === 6}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <span className="text-muted-foreground mb-1 block text-xs">{t('combat.defense_rolls')}</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {defenseRolls.map((value, i) => (
+                    <DiceResult
+                      key={`def-${i}`}
+                      value={value}
+                      isSuccess={value >= 4}
+                      isCritical={value === 6}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <Button
+                onClick={handleQuickAttack}
+                disabled={isLoading || disabled}
+                className="mt-auto w-full"
+                size="lg"
+              >
+                {t('combat.action.attack')}
+              </Button>
+            </div>
+          </div>
         )}
 
-        {/* Item tab */}
-        {activeTab === 'item' && (
-          <div className="flex flex-col gap-2">
+        {/* Doctrine content */}
+        {activeTab === 'doctrine' && !targetingMode && (
+          <div className="flex flex-1 flex-col gap-2">
+            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">{t('doctrines.title')}</div>
+            <DoctrinePanel
+              showUseControls
+              currentMana={currentClass.mana}
+              onUseDoctrine={handleDoctrineUse}
+              isUsingDoctrine={isLoading}
+              horizontal
+            />
+          </div>
+        )}
+
+        {/* Item content */}
+        {activeTab === 'item' && !targetingMode && (
+          <div className="flex flex-1 flex-col gap-2">
+            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">{t('inventory.items')}</div>
             {Object.keys(groupedConsumables).length === 0 ? (
-              <p className="text-muted-foreground text-center text-sm italic">{t('combat.no_items')}</p>
+              <p className="text-muted-foreground flex flex-1 items-center justify-center text-sm">{t('combat.no_items')}</p>
             ) : (
-              Object.entries(groupedConsumables).map(([defId, { item, count }]) => {
+              Object.entries(groupedConsumables).map(([defId, { count }]) => {
                 const consumable = getConsumableById(defId)
                 if (!consumable) return null
 

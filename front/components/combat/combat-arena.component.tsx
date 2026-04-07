@@ -60,27 +60,27 @@ export default function CombatArena({
   return (
     <div className={cn('flex flex-col overflow-hidden', className)}>
       {/* Centered arena container */}
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-2 p-4">
-        {/* Battlefield: enemy top-right, player bottom-left */}
-        <div className="flex flex-col gap-4 rounded-lg border p-4">
-          {/* Enemy: pushed to the right */}
-          <div className="flex justify-end">
-            <EnemyDisplay
-              enemies={combat.enemies}
-              animation={combat.animation}
-              damageNumbers={combat.damageNumbers}
-              targetingMode={
-                isPlayerTurn && (combat.targetingMode || combat.attackRolls)
-                  ? combat.targetingMode ?? 'single'
-                  : null
-              }
-              onSelectTarget={handleTargetSelect}
-              className="w-80"
-            />
-          </div>
+      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center gap-3 px-8 py-4">
+        {/* Battle Scene */}
+        <div className="w-full overflow-hidden rounded-lg border">
+          <div className="flex flex-col gap-4 p-5">
+            {/* Enemy: pushed to the right */}
+            <div className="flex justify-end">
+              <EnemyDisplay
+                enemies={combat.enemies}
+                animation={combat.animation}
+                damageNumbers={combat.damageNumbers}
+                targetingMode={
+                  isPlayerTurn && (combat.targetingMode || combat.attackRolls)
+                    ? combat.targetingMode ?? 'single'
+                    : null
+                }
+                onSelectTarget={handleTargetSelect}
+                className="w-full max-w-sm"
+              />
+            </div>
 
-          {/* Player: pushed to the left */}
-          <div className="flex flex-col gap-1">
+            {/* Player: pushed to the left */}
             <PlayerDisplay
               name={character.name}
               currentClass={character.currentClass}
@@ -92,7 +92,7 @@ export default function CombatArena({
               magicNature={character.magicNature}
               animation={combat.animation}
               damageNumbers={combat.damageNumbers}
-              className="w-96"
+              className="w-full max-w-md"
             />
 
             {/* Phase indicator */}
@@ -102,9 +102,10 @@ export default function CombatArena({
               {combat.phase === 'animating' && '...'}
             </div>
           </div>
+
         </div>
 
-        {/* Bottom: Action bar — full width of the centered container */}
+        {/* Action bar */}
         <CombatActionBar
           character={character}
           diceBank={combat.diceBank}
@@ -122,6 +123,7 @@ export default function CombatArena({
           isLoading={combat.isLoading}
           disabled={!isPlayerTurn}
           enemies={combat.enemies}
+          className=""
         />
       </div>
 

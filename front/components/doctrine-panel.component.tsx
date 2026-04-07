@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { MagicNature } from '@shared/constants/classes'
 import type { DoctrineAttributeType, DoctrineDefinition } from '@shared/types/doctrine.types'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -26,6 +27,26 @@ const ATTRIBUTE_COLORS: Record<DoctrineAttributeType, string> = {
   DARKNESS: 'bg-purple-400/10 text-purple-400',
   ICE: 'bg-sky-300/10 text-sky-300',
   MIND: 'bg-pink-400/10 text-pink-400'
+}
+
+function DoctrineImage({ doctrineId, alt }: { doctrineId: string; alt: string }) {
+  const [hasError, setHasError] = useState(false)
+
+  if (hasError) {
+    return <Zap className='h-6 w-6 text-muted-foreground' />
+  }
+
+  return (
+    <Image
+      src={`/assets/doctrines/${doctrineId}.png`}
+      alt={alt}
+      width={56}
+      height={56}
+      className='h-full w-full object-contain'
+      style={{ imageRendering: 'pixelated' }}
+      onError={() => setHasError(true)}
+    />
+  )
 }
 
 interface DoctrinePanelProps {
@@ -123,14 +144,7 @@ export default function DoctrinePanel({
         )}
       >
         <div className='bg-muted/50 relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded border p-1'>
-          <Image
-            src={`/assets/doctrines/${doctrine.id}.png`}
-            alt={t(doctrine.nameKey)}
-            width={56}
-            height={56}
-            className='h-full w-full object-contain'
-            style={{ imageRendering: 'pixelated' }}
-          />
+          <DoctrineImage doctrineId={doctrine.id} alt={t(doctrine.nameKey)} />
         </div>
         <div className='min-w-0 flex-1'>
           <div className='flex items-center gap-2'>
@@ -144,14 +158,14 @@ export default function DoctrinePanel({
               {t('doctrines.mana_cost', { cost: doctrine.manaCost })}
             </span>
             <span
-              className={`rounded-full px-2 py-0.5 text-xs font-bold capitalize ${MAGIC_NATURE_COLORS[doctrine.magicNature]}`}
+              className={`rounded-full border border-current/20 px-2 py-0.5 text-xs font-bold capitalize ${MAGIC_NATURE_COLORS[doctrine.magicNature]}`}
             >
               {t(`doctrines.magic_nature.${doctrine.magicNature}`)}
             </span>
-            <span className={`rounded-full px-2 py-0.5 text-xs font-bold capitalize ${ATTRIBUTE_COLORS[doctrine.attribute]}`}>
+            <span className={`rounded-full border border-current/20 px-2 py-0.5 text-xs font-bold capitalize ${ATTRIBUTE_COLORS[doctrine.attribute]}`}>
               {t(`doctrines.attribute.${doctrine.attribute}`)}
             </span>
-            <span className='rounded-full bg-white/10 px-2 py-0.5 text-xs font-bold text-white/70'>
+            <span className='rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-xs font-bold text-white/70'>
               {t('doctrines.tier', { tier: doctrine.tier })}
             </span>
           </div>
@@ -179,7 +193,7 @@ export default function DoctrinePanel({
             ))}
           {showUseControls && isEquippedDoctrine && (
             <Button
-              variant='secondary'
+              variant='outline'
               size='sm'
               onClick={() => handleUse(doctrine)}
               disabled={!canUse || isUsingDoctrine}
@@ -197,12 +211,9 @@ export default function DoctrinePanel({
   if (showUseControls && !showEquipControls) {
     if (horizontal) {
       return (
-        <div className={cn('p-3', className)}>
-          <div className='mb-2 text-xs font-medium tracking-wider text-purple-500/80 uppercase'>
-            {t('doctrines.title')}
-          </div>
+        <div className={cn('flex flex-1 flex-col gap-2', className)}>
           {equippedDoctrines.length === 0 ? (
-            <p className='text-muted-foreground text-sm'>{t('doctrines.empty_equipped')}</p>
+            <p className='text-muted-foreground flex flex-1 items-center justify-center text-sm'>{t('doctrines.empty_equipped')}</p>
           ) : (
             <div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
               {equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}
