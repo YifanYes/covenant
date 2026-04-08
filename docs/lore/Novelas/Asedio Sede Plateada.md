@@ -394,7 +394,7 @@ Protegiendo.
 
 Hasta el final.
 
-## 4. Contraataque
+## 4. Parada y Contraataque
 
 Ezequiel abrió los ojos. Bueno, uno de ellos. El otro estaba cubierto por una venda que le daba la vuelta a la cabeza. De hecho, todo él estaba cubierto de vendas. Parecía una momia recién salida del sarcófago.
 
@@ -418,7 +418,7 @@ Ezequiel dejó escapar un suspiro de alivio. Al menos eso había salido bien.
 
 Miguel se inclinó hacia adelante, apoyando los codos en las rodillas.
 
-—Lo que hicisteis fue una locura. Saltar sobre los navíos enemigos, enfrentaros a un Caballero Caído sin apoyo, aguantar una horda de demonios sin maná... —hizo una pausa. —Fue exactamente lo que necesitábamos.
+—Lo que hicisteis fue una locura. Catapultaros sobre los navíos enemigos, enfrentaros a un Caballero Caído sin apoyo, aguantar una horda de demonios sin maná... —hizo una pausa. —Fue exactamente lo que necesitábamos.
 
 —El sargento tuvo la idea.
 
