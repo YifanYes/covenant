@@ -2,6 +2,18 @@
 
 Los Poderes infernales comandan La Legión. Su objetivo es separar a la humanidad de Dios.
 
+Los demonios de la Legión pueden venir de varios orígenes:
+
+- Humanos que se alían con Satán y ofrecen su cuerpo a cambio de poder. Uno o varios demonios lo poseen.
+- Demonios que poseen un cuerpo humano de forma forzada.
+- Demonios que se materializan en este mundo. Solo un demonio poderoso es capaz de realizar esta materialización.
+
+Los demonios tienen varias formas:
+
+- Humana: son indistinguibles de un ser humano común. Solo se les puede diferenciar por su comportamiento.
+- Híbrida: en la forma híbrida, el demonio adquiere ojos de lagarto, de diferentes tonalidades. La más común es el amarillo. Le salen cuernos de la cabeza, y su piel se torna escamosa.
+- Demonio: dependiendo de a qué grupo pertenezca, el demonio materializa su forma completa en este mundo. Puede aparecerse como una quimera, como un ser de humo y fuego, etc.
+
 Jerarquía:
 
 - **Espíritus malignos y mentirosos:** Los espíritus malignos poseen y atormentan a las personas, otorgándoles fuerza sobrehumana e inmunidad al dolor. Los espíritus mentirosos operan mediante el sabotaje, las mentiras y la manipulación, sembrando discordia entre familias y comunidades. Ambos tipos son la infantería invisible de La Legión, infiltrándose en hogares, iglesias y gobiernos para corromper desde dentro.

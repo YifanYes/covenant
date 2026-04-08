@@ -1,0 +1,10 @@
+[build]
+builder = "railpack"
+buildCommand = "pnpm install && pnpm prisma generate && pnpm build"
+
+[deploy]
+startCommand = "pnpm prisma db push && pnpm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10

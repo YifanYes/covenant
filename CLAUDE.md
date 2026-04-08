@@ -15,44 +15,45 @@ This project uses TypeScript throughout. When modifying types or interfaces, alw
 Always run the full test suite (`pnpm run test`) after making changes, especially for auth, combat, tier progression, and crafting systems. Do not consider a task complete until tests pass.
 
 ```bash
-# Backend (Terminal 1)
-cd server && pnpm dev
-
-# Frontend (Terminal 2)
-cd front && pnpm dev
+pnpm dev    # Start Next.js dev server (includes backend API routes)
 ```
 
 ### Testing
 
-Uses Vitest. Test files go in `server/__tests__/` mirroring the source structure. Mock fixture factories live in `__tests__/fixtures/` using the override pattern (e.g., `mockCharacter(overrides)`). Services are tested by mocking repositories via constructor injection.
+Uses Vitest. Test files go in `src/server/__tests__/` mirroring the source structure. Mock fixture factories live in `__tests__/fixtures/` using the override pattern (e.g., `mockCharacter(overrides)`). Services are tested by mocking repositories via constructor injection.
 
 ```bash
-cd server && pnpm test           # Run tests
-cd server && pnpm test:coverage  # Run with coverage
+pnpm test           # Run tests
+pnpm test:coverage  # Run with coverage
 ```
 
 ### Linting
 
 ```bash
-cd front && pnpm lint
+pnpm lint
 ```
 
 ### Database
 
 ```bash
-cd server
-npx prisma db push      # Push schema to Supabase
+npx prisma db push      # Push schema to database
 npx prisma generate     # Regenerate client
 npx prisma migrate dev  # Create migration
 ```
 
 ## Architecture
 
-### Monorepo Structure
+### Project Structure
 
-- `front/` - Next.js 16 frontend (App Router, React 19, TailwindCSS v4)
-- `server/` - Backend (Node.js, tRPC, Fastify, Prisma)
-- `shared/` - Zod schemas (single source of truth for types)
+Single Next.js app with embedded tRPC server:
+
+- `src/app/` - Next.js App Router pages and API routes
+- `src/app/api/trpc/` - tRPC route handler (fetch adapter)
+- `src/app/api/auth/` - Better Auth route handler
+- `src/server/` - Backend (tRPC routers, services, repositories, Prisma)
+- `src/shared/` - Zod schemas, types, and game constants (single source of truth)
+- `src/components/` - Shared React components
+- `prisma/` - Prisma schema and migrations
 - `docs/specs/` - Technical specifications for complex features
 
 ### Backend Layered Architecture
@@ -64,7 +65,7 @@ Request → Router (validation) → Service (business logic) → Repository (dat
 - **Routers**: Thin layer, input validation only, delegates to services. Use `protectedProcedure` for authenticated routes, `publicProcedure` for public routes
 - **Services**: Class-based with constructor injection, accessed via `ctx.services`
 - **Repositories**: Prisma queries, one per entity, no business logic. Extend `BaseRepository<T>` or `UserScopedRepository<T>` from `base.repository.ts`
-- **Service Factory**: `server/services/service.factory.ts` registers all services with lazy initialization (`??=`). Services are layered — Layer 1: repo-only deps, Layer 2: repo + L1 services, Layer 3: complex deps. New services must be registered here to be available via `ctx.services`
+- **Service Factory**: `src/server/services/service.factory.ts` registers all services with lazy initialization (`??=`). Services are layered — Layer 1: repo-only deps, Layer 2: repo + L1 services, Layer 3: complex deps. New services must be registered here to be available via `ctx.services`
 
 ### Frontend Architecture
 
@@ -100,6 +101,20 @@ const mutation = useMutation(
 
 **Common mistake**: Using `trpc.*.queryOptions()` or `trpc.*.mutationOptions()` will not work correctly. Always use `trpcOptions` for options.
 
+### Server-Side tRPC Caller (RSC)
+
+For React Server Components, use the server-side caller to fetch data without HTTP overhead:
+
+```tsx
+import { createServerCaller } from '@/server/trpc-caller'
+
+export default async function Page() {
+  const trpc = await createServerCaller()
+  const data = await trpc.dashboard.getData()
+  return <ClientComponent initialData={data} />
+}
+```
+
 ## Code Conventions
 
 ### File Naming
@@ -129,8 +144,8 @@ const mutation = useMutation(
 
 - **NEVER hardcode user-facing strings** - always use translation keys via `useTranslation()` hook
 - Translation files location:
-  - English: `front/public/locales/en/translation.json`
-  - Spanish: `front/public/locales/es/translation.json`
+  - English: `public/locales/en/translation.json`
+  - Spanish: `public/locales/es/translation.json`
 - Add keys to BOTH locale files when adding new strings
 - Use `t('key')` for translations, never raw strings like `"Range"` or `"Pattern"`
 
@@ -142,13 +157,13 @@ const mutation = useMutation(
 
 ### Environment
 
-- `server/.env.example` has all required variables (DATABASE_URL, JWT_SECRET, GOOGLE_CLIENT_ID, etc.)
+- `.env.example` has all required variables (DATABASE_URL, JWT_SECRET, GOOGLE_CLIENT_ID, etc.)
 
 ## Adding Features
 
 1. Check `roadmap.md` for current phase priorities
 2. Create spec in `docs/specs/` to document the implementation
-3. Add Zod schema in `shared/schemas/`
+3. Add Zod schema in `src/shared/schemas/`
 4. Backend: Repository → Service → Register in ServiceFactory → Router
 5. Frontend: Component → Hook → View
 6. Add i18n keys to both locales

@@ -1,3 +1,20 @@
 **/node_modules/
 **/bruno/ARQ/environments
 .DS_Store
+
+# Next.js
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.prod
+
+# Build
+dist/
+generated/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
