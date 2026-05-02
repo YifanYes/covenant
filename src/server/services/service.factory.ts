@@ -5,23 +5,18 @@ import { AreaRepository } from '../repositories/area.repository'
 import { CharacterRepository } from '../repositories/character.repository'
 import { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import { HabitRepository } from '../repositories/habit.repository'
-import { InvestmentRepository } from '../repositories/investment.repository'
 import { ObjectiveRepository } from '../repositories/objective.repository'
 import { TaskRepository } from '../repositories/task.repository'
-import { ForumRepository } from '../repositories/forum.repository'
 import { UserRepository } from '../repositories/user.repository'
 import { ActivityService } from './activity.service'
 import { AreaService } from './area.service'
 import { AuthService } from './auth.service'
 import { CharacterService } from './character.service'
 import { CombatService } from './combat.service'
-import { CraftingService } from './crafting.service'
 import { DashboardService } from './dashboard.service'
 import { DeadlineService } from './deadline.service'
 import { DiceService } from './dice.service'
-import { ForumService } from './forum.service'
 import { HabitService } from './habit.service'
-import { InvestmentService } from './investment.service'
 import { KillRecordService } from './kill-record.service'
 
 import { ObjectiveService } from './objective.service'
@@ -40,9 +35,7 @@ export class ServiceFactory {
   private _areaRepository?: AreaRepository
   private _characterRepository?: CharacterRepository
   private _combatEnemyRepository?: CombatEnemyRepository
-  private _forumRepository?: ForumRepository
   private _habitRepository?: HabitRepository
-  private _investmentRepository?: InvestmentRepository
   private _objectiveRepository?: ObjectiveRepository
   private _taskRepository?: TaskRepository
   private _userRepository?: UserRepository
@@ -53,13 +46,10 @@ export class ServiceFactory {
   private _authService?: AuthService
   private _characterService?: CharacterService
   private _combatService?: CombatService
-  private _craftingService?: CraftingService
   private _dashboardService?: DashboardService
   private _deadlineService?: DeadlineService
   private _diceService?: DiceService
-  private _forumService?: ForumService
   private _habitService?: HabitService
-  private _investmentService?: InvestmentService
   private _killRecordService?: KillRecordService
   private _objectiveService?: ObjectiveService
   private _storeService?: StoreService
@@ -89,16 +79,8 @@ export class ServiceFactory {
     return (this._combatEnemyRepository ??= new CombatEnemyRepository(this.prisma))
   }
 
-  private get forumRepository(): ForumRepository {
-    return (this._forumRepository ??= new ForumRepository(this.prisma))
-  }
-
   private get habitRepository(): HabitRepository {
     return (this._habitRepository ??= new HabitRepository(this.prisma))
-  }
-
-  private get investmentRepository(): InvestmentRepository {
-    return (this._investmentRepository ??= new InvestmentRepository(this.prisma))
   }
 
   private get objectiveRepository(): ObjectiveRepository {
@@ -133,10 +115,6 @@ export class ServiceFactory {
     return (this._diceService ??= new DiceService(this.characterRepository))
   }
 
-  get forum(): ForumService {
-    return (this._forumService ??= new ForumService(this.forumRepository, this.characterRepository))
-  }
-
   // Layer 2: Repository + Layer 1 service dependencies
   get combat(): CombatService {
     return (this._combatService ??= new CombatService(
@@ -146,10 +124,6 @@ export class ServiceFactory {
       this.activityRepository,
       this.killRecord
     ))
-  }
-
-  get crafting(): CraftingService {
-    return (this._craftingService ??= new CraftingService(this.characterRepository, this.character))
   }
 
   get habit(): HabitService {
@@ -195,10 +169,6 @@ export class ServiceFactory {
     ))
   }
 
-  get investment(): InvestmentService {
-    return (this._investmentService ??= new InvestmentService(this.investmentRepository, this.characterRepository, this.character))
-  }
-
   get killRecord(): KillRecordService {
     return (this._killRecordService ??= new KillRecordService(this.characterRepository, this.combatEnemyRepository))
   }
@@ -209,6 +179,6 @@ export class ServiceFactory {
 
   // Layer 1: Repository-only dependencies (utilities)
   get deadline(): DeadlineService {
-    return (this._deadlineService ??= new DeadlineService(this.activityRepository, this.investmentRepository))
+    return (this._deadlineService ??= new DeadlineService(this.activityRepository))
   }
 }

@@ -18,8 +18,7 @@ export const mockCharacter = (overrides = {}) => ({
       className: CharacterClassName.TEMPLAR,
       tier: 1,
       health: 100,
-      mana: 50,
-      morality: 50
+      mana: 50
     }
   ],
   inventory: [],

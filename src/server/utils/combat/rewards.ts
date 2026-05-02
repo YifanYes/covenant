@@ -1,9 +1,7 @@
 import { getActivityById, selectEnemyWithFallback } from '@shared/constants/activities'
+import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
 import { applyStatScaling, calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
-import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
-import { getEnemyTypeFromTemplate, rollMaterialDrops, type MaterialDrop } from '@shared/constants/drop-tables'
-import type { WeaponDamageType } from '@shared/constants/items'
 import type { EncounterState } from '@shared/types/combat.types'
 import {
   TACTICAL_STATE_VERSION,
@@ -23,7 +21,7 @@ export interface CombatStateRepos {
   combatEnemyRepository?: CombatEnemyRepository
 }
 
-/** Extended repo set for functions that also process rewards, gold, materials, and tier progression. */
+/** Extended repo set for functions that also process rewards, gold, and tier progression. */
 export interface CombatRewardDeps extends CombatStateRepos {
   activityRepository?: ActivityRepository
   killRecordService?: KillRecordService
@@ -34,7 +32,6 @@ export type CombatRepos = CombatRewardDeps
 
 export interface EnemyDefeatResult {
   goldReward: number
-  materialDrops: MaterialDrop[]
   nextEnemy?: {
     id: string
     templateId: string
@@ -56,8 +53,7 @@ export async function processEnemyDefeat(
   repos: CombatRewardDeps
 ): Promise<EnemyDefeatResult> {
   const result: EnemyDefeatResult = {
-    goldReward: 0,
-    materialDrops: []
+    goldReward: 0
   }
 
   if (killedEnemyIds.length === 0 || !repos.combatEnemyRepository) {
@@ -96,22 +92,6 @@ export async function processEnemyDefeat(
   // Add gold to character's balance
   if (participation?.characterId && result.goldReward > 0) {
     await repos.characterRepository.addGold(participation.characterId, result.goldReward)
-  }
-
-  // Roll for material drops based on enemy type
-  if (participation?.characterId && enemyTemplate) {
-    const enemyType = getEnemyTypeFromTemplate(activeEnemy.templateId)
-    const enemyDamageType = enemyTemplate.damageType as WeaponDamageType | undefined
-    result.materialDrops = rollMaterialDrops(enemyType, enemyDamageType)
-
-    // Add materials to character
-    if (result.materialDrops.length > 0) {
-      const materialsToAdd: Record<string, number> = {}
-      for (const drop of result.materialDrops) {
-        materialsToAdd[drop.materialId] = (materialsToAdd[drop.materialId] || 0) + drop.quantity
-      }
-      await repos.characterRepository.addMaterials(participation.characterId, materialsToAdd)
-    }
   }
 
   // Check tier progression after enemy defeat

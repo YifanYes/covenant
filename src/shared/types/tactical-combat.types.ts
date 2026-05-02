@@ -217,8 +217,6 @@ export interface TacticalAttackResult {
   logEntries: CombatLogEntry[]
   // Gold reward if enemy was defeated
   goldReward?: number
-  // Material drops if enemy was defeated
-  materialDrops?: { materialId: string; quantity: number }[]
   // Next enemy data if a new enemy was spawned
   nextEnemy?: {
     id: string
@@ -288,7 +286,6 @@ export interface TacticalDoctrineResultBase {
   manaRestored?: number
   selfDamage?: number
   goldReward?: number
-  materialDrops?: { materialId: string; quantity: number }[]
   nextEnemy?: {
     id: string
     templateId: string
