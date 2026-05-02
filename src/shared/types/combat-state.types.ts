@@ -59,7 +59,6 @@ export interface CombatAttackResult {
   defenderRolls: { value: number; isSuccess: boolean; isCritical: boolean }[]
   logEntries: CombatLogEntry[]
   goldReward?: number
-  materialDrops?: { materialId: string; quantity: number }[]
   nextEnemy?: {
     id: string
     templateId: string
@@ -121,7 +120,6 @@ export interface CombatDoctrineResult {
   manaRestored?: number
   selfDamage?: number
   goldReward?: number
-  materialDrops?: { materialId: string; quantity: number }[]
   nextEnemy?: {
     id: string
     templateId: string

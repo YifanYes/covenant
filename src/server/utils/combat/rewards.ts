@@ -1,8 +1,7 @@
 import { getActivityById, selectEnemyWithFallback } from '@shared/constants/activities'
+import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
 import { applyStatScaling, calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
-import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
-import type { MaterialDrop } from '@shared/constants/drop-tables'
 import type { EncounterState } from '@shared/types/combat.types'
 import {
   TACTICAL_STATE_VERSION,
@@ -33,7 +32,6 @@ export type CombatRepos = CombatRewardDeps
 
 export interface EnemyDefeatResult {
   goldReward: number
-  materialDrops: MaterialDrop[]
   nextEnemy?: {
     id: string
     templateId: string
@@ -55,8 +53,7 @@ export async function processEnemyDefeat(
   repos: CombatRewardDeps
 ): Promise<EnemyDefeatResult> {
   const result: EnemyDefeatResult = {
-    goldReward: 0,
-    materialDrops: []
+    goldReward: 0
   }
 
   if (killedEnemyIds.length === 0 || !repos.combatEnemyRepository) {
