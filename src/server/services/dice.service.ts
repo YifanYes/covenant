@@ -62,7 +62,7 @@ export class DiceService {
     const sorted = [...completions].sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime())
 
     let streak = 0
-    let currentDate = new Date()
+    const currentDate = new Date()
     currentDate.setHours(0, 0, 0, 0)
 
     const lastCompletionDate = new Date(sorted[0].completedAt)

@@ -22,7 +22,7 @@ export const auth = betterAuth({
     nextCookies(),
     magicLink({
       sendMagicLink: async ({ email, url }) => {
-        await resend.emails.send({
+        const result = await resend.emails.send({
           from: env.FROM_EMAIL,
           to: email,
           subject: 'Sign in to Covenant',
@@ -33,6 +33,7 @@ export const auth = betterAuth({
             <p>This link will expire in 10 minutes.</p>
           `
         })
+        if (result.error) throw new Error(`Failed to send magic link: ${result.error.message}`)
       }
     })
   ],

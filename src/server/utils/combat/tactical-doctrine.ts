@@ -1,6 +1,5 @@
 import { DOCTRINES, SELF_BUFF_EFFECT_TYPES, SPECIAL_SELF_BUFF_DOCTRINES } from '@shared/constants/doctrines'
 import { getEnemy } from '@shared/constants/enemies'
-import type { MaterialDrop } from '@shared/constants/drop-tables'
 import { DoctrineEffectType, DoctrineTarget, NEGATIVE_STATUSES, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 import type { CombatLogEntry } from '@shared/types/gamification.types'
 import { CombatLogType } from '@shared/types/gamification.types'
@@ -525,7 +524,6 @@ export async function executeTacticalDoctrine(
 
   // Handle enemy defeats and spawn next enemy
   let goldReward = 0
-  let materialDrops: MaterialDrop[] = []
   let nextEnemy: { id: string; templateId: string; name: string; currentHealth: number; maxHealth: number } | undefined
   let tierProgression: { oldTier: number; newTier: number } | undefined
 
@@ -557,7 +555,6 @@ export async function executeTacticalDoctrine(
           repos
         )
         goldReward = defeatResult.goldReward
-        materialDrops = defeatResult.materialDrops
         nextEnemy = defeatResult.nextEnemy
         tierProgression = defeatResult.tierProgression
       }
@@ -577,7 +574,6 @@ export async function executeTacticalDoctrine(
     manaRestored: manaRestored > 0 ? manaRestored : undefined,
     selfDamage: selfDamage > 0 ? selfDamage : undefined,
     goldReward: goldReward > 0 ? goldReward : undefined,
-    materialDrops: materialDrops.length > 0 ? materialDrops : undefined,
     nextEnemy,
     tierProgression
   }

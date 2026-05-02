@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
  * These tests verify that character ownership validation is properly
  * integrated into the services that are called by routers.
  *
- * The routers (activity.router.ts, investment.router.ts) call
+ * The routers (activity.router.ts) call
  * verifyCharacterOwnership before delegating to services.
  * These tests verify the ownership check logic works correctly.
  */
@@ -162,71 +162,5 @@ describe('Character Ownership Validation', () => {
       expect(mockActivityService.getActivities).toHaveBeenCalledWith(undefined)
     })
 
-    it('should check ownership for investment.contribute pattern', async () => {
-      const characterId = 'char-1'
-      const userId = 'user-1'
-      const investmentId = 'inv-1'
-      const amount = 100
-      const mockInvestmentService = {
-        contribute: vi.fn().mockResolvedValue({ success: true })
-      }
-
-      // Simulate investment.contribute router pattern
-      async function investmentContributeHandler(
-        inputInvestmentId: string,
-        inputCharacterId: string,
-        inputAmount: number,
-        inputUserId: string
-      ) {
-        const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
-        if (!isOwner) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
-        }
-        return mockInvestmentService.contribute(inputInvestmentId, inputCharacterId, inputAmount)
-      }
-
-      // Test authorized contribution
-      mockCharacterService.verifyCharacterOwnership.mockResolvedValue(true)
-      await investmentContributeHandler(investmentId, characterId, amount, userId)
-
-      expect(mockCharacterService.verifyCharacterOwnership).toHaveBeenCalledWith(characterId, userId)
-      expect(mockInvestmentService.contribute).toHaveBeenCalledWith(investmentId, characterId, amount)
-    })
-
-    it('should block investment.contribute when ownership fails', async () => {
-      const characterId = 'other-users-char'
-      const userId = 'attacker-user'
-      const investmentId = 'inv-1'
-      const amount = 100
-      const mockInvestmentService = {
-        contribute: vi.fn()
-      }
-
-      // Simulate investment.contribute router pattern
-      async function investmentContributeHandler(
-        inputInvestmentId: string,
-        inputCharacterId: string,
-        inputAmount: number,
-        inputUserId: string
-      ) {
-        const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
-        if (!isOwner) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
-        }
-        return mockInvestmentService.contribute(inputInvestmentId, inputCharacterId, inputAmount)
-      }
-
-      // Test unauthorized contribution - attacker trying to use another user's character
-      mockCharacterService.verifyCharacterOwnership.mockResolvedValue(false)
-
-      await expect(
-        investmentContributeHandler(investmentId, characterId, amount, userId)
-      ).rejects.toMatchObject({
-        code: 'FORBIDDEN'
-      })
-
-      // Verify contribute was never called
-      expect(mockInvestmentService.contribute).not.toHaveBeenCalled()
-    })
   })
 })

@@ -15,6 +15,7 @@ export function proxy(request: NextRequest) {
   const landingPrefixRoutes = ['/story', '/card']
   const isPublicRoute =
     authRoutes.some((r) => pathname.startsWith(r)) ||
+    pathname.startsWith('/api/') ||
     landingRoutes.includes(pathname) ||
     landingPrefixRoutes.some((r) => pathname.startsWith(r))
 
