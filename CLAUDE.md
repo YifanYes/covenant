@@ -6,6 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Covenant is a gamified productivity platform combining task management, habit tracking, and objective setting with RPG-style progression. It follows a biblical Apocalypse narrative theme in a dark fantasy setting.
 
+## Design System
+
+Visual identity, faction color palettes, typography, and UI principles are in:
+
+@DESIGN.md
+
 ## Commands
 
 ### Development
