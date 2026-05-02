@@ -6,10 +6,6 @@
 
 ## High Priority
 
-- [ ] Security: Database SSL Disabled
-  - `server/lib/prisma.ts` (line 14)
-  - **Fix:** Change `rejectUnauthorized: false` to `true` in production
-
 - [ ] Security: Cookie Security Production-Only
   - `server/lib/auth.ts` (lines 42-52)
   - **Fix:** Apply secure/sameSite/httpOnly in all environments

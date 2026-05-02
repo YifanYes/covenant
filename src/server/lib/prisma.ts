@@ -11,7 +11,7 @@ const pool = new Pool({
   user: url.username,
   password: decodeURIComponent(url.password),
   database: url.pathname.slice(1),
-  ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : false,
   max: 10,
   min: 1,
   idleTimeoutMillis: 30000,
