@@ -158,7 +158,7 @@ export class ActivityService {
     let shouldInitializeTacticalState = false
 
     // Get or initialize encounter state
-    let combatStats = await this.activityParticipationRepository.getCombatStats(participation.id)
+    const combatStats = await this.activityParticipationRepository.getCombatStats(participation.id)
     let encounterState = combatStats as EncounterState | null
 
     if (!activeEnemy) {

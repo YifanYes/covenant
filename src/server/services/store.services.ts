@@ -5,10 +5,7 @@ import {
   getConsumableById,
   getItemById
 } from '@shared/constants/items'
-import { getMaterialById } from '@shared/constants/materials'
-import { canPurchaseMaterial, getAvailableShopMaterials, getMaterialPrice, SHOP_MATERIALS } from '@shared/constants/shop-materials'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
-import type { MaterialPurchaseResult, ShopMaterialInfo, ShopMaterialListResult } from '@shared/types/crafting.types'
 import type { PurchaseResult, StoreListResult } from '@shared/types/store.types'
 import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
@@ -122,88 +119,4 @@ export class StoreService {
     }
   }
 
-  async listMaterials(userId: string): Promise<ShopMaterialListResult> {
-    const character = await this.characterRepository.findWithClasses(userId)
-
-    if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${userId} not found` })
-    }
-
-    const { tier } = this.characterService.getCharacterProgress(character)
-
-    const availableShopMaterials = getAvailableShopMaterials(tier)
-
-    const materials: ShopMaterialInfo[] = availableShopMaterials
-      .map((sm) => {
-        const material = getMaterialById(sm.materialId)
-        if (!material) return null
-
-        return {
-          materialId: sm.materialId,
-          material,
-          price: sm.price,
-          minTier: sm.minTier,
-          canPurchase: tier >= sm.minTier
-        }
-      })
-      .filter((m): m is ShopMaterialInfo => m !== null)
-
-    return {
-      materials,
-      gold: character.gold,
-      characterTier: tier
-    }
-  }
-
-  async purchaseMaterial(userId: string, materialId: string, quantity: number): Promise<MaterialPurchaseResult> {
-    const character = await this.characterRepository.findWithClasses(userId)
-
-    if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${userId} not found` })
-    }
-
-    const { tier } = this.characterService.getCharacterProgress(character)
-
-    // Validate material exists in shop
-    const shopMaterial = SHOP_MATERIALS[materialId]
-    if (!shopMaterial) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Material ${materialId} not available in shop` })
-    }
-
-    // Validate tier requirement
-    if (!canPurchaseMaterial(materialId, tier)) {
-      throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: `Material ${materialId} requires Tier ${shopMaterial.minTier}`
-      })
-    }
-
-    // Calculate total cost
-    const price = getMaterialPrice(materialId)
-    if (price === undefined) {
-      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: `Price not found for material ${materialId}` })
-    }
-
-    const totalCost = price * quantity
-
-    // Validate gold
-    if (character.gold < totalCost) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not enough gold' })
-    }
-
-    // Add materials to character
-    const materialsToAdd: Record<string, number> = { [materialId]: quantity }
-    await this.characterRepository.addMaterials(character.id, materialsToAdd)
-
-    // Deduct gold
-    const newGold = character.gold - totalCost
-    await this.characterRepository.updateGold(character.id, newGold)
-
-    return {
-      success: true,
-      purchasedMaterials: [{ materialId, quantity }],
-      totalCost,
-      remainingGold: newGold
-    }
-  }
 }

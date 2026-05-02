@@ -102,16 +102,4 @@ export const invalidators = {
     ])
   },
 
-  /**
-   * Invalidate investment-related queries.
-   * Use after creating or updating investments.
-   */
-  investments: async (characterId: string) => {
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: trpcOptions.investment.list.queryKey({ characterId })
-      }),
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.get.queryKey() })
-    ])
-  }
 }

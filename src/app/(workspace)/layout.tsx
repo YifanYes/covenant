@@ -10,7 +10,7 @@ import { useEffect, useSyncExternalStore } from 'react'
 import ProductivityLayout from './productivity-layout'
 import RPGLayout from './rpg-layout'
 
-const RPG_ROUTES = ['/map', '/inventory', '/shop', '/investments', '/crafting', '/forum']
+const RPG_ROUTES = ['/map', '/inventory', '/shop']
 
 export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()

@@ -85,12 +85,9 @@ model Character {
   inventory               Json?                    @default("[]")
   loadout                 Json?                    @default("[]")
   magicNature             String?                  @db.VarChar(50)
-  materials               Json?                    @default("{}")
   user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   activityParticipations  ActivityParticipation[]
   classes                 CharacterClass[]
-  investmentContributions InvestmentContribution[]
-  forumComments           ForumComment[]
 
   @@map("characters")
 }
@@ -111,7 +108,6 @@ model CharacterClass {
   tier              Int       @default(1)
   maxHealth         Int       @default(5)
   maxMana           Int       @default(5)
-  morality          Int       @default(50)
   equippedDoctrines String[]  @default([])
   character         Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
@@ -261,54 +257,3 @@ model HabitCompletion {
   @@map("habit_completions")
 }
 
-model Investment {
-  id            String                   @id @default(uuid()) @db.Uuid
-  investmentId  String                   @db.VarChar(255)
-  factionName   String                   @db.VarChar(100)
-  status        String                   @db.VarChar(20)
-  currentAmount Int                      @default(0)
-  targetAmount  Int
-  startedAt     DateTime                 @default(now()) @db.Timestamp(6)
-  deadline      DateTime                 @db.Timestamp(6)
-  completedAt   DateTime?                @db.Timestamp(6)
-  contributions InvestmentContribution[]
-
-  @@index([factionName, status])
-  @@map("investments")
-}
-
-model InvestmentContribution {
-  id            String     @id @default(uuid()) @db.Uuid
-  investmentId  String     @db.Uuid
-  characterId   String     @db.Uuid
-  amount        Int
-  contributedAt DateTime   @default(now()) @db.Timestamp(6)
-  investment    Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
-  character     Character  @relation(fields: [characterId], references: [id], onDelete: Cascade)
-
-  @@index([investmentId])
-  @@index([characterId])
-  @@map("investment_contributions")
-}
-
-model ForumComment {
-  id        String         @id @default(uuid()) @db.Uuid
-  parentId  String?        @db.Uuid
-  rootId    String         @db.Uuid
-  title     String?        @db.VarChar(255)
-  content   String         @db.Text
-  faction   String         @db.VarChar(100)
-  authorId  String         @db.Uuid
-  depth     Int            @default(0)
-  createdAt DateTime       @default(now()) @db.Timestamp(6)
-  updatedAt DateTime       @updatedAt @db.Timestamp(6)
-  parent    ForumComment?  @relation("CommentTree", fields: [parentId], references: [id], onDelete: Cascade)
-  children  ForumComment[] @relation("CommentTree")
-  author    Character      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-
-  @@index([parentId])
-  @@index([rootId])
-  @@index([authorId])
-  @@index([faction])
-  @@map("forum_comments")
-}

@@ -2,12 +2,9 @@ import { activityRouter } from './routers/activity.router'
 import { areasRouter } from './routers/areas.router'
 import { authRouter } from './routers/auth.router'
 import { characterRouter } from './routers/character.router'
-import { craftingRouter } from './routers/crafting.router'
 import { dashboardRouter } from './routers/dashboard.router'
-import { forumRouter } from './routers/forum.router'
 import { deadlineRouter } from './routers/deadline.router'
 import { habitsRouter } from './routers/habits.router'
-import { investmentRouter } from './routers/investment.router'
 import { killRecordRouter } from './routers/kill-record.router'
 import { objectivesRouter } from './routers/objectives.router'
 import { storeRouter } from './routers/store.router'
@@ -28,12 +25,9 @@ export const appRouter = t.router({
   habits: habitsRouter,
   dashboard: dashboardRouter,
   activity: activityRouter,
-  investment: investmentRouter,
   killRecord: killRecordRouter,
   store: storeRouter,
-  crafting: craftingRouter,
-  deadline: deadlineRouter,
-  forum: forumRouter
+  deadline: deadlineRouter
 })
 
 export type AppRouter = typeof appRouter

@@ -12,7 +12,6 @@ export interface CharacterClassType {
   magicAtk: number
   magicDef: number
   manaRegen: number
-  morality: number
   equippedDoctrines: string[] // Array of doctrine IDs, max 2
   createdAt: Date
   updatedAt: Date
@@ -30,7 +29,6 @@ export interface CharacterType {
   gold: number
   inventory: any
   loadout: any
-  materials: any
   createdAt: Date
   updatedAt: Date
 }
