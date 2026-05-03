@@ -12,7 +12,7 @@ import { useTasksStore } from '@/stores/tasks.store'
 import Textarea from '@/ui/textarea.component'
 import { invalidators } from '@/utils/query-invalidation.utils'
 import { getRewardText } from '@/utils/text.utils'
-import { queryClient, trpcOptions } from '@/utils/trpc.utils'
+import { trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import {
   TaskEffort,
@@ -36,17 +36,13 @@ export default function UpdateTaskDialog() {
   const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
+  const monthIndexParams = { monthIndex: monthIndex.toString(), year: dayjs().year().toString() }
+
   const updateMutation = useMutation(
     trpcOptions.tasks.update.mutationOptions({
       onSuccess: async (data: { diceEarned: number }) => {
         toast.success(t('tasks.success.update', { diceReward: getRewardText(data.diceEarned) }))
-        await queryClient.invalidateQueries({
-          queryKey: trpcOptions.tasks.getByDate.queryKey({
-            monthIndex: monthIndex.toString(),
-            year: dayjs().year().toString()
-          })
-        })
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
+        await invalidators.tasks(monthIndexParams)
         await invalidators.character()
         setSelectedTask(undefined)
       },
@@ -58,13 +54,7 @@ export default function UpdateTaskDialog() {
     trpcOptions.tasks.delete.mutationOptions({
       onSuccess: async () => {
         toast.success(t('tasks.success.delete'))
-        await queryClient.invalidateQueries({
-          queryKey: trpcOptions.tasks.getByDate.queryKey({
-            monthIndex: monthIndex.toString(),
-            year: dayjs().year().toString()
-          })
-        })
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
+        await invalidators.tasks(monthIndexParams)
         setSelectedTask(undefined)
       },
       onError: (error) => toast.error(t('tasks.error.internal.delete'), { description: error.message })
@@ -75,13 +65,7 @@ export default function UpdateTaskDialog() {
     trpcOptions.tasks.duplicate.mutationOptions({
       onSuccess: async () => {
         toast.success(t('tasks.success.duplicate'))
-        await queryClient.invalidateQueries({
-          queryKey: trpcOptions.tasks.getByDate.queryKey({
-            monthIndex: monthIndex.toString(),
-            year: dayjs().year().toString()
-          })
-        })
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
+        await invalidators.tasks(monthIndexParams)
         setSelectedTask(undefined)
       },
       onError: (error) => toast.error(t('tasks.error.internal.duplicate'), { description: error.message })
