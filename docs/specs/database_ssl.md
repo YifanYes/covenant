@@ -13,6 +13,7 @@ ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : false,
 Setting `rejectUnauthorized: false` disables certificate verification entirely. Any server can present any certificate and the client will accept it, enabling man-in-the-middle attacks on the database connection. Credentials and query results travel over what appears to be an encrypted channel but can be intercepted.
 
 `rejectUnauthorized: true` (the Node.js default) ensures:
+
 - The server's certificate is signed by a trusted CA
 - The certificate has not expired
 - The hostname in the certificate matches the connection hostname
@@ -30,13 +31,16 @@ Internal hostnames (`postgres.railway.internal`) are covered by Railway's certif
 **Cause:** The database certificate is signed by a private CA not in Node.js's default trust store (common with some on-premise or misconfigured managed databases).
 
 **Fix:** Add the CA certificate via the `ssl.ca` option:
+
 ```ts
 ssl: {
   rejectUnauthorized: true,
   ca: fs.readFileSync('/path/to/ca.pem').toString(),
 }
 ```
+
 Or set via environment variable and pass it in:
+
 ```ts
 ssl: {
   rejectUnauthorized: true,
@@ -69,9 +73,11 @@ SSL remains disabled in `development` and `test` environments (the pool receives
 ## Verifying SSL Is Active
 
 Connect with `psql` and run:
+
 ```sql
 SELECT ssl, version FROM pg_stat_ssl WHERE pid = pg_backend_pid();
 ```
+
 If `ssl` is `t`, the connection is encrypted.
 
 Or check from Node.js by listening to the pool's `connect` event and inspecting `client.ssl`.
