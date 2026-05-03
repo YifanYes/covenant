@@ -23,7 +23,7 @@ export default function StoreFilters({ gold, tierFilter, typeFilter, onTierChang
       </div>
       <div className="flex gap-2">
         <Select value={tierFilter} onValueChange={onTierChange}>
-          <SelectTrigger className="w-[160px] cursor-pointer">
+          <SelectTrigger className="w-40 cursor-pointer">
             <SelectValue placeholder={t('store.filter.tier')} />
           </SelectTrigger>
           <SelectContent>
@@ -34,7 +34,7 @@ export default function StoreFilters({ gold, tierFilter, typeFilter, onTierChang
           </SelectContent>
         </Select>
         <Select value={typeFilter} onValueChange={onTypeChange}>
-          <SelectTrigger className="w-[160px] cursor-pointer">
+          <SelectTrigger className="w-40 cursor-pointer">
             <SelectValue placeholder={t('store.filter.type')} />
           </SelectTrigger>
           <SelectContent>

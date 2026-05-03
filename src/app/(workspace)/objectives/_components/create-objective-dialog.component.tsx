@@ -3,9 +3,9 @@ import BaseFormDialog from '@/common/base-form-dialog.component'
 import DatePicker from '@/forms/date-picker.component'
 import MultiSelect from '@/forms/multi-select.component'
 import TextInput from '@/forms/text-input.component'
+import { clientLogger } from '@/lib/logger.client'
 import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
-import { clientLogger } from '@/lib/logger.client'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
@@ -70,7 +70,7 @@ export default function CreateObjectiveDialog() {
       submitLabel="save_changes"
       isLoading={mutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
-      className="sm:max-w-[500px]"
+      className="sm:max-w-125"
       trigger={
         <Button>
           <Plus />
