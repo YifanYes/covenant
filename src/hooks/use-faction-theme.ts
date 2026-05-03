@@ -49,7 +49,7 @@ export function useFactionThemeProvider({ initialFaction }: { initialFaction: Fa
 
   const syncStorage = (value: string) => {
     localStorage.setItem(STORAGE_KEY, value)
-    document.cookie = `${STORAGE_KEY}=${value}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+    document.cookie = `${STORAGE_KEY}=${value}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax; Secure`
   }
 
   const setFaction = (newFaction: Faction) => {
