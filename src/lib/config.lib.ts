@@ -9,8 +9,7 @@ const _env = envSchema.safeParse({
 })
 
 if (!_env.success) {
-  console.error('Invalid environment variables:', _env.error.flatten())
-  throw new Error('Invalid environment variables')
+  throw new Error(`Invalid environment variables: ${JSON.stringify(_env.error.flatten())}`)
 }
 
 export const env = _env.data

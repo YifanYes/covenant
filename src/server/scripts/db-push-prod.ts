@@ -2,6 +2,7 @@ import { spawn } from 'child_process'
 import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { logger } from '../lib/logger'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -11,21 +12,21 @@ if (!process.env.DIRECT_URL) {
   const result = dotenv.config({ path: envPath })
 
   if (result.error) {
-    console.log('⚠️  Could not load .env.prod (This is expected in CI if secrets are injected)')
+    logger.warn('Could not load .env.prod — expected in CI when secrets are injected')
   } else {
-    console.log('✅ Loaded environment from .env.prod')
+    logger.info('Loaded environment from .env.prod')
   }
 } else {
-  console.log('✅ Used existing environment variables')
+  logger.info('Used existing environment variables')
 }
 
 if (!process.env.DIRECT_URL) {
-  console.error('❌ DIRECT_URL is missing from environment')
+  logger.error('DIRECT_URL is missing from environment')
   process.exit(1)
 }
 
 const directUrl = new URL(process.env.DIRECT_URL)
-console.log(`   DIRECT_URL host: ${directUrl.hostname}`)
+logger.info({ host: directUrl.hostname }, 'DIRECT_URL resolved')
 
 // Run prisma db push
 const prisma = spawn('npx', ['prisma', 'db', 'push', '--accept-data-loss', '--url', process.env.DIRECT_URL!], {

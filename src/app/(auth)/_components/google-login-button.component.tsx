@@ -1,5 +1,6 @@
 'use client'
 import LoaderButton from '@/common/loader-button.component'
+import { clientLogger } from '@/lib/logger.client'
 import { signIn } from '@/lib/auth.lib'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -17,7 +18,7 @@ export default function GoogleLoginButton() {
         callbackURL: `${window.location.origin}/login`
       })
     } catch (error) {
-      console.error(error)
+      clientLogger.error('Google login failed', error)
       toast.error(t('login.error.title'), { description: t('login.error.google_unavailable') })
       setIsLoading(false)
     }

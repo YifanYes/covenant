@@ -5,6 +5,7 @@ import MultiSelect from '@/forms/multi-select.component'
 import TextInput from '@/forms/text-input.component'
 import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
+import { clientLogger } from '@/lib/logger.client'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
@@ -29,7 +30,7 @@ export default function CreateObjectiveDialog() {
         setOpen(false)
       },
       onError: (error) => {
-        console.error(error)
+        clientLogger.error('Failed to create objective', error)
         toast.error(t('create_objective_dialog.error.internal'))
       }
     })
