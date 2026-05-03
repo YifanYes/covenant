@@ -56,11 +56,11 @@ export default function ObjectiveSummaryList({ title, tasks, habits, setSelected
             )}
           </div>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[700px]">
+        <DialogContent className="sm:max-w-175">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
-          <div className="mt-4 grid h-[80vh] max-h-[600px] min-h-[200px] grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="mt-4 grid h-[80vh] max-h-150 min-h-50 grid-cols-1 gap-6 md:grid-cols-2">
             {/* Tasks Column */}
             <div className="flex min-h-0 flex-col gap-3 md:pr-6">
               <h3 className="text-base font-semibold">{t('tasks.title')}</h3>

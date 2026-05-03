@@ -1,16 +1,18 @@
 import { DOCTRINES, SELF_BUFF_EFFECT_TYPES, SPECIAL_SELF_BUFF_DOCTRINES } from '@shared/constants/doctrines'
 import { getEnemy } from '@shared/constants/enemies'
-import { DoctrineEffectType, DoctrineTarget, NEGATIVE_STATUSES, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
+import {
+  DoctrineEffectType,
+  DoctrineTarget,
+  NEGATIVE_STATUSES,
+  StatusEffect,
+  type ActiveStatusEffect
+} from '@shared/types/doctrine.types'
 import type { CombatLogEntry } from '@shared/types/gamification.types'
 import { CombatLogType } from '@shared/types/gamification.types'
-import type {
-  TacticalStateData,
-  TacticalDoctrineResult
-} from '@shared/types/tactical-combat.types'
+import type { TacticalDoctrineResult, TacticalStateData } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 
-import { rollDice, calculateHitsWithCount, getCurrentClassOrThrow } from './dice'
-import { getActiveDoctrineBuffs } from './doctrine-buffs'
+import { calculateHitsWithCount, getCurrentClassOrThrow, rollDice } from './dice'
 import { processEnemyDefeat, type CombatRewardDeps, type CombatStateRepos } from './rewards'
 
 /**
@@ -46,7 +48,7 @@ export async function executeTacticalDoctrine(
   }
 
   if (state.turnOrder[state.currentTurnIndex] !== casterId) {
-    throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not this unit\'s turn' })
+    throw new TRPCError({ code: 'BAD_REQUEST', message: "Not this unit's turn" })
   }
 
   if (caster.hasActed) {
@@ -62,12 +64,8 @@ export async function executeTacticalDoctrine(
     throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not enough mana' })
   }
 
-  // Find caster index
-  const casterIndex = state.units.findIndex((u) => u.id === casterId)
-
   // Use targetIds directly as affected units
   const affectedUnitIds = targetIds
-  const affectedTiles: { x: number; y: number }[] = []
 
   const timestamp = Date.now()
   const logEntries: CombatLogEntry[] = []
@@ -76,7 +74,6 @@ export async function executeTacticalDoctrine(
   // Track special doctrine results
   let manaRestored = 0
   let selfDamage = 0
-  let killCount = 0
 
   // Log doctrine cast
   logEntries.push({
@@ -221,8 +218,9 @@ export async function executeTacticalDoctrine(
               // Get enemy template to find tier
               // Unit's name contains the templateId info, or we can look it up
               // For tactical state, we need to get the enemy from the database
-              const enemyTemplate = getEnemy(targetUnit.name.split('|')[0]) // Try to get from name
-                || state.units.find(u => u.id === targetId) // Fallback
+              const enemyTemplate =
+                getEnemy(targetUnit.name.split('|')[0]) || // Try to get from name
+                state.units.find((u) => u.id === targetId) // Fallback
               if (enemyTemplate && 'tier' in enemyTemplate) {
                 enemyTier = (enemyTemplate as any).tier || 2
               } else {
@@ -294,11 +292,11 @@ export async function executeTacticalDoctrine(
             const { results: rollResults, count: hits } = calculateHitsWithCount(
               powerRolls,
               4, // Standard attack threshold
-              6  // 6s are criticals
+              6 // 6s are criticals
             )
 
             // Count extra hits from criticals (6s)
-            const criticalCount = rollResults.filter(r => r.isCritical).length
+            const criticalCount = rollResults.filter((r) => r.isCritical).length
             let totalHits = hits + criticalCount // Criticals generate extra hits
 
             // Apply AoE damage reduction for 'all' targeting
@@ -342,7 +340,6 @@ export async function executeTacticalDoctrine(
               })
 
               if (killed) {
-                killCount++
                 logEntries.push({
                   timestamp: timestamp + 0.2,
                   type: CombatLogType.ENEMY_DEFEATED,
@@ -510,7 +507,8 @@ export async function executeTacticalDoctrine(
   await repos.activityParticipationRepository.updateTacticalState(participationId, updatedState)
 
   // Sync player health to CharacterClass if player's health changed (self-damage or healing)
-  const playerHealthChanged = selfDamage > 0 || effects.some((e) => e.unitId === casterId && (e.damageDealt || e.healthRestored))
+  const playerHealthChanged =
+    selfDamage > 0 || effects.some((e) => e.unitId === casterId && (e.damageDealt || e.healthRestored))
   if (playerHealthChanged && casterId.startsWith('player-') && participation.characterId) {
     const playerUnit = updatedState.units.find((u) => u.id === casterId)
     if (playerUnit) {
@@ -548,12 +546,7 @@ export async function executeTacticalDoctrine(
       // Handle enemy defeat via unified processEnemyDefeat
       if (killedEnemyEffects.length > 0) {
         const killedIds = killedEnemyEffects.map((e) => e.unitId)
-        const defeatResult = await processEnemyDefeat(
-          participationId,
-          updatedState,
-          killedIds,
-          repos
-        )
+        const defeatResult = await processEnemyDefeat(participationId, updatedState, killedIds, repos)
         goldReward = defeatResult.goldReward
         nextEnemy = defeatResult.nextEnemy
         tierProgression = defeatResult.tierProgression
@@ -605,9 +598,10 @@ export async function useSelfBuffDoctrine(
   }
 
   // Validate this is a self-buff doctrine
-  const isSelfBuff = (doctrine.effects.some(
-    (e) => SELF_BUFF_EFFECT_TYPES.includes(e.type) && e.target === DoctrineTarget.SELF
-  ) && !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)) || SPECIAL_SELF_BUFF_DOCTRINES.includes(doctrineId)
+  const isSelfBuff =
+    (doctrine.effects.some((e) => SELF_BUFF_EFFECT_TYPES.includes(e.type) && e.target === DoctrineTarget.SELF) &&
+      !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)) ||
+    SPECIAL_SELF_BUFF_DOCTRINES.includes(doctrineId)
 
   if (!isSelfBuff) {
     throw new TRPCError({ code: 'BAD_REQUEST', message: 'This doctrine requires targeting' })
@@ -640,7 +634,7 @@ export async function useSelfBuffDoctrine(
   // Check if it's the caster's turn
   const currentUnitId = state.turnOrder[state.currentTurnIndex]
   if (currentUnitId !== casterId) {
-    throw new TRPCError({ code: 'BAD_REQUEST', message: 'Not this unit\'s turn' })
+    throw new TRPCError({ code: 'BAD_REQUEST', message: "Not this unit's turn" })
   }
 
   // Get the buff values from the doctrine
@@ -688,7 +682,11 @@ export async function useSelfBuffDoctrine(
   // Bug 1 fix: For mixed SELF+ENEMY doctrines (shoulder_charge, righteous_charge, law_hammer),
   // scan for APPLY_STATUS(ENEMY) effects and store as pending enemy status
   for (const docEffect of doctrine.effects) {
-    if (docEffect.target === DoctrineTarget.ENEMY && docEffect.type === DoctrineEffectType.APPLY_STATUS && docEffect.statusEffect) {
+    if (
+      docEffect.target === DoctrineTarget.ENEMY &&
+      docEffect.type === DoctrineEffectType.APPLY_STATUS &&
+      docEffect.statusEffect
+    ) {
       activeEffect.pendingEnemyStatus = docEffect.statusEffect
       activeEffect.pendingEnemyStatusDuration = docEffect.duration || 1
       break
@@ -727,7 +725,16 @@ export async function useSelfBuffDoctrine(
     type: CombatLogType.DOCTRINE_EFFECT,
     data: {
       doctrine: doctrineId,
-      effect: bonusDice > 0 ? 'power_boost' : thresholdMod !== 0 ? 'threshold_reduction' : negateHits > 0 ? 'damage_negation' : guaranteedCritical ? 'guaranteed_critical' : 'buff',
+      effect:
+        bonusDice > 0
+          ? 'power_boost'
+          : thresholdMod !== 0
+            ? 'threshold_reduction'
+            : negateHits > 0
+              ? 'damage_negation'
+              : guaranteedCritical
+                ? 'guaranteed_critical'
+                : 'buff',
       bonusDice,
       thresholdMod,
       negateHits,
