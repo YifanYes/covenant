@@ -16,10 +16,6 @@
 
 ## Medium Priority
 
-- [ ] Security: Theme Validation Too Permissive
-  - `shared/schemas/auth.schemas.ts` (line 37-39)
-  - **Fix:** Use enum validation with valid faction names
-
 - [ ] Security: Error Messages Leak Resource Existence
   - Multiple service files
   - **Fix:** Use generic "Resource not found or access denied" messages

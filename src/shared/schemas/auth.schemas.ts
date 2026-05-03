@@ -1,3 +1,4 @@
+import { Faction } from '@shared/constants/activities'
 import { z } from 'zod'
 
 export const signUpSchema = z.object({
@@ -35,6 +36,6 @@ export const updatePasswordSchema = z.object({
 export type UpdatePasswordSchema = z.infer<typeof updatePasswordSchema>
 
 export const updateThemeSchema = z.object({
-  theme: z.string()
+  theme: z.enum(Faction)
 })
 export type UpdateThemeType = z.infer<typeof updateThemeSchema>
