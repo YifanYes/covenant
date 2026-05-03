@@ -1,12 +1,12 @@
 'use client'
-import { cn } from '@/lib/cn.lib'
-import DiceRoller from '@/app/(workspace)/map/_components/dice-roller.component'
 import DiceResult from '@/app/(workspace)/map/_components/dice-result.component'
+import DiceRoller from '@/app/(workspace)/map/_components/dice-roller.component'
 import DoctrinePanel from '@/components/doctrine-panel.component'
+import { cn } from '@/lib/cn.lib'
 import Button from '@/ui/button.component'
 import { getConsumableById } from '@shared/constants/items'
-import { ItemType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
 import type { DoctrineDefinition } from '@shared/types/doctrine.types'
+import { ItemType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -57,9 +57,7 @@ export default function CombatActionBar({
   const currentClass = character.classes.find((c) => c.className === character.currentClass)!
 
   // Get consumables from inventory, grouped by definitionId
-  const consumables = (character.inventory || []).filter(
-    (item: InventoryItem) => item.type === ItemType.CONSUMABLE
-  )
+  const consumables = (character.inventory || []).filter((item: InventoryItem) => item.type === ItemType.CONSUMABLE)
   const groupedConsumables = consumables.reduce<Record<string, { item: InventoryItem; count: number }>>((acc, item) => {
     if (!item.definitionId) return acc
     if (acc[item.definitionId]) {
@@ -134,9 +132,7 @@ export default function CombatActionBar({
         {targetingMode && selectedDoctrineId && (
           <div className="flex items-center justify-between rounded bg-amber-500/10 px-3 py-1.5 text-sm">
             <span className="text-amber-400">
-              {targetingMode === 'all'
-                ? t('combat.targeting.all')
-                : t('combat.targeting.single')}
+              {targetingMode === 'all' ? t('combat.targeting.all') : t('combat.targeting.single')}
             </span>
             <Button variant="ghost" size="sm" onClick={onCancelDoctrine}>
               {t('common.cancel')}
@@ -147,7 +143,9 @@ export default function CombatActionBar({
         {/* Attack content — sequential: dice roller, then results */}
         {activeTab === 'attack' && !targetingMode && !attackRolls && (
           <div className="flex min-h-0 flex-1 flex-col gap-2">
-            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">{t('combat.to_battle')}</div>
+            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+              {t('combat.to_battle')}
+            </div>
             <DiceRoller
               diceBank={diceBank}
               attackDiceCount={currentClass.strengthAtk}
@@ -161,18 +159,15 @@ export default function CombatActionBar({
 
         {activeTab === 'attack' && !targetingMode && attackRolls && defenseRolls && (
           <div className="flex min-h-0 flex-1 flex-col gap-2">
-            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">{t('combat.results')}</div>
+            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+              {t('combat.results')}
+            </div>
             <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
               <div>
                 <span className="text-muted-foreground mb-1 block text-xs">{t('combat.attack_rolls')}</span>
                 <div className="flex flex-wrap gap-1.5">
                   {attackRolls.map((value, i) => (
-                    <DiceResult
-                      key={`atk-${i}`}
-                      value={value}
-                      isSuccess={value >= 4}
-                      isCritical={value === 6}
-                    />
+                    <DiceResult key={`atk-${i}`} value={value} isSuccess={value >= 4} isCritical={value === 6} />
                   ))}
                 </div>
               </div>
@@ -181,22 +176,12 @@ export default function CombatActionBar({
                 <span className="text-muted-foreground mb-1 block text-xs">{t('combat.defense_rolls')}</span>
                 <div className="flex flex-wrap gap-1.5">
                   {defenseRolls.map((value, i) => (
-                    <DiceResult
-                      key={`def-${i}`}
-                      value={value}
-                      isSuccess={value >= 4}
-                      isCritical={value === 6}
-                    />
+                    <DiceResult key={`def-${i}`} value={value} isSuccess={value >= 4} isCritical={value === 6} />
                   ))}
                 </div>
               </div>
 
-              <Button
-                onClick={handleQuickAttack}
-                disabled={isLoading || disabled}
-                className="mt-auto w-full"
-                size="lg"
-              >
+              <Button onClick={handleQuickAttack} disabled={isLoading || disabled} className="mt-auto w-full" size="lg">
                 {t('combat.action.attack')}
               </Button>
             </div>
@@ -206,7 +191,9 @@ export default function CombatActionBar({
         {/* Doctrine content */}
         {activeTab === 'doctrine' && !targetingMode && (
           <div className="flex flex-1 flex-col gap-2">
-            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">{t('doctrines.title')}</div>
+            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+              {t('doctrines.title')}
+            </div>
             <DoctrinePanel
               showUseControls
               currentMana={currentClass.mana}
@@ -220,9 +207,13 @@ export default function CombatActionBar({
         {/* Item content */}
         {activeTab === 'item' && !targetingMode && (
           <div className="flex flex-1 flex-col gap-2">
-            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">{t('inventory.items')}</div>
+            <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+              {t('inventory.items')}
+            </div>
             {Object.keys(groupedConsumables).length === 0 ? (
-              <p className="text-muted-foreground flex flex-1 items-center justify-center text-sm">{t('combat.no_items')}</p>
+              <p className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
+                {t('combat.no_items')}
+              </p>
             ) : (
               Object.entries(groupedConsumables).map(([defId, { count }]) => {
                 const consumable = getConsumableById(defId)

@@ -1,4 +1,5 @@
 'use client'
+
 import { useTasksStore } from '@/stores/tasks.store'
 import type { Task } from '@/types/models.types'
 import { getPriorityStyles, getPriorityTextColors } from '@/utils/theme.utils'
@@ -16,7 +17,9 @@ export default function TaskMatrix() {
   const { tasks, setTasks, setSelectedTask } = useTasksStore()
 
   useEffect(() => {
-    !isUndefined(data?.tasks) && setTasks(data?.tasks)
+    if (!isUndefined(data?.tasks)) {
+      setTasks(data?.tasks)
+    }
   }, [data, setTasks])
 
   const allTasks = useMemo(() => {
@@ -80,7 +83,7 @@ export default function TaskMatrix() {
   }, [tasksWithPriority])
 
   return (
-    <div className='grid h-full grid-cols-2 grid-rows-2 gap-2'>
+    <div className="grid h-full grid-cols-2 grid-rows-2 gap-2">
       {quadrants.map((quadrant) => (
         <TaskMatrixQuadrantCard key={quadrant.key} quadrant={quadrant} t={t} onTaskClick={setSelectedTask} />
       ))}

@@ -9,7 +9,7 @@ import TextInput from '@/forms/text-input.component'
 import { useCalendarStore } from '@/stores/calendar.store'
 import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
 import {
@@ -81,10 +81,10 @@ export default function CreateTaskDialog() {
     <BaseFormDialog
       open={open}
       onOpenChange={handleOpenChange}
-      title='create_task_dialog.title'
-      description='create_task_dialog.description'
+      title="create_task_dialog.title"
+      description="create_task_dialog.description"
       onSubmit={handleSubmit(onSubmit)}
-      submitLabel='create'
+      submitLabel="create"
       isLoading={mutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
       trigger={
@@ -93,34 +93,34 @@ export default function CreateTaskDialog() {
           <span>{t('tasks.add')}</span>
         </Button>
       }
-      className='md:max-w-fit md:min-w-150'
+      className="md:max-w-fit md:min-w-150"
     >
-      <div className='grid gap-4'>
-        <div className='grid gap-3'>
+      <div className="grid gap-4">
+        <div className="grid gap-3">
           <TextInput
-            type='text'
+            type="text"
             placeholder={t('create_task_dialog.title_placeholder')}
-            className='h-9'
+            className="h-9"
             {...register('title')}
             {...(errors.title?.message && { errorMessage: t(errors.title.message.toString()) })}
             required
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Textarea
             placeholder={t('create_task_dialog.description_placeholder')}
-            className='h-20 resize-none overflow-y-auto'
+            className="h-20 resize-none overflow-y-auto"
             {...register('description')}
             {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='dueDate'
+            name="dueDate"
             control={control}
             render={({ field }) => (
               <DatePicker
-                className='w-full'
+                className="w-full"
                 value={typeof field.value === 'string' ? new Date(field.value) : field.value}
                 onChange={field.onChange}
                 placeholder={t('create_task_dialog.due_date_placeholder')}
@@ -128,32 +128,32 @@ export default function CreateTaskDialog() {
             )}
           />
         </div>
-        <div className='grid min-w-0 gap-3'>
+        <div className="grid min-w-0 gap-3">
           <ObjectivesSelector
             control={control}
             objectives={objectivesData?.objectives || []}
             placeholder={t('create_task_dialog.objectives_placeholder')}
           />
         </div>
-        <div className='grid min-w-0 gap-3'>
+        <div className="grid min-w-0 gap-3">
           <AreasSelector
             control={control}
             areas={areasData?.areas || []}
             placeholder={t('create_task_dialog.areas_placeholder')}
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='color'
+            name="color"
             control={control}
             render={({ field }) => (
               <ColorSelector label={t('tasks.color')} value={field.value ?? undefined} onChange={field.onChange} />
             )}
           />
         </div>
-        <div className='grid grid-cols-2 gap-3'>
+        <div className="grid grid-cols-2 gap-3">
           <Controller
-            name='effort'
+            name="effort"
             control={control}
             render={({ field }) => (
               <SingleSelect
@@ -169,7 +169,7 @@ export default function CreateTaskDialog() {
             )}
           />
           <Controller
-            name='impact'
+            name="impact"
             control={control}
             render={({ field }) => (
               <SingleSelect

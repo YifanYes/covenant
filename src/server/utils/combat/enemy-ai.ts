@@ -1,17 +1,11 @@
-import { StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
-import type {
-  CombatLogEntry,
-  DiceRollResult
-} from '@shared/types/gamification.types'
+import { StatusEffect } from '@shared/types/doctrine.types'
+import type { CombatLogEntry } from '@shared/types/gamification.types'
 import { CombatLogType } from '@shared/types/gamification.types'
-import type {
-  TacticalStateData,
-  EnemyTurnResult
-} from '@shared/types/tactical-combat.types'
+import type { EnemyTurnResult } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 
-import { rollDice, calculateHitsWithCount, getCurrentClassOrThrow } from './dice'
-import { getActiveDoctrineBuffs, clearConsumedDefenseDoctrines } from './doctrine-buffs'
+import { calculateHitsWithCount, getCurrentClassOrThrow, rollDice } from './dice'
+import { clearConsumedDefenseDoctrines, getActiveDoctrineBuffs } from './doctrine-buffs'
 import type { CombatStateRepos } from './rewards'
 
 /**
@@ -157,9 +151,7 @@ export async function executeEnemyTurn(
     })
 
     // Advance turn to the next unit (same logic as normal turn end)
-    let nextTurnIndex = updatedTurnOrder.length > 0
-      ? (state.currentTurnIndex + 1) % updatedTurnOrder.length
-      : 0
+    let nextTurnIndex = updatedTurnOrder.length > 0 ? (state.currentTurnIndex + 1) % updatedTurnOrder.length : 0
     // Safety: ensure index is within bounds after filtering
     if (nextTurnIndex >= updatedTurnOrder.length) {
       nextTurnIndex = 0
@@ -243,7 +235,12 @@ export async function executeEnemyTurn(
     let effectiveEnemyAttackDice = enemyAttackDice
     if (currentEnemy.activeEffects) {
       for (const statusEff of currentEnemy.activeEffects) {
-        if (statusEff.effect === StatusEffect.WEAKENED && statusEff.debuffType === 'attack' && statusEff.debuffValue != null && statusEff.remainingTurns > 0) {
+        if (
+          statusEff.effect === StatusEffect.WEAKENED &&
+          statusEff.debuffType === 'attack' &&
+          statusEff.debuffValue != null &&
+          statusEff.remainingTurns > 0
+        ) {
           effectiveEnemyAttackDice = Math.max(0, effectiveEnemyAttackDice + statusEff.debuffValue) // debuffValue is negative
         }
       }
@@ -251,10 +248,7 @@ export async function executeEnemyTurn(
 
     // Roll attack dice
     const attackRolls = rollDice(effectiveEnemyAttackDice)
-    const { results: attackResults, count: attackHits } = calculateHitsWithCount(
-      attackRolls,
-      enemyAttackThreshold
-    )
+    const { results: attackResults, count: attackHits } = calculateHitsWithCount(attackRolls, enemyAttackThreshold)
     attackerRolls = attackResults
 
     // Bug 6 fix: Check player's doctrine buffs for defenseZero
@@ -286,7 +280,11 @@ export async function executeEnemyTurn(
     logEntries.push({
       timestamp: timestamp + 3,
       type: CombatLogType.PLAYER_DEFENDS,
-      data: { blocks: defenseBlocks, rolls: defenseRollValues, negatedHits: playerDefenseBuffs.negateHits > 0 ? playerDefenseBuffs.negateHits : undefined }
+      data: {
+        blocks: defenseBlocks,
+        rolls: defenseRollValues,
+        negatedHits: playerDefenseBuffs.negateHits > 0 ? playerDefenseBuffs.negateHits : undefined
+      }
     })
 
     logEntries.push({
@@ -328,9 +326,10 @@ export async function executeEnemyTurn(
           ...unit,
           currentHealth: newTargetHealth,
           // Clear consumed defense buffs after taking damage
-          activeDoctrines: (damageDealt ?? 0) > 0 || playerDefenseBuffs.negateHits > 0
-            ? clearConsumedDefenseDoctrines(unit.activeDoctrines)
-            : unit.activeDoctrines
+          activeDoctrines:
+            (damageDealt ?? 0) > 0 || playerDefenseBuffs.negateHits > 0
+              ? clearConsumedDefenseDoctrines(unit.activeDoctrines)
+              : unit.activeDoctrines
         }
       }
       return unit

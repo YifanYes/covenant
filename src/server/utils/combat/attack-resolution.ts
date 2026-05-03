@@ -1,4 +1,3 @@
-import { TRPCError } from '@trpc/server'
 import { StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 import type { CombatLogEntry } from '@shared/types/gamification.types'
 import { CombatLogType } from '@shared/types/gamification.types'
@@ -7,8 +6,9 @@ import type {
   TacticalAttackResult,
   TacticalStateData
 } from '@shared/types/tactical-combat.types'
+import { TRPCError } from '@trpc/server'
 import { calculateHitsWithCount, getCurrentClassOrThrow } from './dice'
-import { getActiveDoctrineBuffs, clearConsumedDoctrines, clearConsumedDefenseDoctrines } from './doctrine-buffs'
+import { clearConsumedDefenseDoctrines, clearConsumedDoctrines, getActiveDoctrineBuffs } from './doctrine-buffs'
 import { processEnemyDefeat, type CombatRewardDeps } from './rewards'
 
 /**

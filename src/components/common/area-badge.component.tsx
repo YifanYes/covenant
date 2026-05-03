@@ -17,7 +17,7 @@ export default function AreaBadge({ area }: { area: Area }) {
     <div
       className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors duration-200 ${areaStyle.styles}`}
     >
-      {currentIcon && <currentIcon.component className='size-4' />}
+      {currentIcon && <currentIcon.component className="size-4" />}
       <span>{t(area.name)}</span>
     </div>
   )

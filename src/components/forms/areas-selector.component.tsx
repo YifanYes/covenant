@@ -12,13 +12,7 @@ interface AreasSelectorProps {
   label?: string
 }
 
-export default function AreasSelector({
-  control,
-  areas,
-  name = 'areas',
-  placeholder,
-  label
-}: AreasSelectorProps) {
+export default function AreasSelector({ control, areas, name = 'areas', placeholder, label }: AreasSelectorProps) {
   const { t } = useTranslation()
 
   return (

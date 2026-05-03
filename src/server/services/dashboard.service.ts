@@ -1,7 +1,7 @@
+import type { Area, HabitCompletion, Objective, Task } from '@/generated/prisma'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import type { DashboardData } from '@shared/types/dashboard.types'
 import dayjs from 'dayjs'
-import type { Area, HabitCompletion, Objective, Task } from '@/generated/prisma'
 import type { AreaRepository } from '../repositories/area.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { HabitRepository } from '../repositories/habit.repository'

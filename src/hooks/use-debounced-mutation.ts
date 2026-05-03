@@ -9,7 +9,7 @@ export const useDebouncedMutation = <TData, TError, TVariables>(
   const mutation = useMutation<TData, TError, TVariables>(mutationOpts)
 
   const debouncedMutate = (vars: TVariables) => {
-    timeoutRef.current && clearTimeout(timeoutRef.current)
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
     timeoutRef.current = setTimeout(() => mutation.mutate(vars), delay)
   }
 

@@ -1,6 +1,6 @@
+import type { Objective, PrismaClient } from '@/generated/prisma'
 import type { CreateObjectiveBodyType, UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { TRPCError } from '@trpc/server'
-import type { Objective, PrismaClient } from '@/generated/prisma'
 
 const OBJECTIVE_INCLUDE = {
   areas: true

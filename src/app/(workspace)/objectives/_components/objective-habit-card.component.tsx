@@ -33,22 +33,22 @@ export default function ObjectiveHabitCard({ habit }: ObjectiveHabitCardProps) {
   }, [completions, recurrence])
 
   return (
-    <div className='flex flex-col gap-2 rounded-lg border p-3'>
-      <div className='flex items-center gap-2'>
-        <div className='bg-secondary/10 text-secondary rounded-md p-1.5'>
-          <Repeat className='h-4 w-4' />
+    <div className="flex flex-col gap-2 rounded-lg border p-3">
+      <div className="flex items-center gap-2">
+        <div className="bg-secondary/10 text-secondary rounded-md p-1.5">
+          <Repeat className="h-4 w-4" />
         </div>
-        <h4 className='flex-1 truncate text-sm font-medium'>{name}</h4>
+        <h4 className="flex-1 truncate text-sm font-medium">{name}</h4>
       </div>
-      <div className='grid grid-cols-7 gap-1'>
+      <div className="grid grid-cols-7 gap-1">
         {calendarDays.map(({ date, count, background, style }, index) => (
           <div
             key={index}
-            className='relative flex aspect-square items-center justify-center overflow-hidden rounded-sm'
+            className="relative flex aspect-square items-center justify-center overflow-hidden rounded-sm"
             title={`${date}: ${count}`}
           >
             <div className={`absolute inset-0 ${background}`} style={style} />
-            {count > 1 && <span className='text-background relative z-10 text-[10px] font-bold'>+{count}</span>}
+            {count > 1 && <span className="text-background relative z-10 text-[10px] font-bold">+{count}</span>}
           </div>
         ))}
       </div>

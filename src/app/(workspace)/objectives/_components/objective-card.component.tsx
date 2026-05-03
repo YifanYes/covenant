@@ -16,7 +16,7 @@ import Dialog, {
   DialogTrigger
 } from '@/ui/dialog.component'
 import Textarea from '@/ui/textarea.component'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -89,16 +89,16 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <div className='group border-foreground/20 bg-background hover:border-primary hover:bg-accent/30 flex h-full w-full cursor-pointer flex-col rounded-lg border-2 p-4 transition-all duration-200 hover:scale-[1.02]'>
-          <div className='flex items-start justify-between gap-6'>
-            <div className='flex flex-1 flex-col gap-1'>
-              <h4 className='text-sm leading-tight font-semibold'>{objective.name}</h4>
-              <div className='text-muted-foreground text-xs'>
+        <div className="group border-foreground/20 bg-background hover:border-primary hover:bg-accent/30 flex h-full w-full cursor-pointer flex-col rounded-lg border-2 p-4 transition-all duration-200 hover:scale-[1.02]">
+          <div className="flex items-start justify-between gap-6">
+            <div className="flex flex-1 flex-col gap-1">
+              <h4 className="text-sm leading-tight font-semibold">{objective.name}</h4>
+              <div className="text-muted-foreground text-xs">
                 {objective.dueDate ? dayjs(objective.dueDate).format('L') : t('objectives.no_date')}
               </div>
             </div>
             {objective.areas && objective.areas.length > 0 && (
-              <div className='flex shrink-0 gap-2'>
+              <div className="flex shrink-0 gap-2">
                 {objective.areas.map((area) => {
                   const areaStyle = areaSimpleStyles.find((defaultArea) => defaultArea.color === area.color)
                   const currentIcon = allIcons.find((icon) => icon.name === area.icon)
@@ -113,10 +113,10 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
             )}
           </div>
           {objective.description && (
-            <p className='text-muted-foreground mt-4 line-clamp-2 text-sm leading-relaxed'>{objective.description}</p>
+            <p className="text-muted-foreground mt-4 line-clamp-2 text-sm leading-relaxed">{objective.description}</p>
           )}
           {(objective.tasks && objective.tasks.length > 0) || (objective.habits && objective.habits.length > 0) ? (
-            <div className='mt-4 border-t pt-4'>
+            <div className="mt-4 border-t pt-4">
               <ObjectiveSummaryList
                 title={objective.name}
                 tasks={objective.tasks || []}
@@ -124,47 +124,47 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
               />
             </div>
           ) : (
-            <div className='mt-4 flex flex-1 items-center justify-center border-t pt-6 pb-4'>
-              <p className='text-muted-foreground text-center text-xs italic'>{t('objectives.no_tasks_or_habits')}</p>
+            <div className="mt-4 flex flex-1 items-center justify-center border-t pt-6 pb-4">
+              <p className="text-muted-foreground text-center text-xs italic">{t('objectives.no_tasks_or_habits')}</p>
             </div>
           )}
         </div>
       </DialogTrigger>
 
-      <DialogContent className='sm:max-w-[600px]'>
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{t('objectives.update.title')}</DialogTitle>
         </DialogHeader>
 
-        <div className='grid gap-4 p-1'>
+        <div className="grid gap-4 p-1">
           <Controller
-            name='name'
+            name="name"
             control={control}
             render={({ field }) => (
               <TextInput
                 {...field}
-                type='text'
+                type="text"
                 placeholder={t('create_objective_dialog.name_placeholder')}
-                className='h-9 w-full'
+                className="h-9 w-full"
                 tabIndex={-1}
                 {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
               />
             )}
           />
           <Controller
-            name='description'
+            name="description"
             control={control}
             render={({ field }) => (
               <Textarea
                 placeholder={t('create_objective_dialog.description_placeholder')}
-                className='h-20 w-full resize-none'
+                className="h-20 w-full resize-none"
                 value={field.value}
                 onChange={field.onChange}
               />
             )}
           />
           <Controller
-            name='dueDate'
+            name="dueDate"
             control={control}
             render={({ field }) => (
               <DatePicker
@@ -175,24 +175,24 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
             )}
           />
           <MultiSelect
-            name='areas'
+            name="areas"
             control={control}
             items={areasData?.areas.map((a) => ({ id: a.id, label: t(a.name) })) || []}
             placeholder={t('create_objective_dialog.select_areas_placeholder')}
           />
         </div>
 
-        <DialogFooter className='flex h-auto justify-end'>
-          <div className='mr-auto flex gap-2'>
+        <DialogFooter className="flex h-auto justify-end">
+          <div className="mr-auto flex gap-2">
             <ConfirmDeleteObjectiveDialog objective={objective} onDeleteSuccess={handleDeleteSuccess} />
             <ConfirmCompleteObjectiveDialog objective={objective} onCompleteSuccess={handleCompleteSuccess} />
           </div>
-          <div className='flex gap-2'>
-            <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
-              <Button variant='outline'>{t('cancel')}</Button>
+          <div className="flex gap-2">
+            <DialogClose asChild className="hover:bg-foreground/10 cursor-pointer">
+              <Button variant="outline">{t('cancel')}</Button>
             </DialogClose>
             <LoaderButton
-              className='cursor-pointer'
+              className="cursor-pointer"
               disabled={!isValid || !isDirty}
               isLoading={updateMutation.isPending}
               onClick={handleSubmit((data) => onSubmit(data as UpdateObjectiveBodyType))}

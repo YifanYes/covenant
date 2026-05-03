@@ -115,7 +115,10 @@ export default function KillRecordDetailDialog({ enemy, open, onOpenChange }: Ki
         {/* Combat Log */}
         <div className="flex min-h-0 flex-1 flex-col gap-2">
           <h3 className="shrink-0 text-sm font-medium">{t('inventory.kill_record.combat_log')}</h3>
-          <CombatLog entries={combatLogEntries} className="min-h-0 flex-1 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent" />
+          <CombatLog
+            entries={combatLogEntries}
+            className="min-h-0 flex-1 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+          />
         </div>
       </DialogContent>
     </Dialog>

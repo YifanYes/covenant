@@ -95,7 +95,7 @@ export default function UpdateTaskDialog() {
   }
 
   useEffect(() => {
-    selectedTask &&
+    if (selectedTask) {
       reset({
         ...selectedTask,
         objectives: map(selectedTask?.objectives, (objective) => objective.id),
@@ -104,6 +104,7 @@ export default function UpdateTaskDialog() {
         effort: selectedTask?.effort as TaskEffort | undefined,
         impact: selectedTask?.impact as TaskImpact | undefined
       })
+    }
   }, [selectedTask, reset])
 
   return (

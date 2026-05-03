@@ -30,7 +30,10 @@ export class DiceService {
     }
   }
 
-  async consumeDiceFromBank(userId: string, amount: number): Promise<{ success: boolean; consumed: number; remaining: number }> {
+  async consumeDiceFromBank(
+    userId: string,
+    amount: number
+  ): Promise<{ success: boolean; consumed: number; remaining: number }> {
     const character = await this.characterRepository.findWithClasses(userId)
 
     if (!character) return { success: false, consumed: 0, remaining: 0 }

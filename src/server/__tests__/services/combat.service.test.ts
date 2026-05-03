@@ -1,9 +1,14 @@
+import { DOCTRINES } from '@shared/constants/doctrines'
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
-import { TACTICAL_STATE_VERSION, TerrainType, type TacticalStateData, type TileState } from '@shared/types/tactical-combat.types'
 import { ItemType } from '@shared/types/gamification.types'
+import {
+  TACTICAL_STATE_VERSION,
+  TerrainType,
+  type TacticalStateData,
+  type TileState
+} from '@shared/types/tactical-combat.types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CombatService } from '../../services/combat.service'
-import { DOCTRINES } from '@shared/constants/doctrines'
 
 describe('CombatService', () => {
   let combatService: CombatService
@@ -173,7 +178,7 @@ describe('CombatService', () => {
 
       // The key test: POWER_MODIFIER with SELF target should apply damage
       // to enemies in the AoE based on rolling the power dice (10 dice)
-      const enemyEffect = result.effects.find(e => e.unitId === 'enemy-1')
+      const enemyEffect = result.effects.find((e) => e.unitId === 'enemy-1')
 
       // Expected behavior: enemyEffect should have damageDealt > 0
       // based on rolling 10 dice where hits deal damage
@@ -509,12 +514,12 @@ describe('CombatService', () => {
         [1, 1, 1], // Enemy fails all defense
         4, // attack threshold
         4, // defense threshold
-        6  // base critical threshold (will be reduced to 5)
+        6 // base critical threshold (will be reduced to 5)
       )
 
       expect(result.success).toBe(true)
       // All 5s should be criticals now (threshold reduced from 6 to 5)
-      expect(result.attackerRolls.filter(r => r.isCritical).length).toBe(3)
+      expect(result.attackerRolls.filter((r) => r.isCritical).length).toBe(3)
       expect(result.damageDealt).toBe(3) // 3 hits
     })
 
@@ -605,7 +610,7 @@ describe('CombatService', () => {
 
       expect(result.success).toBe(true)
       // With -2 threshold mod, effective threshold is 2, so both 2 and 3 hit
-      expect(result.attackerRolls.filter(r => r.isSuccess).length).toBe(2)
+      expect(result.attackerRolls.filter((r) => r.isSuccess).length).toBe(2)
       expect(result.damageDealt).toBe(2)
     })
 
@@ -720,14 +725,16 @@ describe('CombatService', () => {
       )
 
       // Try to cast stellar_collapse (costs 8 mana) with 0 mana
-      await expect(combatServiceWithEnemyRepo.executeTacticalDoctrine(
-        'test-participation',
-        'player-1',
-        'stellar_collapse',
-        'single',
-        ['enemy-1'],
-        0 // Zero mana
-      )).rejects.toThrow('Not enough mana')
+      await expect(
+        combatServiceWithEnemyRepo.executeTacticalDoctrine(
+          'test-participation',
+          'player-1',
+          'stellar_collapse',
+          'single',
+          ['enemy-1'],
+          0 // Zero mana
+        )
+      ).rejects.toThrow('Not enough mana')
     })
 
     it('should allow doctrine cast when mana exactly equals cost', async () => {
@@ -809,8 +816,7 @@ describe('CombatService', () => {
       expect(result.success).toBe(true)
       // Only the living enemy should be affected
       // Dead enemy should not appear in effects (or should have 0 damage)
-      const deadEnemyEffect = result.effects.find(e => e.unitId === 'enemy-2')
-      const livingEnemyEffect = result.effects.find(e => e.unitId === 'enemy-1')
+      const livingEnemyEffect = result.effects.find((e) => e.unitId === 'enemy-1')
 
       expect(livingEnemyEffect).toBeDefined()
       // Dead enemies shouldn't be targeted or should be filtered
@@ -851,7 +857,7 @@ describe('CombatService', () => {
       expect(result.success).toBe(true)
 
       // Enemy with 1 HP should be killed
-      const enemyEffect = result.effects.find(e => e.unitId === 'enemy-1')
+      const enemyEffect = result.effects.find((e) => e.unitId === 'enemy-1')
       expect(enemyEffect).toBeDefined()
 
       // If any damage was dealt, enemy should be killed
@@ -860,7 +866,7 @@ describe('CombatService', () => {
       }
 
       // Updated state should not include the dead enemy
-      expect(result.updatedState.units.find(u => u.id === 'enemy-1')).toBeUndefined()
+      expect(result.updatedState.units.find((u) => u.id === 'enemy-1')).toBeUndefined()
     })
 
     it('should not affect caster with enemy-targeted DIRECT_DAMAGE doctrine', async () => {
@@ -894,34 +900,42 @@ describe('CombatService', () => {
       expect(result.success).toBe(true)
 
       // Caster should not take damage from their own doctrine
-      const casterEffect = result.effects.find(e => e.unitId === 'player-1')
+      const casterEffect = result.effects.find((e) => e.unitId === 'player-1')
       if (casterEffect?.damageDealt !== undefined) {
         expect(casterEffect.damageDealt).toBe(0)
       }
 
       // Caster should still have full health
-      const caster = result.updatedState.units.find(u => u.id === 'player-1')
+      const caster = result.updatedState.units.find((u) => u.id === 'player-1')
       expect(caster?.currentHealth).toBe(10)
     })
   })
 
   describe('useConsumable', () => {
-    const createMockCharacter = (health: number, maxHealth: number, mana: number, maxMana: number, inventory: any[] = []) => ({
+    const createMockCharacter = (
+      health: number,
+      maxHealth: number,
+      mana: number,
+      maxMana: number,
+      inventory: any[] = []
+    ) => ({
       id: 'char-1',
       name: 'Test Character',
       currentClass: 'knight',
       data: { activeActivityId: 'activity-1' },
       inventory,
       loadout: [],
-      classes: [{
-        id: 'class-1',
-        className: 'knight',
-        health,
-        maxHealth,
-        mana,
-        maxMana,
-        tier: 1
-      }]
+      classes: [
+        {
+          id: 'class-1',
+          className: 'knight',
+          health,
+          maxHealth,
+          mana,
+          maxMana,
+          tier: 1
+        }
+      ]
     })
 
     const createTacticalStateForConsumable = (playerHealth: number, maxHealth: number): TacticalStateData => {
@@ -975,15 +989,15 @@ describe('CombatService', () => {
     }
 
     it('should restore health when using health potion outside tactical combat', async () => {
-      const inventory = [{
-        id: 'item-1',
-        type: ItemType.CONSUMABLE,
-        definitionId: 'health_potion'
-      }]
+      const inventory = [
+        {
+          id: 'item-1',
+          type: ItemType.CONSUMABLE,
+          definitionId: 'health_potion'
+        }
+      ]
 
-      mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(
-        createMockCharacter(5, 10, 5, 10, inventory)
-      )
+      mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(createMockCharacter(5, 10, 5, 10, inventory))
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
       mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue(null)
@@ -997,15 +1011,15 @@ describe('CombatService', () => {
     })
 
     it('should restore health in tactical combat and update tactical state', async () => {
-      const inventory = [{
-        id: 'item-1',
-        type: ItemType.CONSUMABLE,
-        definitionId: 'health_potion'
-      }]
+      const inventory = [
+        {
+          id: 'item-1',
+          type: ItemType.CONSUMABLE,
+          definitionId: 'health_potion'
+        }
+      ]
 
-      mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(
-        createMockCharacter(5, 10, 5, 10, inventory)
-      )
+      mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(createMockCharacter(5, 10, 5, 10, inventory))
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
       mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue({
@@ -1028,15 +1042,17 @@ describe('CombatService', () => {
     })
 
     it('should restore mana when using mana potion', async () => {
-      const inventory = [{
-        id: 'item-1',
-        type: ItemType.CONSUMABLE,
-        definitionId: 'mana_potion'
-      }]
+      const inventory = [
+        {
+          id: 'item-1',
+          type: ItemType.CONSUMABLE,
+          definitionId: 'mana_potion'
+        }
+      ]
 
-      mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(
-        createMockCharacter(10, 10, 2, 10, inventory)
-      )
+      mockCharacterRepo.findWithClassesOrThrow = vi
+        .fn()
+        .mockResolvedValue(createMockCharacter(10, 10, 2, 10, inventory))
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
       mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue(null)
@@ -1049,11 +1065,13 @@ describe('CombatService', () => {
     })
 
     it('should cap health restoration at max health', async () => {
-      const inventory = [{
-        id: 'item-1',
-        type: ItemType.CONSUMABLE,
-        definitionId: 'health_potion'
-      }]
+      const inventory = [
+        {
+          id: 'item-1',
+          type: ItemType.CONSUMABLE,
+          definitionId: 'health_potion'
+        }
+      ]
 
       mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(
         createMockCharacter(8, 10, 5, 10, inventory) // Only 2 HP missing
@@ -1070,11 +1088,13 @@ describe('CombatService', () => {
     })
 
     it('should return undefined healthRestored when already at max health', async () => {
-      const inventory = [{
-        id: 'item-1',
-        type: ItemType.CONSUMABLE,
-        definitionId: 'health_potion'
-      }]
+      const inventory = [
+        {
+          id: 'item-1',
+          type: ItemType.CONSUMABLE,
+          definitionId: 'health_potion'
+        }
+      ]
 
       mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(
         createMockCharacter(10, 10, 5, 10, inventory) // Already at max health
@@ -1094,13 +1114,11 @@ describe('CombatService', () => {
         createMockCharacter(5, 10, 5, 10, []) // Empty inventory
       )
 
-      await expect(combatService.useConsumable('user-1', 'health_potion'))
-        .rejects.toThrow('not in inventory')
+      await expect(combatService.useConsumable('user-1', 'health_potion')).rejects.toThrow('not in inventory')
     })
 
     it('should throw error if consumable does not exist', async () => {
-      await expect(combatService.useConsumable('user-1', 'invalid_potion'))
-        .rejects.toThrow('not found')
+      await expect(combatService.useConsumable('user-1', 'invalid_potion')).rejects.toThrow('not found')
     })
 
     it('should remove consumable from inventory after use', async () => {
@@ -1110,9 +1128,7 @@ describe('CombatService', () => {
         { id: 'item-3', type: ItemType.WEAPON_MELEE, definitionId: 'sword' }
       ]
 
-      mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(
-        createMockCharacter(5, 10, 5, 10, inventory)
-      )
+      mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(createMockCharacter(5, 10, 5, 10, inventory))
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
       mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue(null)
@@ -1127,16 +1143,16 @@ describe('CombatService', () => {
     })
 
     it('should use tactical state health when in tactical combat', async () => {
-      const inventory = [{
-        id: 'item-1',
-        type: ItemType.CONSUMABLE,
-        definitionId: 'health_potion'
-      }]
+      const inventory = [
+        {
+          id: 'item-1',
+          type: ItemType.CONSUMABLE,
+          definitionId: 'health_potion'
+        }
+      ]
 
       // Character has 8 HP in database, but 3 HP in tactical state
-      mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(
-        createMockCharacter(8, 10, 5, 10, inventory)
-      )
+      mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(createMockCharacter(8, 10, 5, 10, inventory))
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
       mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue({

@@ -18,18 +18,11 @@ export interface EncounterPattern {
 export const ENCOUNTER_PATTERNS: Record<number, EncounterPattern> = {
   1: {
     tier: 1,
-    slots: [
-      { type: 'MINION' },
-      { type: 'MINION', optional: true, chance: 0.3 }
-    ]
+    slots: [{ type: 'MINION' }, { type: 'MINION', optional: true, chance: 0.3 }]
   },
   2: {
     tier: 2,
-    slots: [
-      { type: 'MINION' },
-      { type: 'MINION' },
-      { type: 'ELITE' }
-    ]
+    slots: [{ type: 'MINION' }, { type: 'MINION' }, { type: 'ELITE' }]
   },
   3: {
     tier: 3,
@@ -42,12 +35,7 @@ export const ENCOUNTER_PATTERNS: Record<number, EncounterPattern> = {
   },
   4: {
     tier: 4,
-    slots: [
-      { type: 'ELITE' },
-      { type: 'MINION' },
-      { type: 'ELITE' },
-      { type: 'BOSS' }
-    ]
+    slots: [{ type: 'ELITE' }, { type: 'MINION' }, { type: 'ELITE' }, { type: 'BOSS' }]
   }
 }
 

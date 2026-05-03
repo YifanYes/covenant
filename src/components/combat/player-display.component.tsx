@@ -1,10 +1,10 @@
 'use client'
-import { cn } from '@/lib/cn.lib'
 import HealthBar from '@/app/(workspace)/map/_components/health-bar.component'
-import { DamageNumberContainer } from '@/components/combat/damage-number.component'
-import CombatUnitSprite from '@/components/combat/combat-unit-sprite.component'
 import TierBadge from '@/common/tier-badge.component'
+import CombatUnitSprite from '@/components/combat/combat-unit-sprite.component'
+import { DamageNumberContainer } from '@/components/combat/damage-number.component'
 import type { CombatAnimationState } from '@/hooks/use-combat-animations.hook'
+import { cn } from '@/lib/cn.lib'
 import { Battery, Heart } from '@nsmr/pixelart-react'
 import { useTranslation } from 'react-i18next'
 

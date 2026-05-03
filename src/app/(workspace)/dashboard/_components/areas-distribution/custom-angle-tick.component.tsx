@@ -33,8 +33,8 @@ export default function CustomAngleTickComponent({ payload, x, y, textAnchor, da
         <text
           dy={6}
           textAnchor={textAnchor}
-          fontSize='8px'
-          fontWeight='medium'
+          fontSize="8px"
+          fontWeight="medium"
           fill={theme === 'dark' ? '#bebab1' : '#5d5c55'}
         >
           {payload.value}

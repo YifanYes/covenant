@@ -16,10 +16,10 @@ export default function TaskSummaryList({ title, tasks, setSelectedTask }: TaskS
   if (tasks.length <= 2) return null
 
   return (
-    <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()} className='w-fit'>
+    <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()} className="w-fit">
       <Dialog>
         <DialogTrigger asChild>
-          <button className='text-muted-foreground hover:text-foreground w-full cursor-pointer text-left text-xs'>
+          <button className="text-muted-foreground hover:text-foreground w-full cursor-pointer text-left text-xs">
             +{tasks.length - 2} {t('more')}
           </button>
         </DialogTrigger>
@@ -27,7 +27,7 @@ export default function TaskSummaryList({ title, tasks, setSelectedTask }: TaskS
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
-          <ul className='flex flex-col gap-1'>
+          <ul className="flex flex-col gap-1">
             {tasks.map((task) => (
               <Task key={task.id} task={task} setSelectedTask={setSelectedTask} hideHandle />
             ))}

@@ -2,6 +2,8 @@
 import CombatActionBar from '@/components/combat/combat-action-bar.component'
 import EnemyDisplay from '@/components/combat/enemy-display.component'
 import PlayerDisplay from '@/components/combat/player-display.component'
+import { useCombat } from '@/hooks/use-combat.hook'
+import { cn } from '@/lib/cn.lib'
 import AlertDialog, {
   AlertDialogAction,
   AlertDialogContent,
@@ -10,8 +12,6 @@ import AlertDialog, {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/ui/alert-dialog.component'
-import { useCombat } from '@/hooks/use-combat.hook'
-import { cn } from '@/lib/cn.lib'
 import type { CombatLogEntry, EnemyState, InventoryCharacter } from '@shared/types/gamification.types'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
@@ -72,7 +72,7 @@ export default function CombatArena({
                 damageNumbers={combat.damageNumbers}
                 targetingMode={
                   isPlayerTurn && (combat.targetingMode || combat.attackRolls)
-                    ? combat.targetingMode ?? 'single'
+                    ? (combat.targetingMode ?? 'single')
                     : null
                 }
                 onSelectTarget={handleTargetSelect}
@@ -102,7 +102,6 @@ export default function CombatArena({
               {combat.phase === 'animating' && '...'}
             </div>
           </div>
-
         </div>
 
         {/* Action bar */}

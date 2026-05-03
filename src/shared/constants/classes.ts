@@ -69,7 +69,7 @@ export const CLASS_BASE_STATS = {
 export function calculateMaxStats(className: CharacterClassName, tier: number) {
   const base = CLASS_BASE_STATS[className]
   return {
-    maxHealth: base.baseHealth + (tier * 2),
+    maxHealth: base.baseHealth + tier * 2,
     maxMana: base.baseMana + tier
   }
 }

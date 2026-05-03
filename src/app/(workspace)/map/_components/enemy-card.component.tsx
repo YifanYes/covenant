@@ -50,13 +50,13 @@ export default function EnemyCard({ enemy, isTarget, className }: EnemyCardProps
       )}
     >
       {/* Enemy Portrait */}
-      <div className='shrink-0'>
+      <div className="shrink-0">
         <Image
           src={`/assets/enemies/${template.imageId}.png`}
           alt={t(template.name)}
           width={64}
           height={64}
-          className='h-16 w-16 rounded-lg object-cover'
+          className="h-16 w-16 rounded-lg object-cover"
           onError={(e) => {
             // Hide the image if it fails to load
             e.currentTarget.style.display = 'none'
@@ -65,8 +65,8 @@ export default function EnemyCard({ enemy, isTarget, className }: EnemyCardProps
       </div>
 
       {/* Enemy Info */}
-      <div className='flex min-w-0 flex-1 flex-col gap-2'>
-        <div className='flex items-center justify-between gap-2'>
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <div className="flex items-center justify-between gap-2">
           <span className={cn('truncate text-sm font-medium', isDead && 'line-through')}>{getEnemyName()}</span>
           <span className={cn('shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium', getTypeBadgeColor())}>
             {template.type}
@@ -75,12 +75,12 @@ export default function EnemyCard({ enemy, isTarget, className }: EnemyCardProps
 
         <HealthBar current={enemy.currentHealth} max={enemy.maxHealth} />
 
-        <div className='text-muted-foreground flex gap-2 truncate text-[10px]'>
-          <span className='truncate'>{t(`inventory.damage_type.${template.damageType}`)}</span>
+        <div className="text-muted-foreground flex gap-2 truncate text-[10px]">
+          <span className="truncate">{t(`inventory.damage_type.${template.damageType}`)}</span>
           <span>•</span>
-          <span className='shrink-0'>ATK: {template.attackDice}d</span>
+          <span className="shrink-0">ATK: {template.attackDice}d</span>
           <span>•</span>
-          <span className='shrink-0'>DEF: {template.defenseDice}d</span>
+          <span className="shrink-0">DEF: {template.defenseDice}d</span>
         </div>
       </div>
     </div>

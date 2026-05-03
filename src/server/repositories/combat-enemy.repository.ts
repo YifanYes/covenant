@@ -1,5 +1,5 @@
-import { CombatEnemyStatus } from '@shared/types/gamification.types'
 import { Prisma, type PrismaClient } from '@/generated/prisma'
+import { CombatEnemyStatus } from '@shared/types/gamification.types'
 
 export class CombatEnemyRepository {
   constructor(private prisma: PrismaClient) {}

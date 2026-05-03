@@ -24,16 +24,16 @@ export default function LoadoutPanel({ character, onUnequip }: LoadoutPanelProps
   )
 
   return (
-    <Card className='flex min-h-0 w-full flex-1 flex-col gap-0'>
-      <CardHeader className='flex shrink-0 flex-row items-center justify-between pb-2'>
-        <CardTitle className='flex items-center gap-2 text-sm font-medium'>
-          <Luggage className='h-4 w-4' />
+    <Card className="flex min-h-0 w-full flex-1 flex-col gap-0">
+      <CardHeader className="flex shrink-0 flex-row items-center justify-between pb-2">
+        <CardTitle className="flex items-center gap-2 text-sm font-medium">
+          <Luggage className="h-4 w-4" />
           {t('inventory.loadout')}
         </CardTitle>
       </CardHeader>
-      <CardContent className='flex h-full flex-col justify-center pt-2'>
-        <div className='flex h-full flex-row gap-3'>
-          <div className='flex flex-1 flex-col items-center justify-center gap-4'>
+      <CardContent className="flex h-full flex-col justify-center pt-2">
+        <div className="flex h-full flex-row gap-3">
+          <div className="flex flex-1 flex-col items-center justify-center gap-4">
             <EquipmentSlot
               type={SlotTypeEnum.WEAPON}
               item={loadoutItems.weapon}

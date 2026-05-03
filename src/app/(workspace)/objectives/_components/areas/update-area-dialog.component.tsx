@@ -6,7 +6,7 @@ import TextInput from '@/forms/text-input.component'
 import { areaStyles } from '@/types/colors.types'
 import { allIcons } from '@/types/icons.types'
 import type { Area } from '@/types/models.types'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { defaultAreas, updateAreaSchema, type UpdateAreaBodyType } from '@shared/schemas/areas.schemas'
 import { useMutation } from '@tanstack/react-query'
@@ -79,7 +79,7 @@ export default function UpdateAreaDialog({ area }: { area: Area }) {
         areaStyle.styles
       } ${!isDefaultArea ? 'cursor-pointer hover:brightness-110' : ''}`}
     >
-      {currentIcon && <currentIcon.component className='size-4' />}
+      {currentIcon && <currentIcon.component className="size-4" />}
       <span>{t(area.name)}</span>
     </div>
   ) : null
@@ -96,25 +96,25 @@ export default function UpdateAreaDialog({ area }: { area: Area }) {
     <BaseFormDialog
       open={open}
       onOpenChange={handleOpenChange}
-      title='update_area_dialog.title'
-      description='update_area_dialog.description'
+      title="update_area_dialog.title"
+      description="update_area_dialog.description"
       onSubmit={handleSubmit(onSubmit)}
-      submitLabel='save_changes'
+      submitLabel="save_changes"
       isLoading={updateMutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
       extraFooterActions={<ConfirmDeleteAreaDialog area={area} onDeleteSuccess={handleDeleteSuccess} />}
       trigger={Badge}
     >
-      <div className='grid gap-4'>
-        <div className='grid gap-3'>
+      <div className="grid gap-4">
+        <div className="grid gap-3">
           <Controller
-            name='name'
+            name="name"
             control={control}
             render={({ field }) => (
               <TextInput
-                type='text'
+                type="text"
                 placeholder={t('create_area_dialog.name')}
-                className='h-9'
+                className="h-9"
                 tabIndex={-1}
                 {...field}
                 value={t(field.value || '')}
@@ -124,18 +124,18 @@ export default function UpdateAreaDialog({ area }: { area: Area }) {
             )}
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='color'
+            name="color"
             control={control}
-            render={({ field }) => <ColorSelector className='w-full' value={field.value} onChange={field.onChange} />}
+            render={({ field }) => <ColorSelector className="w-full" value={field.value} onChange={field.onChange} />}
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='icon'
+            name="icon"
             control={control}
-            render={({ field }) => <IconPicker className='w-full' value={field.value} onChange={field.onChange} />}
+            render={({ field }) => <IconPicker className="w-full" value={field.value} onChange={field.onChange} />}
           />
         </div>
       </div>

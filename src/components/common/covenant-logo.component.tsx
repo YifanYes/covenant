@@ -17,7 +17,7 @@ export default function CovenantLogo({ className }: CovenantLogoProps) {
         WebkitMaskSize: 'contain',
         WebkitMaskPosition: 'center'
       }}
-      className={cn('bg-foreground aspect-[598/432]', className)}
+      className={cn('bg-foreground aspect-598/432', className)}
     />
   )
 }

@@ -1,10 +1,10 @@
 'use client'
-import { cn } from '@/lib/cn.lib'
 import HealthBar from '@/app/(workspace)/map/_components/health-bar.component'
-import { DamageNumberContainer } from '@/components/combat/damage-number.component'
 import CombatUnitSprite from '@/components/combat/combat-unit-sprite.component'
+import { DamageNumberContainer } from '@/components/combat/damage-number.component'
 import type { CombatAnimationState } from '@/hooks/use-combat-animations.hook'
-import { getEnemy, EnemyType } from '@shared/constants/enemies'
+import { cn } from '@/lib/cn.lib'
+import { EnemyType, getEnemy } from '@shared/constants/enemies'
 import type { EnemyState } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 
@@ -61,13 +61,7 @@ export default function EnemyDisplay({
         const isTargetable = targetingMode !== null && !isDead
 
         return (
-          <div
-            key={enemy.id}
-            className={cn(
-              'flex items-start gap-3 transition-all',
-              isDead && 'opacity-40 grayscale'
-            )}
-          >
+          <div key={enemy.id} className={cn('flex items-start gap-3 transition-all', isDead && 'opacity-40 grayscale')}>
             {/* Left: Info panel */}
             <div className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-lg border p-3">
               <div className="flex items-center gap-2">
@@ -75,9 +69,7 @@ export default function EnemyDisplay({
                 {getTypeBadge(enemy)}
               </div>
               <HealthBar current={enemy.currentHealth} max={enemy.maxHealth} className="w-full" />
-              {isTargetable && (
-                <span className="text-emerald-400 text-xs">{t('combat.action.select_target')}</span>
-              )}
+              {isTargetable && <span className="text-emerald-400 text-xs">{t('combat.action.select_target')}</span>}
             </div>
 
             {/* Right: Sprite (flipped to face player) */}

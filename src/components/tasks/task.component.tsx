@@ -39,24 +39,24 @@ export default function Task({
         !hideHover && 'hover:rounded-md hover:border-transparent hover:bg-gray-50/10'
       )}
     >
-      {!hideHandle && <DragAndDrop className='drag-handle cursor-grab' />}
+      {!hideHandle && <DragAndDrop className="drag-handle cursor-grab" />}
       <div
         className={cn(
           'h-3 w-3 shrink-0 rounded-full',
           task.color ? getColorClasses(task.color, { bg: 'bg-muted', text: 'text-muted-foreground' }).bg : 'bg-muted'
         )}
       />
-      <div className='flex flex-1 flex-col gap-1'>
-        <div className='flex items-center justify-between gap-2'>
-          <h3 className='text-foreground text-sm font-semibold'>{task.title}</h3>
+      <div className="flex flex-1 flex-col gap-1">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-foreground text-sm font-semibold">{task.title}</h3>
           {task.dueDate && (
-            <span className='text-muted-foreground text-xs whitespace-nowrap'>
+            <span className="text-muted-foreground text-xs whitespace-nowrap">
               {dayjs(task.dueDate).format('DD MMM')}
             </span>
           )}
         </div>
         {(task.effort || task.impact || (task.objectives && task.objectives.length > 0) || taskAreas.length > 0) && (
-          <div className='flex flex-wrap items-center gap-4'>
+          <div className="flex flex-wrap items-center gap-4">
             {/* 1. Effort / Impact */}
             {(task.effort || task.impact) && (
               <span
@@ -70,12 +70,12 @@ export default function Task({
             )}
             {/* 2. Areas */}
             {taskAreas.length > 0 && (
-              <div className='flex items-center gap-1'>
+              <div className="flex items-center gap-1">
                 {taskAreas.map(({ id, name, icon, color }) => {
                   const areaStyle = areaSimpleStyles.find(({ color: areaColor }) => areaColor === color)
                   const currentIcon = allIcons.find(({ name: iconName }) => iconName === icon)
                   return !areaStyle || !currentIcon ? null : (
-                    <div key={id} title={t(name)} className='flex items-center'>
+                    <div key={id} title={t(name)} className="flex items-center">
                       <currentIcon.component className={cn('size-3.5', areaStyle.styles)} />
                     </div>
                   )
@@ -84,11 +84,11 @@ export default function Task({
             )}
             {/* 3. Objectives */}
             {task.objectives && task.objectives.length > 0 && (
-              <div className='flex flex-wrap items-center gap-2'>
+              <div className="flex flex-wrap items-center gap-2">
                 {task.objectives.map((objective) => (
                   <span
                     key={objective.id}
-                    className='text-muted-foreground border-muted-foreground/30 rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase'
+                    className="text-muted-foreground border-muted-foreground/30 rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase"
                   >
                     {objective.name}
                   </span>

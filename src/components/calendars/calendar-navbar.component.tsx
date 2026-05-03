@@ -18,31 +18,31 @@ export default function CalendarNavbar() {
   const formattedMonthYear = capitalize(currentMonth.format('MMMM YYYY'))
 
   return (
-    <div className='flex items-center justify-between gap-4 py-2'>
-      <p className='transform-capitalize text-xl font-semibold'>{formattedMonthYear}</p>
-      <div className='flex items-center gap-4'>
-        <div className='flex gap-1'>
+    <div className="flex items-center justify-between gap-4 py-2">
+      <p className="transform-capitalize text-xl font-semibold">{formattedMonthYear}</p>
+      <div className="flex items-center gap-4">
+        <div className="flex gap-1">
           <Button
-            variant='ghost'
-            size='icon'
+            variant="ghost"
+            size="icon"
             onClick={handlePrevMonth}
-            className='hover:border-primary border-card border-2 transition-colors'
+            className="hover:border-primary border-card border-2 transition-colors"
           >
-            <ChevronLeft className='h-5 w-5' />
+            <ChevronLeft className="h-5 w-5" />
           </Button>
           <Button
-            variant='ghost'
-            size='icon'
+            variant="ghost"
+            size="icon"
             onClick={handleNextMonth}
-            className='hover:border-primary border-card border-2 transition-colors'
+            className="hover:border-primary border-card border-2 transition-colors"
           >
-            <ChevronRight className='h-5 w-5' />
+            <ChevronRight className="h-5 w-5" />
           </Button>
         </div>
         <Button
-          variant='ghost'
+          variant="ghost"
           onClick={handleReset}
-          className='hover:border-primary border-card border-2 transition-colors'
+          className="hover:border-primary border-card border-2 transition-colors"
         >
           {t('calendar.today')}
         </Button>

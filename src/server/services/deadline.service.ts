@@ -1,5 +1,5 @@
-import type { ActivityRepository } from '../repositories/activity.repository'
 import { logger } from '../lib/logger'
+import type { ActivityRepository } from '../repositories/activity.repository'
 
 const log = logger.child({ service: 'deadline' })
 
@@ -11,9 +11,7 @@ export interface DeadlineValidationResult {
 }
 
 export class DeadlineService {
-  constructor(
-    private activityRepository: ActivityRepository
-  ) {}
+  constructor(private activityRepository: ActivityRepository) {}
 
   async validateDeadlines(): Promise<DeadlineValidationResult> {
     const now = new Date()
@@ -41,11 +39,14 @@ export class DeadlineService {
       }
     }
 
-    log.info({
-      activitiesProcessed: result.activitiesProcessed,
-      activitiesCompleted: result.activitiesCompleted.length,
-      activitiesFailed: result.activitiesFailed.length
-    }, 'Deadline validation processed')
+    log.info(
+      {
+        activitiesProcessed: result.activitiesProcessed,
+        activitiesCompleted: result.activitiesCompleted.length,
+        activitiesFailed: result.activitiesFailed.length
+      },
+      'Deadline validation processed'
+    )
 
     return result
   }

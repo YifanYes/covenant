@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest'
 import {
   calculateTierFromKills,
   getTierProgress,
   MAX_BETA_TIER,
   TIER_REQUIREMENTS
 } from '@shared/constants/tier-progression'
+import { describe, expect, it } from 'vitest'
 
 describe('TIER_REQUIREMENTS', () => {
   it('should have tier 2 at 10 kills for beta', () => {

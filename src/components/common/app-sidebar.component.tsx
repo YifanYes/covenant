@@ -57,9 +57,9 @@ export default function AppSidebar() {
   if (!mounted) {
     return (
       <Sidebar collapsible="icon">
-        <SidebarHeader className="h-[60px]" />
+        <SidebarHeader className="h-15" />
         <SidebarContent />
-        <SidebarFooter className="h-[48px]" />
+        <SidebarFooter className="h-12" />
       </Sidebar>
     )
   }

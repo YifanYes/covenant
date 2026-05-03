@@ -1,7 +1,7 @@
+import { Prisma, type PrismaClient, type Task } from '@/generated/prisma'
 import type { BulkUpdateTaskItem, CreateTaskType, UpdateTaskType } from '@shared/schemas/tasks.schemas'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
-import { Prisma, type PrismaClient, type Task } from '@/generated/prisma'
 
 const TASK_INCLUDE = {
   objectives: {

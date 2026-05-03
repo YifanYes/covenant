@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 
 export type CombatAnimationState =
   | 'idle'
@@ -20,18 +20,15 @@ export function useCombatAnimations() {
   const [animation, setAnimation] = useState<CombatAnimationState>('idle')
   const [damageNumbers, setDamageNumbers] = useState<DamageNumberData[]>([])
 
-  const playAnimation = useCallback(
-    (type: CombatAnimationState, durationMs: number = 600): Promise<void> => {
-      return new Promise((resolve) => {
-        setAnimation(type)
-        setTimeout(() => {
-          setAnimation('idle')
-          resolve()
-        }, durationMs)
-      })
-    },
-    []
-  )
+  const playAnimation = useCallback((type: CombatAnimationState, durationMs: number = 600): Promise<void> => {
+    return new Promise((resolve) => {
+      setAnimation(type)
+      setTimeout(() => {
+        setAnimation('idle')
+        resolve()
+      }, durationMs)
+    })
+  }, [])
 
   const playAttackAnimation = useCallback(() => playAnimation('player-attack', 600), [playAnimation])
 

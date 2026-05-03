@@ -100,6 +100,5 @@ export const invalidators = {
       queryClient.invalidateQueries({ queryKey: trpcOptions.store.list.queryKey() }),
       queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
     ])
-  },
-
+  }
 }

@@ -1,6 +1,6 @@
+import type { ActivityParticipation, PrismaClient } from '@/generated/prisma'
 import type { ActiveStatusEffect } from '@shared/types/doctrine.types'
 import type { TacticalStateData } from '@shared/types/tactical-combat.types'
-import type { ActivityParticipation, PrismaClient } from '@/generated/prisma'
 
 export class ActivityParticipationRepository {
   constructor(private prisma: PrismaClient) {}
@@ -73,10 +73,7 @@ export class ActivityParticipationRepository {
     }
   }
 
-  async updateTacticalState(
-    participationId: string,
-    tacticalState: TacticalStateData
-  ): Promise<void> {
+  async updateTacticalState(participationId: string, tacticalState: TacticalStateData): Promise<void> {
     await this.prisma.activityParticipation.update({
       where: { id: participationId },
       data: { tacticalState: tacticalState as any }
@@ -144,10 +141,7 @@ export class ActivityParticipationRepository {
     }
   }
 
-  async updateCombatStats<T extends object>(
-    participationId: string,
-    combatStats: T
-  ): Promise<void> {
+  async updateCombatStats<T extends object>(participationId: string, combatStats: T): Promise<void> {
     await this.prisma.activityParticipation.update({
       where: { id: participationId },
       data: { combatStats: combatStats as any }

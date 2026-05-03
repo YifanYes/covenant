@@ -27,11 +27,11 @@ export default function PasswordInput({
 
   return (
     <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
-      <div className='relative'>
+      <div className="relative">
         <input
           id={fieldId}
           type={showPassword ? 'text' : 'password'}
-          data-slot='input'
+          data-slot="input"
           aria-invalid={!!errorMessage}
           className={cn(
             'file:text-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-all duration-200 outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -44,16 +44,16 @@ export default function PasswordInput({
           required={required}
         />
         <Button
-          type='button'
-          variant='ghost'
-          size='sm'
-          className='text-icon hover:text-icon-hover absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent'
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="text-icon hover:text-icon-hover absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
           onClick={() => setShowPassword((prev) => !prev)}
         >
           {showPassword ? (
-            <Eye className='h-4 w-4' aria-hidden='true' />
+            <Eye className="h-4 w-4" aria-hidden="true" />
           ) : (
-            <EyeClosed className='h-4 w-4' aria-hidden='true' />
+            <EyeClosed className="h-4 w-4" aria-hidden="true" />
           )}
         </Button>
       </div>

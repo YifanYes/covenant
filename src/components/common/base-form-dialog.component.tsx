@@ -59,14 +59,14 @@ export default function BaseFormDialog({
 
         {children}
 
-        <DialogFooter className='flex h-auto items-center justify-between gap-2'>
+        <DialogFooter className="flex h-auto items-center justify-between gap-2">
           {extraFooterActions || <div />}
-          <div className='flex gap-2'>
-            <DialogClose asChild className='hover:bg-foreground/10 cursor-pointer'>
-              <Button variant='outline'>{cancelLabel ? t(cancelLabel) : t('cancel')}</Button>
+          <div className="flex gap-2">
+            <DialogClose asChild className="hover:bg-foreground/10 cursor-pointer">
+              <Button variant="outline">{cancelLabel ? t(cancelLabel) : t('cancel')}</Button>
             </DialogClose>
             <LoaderButton
-              className='cursor-pointer'
+              className="cursor-pointer"
               disabled={isSubmitDisabled}
               isLoading={!!isLoading}
               onClick={onSubmit}

@@ -208,13 +208,13 @@ export default function DatePicker({
                 'dark:bg-input/30 h-auto rounded-md border bg-transparent px-3 transition-all duration-200'
               )}
             >
-              <Calendar className='h-4 w-4' />
+              <Calendar className="h-4 w-4" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className='w-auto p-0' align='start' alignOffset={-8} sideOffset={8}>
+          <PopoverContent className="w-auto p-0" align="start" alignOffset={-8} sideOffset={8}>
             <CalendarComponent
               key={i18n.language}
-              mode='single'
+              mode="single"
               selected={value || undefined}
               onSelect={handleDateSelect}
               month={month}

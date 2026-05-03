@@ -7,7 +7,6 @@ import {
 } from '../types/doctrine.types'
 import { CharacterClassName, MagicNature } from './classes'
 
-
 export const MAX_EQUIPPED_DOCTRINES = 2
 
 /** Effect types that qualify a doctrine as a self-buff (no targeting required) */

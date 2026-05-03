@@ -16,7 +16,7 @@ export default function FormLabel({
       className={`mb-1 inline-flex items-center gap-1 pl-0.5 text-sm font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}
     >
       <span>{label}</span>
-      {required && <span className='text-destructive leading-none'>*</span>}
+      {required && <span className="text-destructive leading-none">*</span>}
     </label>
   )
 }

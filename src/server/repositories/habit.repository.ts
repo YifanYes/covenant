@@ -1,6 +1,6 @@
+import type { Habit, HabitCompletion, PrismaClient } from '@/generated/prisma'
 import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { TRPCError } from '@trpc/server'
-import type { Habit, HabitCompletion, PrismaClient } from '@/generated/prisma'
 
 const HABIT_INCLUDE = {
   objectives: true,

@@ -31,7 +31,7 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: 'covenant-store',
       partialize: (state) => ({ email: state.email, userId: state.userId }),
-      skipHydration: typeof window === 'undefined',
+      skipHydration: typeof window === 'undefined'
     }
   )
 )

@@ -1,11 +1,11 @@
-import { z } from 'zod'
-import { TRPCError } from '@trpc/server'
-import { protectedProcedure, t } from '../trpc'
 import type {
-  TacticalDoctrineResultWithMana,
   SelfBuffDoctrineResultWithMana,
+  TacticalDoctrineResultWithMana,
   TacticalStateData
 } from '@shared/types/tactical-combat.types'
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
+import { protectedProcedure, t } from '../trpc'
 
 export const activityRouter = t.router({
   // Get tactical combat state for a participation
@@ -13,10 +13,7 @@ export const activityRouter = t.router({
     .input(z.object({ participationId: z.string() }))
     .query(async ({ input, ctx }) => {
       // Verify the user owns this participation
-      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
-        input.participationId,
-        ctx.user.id
-      )
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(input.participationId, ctx.user.id)
       if (!isOwner) {
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this combat' })
       }
@@ -66,10 +63,7 @@ export const activityRouter = t.router({
     )
     .mutation(async ({ input, ctx }) => {
       // Verify the user owns this participation
-      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
-        input.participationId,
-        ctx.user.id
-      )
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(input.participationId, ctx.user.id)
       if (!isOwner) {
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
       }
@@ -107,10 +101,7 @@ export const activityRouter = t.router({
     )
     .mutation(async ({ input, ctx }) => {
       // Verify the user owns this participation
-      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
-        input.participationId,
-        ctx.user.id
-      )
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(input.participationId, ctx.user.id)
       if (!isOwner) {
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
       }
@@ -141,10 +132,7 @@ export const activityRouter = t.router({
     )
     .mutation(async ({ input, ctx }): Promise<TacticalDoctrineResultWithMana> => {
       // Verify the user owns this participation
-      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
-        input.participationId,
-        ctx.user.id
-      )
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(input.participationId, ctx.user.id)
       if (!isOwner) {
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
       }
@@ -176,11 +164,7 @@ export const activityRouter = t.router({
       // Deduct mana from the character's class after successful doctrine use
       if (result.success) {
         const newMana = currentClass.mana - result.manaCost
-        await ctx.services.character.updateHealth(
-          currentClass.id,
-          currentClass.health,
-          newMana
-        )
+        await ctx.services.character.updateHealth(currentClass.id, currentClass.health, newMana)
         // Return newMana so frontend uses authoritative server value
         return { ...result, success: true as const, newMana }
       }
@@ -199,10 +183,7 @@ export const activityRouter = t.router({
     )
     .mutation(async ({ input, ctx }): Promise<SelfBuffDoctrineResultWithMana> => {
       // Verify the user owns this participation
-      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
-        input.participationId,
-        ctx.user.id
-      )
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(input.participationId, ctx.user.id)
       if (!isOwner) {
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
       }
@@ -232,11 +213,7 @@ export const activityRouter = t.router({
       // Deduct mana from the character's class after successful doctrine use
       if (result.success) {
         const newMana = currentClass.mana - result.manaCost
-        await ctx.services.character.updateHealth(
-          currentClass.id,
-          currentClass.health,
-          newMana
-        )
+        await ctx.services.character.updateHealth(currentClass.id, currentClass.health, newMana)
         // Return newMana so frontend uses authoritative server value
         return { ...result, success: true as const, newMana }
       }
@@ -254,10 +231,7 @@ export const activityRouter = t.router({
     )
     .mutation(async ({ input, ctx }) => {
       // Verify the user owns this participation
-      const isOwner = await ctx.services.activityParticipation.verifyOwnership(
-        input.participationId,
-        ctx.user.id
-      )
+      const isOwner = await ctx.services.activityParticipation.verifyOwnership(input.participationId, ctx.user.id)
       if (!isOwner) {
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
       }

@@ -9,7 +9,7 @@ interface CharacterTabProps {
 
 export default function CharacterTab({ character }: CharacterTabProps) {
   return (
-    <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <CharacterPreview character={character} />
       <CharacterStatus character={character} />
     </div>

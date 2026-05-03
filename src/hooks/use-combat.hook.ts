@@ -102,11 +102,7 @@ export function useCombat(
         // Show damage numbers
         if (result.damageDealt > 0) {
           const isCrit = result.attackerRolls.some((r) => r.isCritical)
-          await animations.showDamageNumber(
-            result.damageDealt,
-            isCrit ? 'critical' : 'damage',
-            result.targetId
-          )
+          await animations.showDamageNumber(result.damageDealt, isCrit ? 'critical' : 'damage', result.targetId)
         }
 
         // Update combat log
