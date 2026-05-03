@@ -20,15 +20,6 @@
   - Multiple service files
   - **Fix:** Use generic "Resource not found or access denied" messages
 
-- [ ] Security: Missing DB Indexes
-  - `server/prisma/schema.prisma`
-  - Tables: Task, Habit, Objective, Area, HabitCompletion
-  - **Fix:** Add `@@index([userId])` to these models
-
-- [ ] Security: Client Cookie Missing Secure Flag
-  - `front/hooks/use-faction-theme.ts` (lines 51-52)
-  - **Fix:** Add `Secure` flag to cookie
-
 ## Low Priority
 
 - [ ] Security: No Audit Logging
@@ -41,8 +32,10 @@
   - Multiple `as any` usages
   - **Fix:** Replace with proper types
 
-- [ ] Security: Excessive Console Logging
-  - **Fix:** Use structured logging in production
+- [ ] Tooling: ESLint Lints `front/.next/` Build Artifacts
+  - `eslint.config.mjs` — `globalIgnores` only covers `.next/**`, not `front/.next/**`
+  - `front/` is a legacy frontend directory whose cached build chunks are picked up by the linter, producing ~30 false errors (`no-unused-vars`, `no-require-imports`, `ban-ts-comment`, `no-assign-module-variable`)
+  - **Fix:** Add `'front/.next/**'` to the `globalIgnores` array in `eslint.config.mjs`
 
 - [ ] Combat: Duplicated Grid Logic
   - `tactical-combat.store.ts:1025-1040, 1453-1468, 156-180`
