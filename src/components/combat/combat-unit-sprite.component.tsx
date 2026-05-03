@@ -1,6 +1,6 @@
 'use client'
-import { cn } from '@/lib/cn.lib'
 import type { CombatAnimationState } from '@/hooks/use-combat-animations.hook'
+import { cn } from '@/lib/cn.lib'
 import { motion } from 'framer-motion'
 
 interface CombatUnitSpriteProps {

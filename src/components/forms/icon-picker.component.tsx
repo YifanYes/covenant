@@ -74,7 +74,7 @@ export default function IconPicker({
           <DropdownMenuTrigger asChild>
             <Button
               id={fieldId}
-              variant='outline'
+              variant="outline"
               className={cn(
                 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 flex h-9 w-full items-center justify-between gap-2 font-normal transition-all duration-200',
                 required && !value ? 'text-destructive' : ''
@@ -83,10 +83,10 @@ export default function IconPicker({
               name={name}
               aria-invalid={!!errorMessage}
             >
-              <div className='flex items-center gap-2 truncate'>
+              <div className="flex items-center gap-2 truncate">
                 {currentIcon ? (
                   <>
-                    <currentIcon.component className='h-4 w-4' />
+                    <currentIcon.component className="h-4 w-4" />
                     <span>{currentIcon.name}</span>
                   </>
                 ) : (
@@ -95,22 +95,22 @@ export default function IconPicker({
                   </span>
                 )}
               </div>
-              <ChevronDown className='text-muted-foreground h-4 w-4' />
+              <ChevronDown className="text-muted-foreground h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className='w-[300px] p-3' align='start' alignOffset={-8} sideOffset={8}>
-            <div className='relative mb-3'>
-              <Search className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
+          <DropdownMenuContent className="w-[300px] p-3" align="start" alignOffset={-8} sideOffset={8}>
+            <div className="relative mb-3">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={t('icons.search_placeholder')}
-                className='pl-10 text-sm'
+                className="pl-10 text-sm"
               />
             </div>
 
-            <div className='mb-3 flex flex-wrap gap-1.5'>
+            <div className="mb-3 flex flex-wrap gap-1.5">
               {Object.entries(iconCategories).map(([key, label]) => (
                 <button
                   key={key}
@@ -127,9 +127,9 @@ export default function IconPicker({
               ))}
             </div>
 
-            <ScrollArea className='max-h-64 overflow-visible'>
+            <ScrollArea className="max-h-64 overflow-visible">
               {filteredIcons.length > 0 ? (
-                <div className='grid grid-cols-6 gap-2 p-0.5'>
+                <div className="grid grid-cols-6 gap-2 p-0.5">
                   {filteredIcons.map((icon, index) => {
                     const IconComponent = icon.component
                     return (
@@ -144,14 +144,14 @@ export default function IconPicker({
                         )}
                         title={icon.name}
                       >
-                        <IconComponent className='mx-auto h-4 w-4' />
+                        <IconComponent className="mx-auto h-4 w-4" />
                       </button>
                     )
                   })}
                 </div>
               ) : (
-                <div className='text-muted-foreground py-8 text-center text-sm'>
-                  <Search className='text-muted-foreground/50 mx-auto mb-2 h-8 w-8' />
+                <div className="text-muted-foreground py-8 text-center text-sm">
+                  <Search className="text-muted-foreground/50 mx-auto mb-2 h-8 w-8" />
                   <p>{t('icons.not_found')}</p>
                 </div>
               )}
@@ -160,15 +160,15 @@ export default function IconPicker({
         </DropdownMenu>
         {value && !disabled && (
           <button
-            type='button'
-            className='text-muted-foreground hover:text-foreground absolute top-1/2 right-9 z-10 h-4 w-4 -translate-y-1/2 cursor-pointer transition-colors'
+            type="button"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-9 z-10 h-4 w-4 -translate-y-1/2 cursor-pointer transition-colors"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
               handleClear()
             }}
           >
-            <Close className='h-full w-full [&_svg]:size-full [&_svg]:fill-current' />
+            <Close className="h-full w-full [&_svg]:size-full [&_svg]:fill-current" />
           </button>
         )}
       </div>

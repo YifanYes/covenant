@@ -2,8 +2,8 @@
 import Button from '@/ui/button.component'
 import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/card.component'
 import { parseTranslationKey } from '@/utils/locale.utils'
-import { type ReactNode } from 'react'
 import Link from 'next/link'
+import { type ReactNode } from 'react'
 
 interface DashboardSectionWrapperComponentProps {
   title: string
@@ -30,16 +30,16 @@ export default function DashboardSectionWrapperComponent({
 }: DashboardSectionWrapperComponentProps) {
   return (
     <Card className={`col-span-1 flex h-full flex-col gap-2 ${className}`}>
-      <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-3'>
-        <div className='space-y-1'>
-          <CardTitle className='flex items-center gap-2'>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <div className="space-y-1">
+          <CardTitle className="flex items-center gap-2">
             <Icon className={`h-5 w-5 ${iconColorClass}`} />
             {parseTranslationKey(title)}
           </CardTitle>
           <CardDescription>{description}</CardDescription>
         </div>
         {linkTo && linkText && (
-          <Button variant='ghost' size='sm' className='h-8 text-xs' asChild>
+          <Button variant="ghost" size="sm" className="h-8 text-xs" asChild>
             <Link href={linkTo}>{linkText}</Link>
           </Button>
         )}

@@ -123,10 +123,10 @@ function StoreContent() {
   }
 
   return (
-    <div className='flex h-[calc(100dvh-3rem)] w-full gap-6 overflow-hidden pr-4'>
+    <div className="flex h-[calc(100dvh-3rem)] w-full gap-6 overflow-hidden pr-4">
       {/* Left Panel - Store Items */}
-      <Card className='flex min-h-0 flex-1 flex-col gap-4 overflow-hidden py-4'>
-        <CardHeader className='shrink-0'>
+      <Card className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden py-4">
+        <CardHeader className="shrink-0">
           <CardTitle>
             <StoreFilters
               gold={store.gold}
@@ -137,7 +137,7 @@ function StoreContent() {
             />
           </CardTitle>
         </CardHeader>
-        <CardContent className='min-h-0 flex-1 overflow-hidden p-0 pr-2'>
+        <CardContent className="min-h-0 flex-1 overflow-hidden p-0 pr-2">
           <StoreItemGrid
             itemsByTier={itemsByTier}
             selectedIds={selectedIds}

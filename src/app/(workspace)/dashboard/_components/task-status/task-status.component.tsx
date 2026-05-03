@@ -15,19 +15,19 @@ export default function TaskStatusComponent({ stats }: TaskStatusComponentProps)
 
   return (
     <DashboardSectionWrapperComponent
-      title='dashboard.task_status.title'
+      title="dashboard.task_status.title"
       icon={Zap}
-      iconColorClass='text-yellow-500'
-      contentClassName='px-0'
-      className='gap-0'
+      iconColorClass="text-yellow-500"
+      contentClassName="px-0"
+      className="gap-0"
     >
       <DashboardPieChartComponent
         data={taskStats}
         collectionLength={totalTasks}
         config={defaultTaskConfig}
         labelValue={totalTasks.toLocaleString()}
-        chartLabel='dashboard.task_status.tasks'
-        emptyLabel='dashboard.task_status.no_tasks'
+        chartLabel="dashboard.task_status.tasks"
+        emptyLabel="dashboard.task_status.no_tasks"
       />
     </DashboardSectionWrapperComponent>
   )

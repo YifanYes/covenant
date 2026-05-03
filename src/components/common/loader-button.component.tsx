@@ -27,7 +27,7 @@ export default function LoaderButton({
       className={`${className || ''}`}
       aria-busy={isLoading}
     >
-      {isLoading && <Loader className='animate-spin' />}
+      {isLoading && <Loader className="animate-spin" />}
       {!isLoading && icon}
       {label}
     </Button>

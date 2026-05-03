@@ -35,18 +35,18 @@ export default function ArmoryTab({ character, onEquipItem, onUnequipItem }: Arm
   }, [])
 
   return (
-    <div className='flex h-full flex-col gap-4'>
+    <div className="flex h-full flex-col gap-4">
       {/* Filter controls */}
-      <div className='flex shrink-0 flex-wrap items-center gap-3'>
+      <div className="flex shrink-0 flex-wrap items-center gap-3">
         <Select
           value={tierFilter?.toString() ?? 'all'}
           onValueChange={(value: string) => setTierFilter(value === 'all' ? null : Number(value))}
         >
-          <SelectTrigger className='w-[140px]'>
+          <SelectTrigger className="w-35">
             <SelectValue placeholder={t('inventory.filter.all_tiers')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='all'>{t('inventory.filter.all_tiers')}</SelectItem>
+            <SelectItem value="all">{t('inventory.filter.all_tiers')}</SelectItem>
             {availableTiers.map((tier) => (
               <SelectItem key={tier} value={tier.toString()}>
                 {t('inventory.filter.tier', { tier })}
@@ -56,27 +56,27 @@ export default function ArmoryTab({ character, onEquipItem, onUnequipItem }: Arm
         </Select>
 
         <Select value={typeFilter} onValueChange={(value: string) => setTypeFilter(value as EquipmentTypeFilter)}>
-          <SelectTrigger className='w-[140px]'>
+          <SelectTrigger className="w-35">
             <SelectValue placeholder={t('inventory.filter.all_types')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='all'>{t('inventory.filter.all_types')}</SelectItem>
-            <SelectItem value='weapon'>{t('inventory.filter.weapon')}</SelectItem>
-            <SelectItem value='armor'>{t('inventory.filter.armor')}</SelectItem>
-            <SelectItem value='consumable'>{t('inventory.filter.consumable')}</SelectItem>
+            <SelectItem value="all">{t('inventory.filter.all_types')}</SelectItem>
+            <SelectItem value="weapon">{t('inventory.filter.weapon')}</SelectItem>
+            <SelectItem value="armor">{t('inventory.filter.armor')}</SelectItem>
+            <SelectItem value="consumable">{t('inventory.filter.consumable')}</SelectItem>
           </SelectContent>
         </Select>
 
         {hasActiveFilters && (
-          <Button variant='outline' size='sm' onClick={clearFilters}>
-            <Close className='mr-2 h-4 w-4' />
+          <Button variant="outline" size="sm" onClick={clearFilters}>
+            <Close className="mr-2 h-4 w-4" />
             {t('inventory.filter.clear')}
           </Button>
         )}
       </div>
 
       {/* Content grid */}
-      <div className='grid min-h-0 flex-1 grid-cols-1 gap-6 overflow-auto lg:grid-cols-[1fr_2fr]'>
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 overflow-auto lg:grid-cols-[1fr_2fr]">
         <LoadoutPanel character={character} onUnequip={onUnequipItem} />
         <InventoryGrid
           character={character}

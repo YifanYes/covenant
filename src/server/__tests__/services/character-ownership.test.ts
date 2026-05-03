@@ -161,6 +161,5 @@ describe('Character Ownership Validation', () => {
       expect(mockCharacterService.verifyCharacterOwnership).not.toHaveBeenCalled()
       expect(mockActivityService.getActivities).toHaveBeenCalledWith(undefined)
     })
-
   })
 })

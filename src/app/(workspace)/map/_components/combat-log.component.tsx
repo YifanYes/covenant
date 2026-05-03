@@ -158,21 +158,21 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
       )}
     >
       {entries.length === 0 ? (
-        <p className='text-muted-foreground text-center text-sm italic'>{t('combat.log.empty')}</p>
+        <p className="text-muted-foreground text-center text-sm italic">{t('combat.log.empty')}</p>
       ) : (
         entries.map((entry, index) => {
           const Icon = getEntryIcon(entry.type)
           const isEndOfTurn = entry.type === CombatLogType.PLAYER_ATTACK && index < entries.length - 1
 
           return (
-            <div key={index} className='flex flex-col gap-2'>
-              <div className='flex items-start gap-3'>
+            <div key={index} className="flex flex-col gap-2">
+              <div className="flex items-start gap-3">
                 <div className={cn('mt-0.5', getEntryColor(entry.type))}>
-                  <Icon className='h-4 w-4' />
+                  <Icon className="h-4 w-4" />
                 </div>
-                <span className='text-foreground/90 text-sm'>{formatEntry(entry)}</span>
+                <span className="text-foreground/90 text-sm">{formatEntry(entry)}</span>
               </div>
-              {isEndOfTurn && <Separator className='my-2' />}
+              {isEndOfTurn && <Separator className="my-2" />}
             </div>
           )
         })

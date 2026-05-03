@@ -62,17 +62,17 @@ export default function TaskList({ id, group, mutation }: { id: string; group: s
   }, [tasks, id, setValues])
 
   return (
-    <section className='w-full py-4'>
-      <header className='mb-2 flex items-center justify-between'>
-        <h2 className='text-md font-medium'>{t(`task_status.${id}`).toUpperCase()}</h2>
+    <section className="w-full py-4">
+      <header className="mb-2 flex items-center justify-between">
+        <h2 className="text-md font-medium">{t(`task_status.${id}`).toUpperCase()}</h2>
       </header>
-      <div className='relative isolate min-h-[80px] rounded-md border-2'>
+      <div className="relative isolate min-h-20 rounded-md border-2">
         {values.length === 0 && (
-          <div className='text-muted-foreground pointer-events-none absolute inset-0 flex items-center justify-center p-4 text-sm italic'>
+          <div className="text-muted-foreground pointer-events-none absolute inset-0 flex items-center justify-center p-4 text-sm italic">
             {t(`tasks.empty.${id}` as any, { defaultValue: t('tasks.empty') })}
           </div>
         )}
-        <ul ref={parent} className='flex h-full min-h-[80px] flex-col gap-1 rounded-md p-3' data-list-id={id}>
+        <ul ref={parent} className="flex h-full min-h-20 flex-col gap-1 rounded-md p-3" data-list-id={id}>
           {map(values, (task: TaskType) => (
             <Task key={task.id} task={task} setSelectedTask={setSelectedTask} />
           ))}

@@ -1,16 +1,13 @@
+import { StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 import { describe, expect, it } from 'vitest'
 import {
-  getActiveDoctrineBuffs,
+  clearConsumedDefenseDoctrines,
   clearConsumedDoctrines,
-  clearConsumedDefenseDoctrines
+  getActiveDoctrineBuffs
 } from '../../../utils/combat/doctrine-buffs'
-import { StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 
 // ---------- helpers ----------
-const makeDoctrineEffect = (
-  doctrineId: string,
-  remainingTurns: number = 1
-): ActiveStatusEffect => ({
+const makeDoctrineEffect = (doctrineId: string, remainingTurns: number = 1): ActiveStatusEffect => ({
   effect: StatusEffect.DOCTRINE_ACTIVE,
   remainingTurns,
   sourceDoctrineId: doctrineId
@@ -206,5 +203,4 @@ describe('doctrine-buffs utilities', () => {
       expect(result.miraculous_protection).toBeUndefined()
     })
   })
-
 })

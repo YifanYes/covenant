@@ -64,13 +64,13 @@ export default function KillRecordCard({ enemy, onClick }: KillRecordCardProps) 
       )}
     >
       {/* Enemy Portrait */}
-      <div className='shrink-0'>
+      <div className="shrink-0">
         <Image
           src={`/assets/enemies/${template.imageId}.png`}
           alt={t(template.name)}
           width={64}
           height={64}
-          className='h-16 w-16 rounded-lg object-cover'
+          className="h-16 w-16 rounded-lg object-cover"
           onError={(e) => {
             e.currentTarget.style.display = 'none'
           }}
@@ -78,26 +78,25 @@ export default function KillRecordCard({ enemy, onClick }: KillRecordCardProps) 
       </div>
 
       {/* Enemy Info */}
-      <div className='flex min-w-0 flex-1 flex-col gap-1'>
-        <div className='flex items-center justify-between gap-2'>
-          <span className='truncate text-sm font-medium'>{getEnemyName()}</span>
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate text-sm font-medium">{getEnemyName()}</span>
           <span className={cn('shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium', getTypeBadgeColor())}>
             {template.type}
           </span>
         </div>
 
-        <div className='text-muted-foreground flex flex-wrap gap-x-3 gap-y-1 text-xs'>
+        <div className="text-muted-foreground flex flex-wrap gap-x-3 gap-y-1 text-xs">
           <span>
-            <span className='text-emerald-500'>{enemy.damageDealt}</span>{' '}
+            <span className="text-emerald-500">{enemy.damageDealt}</span>{' '}
             {t('inventory.kill_record.damage_dealt_short')}
           </span>
           <span>
-            <span className='text-red-500'>{enemy.damageTaken}</span>{' '}
-            {t('inventory.kill_record.damage_received_short')}
+            <span className="text-red-500">{enemy.damageTaken}</span> {t('inventory.kill_record.damage_received_short')}
           </span>
         </div>
 
-        <span className='text-muted-foreground text-[10px]'>{getTimeAgo()}</span>
+        <span className="text-muted-foreground text-[10px]">{getTimeAgo()}</span>
       </div>
     </button>
   )

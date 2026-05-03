@@ -6,7 +6,7 @@ import SingleSelect from '@/forms/single-select.component'
 import TextInput from '@/forms/text-input.component'
 import type { Habit } from '@/types/models.types'
 import Textarea from '@/ui/textarea.component'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { HabitTimespan, updateHabitSchema, type UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -88,51 +88,51 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
     <BaseFormDialog
       open={open}
       onOpenChange={handleOpenChange}
-      title='update_habit_dialog.title'
-      description='update_habit_dialog.description'
+      title="update_habit_dialog.title"
+      description="update_habit_dialog.description"
       onSubmit={handleSubmit(onSubmit)}
-      submitLabel='save_changes'
+      submitLabel="save_changes"
       isLoading={updateMutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
       extraFooterActions={<ConfirmDeleteHabitDialog habit={habit} onDeleteSuccess={handleDeleteSuccess} />}
       trigger={<HabitCard habit={habit} />}
     >
-      <div className='grid gap-4'>
-        <div className='grid gap-3'>
+      <div className="grid gap-4">
+        <div className="grid gap-3">
           <TextInput
-            type='text'
+            type="text"
             label={t('create_habit_dialog.name_placeholder')}
             placeholder={t('create_habit_dialog.name_placeholder')}
-            className='h-9'
+            className="h-9"
             {...register('name')}
             {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
             tabIndex={-1}
             required
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Textarea
             placeholder={t('create_habit_dialog.description_placeholder')}
-            className='h-20 resize-none overflow-y-auto'
+            className="h-20 resize-none overflow-y-auto"
             {...register('description')}
             {...(errors.description?.message && { errorMessage: t(errors.description.message.toString()) })}
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <TextInput
-            type='number'
+            type="number"
             label={t('create_habit_dialog.recurrence_placeholder')}
             placeholder={t('create_habit_dialog.recurrence_placeholder')}
-            className='h-9'
+            className="h-9"
             min={1}
             {...register('recurrence', { valueAsNumber: true })}
             {...(errors.recurrence?.message && { errorMessage: t(errors.recurrence.message.toString()) })}
             required
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='timespan'
+            name="timespan"
             control={control}
             render={({ field }) => (
               <SingleSelect
@@ -146,7 +146,7 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
             )}
           />
         </div>
-        <div className='grid min-w-0 gap-3'>
+        <div className="grid min-w-0 gap-3">
           <ObjectivesSelector
             control={control}
             objectives={objectivesData?.objectives || []}
@@ -154,7 +154,7 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
             label={t('create_habit_dialog.objectives_placeholder')}
           />
         </div>
-        <div className='grid min-w-0 gap-3'>
+        <div className="grid min-w-0 gap-3">
           <AreasSelector
             control={control}
             areas={areasData?.areas || []}

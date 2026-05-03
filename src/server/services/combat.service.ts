@@ -2,18 +2,14 @@ import { DOCTRINES } from '@shared/constants/doctrines'
 import { getConsumableById } from '@shared/constants/items'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { DoctrineEffectType, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
-import type {
-  CombatLogEntry,
-  DiceRollResult,
-  InventoryItem
-} from '@shared/types/gamification.types'
+import type { CombatLogEntry, DiceRollResult, InventoryItem } from '@shared/types/gamification.types'
 import { ItemType } from '@shared/types/gamification.types'
 import {
-  type TacticalStateData,
   type AttackValidationResult,
-  type TacticalAttackResult,
   type EnemyTurnResult,
-  type TacticalDoctrineResult
+  type TacticalAttackResult,
+  type TacticalDoctrineResult,
+  type TacticalStateData
 } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
@@ -22,12 +18,12 @@ import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { KillRecordService } from './kill-record.service'
 
+import * as attackResolution from '../utils/combat/attack-resolution'
 import * as dice from '../utils/combat/dice'
 import * as doctrineBuffs from '../utils/combat/doctrine-buffs'
-import * as attackResolution from '../utils/combat/attack-resolution'
 import * as enemyAI from '../utils/combat/enemy-ai'
-import * as tacticalDoctrine from '../utils/combat/tactical-doctrine'
 import { type CombatRewardDeps } from '../utils/combat/rewards'
+import * as tacticalDoctrine from '../utils/combat/tactical-doctrine'
 
 export class CombatService {
   constructor(
@@ -226,11 +222,7 @@ export class CombatService {
   // TACTICAL COMBAT METHODS
   // ============================================================
 
-  validateTacticalAttack(
-    state: TacticalStateData,
-    attackerId: string,
-    targetId: string
-  ): AttackValidationResult {
+  validateTacticalAttack(state: TacticalStateData, attackerId: string, targetId: string): AttackValidationResult {
     return attackResolution.validateTacticalAttack(state, attackerId, targetId)
   }
 
@@ -245,8 +237,15 @@ export class CombatService {
     attackCriticalThreshold: number = 6
   ): Promise<TacticalAttackResult> {
     return attackResolution.executeTacticalAttack(
-      participationId, attackerId, targetId, attackerRolls, defenderRolls,
-      attackThreshold, defenseThreshold, attackCriticalThreshold, this.repos
+      participationId,
+      attackerId,
+      targetId,
+      attackerRolls,
+      defenderRolls,
+      attackThreshold,
+      defenseThreshold,
+      attackCriticalThreshold,
+      this.repos
     )
   }
 
@@ -260,10 +259,7 @@ export class CombatService {
     enemyAttackDice: number,
     enemyAttackThreshold: number
   ): Promise<EnemyTurnResult> {
-    return enemyAI.executeEnemyTurn(
-      participationId, enemyId,
-      enemyAttackDice, enemyAttackThreshold, this.repos
-    )
+    return enemyAI.executeEnemyTurn(participationId, enemyId, enemyAttackDice, enemyAttackThreshold, this.repos)
   }
 
   // ============================================================
@@ -278,7 +274,15 @@ export class CombatService {
     targetIds: string[],
     casterMana: number
   ): Promise<TacticalDoctrineResult> {
-    return tacticalDoctrine.executeTacticalDoctrine(participationId, casterId, doctrineId, targeting, targetIds, casterMana, this.repos)
+    return tacticalDoctrine.executeTacticalDoctrine(
+      participationId,
+      casterId,
+      doctrineId,
+      targeting,
+      targetIds,
+      casterMana,
+      this.repos
+    )
   }
 
   async useSelfBuffDoctrine(
@@ -297,10 +301,7 @@ export class CombatService {
     return tacticalDoctrine.useSelfBuffDoctrine(participationId, casterId, doctrineId, casterMana, this.repos)
   }
 
-  getActiveDoctrineBuffs(
-    unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined,
-    incomingHits?: number
-  ) {
+  getActiveDoctrineBuffs(unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined, incomingHits?: number) {
     return doctrineBuffs.getActiveDoctrineBuffs(unitActiveDoctrines, incomingHits)
   }
 

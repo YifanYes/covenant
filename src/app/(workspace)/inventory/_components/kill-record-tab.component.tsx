@@ -10,7 +10,7 @@ export default function KillRecordTab() {
   const { data: statsData } = useSuspenseQuery(trpcOptions.killRecord.getKillStats.queryOptions())
 
   return (
-    <div className='flex h-full flex-col gap-4'>
+    <div className="flex h-full flex-col gap-4">
       <TierProgressCard />
       <KillRecordStats stats={statsData} />
       <KillRecordList enemies={killRecordData.enemies} />

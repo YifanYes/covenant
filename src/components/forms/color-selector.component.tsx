@@ -45,7 +45,7 @@ export default function ColorSelector({
         <SelectContent>
           {colorOptions.map(({ color, styles }) => (
             <SelectItem key={color} value={color}>
-              <div className='flex items-center gap-2'>
+              <div className="flex items-center gap-2">
                 <span className={`h-4 w-4 rounded-full ${styles}`} />
                 <span>{t(`colors.${color}`)}</span>
               </div>

@@ -27,24 +27,24 @@ export default function StoreItemTooltip({
   return (
     <Tooltip delayDuration={500}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent className='max-w-xs border-zinc-700 bg-zinc-800 p-3'>
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-center gap-2'>
-            <Image src={itemImagePath} alt={itemName} width={32} height={32} className='h-8 w-8 object-contain' />
-            <span className='font-semibold text-zinc-100'>{itemName}</span>
+      <TooltipContent className="max-w-xs border-zinc-700 bg-zinc-800 p-3">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Image src={itemImagePath} alt={itemName} width={32} height={32} className="h-8 w-8 object-contain" />
+            <span className="font-semibold text-zinc-100">{itemName}</span>
           </div>
-          {itemDescription && <p className='text-xs text-zinc-400'>{itemDescription}</p>}
+          {itemDescription && <p className="text-xs text-zinc-400">{itemDescription}</p>}
           {isTierRestricted && (
-            <div className='rounded bg-red-900/30 px-2 py-1 text-xs text-red-400'>
+            <div className="rounded bg-red-900/30 px-2 py-1 text-xs text-red-400">
               {t('store.tier_required', { tier: item.tier, current: characterTier })}
             </div>
           )}
-          <div className='border-t border-zinc-700 pt-2'>
+          <div className="border-t border-zinc-700 pt-2">
             <ItemStatsDisplay stats={item.stats} />
           </div>
-          <div className='flex items-center justify-between text-xs'>
-            <span className='text-zinc-400'>Tier {item.tier}</span>
-            <span className='font-medium text-zinc-500 italic'>{t('store.random_rarity')}</span>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-zinc-400">Tier {item.tier}</span>
+            <span className="font-medium text-zinc-500 italic">{t('store.random_rarity')}</span>
           </div>
         </div>
       </TooltipContent>

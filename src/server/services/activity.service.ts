@@ -1,17 +1,21 @@
 import { selectEnemyWithFallback } from '@shared/constants/activities'
-import { applyStatScaling, getEnemy } from '@shared/constants/enemies'
-import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
+import { applyStatScaling } from '@shared/constants/enemies'
+import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import type { EncounterState } from '@shared/types/combat.types'
 import type { CombatLogEntry } from '@shared/types/gamification.types'
-import { TACTICAL_STATE_VERSION, TerrainType, type TacticalStateData, type TileState } from '@shared/types/tactical-combat.types'
+import {
+  TACTICAL_STATE_VERSION,
+  TerrainType,
+  type TacticalStateData,
+  type TileState
+} from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import { ActivityDifficulty, getActivityById } from '../../shared/constants/activities'
-import type { ActivityRepository } from '../repositories/activity.repository'
 import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
+import type { ActivityRepository } from '../repositories/activity.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { CharacterService } from './character.service'
-
 
 export class ActivityService {
   constructor(
@@ -36,12 +40,16 @@ export class ActivityService {
     // Minimal grid (no longer used for gameplay, kept for state compatibility)
     const gridWidth = 1
     const gridHeight = 1
-    const tiles: TileState[][] = [[{
-      position: { x: 0, y: 0 },
-      terrain: TerrainType.GRASS,
-      occupantId: null,
-      isWalkable: true
-    }]]
+    const tiles: TileState[][] = [
+      [
+        {
+          position: { x: 0, y: 0 },
+          terrain: TerrainType.GRASS,
+          occupantId: null,
+          isWalkable: true
+        }
+      ]
+    ]
 
     const units = [
       {

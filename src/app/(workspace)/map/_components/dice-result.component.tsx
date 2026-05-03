@@ -49,10 +49,10 @@ function DiceFace({ value, className }: { value: number; className?: string }) {
   const pips = pipPositions[value] || []
 
   return (
-    <svg viewBox='0 0 32 32' className={cn('h-full w-full', className)} style={{ shapeRendering: 'crispEdges' }}>
+    <svg viewBox="0 0 32 32" className={cn('h-full w-full', className)} style={{ shapeRendering: 'crispEdges' }}>
       {/* Pips - square pixels for authentic 8-bit look */}
       {pips.map(([cx, cy], i) => (
-        <rect key={i} x={cx - 3} y={cy - 3} width='6' height='6' className='fill-current' />
+        <rect key={i} x={cx - 3} y={cy - 3} width="6" height="6" className="fill-current" />
       ))}
     </svg>
   )

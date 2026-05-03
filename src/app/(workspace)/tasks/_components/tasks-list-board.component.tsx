@@ -33,7 +33,9 @@ export default function TasksListBoard() {
   )
 
   useEffect(() => {
-    !isUndefined(data?.tasks) && setTasks(data?.tasks)
+    if (!isUndefined(data?.tasks)) {
+      setTasks(data?.tasks)
+    }
   }, [data, setTasks])
 
   return (

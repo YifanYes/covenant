@@ -16,12 +16,12 @@ export default function BlindspotListComponent({ items, emptyKey }: BlindspotLis
 
   if (data.length === 0) {
     return (
-      <p className='text-muted-foreground flex h-full items-center justify-center text-center text-xs'>{t(emptyKey)}</p>
+      <p className="text-muted-foreground flex h-full items-center justify-center text-center text-xs">{t(emptyKey)}</p>
     )
   }
 
   return (
-    <ul className='list-inside list-disc space-y-1 text-xs'>
+    <ul className="list-inside list-disc space-y-1 text-xs">
       {data.map((item, i) => (
         <li key={i}>
           {parseTranslationKey(item.name)}: {item.lastCompletion ? dayjs(item.lastCompletion).get('days') : '∞'}{' '}

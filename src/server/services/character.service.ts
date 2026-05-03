@@ -303,5 +303,4 @@ export class CharacterService {
 
     return { success: true, equippedDoctrines: newEquippedDoctrines }
   }
-
 }

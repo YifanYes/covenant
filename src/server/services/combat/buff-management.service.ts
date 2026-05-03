@@ -70,7 +70,7 @@ export class BuffManagementService {
       }
 
       if ((THORNS_DOCTRINES as readonly string[]).includes(doctrineId)) {
-        const thornEffect = doctrine.effects.find(e => e.thornsDamage !== undefined)
+        const thornEffect = doctrine.effects.find((e) => e.thornsDamage !== undefined)
         if (thornEffect?.thornsDamage) {
           thornsDamage = Math.max(thornsDamage, thornEffect.thornsDamage)
         }
@@ -154,9 +154,7 @@ export class BuffManagementService {
       DoctrineEffectType.GUARANTEED_CRITICAL
     ]
 
-    const defenseBuffTypes: DoctrineEffectType[] = [
-      DoctrineEffectType.NEGATE_HITS
-    ]
+    const defenseBuffTypes: DoctrineEffectType[] = [DoctrineEffectType.NEGATE_HITS]
 
     for (const [doctrineId, effect] of Object.entries(unitActiveDoctrines)) {
       const doctrine = DOCTRINES[doctrineId]
@@ -168,13 +166,13 @@ export class BuffManagementService {
         continue
       }
 
-      const isAttackSelfBuff = doctrine.effects.some(
-        (e) => attackBuffTypes.includes(e.type) && e.target === DoctrineTarget.SELF
-      ) && !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)
+      const isAttackSelfBuff =
+        doctrine.effects.some((e) => attackBuffTypes.includes(e.type) && e.target === DoctrineTarget.SELF) &&
+        !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)
 
-      const isDefenseSelfBuff = doctrine.effects.some(
-        (e) => defenseBuffTypes.includes(e.type) && e.target === DoctrineTarget.SELF
-      ) && !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)
+      const isDefenseSelfBuff =
+        doctrine.effects.some((e) => defenseBuffTypes.includes(e.type) && e.target === DoctrineTarget.SELF) &&
+        !doctrine.effects.some((e) => e.target === DoctrineTarget.ENEMY || e.target === DoctrineTarget.ALL_ENEMIES)
 
       if (isAttackSelfBuff) {
         continue

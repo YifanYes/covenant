@@ -105,23 +105,22 @@ export default function MultiSelect({
 
         return (
           <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
-            <div className='relative w-full' ref={containerRef}>
+            <div className="relative w-full" ref={containerRef}>
               <button
                 ref={buttonRef}
                 id={fieldId}
-                type='button'
+                type="button"
                 onClick={handleToggleOpen}
                 className={cn(
                   'border-input dark:bg-input/30 ring-offset-background placeholder:text-muted-foreground focus:ring-ring hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 flex w-full items-center gap-2 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-all duration-200 focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
                   value.length === 0 && required && 'text-destructive',
                   errorMessage && 'border-destructive'
                 )}
-                aria-invalid={!!errorMessage}
               >
                 <span className={cn('w-0 flex-1 truncate text-left', value.length === 0 && 'text-muted-foreground')}>
                   {displayText}
                 </span>
-                <ChevronDown className='h-4 w-4 shrink-0 opacity-50' />
+                <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
               </button>
 
               {isOpen && (
@@ -146,12 +145,12 @@ export default function MultiSelect({
                       >
                         <span className={cn('absolute left-2 flex h-3.5 w-3.5 items-center justify-center')}>
                           {isSelected ? (
-                            <Check className='h-4 w-4' />
+                            <Check className="h-4 w-4" />
                           ) : (
-                            <div className='bg-muted-foreground h-1 w-1 rounded-full' />
+                            <div className="bg-muted-foreground h-1 w-1 rounded-full" />
                           )}
                         </span>
-                        <span className='ml-6'>{item.label}</span>
+                        <span className="ml-6">{item.label}</span>
                       </div>
                     )
                   })}

@@ -50,7 +50,7 @@ export default function BaseConfirmDialog({
           <AlertDialogDescription>{description ? t(description) : null}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className='hover:bg-foreground/10 cursor-pointer'>
+          <AlertDialogCancel className="hover:bg-foreground/10 cursor-pointer">
             {cancelLabel ? t(cancelLabel) : t('cancel')}
           </AlertDialogCancel>
           <LoaderButton

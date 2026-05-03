@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { rollDice, calculateHitsWithCount, getCurrentClassOrThrow } from '../../../utils/combat/dice'
 import type { CharacterWithClasses } from '@shared/types/character.types'
+import { describe, expect, it } from 'vitest'
+import { calculateHitsWithCount, getCurrentClassOrThrow, rollDice } from '../../../utils/combat/dice'
 
 describe('dice utilities', () => {
   // ---------- rollDice ----------
@@ -33,8 +33,8 @@ describe('dice utilities', () => {
       for (const r of rolls) counts[r - 1]++
       // Each face should appear ~1000 times. Allow 30% tolerance.
       for (const c of counts) {
-        expect(c).toBeGreaterThan(N / 6 * 0.7)
-        expect(c).toBeLessThan(N / 6 * 1.3)
+        expect(c).toBeGreaterThan((N / 6) * 0.7)
+        expect(c).toBeLessThan((N / 6) * 1.3)
       }
     })
   })

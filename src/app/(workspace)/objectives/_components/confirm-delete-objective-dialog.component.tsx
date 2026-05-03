@@ -2,7 +2,7 @@
 import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
 import type { Objective } from '@/types/models.types'
 import Button from '@/ui/button.component'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Trash } from '@nsmr/pixelart-react'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -36,18 +36,18 @@ export default function ConfirmDeleteObjectiveDialog({ objective, onDeleteSucces
     <BaseConfirmDialog
       open={open}
       onOpenChange={setOpen}
-      title='objectives.delete.title'
-      description='objectives.delete.description'
+      title="objectives.delete.title"
+      description="objectives.delete.description"
       onConfirm={handleDelete}
-      confirmLabel='delete'
+      confirmLabel="delete"
       isLoading={deleteMutation.isPending}
       trigger={
         <Button
-          variant='outline'
+          variant="outline"
           disabled={deleteMutation.isPending}
-          className='text-destructive hover:text-foreground hover:bg-foreground/10'
+          className="text-destructive hover:text-foreground hover:bg-foreground/10"
         >
-          <Trash className='h-4 w-4' />
+          <Trash className="h-4 w-4" />
           {t('delete')}
         </Button>
       }

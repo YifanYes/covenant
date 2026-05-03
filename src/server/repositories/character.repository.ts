@@ -1,10 +1,10 @@
+import { type Character, type PrismaClient } from '@/generated/prisma'
 import { Faction } from '@shared/constants/activities'
 import { CharacterClassName, CLASS_INITIAL_STATS } from '@shared/constants/classes'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
-import { type Character, type PrismaClient } from '@/generated/prisma'
 
 export class CharacterRepository {
   constructor(private prisma: PrismaClient) {}

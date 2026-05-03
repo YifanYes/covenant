@@ -5,7 +5,7 @@ import MultiSelect from '@/forms/multi-select.component'
 import TextInput from '@/forms/text-input.component'
 import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
 import { createObjectiveSchema, type CreateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
@@ -63,13 +63,13 @@ export default function CreateObjectiveDialog() {
     <BaseFormDialog
       open={open}
       onOpenChange={handleOpenChange}
-      title='create_objective_dialog.title'
-      description='create_objective_dialog.description'
+      title="create_objective_dialog.title"
+      description="create_objective_dialog.description"
       onSubmit={handleSubmit(onSubmit)}
-      submitLabel='save_changes'
+      submitLabel="save_changes"
       isLoading={mutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
-      className='sm:max-w-[500px]'
+      className="sm:max-w-[500px]"
       trigger={
         <Button>
           <Plus />
@@ -77,29 +77,29 @@ export default function CreateObjectiveDialog() {
         </Button>
       }
     >
-      <div className='grid gap-4'>
+      <div className="grid gap-4">
         <TextInput
-          type='text'
+          type="text"
           placeholder={t('create_objective_dialog.name_placeholder')}
-          className='h-9'
+          className="h-9"
           {...register('name')}
           {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
           required
         />
         <Controller
-          name='description'
+          name="description"
           control={control}
           render={({ field }) => (
             <Textarea
               placeholder={t('create_objective_dialog.description_placeholder')}
-              className='h-20'
+              className="h-20"
               value={field.value}
               onChange={field.onChange}
             />
           )}
         />
         <Controller
-          name='dueDate'
+          name="dueDate"
           control={control}
           render={({ field }) => (
             <DatePicker
@@ -110,7 +110,7 @@ export default function CreateObjectiveDialog() {
           )}
         />
         <MultiSelect
-          name='areas'
+          name="areas"
           control={control}
           items={areasData?.areas.map((a) => ({ id: a.id, label: t(a.name) })) || []}
           placeholder={t('create_objective_dialog.select_areas_placeholder')}

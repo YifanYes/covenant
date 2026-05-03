@@ -3,8 +3,8 @@ import { cn } from '@/lib/cn.lib'
 import Button from '@/ui/button.component'
 import { Cart, Minus, Money, Plus } from '@nsmr/pixelart-react'
 import type { ItemDefinition } from '@shared/constants/items'
-import Image from 'next/image'
 import { ItemType } from '@shared/types/gamification.types'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 import StoreItemTooltip from './store-item-tooltip.component'
 
@@ -62,62 +62,62 @@ export default function StoreItemCard({
         )}
       >
         {isSelected && !isConsumable && (
-          <div className='absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50'>
-            <Cart className='text-primary h-10 w-10' />
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50">
+            <Cart className="text-primary h-10 w-10" />
           </div>
         )}
 
         <button
           onClick={onToggle}
           disabled={isDisabled}
-          className='flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center'
+          className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center"
         >
-          <Image src={itemImagePath} alt={displayName} width={40} height={40} className='h-10 w-10 object-contain' />
+          <Image src={itemImagePath} alt={displayName} width={40} height={40} className="h-10 w-10 object-contain" />
         </button>
 
-        <div className='min-w-0 flex-1'>
-          <button onClick={onToggle} disabled={isDisabled} className='w-full cursor-pointer text-left'>
-            <div className='truncate pr-6 text-sm font-medium'>{displayName}</div>
-            <div className='text-muted-foreground line-clamp-1 text-xs'>{displayDescription}</div>
+        <div className="min-w-0 flex-1">
+          <button onClick={onToggle} disabled={isDisabled} className="w-full cursor-pointer text-left">
+            <div className="truncate pr-6 text-sm font-medium">{displayName}</div>
+            <div className="text-muted-foreground line-clamp-1 text-xs">{displayDescription}</div>
           </button>
-          <div className='mt-1 flex items-center justify-between'>
-            <span className='text-muted-foreground text-xs italic'>{t('store.random_rarity')}</span>
+          <div className="mt-1 flex items-center justify-between">
+            <span className="text-muted-foreground text-xs italic">{t('store.random_rarity')}</span>
 
             {isConsumable && isSelected ? (
-              <div className='flex items-center gap-1'>
+              <div className="flex items-center gap-1">
                 <Button
-                  variant='ghost'
-                  size='icon'
-                  className='h-6 w-6'
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
                   onClick={(e) => {
                     e.stopPropagation()
                     handleQuantityChange(-1)
                   }}
                   disabled={quantity <= 1}
                 >
-                  <Minus className='h-3 w-3' />
+                  <Minus className="h-3 w-3" />
                 </Button>
-                <span className='min-w-6 text-center text-sm font-medium'>{quantity}</span>
+                <span className="min-w-6 text-center text-sm font-medium">{quantity}</span>
                 <Button
-                  variant='ghost'
-                  size='icon'
-                  className='h-6 w-6'
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
                   onClick={(e) => {
                     e.stopPropagation()
                     handleQuantityChange(1)
                   }}
                   disabled={!canAfford || (maxQuantity !== undefined && quantity >= maxQuantity)}
                 >
-                  <Plus className='h-3 w-3' />
+                  <Plus className="h-3 w-3" />
                 </Button>
-                <span className='flex items-center gap-1 text-sm font-medium'>
-                  <Money className='h-3.5 w-3.5 text-yellow-500' />
+                <span className="flex items-center gap-1 text-sm font-medium">
+                  <Money className="h-3.5 w-3.5 text-yellow-500" />
                   {item.price * quantity}
                 </span>
               </div>
             ) : (
-              <span className='flex items-center gap-1 text-sm font-medium'>
-                <Money className='h-3.5 w-3.5 text-yellow-500' />
+              <span className="flex items-center gap-1 text-sm font-medium">
+                <Money className="h-3.5 w-3.5 text-yellow-500" />
                 {item.price}
               </span>
             )}

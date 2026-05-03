@@ -1,5 +1,5 @@
-import { vi } from 'vitest'
 import type { PrismaClient } from '@/generated/prisma'
+import { vi } from 'vitest'
 
 export type MockPrismaClient = {
   [K in keyof PrismaClient]: {

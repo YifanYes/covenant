@@ -1,6 +1,9 @@
 'use client'
 import LoaderButton from '@/common/loader-button.component'
 import TierBadge from '@/common/tier-badge.component'
+import CombatArena from '@/components/combat/combat-arena.component'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { cn } from '@/lib/cn.lib'
 import AlertDialog, {
   AlertDialogAction,
   AlertDialogCancel,
@@ -14,6 +17,7 @@ import { Badge } from '@/ui/badge.component'
 import Button from '@/ui/button.component'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { Progress } from '@/ui/progress.component'
+import { useSidebar } from '@/ui/sidebar.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { ChevronLeft } from '@nsmr/pixelart-react'
 import { ActivityDifficulty, getActivityById } from '@shared/constants/activities'
@@ -25,10 +29,6 @@ import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import CombatArena from '@/components/combat/combat-arena.component'
-import { useSidebar } from '@/ui/sidebar.component'
-import { useIsMobile } from '@/hooks/use-mobile'
-import { cn } from '@/lib/cn.lib'
 
 export default function ActivityDetailPage() {
   const { id } = useParams()
@@ -98,10 +98,7 @@ export default function ActivityDetailPage() {
   // Auto-spawn enemy when participating but no active enemy and activity not completed
   const isActivityCompleted = activity ? activity.progress >= activity.target : false
   const shouldSpawnEnemy =
-    activity &&
-    (activity.isParticipating || hasJoined) &&
-    !participation?.activeEnemy &&
-    !isActivityCompleted
+    activity && (activity.isParticipating || hasJoined) && !participation?.activeEnemy && !isActivityCompleted
 
   // Use effect to trigger spawn when conditions are met
   useEffect(() => {
@@ -212,7 +209,12 @@ export default function ActivityDetailPage() {
   }
 
   return (
-    <div className={cn('bg-background fixed inset-0 flex flex-col overflow-hidden transition-[left] duration-200 ease-linear', !isMobile && (sidebarState === 'collapsed' ? 'left-(--sidebar-width-icon)' : 'left-(--sidebar-width)'))}>
+    <div
+      className={cn(
+        'bg-background fixed inset-0 flex flex-col overflow-hidden transition-[left] duration-200 ease-linear',
+        !isMobile && (sidebarState === 'collapsed' ? 'left-(--sidebar-width-icon)' : 'left-(--sidebar-width)')
+      )}
+    >
       {/* Header */}
       <div className="bg-card flex-none border-b px-4 py-2">
         <div className="flex items-center gap-4">
@@ -224,7 +226,9 @@ export default function ActivityDetailPage() {
           <div className="flex flex-1 items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold">{t(activity.name)}</h1>
-              <Badge className="border-emerald-600 bg-emerald-600/15 text-emerald-400">{t('activities.status.active')}</Badge>
+              <Badge className="border-emerald-600 bg-emerald-600/15 text-emerald-400">
+                {t('activities.status.active')}
+              </Badge>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground text-sm">
@@ -250,11 +254,14 @@ export default function ActivityDetailPage() {
       )}
 
       {/* Loading state while spawning enemy */}
-      {!currentEnemy && (activity.isParticipating || hasJoined) && !isActivityCompleted && (isSpawning || shouldSpawnEnemy) && (
-        <div className="flex min-h-0 flex-1 items-center justify-center">
-          <div className="text-muted-foreground animate-pulse">{t('combat.spawning_enemy')}</div>
-        </div>
-      )}
+      {!currentEnemy &&
+        (activity.isParticipating || hasJoined) &&
+        !isActivityCompleted &&
+        (isSpawning || shouldSpawnEnemy) && (
+          <div className="flex min-h-0 flex-1 items-center justify-center">
+            <div className="text-muted-foreground animate-pulse">{t('combat.spawning_enemy')}</div>
+          </div>
+        )}
     </div>
   )
 }

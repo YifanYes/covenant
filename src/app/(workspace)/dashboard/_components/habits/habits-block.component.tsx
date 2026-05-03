@@ -18,19 +18,19 @@ export default function HabitsBlockComponent({ metrics }: HabitsBlockComponentPr
 
   return (
     <DashboardSectionWrapperComponent
-      title='dashboard.habits.title'
+      title="dashboard.habits.title"
       icon={Checklist}
-      iconColorClass='text-lime-500'
-      contentClassName='px-0'
-      className='gap-0'
+      iconColorClass="text-lime-500"
+      contentClassName="px-0"
+      className="gap-0"
     >
       <DashboardPieChartComponent
         data={chartData}
         collectionLength={metrics?.completedToday}
         config={defaultHabitConfig}
         labelValue={completionRate}
-        chartLabel='dashboard.habits.completion'
-        emptyLabel='dashboard.habits.no_habits'
+        chartLabel="dashboard.habits.completion"
+        emptyLabel="dashboard.habits.no_habits"
       />
     </DashboardSectionWrapperComponent>
   )

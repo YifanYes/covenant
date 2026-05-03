@@ -9,14 +9,14 @@ import { I18nProvider } from './providers/i18n-provider'
 import { TRPCProvider } from './providers/trpc-provider'
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-sans',
+  subsets: ['latin']
+})
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-mono',
+  subsets: ['latin']
+})
 
 const ebGaramond = EB_Garamond({
   variable: '--font-eb-garamond',

@@ -344,7 +344,9 @@ function ClosingAndFooterSection() {
             <span className="text-primary text-2xl font-bold">Covenant</span>
           </div>
           <Separator className="w-24" />
-          <p className="text-muted-foreground text-sm">&copy; {new Date().getFullYear()} Covenant. All rights reserved.</p>
+          <p className="text-muted-foreground text-sm">
+            &copy; {new Date().getFullYear()} Covenant. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>
@@ -354,13 +356,13 @@ function ClosingAndFooterSection() {
 export default function LandingPage() {
   return (
     <main className="bg-background h-screen overflow-y-auto scroll-smooth pt-16 snap-y snap-mandatory scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-        <HeroSection />
-        <ValuePropositionSection />
-        <ProductivitySection />
-        <CharacterSection />
-        <CombatSection />
-        <ComingSoonSection />
-        <ClosingAndFooterSection />
-      </main>
+      <HeroSection />
+      <ValuePropositionSection />
+      <ProductivitySection />
+      <CharacterSection />
+      <CombatSection />
+      <ComingSoonSection />
+      <ClosingAndFooterSection />
+    </main>
   )
 }

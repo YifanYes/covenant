@@ -3,10 +3,10 @@ import Button from '@/components/ui/button.component'
 import { cn } from '@/lib/cn.lib'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Loader, Trophy, Zap } from '@nsmr/pixelart-react'
-import Image from 'next/image'
 import { MagicNature } from '@shared/constants/classes'
 import type { DoctrineAttributeType, DoctrineDefinition } from '@shared/types/doctrine.types'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import Image from 'next/image'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -33,7 +33,7 @@ function DoctrineImage({ doctrineId, alt }: { doctrineId: string; alt: string })
   const [hasError, setHasError] = useState(false)
 
   if (hasError) {
-    return <Zap className='h-6 w-6 text-muted-foreground' />
+    return <Zap className="h-6 w-6 text-muted-foreground" />
   }
 
   return (
@@ -42,7 +42,7 @@ function DoctrineImage({ doctrineId, alt }: { doctrineId: string; alt: string })
       alt={alt}
       width={56}
       height={56}
-      className='h-full w-full object-contain'
+      className="h-full w-full object-contain"
       style={{ imageRendering: 'pixelated' }}
       onError={() => setHasError(true)}
     />
@@ -143,18 +143,18 @@ export default function DoctrinePanel({
           doctrine.isUltimate && 'border-amber-500/50'
         )}
       >
-        <div className='bg-muted/50 relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded border p-1'>
+        <div className="bg-muted/50 relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded border p-1">
           <DoctrineImage doctrineId={doctrine.id} alt={t(doctrine.nameKey)} />
         </div>
-        <div className='min-w-0 flex-1'>
-          <div className='flex items-center gap-2'>
-            {doctrine.isUltimate && <Trophy className='h-4 w-4 shrink-0 text-amber-500' />}
-            <span className='truncate font-medium'>{t(doctrine.nameKey)}</span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            {doctrine.isUltimate && <Trophy className="h-4 w-4 shrink-0 text-amber-500" />}
+            <span className="truncate font-medium">{t(doctrine.nameKey)}</span>
           </div>
-          <p className='text-muted-foreground mt-1 line-clamp-2 text-xs'>{t(doctrine.descriptionKey)}</p>
-          <div className='mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs'>
-            <span className='flex items-center gap-1 text-blue-500'>
-              <Zap className='h-3 w-3' />
+          <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">{t(doctrine.descriptionKey)}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+            <span className="flex items-center gap-1 text-blue-500">
+              <Zap className="h-3 w-3" />
               {t('doctrines.mana_cost', { cost: doctrine.manaCost })}
             </span>
             <span
@@ -162,20 +162,22 @@ export default function DoctrinePanel({
             >
               {t(`doctrines.magic_nature.${doctrine.magicNature}`)}
             </span>
-            <span className={`rounded-full border border-current/20 px-2 py-0.5 text-xs font-bold capitalize ${ATTRIBUTE_COLORS[doctrine.attribute]}`}>
+            <span
+              className={`rounded-full border border-current/20 px-2 py-0.5 text-xs font-bold capitalize ${ATTRIBUTE_COLORS[doctrine.attribute]}`}
+            >
               {t(`doctrines.attribute.${doctrine.attribute}`)}
             </span>
-            <span className='rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-xs font-bold text-white/70'>
+            <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-xs font-bold text-white/70">
               {t('doctrines.tier', { tier: doctrine.tier })}
             </span>
           </div>
         </div>
-        <div className='flex shrink-0 flex-col gap-1'>
+        <div className="flex shrink-0 flex-col gap-1">
           {showEquipControls &&
             (isEquippedDoctrine ? (
               <Button
-                variant='outline'
-                size='sm'
+                variant="outline"
+                size="sm"
                 onClick={() => handleUnequip(doctrine.id)}
                 disabled={unequipMutation.isPending}
               >
@@ -183,8 +185,8 @@ export default function DoctrinePanel({
               </Button>
             ) : (
               <Button
-                variant='outline'
-                size='sm'
+                variant="outline"
+                size="sm"
                 onClick={() => handleEquip(doctrine.id)}
                 disabled={equipMutation.isPending || equippedDoctrines.length >= 2}
               >
@@ -193,13 +195,13 @@ export default function DoctrinePanel({
             ))}
           {showUseControls && isEquippedDoctrine && (
             <Button
-              variant='outline'
-              size='sm'
+              variant="outline"
+              size="sm"
               onClick={() => handleUse(doctrine)}
               disabled={!canUse || isUsingDoctrine}
               className={cn((!canUse || isUsingDoctrine) && 'opacity-50')}
             >
-              {isUsingDoctrine ? <Loader className='h-3 w-3 animate-spin' /> : t('doctrines.use')}
+              {isUsingDoctrine ? <Loader className="h-3 w-3 animate-spin" /> : t('doctrines.use')}
             </Button>
           )}
         </div>
@@ -213,9 +215,11 @@ export default function DoctrinePanel({
       return (
         <div className={cn('flex flex-1 flex-col gap-2', className)}>
           {equippedDoctrines.length === 0 ? (
-            <p className='text-muted-foreground flex flex-1 items-center justify-center text-sm'>{t('doctrines.empty_equipped')}</p>
+            <p className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
+              {t('doctrines.empty_equipped')}
+            </p>
           ) : (
-            <div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               {equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}
             </div>
           )}
@@ -225,13 +229,13 @@ export default function DoctrinePanel({
 
     return (
       <div className={cn('rounded-lg border p-4', className)}>
-        <div className='mb-2 text-sm font-medium tracking-wider text-purple-500/80 uppercase'>
+        <div className="mb-2 text-sm font-medium tracking-wider text-purple-500/80 uppercase">
           {t('doctrines.title')}
         </div>
         {equippedDoctrines.length === 0 ? (
-          <p className='text-muted-foreground text-sm'>{t('doctrines.empty_equipped')}</p>
+          <p className="text-muted-foreground text-sm">{t('doctrines.empty_equipped')}</p>
         ) : (
-          <div className='space-y-2'>{equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}</div>
+          <div className="space-y-2">{equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}</div>
         )}
       </div>
     )
@@ -241,25 +245,25 @@ export default function DoctrinePanel({
   return (
     <div className={cn('space-y-4', className)}>
       {/* Equipped Doctrines */}
-      <div className='rounded-lg border p-4'>
-        <div className='mb-3 flex items-center justify-between'>
-          <h3 className='font-semibold'>{t('doctrines.equipped')}</h3>
-          <span className='text-muted-foreground text-sm'>{equippedDoctrines.length}/2</span>
+      <div className="rounded-lg border p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="font-semibold">{t('doctrines.equipped')}</h3>
+          <span className="text-muted-foreground text-sm">{equippedDoctrines.length}/2</span>
         </div>
         {equippedDoctrines.length === 0 ? (
-          <p className='text-muted-foreground text-sm'>{t('doctrines.empty_equipped')}</p>
+          <p className="text-muted-foreground text-sm">{t('doctrines.empty_equipped')}</p>
         ) : (
-          <div className='space-y-2'>{equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}</div>
+          <div className="space-y-2">{equippedDoctrines.map((doctrine) => renderDoctrineCard(doctrine, true))}</div>
         )}
       </div>
 
       {/* Available Doctrines */}
-      <div className='rounded-lg border p-4'>
-        <h3 className='mb-3 font-semibold'>{t('doctrines.available')}</h3>
+      <div className="rounded-lg border p-4">
+        <h3 className="mb-3 font-semibold">{t('doctrines.available')}</h3>
         {availableDoctrines.length === 0 ? (
-          <p className='text-muted-foreground text-sm'>{t('doctrines.no_doctrines')}</p>
+          <p className="text-muted-foreground text-sm">{t('doctrines.no_doctrines')}</p>
         ) : (
-          <div className='space-y-2'>
+          <div className="space-y-2">
             {availableDoctrines.filter((d) => !isEquipped(d.id)).map((doctrine) => renderDoctrineCard(doctrine, false))}
           </div>
         )}

@@ -1,10 +1,10 @@
 'use client'
 
+import type { AppRouter } from '@/server/router'
 import { QueryClient } from '@tanstack/react-query'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { createTRPCReact } from '@trpc/react-query'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
-import type { AppRouter } from '@/server/router'
 
 // Same-origin link — cookies sent automatically
 const trpcLink = httpBatchLink({
@@ -15,21 +15,21 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000, // 1 minute
-      refetchOnWindowFocus: false,
-    },
-  },
+      refetchOnWindowFocus: false
+    }
+  }
 })
 
 // Vanilla tRPC client
 const vanillaClient = createTRPCClient<AppRouter>({
-  links: [trpcLink],
+  links: [trpcLink]
 })
 
 // React hooks client - provides .Provider, .useMutation(), etc.
 const trpcReact = createTRPCReact<AppRouter>()
 
 export const trpcClient = trpcReact.createClient({
-  links: [trpcLink],
+  links: [trpcLink]
 })
 
 // Export trpcReact for Provider usage
@@ -38,7 +38,7 @@ export const trpcReactClient = trpcReact
 // Options proxy - provides .queryOptions() and .mutationOptions()
 const trpcOptions = createTRPCOptionsProxy<AppRouter>({
   client: vanillaClient as any,
-  queryClient,
+  queryClient
 })
 
 // Export trpcReact directly for hooks (useQuery, useMutation, etc.)

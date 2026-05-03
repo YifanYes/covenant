@@ -381,4 +381,3 @@ export function applyRarityToStats(stats: ItemStats, rarity: ItemRarity): ItemSt
 
   return newStats
 }
-

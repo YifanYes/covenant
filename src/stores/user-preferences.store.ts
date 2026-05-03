@@ -22,7 +22,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
     }),
     {
       name: 'covenant-user-preferences',
-      skipHydration: typeof window === 'undefined',
+      skipHydration: typeof window === 'undefined'
     }
   )
 )

@@ -34,14 +34,14 @@ export default function StoreItemGrid({
   }
 
   return (
-    <ScrollArea className='h-full pr-4 pb-2 pl-6'>
-      <div className='space-y-6 px-1'>
+    <ScrollArea className="h-full pr-4 pb-2 pl-6">
+      <div className="space-y-6 px-1">
         {sortedTiers.map(([tier, items]) => (
           <div key={tier}>
-            <h3 className='text-muted-foreground mb-3 text-sm font-semibold'>
+            <h3 className="text-muted-foreground mb-3 text-sm font-semibold">
               {t('store.tier')} {tier}
             </h3>
-            <div className='grid gap-3 sm:grid-cols-1 lg:grid-cols-2'>
+            <div className="grid gap-3 sm:grid-cols-1 lg:grid-cols-2">
               {items.map((item) => (
                 <StoreItemCard
                   key={item.id}
@@ -60,7 +60,7 @@ export default function StoreItemGrid({
           </div>
         ))}
         {isEmpty && (
-          <div className='text-muted-foreground flex h-40 items-center justify-center'>{t('store.no_items')}</div>
+          <div className="text-muted-foreground flex h-40 items-center justify-center">{t('store.no_items')}</div>
         )}
       </div>
     </ScrollArea>

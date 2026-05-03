@@ -61,10 +61,7 @@ export default function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {locales.map((locale) => (
-                <DropdownMenuItem
-                  key={locale.code}
-                  onClick={() => changeLocale(locale.code)}
-                >
+                <DropdownMenuItem key={locale.code} onClick={() => changeLocale(locale.code)}>
                   {locale.label}
                 </DropdownMenuItem>
               ))}

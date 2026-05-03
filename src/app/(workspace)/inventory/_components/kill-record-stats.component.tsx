@@ -43,17 +43,17 @@ export default function KillRecordStats({ stats }: KillRecordStatsProps) {
   ]
 
   return (
-    <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       {statCards.map((stat) => {
         const Icon = stat.icon
         return (
           <div
             key={stat.label}
-            className='border-border bg-muted/30 flex flex-col items-center gap-2 rounded-lg border p-3'
+            className="border-border bg-muted/30 flex flex-col items-center gap-2 rounded-lg border p-3"
           >
             <Icon className={cn('h-6 w-6', stat.color)} />
-            <span className='text-xl font-bold'>{stat.value.toLocaleString()}</span>
-            <span className='text-muted-foreground text-center text-xs'>{stat.label}</span>
+            <span className="text-xl font-bold">{stat.value.toLocaleString()}</span>
+            <span className="text-muted-foreground text-center text-xs">{stat.label}</span>
           </div>
         )
       })}

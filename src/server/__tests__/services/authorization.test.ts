@@ -37,9 +37,7 @@ describe('Authorization - Service Layer', () => {
         const userId = 'user-1'
         const input = { id: 'area-1', name: 'Updated Name' }
 
-        mockAreaRepo.update.mockRejectedValue(
-          new TRPCError({ code: 'NOT_FOUND', message: 'Area area-1 not found' })
-        )
+        mockAreaRepo.update.mockRejectedValue(new TRPCError({ code: 'NOT_FOUND', message: 'Area area-1 not found' }))
 
         await expect(areaService.update(userId, input)).rejects.toMatchObject({
           code: 'NOT_FOUND'
@@ -63,9 +61,7 @@ describe('Authorization - Service Layer', () => {
         const userId = 'user-1'
         const areaId = 'area-1'
 
-        mockAreaRepo.delete.mockRejectedValue(
-          new TRPCError({ code: 'NOT_FOUND', message: 'Area area-1 not found' })
-        )
+        mockAreaRepo.delete.mockRejectedValue(new TRPCError({ code: 'NOT_FOUND', message: 'Area area-1 not found' }))
 
         await expect(areaService.delete(userId, areaId)).rejects.toMatchObject({
           code: 'NOT_FOUND'

@@ -1,16 +1,18 @@
 import { cookies } from 'next/headers'
 
 export const metadata = {
-  title: 'Mechanics - Covenant',
+  title: 'Mechanics - Covenant'
 }
 
 const SUPPORTED_LOCALES = ['en', 'es'] as const
-type SupportedLocale = typeof SUPPORTED_LOCALES[number]
+type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
 
 export default async function MechanicsPage() {
   const cookieStore = await cookies()
   const rawLang = cookieStore.get('i18nextLng')?.value
-  const lang: SupportedLocale = SUPPORTED_LOCALES.includes(rawLang as SupportedLocale) ? (rawLang as SupportedLocale) : 'en'
+  const lang: SupportedLocale = SUPPORTED_LOCALES.includes(rawLang as SupportedLocale)
+    ? (rawLang as SupportedLocale)
+    : 'en'
 
   const Content = (await import(`./${lang === 'es' ? 'content.es.mdx' : 'content.en.mdx'}`)).default
 

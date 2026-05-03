@@ -4,7 +4,7 @@ import ColorSelector from '@/forms/color-selector.component'
 import IconPicker from '@/forms/icon-picker.component'
 import TextInput from '@/forms/text-input.component'
 import Button from '@/ui/button.component'
-import { queryClient, trpc, trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from '@nsmr/pixelart-react'
 import { createAreaSchema, type CreateAreaBodyType } from '@shared/schemas/areas.schemas'
@@ -48,10 +48,10 @@ export default function CreateAreaDialog() {
     <BaseFormDialog
       open={open}
       onOpenChange={handleOpenChange}
-      title='create_area_dialog.title'
-      description='create_area_dialog.description'
+      title="create_area_dialog.title"
+      description="create_area_dialog.description"
       onSubmit={handleSubmit(onSubmit)}
-      submitLabel='save_changes'
+      submitLabel="save_changes"
       isLoading={mutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
       trigger={
@@ -61,29 +61,29 @@ export default function CreateAreaDialog() {
         </Button>
       }
     >
-      <div className='grid gap-4'>
-        <div className='grid gap-3'>
+      <div className="grid gap-4">
+        <div className="grid gap-3">
           <TextInput
-            type='text'
+            type="text"
             placeholder={t('create_area_dialog.name')}
-            className='h-9'
+            className="h-9"
             {...register('name')}
             {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
             required
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='color'
+            name="color"
             control={control}
-            render={({ field }) => <ColorSelector className='w-full' value={field.value} onChange={field.onChange} />}
+            render={({ field }) => <ColorSelector className="w-full" value={field.value} onChange={field.onChange} />}
           />
         </div>
-        <div className='grid gap-3'>
+        <div className="grid gap-3">
           <Controller
-            name='icon'
+            name="icon"
             control={control}
-            render={({ field }) => <IconPicker className='w-full' value={field.value} onChange={field.onChange} />}
+            render={({ field }) => <IconPicker className="w-full" value={field.value} onChange={field.onChange} />}
           />
         </div>
       </div>

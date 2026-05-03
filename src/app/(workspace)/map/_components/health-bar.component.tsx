@@ -19,14 +19,14 @@ export default function HealthBar({ current, max, className, showLabel = true }:
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <div className='bg-muted relative h-2.5 flex-1 overflow-hidden rounded-full'>
+      <div className="bg-muted relative h-2.5 flex-1 overflow-hidden rounded-full">
         <div
           className={cn('absolute inset-y-0 left-0 transition-all duration-300', getBarColor())}
           style={{ width: `${percentage}%` }}
         />
       </div>
       {showLabel && (
-        <span className='text-muted-foreground min-w-12 text-right text-xs font-medium'>
+        <span className="text-muted-foreground min-w-12 text-right text-xs font-medium">
           {current}/{max}
         </span>
       )}

@@ -8,12 +8,7 @@ interface DamageNumberProps {
 }
 
 export default function DamageNumber({ amount, type }: DamageNumberProps) {
-  const colorClass =
-    type === 'heal'
-      ? 'text-emerald-400'
-      : type === 'critical'
-        ? 'text-yellow-400'
-        : 'text-red-400'
+  const colorClass = type === 'heal' ? 'text-emerald-400' : type === 'critical' ? 'text-yellow-400' : 'text-red-400'
 
   const prefix = type === 'heal' ? '+' : '-'
 
@@ -26,7 +21,8 @@ export default function DamageNumber({ amount, type }: DamageNumberProps) {
       className={cn('pointer-events-none absolute text-2xl font-bold', colorClass)}
       style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
     >
-      {prefix}{amount}
+      {prefix}
+      {amount}
     </motion.div>
   )
 }
@@ -40,7 +36,10 @@ export function DamageNumberContainer({ numbers, targetId }: DamageNumberContain
   const filtered = numbers.filter((n) => n.targetId === targetId)
 
   return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-center" style={{ transform: 'scaleX(-1)' }}>
+    <div
+      className="pointer-events-none absolute inset-0 flex items-center justify-center"
+      style={{ transform: 'scaleX(-1)' }}
+    >
       <AnimatePresence>
         {filtered.map((n, i) => (
           <DamageNumber key={`${targetId}-${i}-${n.amount}`} amount={n.amount} type={n.type} />

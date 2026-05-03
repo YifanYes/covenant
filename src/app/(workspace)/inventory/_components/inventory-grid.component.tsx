@@ -95,20 +95,20 @@ export default function InventoryGrid({
   }, [character?.inventory, character?.loadout, tierFilter, typeFilter])
 
   return (
-    <Card className='flex h-fit w-full flex-1 flex-col gap-0'>
-      <CardHeader className='flex shrink-0 flex-row items-center justify-between pb-2'>
-        <CardTitle className='flex items-center gap-2 text-sm font-medium'>
-          <Group className='h-4 w-4' />
+    <Card className="flex h-fit w-full flex-1 flex-col gap-0">
+      <CardHeader className="flex shrink-0 flex-row items-center justify-between pb-2">
+        <CardTitle className="flex items-center gap-2 text-sm font-medium">
+          <Group className="h-4 w-4" />
           {t('inventory.armory')}
         </CardTitle>
       </CardHeader>
-      <CardContent className='flex-1 overflow-y-auto'>
+      <CardContent className="flex-1 overflow-y-auto">
         {groupedItems.length === 0 ? (
-          <div className='flex h-full flex-col items-center justify-center gap-2'>
-            <span className='text-muted-foreground text-sm'>{t('inventory.empty')}</span>
+          <div className="flex h-full flex-col items-center justify-center gap-2">
+            <span className="text-muted-foreground text-sm">{t('inventory.empty')}</span>
           </div>
         ) : (
-          <div className='flex flex-wrap gap-2 py-1'>
+          <div className="flex flex-wrap gap-2 py-1">
             {groupedItems.map(({ item, quantity }) => (
               <ItemCard
                 key={item.id}

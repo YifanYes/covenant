@@ -4,9 +4,9 @@ import { useAuthStore } from '@/stores/auth.store'
 import Button from '@/ui/button.component'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { useMutation } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 export const ConfirmDeleteAccountDialog = () => {
@@ -33,10 +33,10 @@ export const ConfirmDeleteAccountDialog = () => {
     <BaseConfirmDialog
       open={open}
       onOpenChange={setOpen}
-      title='confirm_delete_account_dialog.title'
-      description='confirm_delete_account_dialog.description'
+      title="confirm_delete_account_dialog.title"
+      description="confirm_delete_account_dialog.description"
       onConfirm={handleDelete}
-      confirmLabel='delete'
+      confirmLabel="delete"
       isLoading={deleteAccountMutation.isPending}
       trigger={
         <Button

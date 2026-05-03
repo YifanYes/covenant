@@ -7,11 +7,7 @@ import {
   type TileState
 } from '@shared/types/tactical-combat.types'
 
-export function createTestGrid(
-  width: number = 8,
-  height: number = 7,
-  overrides?: Partial<TileState>
-): TileState[][] {
+export function createTestGrid(width: number = 8, height: number = 7, overrides?: Partial<TileState>): TileState[][] {
   const tiles: TileState[][] = []
   for (let y = 0; y < height; y++) {
     const row: TileState[] = []

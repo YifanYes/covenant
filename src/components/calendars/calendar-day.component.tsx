@@ -20,12 +20,12 @@ export default function CalendarDay({ day, weekIndex, tasks }: CalendarDayProps)
     day.isSame(dayjs(), 'day') ? 'bg-primary text-primary-foreground rounded-full w-7' : ''
 
   return (
-    <div className='flex flex-col border-2'>
-      <header className='flex flex-col items-center'>
-        {weekIndex === 0 && <p className='mt-1 text-sm'>{day.format('ddd').toUpperCase()}</p>}
+    <div className="flex flex-col border-2">
+      <header className="flex flex-col items-center">
+        {weekIndex === 0 && <p className="mt-1 text-sm">{day.format('ddd').toUpperCase()}</p>}
         <p className={cn('my-1 p-1 text-center text-sm', getCurrentDayClass())}>{day.format('D')}</p>
       </header>
-      <div className='flex flex-col gap-1 p-1'>
+      <div className="flex flex-col gap-1 p-1">
         {dayTasks.slice(0, 2).map((task) => {
           const colorClasses = getColorClasses(task.color, {
             bg: 'bg-muted',
@@ -44,7 +44,7 @@ export default function CalendarDay({ day, weekIndex, tasks }: CalendarDayProps)
                 colorClasses.text
               )}
             >
-              <span className='truncate font-medium'>{task.title}</span>
+              <span className="truncate font-medium">{task.title}</span>
             </button>
           )
         })}

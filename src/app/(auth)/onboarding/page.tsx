@@ -9,10 +9,10 @@ import { Check, ChevronLeft, ChevronRight } from '@nsmr/pixelart-react'
 import { CharacterClassName, MagicNature } from '@shared/constants/classes'
 import { createCharacterSchema, type CreateCharacterType } from '@shared/schemas/character.schemas'
 import { useMutation } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 const MAGIC_NATURE_QUESTIONS = [
@@ -76,36 +76,36 @@ export default function Onboarding() {
   }
 
   return (
-    <div className='flex min-h-screen w-full items-center justify-center p-4'>
+    <div className="flex min-h-screen w-full items-center justify-center p-4">
       <div className={`flex w-full flex-col gap-6 ${step === 1 ? 'max-w-md' : 'max-w-2xl'}`}>
         {step === 1 ? (
           <>
-            <div className='mb-6 flex flex-col gap-2'>
-              <h2 className='text-2xl font-bold'>{t('onboarding.title')}</h2>
-              <p className='text-muted-foreground text-sm'>{t('onboarding.subtitle')}</p>
+            <div className="mb-6 flex flex-col gap-2">
+              <h2 className="text-2xl font-bold">{t('onboarding.title')}</h2>
+              <p className="text-muted-foreground text-sm">{t('onboarding.subtitle')}</p>
             </div>
 
-            <div className='grid gap-8'>
-              <div className='grid gap-2'>
-                <Label htmlFor='name'>{t('onboarding.name_label')}</Label>
+            <div className="grid gap-8">
+              <div className="grid gap-2">
+                <Label htmlFor="name">{t('onboarding.name_label')}</Label>
                 <TextInput
-                  id='name'
-                  type='text'
+                  id="name"
+                  type="text"
                   placeholder={t('onboarding.name_placeholder')}
                   {...register('name')}
                   {...(errors.name?.message && { errorMessage: t(errors.name.message.toString()) })}
                   required
-                  className='hover:bg-primary/20 hover:text-primary hover:border-primary dark:hover:bg-primary/20'
+                  className="hover:bg-primary/20 hover:text-primary hover:border-primary dark:hover:bg-primary/20"
                 />
               </div>
 
-              <div className='grid gap-2'>
+              <div className="grid gap-2">
                 <Label>{t('onboarding.class_label')}</Label>
                 <Controller
-                  name='className'
+                  name="className"
                   control={control}
                   render={({ field }) => (
-                    <div className='grid gap-3'>
+                    <div className="grid gap-3">
                       {[CharacterClassName.TEMPLAR, CharacterClassName.HERALD].map((className) => (
                         <label
                           key={className}
@@ -117,22 +117,22 @@ export default function Onboarding() {
                           )}
                         >
                           <input
-                            type='radio'
+                            type="radio"
                             value={className}
                             checked={field.value === className}
                             onChange={(e) => field.onChange(e.target.value)}
-                            className='sr-only'
+                            className="sr-only"
                           />
-                          <span className='flex h-4 w-4 items-center justify-center'>
+                          <span className="flex h-4 w-4 items-center justify-center">
                             {field.value === className ? (
-                              <Check className='h-4 w-4' />
+                              <Check className="h-4 w-4" />
                             ) : (
-                              <div className='bg-muted-foreground h-1.5 w-1.5 rounded-full' />
+                              <div className="bg-muted-foreground h-1.5 w-1.5 rounded-full" />
                             )}
                           </span>
-                          <div className='flex-1'>
-                            <div className='font-medium'>{t(`classes.${className}.name`)}</div>
-                            <p className='text-muted-foreground text-sm'>{t(`classes.${className}.description`)}</p>
+                          <div className="flex-1">
+                            <div className="font-medium">{t(`classes.${className}.name`)}</div>
+                            <p className="text-muted-foreground text-sm">{t(`classes.${className}.description`)}</p>
                           </div>
                         </label>
                       ))}
@@ -142,34 +142,34 @@ export default function Onboarding() {
               </div>
 
               <button
-                type='button'
+                type="button"
                 disabled={!isValid || !isDirty}
                 onClick={goToStep2}
-                className='bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground flex w-full cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-2 font-medium transition-colors disabled:cursor-not-allowed'
+                className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground flex w-full cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-2 font-medium transition-colors disabled:cursor-not-allowed"
               >
                 {t('onboarding.next')}
-                <ChevronRight className='h-4 w-4' />
+                <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </>
         ) : (
           <>
-            <div className='mb-4 flex flex-col gap-4'>
-              <div className='flex items-center'>
+            <div className="mb-4 flex flex-col gap-4">
+              <div className="flex items-center">
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => setStep(1)}
-                  className='text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-1 text-sm transition-colors'
+                  className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-1 text-sm transition-colors"
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <ChevronLeft className="h-4 w-4" />
                   {t('onboarding.back')}
                 </button>
-                <h2 className='flex-1 text-center text-2xl font-bold'>{t('onboarding.magic_nature.title')}</h2>
+                <h2 className="flex-1 text-center text-2xl font-bold">{t('onboarding.magic_nature.title')}</h2>
               </div>
-              <p className='text-muted-foreground text-sm'>{t('onboarding.magic_nature.subtitle')}</p>
+              <p className="text-muted-foreground text-sm">{t('onboarding.magic_nature.subtitle')}</p>
             </div>
 
-            <div className='grid gap-8'>
+            <div className="grid gap-8">
               {MAGIC_NATURE_QUESTIONS.map((question) => {
                 // Order the natures based on firstNature
                 const orderedNatures =
@@ -178,9 +178,9 @@ export default function Onboarding() {
                     : [MagicNature.VOID, MagicNature.FORM]
 
                 return (
-                  <div key={question.id} className='grid gap-3'>
-                    <p className='text-sm font-medium'>{t(`onboarding.magic_nature.q${question.id}.question`)}</p>
-                    <div className='grid gap-2'>
+                  <div key={question.id} className="grid gap-3">
+                    <p className="text-sm font-medium">{t(`onboarding.magic_nature.q${question.id}.question`)}</p>
+                    <div className="grid gap-2">
                       {orderedNatures.map((nature) => (
                         <label
                           key={nature}
@@ -192,18 +192,18 @@ export default function Onboarding() {
                           )}
                         >
                           <input
-                            type='radio'
+                            type="radio"
                             name={`question-${question.id}`}
                             value={nature}
                             checked={answers[question.id] === nature}
                             onChange={() => handleAnswer(question.id, nature)}
-                            className='sr-only'
+                            className="sr-only"
                           />
-                          <span className='mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center'>
+                          <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center">
                             {answers[question.id] === nature ? (
-                              <Check className='h-4 w-4' />
+                              <Check className="h-4 w-4" />
                             ) : (
-                              <div className='bg-muted-foreground h-1.5 w-1.5 rounded-full' />
+                              <div className="bg-muted-foreground h-1.5 w-1.5 rounded-full" />
                             )}
                           </span>
                           <span>{t(`onboarding.magic_nature.q${question.id}.${nature}`)}</span>
@@ -219,7 +219,7 @@ export default function Onboarding() {
                 isLoading={createCharacterMutation.isPending}
                 onClick={handleSubmit(onSubmit)}
                 label={t('onboarding.button')}
-                className='w-full'
+                className="w-full"
               />
             </div>
           </>
