@@ -1,4 +1,7 @@
 import { defineConfig } from 'prisma/config'
+import { config } from 'dotenv'
+
+config({ path: '.env.local' })
 
 const directUrl = process.env.DIRECT_URL
 

@@ -202,6 +202,7 @@ model Area {
   tasks      Task[]      @relation("AreaToTask")
   habits     Habit[]     @relation("AreaToHabit")
 
+  @@unique([userId, name])
   @@index([userId])
   @@map("areas")
 }

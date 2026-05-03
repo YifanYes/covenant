@@ -148,10 +148,8 @@ export class CharacterRepository {
 
   async createAreas(userId: string): Promise<void> {
     await this.prisma.area.createMany({
-      data: defaultAreas.map((area) => ({
-        ...area,
-        userId
-      }))
+      data: defaultAreas.map((area) => ({ ...area, userId })),
+      skipDuplicates: true
     })
   }
 
