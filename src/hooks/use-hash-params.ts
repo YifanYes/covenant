@@ -13,7 +13,10 @@ export const useHashParams = () => {
 
     const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash
     return Object.fromEntries(new URLSearchParams(hash))
-  }, [searchParams]) // Re-run when searchParams change to keep it reactive
+  // Intentional: searchParams isn't read inside the callback, but its presence in the dep array causes
+  // re-evaluation on navigation (Next.js refreshes searchParams on route changes), keeping hash params
+  // in sync without a separate router event subscription.
+  }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return hashParams
 }
