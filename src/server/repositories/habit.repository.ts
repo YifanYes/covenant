@@ -1,6 +1,9 @@
 import type { Habit, HabitCompletion, PrismaClient } from '@/generated/prisma'
 import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { TRPCError } from '@trpc/server'
+import { logger } from '../lib/logger'
+
+const log = logger.child({ component: 'habit-repository' })
 
 const HABIT_INCLUDE = {
   objectives: true,
@@ -53,8 +56,12 @@ export class HabitRepository {
       where: { id }
     })
 
-    if (!habit || habit.userId !== userId) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Habit ${id} not found` })
+    if (!habit) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+    }
+    if (habit.userId !== userId) {
+      log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized habit access attempt')
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
     }
 
     return habit
