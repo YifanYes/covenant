@@ -6,9 +6,7 @@
 
 ## High Priority
 
-- [ ] Security: Session Tokens in Plaintext
-  - Prisma schema - Session model
-  - **Fix:** Hash tokens with bcrypt before storage
+- [ ] Hacer que el token de autenticación nunca expire.
 
 ## Medium Priority
 
@@ -18,7 +16,7 @@
 
 ## Low Priority
 
-- [ ] Security: No Audit Logging
+- [x] Security: No Audit Logging
   - **Fix:** Log auth events (login, session, account changes)
 
 - [ ] Security: No Account Lockout

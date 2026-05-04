@@ -15,6 +15,7 @@ export const authRouter = t.router({
   }),
 
   deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {
+    ctx.log.warn({ event: 'AUTH_ACCOUNT_DELETED', userId: ctx.user.id }, 'Account deletion initiated')
     return ctx.services.auth.deleteAccount(ctx.user.id)
   }),
 
