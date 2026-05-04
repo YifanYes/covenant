@@ -32,11 +32,6 @@
   - Multiple `as any` usages
   - **Fix:** Replace with proper types
 
-- [ ] Tooling: ESLint Lints `front/.next/` Build Artifacts
-  - `eslint.config.mjs` — `globalIgnores` only covers `.next/**`, not `front/.next/**`
-  - `front/` is a legacy frontend directory whose cached build chunks are picked up by the linter, producing ~30 false errors (`no-unused-vars`, `no-require-imports`, `ban-ts-comment`, `no-assign-module-variable`)
-  - **Fix:** Add `'front/.next/**'` to the `globalIgnores` array in `eslint.config.mjs`
-
 - [ ] Combat: Duplicated Grid Logic
   - `tactical-combat.store.ts:1025-1040, 1453-1468, 156-180`
   - **Fix:** Extract to `shared/utils/grid.utils.ts`
