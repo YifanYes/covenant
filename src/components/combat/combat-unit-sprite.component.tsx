@@ -2,6 +2,7 @@
 import type { CombatAnimationState } from '@/hooks/use-combat-animations.hook'
 import { cn } from '@/lib/cn.lib'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 interface CombatUnitSpriteProps {
   imageUrl: string
@@ -80,10 +81,11 @@ export default function CombatUnitSprite({
       animate={activeVariant}
       variants={variants}
     >
-      <img
+      <Image
         src={imageUrl}
         alt={alt}
-        className="h-full w-full object-contain"
+        fill
+        className="object-contain"
         style={{ imageRendering: 'pixelated' }}
         onError={(e) => {
           e.currentTarget.style.display = 'none'
