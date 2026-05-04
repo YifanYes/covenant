@@ -19,21 +19,37 @@ SHA-256 is the correct tool:
 
 ## How Better Auth Uses Session Tokens
 
-Better Auth v1.4.18 session lifecycle (confirmed in `node_modules/better-auth/dist/db/internal-adapter.mjs` and `prisma-adapter.mjs`):
+Better Auth v1.4.18 session lifecycle (confirmed in `node_modules/better-auth/dist/db/internal-adapter.mjs` and `node_modules/better-auth/dist/adapters/prisma-adapter/prisma-adapter.mjs`):
 
 1. Generates `token = generateId(32)` (random, ~192-bit)
 2. Stores via `prisma.session.create({ data: { token, ... } })`
 3. Sends raw token in a cookie to the client
 4. On each request: reads token from cookie, queries `prisma.session.findFirst({ where: { token: cookieValue } })`
-5. Also queries by token for `delete` and `deleteMany` (sign-out, session revocation)
+5. On session rolling (expiry extension): calls `updateSession(token, ...)` which issues `prisma.session.update({ where: { token }, data: ... })`
+6. For session listing (`findSessions`): issues `prisma.session.findMany({ where: { token: { in: [...] } } })`
+7. Also queries by token for `delete` and `deleteMany` (sign-out, session revocation)
 
-The Prisma adapter always uses `findFirst` (not `findUnique`) for session token lookups.
+The Prisma adapter's `findOne` call translates to Prisma's `findFirst` (not `findUnique`).
 
 ## Implementation
 
 Use a **Prisma Client Extension** (query component) on the `session` model. The extension intercepts all operations that touch `token` and applies SHA-256 before any SQL executes. Better Auth and the rest of the app are unchanged — they continue operating on raw tokens.
 
 No schema migration is needed. SHA-256 hex output is always 64 chars, which fits the existing `String` column.
+
+### Critical: restore the raw token on the way out
+
+Hashing the input is only half the contract. Prisma returns the row that was written, so a `create` whose input was hashed returns a row whose `token` is the hash. Better Auth then reads `session.session.token` and writes it into the session cookie via `setSessionCookie(..., session.session.token, ...)`. On the next request, the cookie holds the hashed value; the `findFirst` interceptor hashes it a second time and the lookup never matches — every request after sign-in 401s.
+
+The extension must therefore restore the raw token on the returned row for every operation that has a raw token in scope:
+
+- `create({ data })` — capture `data.token`, hash it for the write, restore the raw value on the returned row.
+- `findFirst({ where })` — capture `where.token`, hash it for the lookup, restore the raw value on the returned row (caller's input == row's stored value, so they're interchangeable from the caller's perspective).
+- `update({ where })` — same pattern as `findFirst`. Better Auth's session-rolling path uses the returned row's `token` to refresh the cookie, so this restoration is what keeps cookies stable across `updateAge` rolls.
+- `delete({ where })` — same pattern (Better Auth ignores the return, but restore for consistency).
+- `findMany({ where })` — when `where.token` is a string or `{ in: [...] }`, build a `hash → raw` map and restore each returned row from it.
+- `deleteMany` — returns a count; nothing to restore.
+- `findMany` without a token filter (e.g. listing by `userId`) — no raw token in scope, so rows leak the hashed value to the caller. This breaks `listSessions` / multi-session revocation flows; out of scope for this spec, but flag for the future.
 
 ### New file: `src/server/lib/session-token.ts`
 
@@ -55,42 +71,91 @@ import { hashSessionToken } from './session-token'
 
 // ... existing pool/adapter construction unchanged ...
 
+// Store the base client in global — not the extended variant — to avoid double-extension on hot-reload.
 const baseClient = globalForPrisma.prisma || new PrismaClient({ adapter })
 
 if (env.NODE_ENV !== 'production') globalForPrisma.prisma = baseClient
+
+// Restore the raw token on a returned row so callers (better-auth) keep operating on raw tokens.
+// Without this, the hashed value leaks back out via session.token and gets written to the cookie,
+// breaking the next request because the cookie's hashed value gets hashed again on lookup.
+function restoreToken<T>(row: T, rawToken: string | null): T {
+  if (!rawToken || !row || typeof row !== 'object') return row
+  if ('token' in row && typeof (row as { token: unknown }).token === 'string') {
+    return { ...(row as object), token: rawToken } as T
+  }
+  return row
+}
 
 const sessionHashExtension = Prisma.defineExtension({
   name: 'session-token-hash',
   query: {
     session: {
       async create({ args, query }) {
-        if (typeof args.data?.token === 'string') {
-          args.data = { ...args.data, token: hashSessionToken(args.data.token) }
+        const rawToken = typeof args.data?.token === 'string' ? args.data.token : null
+        if (rawToken) {
+          args.data = { ...args.data, token: hashSessionToken(rawToken) }
         }
-        return query(args)
+        const result = await query(args)
+        return restoreToken(result, rawToken)
       },
       async findFirst({ args, query }) {
-        if (typeof args.where?.token === 'string') {
-          args.where = { ...args.where, token: hashSessionToken(args.where.token) }
+        const rawToken = typeof args.where?.token === 'string' ? args.where.token : null
+        if (rawToken) {
+          args.where = { ...args.where, token: hashSessionToken(rawToken) }
         }
-        return query(args)
+        const result = await query(args)
+        return restoreToken(result, rawToken)
       },
       async findMany({ args, query }) {
-        if (typeof args.where?.token === 'string') {
-          args.where = { ...args.where, token: hashSessionToken(args.where.token) }
+        const token = args.where?.token
+        let restoreMap: Map<string, string> | null = null
+        if (typeof token === 'string') {
+          const hashed = hashSessionToken(token)
+          args.where = { ...args.where, token: hashed }
+          restoreMap = new Map([[hashed, token]])
+        } else if (token !== null && typeof token === 'object' && Array.isArray(token.in)) {
+          // better-auth's findSessions passes { token: { in: [...] } } — hash each element
+          restoreMap = new Map()
+          const hashedIn = token.in.map((t: string) => {
+            const h = hashSessionToken(t)
+            restoreMap!.set(h, t)
+            return h
+          })
+          args.where = { ...args.where, token: { ...token, in: hashedIn } }
         }
-        return query(args)
+        const result = await query(args)
+        if (Array.isArray(result) && restoreMap) {
+          return result.map((row) => {
+            if (row && typeof row === 'object' && 'token' in row && typeof (row as { token: unknown }).token === 'string') {
+              const raw = restoreMap!.get((row as { token: string }).token)
+              if (raw) return { ...(row as object), token: raw }
+            }
+            return row
+          })
+        }
+        return result
+      },
+      async update({ args, query }) {
+        // better-auth's updateSession uses WHERE token = ? (not by id)
+        const rawToken = typeof args.where?.token === 'string' ? args.where.token : null
+        if (rawToken) {
+          args.where = { ...args.where, token: hashSessionToken(rawToken) }
+        }
+        const result = await query(args)
+        return restoreToken(result, rawToken)
       },
       async delete({ args, query }) {
-        if (typeof args.where?.token === 'string') {
-          args.where = { ...args.where, token: hashSessionToken(args.where.token) }
+        const rawToken = typeof args.where?.token === 'string' ? args.where.token : null
+        if (rawToken) {
+          args.where = { ...args.where, token: hashSessionToken(rawToken) }
         }
-        return query(args)
+        const result = await query(args)
+        return restoreToken(result, rawToken)
       },
       async deleteMany({ args, query }) {
-        const where = args.where as { token?: unknown } | undefined
-        if (typeof where?.token === 'string') {
-          args.where = { ...args.where, token: hashSessionToken(where.token) }
+        if (typeof args.where?.token === 'string') {
+          args.where = { ...args.where, token: hashSessionToken(args.where.token) }
         }
         return query(args)
       },
@@ -98,22 +163,21 @@ const sessionHashExtension = Prisma.defineExtension({
   },
 })
 
-// $extends returns a subtype that TypeScript doesn't accept as PrismaClient without a cast.
-// The runtime shape is fully compatible — all repository/service operations work unchanged.
+// $extends returns a subtype TypeScript won't accept as PrismaClient without a cast.
+// The runtime shape is fully compatible — all repository and service operations work unchanged.
 export const prisma = baseClient.$extends(sessionHashExtension) as unknown as PrismaClient
 ```
 
 **Operations intercepted:**
 
-| Operation | Why |
-|-----------|-----|
-| `create` | Hash before insert |
-| `findFirst` | Hash before lookup (primary session validation path) |
-| `findMany` | Hash before lookup (session listing) |
-| `delete` | Hash before sign-out lookup |
-| `deleteMany` | Hash before bulk revocation |
-
-`update` and `updateMany` are **not** intercepted — Better Auth updates sessions by `id`, never by `token`.
+| Operation   | Hashes input on                | Restores raw token in result                          |
+| ----------- | ------------------------------ | ----------------------------------------------------- |
+| `create`    | `data.token`                   | the returned row                                      |
+| `findFirst` | `where.token`                  | the returned row                                      |
+| `findMany`  | `where.token` (string or `in`) | each row, mapped back via `hash → raw`                |
+| `update`    | `where.token`                  | the returned row (used by Better Auth's session roll) |
+| `delete`    | `where.token`                  | the returned row (Better Auth ignores it)             |
+| `deleteMany`| `where.token`                  | n/a — returns a count                                 |
 
 ## Tests
 
@@ -151,58 +215,9 @@ describe('hashSessionToken', () => {
 
 ### `src/server/__tests__/lib/prisma-session-extension.test.ts`
 
-Tests for the interceptor logic without a real Prisma client:
+Logic-level tests for the hash-application rules (create, where-string, where-in). Extension wiring is verified manually via the steps in **Verification** below.
 
-```typescript
-import { describe, expect, it } from 'vitest'
-import { hashSessionToken } from '../../lib/session-token'
-
-function applyCreateHash<T extends { data?: { token?: unknown } }>(args: T): T {
-  if (typeof args.data?.token === 'string') {
-    return { ...args, data: { ...args.data, token: hashSessionToken(args.data.token) } }
-  }
-  return args
-}
-
-function applyWhereHash<T extends { where?: { token?: unknown } }>(args: T): T {
-  if (typeof args.where?.token === 'string') {
-    return { ...args, where: { ...args.where, token: hashSessionToken(args.where.token as string) } }
-  }
-  return args
-}
-
-describe('session create interceptor', () => {
-  it('hashes token in data', () => {
-    const raw = 'rawtoken123'
-    const result = applyCreateHash({ data: { token: raw, userId: 'u1' } })
-    expect(result.data!.token).toBe(hashSessionToken(raw))
-    expect(result.data!.token).not.toBe(raw)
-  })
-
-  it('is a no-op when token is absent', () => {
-    const args = { data: { userId: 'u1' } }
-    expect(applyCreateHash(args)).toEqual(args)
-  })
-})
-
-describe('session find/delete interceptor', () => {
-  it('hashes token in where clause', () => {
-    const raw = 'myrawtoken'
-    const result = applyWhereHash({ where: { token: raw } })
-    expect(result.where!.token).toBe(hashSessionToken(raw))
-  })
-
-  it('is a no-op when token is not in where', () => {
-    const args = { where: { userId: 'u1' } }
-    expect(applyWhereHash(args)).toEqual(args)
-  })
-
-  it('is a no-op when where is undefined', () => {
-    const args = {}
-    expect(applyWhereHash(args)).toEqual(args)
-  })
-})
-```
+See the file for full coverage including: `create` data hashing, `findFirst`/`update`/`delete`/`deleteMany` where-string hashing, `findMany` with `{ in: [...] }` filter hashing, and no-op cases.
 
 ## Migration
 
@@ -210,7 +225,7 @@ describe('session find/delete interceptor', () => {
 
 - No schema migration needed
 - Optionally clear stale rows before deploy: `DELETE FROM sessions;`
-- No rollback needed for the schema; if reverting the code, tokens become plaintext again (which is no worse than the current state)
+- **Rollback warning**: if the code is reverted after deploy, the DB contains hashed tokens but the reverted code does raw-token lookups — all sessions appear invalid and no one can authenticate until the sessions table is cleared. Clear the table on both deploy and any rollback that follows a deploy.
 
 ## Verification
 
@@ -219,3 +234,5 @@ describe('session find/delete interceptor', () => {
 3. Sign in via magic link or Google OAuth
 4. Query DB: `SELECT token FROM sessions LIMIT 1;` — should be a 64-char lowercase hex string
 5. Make an authenticated API request — session validation succeeds
+6. Sign out — re-sign in succeeds (confirms `delete` + `create` paths)
+7. Trigger a session listing (e.g. active sessions UI) — sessions appear correctly (confirms `findMany` + `in` path)
