@@ -5,6 +5,9 @@ import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
+import { logger } from '../lib/logger'
+
+const log = logger.child({ component: 'character-repository' })
 
 export class CharacterRepository {
   constructor(private prisma: PrismaClient) {}
@@ -18,7 +21,7 @@ export class CharacterRepository {
   async findByUserIdOrThrow(userId: string): Promise<Character> {
     const character = await this.findByUserId(userId)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Character not found for user ${userId}` })
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
     }
     return character
   }
@@ -35,7 +38,7 @@ export class CharacterRepository {
   async findWithClassesOrThrow(userId: string): Promise<CharacterWithClasses> {
     const character = await this.findWithClasses(userId)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Character not found for user ${userId}` })
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
     }
     return character
   }
@@ -52,10 +55,11 @@ export class CharacterRepository {
   async findByIdWithClassesOrThrow(id: string, userId?: string): Promise<CharacterWithClasses> {
     const character = await this.findByIdWithClasses(id)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${id} not found` })
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
     }
-    if (userId && character.userId !== userId) {
-      throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
+    if (userId !== undefined && character.userId !== userId) {
+      log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized character access attempt')
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
     }
     return character
   }

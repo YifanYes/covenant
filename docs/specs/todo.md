@@ -6,10 +6,6 @@
 
 ## High Priority
 
-- [ ] Security: Cookie Security Production-Only
-  - `server/lib/auth.ts` (lines 42-52)
-  - **Fix:** Apply secure/sameSite/httpOnly in all environments. Implement the spec in `/docs/specs/session_token_hashing.md`.
-
 - [ ] Security: Session Tokens in Plaintext
   - Prisma schema - Session model
   - **Fix:** Hash tokens with bcrypt before storage

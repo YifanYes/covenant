@@ -1,5 +1,8 @@
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '@/generated/prisma'
+import { logger } from '../lib/logger'
+
+const log = logger.child({ component: 'base-repository' })
 
 /**
  * Base repository providing common CRUD operations.
@@ -20,11 +23,6 @@ export abstract class BaseRepository<T extends { id: string }> {
   }
 
   /**
-   * The human-readable name of this entity for error messages.
-   */
-  protected abstract get entityName(): string
-
-  /**
    * Find an entity by its ID.
    */
   async findById(id: string): Promise<T | null> {
@@ -39,7 +37,7 @@ export abstract class BaseRepository<T extends { id: string }> {
     if (!entity) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: `${this.entityName} not found`
+        message: 'Resource not found or access denied'
       })
     }
     return entity
@@ -83,7 +81,7 @@ export abstract class UserScopedRepository<
     if (!entity) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: `${this.entityName} not found for user`
+        message: 'Resource not found or access denied'
       })
     }
     return entity
@@ -94,12 +92,13 @@ export abstract class UserScopedRepository<
    * Throws if the entity doesn't exist or doesn't belong to the user.
    */
   async findByIdWithOwnershipOrThrow(id: string, userId: string): Promise<T> {
-    const entity = await this.findByIdOrThrow(id)
+    const entity = await this.model.findUnique({ where: { id } })
+    if (!entity) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+    }
     if (entity.userId !== userId) {
-      throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: `Access denied to ${this.entityName}`
-      })
+      log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized resource access attempt')
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
     }
     return entity
   }

@@ -108,7 +108,7 @@ describe('CharacterRepository - Authorization', () => {
       })
     })
 
-    it('should throw FORBIDDEN when user does not own the character', async () => {
+    it('should throw NOT_FOUND when user does not own the character', async () => {
       const characterId = 'char-1'
       const userId = 'user-1'
       const otherUserId = 'user-2'
@@ -123,7 +123,7 @@ describe('CharacterRepository - Authorization', () => {
 
       await expect(characterRepository.findByIdWithClassesOrThrow(characterId, userId)).rejects.toThrow(TRPCError)
       await expect(characterRepository.findByIdWithClassesOrThrow(characterId, userId)).rejects.toMatchObject({
-        code: 'FORBIDDEN'
+        code: 'NOT_FOUND'
       })
     })
   })

@@ -2,6 +2,9 @@ import { Prisma, type PrismaClient, type Task } from '@/generated/prisma'
 import type { BulkUpdateTaskItem, CreateTaskType, UpdateTaskType } from '@shared/schemas/tasks.schemas'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
+import { logger } from '../lib/logger'
+
+const log = logger.child({ component: 'task-repository' })
 
 const TASK_INCLUDE = {
   objectives: {
@@ -117,8 +120,12 @@ export class TaskRepository {
       include: TASK_INCLUDE
     })
 
-    if (!task || task.userId !== userId) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Task ${id} not found` })
+    if (!task) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+    }
+    if (task.userId !== userId) {
+      log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized task access attempt')
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
     }
 
     return task

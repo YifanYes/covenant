@@ -62,7 +62,7 @@ export class KillRecordService {
     if (!character) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: `Character not found for user ${userId}`
+        message: 'Character not found'
       })
     }
 
@@ -78,7 +78,7 @@ export class KillRecordService {
     if (!character) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: `Character ${characterId} not found`
+        message: 'Character not found'
       })
     }
 

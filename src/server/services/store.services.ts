@@ -15,7 +15,7 @@ export class StoreService {
     const character = await this.characterRepository.findWithClasses(userId)
 
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${userId} not found` })
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
     }
 
     const { tier } = this.characterService.getCharacterProgress(character)
@@ -43,7 +43,7 @@ export class StoreService {
     const character = await this.characterRepository.findWithClasses(userId)
 
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Character ${userId} not found` })
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
     }
 
     const { tier: characterTier } = this.characterService.getCharacterProgress(character)
