@@ -1,7 +1,7 @@
 'use client'
 
 import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.component'
-import { BookOpen } from '@nsmr/pixelart-react'
+import { BookOpen } from 'pixelarticons/react'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 

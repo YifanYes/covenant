@@ -1,5 +1,5 @@
 'use client'
-import { Checklist } from '@nsmr/pixelart-react'
+import { ListBox as Checklist } from 'pixelarticons/react'
 import { useMemo } from 'react'
 import DashboardPieChartComponent from '../dashboard-pie-chart/dashboard-pie-chart.component'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper.component'

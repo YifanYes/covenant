@@ -1,4 +1,4 @@
-import { Loader } from '@nsmr/pixelart-react'
+import { Loader } from 'pixelarticons/react'
 
 export default function Loading() {
   return (

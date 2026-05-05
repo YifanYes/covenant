@@ -2,7 +2,7 @@
 import Button from '@/components/ui/button.component'
 import { cn } from '@/lib/cn.lib'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import { Loader, Trophy, Zap } from '@nsmr/pixelart-react'
+import { Loader, Trophy, Zap } from 'pixelarticons/react'
 import { MagicNature } from '@shared/constants/classes'
 import type { DoctrineAttributeType, DoctrineDefinition } from '@shared/types/doctrine.types'
 import { useMutation, useQuery } from '@tanstack/react-query'

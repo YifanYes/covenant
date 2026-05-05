@@ -1,6 +1,6 @@
 'use client'
 import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select.component'
-import { Money } from '@nsmr/pixelart-react'
+import { Money } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 
 interface StoreFiltersProps {

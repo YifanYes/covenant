@@ -1,6 +1,6 @@
 'use client'
 import { cn } from '@/lib/cn.lib'
-import { Coin, Shield, Zap } from '@nsmr/pixelart-react'
+import { Coins as Coin, Shield, Zap } from 'pixelarticons/react'
 import type { InventoryItem, SlotType } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 import ItemCard from './item-card.component'

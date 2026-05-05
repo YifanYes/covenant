@@ -1,6 +1,6 @@
 'use client'
 import Button from '@/ui/button.component'
-import { Loader } from '@nsmr/pixelart-react'
+import { Loader } from 'pixelarticons/react'
 
 export default function LoaderButton({
   disabled,

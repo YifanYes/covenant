@@ -24,11 +24,11 @@ We will implement different mechanics for character progression to ensure users 
 
 ## Core Loop
 
-1.  **Action**: User completes a Task, Habit or Objective.
-2.  **Reward**: User gains Dice Rolls.
-3.  **Conflict**: User spends Dice in the Adventure tab to complete a Mission.
-4.  **Loot**: If mission is successful, User gets gold, XP and items.
-5.  **Equip**: User uses gold to buy or finds Equipment to improve stats. (Crafting moved to roadmap). Gold can be used to make decisions that impact the story.
+1. **Action**: User completes a Task, Habit or Objective.
+2. **Reward**: User gains Dice Rolls.
+3. **Conflict**: User spends Dice in the Adventure tab to complete a Mission.
+4. **Loot**: If mission is successful, User gets gold, XP and items.
+5. **Equip**: User uses gold to buy or finds Equipment to improve stats. (Crafting moved to roadmap). Gold can be used to make decisions that impact the story.
 
 ## Dice-Based Combat System
 
@@ -550,24 +550,27 @@ This section outlines the frontend modifications required to support the gamific
 Restructure the sidebar into two sections:
 
 **Productivity Section:**
-| Item | Route | Icon |
-|------|-------|------|
-| Dashboard | `/` | `LayoutDashboard` |
-| Objectives & Areas | `/objectives` | `Target` |
-| Tasks | `/tasks` | `CheckSquare` |
-| Habits | `/habits` | `Repeat` |
+
+| Item               | Route         | Icon              |
+| ------------------ | ------------- | ----------------- |
+| Dashboard          | `/`           | `LayoutDashboard` |
+| Objectives & Areas | `/objectives` | `Target`          |
+| Tasks              | `/tasks`      | `CheckSquare`     |
+| Habits             | `/habits`     | `Repeat`          |
 
 **RPG Section:**
-| Item | Route | Icon |
-|------|-------|------|
-| Inventory | `/inventory` | `Backpack` |
-| Shop | `/shop` | `Store` |
-| Map Activities | `/map` | `Map` |
-| Activities Log | `/activities-log` | `Scroll` |
+
+| Item           | Route             | Icon       |
+| -------------- | ----------------- | ---------- |
+| Inventory      | `/inventory`      | `Backpack` |
+| Shop           | `/shop`           | `Store`    |
+| Map Activities | `/map`            | `Map`      |
+| Activities Log | `/activities-log` | `Scroll`   |
 
 **Configuration Section:**
-| Item | Route | Icon |
-|------|-------|------|
+
+| Item     | Route       | Icon       |
+| -------- | ----------- | ---------- |
 | Settings | `/settings` | `Settings` |
 
 > **Note:** The previous Adventure view (`/adventure`) is removed. Combat is now accessed through Map Activities.

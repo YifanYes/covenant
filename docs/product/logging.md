@@ -10,10 +10,10 @@ Covenant uses [Pino](https://github.com/pinojs/pino) for structured server-side 
 
 The logger is a Pino instance configured via environment variables:
 
-| Variable    | Default (dev) | Default (prod) | Description                      |
-| ----------- | ------------- | -------------- | -------------------------------- |
+| Variable    | Default (dev) | Default (prod) | Description                                |
+| ----------- | ------------- | -------------- | ------------------------------------------ |
 | `LOG_LEVEL` | `debug`       | `info`         | One of `fatal error warn info debug trace` |
-| `NODE_ENV`  | —             | —              | `production` disables pretty-print |
+| `NODE_ENV`  | —             | —              | `production` disables pretty-print         |
 
 In development, output is pretty-printed with colorized level labels and `HH:mm:ss.ms` timestamps. In production, output is newline-delimited JSON suitable for log aggregators (Datadog, Loki, etc.).
 
@@ -48,6 +48,7 @@ All log calls inside a request handler should use `ctx.log` rather than the root
 **Location:** `src/lib/logger.client.ts`
 
 A lightweight wrapper that:
+
 - In **development**: calls `console[level]` for immediate browser devtools feedback
 - In **all environments**: ships a fire-and-forget POST to `/api/logs` (never throws, never blocks)
 
@@ -84,9 +85,9 @@ The schema is defined in `src/shared/schemas/logs.schemas.ts` and validated by b
 
 **Location:** `src/app/api/logs/route.ts`
 
-| Method | Path       | Auth     | Purpose                          |
-| ------ | ---------- | -------- | -------------------------------- |
-| POST   | `/api/logs`| None     | Receive client log, forward to Pino |
+| Method | Path        | Auth | Purpose                             |
+| ------ | ----------- | ---- | ----------------------------------- |
+| POST   | `/api/logs` | None | Receive client log, forward to Pino |
 
 The endpoint validates the payload with `clientLogSchema`, then calls:
 
@@ -97,6 +98,7 @@ logger[level]({ source: 'client', timestamp, context }, message)
 This means client logs appear in the same Pino stream as server logs, tagged with `"source":"client"`, and can be filtered or routed separately in any log aggregator.
 
 **Error responses:**
+
 - `400 { error: 'Invalid payload' }` — Zod validation failed
 - `400 { error: 'Bad request' }` — malformed JSON body
 
@@ -104,10 +106,12 @@ This means client logs appear in the same Pino stream as server logs, tagged wit
 
 ## Adding Logs
 
-| Location        | Import                                  | API                                   |
-| --------------- | --------------------------------------- | ------------------------------------- |
-| Server (tRPC)   | Use `ctx.log` from tRPC context         | `ctx.log.info({ ... }, 'message')`    |
-| Server (script) | `import { logger } from '../lib/logger'`| `logger.error({ ... }, 'message')`    |
-| Client          | `import { clientLogger } from '@/lib/logger.client'` | `clientLogger.error('msg', ctx)` |
+| Location        | Import                                               | API                                |
+| --------------- | ---------------------------------------------------- | ---------------------------------- |
+| Server (tRPC)   | Use `ctx.log` from tRPC context                      | `ctx.log.info({ ... }, 'message')` |
+| Server (script) | `import { logger } from '../lib/logger'`             | `logger.error({ ... }, 'message')` |
+| Client          | `import { clientLogger } from '@/lib/logger.client'` | `clientLogger.error('msg', ctx)`   |
+| Server (script) | `import { logger } from '../lib/logger'`             | `logger.error({ ... }, 'message')` |
+| Client          | `import { clientLogger } from '@/lib/logger.client'` | `clientLogger.error('msg', ctx)`   |
 
 Never use `console.*` directly — use the appropriate logger so all output is structured, filterable, and routed consistently.

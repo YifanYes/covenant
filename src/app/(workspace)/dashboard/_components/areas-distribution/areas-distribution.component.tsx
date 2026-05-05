@@ -1,6 +1,6 @@
 'use client'
 import ChartContainer, { ChartTooltip } from '@/ui/chart.component'
-import { TrackChanges } from '@nsmr/pixelart-react'
+import { Reload as TrackChanges } from 'pixelarticons/react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from 'recharts'

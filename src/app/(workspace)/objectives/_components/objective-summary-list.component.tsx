@@ -2,7 +2,7 @@
 import Task from '@/tasks/task.component'
 import type { Habit, Task as TaskType } from '@/types/models.types'
 import Dialog, { DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/ui/dialog.component'
-import { Repeat } from '@nsmr/pixelart-react'
+import { Repeat } from 'pixelarticons/react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useTranslation } from 'react-i18next'
 import ObjectiveHabitCard from './objective-habit-card.component'

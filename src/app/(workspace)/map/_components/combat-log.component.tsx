@@ -1,7 +1,7 @@
 'use client'
 import { cn } from '@/lib/cn.lib'
 import Separator from '@/ui/separator.component'
-import { Alert, Battery, Bullseye, Flag, Heart, Shield, Trophy, Zap } from '@nsmr/pixelart-react'
+import { SquareAlert as Alert, Battery, Target as Bullseye, Flag, Heart, Shield, Trophy, Zap } from 'pixelarticons/react'
 import { CombatLogType, type CombatLogEntry } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 

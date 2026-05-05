@@ -6,10 +6,10 @@ Covenant is a high-performance productivity infrastructure embedded in a dark fa
 
 ## 1. Style & Atmosphere
 
-| Aspect        | Description                                                                           |
-| ------------- | ------------------------------------------------------------------------------------- |
-| **Genre**     | Dark Fantasy                                                                          |
-| **Atmosphere** | A divided world in constant conflict. The tone is solemn, mystical, and warlike.    |
+| Aspect         | Description                                                                      |
+| -------------- | -------------------------------------------------------------------------------- |
+| **Genre**      | Dark Fantasy                                                                     |
+| **Atmosphere** | A divided world in constant conflict. The tone is solemn, mystical, and warlike. |
 
 ### Interface Duality
 
@@ -40,42 +40,42 @@ The chromatic strategy is based on **Eigengrau** (intrinsic grey), **Chiaroscuro
 
 ### 3.1 Global Semantic Colors
 
-| Semantic  | Color            | Hex       |
-| --------- | ---------------- | --------- |
-| Success   | Oxidized Green   | `#387072` |
-| Error     | Bruised Purple   | `#854d64` |
-| Info      | Spectral Blue    | `#3f5b66` |
-| Warning   | Sanctified Gold  | `#b0a36a` |
+| Semantic | Color           | Hex       |
+| -------- | --------------- | --------- |
+| Success  | Oxidized Green  | `#387072` |
+| Error    | Bruised Purple  | `#854d64` |
+| Info     | Spectral Blue   | `#3f5b66` |
+| Warning  | Sanctified Gold | `#b0a36a` |
 
 ### 3.2 Faction Color Matrix
 
 #### Sacred Knights
 
-| Mode  | Background | Surface/Card | Primary Text | Accent            |
-| ----- | ---------- | ------------ | ------------ | ----------------- |
-| Dark  | `#1c1a17`  | `#2d2b27`    | `#c2b29a`    | `#b0a36a` (Gold)  |
-| Light | `#edead9`  | `#ffffff`    | `#5a5444`    | `#8c7d4b`         |
+| Mode  | Background | Surface/Card | Primary Text | Accent           |
+| ----- | ---------- | ------------ | ------------ | ---------------- |
+| Dark  | `#1c1a17`  | `#2d2b27`    | `#c2b29a`    | `#b0a36a` (Gold) |
+| Light | `#edead9`  | `#ffffff`    | `#5a5444`    | `#8c7d4b`        |
 
 #### The Legion
 
-| Mode  | Background | Surface/Card | Primary Text | Accent              |
-| ----- | ---------- | ------------ | ------------ | ------------------- |
-| Dark  | `#0f0f13`  | `#1a1a21`    | `#c2b29a`    | `#8e76a1` (Purple)  |
-| Light | `#eae7ef`  | `#ffffff`    | `#4a3b54`    | `#4a3b54`           |
+| Mode  | Background | Surface/Card | Primary Text | Accent             |
+| ----- | ---------- | ------------ | ------------ | ------------------ |
+| Dark  | `#0f0f13`  | `#1a1a21`    | `#c2b29a`    | `#8e76a1` (Purple) |
+| Light | `#eae7ef`  | `#ffffff`    | `#4a3b54`    | `#4a3b54`          |
 
 #### Alchemists' League
 
-| Mode  | Background | Surface/Card | Primary Text | Accent            |
-| ----- | ---------- | ------------ | ------------ | ----------------- |
-| Dark  | `#121b21`  | `#1d2a33`    | `#c2b29a`    | `#3f5b66` (Cyan)  |
-| Light | `#e6edef`  | `#ffffff`    | `#2a414a`    | `#2a414a`         |
+| Mode  | Background | Surface/Card | Primary Text | Accent           |
+| ----- | ---------- | ------------ | ------------ | ---------------- |
+| Dark  | `#121b21`  | `#1d2a33`    | `#c2b29a`    | `#3f5b66` (Cyan) |
+| Light | `#e6edef`  | `#ffffff`    | `#2a414a`    | `#2a414a`        |
 
 #### The Wandering Death
 
-| Mode  | Background | Surface/Card | Primary Text | Accent           |
-| ----- | ---------- | ------------ | ------------ | ---------------- |
-| Dark  | `#242525`  | `#333535`    | `#c2b29a`    | `#787a7a` (Ash)  |
-| Light | `#ebeded`  | `#ffffff`    | `#444545`    | `#555757`        |
+| Mode  | Background | Surface/Card | Primary Text | Accent          |
+| ----- | ---------- | ------------ | ------------ | --------------- |
+| Dark  | `#242525`  | `#333535`    | `#c2b29a`    | `#787a7a` (Ash) |
+| Light | `#ebeded`  | `#ffffff`    | `#444545`    | `#555757`       |
 
 #### Crimson Inquisition
 
@@ -86,10 +86,10 @@ The chromatic strategy is based on **Eigengrau** (intrinsic grey), **Chiaroscuro
 
 #### Blood Pact
 
-| Mode  | Background | Surface/Card | Primary Text | Accent             |
-| ----- | ---------- | ------------ | ------------ | ------------------ |
-| Dark  | `#1e1b1b`  | `#2a2525`    | `#c2b29a`    | `#a83232` (Blood)  |
-| Light | `#eddada`  | `#ffffff`    | `#5c2a2a`    | `#8c1c1c`          |
+| Mode  | Background | Surface/Card | Primary Text | Accent            |
+| ----- | ---------- | ------------ | ------------ | ----------------- |
+| Dark  | `#1e1b1b`  | `#2a2525`    | `#c2b29a`    | `#a83232` (Blood) |
+| Light | `#eddada`  | `#ffffff`    | `#5c2a2a`    | `#8c1c1c`         |
 
 ---
 
@@ -148,12 +148,12 @@ li {
 
 ## 5. Typography & Visual Hierarchy
 
-| Element                    | Font           | Description                                                                     |
-| -------------------------- | -------------- | ------------------------------------------------------------------------------- |
-| **Headings (H1–H6)**       | Cinzel         | Classic serif for solemn titles and section names. 90% opacity.                 |
-| **Body & Task Lists**      | EB Garamond    | High-legibility font with technical and academic aesthetic. 80% opacity.        |
-| **UI Labels**              | Press Start 2P | 8-bit style for RPG-specific elements (where applicable).                       |
-| **Disabled Elements**      | —              | 40% opacity.                                                                    |
+| Element               | Font           | Description                                                              |
+| --------------------- | -------------- | ------------------------------------------------------------------------ |
+| **Headings (H1–H6)**  | Cinzel         | Classic serif for solemn titles and section names. 90% opacity.          |
+| **Body & Task Lists** | EB Garamond    | High-legibility font with technical and academic aesthetic. 80% opacity. |
+| **UI Labels**         | Press Start 2P | 8-bit style for RPG-specific elements (where applicable).                |
+| **Disabled Elements** | —              | 40% opacity.                                                             |
 
 ---
 
@@ -161,19 +161,19 @@ li {
 
 ### 6.1 Base Elements
 
-| Aspect            | Implementation                                                                                              |
-| ----------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Rendering**     | `image-rendering: pixelated;` applied globally in CSS to prevent blur on scaling.                          |
-| **Layout**        | Tailwind CSS for the responsive grid system.                                                                |
-| **Components**    | Customized NES.css base using `:root` variables to inject the selected faction's palette.                   |
-| **Accessibility** | `prefers-reduced-motion` support that disables shake/vibration animations.                                  |
+| Aspect            | Implementation                                                                            |
+| ----------------- | ----------------------------------------------------------------------------------------- |
+| **Rendering**     | `image-rendering: pixelated;` applied globally in CSS to prevent blur on scaling.         |
+| **Layout**        | Tailwind CSS for the responsive grid system.                                              |
+| **Components**    | Customized NES.css base using `:root` variables to inject the selected faction's palette. |
+| **Accessibility** | `prefers-reduced-motion` support that disables shake/vibration animations.                |
 
 ### 6.2 Ornamental Elements
 
-| Element       | Description                                                                                                              |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Dividers**  | Instead of plain `<hr>` lines, use repeatable SVGs or sprites: rusted chains, thorny roots, or stone cracks.            |
-| **Loaders**   | A spinning religious symbol or a chalice filling with blood.                                                             |
+| Element      | Description                                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------------------ |
+| **Dividers** | Instead of plain `<hr>` lines, use repeatable SVGs or sprites: rusted chains, thorny roots, or stone cracks. |
+| **Loaders**  | A spinning religious symbol or a chalice filling with blood.                                                 |
 
 ---
 
@@ -181,9 +181,9 @@ li {
 
 Optimizes operational efficiency through human-oriented design that maintains thematic cohesion without visual distraction.
 
-| Principle                    | Description                                                                                                                                              |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Minimalism & Integration** | Lists and calendars with generous negative space; surfaces use the faction's Surface/Card tone.                                                          |
-| **Data Hierarchy**           | Critical elements are highlighted with the accent color; secondary information uses reduced opacity (60%) over the Bone White tone (`#c2b29a`).          |
-| **Pixel-Perfect Precision**  | Margins, padding, and component sizes must align to an 8px grid.                                                                                         |
-| **Technical Interactivity**  | Immediate feedback on task completion via clear state changes; DotGothic16 bitmap typography for maximum sharpness at small sizes.                       |
+| Principle                    | Description                                                                                                                                     |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Minimalism & Integration** | Lists and calendars with generous negative space; surfaces use the faction's Surface/Card tone.                                                 |
+| **Data Hierarchy**           | Critical elements are highlighted with the accent color; secondary information uses reduced opacity (60%) over the Bone White tone (`#c2b29a`). |
+| **Pixel-Perfect Precision**  | Margins, padding, and component sizes must align to an 8px grid.                                                                                |
+| **Technical Interactivity**  | Immediate feedback on task completion via clear state changes; DotGothic16 bitmap typography for maximum sharpness at small sizes.              |

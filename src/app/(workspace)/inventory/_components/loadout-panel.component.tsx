@@ -1,6 +1,6 @@
 'use client'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
-import { Luggage } from '@nsmr/pixelart-react'
+import { Suitcase as Luggage } from 'pixelarticons/react'
 import { SlotType as SlotTypeEnum, type InventoryCharacter, type SlotType } from '@shared/types/gamification.types'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'

@@ -1,7 +1,7 @@
 'use client'
 import LoaderButton from '@/components/common/loader-button.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import { Heart } from '@nsmr/pixelart-react'
+import { Heart } from 'pixelarticons/react'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'

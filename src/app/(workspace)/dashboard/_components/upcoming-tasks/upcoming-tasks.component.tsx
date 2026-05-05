@@ -2,7 +2,7 @@
 import { cn } from '@/lib/cn.lib'
 import type { Task } from '@/types/models.types'
 import { getColorClasses } from '@/utils/theme.utils'
-import { CalendarMonth } from '@nsmr/pixelart-react'
+import { Calendar as CalendarMonth } from 'pixelarticons/react'
 import dayjs from 'dayjs'
 import { useTranslation } from 'react-i18next'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper.component'

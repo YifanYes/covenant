@@ -8,21 +8,21 @@ Replaces the `MapActivity`/`ActivityParticipation` shared-event system with indi
 
 ### `CharacterQuest` (replaces `ActivityParticipation` + `MapActivity`)
 
-| Field                | Type     | Notes                                |
-| -------------------- | -------- | ------------------------------------ |
-| id                   | UUID     | PK                                   |
-| characterId          | UUID     | FK → Character                       |
-| questId              | VARCHAR  | Template ID from QUESTS constants    |
-| status               | VARCHAR  | ACTIVE / COMPLETED / ABANDONED       |
-| progress             | Int      | Enemies killed so far                |
-| target               | Int      | Enemies needed to complete           |
-| goldEarned           | Int      | Gold accumulated                     |
-| startedAt            | DateTime |                                      |
-| completedAt          | DateTime | nullable                             |
-| activeDoctrines      | Json     | Player doctrine state                |
-| enemyActiveDoctrines | Json     | Enemy doctrine state                 |
-| combatStats          | Json     | Encounter pattern state              |
-| tacticalState        | Json     | Full tactical combat snapshot        |
+| Field                | Type     | Notes                             |
+| -------------------- | -------- | --------------------------------- |
+| id                   | UUID     | PK                                |
+| characterId          | UUID     | FK → Character                    |
+| questId              | VARCHAR  | Template ID from QUESTS constants |
+| status               | VARCHAR  | ACTIVE / COMPLETED / ABANDONED    |
+| progress             | Int      | Enemies killed so far             |
+| target               | Int      | Enemies needed to complete        |
+| goldEarned           | Int      | Gold accumulated                  |
+| startedAt            | DateTime |                                   |
+| completedAt          | DateTime | nullable                          |
+| activeDoctrines      | Json     | Player doctrine state             |
+| enemyActiveDoctrines | Json     | Enemy doctrine state              |
+| combatStats          | Json     | Encounter pattern state           |
+| tacticalState        | Json     | Full tactical combat snapshot     |
 
 `CombatEnemy.participationId` → renamed to `characterQuestId`.
 

@@ -1,6 +1,6 @@
 'use client'
 import { cn } from '@/lib/cn.lib'
-import { Check, ChevronRight, Circle } from '@nsmr/pixelart-react'
+import { Check, ChevronRight, Circle } from 'pixelarticons/react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import * as React from 'react'
 

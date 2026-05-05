@@ -1,7 +1,7 @@
 'use client'
 import Button from '@/ui/button.component'
 import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select.component'
-import { Close } from '@nsmr/pixelart-react'
+import { Cancel as Close } from 'pixelarticons/react'
 import {
   EquipmentTypeFilter,
   type InventoryCharacter,
