@@ -1,4 +1,3 @@
-import { getMaxDiceForTier } from '@shared/constants/dice.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DiceService } from '../../services/dice.service'
 import { mockCharacter } from '../fixtures/character.fixtures'
@@ -10,13 +9,11 @@ describe('DiceService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    // Create mock repository with mocked methods
     mockCharacterRepo = {
       findWithClasses: vi.fn(),
       updateCharacterData: vi.fn()
     }
 
-    // Inject the mock repository directly
     diceService = new DiceService(mockCharacterRepo)
   })
 
@@ -25,7 +22,6 @@ describe('DiceService', () => {
       const character = mockCharacter({
         data: { diceBank: 0 }
       })
-      // Tier 1 max dice is 20 usually
       mockCharacterRepo.findWithClasses.mockResolvedValue(character)
 
       const result = await diceService.addDiceToBank('user-1', 5)
@@ -33,24 +29,29 @@ describe('DiceService', () => {
       expect(result.success).toBe(true)
       expect(result.earned).toBe(5)
       expect(result.total).toBe(5)
-      expect(mockCharacterRepo.updateCharacterData).toHaveBeenCalled()
+      expect(mockCharacterRepo.updateCharacterData).toHaveBeenCalledWith(character.id, { diceBank: 5 })
     })
 
-    it('should cap dice at max limit', async () => {
+    it('should accumulate dice beyond any tier threshold', async () => {
       const character = mockCharacter({
-        data: { diceBank: 18 }
+        data: { diceBank: 100 }
       })
-      // Assuming Tier 1 max is 20
-      const maxDice = getMaxDiceForTier(1)
-
       mockCharacterRepo.findWithClasses.mockResolvedValue(character)
 
-      // Try adding 5, should only add 2 to reach 20
-      const result = await diceService.addDiceToBank('user-1', 5)
+      const result = await diceService.addDiceToBank('user-1', 50)
 
-      expect(result.earned).toBe(maxDice - 18)
-      expect(result.total).toBe(maxDice)
-      expect(result.limitReached).toBe(true)
+      expect(result.success).toBe(true)
+      expect(result.earned).toBe(50)
+      expect(result.total).toBe(150)
+    })
+
+    it('should return failure if character not found', async () => {
+      mockCharacterRepo.findWithClasses.mockResolvedValue(null)
+
+      const result = await diceService.addDiceToBank('nonexistent', 5)
+
+      expect(result.success).toBe(false)
+      expect(result.earned).toBe(0)
     })
   })
 
@@ -66,10 +67,7 @@ describe('DiceService', () => {
       expect(result.success).toBe(true)
       expect(result.consumed).toBe(5)
       expect(result.remaining).toBe(5)
-      expect(mockCharacterRepo.updateCharacterData).toHaveBeenCalledWith(
-        character.id,
-        expect.objectContaining({ diceBank: 5 })
-      )
+      expect(mockCharacterRepo.updateCharacterData).toHaveBeenCalledWith(character.id, { diceBank: 5 })
     })
 
     it('should only consume available dice if requesting more than available', async () => {
@@ -83,10 +81,7 @@ describe('DiceService', () => {
       expect(result.success).toBe(true)
       expect(result.consumed).toBe(3)
       expect(result.remaining).toBe(0)
-      expect(mockCharacterRepo.updateCharacterData).toHaveBeenCalledWith(
-        character.id,
-        expect.objectContaining({ diceBank: 0 })
-      )
+      expect(mockCharacterRepo.updateCharacterData).toHaveBeenCalledWith(character.id, { diceBank: 0 })
     })
 
     it('should return failure if character not found', async () => {
@@ -126,10 +121,9 @@ describe('DiceService', () => {
 
       const completions = [
         { completedAt: today },
-        { completedAt: today } // Duplicate day shouldn't break streak logic
+        { completedAt: today }
       ]
 
-      // Depending on implementation, it might count as 1
       expect(diceService.calculateHabitStreak(completions)).toBe(1)
     })
   })

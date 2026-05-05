@@ -1,25 +1,22 @@
 import type { PrismaClient } from '@/generated/prisma'
-import { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
-import { ActivityRepository } from '../repositories/activity.repository'
 import { AreaRepository } from '../repositories/area.repository'
+import { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import { CharacterRepository } from '../repositories/character.repository'
 import { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import { HabitRepository } from '../repositories/habit.repository'
 import { ObjectiveRepository } from '../repositories/objective.repository'
 import { TaskRepository } from '../repositories/task.repository'
 import { UserRepository } from '../repositories/user.repository'
-import { ActivityService } from './activity.service'
 import { AreaService } from './area.service'
 import { AuthService } from './auth.service'
 import { CharacterService } from './character.service'
 import { CombatService } from './combat.service'
 import { DashboardService } from './dashboard.service'
-import { DeadlineService } from './deadline.service'
 import { DiceService } from './dice.service'
 import { HabitService } from './habit.service'
 import { KillRecordService } from './kill-record.service'
-
 import { ObjectiveService } from './objective.service'
+import { QuestService } from './quest.service'
 import { StoreService } from './store.services'
 import { TaskService } from './task.service'
 
@@ -30,8 +27,7 @@ import { TaskService } from './task.service'
  */
 export class ServiceFactory {
   // Repositories (private, lazy-initialized)
-  private _activityParticipationRepository?: ActivityParticipationRepository
-  private _activityRepository?: ActivityRepository
+  private _characterQuestRepository?: CharacterQuestRepository
   private _areaRepository?: AreaRepository
   private _characterRepository?: CharacterRepository
   private _combatEnemyRepository?: CombatEnemyRepository
@@ -41,17 +37,16 @@ export class ServiceFactory {
   private _userRepository?: UserRepository
 
   // Services (private, lazy-initialized)
-  private _activityService?: ActivityService
   private _areaService?: AreaService
   private _authService?: AuthService
   private _characterService?: CharacterService
   private _combatService?: CombatService
   private _dashboardService?: DashboardService
-  private _deadlineService?: DeadlineService
   private _diceService?: DiceService
   private _habitService?: HabitService
   private _killRecordService?: KillRecordService
   private _objectiveService?: ObjectiveService
+  private _questService?: QuestService
   private _storeService?: StoreService
   private _taskService?: TaskService
 
@@ -59,12 +54,8 @@ export class ServiceFactory {
 
   // ============== Repository Getters (private) ==============
 
-  private get activityParticipationRepository(): ActivityParticipationRepository {
-    return (this._activityParticipationRepository ??= new ActivityParticipationRepository(this.prisma))
-  }
-
-  private get activityRepository(): ActivityRepository {
-    return (this._activityRepository ??= new ActivityRepository(this.prisma))
+  private get characterQuestRepository(): CharacterQuestRepository {
+    return (this._characterQuestRepository ??= new CharacterQuestRepository(this.prisma))
   }
 
   private get areaRepository(): AreaRepository {
@@ -98,8 +89,8 @@ export class ServiceFactory {
   // ============== Service Getters (public) ==============
 
   // Repository access (for simple queries without business logic)
-  get activityParticipation(): ActivityParticipationRepository {
-    return this.activityParticipationRepository
+  get characterQuest(): CharacterQuestRepository {
+    return this.characterQuestRepository
   }
 
   // Layer 1: Repository-only dependencies
@@ -119,9 +110,8 @@ export class ServiceFactory {
   get combat(): CombatService {
     return (this._combatService ??= new CombatService(
       this.characterRepository,
-      this.activityParticipationRepository,
+      this.characterQuestRepository,
       this.combatEnemyRepository,
-      this.activityRepository,
       this.killRecord
     ))
   }
@@ -139,15 +129,6 @@ export class ServiceFactory {
   }
 
   // Layer 3: Repository + Layer 2 service dependencies
-  get activity(): ActivityService {
-    return (this._activityService ??= new ActivityService(
-      this.activityRepository,
-      this.combatEnemyRepository,
-      this.character,
-      this.activityParticipationRepository
-    ))
-  }
-
   get auth(): AuthService {
     return (this._authService ??= new AuthService(
       this.userRepository,
@@ -173,12 +154,15 @@ export class ServiceFactory {
     return (this._killRecordService ??= new KillRecordService(this.characterRepository, this.combatEnemyRepository))
   }
 
-  get store(): StoreService {
-    return (this._storeService ??= new StoreService(this.characterRepository, this.character))
+  get quest(): QuestService {
+    return (this._questService ??= new QuestService(
+      this.characterQuestRepository,
+      this.combatEnemyRepository,
+      this.character
+    ))
   }
 
-  // Layer 1: Repository-only dependencies (utilities)
-  get deadline(): DeadlineService {
-    return (this._deadlineService ??= new DeadlineService(this.activityRepository))
+  get store(): StoreService {
+    return (this._storeService ??= new StoreService(this.characterRepository, this.character))
   }
 }

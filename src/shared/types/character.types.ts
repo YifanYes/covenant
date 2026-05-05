@@ -38,6 +38,5 @@ export type CharacterWithClasses = CharacterType & { classes: CharacterClassType
 export interface CharacterProgress {
   currentClass: CharacterClassType | undefined
   tier: number
-  maxDice: number
   diceBank: number
 }

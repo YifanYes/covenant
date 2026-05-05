@@ -1566,6 +1566,9 @@
     "faction_theme_label": "Tema de Facción",
     "title": "Configuración"
   },
+  "nav": {
+    "quests": "Misiones"
+  },
   "sidebar": {
     "calendar": "Calendario",
     "close": "Colapsar menú",
@@ -1581,6 +1584,7 @@
     "productivity": "Productividad",
     "review": "Revisión",
     "rpg": "RPG",
+    "quests": "Misiones",
     "settings": "Configuración",
     "shop": "Tienda",
     "tasks": "Tareas"
@@ -1825,6 +1829,46 @@
     "yifan": {
       "name": "Yifan Ye",
       "quote": "Efesios 6, 10-17"
+    }
+  },
+  "quests": {
+    "title": "Misiones",
+    "subtitle": "Elige tu misión. Cada victoria da forma a la guerra.",
+    "available": "Misiones Disponibles",
+    "active_quest": "Misión Activa",
+    "start": "Iniciar Misión",
+    "continue": "Continuar Misión",
+    "already_active": "Completa la misión activa primero",
+    "started": "¡Misión iniciada!",
+    "not_found": "Misión no encontrada",
+    "unknown": "Misión Desconocida",
+    "objective": "Objetivo",
+    "reward": "Recompensa",
+    "kill_enemies": "Derrotar {{count}} enemigos",
+    "status": {
+      "active": "Activa",
+      "completed": "Completada",
+      "abandoned": "Abandonada"
+    },
+    "difficulty": {
+      "easy": "Fácil",
+      "normal": "Normal",
+      "hard": "Difícil"
+    },
+    "error": {
+      "start": "Error al iniciar la misión"
+    },
+    "patrol_north_gate": {
+      "name": "Patrulla: Puerta Norte",
+      "description": "Los demonios están probando las defensas en la puerta norte. Elimina 5 amenazas para asegurar el perímetro."
+    },
+    "assault_the_harbor": {
+      "name": "Asalto: El Puerto",
+      "description": "Bandidos han tomado el puerto. Elimina 8 enemigos y restaura el orden en los muelles."
+    },
+    "defend_the_southern_wall": {
+      "name": "Defensa: Muro Sur",
+      "description": "Un asalto demoníaco implacable amenaza el muro sur. Elimina 10 atacantes para mantener la línea."
     }
   }
 }

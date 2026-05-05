@@ -12,8 +12,7 @@ import {
   type TacticalStateData
 } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
-import type { ActivityParticipationRepository } from '../repositories/activity-participation.repository'
-import type { ActivityRepository } from '../repositories/activity.repository'
+import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { KillRecordService } from './kill-record.service'
@@ -28,18 +27,16 @@ import * as tacticalDoctrine from '../utils/combat/tactical-doctrine'
 export class CombatService {
   constructor(
     private characterRepository: CharacterRepository,
-    private activityParticipationRepository: ActivityParticipationRepository,
+    private characterQuestRepository: CharacterQuestRepository,
     private combatEnemyRepository?: CombatEnemyRepository,
-    private activityRepository?: ActivityRepository,
     private killRecordService?: KillRecordService
   ) {}
 
   private get repos(): CombatRewardDeps {
     return {
       characterRepository: this.characterRepository,
-      activityParticipationRepository: this.activityParticipationRepository,
+      characterQuestRepository: this.characterQuestRepository,
       combatEnemyRepository: this.combatEnemyRepository,
-      activityRepository: this.activityRepository,
       killRecordService: this.killRecordService
     }
   }
@@ -82,18 +79,11 @@ export class CombatService {
 
     const currentClass = dice.getCurrentClassOrThrow(character)
 
-    // Check if there's an active tactical combat - use tactical state health if so
-    // Get the active activity ID from character data
-    const activeActivityId = (character.data as any)?.activeActivityId
-    let participation: { id: string; tacticalState: TacticalStateData | null } | null = null
-
-    if (activeActivityId) {
-      // Find participation for the active activity
-      participation = await this.activityParticipationRepository.findByCharacterAndActivity(
-        character.id,
-        activeActivityId
-      )
-    }
+    // Check if there's an active quest with a tactical combat state
+    const activeQuest = await this.characterQuestRepository.findActiveByCharacterId(character.id)
+    const participation: { id: string; tacticalState: TacticalStateData | null } | null = activeQuest
+      ? { id: activeQuest.id, tacticalState: activeQuest.tacticalState }
+      : null
 
     const playerUnit = participation?.tacticalState?.units?.find((u) => u.id.startsWith('player-'))
 
@@ -126,7 +116,7 @@ export class CombatService {
     )
 
     // Update tactical combat state if there's an active tactical combat
-    if (participation?.tacticalState?.units && playerUnit && healthRestored > 0) {
+    if (participation?.id && participation.tacticalState?.units && playerUnit && healthRestored > 0) {
       const units = [...participation.tacticalState.units]
       const playerUnitIndex = units.findIndex((u) => u.id.startsWith('player-'))
 
@@ -136,7 +126,7 @@ export class CombatService {
           currentHealth: Math.min(playerUnit.currentHealth + healthRestored, playerUnit.maxHealth)
         }
 
-        await this.activityParticipationRepository.updateTacticalState(participation.id, {
+        await this.characterQuestRepository.updateTacticalState(participation.id, {
           ...participation.tacticalState,
           units
         })
@@ -153,7 +143,7 @@ export class CombatService {
   async useDoctrine(
     userId: string,
     doctrineId: string,
-    participationId: string
+    questId: string
   ): Promise<{ success: boolean; effect: ActiveStatusEffect }> {
     const character = await this.characterRepository.findWithClassesOrThrow(userId)
     const currentClass = this.getCurrentClassOrThrow(character)
@@ -182,14 +172,14 @@ export class CombatService {
       currentClass.mana - doctrine.manaCost
     )
 
-    // Update activity participation state
-    const participation = await this.activityParticipationRepository.findByIdWithDoctrines(participationId)
+    // Update quest state
+    const quest = await this.characterQuestRepository.findByIdWithDoctrines(questId)
 
-    if (!participation) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Activity participation not found' })
+    if (!quest) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Quest not found' })
     }
 
-    const activeDoctrines = participation.activeDoctrines || {}
+    const activeDoctrines = quest.activeDoctrines || {}
 
     // Apply first effect as status (for status-applying doctrines) or as immediate effect
     const primaryEffect = doctrine.effects[0]
@@ -205,7 +195,7 @@ export class CombatService {
     } else {
       // Immediate effect doctrine - apply for 1 turn
       newStatusEffect = {
-        effect: StatusEffect.DOCTRINE_ACTIVE, // Placeholder for immediate effect doctrines
+        effect: StatusEffect.DOCTRINE_ACTIVE,
         remainingTurns: 1,
         sourceDoctrineId: doctrineId
       }
@@ -213,7 +203,7 @@ export class CombatService {
 
     activeDoctrines[doctrineId] = newStatusEffect
 
-    await this.activityParticipationRepository.updateActiveDoctrines(participationId, activeDoctrines)
+    await this.characterQuestRepository.updateActiveDoctrines(questId, activeDoctrines)
 
     return { success: true, effect: newStatusEffect }
   }
@@ -227,7 +217,7 @@ export class CombatService {
   }
 
   async executeTacticalAttack(
-    participationId: string,
+    questId: string,
     attackerId: string,
     targetId: string,
     attackerRolls: number[],
@@ -237,7 +227,7 @@ export class CombatService {
     attackCriticalThreshold: number = 6
   ): Promise<TacticalAttackResult> {
     return attackResolution.executeTacticalAttack(
-      participationId,
+      questId,
       attackerId,
       targetId,
       attackerRolls,
@@ -254,12 +244,12 @@ export class CombatService {
   // ============================================================
 
   async executeEnemyTurn(
-    participationId: string,
+    questId: string,
     enemyId: string,
     enemyAttackDice: number,
     enemyAttackThreshold: number
   ): Promise<EnemyTurnResult> {
-    return enemyAI.executeEnemyTurn(participationId, enemyId, enemyAttackDice, enemyAttackThreshold, this.repos)
+    return enemyAI.executeEnemyTurn(questId, enemyId, enemyAttackDice, enemyAttackThreshold, this.repos)
   }
 
   // ============================================================
@@ -267,7 +257,7 @@ export class CombatService {
   // ============================================================
 
   async executeTacticalDoctrine(
-    participationId: string,
+    questId: string,
     casterId: string,
     doctrineId: string,
     targeting: 'single' | 'all',
@@ -275,7 +265,7 @@ export class CombatService {
     casterMana: number
   ): Promise<TacticalDoctrineResult> {
     return tacticalDoctrine.executeTacticalDoctrine(
-      participationId,
+      questId,
       casterId,
       doctrineId,
       targeting,
@@ -286,7 +276,7 @@ export class CombatService {
   }
 
   async useSelfBuffDoctrine(
-    participationId: string,
+    questId: string,
     casterId: string,
     doctrineId: string,
     casterMana: number
@@ -298,7 +288,7 @@ export class CombatService {
     logEntries: CombatLogEntry[]
     updatedState: TacticalStateData
   }> {
-    return tacticalDoctrine.useSelfBuffDoctrine(participationId, casterId, doctrineId, casterMana, this.repos)
+    return tacticalDoctrine.useSelfBuffDoctrine(questId, casterId, doctrineId, casterMana, this.repos)
   }
 
   getActiveDoctrineBuffs(unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined, incomingHits?: number) {

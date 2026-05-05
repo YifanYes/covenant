@@ -76,15 +76,15 @@ export const invalidators = {
    * Invalidate combat-related queries.
    * Use after combat actions like attacks, moves, or enemy turns.
    */
-  combat: async (participationId?: string) => {
+  combat: async (questId?: string) => {
     const promises = [
-      queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() }),
+      queryClient.invalidateQueries({ queryKey: trpcOptions.quest.list.queryKey() }),
       queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
     ]
-    if (participationId) {
+    if (questId) {
       promises.push(
         queryClient.invalidateQueries({
-          queryKey: trpcOptions.activity.getTacticalState.queryKey({ participationId })
+          queryKey: trpcOptions.quest.getTacticalState.queryKey({ questId })
         })
       )
     }

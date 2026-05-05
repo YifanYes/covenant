@@ -2,7 +2,7 @@
 
 import { FactionThemeContext, useFactionThemeProvider } from '@/hooks/use-faction-theme'
 import { ThemeContext } from '@/hooks/use-theme'
-import { Faction } from '@shared/constants/activities'
+import { Faction } from '@shared/constants/factions'
 import { useLayoutEffect, useState } from 'react'
 
 export type Theme = 'light' | 'dark'

@@ -23,7 +23,7 @@ export async function executeEnemyTurn(
   repos: CombatStateRepos
 ): Promise<EnemyTurnResult> {
   // Get current tactical state
-  const participation = await repos.activityParticipationRepository.findByIdWithTacticalState(participationId)
+  const participation = await repos.characterQuestRepository.findByIdWithTacticalState(participationId)
 
   if (!participation) {
     throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
@@ -174,7 +174,7 @@ export async function executeEnemyTurn(
     }
 
     // Save state to database
-    await repos.activityParticipationRepository.updateTacticalState(participationId, state)
+    await repos.characterQuestRepository.updateTacticalState(participationId, state)
 
     // Save combat log
     if (repos.combatEnemyRepository && logEntries.length > 0) {
@@ -422,7 +422,7 @@ export async function executeEnemyTurn(
   }
 
   // Save state to database
-  await repos.activityParticipationRepository.updateTacticalState(participationId, state)
+  await repos.characterQuestRepository.updateTacticalState(participationId, state)
 
   // Sync player health to CharacterClass if player took damage from enemy attack
   if (attacked && damageDealt && damageDealt > 0 && participation.characterId) {

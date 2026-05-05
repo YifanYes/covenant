@@ -1566,6 +1566,9 @@
     "faction_theme_label": "Faction Theme",
     "title": "Settings"
   },
+  "nav": {
+    "quests": "Quests"
+  },
   "sidebar": {
     "calendar": "Calendar",
     "close": "Collapse menu",
@@ -1581,6 +1584,7 @@
     "productivity": "Productivity",
     "review": "Review",
     "rpg": "RPG",
+    "quests": "Quests",
     "settings": "Settings",
     "shop": "Shop",
     "tasks": "Tasks"
@@ -1825,6 +1829,46 @@
     "yifan": {
       "name": "Yifan Ye",
       "quote": "Ephesians 6, 10-17"
+    }
+  },
+  "quests": {
+    "title": "Quests",
+    "subtitle": "Choose your mission. Every victory shapes the war.",
+    "available": "Available Quests",
+    "active_quest": "Active Quest",
+    "start": "Start Quest",
+    "continue": "Continue Quest",
+    "already_active": "Complete active quest first",
+    "started": "Quest started!",
+    "not_found": "Quest not found",
+    "unknown": "Unknown Quest",
+    "objective": "Objective",
+    "reward": "Reward",
+    "kill_enemies": "Defeat {{count}} enemies",
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "abandoned": "Abandoned"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "normal": "Normal",
+      "hard": "Hard"
+    },
+    "error": {
+      "start": "Failed to start quest"
+    },
+    "patrol_north_gate": {
+      "name": "Patrol: North Gate",
+      "description": "Demons are testing the defenses at the north gate. Eliminate 5 threats to secure the perimeter."
+    },
+    "assault_the_harbor": {
+      "name": "Assault: The Harbor",
+      "description": "Bandits have seized the harbor. Root out 8 enemies and restore order to the docks."
+    },
+    "defend_the_southern_wall": {
+      "name": "Defense: Southern Wall",
+      "description": "A relentless demonic assault threatens the southern wall. Eliminate 10 attackers to hold the line."
     }
   }
 }

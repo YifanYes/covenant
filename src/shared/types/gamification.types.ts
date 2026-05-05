@@ -97,13 +97,6 @@ export interface CombatLogEntry {
   data: Record<string, unknown>
 }
 
-export const ActivityStatus = {
-  ACTIVE: 'ACTIVE',
-  COMPLETED: 'COMPLETED',
-  FAILED: 'FAILED'
-} as const
-export type ActivityStatus = (typeof ActivityStatus)[keyof typeof ActivityStatus]
-
 // Combat types
 export interface DiceRollResult {
   value: number
@@ -124,7 +117,7 @@ export interface ResolveCombatParams {
   weaponDamageType: WeaponDamageType
   weaponSpeed: number
   enemy: EnemyTemplate
-  participationId: string
+  questId: string
 }
 
 export interface CombatTurnResult {
@@ -179,7 +172,6 @@ export interface InventoryCharacter {
   currentClass: string
   data: Record<string, unknown>
   gold: number
-  maxDice: number
   tier: number
   inventory: InventoryItem[]
   loadout: InventoryItem[]

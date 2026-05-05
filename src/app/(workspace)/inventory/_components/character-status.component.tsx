@@ -100,7 +100,7 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
             <span className="text-sm font-medium">{t('inventory.dice_bank')}</span>
           </div>
           <span className="text-sm font-black text-purple-400/90">
-            {(character.data?.diceBank as number) || 0} / {character.maxDice || 10}
+            {(character.data?.diceBank as number) || 0}
           </span>
         </div>
       </CardContent>

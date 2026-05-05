@@ -16,9 +16,6 @@
 
 ## Low Priority
 
-- [x] Security: No Audit Logging
-  - **Fix:** Log auth events (login, session, account changes)
-
 - [ ] Security: No Account Lockout
   - **Fix:** Implement exponential backoff on failed logins
 

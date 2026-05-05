@@ -10,23 +10,15 @@ export class DiceService {
 
     if (!character) return { success: false, earned: 0 }
 
-    const { maxDice: maxCapacity, diceBank: currentDice } = getCharacterProgress(character)
-    const rawCharacterData = (character.data as any) || {}
-    const newDice = Math.min(currentDice + amount, maxCapacity)
-    const earned = newDice - currentDice
+    const { diceBank: currentDice } = getCharacterProgress(character)
+    const newDice = currentDice + amount
 
-    const newData = {
-      ...rawCharacterData,
-      diceBank: newDice
-    }
-
-    await this.characterRepository.updateCharacterData(character.id, newData)
+    await this.characterRepository.updateCharacterData(character.id, { diceBank: newDice })
 
     return {
       success: true,
-      earned,
-      total: newDice,
-      limitReached: newDice === maxCapacity && earned < amount
+      earned: amount,
+      total: newDice
     }
   }
 
@@ -39,18 +31,12 @@ export class DiceService {
     if (!character) return { success: false, consumed: 0, remaining: 0 }
 
     const { diceBank: currentDice } = getCharacterProgress(character)
-    const rawCharacterData = (character.data as any) || {}
 
     // Can only consume up to what's available
     const consumed = Math.min(amount, currentDice)
     const newDice = currentDice - consumed
 
-    const newData = {
-      ...rawCharacterData,
-      diceBank: newDice
-    }
-
-    await this.characterRepository.updateCharacterData(character.id, newData)
+    await this.characterRepository.updateCharacterData(character.id, { diceBank: newDice })
 
     return {
       success: true,
