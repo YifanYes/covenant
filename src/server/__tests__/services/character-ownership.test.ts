@@ -119,7 +119,7 @@ describe('Character Ownership Validation', () => {
         getActivities: vi.fn().mockResolvedValue([])
       }
 
-      // Simulate activity.list router pattern
+      // Simulate quest.list router pattern
       async function activityListHandler(inputCharacterId: string | undefined, inputUserId: string) {
         if (inputCharacterId) {
           const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
@@ -144,7 +144,7 @@ describe('Character Ownership Validation', () => {
         getActivities: vi.fn().mockResolvedValue([])
       }
 
-      // Simulate activity.list router pattern
+      // Simulate quest.list router pattern
       async function activityListHandler(inputCharacterId: string | undefined, inputUserId: string) {
         if (inputCharacterId) {
           const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)

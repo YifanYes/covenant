@@ -13,7 +13,7 @@ import Sidebar, {
   SidebarMenuItem,
   SidebarTrigger
 } from '@/ui/sidebar.component'
-import { BookOpen, Dashboard, List, Luggage, Map, Sliders, Store, Trophy } from '@nsmr/pixelart-react'
+import { BookOpen, Dashboard, List, Luggage, ScrollVertical, Sliders, Store, Trophy } from '@nsmr/pixelart-react'
 import Link from 'next/link'
 import { useSyncExternalStore, type ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -94,9 +94,9 @@ export default function AppSidebar() {
         icon: Luggage
       },
       {
-        title: t('sidebar.map'),
-        url: '/map',
-        icon: Map
+        title: t('sidebar.quests'),
+        url: '/quests',
+        icon: ScrollVertical
       },
       {
         title: t('sidebar.shop'),

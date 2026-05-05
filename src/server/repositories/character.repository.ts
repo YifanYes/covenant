@@ -1,5 +1,5 @@
 import { type Character, type PrismaClient } from '@/generated/prisma'
-import { Faction } from '@shared/constants/activities'
+import { Faction } from '@shared/constants/factions'
 import { CharacterClassName, CLASS_INITIAL_STATS } from '@shared/constants/classes'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
@@ -70,15 +70,6 @@ export class CharacterRepository {
       select: { userId: true }
     })
     return character?.userId === userId
-  }
-
-  async updateDiceBank(characterId: string, characterData: Record<string, unknown>, newDice: number): Promise<void> {
-    await this.prisma.character.update({
-      where: { id: characterId },
-      data: {
-        data: { ...characterData, diceBank: newDice }
-      }
-    })
   }
 
   async updateHealth(classId: string, health: number, mana: number): Promise<void> {

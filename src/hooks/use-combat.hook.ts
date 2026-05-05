@@ -13,7 +13,7 @@ export type CombatPhase = 'player_input' | 'animating' | 'enemy_turn' | 'victory
 
 export function useCombat(
   character: InventoryCharacter,
-  participationId: string,
+  questId: string,
   initialEnemies: EnemyState[],
   initialCombatLog: CombatLogEntry[],
   diceBank: number
@@ -27,7 +27,7 @@ export function useCombat(
 
   // Tactical state from server
   const { data: tacticalState } = useSuspenseQuery(
-    trpcOptions.activity.getTacticalState.queryOptions({ participationId })
+    trpcOptions.quest.getTacticalState.queryOptions({ questId })
   )
 
   // Local state derived from server + client
@@ -85,16 +85,16 @@ export function useCombat(
   }, [tacticalState]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const invalidateQueries = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: trpcOptions.activity.list.queryKey() })
+    queryClient.invalidateQueries({ queryKey: trpcOptions.quest.list.queryKey() })
     queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
     queryClient.invalidateQueries({
-      queryKey: trpcOptions.activity.getTacticalState.queryKey({ participationId })
+      queryKey: trpcOptions.quest.getTacticalState.queryKey({ questId })
     })
-  }, [participationId])
+  }, [questId])
 
   // ========== Attack Mutation ==========
   const attackMutation = useMutation(
-    trpcOptions.activity.executeTacticalAttack.mutationOptions({
+    trpcOptions.quest.executeTacticalAttack.mutationOptions({
       onSuccess: async (result) => {
         // Show attack animation
         await animations.playAttackAnimation()
@@ -168,7 +168,7 @@ export function useCombat(
 
   // ========== Enemy Turn Mutation ==========
   const enemyTurnMutation = useMutation(
-    trpcOptions.activity.executeTacticalEnemyTurn.mutationOptions({
+    trpcOptions.quest.executeTacticalEnemyTurn.mutationOptions({
       onSuccess: async (result) => {
         // Handle status effect damage
         if (result.statusEffectDamage && result.statusEffectDamage > 0) {
@@ -220,7 +220,7 @@ export function useCombat(
 
   // ========== Doctrine Mutation ==========
   const doctrineMutation = useMutation(
-    trpcOptions.activity.executeTacticalDoctrine.mutationOptions({
+    trpcOptions.quest.executeTacticalDoctrine.mutationOptions({
       onSuccess: async (result) => {
         if (!result.success) return
 
@@ -296,7 +296,7 @@ export function useCombat(
 
   // ========== Self-Buff Doctrine Mutation ==========
   const selfBuffMutation = useMutation(
-    trpcOptions.activity.useSelfBuffDoctrine.mutationOptions({
+    trpcOptions.quest.useSelfBuffDoctrine.mutationOptions({
       onSuccess: async (result) => {
         if (!result.success) return
 
@@ -321,7 +321,7 @@ export function useCombat(
 
   // ========== Potion Mutation ==========
   const potionMutation = useMutation(
-    trpcOptions.activity.usePotion.mutationOptions({
+    trpcOptions.quest.usePotion.mutationOptions({
       onSuccess: async (result) => {
         if (!result.success) return
 
@@ -373,7 +373,7 @@ export function useCombat(
       }
 
       attackMutation.mutate({
-        participationId,
+        questId,
         attackerId: playerUnit?.id ?? 'player-1',
         targetId,
         attackRolls,
@@ -383,7 +383,7 @@ export function useCombat(
         attackCriticalThreshold: 6
       })
     },
-    [attackRolls, defenseRolls, participationId, playerUnit?.id, attackMutation, t]
+    [attackRolls, defenseRolls, questId, playerUnit?.id, attackMutation, t]
   )
 
   const castDoctrine = useCallback(
@@ -398,13 +398,13 @@ export function useCombat(
 
       if (isSelfBuff) {
         selfBuffMutation.mutate({
-          participationId,
+          questId,
           casterId: playerUnit?.id ?? 'player-1',
           doctrineId
         })
       } else {
         doctrineMutation.mutate({
-          participationId,
+          questId,
           casterId: playerUnit?.id ?? 'player-1',
           doctrineId,
           targeting: doctrine.targeting ?? 'single',
@@ -412,14 +412,14 @@ export function useCombat(
         })
       }
     },
-    [participationId, playerUnit?.id, doctrineMutation, selfBuffMutation]
+    [questId, playerUnit?.id, doctrineMutation, selfBuffMutation]
   )
 
   const usePotion = useCallback(
     (consumableId: string) => {
-      potionMutation.mutate({ participationId, consumableId })
+      potionMutation.mutate({ questId, consumableId })
     },
-    [participationId, potionMutation]
+    [questId, potionMutation]
   )
 
   const selectDoctrine = useCallback(
@@ -466,7 +466,7 @@ export function useCombat(
 
         try {
           await enemyTurnMutation.mutateAsync({
-            participationId,
+            questId,
             enemyId: enemy.id,
             enemyAttackDice: template.attackDice,
             enemyAttackThreshold: 4

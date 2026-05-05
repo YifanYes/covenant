@@ -1,6 +1,6 @@
 import ThemeProvider, { Theme } from '@/components/common/theme-provider.component'
 import Toaster from '@/components/ui/toaster.component'
-import { Faction } from '@shared/constants/activities'
+import { Faction } from '@shared/constants/factions'
 import type { Metadata } from 'next'
 import { Cinzel, EB_Garamond, Geist, Geist_Mono } from 'next/font/google'
 import { cookies, headers } from 'next/headers'

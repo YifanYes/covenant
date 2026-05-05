@@ -59,7 +59,7 @@ export const createMockPrisma = (): MockPrismaClient => {
       update: vi.fn(),
       delete: vi.fn()
     },
-    activity: {
+    characterQuest: {
       findUnique: vi.fn(),
       findFirst: vi.fn(),
       findMany: vi.fn(),
@@ -68,14 +68,6 @@ export const createMockPrisma = (): MockPrismaClient => {
       delete: vi.fn()
     },
     combatEnemy: {
-      findUnique: vi.fn(),
-      findFirst: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn()
-    },
-    activityParticipation: {
       findUnique: vi.fn(),
       findFirst: vi.fn(),
       findMany: vi.fn(),
