@@ -29,7 +29,7 @@ export async function executeTacticalDoctrine(
   repos: CombatRewardDeps
 ): Promise<TacticalDoctrineResult> {
   // Get current tactical state
-  const participation = await repos.activityParticipationRepository.findByIdWithTacticalState(participationId)
+  const participation = await repos.characterQuestRepository.findByIdWithTacticalState(participationId)
 
   if (!participation) {
     throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
@@ -504,7 +504,7 @@ export async function executeTacticalDoctrine(
   }
 
   // Save tactical state to database
-  await repos.activityParticipationRepository.updateTacticalState(participationId, updatedState)
+  await repos.characterQuestRepository.updateTacticalState(participationId, updatedState)
 
   // Sync player health to CharacterClass if player's health changed (self-damage or healing)
   const playerHealthChanged =
@@ -613,7 +613,7 @@ export async function useSelfBuffDoctrine(
   }
 
   // Get current tactical state
-  const participation = await repos.activityParticipationRepository.findByIdWithTacticalState(participationId)
+  const participation = await repos.characterQuestRepository.findByIdWithTacticalState(participationId)
 
   if (!participation) {
     throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
@@ -750,7 +750,7 @@ export async function useSelfBuffDoctrine(
   }
 
   // Save tactical state to database
-  await repos.activityParticipationRepository.updateTacticalState(participationId, updatedState)
+  await repos.characterQuestRepository.updateTacticalState(participationId, updatedState)
 
   // Save combat log entries
   if (repos.combatEnemyRepository && logEntries.length > 0) {

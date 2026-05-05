@@ -4,7 +4,7 @@ import useFactionTheme from '@/hooks/use-faction-theme'
 import { cn } from '@/lib/cn.lib'
 import Label from '@/ui/label.component'
 import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
-import { Faction } from '@shared/constants/activities'
+import { Faction } from '@shared/constants/factions'
 import { useTranslation } from 'react-i18next'
 
 const FACTION_COLORS: Record<Faction, string> = {

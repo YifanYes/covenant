@@ -72,22 +72,22 @@ model Verification {
 }
 
 model Character {
-  id                      String                   @id @default(uuid()) @db.Uuid
-  name                    String                   @db.VarChar(255)
-  title                   String?                  @db.VarChar(255)
-  factionName             String                   @default("HOLY_KNIGHTS")
-  currentClass            String                   @db.VarChar(50)
-  data                    Json?                    @default("{\"diceBank\": 0}")
-  createdAt               DateTime                 @default(now()) @db.Timestamp(6)
-  updatedAt               DateTime                 @updatedAt @db.Timestamp(6)
-  userId                  String                   @unique
-  gold                    Int                      @default(0)
-  inventory               Json?                    @default("[]")
-  loadout                 Json?                    @default("[]")
-  magicNature             String?                  @db.VarChar(50)
-  user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  activityParticipations  ActivityParticipation[]
-  classes                 CharacterClass[]
+  id          String           @id @default(uuid()) @db.Uuid
+  name        String           @db.VarChar(255)
+  title       String?          @db.VarChar(255)
+  factionName String           @default("HOLY_KNIGHTS")
+  currentClass String          @db.VarChar(50)
+  data        Json?            @default("{\"diceBank\": 0}")
+  createdAt   DateTime         @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime         @updatedAt @db.Timestamp(6)
+  userId      String           @unique
+  gold        Int              @default(0)
+  inventory   Json?            @default("[]")
+  loadout     Json?            @default("[]")
+  magicNature String?          @db.VarChar(50)
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quests      CharacterQuest[]
+  classes     CharacterClass[]
 
   @@map("characters")
 }
@@ -115,62 +115,47 @@ model CharacterClass {
   @@map("character_classes")
 }
 
-model MapActivity {
-  id             String                  @id @default(uuid()) @db.Uuid
-  activityId     String                  @db.VarChar(255)
-  status         String                  @db.VarChar(20)
-  progress       Int                     @default(0)
-  target         Int
-  startedAt      DateTime                @default(now()) @db.Timestamp(6)
-  deadline       DateTime                @db.Timestamp(6)
-  completedAt    DateTime?               @db.Timestamp(6)
-  participations ActivityParticipation[]
-
-  @@index([status])
-  @@map("map_activities")
-}
-
-model CombatEnemy {
-  id              String                @id @default(uuid()) @db.Uuid
-  participationId String                @db.Uuid
-  templateId      String                @db.VarChar(255)
-  namePrefix      String                @db.VarChar(100)
-  nameSuffix      String                @db.VarChar(100)
-  maxHealth       Int
-  currentHealth   Int
-  status          String                @default("ACTIVE") @db.VarChar(20)
-  spawnedAt       DateTime              @default(now()) @db.Timestamp(6)
-  defeatedAt      DateTime?             @db.Timestamp(6)
-  turnsElapsed    Int                   @default(0)
-  damageDealt     Int                   @default(0)
-  damageTaken     Int                   @default(0)
-  criticalHits    Int                   @default(0)
-  combatLog       Json?                 @default("[]")
-  participation   ActivityParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
-
-  @@index([participationId])
-  @@map("combat_enemies")
-}
-
-model ActivityParticipation {
+model CharacterQuest {
   id                   String        @id @default(uuid()) @db.Uuid
-  activityId           String        @db.Uuid
   characterId          String        @db.Uuid
-  kills                Int           @default(0)
+  questId              String        @db.VarChar(255)
+  status               String        @db.VarChar(20)
+  progress             Int           @default(0)
+  target               Int
   goldEarned           Int           @default(0)
-  joinedAt             DateTime      @default(now()) @db.Timestamp(6)
-  lastCombatAt         DateTime?     @db.Timestamp(6)
+  startedAt            DateTime      @default(now()) @db.Timestamp(6)
+  completedAt          DateTime?     @db.Timestamp(6)
   activeDoctrines      Json?         @default("{}")
   enemyActiveDoctrines Json?         @default("{}")
   combatStats          Json?         @default("{}")
   tacticalState        Json?         @default("{}")
   enemies              CombatEnemy[]
-  activity             MapActivity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
   character            Character     @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
-  @@unique([activityId, characterId])
   @@index([characterId])
-  @@map("activity_participations")
+  @@map("character_quests")
+}
+
+model CombatEnemy {
+  id               String         @id @default(uuid()) @db.Uuid
+  characterQuestId String         @db.Uuid
+  templateId       String         @db.VarChar(255)
+  namePrefix       String         @db.VarChar(100)
+  nameSuffix       String         @db.VarChar(100)
+  maxHealth        Int
+  currentHealth    Int
+  status           String         @default("ACTIVE") @db.VarChar(20)
+  spawnedAt        DateTime       @default(now()) @db.Timestamp(6)
+  defeatedAt       DateTime?      @db.Timestamp(6)
+  turnsElapsed     Int            @default(0)
+  damageDealt      Int            @default(0)
+  damageTaken      Int            @default(0)
+  criticalHits     Int            @default(0)
+  combatLog        Json?          @default("[]")
+  characterQuest   CharacterQuest @relation(fields: [characterQuestId], references: [id], onDelete: Cascade)
+
+  @@index([characterQuestId])
+  @@map("combat_enemies")
 }
 
 model Objective {

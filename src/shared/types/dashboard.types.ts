@@ -3,7 +3,6 @@ export interface DashboardData {
   character: {
     gold: number
     diceBank: number
-    maxDice: number
     health: number
     mana: number
   } | null

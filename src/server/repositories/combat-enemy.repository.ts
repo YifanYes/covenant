@@ -10,26 +10,26 @@ export class CombatEnemyRepository {
     })
   }
 
-  async getActiveEnemy(participationId: string) {
+  async getActiveEnemy(characterQuestId: string) {
     return this.prisma.combatEnemy.findFirst({
       where: {
-        participationId,
+        characterQuestId,
         status: CombatEnemyStatus.ACTIVE
       }
     })
   }
 
-  async getEnemiesByParticipation(participationId: string) {
+  async getEnemiesByQuest(characterQuestId: string) {
     return this.prisma.combatEnemy.findMany({
-      where: { participationId },
+      where: { characterQuestId },
       orderBy: { spawnedAt: 'desc' }
     })
   }
 
-  async getDefeatedEnemies(participationId: string) {
+  async getDefeatedEnemies(characterQuestId: string) {
     return this.prisma.combatEnemy.findMany({
       where: {
-        participationId,
+        characterQuestId,
         status: CombatEnemyStatus.DEFEATED
       },
       orderBy: { defeatedAt: 'desc' }
@@ -37,7 +37,7 @@ export class CombatEnemyRepository {
   }
 
   async createEnemy(data: {
-    participationId: string
+    characterQuestId: string
     templateId: string
     namePrefix: string
     nameSuffix: string
@@ -46,7 +46,7 @@ export class CombatEnemyRepository {
   }) {
     return this.prisma.combatEnemy.create({
       data: {
-        participationId: data.participationId,
+        characterQuestId: data.characterQuestId,
         templateId: data.templateId,
         namePrefix: data.namePrefix,
         nameSuffix: data.nameSuffix,
@@ -126,7 +126,7 @@ export class CombatEnemyRepository {
   async getDefeatedEnemiesByCharacter(characterId: string, limit = 50, cursor?: string) {
     return this.prisma.combatEnemy.findMany({
       where: {
-        participation: {
+        characterQuest: {
           characterId
         },
         status: CombatEnemyStatus.DEFEATED
@@ -140,7 +140,7 @@ export class CombatEnemyRepository {
   async getKillStats(characterId: string) {
     const result = await this.prisma.combatEnemy.aggregate({
       where: {
-        participation: {
+        characterQuest: {
           characterId
         },
         status: CombatEnemyStatus.DEFEATED

@@ -35,7 +35,7 @@ export class CharacterService {
     const character = await this.characterRepository.findWithClasses(userId)
     if (!character) return null
 
-    const { maxDice, tier } = getCharacterProgress(character)
+    const { tier } = getCharacterProgress(character)
 
     return {
       id: character.id,
@@ -46,7 +46,6 @@ export class CharacterService {
       currentClass: character.currentClass,
       data: character.data as any,
       gold: character.gold,
-      maxDice,
       tier,
       inventory: character.inventory as unknown,
       loadout: character.loadout as unknown,

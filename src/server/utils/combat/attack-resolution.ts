@@ -62,7 +62,7 @@ export async function executeTacticalAttack(
   repos: CombatRewardDeps
 ): Promise<TacticalAttackResult> {
   // Get current tactical state
-  const participation = await repos.activityParticipationRepository.findByIdWithTacticalState(participationId)
+  const participation = await repos.characterQuestRepository.findByIdWithTacticalState(participationId)
 
   if (!participation) {
     throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
@@ -379,10 +379,10 @@ export async function executeTacticalAttack(
   }
 
   // Save tactical state to database
-  await repos.activityParticipationRepository.updateTacticalState(participationId, updatedState)
+  await repos.characterQuestRepository.updateTacticalState(participationId, updatedState)
 
   // Sync player health to CharacterClass if player took damage (thorns, self-damage from 1s)
-  if (damageToAttacker > 0 && attackerUnit.id.startsWith('player-') && participation.characterId) {
+  if (damageToAttacker > 0 && attackerUnit.id.startsWith('player-') && participation?.characterId) {
     const character = await repos.characterRepository.findByIdWithClasses(participation.characterId)
     if (character) {
       const currentClass = getCurrentClassOrThrow(character)

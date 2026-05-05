@@ -1,4 +1,4 @@
-import { getActivityById, selectEnemyWithFallback } from '@shared/constants/activities'
+import { getQuestById, selectEnemyWithFallback } from '@shared/constants/quests'
 import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
 import { applyStatScaling, calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
@@ -8,8 +8,7 @@ import {
   type TacticalStateData,
   type TacticalUnitState
 } from '@shared/types/tactical-combat.types'
-import type { ActivityParticipationRepository } from '../../repositories/activity-participation.repository'
-import type { ActivityRepository } from '../../repositories/activity.repository'
+import type { CharacterQuestRepository } from '../../repositories/character-quest.repository'
 import type { CharacterRepository } from '../../repositories/character.repository'
 import type { CombatEnemyRepository } from '../../repositories/combat-enemy.repository'
 import type { KillRecordService } from '../../services/kill-record.service'
@@ -17,13 +16,12 @@ import type { KillRecordService } from '../../services/kill-record.service'
 /** Minimal repo set used by functions that only read/write combat state (no reward processing). */
 export interface CombatStateRepos {
   characterRepository: CharacterRepository
-  activityParticipationRepository: ActivityParticipationRepository
+  characterQuestRepository: CharacterQuestRepository
   combatEnemyRepository?: CombatEnemyRepository
 }
 
 /** Extended repo set for functions that also process rewards, gold, and tier progression. */
 export interface CombatRewardDeps extends CombatStateRepos {
-  activityRepository?: ActivityRepository
   killRecordService?: KillRecordService
 }
 
@@ -43,11 +41,11 @@ export interface EnemyDefeatResult {
 }
 
 /**
- * Process enemy defeat: award gold, materials, check tier progression, spawn next enemy.
+ * Process enemy defeat: award gold, check tier progression, spawn next enemy.
  * Unified logic extracted from executeTacticalAttack and executeTacticalDoctrine.
  */
 export async function processEnemyDefeat(
-  participationId: string,
+  questId: string,
   updatedState: TacticalStateData,
   killedEnemyIds: string[],
   repos: CombatRewardDeps
@@ -60,7 +58,7 @@ export async function processEnemyDefeat(
     return result
   }
 
-  let activeEnemy = await repos.combatEnemyRepository.getActiveEnemy(participationId)
+  let activeEnemy = await repos.combatEnemyRepository.getActiveEnemy(questId)
 
   // Fallback: if no active enemy found by status, try finding by ID from tactical state
   if (!activeEnemy) {
@@ -81,126 +79,110 @@ export async function processEnemyDefeat(
     result.goldReward = calculateGoldReward(enemyTemplate)
   }
 
-  if (!repos.activityRepository) return result
+  // Update quest progress (kills + gold)
+  await repos.characterQuestRepository.updateProgress(questId, 1, result.goldReward)
 
-  // Update participation stats (kills, gold)
-  await repos.activityRepository.updateParticipation(participationId, 1, result.goldReward)
-
-  // Get participation to find the activity
-  const participation = await repos.activityParticipationRepository.findByIdWithActivity(participationId)
+  // Get the quest to find character and quest template
+  const quest = await repos.characterQuestRepository.findById(questId)
+  if (!quest) return result
 
   // Add gold to character's balance
-  if (participation?.characterId && result.goldReward > 0) {
-    await repos.characterRepository.addGold(participation.characterId, result.goldReward)
+  if (result.goldReward > 0) {
+    await repos.characterRepository.addGold(quest.characterId, result.goldReward)
   }
 
   // Check tier progression after enemy defeat
-  if (participation?.characterId && repos.killRecordService) {
-    const tierResult = await repos.killRecordService.checkAndApplyTierProgressionByCharacterId(
-      participation.characterId
-    )
+  if (repos.killRecordService) {
+    const tierResult = await repos.killRecordService.checkAndApplyTierProgressionByCharacterId(quest.characterId)
     if (tierResult.tierChanged) {
       result.tierProgression = { oldTier: tierResult.oldTier, newTier: tierResult.newTier }
     }
   }
 
-  if (participation?.activityId) {
-    // Update activity progress
-    await repos.activityRepository.updateProgress(participation.activityId, 1)
+  // Reload updated quest to get the latest progress
+  const updatedQuest = await repos.characterQuestRepository.findById(questId)
+  if (!updatedQuest) return result
 
-    // Get activity config to spawn next enemy
-    const activity = await repos.activityRepository.getActivityById(participation.activityId)
-    if (activity) {
-      const config = getActivityById(activity.activityId)
+  const isQuestCompleted = updatedQuest.progress >= updatedQuest.target
 
-      // Check if activity is complete (progress was already incremented by updateProgress)
-      const isActivityCompleted = activity.progress >= activity.target
+  if (isQuestCompleted) {
+    await repos.characterQuestRepository.complete(questId)
+    return result
+  }
 
-      if (!isActivityCompleted && config) {
-        // Get character tier for encounter system
-        const character = await repos.characterRepository.findByIdWithClasses(participation.characterId)
-        const currentClass = character?.classes.find((c) => c.className === character.currentClass)
-        const characterTier = currentClass?.tier || 1
+  // Quest not complete — spawn next enemy
+  const questTemplate = getQuestById(quest.questId)
+  if (!questTemplate) return result
 
-        // Get or update encounter state
-        const combatStats = await repos.activityParticipationRepository.getCombatStats(participationId)
-        let encounterState = combatStats as EncounterState | null
+  // Get character tier for encounter system
+  const character = await repos.characterRepository.findByIdWithClasses(quest.characterId)
+  const currentClass = character?.classes.find((c) => c.className === character.currentClass)
+  const characterTier = currentClass?.tier || 1
 
-        if (encounterState && encounterState.encounterPattern) {
-          const newIndex = encounterState.encounterIndex + 1
-          if (newIndex >= encounterState.encounterPattern.length) {
-            // Sequence complete, generate new pattern
-            const newPattern = generateEncounterSequence(characterTier)
-            encounterState = {
-              encounterPattern: newPattern,
-              encounterIndex: 0,
-              sessionStartedAt: new Date().toISOString()
-            }
-          } else {
-            encounterState = {
-              ...encounterState,
-              encounterIndex: newIndex
-            }
-          }
-        } else {
-          // Initialize encounter state if not present
-          const newPattern = generateEncounterSequence(characterTier)
-          encounterState = {
-            encounterPattern: newPattern,
-            encounterIndex: 0,
-            sessionStartedAt: new Date().toISOString()
-          }
-        }
+  // Get or update encounter state
+  const combatStats = await repos.characterQuestRepository.getCombatStats(questId)
+  let encounterState = combatStats as EncounterState | null
 
-        await repos.activityParticipationRepository.updateCombatStats(participationId, encounterState)
-
-        // Get the current encounter slot
-        const currentSlot = getNextEncounterSlot(encounterState.encounterPattern, encounterState.encounterIndex)
-        const requiredType = currentSlot?.type
-
-        // Select enemy with fallback chain
-        const selected = selectEnemyWithFallback(config.enemySpawnWeights, characterTier, requiredType)
-
-        if (selected) {
-          // Apply stat scaling if character tier > enemy tier
-          const scaledTemplate = applyStatScaling(selected.template, characterTier)
-
-          const nameKeys = generateEnemyNameKeys(scaledTemplate.type)
-          const newEnemy = await repos.combatEnemyRepository!.createEnemy({
-            participationId,
-            templateId: selected.enemyId,
-            namePrefix: nameKeys.prefix,
-            nameSuffix: nameKeys.suffix,
-            maxHealth: scaledTemplate.health,
-            currentHealth: scaledTemplate.health
-          })
-
-          const newEnemyName = `${nameKeys.prefix}|${nameKeys.suffix}`
-
-          result.nextEnemy = {
-            id: newEnemy.id,
-            templateId: selected.enemyId,
-            name: newEnemyName,
-            currentHealth: scaledTemplate.health,
-            maxHealth: scaledTemplate.health
-          }
-
-          // Reinitialize tactical state with new enemy
-          const playerUnit = updatedState.units.find((u) => u.id.startsWith('player-'))
-          if (playerUnit) {
-            const newTacticalState = createTacticalStateWithNewEnemy(
-              updatedState,
-              playerUnit,
-              newEnemy.id,
-              newEnemyName,
-              { current: scaledTemplate.health, max: scaledTemplate.health }
-            )
-            await repos.activityParticipationRepository.updateTacticalState(participationId, newTacticalState)
-          }
-        }
-      } else if (isActivityCompleted) {
-        await repos.activityRepository.completeActivity(participation.activityId)
+  if (encounterState && encounterState.encounterPattern) {
+    const newIndex = encounterState.encounterIndex + 1
+    if (newIndex >= encounterState.encounterPattern.length) {
+      const newPattern = generateEncounterSequence(characterTier)
+      encounterState = {
+        encounterPattern: newPattern,
+        encounterIndex: 0,
+        sessionStartedAt: new Date().toISOString()
       }
+    } else {
+      encounterState = { ...encounterState, encounterIndex: newIndex }
+    }
+  } else {
+    const newPattern = generateEncounterSequence(characterTier)
+    encounterState = {
+      encounterPattern: newPattern,
+      encounterIndex: 0,
+      sessionStartedAt: new Date().toISOString()
+    }
+  }
+
+  await repos.characterQuestRepository.updateCombatStats(questId, encounterState)
+
+  const currentSlot = getNextEncounterSlot(encounterState.encounterPattern, encounterState.encounterIndex)
+  const selected = selectEnemyWithFallback(questTemplate.enemySpawnWeights, characterTier, currentSlot?.type)
+
+  if (selected) {
+    const scaledTemplate = applyStatScaling(selected.template, characterTier)
+    const nameKeys = generateEnemyNameKeys(scaledTemplate.type)
+
+    const newEnemy = await repos.combatEnemyRepository!.createEnemy({
+      characterQuestId: questId,
+      templateId: selected.enemyId,
+      namePrefix: nameKeys.prefix,
+      nameSuffix: nameKeys.suffix,
+      maxHealth: scaledTemplate.health,
+      currentHealth: scaledTemplate.health
+    })
+
+    const newEnemyName = `${nameKeys.prefix}|${nameKeys.suffix}`
+
+    result.nextEnemy = {
+      id: newEnemy.id,
+      templateId: selected.enemyId,
+      name: newEnemyName,
+      currentHealth: scaledTemplate.health,
+      maxHealth: scaledTemplate.health
+    }
+
+    // Reinitialize tactical state with new enemy
+    const playerUnit = updatedState.units.find((u) => u.id.startsWith('player-'))
+    if (playerUnit) {
+      const newTacticalState = createTacticalStateWithNewEnemy(
+        updatedState,
+        playerUnit,
+        newEnemy.id,
+        newEnemyName,
+        { current: scaledTemplate.health, max: scaledTemplate.health }
+      )
+      await repos.characterQuestRepository.updateTacticalState(questId, newTacticalState)
     }
   }
 
@@ -218,14 +200,12 @@ export function createTacticalStateWithNewEnemy(
   newEnemyName: string,
   newEnemyHealth: { current: number; max: number }
 ): TacticalStateData {
-  // Create updated player unit with reset turn flags
   const updatedPlayerUnit: TacticalUnitState = {
     ...playerUnit,
     hasMoved: false,
     hasActed: false
   }
 
-  // Create new enemy unit (no position needed)
   const newEnemyUnit: TacticalUnitState = {
     id: newEnemyId,
     name: newEnemyName,

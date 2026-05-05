@@ -21,7 +21,7 @@ interface CombatArenaProps {
   enemies: EnemyState[]
   combatLog: CombatLogEntry[]
   diceBank: number
-  participationId: string
+  questId: string
   failureText?: string
   className?: string
 }
@@ -31,14 +31,14 @@ export default function CombatArena({
   enemies,
   combatLog,
   diceBank,
-  participationId,
+  questId,
   failureText,
   className
 }: CombatArenaProps) {
   const { t } = useTranslation()
   const router = useRouter()
 
-  const combat = useCombat(character, participationId, enemies, combatLog, diceBank)
+  const combat = useCombat(character, questId, enemies, combatLog, diceBank)
 
   const handleTargetSelect = (targetIdOrAll: string) => {
     if (combat.selectedDoctrineId) {
@@ -134,7 +134,7 @@ export default function CombatArena({
             <AlertDialogDescription>{t('combat.result_dialog.success_description')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => router.push('/map')}>
+            <AlertDialogAction onClick={() => router.push('/quests')}>
               {t('combat.result_dialog.continue')}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -151,7 +151,7 @@ export default function CombatArena({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => router.push('/map')}>
+            <AlertDialogAction onClick={() => router.push('/quests')}>
               {t('combat.death_dialog.continue')}
             </AlertDialogAction>
           </AlertDialogFooter>

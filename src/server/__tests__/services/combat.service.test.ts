@@ -13,7 +13,7 @@ import { CombatService } from '../../services/combat.service'
 describe('CombatService', () => {
   let combatService: CombatService
   let mockCharacterRepo: any
-  let mockActivityParticipationRepo: any
+  let mockCharacterQuestRepo: any
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -26,7 +26,7 @@ describe('CombatService', () => {
       updateInventoryAndLoadout: vi.fn()
     }
 
-    mockActivityParticipationRepo = {
+    mockCharacterQuestRepo = {
       findById: vi.fn(),
       findByIdWithDoctrines: vi.fn(),
       updateDoctrines: vi.fn(),
@@ -34,7 +34,7 @@ describe('CombatService', () => {
     }
 
     // Inject the mock repositories directly
-    combatService = new CombatService(mockCharacterRepo, mockActivityParticipationRepo)
+    combatService = new CombatService(mockCharacterRepo, mockCharacterQuestRepo)
   })
 
   describe('dice mechanics', () => {
@@ -149,16 +149,16 @@ describe('CombatService', () => {
         findById: vi.fn().mockResolvedValue(null)
       }
 
-      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
         id: 'test-participation',
         tacticalState: createTacticalState()
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       // Create combat service with mock repos
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
-        mockActivityParticipationRepo,
+        mockCharacterQuestRepo,
         mockCombatEnemyRepo as any
       )
 
@@ -493,15 +493,15 @@ describe('CombatService', () => {
         appendToCombatLog: vi.fn()
       }
 
-      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
         id: 'test-participation',
         tacticalState: createTacticalStateWithDoctrines()
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
-        mockActivityParticipationRepo,
+        mockCharacterQuestRepo,
         mockCombatEnemyRepo as any
       )
 
@@ -539,15 +539,15 @@ describe('CombatService', () => {
         appendToCombatLog: vi.fn()
       }
 
-      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
         id: 'test-participation',
         tacticalState: stateWithDefenseDoctrines
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
-        mockActivityParticipationRepo,
+        mockCharacterQuestRepo,
         mockCombatEnemyRepo as any
       )
 
@@ -584,15 +584,15 @@ describe('CombatService', () => {
         appendToCombatLog: vi.fn()
       }
 
-      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
         id: 'test-participation',
         tacticalState: stateWithThresholdMod
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
-        mockActivityParticipationRepo,
+        mockCharacterQuestRepo,
         mockCombatEnemyRepo as any
       )
 
@@ -620,15 +620,15 @@ describe('CombatService', () => {
         appendToCombatLog: vi.fn()
       }
 
-      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
         id: 'test-participation',
         tacticalState: createTacticalStateWithDoctrines()
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
-        mockActivityParticipationRepo,
+        mockCharacterQuestRepo,
         mockCombatEnemyRepo as any
       )
 
@@ -646,7 +646,7 @@ describe('CombatService', () => {
       expect(result.success).toBe(true)
 
       // Check that updateTacticalState was called and doctrines were cleared
-      const updateCall = mockActivityParticipationRepo.updateTacticalState.mock.calls[0]
+      const updateCall = mockCharacterQuestRepo.updateTacticalState.mock.calls[0]
       const updatedState = updateCall[1]
       const playerUnit = updatedState.units.find((u: any) => u.id === 'player-1')
 
@@ -712,15 +712,15 @@ describe('CombatService', () => {
         appendToCombatLog: vi.fn()
       }
 
-      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
         id: 'test-participation',
         tacticalState: createTacticalState()
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
-        mockActivityParticipationRepo,
+        mockCharacterQuestRepo,
         mockCombatEnemyRepo as any
       )
 
@@ -744,15 +744,15 @@ describe('CombatService', () => {
         findById: vi.fn().mockResolvedValue(null)
       }
 
-      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
         id: 'test-participation',
         tacticalState: createTacticalState()
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
-        mockActivityParticipationRepo,
+        mockCharacterQuestRepo,
         mockCombatEnemyRepo as any
       )
 
@@ -792,15 +792,15 @@ describe('CombatService', () => {
         findById: vi.fn().mockResolvedValue(null)
       }
 
-      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
         id: 'test-participation',
         tacticalState: stateWithDeadEnemy
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
-        mockActivityParticipationRepo,
+        mockCharacterQuestRepo,
         mockCombatEnemyRepo as any
       )
 
@@ -833,15 +833,15 @@ describe('CombatService', () => {
         findById: vi.fn().mockResolvedValue(null)
       }
 
-      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
         id: 'test-participation',
         tacticalState: stateWithWeakEnemy
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
-        mockActivityParticipationRepo,
+        mockCharacterQuestRepo,
         mockCombatEnemyRepo as any
       )
 
@@ -876,15 +876,15 @@ describe('CombatService', () => {
         findById: vi.fn().mockResolvedValue(null)
       }
 
-      mockActivityParticipationRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
         id: 'test-participation',
         tacticalState: createTacticalState()
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
-        mockActivityParticipationRepo,
+        mockCharacterQuestRepo,
         mockCombatEnemyRepo as any
       )
 
@@ -922,7 +922,7 @@ describe('CombatService', () => {
       id: 'char-1',
       name: 'Test Character',
       currentClass: 'knight',
-      data: { activeActivityId: 'activity-1' },
+      data: { diceBank: 0 },
       inventory,
       loadout: [],
       classes: [
@@ -1000,7 +1000,7 @@ describe('CombatService', () => {
       mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(createMockCharacter(5, 10, 5, 10, inventory))
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
-      mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue(null)
+      mockCharacterQuestRepo.findActiveByCharacterId = vi.fn().mockResolvedValue(null)
 
       const result = await combatService.useConsumable('user-1', 'health_potion')
 
@@ -1022,11 +1022,13 @@ describe('CombatService', () => {
       mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(createMockCharacter(5, 10, 5, 10, inventory))
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
-      mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findActiveByCharacterId = vi.fn().mockResolvedValue({
         id: 'participation-1',
+        characterId: 'char-1',
+        questId: 'patrol_north_gate',
         tacticalState: createTacticalStateForConsumable(3, 10) // Player has 3/10 HP in tactical state
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const result = await combatService.useConsumable('user-1', 'health_potion')
 
@@ -1034,8 +1036,8 @@ describe('CombatService', () => {
       expect(result.healthRestored).toBe(3) // health_potion restores 3 HP
 
       // Should update tactical state with new health
-      expect(mockActivityParticipationRepo.updateTacticalState).toHaveBeenCalled()
-      const updateCall = mockActivityParticipationRepo.updateTacticalState.mock.calls[0]
+      expect(mockCharacterQuestRepo.updateTacticalState).toHaveBeenCalled()
+      const updateCall = mockCharacterQuestRepo.updateTacticalState.mock.calls[0]
       const updatedState = updateCall[1]
       const playerUnit = updatedState.units.find((u: any) => u.id === 'player-1')
       expect(playerUnit.currentHealth).toBe(6) // 3 + 3 = 6
@@ -1055,7 +1057,7 @@ describe('CombatService', () => {
         .mockResolvedValue(createMockCharacter(10, 10, 2, 10, inventory))
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
-      mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue(null)
+      mockCharacterQuestRepo.findActiveByCharacterId = vi.fn().mockResolvedValue(null)
 
       const result = await combatService.useConsumable('user-1', 'mana_potion')
 
@@ -1078,7 +1080,7 @@ describe('CombatService', () => {
       )
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
-      mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue(null)
+      mockCharacterQuestRepo.findActiveByCharacterId = vi.fn().mockResolvedValue(null)
 
       const result = await combatService.useConsumable('user-1', 'health_potion')
 
@@ -1101,7 +1103,7 @@ describe('CombatService', () => {
       )
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
-      mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue(null)
+      mockCharacterQuestRepo.findActiveByCharacterId = vi.fn().mockResolvedValue(null)
 
       const result = await combatService.useConsumable('user-1', 'health_potion')
 
@@ -1131,7 +1133,7 @@ describe('CombatService', () => {
       mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(createMockCharacter(5, 10, 5, 10, inventory))
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
-      mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue(null)
+      mockCharacterQuestRepo.findActiveByCharacterId = vi.fn().mockResolvedValue(null)
 
       await combatService.useConsumable('user-1', 'health_potion')
 
@@ -1155,11 +1157,13 @@ describe('CombatService', () => {
       mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue(createMockCharacter(8, 10, 5, 10, inventory))
       mockCharacterRepo.updateHealth = vi.fn()
       mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
-      mockActivityParticipationRepo.findByCharacterAndActivity = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findActiveByCharacterId = vi.fn().mockResolvedValue({
         id: 'participation-1',
+        characterId: 'char-1',
+        questId: 'patrol_north_gate',
         tacticalState: createTacticalStateForConsumable(3, 10) // Player has 3/10 HP
       })
-      mockActivityParticipationRepo.updateTacticalState = vi.fn()
+      mockCharacterQuestRepo.updateTacticalState = vi.fn()
 
       const result = await combatService.useConsumable('user-1', 'health_potion')
 
