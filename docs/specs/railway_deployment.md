@@ -19,8 +19,8 @@
 NEXT_PUBLIC_API_URL=https://api.arq-game.com
 ```
 
-5. Go to **Settings → Networking** and add custom domain `arq-game.com`
-6. Click **Deploy**
+1. Go to **Settings → Networking** and add custom domain `arq-game.com`
+2. Click **Deploy**
 
 ## 3. Link Custom Domains
 

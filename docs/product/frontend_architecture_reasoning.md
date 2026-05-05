@@ -6,7 +6,7 @@ This document provides a detailed comparison of the frontend architectural shift
 
 ### Legacy vs. New Patterns
 
-| Feature          | Legacy (Before)     | New Covenant (After)              | Rationale & Significance                                                                                                                                                                                         |
+| Feature          | Legacy (Before)     | New Covenant (After)         | Rationale & Significance                                                                                                                                                                                         |
 | :--------------- | :------------------ | :--------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Organization** | Unified Large Files | **4-Subdomain Pattern**      | **Reasoning**: Reduces cognitive load by separating presentation (`*.component`), logic (`*.utils`), types (`*.model`), and constants (`*.config`). This prevents "mega-files" and makes bugs easier to isolate. |
 | **Naming**       | Generic Naming      | **Subdomain Suffixes**       | **Reasoning**: Ensures unique file names in the global namespace. Typing `dashboard.page` or `auth.store` in an IDE allows for instant navigation without name collisions.                                       |

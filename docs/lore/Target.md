@@ -2,7 +2,7 @@
 
 Este mapa de empatía profundiza en la psicología de nuestro usuario objetivo para ARQ.
 
-## 👤 Perfil: Alex, 26 años.
+## 👤 Perfil: Alex, 26 años
 
 Ocupación: Junior Dev / Estudiante de Posgrado / Freelance.
 Contexto: Siente que pierde el tiempo en redes sociales y le cuesta mantener el foco. Le encantan los retos difíciles en los videojuegos (Elden Ring, Darkest Dungeon).

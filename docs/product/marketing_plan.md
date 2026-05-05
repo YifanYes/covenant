@@ -117,12 +117,12 @@ Landing page / Reddit post / Twitter
 
 **Secuencia de emails:**
 
-| Email | Timing            | Contenido                                           |
-| ----- | ----------------- | --------------------------------------------------- |
-| #1    | Inmediato         | Bienvenida + link Discord + qué esperar             |
+| Email | Timing            | Contenido                                                |
+| ----- | ----------------- | -------------------------------------------------------- |
+| #1    | Inmediato         | Bienvenida + link Discord + qué esperar                  |
 | #2    | +3 días           | La visión de Covenant: por qué existe, qué lo diferencia |
-| #3    | +7 días           | Preview de gameplay / screenshots                   |
-| #4    | Cuando hay acceso | Invitación a beta con instrucciones                 |
+| #3    | +7 días           | Preview de gameplay / screenshots                        |
+| #4    | Cuando hay acceso | Invitación a beta con instrucciones                      |
 
 **Herramientas:** Zoho Mail (contratado). Para el funnel de 4 emails de la secuencia de bienvenida, usarías Zoho Campaigns (incluido en varios planes de Zoho):
 
@@ -197,7 +197,7 @@ Twitter es el mejor canal para "building in public" porque el formato favorece u
 | Devlog update    | 2x/semana    | "Esta semana implementé el sistema de facciones..." |
 | Screenshot/GIF   | 1x/semana    | UI, animaciones, gameplay                           |
 | Pregunta genuina | 1x/semana    | "¿Qué prefieren: XP por tareas o por rachas?"       |
-| Hilo de insight  | 1x/2 semanas | Algo que aprendiste construyendo Covenant                |
+| Hilo de insight  | 1x/2 semanas | Algo que aprendiste construyendo Covenant           |
 
 **Regla 80/20:** 80% valor puro (insights, preguntas, compartir conocimiento), 20% mención directa de Covenant. Pero incluso el 20% debe ser interesante por sí mismo, no un "descarga mi app".
 
