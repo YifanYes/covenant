@@ -38,6 +38,7 @@ function getParsedHeadersLang(acceptLang: string | null) {
 }
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://covenantrpg.com'),
   title: 'Covenant - Gamified Productivity',
   description: 'Level up your productivity with Covenant',
   icons: { icon: '/covenant-logo.svg' }
