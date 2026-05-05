@@ -8,7 +8,22 @@
 
 - [ ] Hacer que el token de autenticación nunca expire.
 
+- [ ] Simple feature flag
+  - Enable controlled rollout of new features without redeployments
+
+- [ ] Observability
+  - Logging, metrics, and tracing for backend services and frontend errors
+
 ## Medium Priority
+
+- [ ] Post-its board / card view in productivity section
+  - Kanban-style card view as an alternative layout for tasks in the productivity area
+
+- [ ] Journaling module
+  - Daily/free-form journal entries linked to tasks, habits, and quests
+
+- [ ] Automatic inference of area
+  - Infer task/habit area from content using heuristics or AI classification
 
 - [ ] Security: Error Messages Leak Resource Existence
   - Multiple service files
@@ -34,6 +49,9 @@
 - [ ] Combat: Race - Enemy Turn Guard
   - `use-tactical-enemy-turn.hook.ts:29-31`
   - **Fix:** Use state flag + ref together; debounce effect
+
+- [ ] AI report of the month
+  - Monthly AI-generated summary of user productivity, habit streaks, and progress toward objectives
 
 - [ ] Combat: Race - Async State Access
   - `use-tactical-enemy-turn.hook.ts:34`
