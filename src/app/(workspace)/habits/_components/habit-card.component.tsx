@@ -5,7 +5,7 @@ import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/t
 import { invalidators } from '@/utils/query-invalidation.utils'
 import { getRewardText } from '@/utils/text.utils'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import { Check, Code, Loader } from '@nsmr/pixelart-react'
+import { Check, Braces as Code, Loader } from 'pixelarticons/react'
 import { HabitTimespan } from '@shared/schemas/habits.schemas'
 import { useMutation } from '@tanstack/react-query'
 import type { OpUnitType } from 'dayjs'

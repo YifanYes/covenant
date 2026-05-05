@@ -1,5 +1,5 @@
 'use client'
-import { ChevronDown, ChevronLeft, ChevronRight } from '@nsmr/pixelart-react'
+import { ChevronDown, ChevronLeft, ChevronRight } from 'pixelarticons/react'
 import * as React from 'react'
 import { DayButton, DayPicker, getDefaultClassNames } from 'react-day-picker'
 

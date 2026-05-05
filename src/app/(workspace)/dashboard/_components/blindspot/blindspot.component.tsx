@@ -1,5 +1,5 @@
 'use client'
-import { Alert, BullseyeArrow, Trophy } from '@nsmr/pixelart-react'
+import { SquareAlert, Target, Trophy } from 'pixelarticons/react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper.component'
@@ -21,7 +21,7 @@ export default function BlindspotComponent({ areas, objectives }: BlindspotCompo
   return (
     <DashboardSectionWrapperComponent
       title={`${t('dashboard.blindspot.title')} (${t('dashboard.blindspot.without_activity')})`}
-      icon={Alert}
+      icon={SquareAlert}
       iconColorClass="text-destructive"
       className="lg:col-span-2"
       contentClassName={hasAnyBlindspots ? 'grid gap-4 sm:grid-cols-2' : 'flex items-center justify-center'}
@@ -39,7 +39,7 @@ export default function BlindspotComponent({ areas, objectives }: BlindspotCompo
           </div>
           <div className="border-border bg-card/20 flex max-h-50 flex-col rounded-lg border px-4 py-3">
             <div className="text-foreground mb-2 flex shrink-0 items-center gap-2 text-sm font-bold">
-              <BullseyeArrow className="h-4 w-4" />
+              <Target className="h-4 w-4" />
               {t('dashboard.blindspot.objectives')}
             </div>
             <div className="scrollbar-thin scrollbar-thumb-muted h-full overflow-y-auto">

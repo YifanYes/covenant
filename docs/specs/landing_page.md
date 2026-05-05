@@ -94,6 +94,7 @@ Presenta la experiencia RPG personal: avatar, estadísticas y habilidades.
 ### Grid de Estadísticas
 
 Cards con iconos mostrando las 4 estadísticas:
+
 - **STR** (Trophy)
 - **MAG** (Zap)
 - **HP** (Heart)
@@ -119,12 +120,12 @@ El loop de juego completo: dados → misiones → combate → recompensas.
 
 **Tabla de dados (dentro de la card):**
 
-| Clave i18n                                    | Dados |
-| --------------------------------------------- | ----- |
-| `landing.combat.dice.table.daily_habit`       | 2     |
-| `landing.combat.dice.table.high_impact_task`  | 4     |
-| `landing.combat.dice.table.completed_objective` | 6   |
-| `landing.combat.dice.table.habit_streak`      | 5     |
+| Clave i18n                                      | Dados |
+| ----------------------------------------------- | ----- |
+| `landing.combat.dice.table.daily_habit`         | 2     |
+| `landing.combat.dice.table.high_impact_task`    | 4     |
+| `landing.combat.dice.table.completed_objective` | 6     |
+| `landing.combat.dice.table.habit_streak`        | 5     |
 
 ### Misiones y Aventuras
 
@@ -154,14 +155,14 @@ El loop de juego completo: dados → misiones → combate → recompensas.
 
 **Iconos utilizados:** BookOpen, Gamepad, Trophy, Users, Calendar, Zap (de @nsmr/pixelart-react)
 
-| Feature | Icono | Claves i18n |
-| ------- | ----- | ----------- |
-| Journaling | BookOpen | `landing.coming_soon.features.journaling.title/description` |
-| PvP | Gamepad | `landing.coming_soon.features.pvp.title/description` |
-| Leaderboards | Trophy | `landing.coming_soon.features.leaderboards.title/description` |
-| Co-op | Users | `landing.coming_soon.features.coop.title/description` |
-| Seasonal | Calendar | `landing.coming_soon.features.seasonal.title/description` |
-| Scaling | Zap | `landing.coming_soon.features.scaling.title/description` |
+| Feature      | Icono    | Claves i18n                                                   |
+| ------------ | -------- | ------------------------------------------------------------- |
+| Journaling   | BookOpen | `landing.coming_soon.features.journaling.title/description`   |
+| PvP          | Gamepad  | `landing.coming_soon.features.pvp.title/description`          |
+| Leaderboards | Trophy   | `landing.coming_soon.features.leaderboards.title/description` |
+| Co-op        | Users    | `landing.coming_soon.features.coop.title/description`         |
+| Seasonal     | Calendar | `landing.coming_soon.features.seasonal.title/description`     |
+| Scaling      | Zap      | `landing.coming_soon.features.scaling.title/description`      |
 
 ---
 
@@ -189,6 +190,7 @@ El loop de juego completo: dados → misiones → combate → recompensas.
 **Visual:** Fondo card con borde superior. Contenido centrado.
 
 **Elementos:**
+
 - Logo "Covenant" en texto primario
 - Separador decorativo
 - Copyright dinámico con año actual
@@ -197,15 +199,15 @@ El loop de juego completo: dados → misiones → combate → recompensas.
 
 ## Resumen de Estructura
 
-| Bloque                | Componente                  | Propósito                | CTAs                    | Estado |
-| --------------------- | --------------------------- | ------------------------ | ----------------------- | ------ |
-| A. Hero               | `HeroSection`               | Captura de atención      | `/sign-up`              | ✅     |
-| B. Propuesta          | `ValuePropositionSection`   | Diferenciación           | —                       | ✅     |
-| C. Productividad      | `ProductivitySection`       | Features de gestión      | —                       | ✅     |
-| D. Tu Personaje       | `CharacterSection`          | Experiencia RPG personal | —                       | ✅     |
-| E. Sistema de Combate | `CombatSection`             | Loop de juego            | —                       | ✅     |
-| F. Próximamente       | `ComingSoonSection`         | Roadmap / FOMO           | —                       | ✅     |
-| G. Cierre + H. Footer | `ClosingAndFooterSection`   | Conversión final         | `/sign-up`              | ✅     |
+| Bloque                | Componente                | Propósito                | CTAs       | Estado |
+| --------------------- | ------------------------- | ------------------------ | ---------- | ------ |
+| A. Hero               | `HeroSection`             | Captura de atención      | `/sign-up` | ✅     |
+| B. Propuesta          | `ValuePropositionSection` | Diferenciación           | —          | ✅     |
+| C. Productividad      | `ProductivitySection`     | Features de gestión      | —          | ✅     |
+| D. Tu Personaje       | `CharacterSection`        | Experiencia RPG personal | —          | ✅     |
+| E. Sistema de Combate | `CombatSection`           | Loop de juego            | —          | ✅     |
+| F. Próximamente       | `ComingSoonSection`       | Roadmap / FOMO           | —          | ✅     |
+| G. Cierre + H. Footer | `ClosingAndFooterSection` | Conversión final         | `/sign-up` | ✅     |
 
 ---
 
@@ -214,6 +216,7 @@ El loop de juego completo: dados → misiones → combate → recompensas.
 **Archivo:** `front/app/(landing)/page.tsx`
 
 **Características:**
+
 - Scroll snap vertical (`snap-y snap-mandatory`)
 - Cada sección ocupa altura mínima de pantalla (`min-h-screen`)
 - i18n vía `react-i18next` con hook `useTranslation()`
@@ -221,6 +224,12 @@ El loop de juego completo: dados → misiones → combate → recompensas.
 - Componentes UI reutilizables: Button, Card, Separator
 
 **Componentes importados:**
+-react`
+
+- Componentes UI reutilizables: Button, Card, Separator
+
+**Componentes importados:**
+
 ```tsx
 import Button from '@/components/ui/button.component'
 import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.component'

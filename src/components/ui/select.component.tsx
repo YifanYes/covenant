@@ -1,6 +1,6 @@
 'use client'
 import { cn } from '@/lib/cn.lib'
-import { Check, ChevronDown, ChevronUp } from '@nsmr/pixelart-react'
+import { Check, ChevronDown, ChevronUp } from 'pixelarticons/react'
 import * as SelectPrimitive from '@radix-ui/react-select'
 import * as React from 'react'
 

@@ -1,6 +1,6 @@
 'use client'
 import { cn } from '@/lib/cn.lib'
-import { Bullseye, Heart, Shield, Trophy } from '@nsmr/pixelart-react'
+import { Target as Bullseye, Heart, Shield, Trophy } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 
 interface KillRecordStatsProps {

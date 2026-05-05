@@ -3,23 +3,23 @@
 import Button from '@/components/ui/button.component'
 import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.component'
 import Separator from '@/components/ui/separator.component'
+import Link from 'next/link'
 import {
   BookOpen,
-  Bullseye,
+  Bulletlist,
   Calendar,
   Flag,
   Gamepad,
   Heart,
-  List,
   Repeat,
+  Settings2,
   Shield,
-  Sliders,
+  Target,
   Trophy,
   User,
   Users,
   Zap
-} from '@nsmr/pixelart-react'
-import Link from 'next/link'
+} from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 
 function HeroSection() {
@@ -74,7 +74,7 @@ function ProductivitySection() {
 
   const features = [
     {
-      icon: List,
+      icon: Bulletlist,
       title: t('landing.productivity.tasks.title'),
       body: t('landing.productivity.tasks.body')
     },
@@ -84,7 +84,7 @@ function ProductivitySection() {
       body: t('landing.productivity.habits.body')
     },
     {
-      icon: Bullseye,
+      icon: Target,
       title: t('landing.productivity.goals.title'),
       body: t('landing.productivity.goals.body')
     }
@@ -121,7 +121,7 @@ function CharacterSection() {
 
   const features = [
     {
-      icon: Sliders,
+      icon: Settings2,
       title: t('landing.character.stats.title'),
       body: t('landing.character.stats.body')
     },

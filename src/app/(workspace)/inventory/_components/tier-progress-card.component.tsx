@@ -2,7 +2,7 @@
 import { Progress } from '@/components/ui/progress.component'
 import { cn } from '@/lib/cn.lib'
 import { trpcOptions } from '@/utils/trpc.utils'
-import { Shield, Trophy } from '@nsmr/pixelart-react'
+import { Shield, Trophy } from 'pixelarticons/react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 

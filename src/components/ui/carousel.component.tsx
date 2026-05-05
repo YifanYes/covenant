@@ -5,7 +5,7 @@ import * as React from 'react'
 
 import { cn } from '@/lib/cn.lib'
 import Button from '@/ui/button.component'
-import { ArrowLeft, ArrowRight } from '@nsmr/pixelart-react'
+import { ArrowLeft, ArrowRight } from 'pixelarticons/react'
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>

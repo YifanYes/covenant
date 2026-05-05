@@ -510,6 +510,7 @@ Use `arctic` library for OAuth providers (Google, GitHub, etc.) without Supabase
    ```
 
 2. **Remove Supabase dependencies**:
+
    ```bash
    bun remove @supabase/supabase-js
    ```

@@ -1,5 +1,5 @@
 'use client'
-import { DragAndDrop } from '@nsmr/pixelart-react'
+import { MoreVertical as DragAndDrop } from 'pixelarticons/react'
 
 const TaskSkeleton = () => (
   <li className="group border-input flex items-center gap-3 border-b p-3 px-2 last:border-b-0">

@@ -16,20 +16,20 @@ A daily journaling system with a markdown editor, mood tracking, periodic review
 
 12 emotion-based moods, each with an emoji, color, and i18n key:
 
-| Mood ID        | Emoji | Color (hex) | EN Label      | ES Label       |
-| -------------- | ----- | ----------- | ------------- | -------------- |
-| `happy`        | 😊    | `#FFD700`   | Happy         | Feliz          |
-| `sad`          | 😢    | `#4682B4`   | Sad           | Triste         |
-| `angry`        | 😠    | `#DC143C`   | Angry         | Enfadado       |
-| `disappointed` | 😞    | `#8B7D6B`   | Disappointed  | Decepcionado   |
-| `focused`      | 🎯    | `#228B22`   | Focused       | Concentrado    |
-| `hopeful`      | 🌟    | `#FF8C00`   | Hopeful       | Esperanzado    |
-| `depressed`    | 😔    | `#483D8B`   | Depressed     | Deprimido      |
-| `calm`         | 😌    | `#5F9EA0`   | Calm          | Tranquilo      |
-| `anxious`      | 😰    | `#B22222`   | Anxious       | Ansioso        |
-| `excited`      | 🤩    | `#FF4500`   | Excited       | Emocionado     |
-| `grateful`     | 🙏    | `#DAA520`   | Grateful      | Agradecido     |
-| `tired`        | 😴    | `#708090`   | Tired         | Cansado        |
+| Mood ID        | Emoji | Color (hex) | EN Label     | ES Label     |
+| -------------- | ----- | ----------- | ------------ | ------------ |
+| `happy`        | 😊    | `#FFD700`   | Happy        | Feliz        |
+| `sad`          | 😢    | `#4682B4`   | Sad          | Triste       |
+| `angry`        | 😠    | `#DC143C`   | Angry        | Enfadado     |
+| `disappointed` | 😞    | `#8B7D6B`   | Disappointed | Decepcionado |
+| `focused`      | 🎯    | `#228B22`   | Focused      | Concentrado  |
+| `hopeful`      | 🌟    | `#FF8C00`   | Hopeful      | Esperanzado  |
+| `depressed`    | 😔    | `#483D8B`   | Depressed    | Deprimido    |
+| `calm`         | 😌    | `#5F9EA0`   | Calm         | Tranquilo    |
+| `anxious`      | 😰    | `#B22222`   | Anxious      | Ansioso      |
+| `excited`      | 🤩    | `#FF4500`   | Excited      | Emocionado   |
+| `grateful`     | 🙏    | `#DAA520`   | Grateful     | Agradecido   |
+| `tired`        | 😴    | `#708090`   | Tired        | Cansado      |
 
 Stored as a constant array in `shared/constants/journal.constants.ts`.
 
@@ -39,16 +39,16 @@ Stored as a constant array in `shared/constants/journal.constants.ts`.
 
 ### Prompt Categories (5 prompts each)
 
-| Category       | Example Prompt (EN)                                           |
-| -------------- | ------------------------------------------------------------- |
-| `gratitude`    | "What are three things you're grateful for today?"            |
-| `reflection`   | "What moment from today will you remember most?"              |
-| `growth`       | "What skill or habit did you work on today?"                  |
-| `challenges`   | "What was the hardest part of your day and how did you cope?" |
-| `goals`        | "What is one step you took today toward a long-term goal?"    |
-| `emotions`     | "What emotion dominated your day and why?"                    |
-| `relationships`| "Who made an impact on your day and how?"                     |
-| `creativity`   | "If today were a chapter in a book, what would the title be?" |
+| Category        | Example Prompt (EN)                                           |
+| --------------- | ------------------------------------------------------------- |
+| `gratitude`     | "What are three things you're grateful for today?"            |
+| `reflection`    | "What moment from today will you remember most?"              |
+| `growth`        | "What skill or habit did you work on today?"                  |
+| `challenges`    | "What was the hardest part of your day and how did you cope?" |
+| `goals`         | "What is one step you took today toward a long-term goal?"    |
+| `emotions`      | "What emotion dominated your day and why?"                    |
+| `relationships` | "Who made an impact on your day and how?"                     |
+| `creativity`    | "If today were a chapter in a book, what would the title be?" |
 
 All 40 prompts are defined in `shared/constants/journal-prompts.constants.ts` with i18n keys following the pattern `journaling.prompts.<category>.<index>` (e.g., `journaling.prompts.gratitude.0`).
 
@@ -58,12 +58,12 @@ Journaling integrates with the existing `DiceService` for gamification rewards.
 
 ### Entry Rewards
 
-| Action                | Base Dice | Notes                               |
-| --------------------- | --------- | ----------------------------------- |
-| Daily journal entry   | 1         | One reward per calendar day         |
-| Weekly review         | 2         | Server-enforced 7-day cooldown      |
-| Monthly review        | 4         | Server-enforced 30-day cooldown     |
-| Annual review         | 6         | Server-enforced 365-day cooldown    |
+| Action              | Base Dice | Notes                            |
+| ------------------- | --------- | -------------------------------- |
+| Daily journal entry | 1         | One reward per calendar day      |
+| Weekly review       | 2         | Server-enforced 7-day cooldown   |
+| Monthly review      | 4         | Server-enforced 30-day cooldown  |
+| Annual review       | 6         | Server-enforced 365-day cooldown |
 
 ### Streak Bonuses
 
@@ -104,6 +104,7 @@ Reviews are special journal entries with a `type` field (`weekly`, `monthly`, `a
 Each review type pre-fills the markdown editor with a template:
 
 **Weekly Review Template:**
+
 ```markdown
 ## Weekly Review
 
@@ -117,6 +118,7 @@ Each review type pre-fills the markdown editor with a template:
 ```
 
 **Monthly Review Template:**
+
 ```markdown
 ## Monthly Review
 
@@ -132,6 +134,7 @@ Each review type pre-fills the markdown editor with a template:
 ```
 
 **Annual Review Template:**
+
 ```markdown
 ## Annual Review
 
@@ -154,11 +157,11 @@ Templates are stored as constants in `shared/constants/journal-templates.constan
 
 Server-enforced minimum intervals between reviews of the same type:
 
-| Review Type | Cooldown | Validation                                              |
-| ----------- | -------- | ------------------------------------------------------- |
-| `weekly`    | 7 days   | Last weekly review `createdAt` must be 7+ days ago      |
-| `monthly`   | 30 days  | Last monthly review `createdAt` must be 30+ days ago    |
-| `annual`    | 365 days | Last annual review `createdAt` must be 365+ days ago    |
+| Review Type | Cooldown | Validation                                           |
+| ----------- | -------- | ---------------------------------------------------- |
+| `weekly`    | 7 days   | Last weekly review `createdAt` must be 7+ days ago   |
+| `monthly`   | 30 days  | Last monthly review `createdAt` must be 30+ days ago |
+| `annual`    | 365 days | Last annual review `createdAt` must be 365+ days ago |
 
 The service throws a `TRPCError` with code `TOO_MANY_REQUESTS` if the cooldown hasn't elapsed. The client disables the review button and shows the remaining cooldown time.
 
@@ -176,6 +179,7 @@ Surfaces a random past journal entry for the user to re-read. Designed to spark 
 ### Implementation
 
 The repository query:
+
 ```sql
 WHERE userId = ? AND createdAt < NOW() - INTERVAL '7 days'
   AND (lastCapsuleViewedAt IS NULL OR lastCapsuleViewedAt < NOW() - INTERVAL '30 days')
@@ -234,6 +238,7 @@ model JournalEntry {
 ```
 
 Key decisions:
+
 - `mood` is a nullable varchar matching mood IDs from the constants (not a Prisma enum, to avoid migrations when adding moods)
 - `type` defaults to `"entry"` for daily entries; reviews use `"weekly"`, `"monthly"`, `"annual"`
 - `lastCapsuleViewedAt` tracks when the entry was last surfaced via time capsule
@@ -242,38 +247,38 @@ Key decisions:
 
 ### New Files
 
-| File                                              | Purpose                                        |
-| ------------------------------------------------- | ---------------------------------------------- |
-| `shared/constants/journal.constants.ts`           | Mood definitions (id, emoji, color)            |
-| `shared/constants/journal-prompts.constants.ts`   | 40 prompts across 8 categories with i18n keys  |
-| `shared/constants/journal-templates.constants.ts` | Review templates (weekly/monthly/annual)        |
-| `shared/schemas/journal.schemas.ts`               | Zod schemas for create/update/query             |
-| `shared/types/journal.types.ts`                   | TypeScript types inferred from schemas          |
-| `server/repositories/journal.repository.ts`       | Prisma queries for journal entries              |
-| `server/services/journal.service.ts`              | Business logic, streaks, rewards, cooldowns     |
-| `server/routers/journal.router.ts`                | tRPC endpoints                                  |
-| `server/__tests__/journal.service.test.ts`        | Service unit tests                              |
-| `front/app/(workspace)/journaling/page.tsx`       | Main journaling page                            |
-| `front/app/(workspace)/journaling/_components/journal-editor.component.tsx`   | Markdown editor + mood selector    |
-| `front/app/(workspace)/journaling/_components/mood-calendar.component.tsx`    | Monthly mood grid                  |
-| `front/app/(workspace)/journaling/_components/mood-mosaic.component.tsx`      | Yearly mosaic with share           |
-| `front/app/(workspace)/journaling/_components/review-panel.component.tsx`     | Review creation with templates     |
-| `front/app/(workspace)/journaling/_components/time-capsule.component.tsx`     | Random past entry viewer           |
-| `front/app/(workspace)/journaling/_components/habit-calendar.component.tsx`   | Read-only habit completion grid    |
-| `front/app/(workspace)/journaling/_components/journal-prompt.component.tsx`   | Random prompt button + display     |
-| `front/app/(workspace)/journaling/_components/entry-list.component.tsx`       | Past entries list with search      |
+| File                                                                        | Purpose                                       |
+| --------------------------------------------------------------------------- | --------------------------------------------- |
+| `shared/constants/journal.constants.ts`                                     | Mood definitions (id, emoji, color)           |
+| `shared/constants/journal-prompts.constants.ts`                             | 40 prompts across 8 categories with i18n keys |
+| `shared/constants/journal-templates.constants.ts`                           | Review templates (weekly/monthly/annual)      |
+| `shared/schemas/journal.schemas.ts`                                         | Zod schemas for create/update/query           |
+| `shared/types/journal.types.ts`                                             | TypeScript types inferred from schemas        |
+| `server/repositories/journal.repository.ts`                                 | Prisma queries for journal entries            |
+| `server/services/journal.service.ts`                                        | Business logic, streaks, rewards, cooldowns   |
+| `server/routers/journal.router.ts`                                          | tRPC endpoints                                |
+| `server/__tests__/journal.service.test.ts`                                  | Service unit tests                            |
+| `front/app/(workspace)/journaling/page.tsx`                                 | Main journaling page                          |
+| `front/app/(workspace)/journaling/_components/journal-editor.component.tsx` | Markdown editor + mood selector               |
+| `front/app/(workspace)/journaling/_components/mood-calendar.component.tsx`  | Monthly mood grid                             |
+| `front/app/(workspace)/journaling/_components/mood-mosaic.component.tsx`    | Yearly mosaic with share                      |
+| `front/app/(workspace)/journaling/_components/review-panel.component.tsx`   | Review creation with templates                |
+| `front/app/(workspace)/journaling/_components/time-capsule.component.tsx`   | Random past entry viewer                      |
+| `front/app/(workspace)/journaling/_components/habit-calendar.component.tsx` | Read-only habit completion grid               |
+| `front/app/(workspace)/journaling/_components/journal-prompt.component.tsx` | Random prompt button + display                |
+| `front/app/(workspace)/journaling/_components/entry-list.component.tsx`     | Past entries list with search                 |
 
 ### Files to Modify
 
-| File                                           | Change                                       |
-| ---------------------------------------------- | -------------------------------------------- |
-| `server/prisma/schema.prisma`                  | Add `JournalEntry` model                     |
-| `server/services/service.factory.ts`           | Register `JournalService` (Layer 2: repo + dice) |
-| `server/router.ts`                             | Register `journalingRouter`                  |
-| `shared/constants/dice.constants.ts`           | Add `JOURNAL_DICE_REWARDS` and `JOURNAL_STREAK_THRESHOLDS` |
-| `front/components/common/app-sidebar.component.tsx` | Add journaling nav item to productivity section |
-| `front/public/locales/en/translation.json`     | Add journaling i18n keys                     |
-| `front/public/locales/es/translation.json`     | Add journaling i18n keys (Spanish)           |
+| File                                                | Change                                                     |
+| --------------------------------------------------- | ---------------------------------------------------------- |
+| `server/prisma/schema.prisma`                       | Add `JournalEntry` model                                   |
+| `server/services/service.factory.ts`                | Register `JournalService` (Layer 2: repo + dice)           |
+| `server/router.ts`                                  | Register `journalingRouter`                                |
+| `shared/constants/dice.constants.ts`                | Add `JOURNAL_DICE_REWARDS` and `JOURNAL_STREAK_THRESHOLDS` |
+| `front/components/common/app-sidebar.component.tsx` | Add journaling nav item to productivity section            |
+| `front/public/locales/en/translation.json`          | Add journaling i18n keys                                   |
+| `front/public/locales/es/translation.json`          | Add journaling i18n keys (Spanish)                         |
 
 ### tRPC Endpoints
 
@@ -365,8 +370,18 @@ class JournalRepository {
 import { z } from 'zod'
 
 export const MOOD_IDS = [
-  'happy', 'sad', 'angry', 'disappointed', 'focused', 'hopeful',
-  'depressed', 'calm', 'anxious', 'excited', 'grateful', 'tired'
+  'happy',
+  'sad',
+  'angry',
+  'disappointed',
+  'focused',
+  'hopeful',
+  'depressed',
+  'calm',
+  'anxious',
+  'excited',
+  'grateful',
+  'tired'
 ] as const
 
 export const REVIEW_TYPES = ['weekly', 'monthly', 'annual'] as const
@@ -439,6 +454,13 @@ cd front && pnpm add @uiw/react-md-editor
 ```
 
 The editor renders in the "Write" tab with:
+
+```bash
+cd front && pnpm add @uiw/react-md-editor
+```
+
+The editor renders in the "Write" tab with:
+
 - Toolbar: bold, italic, headings, lists, quote
 - Preview toggle (write / preview / split)
 - Mood selector dropdown below the editor
@@ -770,42 +792,42 @@ Uses the `Feather` icon from `@nsmr/pixelart-react` (or closest available writin
 
 ### Phase 2: Repository & Service
 
-6. Implement `JournalRepository` with all query methods
-7. Implement `JournalService` with business logic, streak calculation, and cooldown enforcement
-8. Register `JournalService` in service factory (Layer 2: repo + dice)
+1. Implement `JournalRepository` with all query methods
+2. Implement `JournalService` with business logic, streak calculation, and cooldown enforcement
+3. Register `JournalService` in service factory (Layer 2: repo + dice)
 
 ### Phase 3: Router & Endpoints
 
-9. Implement `journalingRouter` with all 12 endpoints
-10. Register router in `server/router.ts`
-11. Add i18n keys to both locale files
+1. Implement `journalingRouter` with all 12 endpoints
+2. Register router in `server/router.ts`
+3. Add i18n keys to both locale files
 
 ### Phase 4: Frontend — Write Tab
 
-12. Install `@uiw/react-md-editor`
-13. Create journaling page with tab layout
-14. Implement `JournalEditor` component with markdown editor and mood selector
-15. Implement `JournalPrompt` component
-16. Implement `EntryList` component
-17. Add sidebar navigation link
+1. Install `@uiw/react-md-editor`
+2. Create journaling page with tab layout
+3. Implement `JournalEditor` component with markdown editor and mood selector
+4. Implement `JournalPrompt` component
+5. Implement `EntryList` component
+6. Add sidebar navigation link
 
 ### Phase 5: Frontend — Calendar Tab
 
-18. Implement `MoodCalendar` component (monthly mood grid)
-19. Implement `MoodMosaic` component (yearly canvas + share)
-20. Implement `HabitCalendar` component (read-only habit grid)
+1. Implement `MoodCalendar` component (monthly mood grid)
+2. Implement `MoodMosaic` component (yearly canvas + share)
+3. Implement `HabitCalendar` component (read-only habit grid)
 
 ### Phase 6: Frontend — Reviews & Time Capsule
 
-21. Implement `ReviewPanel` component with templates and cooldown display
-22. Implement `TimeCapsule` component
+1. Implement `ReviewPanel` component with templates and cooldown display
+2. Implement `TimeCapsule` component
 
 ### Phase 7: Testing & Polish
 
-23. Write service unit tests (`server/__tests__/journal.service.test.ts`)
-24. Manual testing of all flows
-25. UI polish and responsive design
-26. Verify i18n in both languages
+1. Write service unit tests (`server/__tests__/journal.service.test.ts`)
+2. Manual testing of all flows
+3. UI polish and responsive design
+4. Verify i18n in both languages
 
 ## Future Expansion
 

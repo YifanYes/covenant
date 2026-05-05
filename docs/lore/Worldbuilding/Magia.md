@@ -20,33 +20,33 @@ Los elementos son los ladrillos de la creación. Aunque son neutrales en esencia
 
 Cada elemento común tiene 2–3 fortalezas y 2–3 debilidades. Luz y Oscuridad tienen 3 de cada una (incluyendo su ventaja mutua).
 
-| Atacante ↓ / Defensor → | Fuego | Agua | Hielo | Tierra | Rayo | Aire | Mente | Metal | Luz | Oscuridad |
-| :-- | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
-| **Fuego** | — | ✗ | **✓** | · | · | **✓** | ✗ | · | ✗ | · |
-| **Agua** | **✓** | — | ✗ | **✓** | ✗ | · | · | · | **✓** | · |
-| **Hielo** | ✗ | **✓** | — | · | · | · | **✓** | ✗ | ✗ | · |
-| **Tierra** | · | ✗ | · | — | **✓** | · | ✗ | **✓** | **✓** | · |
-| **Rayo** | · | **✓** | · | ✗ | — | **✓** | · | ✗ | · | **✓** |
-| **Aire** | ✗ | · | · | · | ✗ | — | **✓** | **✓** | · | ✗ |
-| **Mente** | **✓** | · | ✗ | **✓** | · | ✗ | — | · | · | ✗ |
-| **Metal** | · | · | **✓** | ✗ | **✓** | ✗ | · | — | · | **✓** |
-| **Luz** | **✓** | ✗ | **✓** | ✗ | · | · | · | · | — | **✓** |
-| **Oscuridad** | · | · | · | · | ✗ | **✓** | **✓** | ✗ | **✓** | — |
+| Atacante ↓ / Defensor → | Fuego | Agua  | Hielo | Tierra | Rayo  | Aire  | Mente | Metal |  Luz  | Oscuridad |
+| :---------------------- | :---: | :---: | :---: | :----: | :---: | :---: | :---: | :---: | :---: | :-------: |
+| **Fuego**               |   —   |   ✗   | **✓** |   ·    |   ·   | **✓** |   ✗   |   ·   |   ✗   |     ·     |
+| **Agua**                | **✓** |   —   |   ✗   | **✓**  |   ✗   |   ·   |   ·   |   ·   | **✓** |     ·     |
+| **Hielo**               |   ✗   | **✓** |   —   |   ·    |   ·   |   ·   | **✓** |   ✗   |   ✗   |     ·     |
+| **Tierra**              |   ·   |   ✗   |   ·   |   —    | **✓** |   ·   |   ✗   | **✓** | **✓** |     ·     |
+| **Rayo**                |   ·   | **✓** |   ·   |   ✗    |   —   | **✓** |   ·   |   ✗   |   ·   |   **✓**   |
+| **Aire**                |   ✗   |   ·   |   ·   |   ·    |   ✗   |   —   | **✓** | **✓** |   ·   |     ✗     |
+| **Mente**               | **✓** |   ·   |   ✗   | **✓**  |   ·   |   ✗   |   —   |   ·   |   ·   |     ✗     |
+| **Metal**               |   ·   |   ·   | **✓** |   ✗    | **✓** |   ✗   |   ·   |   —   |   ·   |   **✓**   |
+| **Luz**                 | **✓** |   ✗   | **✓** |   ✗    |   ·   |   ·   |   ·   |   ·   |   —   |   **✓**   |
+| **Oscuridad**           |   ·   |   ·   |   ·   |   ·    |   ✗   | **✓** | **✓** |   ✗   | **✓** |     —     |
 
 > **✓** = Ventaja / ✗ = Desventaja / · = Neutral
 
-| Elemento | Fuerte contra | Débil contra | Justificación |
-| :-- | :-- | :-- | :-- |
-| **Fuego** | Hielo, Aire | Agua, Mente, Luz | Derrite el hielo y consume el oxígeno; el agua lo apaga, la disciplina mental lo sofoca y la luz pura lo eclipsa. |
-| **Agua** | Fuego, Tierra, Luz | Hielo, Rayo | Extingue las llamas y erosiona la roca; refracta y dispersa la luz; el frío la congela y el rayo la electrifica. |
-| **Hielo** | Agua, Mente | Fuego, Metal, Luz | Congela el agua y paraliza el pensamiento; el fuego lo derrite, el metal lo quiebra y la calidez de la luz lo disuelve. |
-| **Tierra** | Rayo, Metal, Luz | Agua, Mente | Absorbe la electricidad y sepulta el metal; su masa bloquea y absorbe la luz; el agua la erosiona y la voluntad mueve montañas. |
-| **Rayo** | Agua, Aire, Oscuridad | Tierra, Metal | Electrifica el agua y desgarra la atmósfera; su destello fulminante rasga las tinieblas; la tierra lo absorbe y el metal lo conduce a tierra. |
-| **Aire** | Mente, Metal | Fuego, Rayo, Oscuridad | Dispersa la concentración y corroe el metal; el fuego devora el oxígeno, el rayo domina los cielos y la oscuridad sofoca el viento. |
-| **Mente** | Fuego, Tierra | Hielo, Aire, Oscuridad | La disciplina controla el caos y la voluntad mueve la materia; el frío paraliza el pensamiento, el viento lo dispersa y la oscuridad abruma con lo desconocido. |
-| **Metal** | Hielo, Rayo, Oscuridad | Tierra, Aire | Rompe el hielo y actúa como pararrayos; su solidez inerte resiste la entropía oscura; la tierra lo reclama y el viento lo corroe. |
-| **Luz** | Fuego, Hielo, Oscuridad | Agua, Tierra, Oscuridad | Eclipsa las llamas y su calidez derrite el hielo; el agua la refracta y la tierra sólida la bloquea. Mutuamente fuerte con Oscuridad. |
-| **Oscuridad** | Mente, Aire, Luz | Rayo, Metal, Luz | El terror de lo desconocido abruma la mente y sofoca el viento; el relámpago desgarra las tinieblas y el metal resiste la entropía. Mutuamente fuerte con Luz. |
+| Elemento      | Fuerte contra           | Débil contra            | Justificación                                                                                                                                                   |
+| :------------ | :---------------------- | :---------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Fuego**     | Hielo, Aire             | Agua, Mente, Luz        | Derrite el hielo y consume el oxígeno; el agua lo apaga, la disciplina mental lo sofoca y la luz pura lo eclipsa.                                               |
+| **Agua**      | Fuego, Tierra, Luz      | Hielo, Rayo             | Extingue las llamas y erosiona la roca; refracta y dispersa la luz; el frío la congela y el rayo la electrifica.                                                |
+| **Hielo**     | Agua, Mente             | Fuego, Metal, Luz       | Congela el agua y paraliza el pensamiento; el fuego lo derrite, el metal lo quiebra y la calidez de la luz lo disuelve.                                         |
+| **Tierra**    | Rayo, Metal, Luz        | Agua, Mente             | Absorbe la electricidad y sepulta el metal; su masa bloquea y absorbe la luz; el agua la erosiona y la voluntad mueve montañas.                                 |
+| **Rayo**      | Agua, Aire, Oscuridad   | Tierra, Metal           | Electrifica el agua y desgarra la atmósfera; su destello fulminante rasga las tinieblas; la tierra lo absorbe y el metal lo conduce a tierra.                   |
+| **Aire**      | Mente, Metal            | Fuego, Rayo, Oscuridad  | Dispersa la concentración y corroe el metal; el fuego devora el oxígeno, el rayo domina los cielos y la oscuridad sofoca el viento.                             |
+| **Mente**     | Fuego, Tierra           | Hielo, Aire, Oscuridad  | La disciplina controla el caos y la voluntad mueve la materia; el frío paraliza el pensamiento, el viento lo dispersa y la oscuridad abruma con lo desconocido. |
+| **Metal**     | Hielo, Rayo, Oscuridad  | Tierra, Aire            | Rompe el hielo y actúa como pararrayos; su solidez inerte resiste la entropía oscura; la tierra lo reclama y el viento lo corroe.                               |
+| **Luz**       | Fuego, Hielo, Oscuridad | Agua, Tierra, Oscuridad | Eclipsa las llamas y su calidez derrite el hielo; el agua la refracta y la tierra sólida la bloquea. Mutuamente fuerte con Oscuridad.                           |
+| **Oscuridad** | Mente, Aire, Luz        | Rayo, Metal, Luz        | El terror de lo desconocido abruma la mente y sofoca el viento; el relámpago desgarra las tinieblas y el metal resiste la entropía. Mutuamente fuerte con Luz.  |
 
 ---
 

@@ -1,7 +1,7 @@
 'use client'
 import { cn } from '@/lib/cn.lib'
 import Button from '@/ui/button.component'
-import { Cart, Minus, Money, Plus } from '@nsmr/pixelart-react'
+import { ShoppingCart as Cart, Minus, Money, Plus } from 'pixelarticons/react'
 import type { ItemDefinition } from '@shared/constants/items'
 import { ItemType } from '@shared/types/gamification.types'
 import Image from 'next/image'

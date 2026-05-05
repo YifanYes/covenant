@@ -7,9 +7,9 @@ import { useAuthStore } from '@/stores/auth.store'
 import AlertComponent, { AlertDescription, AlertTitle } from '@/ui/alert.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { Alert, Check, Loader, Mail } from '@nsmr/pixelart-react'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Check, Loader, Mail, SquareAlert } from 'pixelarticons/react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -152,7 +152,7 @@ export default function Login() {
       )}
       {urlError && (
         <AlertComponent variant="destructive">
-          <Alert />
+          <SquareAlert />
           <AlertTitle>{t('login.error.magic_link_error')}</AlertTitle>
           <AlertDescription>
             {urlError === 'Email link is invalid or has expired' ? t('login.error.invalid_magic_link') : urlError}

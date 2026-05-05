@@ -17,14 +17,14 @@ git clone https://github.com/your-username/arq.git
 cd arq
 ```
 
-2. Install dependencies:
+1. Install dependencies:
 
 ```bash
 # Install all workspace dependencies from root
 pnpm install
 ```
 
-3. Configure environment variables:
+1. Configure environment variables:
 
 ```bash
 # Copy the example env file
@@ -33,7 +33,7 @@ cp server/.env.example server/.env
 # Edit server/.env with your database credentials
 ```
 
-4. Set up the database:
+1. Set up the database:
 
 ```bash
 cd server
@@ -79,18 +79,18 @@ arq/
 
 The backend follows a layered architecture to ensure separation of concerns and maintainability:
 
-1.  **tRPC Routers**: Handle incoming requests, validation, and protocol logic. They should be "thin" and delegate business logic to services.
-2.  **Services**: Contain the core business logic. They are orchestrated by a `ServiceFactory` and use Repositories for data access.
-3.  **Repositories**: Encapsulate all database operations using Prisma. This allows for cleaner services and easier testing/refactoring.
-4.  **Shared Layer**: Centralizes Zod schemas and inferred types, serving as the single source of truth for both frontend and backend.
+1. **tRPC Routers**: Handle incoming requests, validation, and protocol logic. They should be "thin" and delegate business logic to services.
+2. **Services**: Contain the core business logic. They are orchestrated by a `ServiceFactory` and use Repositories for data access.
+3. **Repositories**: Encapsulate all database operations using Prisma. This allows for cleaner services and easier testing/refactoring.
+4. **Shared Layer**: Centralizes Zod schemas and inferred types, serving as the single source of truth for both frontend and backend.
 
 ## Spec-Driven Development (SDD)
 
 This project follows **Spec-Driven Development** principles to ensure architectural consistency and quality:
 
-1.  **Define the Spec**: Before implementing complex features, a technical specification is created.
-2.  **Implementation**: Development follows the approved specification strictly.
-3.  **Validation**: Post-implementation verification to ensure the code meets the spec requirements.
+1. **Define the Spec**: Before implementing complex features, a technical specification is created.
+2. **Implementation**: Development follows the approved specification strictly.
+3. **Validation**: Post-implementation verification to ensure the code meets the spec requirements.
 
 ## Tech Stack
 

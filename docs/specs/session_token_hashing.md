@@ -127,7 +127,12 @@ const sessionHashExtension = Prisma.defineExtension({
         const result = await query(args)
         if (Array.isArray(result) && restoreMap) {
           return result.map((row) => {
-            if (row && typeof row === 'object' && 'token' in row && typeof (row as { token: unknown }).token === 'string') {
+            if (
+              row &&
+              typeof row === 'object' &&
+              'token' in row &&
+              typeof (row as { token: unknown }).token === 'string'
+            ) {
               const raw = restoreMap!.get((row as { token: string }).token)
               if (raw) return { ...(row as object), token: raw }
             }
@@ -158,9 +163,9 @@ const sessionHashExtension = Prisma.defineExtension({
           args.where = { ...args.where, token: hashSessionToken(args.where.token) }
         }
         return query(args)
-      },
-    },
-  },
+      }
+    }
+  }
 })
 
 // $extends returns a subtype TypeScript won't accept as PrismaClient without a cast.
@@ -170,14 +175,14 @@ export const prisma = baseClient.$extends(sessionHashExtension) as unknown as Pr
 
 **Operations intercepted:**
 
-| Operation   | Hashes input on                | Restores raw token in result                          |
-| ----------- | ------------------------------ | ----------------------------------------------------- |
-| `create`    | `data.token`                   | the returned row                                      |
-| `findFirst` | `where.token`                  | the returned row                                      |
-| `findMany`  | `where.token` (string or `in`) | each row, mapped back via `hash → raw`                |
-| `update`    | `where.token`                  | the returned row (used by Better Auth's session roll) |
-| `delete`    | `where.token`                  | the returned row (Better Auth ignores it)             |
-| `deleteMany`| `where.token`                  | n/a — returns a count                                 |
+| Operation    | Hashes input on                | Restores raw token in result                          |
+| ------------ | ------------------------------ | ----------------------------------------------------- |
+| `create`     | `data.token`                   | the returned row                                      |
+| `findFirst`  | `where.token`                  | the returned row                                      |
+| `findMany`   | `where.token` (string or `in`) | each row, mapped back via `hash → raw`                |
+| `update`     | `where.token`                  | the returned row (used by Better Auth's session roll) |
+| `delete`     | `where.token`                  | the returned row (Better Auth ignores it)             |
+| `deleteMany` | `where.token`                  | n/a — returns a count                                 |
 
 ## Tests
 
@@ -206,9 +211,7 @@ describe('hashSessionToken', () => {
   })
 
   it('matches known SHA-256 digest', () => {
-    expect(hashSessionToken('test')).toBe(
-      '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'
-    )
+    expect(hashSessionToken('test')).toBe('9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08')
   })
 })
 ```
