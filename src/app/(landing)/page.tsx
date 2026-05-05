@@ -192,8 +192,8 @@ function CombatSection() {
   const combatFeatures = [
     {
       icon: Flag,
-      title: t('landing.combat.missions.title'),
-      body: t('landing.combat.missions.body')
+      title: t('landing.combat.quests.title'),
+      body: t('landing.combat.quests.body')
     },
     {
       icon: Gamepad,

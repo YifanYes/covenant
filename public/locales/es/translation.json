@@ -83,9 +83,9 @@
           "habit_streak": "Racha de hábito (21 días)"
         }
       },
-      "missions": {
-        "title": "Actividades Globales",
-        "body": "Las tareas no se tachan — se convierten en poder para participar en el mundo. Cada victoria otorga oro, materiales y equipo."
+      "quests": {
+        "title": "Misiones",
+        "body": "Elige una misión del tablero y caza a los enemigos que lista. Cada misión completada otorga oro y equipamiento para tu personaje."
       },
       "reactive": {
         "title": "Combate Reactivo",
@@ -93,7 +93,7 @@
       },
       "equipment": {
         "title": "Equipamiento y Loadout",
-        "body": "Armas, armaduras y accesorios que modifican tus estadísticas. El equipo Tier 1 es gratis. A partir del Tier 2, lo ganas o lo compras con oro. El progreso se siente porque lo puedes equipar."
+        "body": "Armas, armaduras y accesorios que modifican tus estadísticas. El equipo Tier 1 es gratis. A partir del Tier 2, lo ganas con misiones o lo compras con oro. El progreso se siente porque lo puedes equipar."
       }
     },
     "coming_soon": {
@@ -117,7 +117,7 @@
         },
         "scaling": {
           "title": "Cocina y Fabricación",
-          "description": "Crea consumibles y forja equipamiento con materiales recolectados."
+          "description": "Crea consumibles y fabrica equipamiento con materiales recolectados."
         },
         "seasonal": {
           "title": "Lanzamiento del Juego de Mesa",
@@ -135,55 +135,6 @@
     "socials": {
       "title": "Síguenos"
     }
-  },
-  "activities": {
-    "assault_ships": {
-      "description": "Una flota de navíos asedia los muelles. En caso de caer, los refuerzos marítimos no podrán llegar a tiempo. Destrúyelos sin piedad.",
-      "failure_consequence": "Los refuerzos de Trinidad no llegan. Se pierde una ruta de escape.",
-      "failure_text": "El mar está lleno de tiburones. Los tiburones están llenos de... bueno, mejor no pensarlo (；￣Д￣)",
-      "name": "Asalto a los Navíos",
-      "objective": "Destruir piratas",
-      "success_consequence": "Los refuerzos de Trinidad llegan. Bonus de 600 oro a todos los participantes.",
-      "success_text": "¡Los piratas se hunden con sus barcos! Que les den de comer a los peces ♪(´ε` )"
-    },
-    "continue": "Continuar actividad",
-    "defense_north_gate": {
-      "description": "¡Dejadnos entrar! ¡Queremos divertirnos con vosotros! ¡Hemos traído regalos para todo el mundo! ✧｡٩(ˊᗜˋ )و✧*｡",
-      "failure_consequence": "La puerta es destruida. Nueva actividad de emergencia: 'Evacuar el Primer Nivel'.",
-      "failure_text": "Los regalos eran garras. Las garras eran mortales. La puerta ya no existe. Qué pena, ya no se hacen puertas así (╯°□°)╯︵ ┻━┻",
-      "name": "Defender la Puerta del Norte",
-      "objective": "Derrotar demonios",
-      "success_consequence": "Se desbloquea 'Investigar Catacumbas'. Bonus de 500 oro a todos los participantes.",
-      "success_text": "¡Los demonios se retiran aullando! La puerta aguanta. Santa Cruz sigue en pie... por ahora (ง'̀-'́)ง"
-    },
-    "defense_south_wall": {
-      "description": "Los demonios avanzan sin descanso. El aire se impregna del olor de la pólvora y la sangre. Estamos agotados. Pero por nuestras familias y por Dios, resistiremos.",
-      "failure_consequence": "Brecha en la muralla sur. Nueva actividad: 'Contener la Brecha'.",
-      "failure_text": "La muralla cayó. Los demonios entran. Debieron traer más caballeros... (눈_눈)",
-      "name": "Defender la Muralla Sur",
-      "objective": "Derrotar demonios",
-      "success_consequence": "Flanco sur asegurado. Bonus de 400 oro a todos los participantes.",
-      "success_text": "¡El sur está asegurado! Ahora huele a victoria... y un poco a azufre, pero sobre todo a victoria ᕙ(⇀‸↼‶)ᕗ"
-    },
-    "error": {
-      "start": "Ocurrió un error al iniciar la actividad"
-    },
-    "not_found": "Actividad no encontrada",
-    "progress": "Progreso",
-    "start": "Unirse a actividad",
-    "status": {
-      "active": "Activa"
-    },
-    "success": {
-      "complete": "¡Actividad completada exitosamente!",
-      "start": "Actividad iniciada exitosamente"
-    },
-    "switch_dialog": {
-      "confirm": "Cambiar actividad",
-      "description": "Ya estás participando en otra actividad. Tu progreso se guardará, pero cambiarás a esta nueva actividad.",
-      "title": "¿Cambiar de actividad?"
-    },
-    "title": "Actividades"
   },
   "adventure": {
     "tier_locked": "Requiere Tier {{tier}}",
@@ -356,7 +307,6 @@
   },
   "crafting": {
     "title": "Forja",
-    "subtitle": "Forja equipo y consumibles con materiales recolectados",
     "materials": "Materiales",
     "recipes": "Recetas",
     "craft": "Forjar",
@@ -1055,50 +1005,6 @@
     "LEGION": "La Legión",
     "LEGION_description": "Aquellos que sirven a la Bestia por poder, ambición o desesperación. Un ejército de demonios, ángeles caídos y humanos rendidos."
   },
-  "forum": {
-    "already_in_faction": "Actualmente eres miembro de {{faction}}.",
-    "back": "Volver al foro",
-    "comments": "Comentarios",
-    "create_post": "Crear publicación",
-    "create_post_description": "Crea una nueva publicación en el foro de la facción",
-    "delete_comment_confirm": "¿Estás seguro de que quieres borrar este comentario?",
-    "delete_post_confirm": "¿Estás seguro de que quieres borrar esta publicación?",
-    "description_placeholder": "Contenido de la publicación",
-    "error": {
-      "create_post": "Error al crear la publicación",
-      "forbidden": "No tienes permiso para realizar esta acción"
-    },
-    "factions_title": "Facciones",
-    "go_to_forum": "Ir al foro",
-    "go_to_your_forum": "Ir a tu foro",
-    "join_faction": "Unirse a la facción",
-    "join_faction_confirm": "¿Estás seguro de que quieres unirte a esta facción?",
-    "join_faction_description": "Una vez que te unas, tendrás acceso al foro y la comunidad de esta facción. No podrás unirte a otra facción, así que decide sabiamente.",
-    "leave_faction": "Abandonar facción",
-    "leave_faction_confirm": "¿Estás seguro de que quieres abandonar esta facción?",
-    "leave_faction_description": "Perderás acceso al foro de esta facción hasta que te unas de nuevo.",
-    "no_comments": "No hay comentarios aún.",
-    "no_posts": "No hay publicaciones aún. ¡Sé el primero en publicar!",
-    "posted_by": "Publicado por",
-    "posts_description": "Habla con los miembros de tu facción",
-    "reply": "Responder",
-    "responses": "Respuestas",
-    "show_replies": "Mostrar {{count}} respuestas",
-    "hide_replies": "Ocultar respuestas",
-    "success": {
-      "create_post": "Publicación creada con éxito",
-      "leave_faction": "Has abandonado la facción"
-    },
-    "time_ago": {
-      "just_now": "justo ahora",
-      "minutes": "hace {{count}}m",
-      "hours": "hace {{count}}h",
-      "days": "hace {{count}}d"
-    },
-    "title": "Foro",
-    "title_placeholder": "Título de la publicación",
-    "write_comment": "Escribe un comentario..."
-  },
   "habits": {
     "add": "Añadir hábito",
     "empty": "Todavía no tienes hábitos. ¡Crea uno para empezar!",
@@ -1460,7 +1366,6 @@
   },
   "map": {
     "lore": "Los Seis Poderes Infernales han lanzado un ataque relámpago a Santa Cruz, la Sede Plateada. La Orden de los Caballeros Sagrados defiende cada muralla mientras los refuerzos vienen en camino. Si cae la Sede Plateada, cae el liderazgo de los Fieles.",
-    "no_activities": "No se encontraron actividades activas.",
     "title": "Mapa del Mundo"
   },
   "more": "más",
@@ -1574,11 +1479,9 @@
     "close": "Colapsar menú",
     "crafting": "Forja",
     "dashboard": "Panel de control",
-    "forum": "Foro",
     "habits": "Hábitos",
     "inventory": "Inventario",
     "investments": "Inversiones",
-    "map": "Mapa del Mundo",
     "objectives": "Objetivos y áreas",
     "open": "Expandir menú",
     "productivity": "Productividad",

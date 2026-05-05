@@ -2,7 +2,7 @@
 
 ## Critical Priority
 
-- [ ] Update landing page with trimmed functionality.
+- [ ]
 
 ## High Priority
 
@@ -28,6 +28,8 @@
 - [ ] Security: Error Messages Leak Resource Existence
   - Multiple service files
   - **Fix:** Use generic "Resource not found or access denied" messages
+
+- [ ] Conversation type quests: it's a dialog where you choose between different choices, each one has a different outcome.
 
 ## Low Priority
 
