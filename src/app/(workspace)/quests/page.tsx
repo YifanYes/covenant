@@ -12,7 +12,7 @@ import Dialog, {
   DialogTitle
 } from '@/ui/dialog.component'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { Close, Flag, Money } from '@nsmr/pixelart-react'
+import { Cancel as Close, Flag, Money } from 'pixelarticons/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'

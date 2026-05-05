@@ -5,7 +5,7 @@ import CombatUnitSprite from '@/components/combat/combat-unit-sprite.component'
 import { DamageNumberContainer } from '@/components/combat/damage-number.component'
 import type { CombatAnimationState } from '@/hooks/use-combat-animations.hook'
 import { cn } from '@/lib/cn.lib'
-import { Battery, Heart } from '@nsmr/pixelart-react'
+import { Battery, Heart } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 
 interface PlayerDisplayProps {

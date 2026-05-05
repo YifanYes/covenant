@@ -1,6 +1,6 @@
 'use client'
 import { cn } from '@/lib/cn.lib'
-import { Close } from '@nsmr/pixelart-react'
+import { Cancel as Close } from 'pixelarticons/react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import * as React from 'react'
 

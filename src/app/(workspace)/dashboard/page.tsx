@@ -1,7 +1,7 @@
 'use client'
 import { useAuthStore } from '@/stores/auth.store'
 import { trpcOptions } from '@/utils/trpc.utils'
-import { Calendar } from '@nsmr/pixelart-react'
+import { Calendar } from 'pixelarticons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { startCase } from 'es-toolkit/compat'

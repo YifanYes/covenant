@@ -11,7 +11,7 @@ import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { Plus } from '@nsmr/pixelart-react'
+import { Plus } from 'pixelarticons/react'
 import {
   createTaskSchema,
   TaskEffort,

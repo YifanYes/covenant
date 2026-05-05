@@ -1,7 +1,7 @@
 'use client'
 import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/cn.lib'
-import { Check, ChevronDown } from '@nsmr/pixelart-react'
+import { Check, ChevronDown } from 'pixelarticons/react'
 import { useEffect, useRef, useState } from 'react'
 import { type Control, Controller } from 'react-hook-form'
 import FormField from './form-field.component'

@@ -1,5 +1,5 @@
 'use client'
-import { Bullseye, Hourglass, Search, SpeedFast, TrendingUp } from '@nsmr/pixelart-react'
+import { Target as Bullseye, AlarmClock as Hourglass, Search, SpeedFast, ArrowUp as TrendingUp } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper.component'
 import { getEfficiencyMetricsData } from './efficiency-metrics.utils'

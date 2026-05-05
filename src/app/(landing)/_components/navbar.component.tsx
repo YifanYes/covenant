@@ -7,7 +7,7 @@ import DropdownMenu, {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu.component'
-import { ChevronDown } from '@nsmr/pixelart-react'
+import { ChevronDown } from 'pixelarticons/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'

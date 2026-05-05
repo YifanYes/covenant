@@ -1,6 +1,6 @@
 'use client'
 
-import { Upload } from '@nsmr/pixelart-react'
+import { Upload } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import type { CardData } from '../../_data/card-data'

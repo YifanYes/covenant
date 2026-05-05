@@ -1,5 +1,5 @@
 'use client'
-import { Close, Money } from '@nsmr/pixelart-react'
+import { Cancel as Close, Money } from 'pixelarticons/react'
 import type { ItemDefinition } from '@shared/constants/items'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'

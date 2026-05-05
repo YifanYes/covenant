@@ -1,4 +1,5 @@
 'use client'
+
 import CovenantLogo from '@/components/common/covenant-logo.component'
 import Separator from '@/ui/separator.component'
 import Sidebar, {
@@ -13,8 +14,8 @@ import Sidebar, {
   SidebarMenuItem,
   SidebarTrigger
 } from '@/ui/sidebar.component'
-import { BookOpen, Dashboard, List, Luggage, ScrollVertical, Sliders, Store, Trophy } from '@nsmr/pixelart-react'
 import Link from 'next/link'
+import { BookOpen, Bulletlist, Castle, Grid3x3, Settings2, Store, Suitcase, Trophy } from 'pixelarticons/react'
 import { useSyncExternalStore, type ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -69,7 +70,7 @@ export default function AppSidebar() {
       {
         title: t('sidebar.dashboard'),
         url: '/dashboard',
-        icon: Dashboard
+        icon: Grid3x3
       },
       {
         title: t('sidebar.objectives'),
@@ -79,7 +80,7 @@ export default function AppSidebar() {
       {
         title: t('sidebar.tasks'),
         url: '/tasks',
-        icon: List
+        icon: Bulletlist
       },
       {
         title: t('sidebar.habits'),
@@ -91,12 +92,12 @@ export default function AppSidebar() {
       {
         title: t('sidebar.inventory'),
         url: '/inventory',
-        icon: Luggage
+        icon: Suitcase
       },
       {
         title: t('sidebar.quests'),
         url: '/quests',
-        icon: ScrollVertical
+        icon: Castle
       },
       {
         title: t('sidebar.shop'),
@@ -108,7 +109,7 @@ export default function AppSidebar() {
       {
         title: t('sidebar.settings'),
         url: '/settings',
-        icon: Sliders
+        icon: Settings2
       }
     ]
   }

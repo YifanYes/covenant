@@ -1,7 +1,7 @@
 'use client'
 import { useCalendarStore } from '@/stores/calendar.store'
 import Button from '@/ui/button.component'
-import { ChevronLeft, ChevronRight } from '@nsmr/pixelart-react'
+import { ChevronLeft, ChevronRight } from 'pixelarticons/react'
 import dayjs from 'dayjs'
 import { capitalize } from 'es-toolkit/compat'
 import { useTranslation } from 'react-i18next'

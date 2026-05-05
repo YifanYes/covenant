@@ -1,7 +1,7 @@
 'use client'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import Separator from '@/ui/separator.component'
-import { Heart, Money, ScriptText, Shield, Zap } from '@nsmr/pixelart-react'
+import { Heart, Money, FileText as ScriptText, Shield, Zap } from 'pixelarticons/react'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 import CharacterDeathOverlay from './character-death-overlay.component'

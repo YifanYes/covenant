@@ -1,5 +1,5 @@
 'use client'
-import { Zap } from '@nsmr/pixelart-react'
+import { Zap } from 'pixelarticons/react'
 import { useMemo } from 'react'
 import DashboardPieChartComponent from '../dashboard-pie-chart/dashboard-pie-chart.component'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper.component'

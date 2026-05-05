@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ['pg', 'pino', 'pino-pretty', 'node-cron'],
   experimental: {
-    optimizePackageImports: ['@nsmr/pixelart-react', 'recharts']
+    optimizePackageImports: ['pixelarticons/react', 'recharts']
   },
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx']
 }

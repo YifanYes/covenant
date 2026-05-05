@@ -1,7 +1,7 @@
 'use client'
 import useTheme from '@/hooks/use-theme'
 import Switch from '@/ui/switch.component'
-import { Moon, Sun } from '@nsmr/pixelart-react'
+import { Moon, CloudSun as Sun } from 'pixelarticons/react'
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme()

@@ -1,6 +1,6 @@
 'use client'
 import type { Habit } from '@/types/models.types'
-import { Repeat } from '@nsmr/pixelart-react'
+import { Repeat } from 'pixelarticons/react'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 

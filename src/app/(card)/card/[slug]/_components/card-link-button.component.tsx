@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronRight, Contact, ExternalLink, Github, Mail, Message } from '@nsmr/pixelart-react'
+import { ChevronRight, Contact, ExternalLink, GitBranch as Github, Mail, Message } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import type { CardLink } from '../../_data/card-data'
 
