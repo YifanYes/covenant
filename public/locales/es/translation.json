@@ -1026,6 +1026,11 @@
   "habits": {
     "add": "Añadir hábito",
     "empty": "Todavía no tienes hábitos. ¡Crea uno para empezar!",
+    "empty_state": {
+      "action": "Crear tu primer hábito",
+      "title": "Sin hábitos",
+      "description": "Tu régimen de entrenamiento diario está vacío. Hasta los héroes necesitan disciplina.\nCrea un hábito y construye tu leyenda un día a la vez."
+    },
     "error": {
       "internal": {
         "complete": "Ocurrió un error al completar el hábito",
@@ -1596,6 +1601,44 @@
       "LOW": "Bajo"
     },
     "empty": "No hay tareas todavía",
+    "empty_state": {
+      "action": "Crear tu primera tarea",
+      "todo": {
+        "title": "Sin tareas",
+        "description": "Tu registro de misiones está vacío. Los demonios se están poniendo arrogantes.\nAñade una tarea y muéstrales quién manda."
+      },
+      "doing": {
+        "title": "Nada en progreso",
+        "description": "¿Cero misiones activas? Hasta los héroes legendarios necesitan empezar por algún lado.\nElige una tarea y ¡ponte en marcha!"
+      },
+      "done": {
+        "title": "Nada completado aún",
+        "description": "No hay misiones terminadas en el tablero.\n¡Completa una tarea y disfruta de la gloria de la victoria!"
+      },
+      "table": {
+        "title": "No se encontraron tareas",
+        "description": "Tu libro de misiones está sospechosamente vacío.\nEs hora de llenarlo de hazañas dignas de ser cantadas."
+      },
+      "calendar": "Empieza creando una nueva tarea. Vincúlala a un objetivo o área para darle propósito.",
+      "matrix": {
+        "quick_win": {
+          "title": "Sin victorias fáciles",
+          "description": "No hay victorias fáciles aquí.\nAñade una tarea de bajo esfuerzo y alto impacto y siéntete como un genio táctico."
+        },
+        "major_project": {
+          "title": "Sin proyectos mayores",
+          "description": "Faltan las misiones épicas.\nAñade una y demuestra que puedes cargar con el peso del destino."
+        },
+        "fill_in": {
+          "title": "Sin tareas de relleno",
+          "description": "Hasta las pequeñas misiones merecen amor.\nAñade una tarea tranquila para mantener el momentum."
+        },
+        "thankless_task": {
+          "title": "Sin tareas ingratas",
+          "description": "Sorprendentemente, no hay tareas odiosas. ¿O quizás solo las estás evitando?\nAñade una y ¡demuestra tu temple!"
+        }
+      }
+    },
     "error": {
       "internal": {
         "create": "Ha ocurrido un error al crear la tarea.",

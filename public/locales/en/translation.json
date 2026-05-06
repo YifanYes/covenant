@@ -1026,6 +1026,11 @@
   "habits": {
     "add": "Add Habit",
     "empty": "You don't have any habits yet. Create one to get started!",
+    "empty_state": {
+      "action": "Create your first habit",
+      "title": "No habits yet",
+      "description": "Your daily training regimen is empty. Even heroes need discipline.\nCreate a habit and build your legend one day at a time."
+    },
     "error": {
       "internal": {
         "complete": "An error occurred while completing the habit",
@@ -1596,6 +1601,44 @@
       "LOW": "Low"
     },
     "empty": "There are no tasks yet",
+    "empty_state": {
+      "action": "Create your first task",
+      "todo": {
+        "title": "No tasks yet",
+        "description": "Your quest log is empty. The demons are getting cocky.\nAdd a task and show them who's boss."
+      },
+      "doing": {
+        "title": "Nothing in progress",
+        "description": "Zero active quests? Even legendary heroes need to start somewhere.\nPick a task and get moving!"
+      },
+      "done": {
+        "title": "Nothing completed yet",
+        "description": "No finished quests on the board.\nComplete a task and bask in the glory of victory!"
+      },
+      "table": {
+        "title": "No tasks found",
+        "description": "Your task ledger is suspiciously empty.\nTime to fill it with deeds worth singing about."
+      },
+      "calendar": "Start by creating a new task. Link it to an objective or area to give it purpose.",
+      "matrix": {
+        "quick_win": {
+          "title": "No quick wins",
+          "description": "No easy victories here.\nAdd a low-effort, high-impact task and feel like a tactical genius."
+        },
+        "major_project": {
+          "title": "No major projects",
+          "description": "The epic quests are missing.\nAdd one and prove you can carry the weight of destiny."
+        },
+        "fill_in": {
+          "title": "No filler tasks",
+          "description": "Even small quests deserve love.\nAdd a chill, low-stakes task to keep the momentum alive."
+        },
+        "thankless_task": {
+          "title": "No thankless tasks",
+          "description": "Surprisingly, no dreaded chores. Or maybe you're just avoiding them?\nAdd one and power through!"
+        }
+      }
+    },
     "error": {
       "internal": {
         "create": "An error ocurred while creating the task",

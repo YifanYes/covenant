@@ -109,6 +109,10 @@ const data = await trpc.dashboard.getData()
 - **Imports**: use path aliases (`@/*`, `@shared/*`, `@ui/*`) — never relative imports
 - **i18n**: NEVER hardcode user-facing strings. Use `useTranslation()`. Add keys to **both** `public/locales/en/translation.json` and `public/locales/es/translation.json`
 
+## Copy Tone
+
+User-facing empty states and microcopy should follow a **friendly, funny, energetic RPG-themed tone** — treat the user like a hero in an epic quest, blend game flavor with light humor, and avoid dry corporate language. See the tasks empty states for the canonical example.
+
 ## Adding a Feature
 
 1. Check `roadmap.md` for phase priorities

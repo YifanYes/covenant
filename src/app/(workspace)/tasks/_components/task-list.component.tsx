@@ -5,8 +5,10 @@ import { type Task as TaskType } from '@/types/models.types'
 import { useDragAndDrop } from '@formkit/drag-and-drop/react'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { clone, filter, flatten, values as getValues, map } from 'es-toolkit/compat'
+import { Flag } from 'pixelarticons/react'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import EmptyState from '@/components/empty-state.component'
 
 export default function TaskList({ id, group, mutation }: { id: string; group: string; mutation: any }) {
   const { t } = useTranslation()
@@ -68,8 +70,13 @@ export default function TaskList({ id, group, mutation }: { id: string; group: s
       </header>
       <div className="relative isolate min-h-20 rounded-md border-2">
         {values.length === 0 && (
-          <div className="text-muted-foreground pointer-events-none absolute inset-0 flex items-center justify-center p-4 text-sm italic">
-            {t(`tasks.empty.${id}` as any, { defaultValue: t('tasks.empty') })}
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
+            <EmptyState
+              size="compact"
+              icon={<Flag className="h-5 w-5" />}
+              title={t(`tasks.empty_state.${id}.title` as any, { defaultValue: t('tasks.empty_state.todo.title') })}
+              description={t(`tasks.empty_state.${id}.description` as any, { defaultValue: t('tasks.empty_state.todo.description') })}
+            />
           </div>
         )}
         <ul ref={parent} className="flex h-full min-h-20 flex-col gap-1 rounded-md p-3" data-list-id={id}>

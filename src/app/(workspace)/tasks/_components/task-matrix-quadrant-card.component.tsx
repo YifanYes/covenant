@@ -4,7 +4,9 @@ import { areaSimpleStyles } from '@/types/colors.types'
 import { allIcons } from '@/types/icons.types'
 import type { Area, Task } from '@/types/models.types'
 import { getColorClasses } from '@/utils/theme.utils'
+import { Battery, Heart, Trophy, Zap } from 'pixelarticons/react'
 import { uniqBy } from 'es-toolkit/compat'
+import EmptyState from '@/components/empty-state.component'
 
 export type Quadrant = {
   key: string
@@ -31,9 +33,24 @@ export default function TaskMatrixQuadrantCard({ quadrant, t, onTaskClick }: Mat
       </div>
       <div className="flex flex-1 flex-col gap-2 overflow-auto">
         {quadrant.tasks.length === 0 ? (
-          <p className="text-card-foreground m-auto text-center text-sm italic opacity-60">
-            {t('tasks.matrix.no_tasks')}
-          </p>
+          <div className="m-auto">
+            <EmptyState
+              size="compact"
+              icon={
+                quadrant.key === 'quick_win' ? (
+                  <Zap className="h-5 w-5" />
+                ) : quadrant.key === 'major_project' ? (
+                  <Trophy className="h-5 w-5" />
+                ) : quadrant.key === 'fill_in' ? (
+                  <Heart className="h-5 w-5" />
+                ) : (
+                  <Battery className="h-5 w-5" />
+                )
+              }
+              title={t(`tasks.empty_state.matrix.${quadrant.key}.title`)}
+              description={t(`tasks.empty_state.matrix.${quadrant.key}.description`)}
+            />
+          </div>
         ) : (
           quadrant.tasks.map((task) => {
             const colorClasses = getColorClasses(task.color, {
