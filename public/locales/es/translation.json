@@ -290,7 +290,8 @@
     },
     "targeting": {
       "single": "Selecciona un objetivo",
-      "all": "Atacando a todos los enemigos"
+      "all": "Atacando a todos los enemigos",
+      "cancel": "Cancelar selección"
     },
     "potion_used": "Usada",
     "potion_healed": "+{{amount}} PV restaurados",
@@ -303,7 +304,8 @@
     "completed": "Completada",
     "error": "Error al cargar datos",
     "failed": "Fallida",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "back": "Volver"
   },
   "crafting": {
     "title": "Forja",

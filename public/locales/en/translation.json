@@ -290,7 +290,8 @@
     },
     "targeting": {
       "single": "Select a target",
-      "all": "Targeting all enemies"
+      "all": "Targeting all enemies",
+      "cancel": "Cancel selection"
     },
     "potion_used": "Used",
     "potion_healed": "+{{amount}} HP restored",
@@ -303,7 +304,8 @@
     "completed": "Completed",
     "error": "Error loading data",
     "failed": "Failed",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "back": "Back"
   },
   "crafting": {
     "title": "Crafting",
