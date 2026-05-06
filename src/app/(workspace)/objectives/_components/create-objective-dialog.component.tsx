@@ -11,12 +11,17 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from 'pixelarticons/react'
 import { createObjectiveSchema, type CreateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { type ReactNode } from 'react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
-export default function CreateObjectiveDialog() {
+interface CreateObjectiveDialogProps {
+  trigger?: ReactNode
+}
+
+export default function CreateObjectiveDialog({ trigger }: CreateObjectiveDialogProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
@@ -72,10 +77,12 @@ export default function CreateObjectiveDialog() {
       isSubmitDisabled={!isValid || !isDirty}
       className="sm:max-w-125"
       trigger={
-        <Button>
-          <Plus />
-          <span>{t('objectives.add')}</span>
-        </Button>
+        trigger || (
+          <Button>
+            <Plus />
+            <span>{t('objectives.add')}</span>
+          </Button>
+        )
       }
     >
       <div className="grid gap-4">

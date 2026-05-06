@@ -1402,6 +1402,11 @@
       "success": "Objetivo eliminado exitosamente",
       "title": "Eliminar objetivo"
     },
+    "empty": {
+      "title": "Aún no hay objetivos",
+      "description": "Los objetivos son tus grandes metas. Crea el primero para comenzar tu viaje.",
+      "action": "Crea tu primer objetivo"
+    },
     "habits_count_one": "{{count}} hábito",
     "habits_count_other": "{{count}} hábitos",
     "no_date": "Sin fecha",

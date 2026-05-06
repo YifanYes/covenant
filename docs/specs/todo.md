@@ -6,10 +6,11 @@
 
 ## High Priority
 
-- [ ] Update the auth token to never expire. For this MVP it would improve user experience.
-
 - [ ] Simple feature flag
   - Enable controlled rollout of new features without redeployments
+
+- [ ] Guild system
+  - Users can create their own guilds, invite their friends, and start guild-wide campaigns. Each guild has a social forum. There are exclusive rewards for guild members.
 
 - [ ] Observability
   - Logging, metrics, and tracing for backend services and frontend errors
