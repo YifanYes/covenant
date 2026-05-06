@@ -15,6 +15,7 @@ model User {
   emailVerified Boolean    @default(false)
   image         String?
   theme         String     @default("HOLY_KNIGHTS")
+  locale        String     @default("es")
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   sessions      Session[]

@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 import GoogleLoginButton from '../_components/google-login-button.component'
 
 export default function SignUp() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const [isSigned, setIsSigned] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -28,9 +28,10 @@ export default function SignUp() {
     async (data: SignUpType) => {
       setIsLoading(true)
       try {
+        const locale = i18n.language || 'es'
         await authClient.signIn.magicLink({
           email: data.email,
-          callbackURL: `${window.location.origin}/onboarding`
+          callbackURL: `${window.location.origin}/onboarding?locale=${locale}`
         })
         setIsSigned(true)
       } catch (error) {
@@ -41,7 +42,7 @@ export default function SignUp() {
         setIsLoading(false)
       }
     },
-    [t]
+    [t, i18n.language]
   )
 
   return (

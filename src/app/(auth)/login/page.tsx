@@ -17,7 +17,7 @@ import { toast } from 'sonner'
 import GoogleLoginButton from '../_components/google-login-button.component'
 
 export default function Login() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const updateUserInfo = useAuthStore((state) => state.updateUserInfo)
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -73,9 +73,10 @@ export default function Login() {
       setIsLoading(true)
       try {
         const redirectTo = searchParams.get('redirect_to') || '/login'
+        const locale = i18n.language || 'es'
         await authClient.signIn.magicLink({
           email: data.email,
-          callbackURL: `${window.location.origin}${redirectTo}`
+          callbackURL: `${window.location.origin}${redirectTo}?locale=${locale}`
         })
         setMagicLinkSent(true)
         toast.success(t('login.success'))
@@ -87,7 +88,7 @@ export default function Login() {
         setIsLoading(false)
       }
     },
-    [searchParams, t]
+    [searchParams, t, i18n.language]
   )
 
   const {

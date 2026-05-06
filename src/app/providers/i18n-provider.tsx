@@ -9,6 +9,8 @@ export function I18nProvider({ children, initialLang }: { children: React.ReactN
   }
 
   useEffect(() => {
+    document.cookie = `i18nextLng=${i18n.language}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+
     const handleLangChange = (lng: string) => {
       document.cookie = `i18nextLng=${lng}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
     }

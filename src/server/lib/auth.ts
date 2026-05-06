@@ -4,36 +4,12 @@ import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { nextCookies } from 'better-auth/next-js'
 import { magicLink } from 'better-auth/plugins'
 import { env } from '../config'
+import { renderMagicLinkEmail, renderWelcomeEmail } from '@/server/emails/render-email'
+import { createServerI18n } from './i18n-server'
 import { logger } from './logger'
 import { prisma } from './prisma'
-
-async function sendBrevoEmail(args: { to: string; subject: string; html: string }) {
-  const ac = new AbortController()
-  const timer = setTimeout(() => ac.abort(), 5000)
-  try {
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'api-key': env.BREVO_API_KEY,
-        'content-type': 'application/json',
-        accept: 'application/json'
-      },
-      body: JSON.stringify({
-        sender: { email: env.FROM_EMAIL, name: 'Covenant' },
-        to: [{ email: args.to }],
-        subject: args.subject,
-        htmlContent: args.html
-      }),
-      signal: ac.signal
-    })
-    if (!res.ok) {
-      const body = await res.text()
-      throw new Error(`Failed to send email: ${res.status} ${body}`)
-    }
-  } finally {
-    clearTimeout(timer)
-  }
-}
+import { EmailService } from '../services/email.service'
+import { DEFAULT_LOCALE, resolveCreateUserLocale, resolveEmailLocale } from './auth-locale.utils'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
@@ -48,17 +24,20 @@ export const auth = betterAuth({
   plugins: [
     nextCookies(),
     magicLink({
-      sendMagicLink: async ({ email, url }) => {
-        await sendBrevoEmail({
-          to: email,
-          subject: 'Sign in to Covenant',
-          html: `
-            <h2>Welcome to Covenant</h2>
-            <p>Click the link below to sign in:</p>
-            <a href="${url}">Sign in to Covenant</a>
-            <p>This link will expire in 10 minutes.</p>
-          `
-        })
+      sendMagicLink: async ({ email, url }, ctx) => {
+        const locale = await resolveEmailLocale(email, ctx)
+        const i18n = await createServerI18n(locale)
+        const html = await renderMagicLinkEmail({ url, minutes: 10, locale })
+        const emailService = new EmailService()
+        try {
+          await emailService.sendEmail({
+            to: email,
+            subject: i18n.t('emails.magicLink.subject'),
+            html
+          })
+        } catch (err) {
+          logger.error({ event: 'MAGIC_LINK_EMAIL_FAILED', email, error: err }, 'Failed to send magic link email')
+        }
       }
     })
   ],
@@ -69,8 +48,32 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
+        before: async (user, context) => {
+          const locale = await resolveCreateUserLocale(context ?? undefined)
+          return { data: { ...user, locale } }
+        },
         after: async (user) => {
           logger.info({ event: 'AUTH_SIGNUP', userId: user.id }, 'User registered')
+          try {
+            const stored = await prisma.user.findUnique({
+              where: { id: user.id },
+              select: { locale: true, email: true }
+            })
+            const locale = stored?.locale || DEFAULT_LOCALE
+            const i18n = await createServerI18n(locale)
+            const html = await renderWelcomeEmail({
+              locale,
+              ctaUrl: `${env.NEXT_PUBLIC_APP_URL}/objectives`
+            })
+            const emailService = new EmailService()
+            await emailService.sendEmail({
+              to: user.email,
+              subject: i18n.t('emails.welcome.subject'),
+              html
+            })
+          } catch (err) {
+            logger.error({ event: 'WELCOME_EMAIL_FAILED', userId: user.id, error: err }, 'Failed to send welcome email')
+          }
         }
       }
     },
