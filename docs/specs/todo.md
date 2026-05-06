@@ -9,6 +9,8 @@
 - [ ] Simple feature flag
   - Enable controlled rollout of new features without redeployments
 
+- [ ] Fix npm warn Unknown project config "enable-pre-post-scripts". This will stop working in the next major version of npm.
+
 - [ ] Guild system
   - Users can create their own guilds, invite their friends, and start guild-wide campaigns. Each guild has a social forum. There are exclusive rewards for guild members.
 

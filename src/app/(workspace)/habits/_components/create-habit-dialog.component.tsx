@@ -11,14 +11,23 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from 'pixelarticons/react'
 import { createHabitSchema, HabitTimespan, type CreateHabitType } from '@shared/schemas/habits.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
-export default function CreateHabitDialog() {
+interface CreateHabitDialogProps {
+  trigger?: ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+export default function CreateHabitDialog({ trigger, open: controlledOpen, onOpenChange }: CreateHabitDialogProps) {
   const { t } = useTranslation()
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+  const setOpen = isControlled ? (onOpenChange ?? (() => {})) : setInternalOpen
   const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
@@ -75,10 +84,12 @@ export default function CreateHabitDialog() {
       isLoading={mutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
       trigger={
-        <Button>
-          <Plus />
-          <span>{t('habits.add')}</span>
-        </Button>
+        trigger || (
+          <Button>
+            <Plus />
+            <span>{t('habits.add')}</span>
+          </Button>
+        )
       }
     >
       <div className="grid gap-4" key={`create-habit-form-${open}`}>

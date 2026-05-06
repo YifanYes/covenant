@@ -1,6 +1,10 @@
 'use client'
+import EmptyState from '@/components/empty-state.component'
+import Button from '@/ui/button.component'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { Plus, Repeat } from 'pixelarticons/react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CreateHabitDialog from './_components/create-habit-dialog.component'
 import UpdateHabitDialog from './_components/update-habit-dialog.component'
@@ -8,17 +12,27 @@ import UpdateHabitDialog from './_components/update-habit-dialog.component'
 export default function Habits() {
   const { t } = useTranslation()
   const { data } = useSuspenseQuery(trpcOptions.habits.getAll.queryOptions())
+  const [createOpen, setCreateOpen] = useState(false)
 
   return (
     <div className="min-h-screen w-full p-6">
       <div className="flex flex-row justify-between gap-4">
         <h1 className="text-2xl font-semibold">{t('habits.title')}</h1>
-        <CreateHabitDialog />
+        <CreateHabitDialog open={createOpen} onOpenChange={setCreateOpen} />
       </div>
       {data?.habits?.length === 0 ? (
-        <div className="flex min-h-50 items-center justify-center">
-          <p className="text-muted-foreground text-sm italic">{t('habits.empty')}</p>
-        </div>
+        <EmptyState
+          size="default"
+          icon={<Repeat className="h-8 w-8" />}
+          title={t('habits.empty_state.title')}
+          description={t('habits.empty_state.description')}
+          action={
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              <span>{t('habits.empty_state.action')}</span>
+            </Button>
+          }
+        />
       ) : (
         <div className="3xl:grid-cols-6 grid grid-cols-1 gap-4 py-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5">
           {data?.habits?.map((habit) => (

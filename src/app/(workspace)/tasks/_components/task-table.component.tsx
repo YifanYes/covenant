@@ -13,7 +13,8 @@ import { invalidators } from '@/utils/query-invalidation.utils'
 import { getRewardText } from '@/utils/text.utils'
 import { getPriorityStyles } from '@/utils/theme.utils'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import { ChevronLeft, ChevronRight, Cancel as Close } from 'pixelarticons/react'
+import EmptyState from '@/components/empty-state.component'
+import { ChevronLeft, ChevronRight, Cancel as Close, Bulletlist, Plus } from 'pixelarticons/react'
 import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -92,7 +93,7 @@ const TaskRow = memo(function TaskRow({ task, onSelect, onStatusChange, isUpdati
   )
 })
 
-export default function TaskTable() {
+export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
   const { t } = useTranslation()
   const { setSelectedTask } = useTasksStore()
   const form = useForm({
@@ -291,16 +292,29 @@ export default function TaskTable() {
               ) : tasks.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="h-75">
-                    <div className="flex h-full flex-col items-center justify-center gap-2">
-                      <p className="text-muted-foreground text-sm italic">
-                        {hasActiveFilters ? t('tasks.table.no_matching_tasks') : t('tasks.table.empty')}
-                      </p>
-                      {hasActiveFilters && (
+                    {!hasActiveFilters && totalCount === 0 ? (
+                      <EmptyState
+                        size="default"
+                        icon={<Bulletlist className="h-8 w-8" />}
+                        title={t('tasks.empty_state.table.title')}
+                        description={t('tasks.empty_state.table.description')}
+                        action={
+                          onCreate && (
+                            <Button onClick={onCreate}>
+                              <Plus className="mr-2 h-4 w-4" />
+                              <span>{t('tasks.empty_state.action')}</span>
+                            </Button>
+                          )
+                        }
+                      />
+                    ) : (
+                      <div className="flex h-full flex-col items-center justify-center gap-2">
+                        <p className="text-muted-foreground text-sm italic">{t('tasks.table.no_matching_tasks')}</p>
                         <Button variant="outline" size="sm" onClick={clearFilters}>
                           {t('tasks.filters.clear')}
                         </Button>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
               ) : (

@@ -21,14 +21,23 @@ import {
 } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
-export default function CreateTaskDialog() {
+interface CreateTaskDialogProps {
+  trigger?: ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+export default function CreateTaskDialog({ trigger, open: controlledOpen, onOpenChange }: CreateTaskDialogProps) {
   const { t } = useTranslation()
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+  const setOpen = isControlled ? (onOpenChange ?? (() => {})) : setInternalOpen
   const { monthIndex } = useCalendarStore()
   const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
@@ -88,10 +97,12 @@ export default function CreateTaskDialog() {
       isLoading={mutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
       trigger={
-        <Button>
-          <Plus />
-          <span>{t('tasks.add')}</span>
-        </Button>
+        trigger || (
+          <Button>
+            <Plus />
+            <span>{t('tasks.add')}</span>
+          </Button>
+        )
       }
       className="md:max-w-fit md:min-w-150"
     >

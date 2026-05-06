@@ -1,6 +1,7 @@
 'use client'
 import { useUserPreferencesStore } from '@/stores/user-preferences.store'
 import Tabs, { TabsContent, TabsList, TabsTrigger } from '@/ui/tabs.component'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CreateTaskDialog from './_components/create-task-dialog.component'
 import TaskCalendar from './_components/task-calendar.component'
@@ -12,6 +13,7 @@ import UpdateTaskDialog from './_components/update-task-dialog.component'
 export default function Tasks() {
   const { t } = useTranslation()
   const { defaultTasksView } = useUserPreferencesStore()
+  const [createOpen, setCreateOpen] = useState(false)
 
   return (
     <div className="h-[calc(100dvh-3rem)] w-full p-6">
@@ -25,7 +27,7 @@ export default function Tasks() {
               <TabsTrigger value="table">{t('tasks.tabs.table')}</TabsTrigger>
               <TabsTrigger value="matrix">{t('tasks.tabs.matrix')}</TabsTrigger>
             </TabsList>
-            <CreateTaskDialog />
+            <CreateTaskDialog open={createOpen} onOpenChange={setCreateOpen} />
           </div>
         </div>
 
@@ -38,7 +40,7 @@ export default function Tasks() {
         </TabsContent>
 
         <TabsContent value="table" className="mt-4 flex flex-1 flex-col overflow-hidden">
-          <TaskTable />
+          <TaskTable onCreate={() => setCreateOpen(true)} />
         </TabsContent>
 
         <TabsContent value="matrix" className="mt-4 flex-1 overflow-hidden">
