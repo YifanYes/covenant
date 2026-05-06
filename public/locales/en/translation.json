@@ -1402,6 +1402,11 @@
       "success": "Objective successfully deleted",
       "title": "Delete objective"
     },
+    "empty": {
+      "title": "No objectives yet",
+      "description": "Objectives are your big goals. Create your first one to start your journey.",
+      "action": "Create your first objective"
+    },
     "habits_count_one": "{{count}} habit",
     "habits_count_other": "{{count}} habits",
     "no_date": "No date",
