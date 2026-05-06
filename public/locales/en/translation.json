@@ -855,6 +855,24 @@
       "name": "Thunder Swarm"
     }
   },
+  "emails": {
+    "magicLink": {
+      "subject": "Your portal to Covenant awaits",
+      "preview": "Your portal to Covenant awaits — enter before the gates close",
+      "heading": "The gates are open",
+      "body": "You're one click away from entering the realm. This link is your key — but it fades in {{minutes}} minutes, so don't linger!",
+      "cta": "Enter Covenant",
+      "footer": "Didn't request this? No worries — just ignore it and the spell will dissipate."
+    },
+    "welcome": {
+      "subject": "Welcome to the war, recruit",
+      "preview": "Your legend starts today — grab a sword and try not to die immediately",
+      "heading": "You have been drafted",
+      "body": "The armies of procrastination won't slay themselves. Your first mission? Define what actually matters. Add your objectives, complete tasks, earn dice, and pretend you're a hero instead of just someone with a to-do list.",
+      "cta": "Define My Quests",
+      "footer": "If you didn't sign up for this, someone really believes in your potential. Or they're messing with you. Either way, ignore this."
+    }
+  },
   "enemies": {
     "alpha_werewolf": "Alpha Werewolf",
     "armored_templar": "Armored Templar",
