@@ -6,13 +6,15 @@
 
 ## High Priority
 
-- [ ] Hacer que el token de autenticación nunca expire.
+- [ ] Update the auth token to never expire. For this MVP it would improve user experience.
 
 - [ ] Simple feature flag
   - Enable controlled rollout of new features without redeployments
 
 - [ ] Observability
   - Logging, metrics, and tracing for backend services and frontend errors
+
+  - [ ] Analyze if implementing [NES.css](https://nostalgic-css.github.io/NES.css/) in the RPG modules would improve the user experience
 
 ## Medium Priority
 
