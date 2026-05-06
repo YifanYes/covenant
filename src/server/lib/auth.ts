@@ -3,12 +3,37 @@ import { createAuthMiddleware } from 'better-auth/api'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { nextCookies } from 'better-auth/next-js'
 import { magicLink } from 'better-auth/plugins'
-import { Resend } from 'resend'
 import { env } from '../config'
 import { logger } from './logger'
 import { prisma } from './prisma'
 
-const resend = new Resend(env.RESEND_API_KEY)
+async function sendBrevoEmail(args: { to: string; subject: string; html: string }) {
+  const ac = new AbortController()
+  const timer = setTimeout(() => ac.abort(), 5000)
+  try {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': env.BREVO_API_KEY,
+        'content-type': 'application/json',
+        accept: 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { email: env.FROM_EMAIL, name: 'Covenant' },
+        to: [{ email: args.to }],
+        subject: args.subject,
+        htmlContent: args.html
+      }),
+      signal: ac.signal
+    })
+    if (!res.ok) {
+      const body = await res.text()
+      throw new Error(`Failed to send email: ${res.status} ${body}`)
+    }
+  } finally {
+    clearTimeout(timer)
+  }
+}
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
@@ -24,8 +49,7 @@ export const auth = betterAuth({
     nextCookies(),
     magicLink({
       sendMagicLink: async ({ email, url }) => {
-        const result = await resend.emails.send({
-          from: env.FROM_EMAIL,
+        await sendBrevoEmail({
           to: email,
           subject: 'Sign in to Covenant',
           html: `
@@ -35,7 +59,6 @@ export const auth = betterAuth({
             <p>This link will expire in 10 minutes.</p>
           `
         })
-        if (result.error) throw new Error(`Failed to send magic link: ${result.error.message}`)
       }
     })
   ],

@@ -7,7 +7,7 @@ const envSchema = z.object({
   DIRECT_URL: z.string().min(1),
   NEXT_PUBLIC_APP_URL: z.string().url(),
   JWT_SECRET: z.string().min(32),
-  RESEND_API_KEY: z.string().min(1),
+  BREVO_API_KEY: z.string().min(1),
   FROM_EMAIL: z.string().email(),
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
