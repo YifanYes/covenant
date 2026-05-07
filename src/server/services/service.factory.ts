@@ -13,7 +13,6 @@ import { CharacterService } from './character.service'
 import { CombatService } from './combat.service'
 import { DashboardService } from './dashboard.service'
 import { DiceService } from './dice.service'
-import { EmailService } from './email.service'
 import { HabitService } from './habit.service'
 import { KillRecordService } from './kill-record.service'
 import { ObjectiveService } from './objective.service'
@@ -44,7 +43,6 @@ export class ServiceFactory {
   private _combatService?: CombatService
   private _dashboardService?: DashboardService
   private _diceService?: DiceService
-  private _emailService?: EmailService
   private _habitService?: HabitService
   private _killRecordService?: KillRecordService
   private _objectiveService?: ObjectiveService
@@ -106,10 +104,6 @@ export class ServiceFactory {
 
   get dice(): DiceService {
     return (this._diceService ??= new DiceService(this.characterRepository))
-  }
-
-  get email(): EmailService {
-    return (this._emailService ??= new EmailService())
   }
 
   // Layer 2: Repository + Layer 1 service dependencies

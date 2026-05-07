@@ -1,43 +1,18 @@
 /**
  * Tests for the session token hashing logic applied by the Prisma extension.
- * These are logic-level tests of the hash-application rules. Extension wiring
- * is verified manually (sign in, query DB, confirm 64-char hex token).
+ * These are logic-level tests of the actual exported functions from session-hash.ts.
+ * Extension wiring is verified manually (sign in, query DB, confirm 64-char hex token).
  */
 import { describe, expect, it } from 'vitest'
+import { hashWhereToken, restoreTokenFromMap } from '../../lib/session-hash'
 import { hashSessionToken } from '../../lib/session-token'
 
+// Simulates the create interceptor's inline hash-and-restore logic
 function applyCreateHash<T extends { data?: { token?: unknown; [k: string]: unknown } }>(args: T): T {
   if (typeof args.data?.token === 'string') {
     return { ...args, data: { ...args.data, token: hashSessionToken(args.data.token) } }
   }
   return args
-}
-
-function applyWhereHash<T extends { where?: { token?: unknown; [k: string]: unknown } }>(args: T): T {
-  if (typeof args.where?.token === 'string') {
-    return { ...args, where: { ...args.where, token: hashSessionToken(args.where.token as string) } }
-  }
-  return args
-}
-
-function applyWhereInHash<T extends { where?: { token?: { in?: unknown[] } | unknown; [k: string]: unknown } }>(args: T): T {
-  const token = args.where?.token
-  if (typeof token === 'string') {
-    return { ...args, where: { ...args.where, token: hashSessionToken(token) } }
-  }
-  if (token !== null && typeof token === 'object' && Array.isArray((token as { in?: unknown[] }).in)) {
-    const arr = (token as { in: string[] }).in
-    return { ...args, where: { ...args.where, token: { ...(token as object), in: arr.map(hashSessionToken) } } }
-  }
-  return args
-}
-
-function restoreToken<T>(row: T, rawToken: string | null): T {
-  if (!rawToken || !row || typeof row !== 'object') return row
-  if ('token' in row && typeof (row as { token: unknown }).token === 'string') {
-    return { ...(row as object), token: rawToken } as T
-  }
-  return row
 }
 
 describe('session create interceptor', () => {
@@ -54,64 +29,77 @@ describe('session create interceptor', () => {
   })
 })
 
-describe('session findFirst / update / delete / deleteMany interceptor', () => {
-  it('hashes token in where clause', () => {
+describe('hashWhereToken — string form { token: "raw" }', () => {
+  it('hashes the raw string and tracks restore mapping', () => {
     const raw = 'myrawtoken'
-    const result = applyWhereHash({ where: { token: raw } })
-    expect(result.where!.token).toBe(hashSessionToken(raw))
-    expect(result.where!.token).not.toBe(raw)
-  })
-
-  it('is a no-op when token is not in where', () => {
-    const args = { where: { userId: 'u1' } }
-    expect(applyWhereHash(args)).toEqual(args)
-  })
-
-  it('is a no-op when where is undefined', () => {
-    const args = {}
-    expect(applyWhereHash(args)).toEqual(args)
+    const { where, restoreMap } = hashWhereToken({ token: raw })
+    expect((where as { token: string }).token).toBe(hashSessionToken(raw))
+    expect(restoreMap?.get(hashSessionToken(raw))).toBe(raw)
   })
 })
 
-describe('session findMany interceptor', () => {
-  it('hashes a single string token', () => {
-    const raw = 'singletoken'
-    const result = applyWhereInHash({ where: { token: raw } })
-    expect(result.where!.token).toBe(hashSessionToken(raw))
+describe('hashWhereToken — operator form { token: { equals: "raw" } }', () => {
+  // Better-auth 1.6.x's prisma adapter produces this shape from convertWhereClause for
+  // findOne/findMany. The pre-1.6 versions used the bare-string form covered above.
+  it('hashes the equals value while preserving the operator wrapper', () => {
+    const raw = 'rawfromequals'
+    const { where, restoreMap } = hashWhereToken({ token: { equals: raw } })
+    const out = (where as { token: { equals: string } }).token
+    expect(out.equals).toBe(hashSessionToken(raw))
+    expect(restoreMap?.get(hashSessionToken(raw))).toBe(raw)
   })
 
-  it('hashes every token in an { in: [...] } filter (findSessions path)', () => {
+  it('preserves other operator keys alongside equals', () => {
+    const raw = 'rawmodal'
+    const { where } = hashWhereToken({ token: { equals: raw, mode: 'insensitive' } })
+    const out = (where as { token: { equals: string; mode: string } }).token
+    expect(out.equals).toBe(hashSessionToken(raw))
+    expect(out.mode).toBe('insensitive')
+  })
+})
+
+describe('hashWhereToken — { token: { in: [...] } } findSessions form', () => {
+  it('hashes every token in the array and builds a restore map', () => {
     const tokens = ['tok1', 'tok2', 'tok3']
-    const result = applyWhereInHash({ where: { token: { in: tokens } } })
-    const tokenResult = result.where!.token as { in: string[] }
-    expect(tokenResult.in).toEqual(tokens.map(hashSessionToken))
-    expect(tokenResult.in).not.toContain(tokens[0])
+    const { where, restoreMap } = hashWhereToken({ token: { in: tokens } })
+    const out = (where as { token: { in: string[] } }).token
+    expect(out.in).toEqual(tokens.map(hashSessionToken))
+    for (const raw of tokens) expect(restoreMap?.get(hashSessionToken(raw))).toBe(raw)
+  })
+})
+
+describe('hashWhereToken — no-op cases', () => {
+  it('passes through when where has no token field', () => {
+    const where = { userId: 'u1' }
+    const result = hashWhereToken(where)
+    expect(result.where).toBe(where)
+    expect(result.restoreMap).toBeNull()
   })
 
-  it('is a no-op when where has no token field', () => {
-    const args = { where: { userId: 'u1' } }
-    expect(applyWhereInHash(args)).toEqual(args)
-  })
-
-  it('is a no-op when where is undefined', () => {
-    const args = {}
-    expect(applyWhereInHash(args)).toEqual(args)
+  it('passes through when where is undefined', () => {
+    expect(hashWhereToken(undefined)).toEqual({ where: undefined, restoreMap: null })
   })
 })
 
 describe('returned-row token restoration', () => {
-  it('replaces the stored hashed token with the raw input token', () => {
+  it('replaces the stored hashed token with the raw input token via the map', () => {
     const raw = 'raw-token-from-input'
-    const row = { id: 's1', userId: 'u1', token: hashSessionToken(raw), expiresAt: new Date() }
-    expect(restoreToken(row, raw).token).toBe(raw)
+    const hashed = hashSessionToken(raw)
+    const row = { id: 's1', userId: 'u1', token: hashed, expiresAt: new Date() }
+    expect(restoreTokenFromMap(row, new Map([[hashed, raw]])).token).toBe(raw)
   })
 
   it('passes through null results unchanged (e.g. findFirst miss)', () => {
-    expect(restoreToken(null, 'raw')).toBeNull()
+    expect(restoreTokenFromMap(null, new Map([['hashed', 'raw']]))).toBeNull()
   })
 
-  it('does nothing when no raw token was supplied (e.g. lookup by userId)', () => {
+  it('does nothing when no map was supplied (e.g. lookup by userId)', () => {
     const row = { id: 's1', token: 'hashed-value' }
-    expect(restoreToken(row, null)).toBe(row)
+    expect(restoreTokenFromMap(row, null)).toBe(row)
+  })
+
+  it('does nothing when the row token is not in the map (e.g. cross-call leak)', () => {
+    const row = { id: 's1', token: 'unknown-hash' }
+    expect(restoreTokenFromMap(row, new Map([['other-hash', 'other-raw']]))).toBe(row)
   })
 })

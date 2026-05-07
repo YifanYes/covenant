@@ -857,24 +857,6 @@
       "name": "Enjambre de Truenos"
     }
   },
-  "emails": {
-    "magicLink": {
-      "subject": "Tu portal a Covenant te espera",
-      "preview": "Tu portal a Covenant te espera — entra antes de que las puertas se cierren",
-      "heading": "Las puertas están abiertas",
-      "body": "Estás a un clic de entrar al reino. Este enlace es tu llave — pero se desvanece en {{minutes}} minutos, ¡así que no te quedes mirando!",
-      "cta": "Entrar a Covenant",
-      "footer": "¿No solicitaste esto? No pasa nada — ignóralo y el hechizo se disipará."
-    },
-    "welcome": {
-      "subject": "Bienvenido a la guerra, recluta",
-      "preview": "Tu leyenda comienza hoy — agarra una espada e intenta no morir inmediatamente",
-      "heading": "Has sido reclutado",
-      "body": "Los ejércitos de la procrastinación no se matan solos. ¿Tu primera misión? Definir lo que realmente importa. Añade tus objetivos, completa tareas, gana dados y finge que eres un héroe en lugar de alguien con una lista de tareas.",
-      "cta": "Definir Mis Misiones",
-      "footer": "Si no te registraste, alguien realmente cree en tu potencial. O te está tomando el pelo. En cualquier caso, ignora esto."
-    }
-  },
   "enemies": {
     "alpha_werewolf": "Hombre Lobo Alfa",
     "armored_templar": "Templario Acorazado",
@@ -1007,7 +989,7 @@
   },
   "errors": {
     "invalid_email": "Correo electrónico no valido",
-    "invalid_password_length": "La contraseña debe tener al menos 6 caracteres",
+    "invalid_password_length": "La contraseña debe tener al menos 8 caracteres",
     "password_mismatch": "Las contraseñas no coinciden",
     "required_field": "Campo requerido"
   },
@@ -1336,29 +1318,20 @@
     "es": "Español"
   },
   "login": {
-    "account_verified": {
-      "description": "Ahora puedes iniciar sesión con tus credenciales.",
-      "title": "¡Cuenta verificada exitosamente!"
-    },
     "button": "Iniciar sesión",
-    "check_email_title": "Revisa tu correo",
     "create_account": "Crear cuenta",
     "dont_have_account": "¿No tienes cuenta?",
     "email": "Correo electrónico",
     "error": {
+      "title": "Error",
       "google_unavailable": "El inicio de sesión con Google no está disponible actualmente, por favor inténtalo más tarde",
       "internal_error": "Ocurrió un error al iniciar sesión",
-      "invalid_credentials": "Credenciales inválidas. Por favor, verifica tu correo y contraseña.",
-      "invalid_magic_link": "Enlace mágico inválido o expirado",
-      "magic_link_error": "Error del enlace mágico"
+      "invalid_credentials": "Credenciales inválidas. Por favor, verifica tu correo y contraseña."
     },
     "google_button": "Iniciar sesión con Google",
-    "magic_link_sent_description": "Haz clic en el enlace del correo para iniciar sesión en tu cuenta.",
-    "magic_link_sent_title": "¡Enlace mágico enviado!",
     "or": "o",
     "password": "Contraseña",
     "recover_password": "Recuperar contraseña",
-    "success": "Se ha enviado un enlace de inicio de sesión a tu correo.",
     "title": "Inicia sesión en Covenant",
     "verifying_messages": [
       "Afilando el acero sagrado...",
@@ -1528,12 +1501,12 @@
     "confirm_password": "Confirmar contraseña",
     "email": "Correo electrónico",
     "error": {
-      "title": "Ocurrió un error al crear la cuenta"
+      "title": "Ocurrió un error al crear la cuenta",
+      "internal_error": "Ocurrió un error inesperado. Por favor, inténtalo más tarde."
     },
     "login": "Inicia sesión",
+    "name": "Nombre",
     "password": "Contraseña",
-    "success_message": "Te hemos enviado un correo de vertificación. Comprueba tu bandeja de entrada.",
-    "success_title": "¡Cuenta creada!",
     "title": "Crear una cuenta en Covenant"
   },
   "status_effects": {

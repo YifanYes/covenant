@@ -2,19 +2,16 @@ import { betterAuth } from 'better-auth'
 import { createAuthMiddleware } from 'better-auth/api'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { nextCookies } from 'better-auth/next-js'
-import { magicLink } from 'better-auth/plugins'
 import { env } from '../config'
-import { renderMagicLinkEmail, renderWelcomeEmail } from '@/server/emails/render-email'
-import { createServerI18n } from './i18n-server'
 import { logger } from './logger'
 import { prisma } from './prisma'
-import { EmailService } from '../services/email.service'
-import { DEFAULT_LOCALE, resolveCreateUserLocale, resolveEmailLocale } from './auth-locale.utils'
+import { resolveCreateUserLocale } from './auth-locale.utils'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   secret: env.JWT_SECRET,
   baseURL: env.NEXT_PUBLIC_APP_URL,
+  emailAndPassword: { enabled: true, autoSignIn: true, minPasswordLength: 8, maxPasswordLength: 128 },
   socialProviders: {
     google: {
       clientId: env.GOOGLE_CLIENT_ID,
@@ -22,28 +19,25 @@ export const auth = betterAuth({
     }
   },
   plugins: [
-    nextCookies(),
-    magicLink({
-      sendMagicLink: async ({ email, url }, ctx) => {
-        const locale = await resolveEmailLocale(email, ctx)
-        const i18n = await createServerI18n(locale)
-        const html = await renderMagicLinkEmail({ url, minutes: 10, locale })
-        const emailService = new EmailService()
-        try {
-          await emailService.sendEmail({
-            to: email,
-            subject: i18n.t('emails.magicLink.subject'),
-            html
-          })
-        } catch (err) {
-          logger.error({ event: 'MAGIC_LINK_EMAIL_FAILED', email, error: err }, 'Failed to send magic link email')
-        }
-      }
-    })
+    nextCookies()
   ],
   session: {
     expiresIn: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24
+  },
+  // Auth paths are explicitly rate-limited to 3 req/10s per IP. Other paths fall back to the
+  // global limit of 100 req/10s. Disabled in test to avoid hitting limits during automated flows.
+  // Storage is in-memory per instance (sufficient now; switch to secondaryStorage if distributed).
+  rateLimit: {
+    enabled: env.NODE_ENV !== 'test',
+    window: 10,
+    max: 100,
+    customRules: {
+      '/sign-in/**': { window: 10, max: 3 },
+      '/sign-up/**': { window: 10, max: 3 },
+      '/change-password/**': { window: 10, max: 3 },
+      '/change-email/**': { window: 10, max: 3 }
+    }
   },
   databaseHooks: {
     user: {
@@ -54,26 +48,6 @@ export const auth = betterAuth({
         },
         after: async (user) => {
           logger.info({ event: 'AUTH_SIGNUP', userId: user.id }, 'User registered')
-          try {
-            const stored = await prisma.user.findUnique({
-              where: { id: user.id },
-              select: { locale: true, email: true }
-            })
-            const locale = stored?.locale || DEFAULT_LOCALE
-            const i18n = await createServerI18n(locale)
-            const html = await renderWelcomeEmail({
-              locale,
-              ctaUrl: `${env.NEXT_PUBLIC_APP_URL}/objectives`
-            })
-            const emailService = new EmailService()
-            await emailService.sendEmail({
-              to: user.email,
-              subject: i18n.t('emails.welcome.subject'),
-              html
-            })
-          } catch (err) {
-            logger.error({ event: 'WELCOME_EMAIL_FAILED', userId: user.id, error: err }, 'Failed to send welcome email')
-          }
         }
       }
     },
@@ -96,7 +70,7 @@ export const auth = betterAuth({
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
       const path = ctx.path
-      if (!path.includes('/sign-in') && !path.includes('/magic-link')) return
+      if (!path.startsWith('/sign-in') && !path.startsWith('/sign-up')) return
       const returned = ctx.context.returned
       if (!(returned instanceof Response)) return
 
