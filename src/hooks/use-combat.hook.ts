@@ -26,9 +26,7 @@ export function useCombat(
   const currentClass = character.classes.find((c) => c.className === character.currentClass)!
 
   // Tactical state from server
-  const { data: tacticalState } = useSuspenseQuery(
-    trpcOptions.quest.getTacticalState.queryOptions({ questId })
-  )
+  const { data: tacticalState } = useSuspenseQuery(trpcOptions.quest.getTacticalState.queryOptions({ questId }))
 
   // Local state derived from server + client
   const [localEnemies, setLocalEnemies] = useState<EnemyState[]>(initialEnemies)
@@ -79,9 +77,11 @@ export function useCombat(
               nameSuffix: existing?.nameSuffix ?? nameParts[1]
             }
           })
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing local UI state from server tactical state (external data source)
         setLocalEnemies(newEnemies)
       }
     }
+    // localEnemies intentionally omitted: we only want to sync when the server tacticalState changes, not when localEnemies updates, to avoid an infinite loop
   }, [tacticalState]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const invalidateQueries = useCallback(() => {

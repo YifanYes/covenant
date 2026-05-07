@@ -28,6 +28,7 @@ export default function Login() {
 
   useEffect(() => {
     if (session?.user && !isRedirecting) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time redirect guard: prevents double-execution when session resolves
       setIsRedirecting(true)
 
       updateUserInfo({
@@ -102,6 +103,7 @@ export default function Login() {
   useEffect(() => {
     const messages = t('login.verifying_messages', { returnObjects: true }) as string[]
     if (Array.isArray(messages) && messages.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- loading message initialization from translations, guarded by array check
       setVerifyingMessage(messages[Math.floor(Math.random() * messages.length)])
     }
   }, [t])
