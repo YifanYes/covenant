@@ -3,10 +3,10 @@ import { useFormField } from '@/hooks/use-form-field'
 import { cn } from '@/lib/cn.lib'
 import { Check, ChevronDown } from 'pixelarticons/react'
 import { useEffect, useRef, useState } from 'react'
-import { type Control, Controller } from 'react-hook-form'
+import { type Control, Controller, type FieldPath, type FieldValues } from 'react-hook-form'
 import FormField from './form-field.component'
 
-export default function MultiSelect({
+export default function MultiSelect<TFieldValues extends FieldValues = FieldValues>({
   name,
   control,
   items,
@@ -16,8 +16,8 @@ export default function MultiSelect({
   errorMessage,
   exclusiveValue
 }: {
-  name: string
-  control: Control<any>
+  name: FieldPath<TFieldValues>
+  control: Control<TFieldValues>
   items: {
     id: string
     label: string
