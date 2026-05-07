@@ -1,29 +1,29 @@
 'use client'
 import MultiSelect from '@/forms/multi-select.component'
 import type { Objective } from '@/types/models.types'
-import type { Control } from 'react-hook-form'
+import type { Control, FieldPath, FieldValues } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-interface ObjectivesSelectorProps {
-  control: Control<any>
+interface ObjectivesSelectorProps<TFieldValues extends FieldValues = FieldValues> {
+  control: Control<TFieldValues>
   objectives: Objective[]
-  name?: string
+  name?: FieldPath<TFieldValues>
   placeholder?: string
   label?: string
 }
 
-export default function ObjectivesSelector({
+export default function ObjectivesSelector<TFieldValues extends FieldValues = FieldValues>({
   control,
   objectives,
-  name = 'objectives',
+  name,
   placeholder,
   label
-}: ObjectivesSelectorProps) {
+}: ObjectivesSelectorProps<TFieldValues>) {
   const { t } = useTranslation()
 
   return (
     <MultiSelect
-      name={name}
+      name={name ?? ('objectives' as FieldPath<TFieldValues>)}
       control={control}
       items={objectives.map(({ id, name: label }) => ({ id, label })) || []}
       placeholder={placeholder || t('objectives.selector.placeholder')}

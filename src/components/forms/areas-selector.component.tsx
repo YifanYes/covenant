@@ -1,23 +1,29 @@
 'use client'
 import MultiSelect from '@/forms/multi-select.component'
 import type { Area } from '@/types/models.types'
-import type { Control } from 'react-hook-form'
+import type { Control, FieldPath, FieldValues } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-interface AreasSelectorProps {
-  control: Control<any>
+interface AreasSelectorProps<TFieldValues extends FieldValues = FieldValues> {
+  control: Control<TFieldValues>
   areas: Area[]
-  name?: string
+  name?: FieldPath<TFieldValues>
   placeholder?: string
   label?: string
 }
 
-export default function AreasSelector({ control, areas, name = 'areas', placeholder, label }: AreasSelectorProps) {
+export default function AreasSelector<TFieldValues extends FieldValues = FieldValues>({
+  control,
+  areas,
+  name,
+  placeholder,
+  label
+}: AreasSelectorProps<TFieldValues>) {
   const { t } = useTranslation()
 
   return (
     <MultiSelect
-      name={name}
+      name={name ?? ('areas' as FieldPath<TFieldValues>)}
       control={control}
       items={areas.map(({ id, name: label }) => ({ id, label: t(label) })) || []}
       placeholder={placeholder || t('areas.selector.placeholder')}
