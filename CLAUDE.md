@@ -30,6 +30,7 @@ Uses Vitest. Test files go in `src/server/__tests__/` mirroring the source struc
 
 ```bash
 pnpm test           # Run tests
+pnpm test:run       # Run tests once (used in CI and pre-push hook)
 pnpm test:coverage  # Run with coverage
 ```
 
@@ -37,7 +38,18 @@ pnpm test:coverage  # Run with coverage
 
 ```bash
 pnpm lint
+npx tsc --noEmit    # Type-check only (required after type/interface changes)
 ```
+
+### Pre-push Hook
+
+Husky runs a full dry-run on every `git push` via `.husky/pre-push`:
+
+```bash
+pnpm install --frozen-lockfile && pnpm prisma generate && pnpm lint && npx tsc --noEmit && pnpm build && pnpm test:run
+```
+
+This simulates Railway's build and catches deployment failures before they hit production. Bypass in emergencies with `git push --no-verify`.
 
 ### Database
 

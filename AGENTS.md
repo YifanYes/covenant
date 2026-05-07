@@ -23,8 +23,19 @@ After changes, run in this order:
 ```bash
 pnpm lint
 npx tsc --noEmit   # required after type/interface changes
-pnpm test          # vitest, must pass before considering task complete
+pnpm test:run      # vitest, must pass before considering task complete
 ```
+
+**Pre-push dry run**: Husky runs a full build + test on every `git push` via `.husky/pre-push`. This simulates Railway's `buildCommand` exactly (`pnpm install --frozen-lockfile && pnpm prisma generate && pnpm lint && npx tsc --noEmit && pnpm build && pnpm test:run`) and catches deployment failures before they hit production.
+
+To bypass the hook in emergencies: `git push --no-verify`
+
+## Deployment / Railway
+
+- **Config**: `railway.toml` — uses `railpack` builder with `buildCommand` and `startCommand`
+- **Healthcheck**: `/api/health` with 100s timeout
+- **Preview environments**: Enable in Railway dashboard under Project Settings → Environments → "Generate Environments for PRs". This creates isolated preview deployments for every pull request using real Railway infrastructure.
+- **CI**: `.github/workflows/pr.yml` runs lint, TypeScript, build, and tests on every PR
 
 ## Testing
 

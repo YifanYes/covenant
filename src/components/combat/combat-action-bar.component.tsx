@@ -71,15 +71,24 @@ export default function CombatActionBar({
 
   // Reset to menu when turn ends or rolls/doctrine clear
   useEffect(() => {
-    if (disabled) setView('menu')
+    if (disabled) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven UI reset: component must return to menu when disabled
+      setView('menu')
+    }
   }, [disabled])
 
   useEffect(() => {
-    if (attackRolls === null) setView('menu')
+    if (attackRolls === null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven UI reset: return to menu after attack rolls clear
+      setView('menu')
+    }
   }, [attackRolls])
 
   useEffect(() => {
-    if (selectedDoctrineId === null) setView('menu')
+    if (selectedDoctrineId === null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven UI reset: return to menu when doctrine is cancelled
+      setView('menu')
+    }
   }, [selectedDoctrineId])
 
   const handleDoctrineUse = (doctrine: DoctrineDefinition) => {

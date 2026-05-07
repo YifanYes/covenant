@@ -95,6 +95,7 @@ const Carousel = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
         return
       }
 
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- initial sync of React state with Embla Carousel external API
       onSelect(api)
       api.on('reInit', onSelect)
       api.on('select', onSelect)
@@ -213,6 +214,7 @@ const CarouselDots = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLD
     React.useEffect(() => {
       if (!api) return
 
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- initial sync of dot state with Embla Carousel external API
       onInit(api)
       onSelect(api)
       api.on('reInit', onInit)

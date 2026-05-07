@@ -1,0 +1,30 @@
+#!/bin/sh
+# Pre-push dry-run hook — simulates Railway build + test cycle
+# This catches missing deps, TypeScript errors, Prisma issues, and test failures
+# before they hit production.
+
+echo "🚧 Starting pre-push dry run (this may take a few minutes)..."
+echo ""
+
+set -e
+
+echo "📦 Installing dependencies..."
+pnpm install --frozen-lockfile
+
+echo "🎲 Generating Prisma client..."
+pnpm prisma generate
+
+echo "🔍 Running lint..."
+pnpm lint
+
+echo "📝 Running TypeScript check..."
+npx tsc --noEmit
+
+echo "🏗️  Running production build..."
+pnpm build
+
+echo "🧪 Running tests..."
+pnpm test:run
+
+echo ""
+echo "✅ Dry run passed — safe to push."
