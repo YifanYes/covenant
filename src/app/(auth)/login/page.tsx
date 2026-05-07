@@ -9,7 +9,7 @@ import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { loginSchema, type LoginType } from '@shared/schemas/auth.schemas'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Check, Loader, Mail, SquareAlert } from 'pixelarticons/react'
+import { Loader, SquareAlert } from 'pixelarticons/react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -17,17 +17,15 @@ import { toast } from 'sonner'
 import GoogleLoginButton from '../_components/google-login-button.component'
 
 export default function Login() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const updateUserInfo = useAuthStore((state) => state.updateUserInfo)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
 
   const { data: session, isPending: isSessionPending } = useSession()
 
-  // Handle session changes - redirect when logged in
   useEffect(() => {
     if (session?.user && !isRedirecting) {
       setIsRedirecting(true)
@@ -38,8 +36,9 @@ export default function Login() {
       })
 
       const redirectTo = searchParams.get('redirect_to')
+      const isSafeRedirect = (v: string) => v.startsWith('/') && !v.startsWith('//')
 
-      if (redirectTo) {
+      if (redirectTo && isSafeRedirect(redirectTo)) {
         router.push(redirectTo)
       } else {
         queryClient
@@ -54,14 +53,12 @@ export default function Login() {
     }
   }, [session, updateUserInfo, router, searchParams, isRedirecting])
 
-  // Check for error in URL params (from magic link failure)
   const urlError = useMemo(() => {
     const error = searchParams.get('error')
     const errorDescription = searchParams.get('error_description')
-    return error && errorDescription ? errorDescription.replace(/\+/g, ' ') : null
+    return error && errorDescription ? decodeURIComponent(errorDescription.replace(/\+/g, ' ')) : null
   }, [searchParams])
 
-  // Clean up URL if there was an error
   useEffect(() => {
     if (urlError) {
       window.history.replaceState(null, '', window.location.pathname)
@@ -72,23 +69,22 @@ export default function Login() {
     async (data: LoginType) => {
       setIsLoading(true)
       try {
-        const redirectTo = searchParams.get('redirect_to') || '/login'
-        const locale = i18n.language || 'es'
-        await authClient.signIn.magicLink({
-          email: data.email,
-          callbackURL: `${window.location.origin}${redirectTo}?locale=${locale}`
-        })
-        setMagicLinkSent(true)
-        toast.success(t('login.success'))
-      } catch (error) {
-        toast.error(t('login.error.title'), {
-          description: error instanceof Error ? error.message : 'Unknown error'
-        })
+        const result = await authClient.signIn.email({ email: data.email, password: data.password })
+        if (result.error) {
+          const description =
+            result.error.status === 401
+              ? t('login.error.invalid_credentials')
+              : t('login.error.internal_error')
+          toast.error(t('login.error.title'), { description })
+          return
+        }
+      } catch {
+        toast.error(t('login.error.title'), { description: t('login.error.internal_error') })
       } finally {
         setIsLoading(false)
       }
     },
-    [searchParams, t, i18n.language]
+    [t]
   )
 
   const {
@@ -96,15 +92,10 @@ export default function Login() {
     handleSubmit,
     formState: { errors, isValid, isDirty }
   } = useForm<LoginType>({
-    defaultValues: { email: '' },
+    defaultValues: { email: '', password: '' },
     resolver: standardSchemaResolver(loginSchema),
     mode: 'onSubmit'
   })
-
-  const isAccountVerified = useMemo(
-    () => searchParams.get('verified') === 'true' || searchParams.get('type') === 'signup',
-    [searchParams]
-  )
 
   const [verifyingMessage, setVerifyingMessage] = useState(() => t('login.verifying_title'))
 
@@ -115,7 +106,6 @@ export default function Login() {
     }
   }, [t])
 
-  // Show loading while checking session or redirecting
   if (isSessionPending || isRedirecting) {
     return (
       <div className="flex w-md flex-col items-center justify-center gap-6 py-8">
@@ -128,36 +118,14 @@ export default function Login() {
     )
   }
 
-  if (magicLinkSent) {
-    return (
-      <div className="flex w-md flex-col gap-2.5">
-        <h2>{t('login.check_email_title')}</h2>
-        <AlertComponent variant="success">
-          <Mail />
-          <AlertTitle>{t('login.magic_link_sent_title')}</AlertTitle>
-          <AlertDescription>{t('login.magic_link_sent_description')}</AlertDescription>
-        </AlertComponent>
-      </div>
-    )
-  }
-
   return (
     <div className="flex w-md flex-col gap-2.5">
       <h2>{t('login.title')}</h2>
-      {isAccountVerified && (
-        <AlertComponent variant="success">
-          <Check />
-          <AlertTitle>{t('login.account_verified.title')}</AlertTitle>
-          <AlertDescription>{t('login.account_verified.description')}</AlertDescription>
-        </AlertComponent>
-      )}
       {urlError && (
         <AlertComponent variant="destructive">
           <SquareAlert />
-          <AlertTitle>{t('login.error.magic_link_error')}</AlertTitle>
-          <AlertDescription>
-            {urlError === 'Email link is invalid or has expired' ? t('login.error.invalid_magic_link') : urlError}
-          </AlertDescription>
+          <AlertTitle>{t('login.error.title')}</AlertTitle>
+          <AlertDescription>{urlError}</AlertDescription>
         </AlertComponent>
       )}
       <TextInput
@@ -165,6 +133,13 @@ export default function Login() {
         placeholder={t('login.email')}
         {...register('email')}
         {...(errors.email?.message && { errorMessage: t(errors.email.message) })}
+        required
+      />
+      <TextInput
+        type="password"
+        placeholder={t('login.password')}
+        {...register('password')}
+        {...(errors.password?.message && { errorMessage: t(errors.password.message) })}
         required
       />
       <LoaderButton

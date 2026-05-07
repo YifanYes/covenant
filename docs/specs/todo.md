@@ -5,6 +5,8 @@
 - [ ] Legal pages — Terms of Service, Privacy Policy, Cookie consent
   - No `/tos`, `/privacy`, or consent banner exists. GDPR/CCPA exposure on EU/CA visitors. Required before public traffic.
 
+- [ ] Analyze game design loop
+
 - [ ] API rate limiting
   - Zero rate limiting in tRPC routers, middleware, or auth endpoints. No `@upstash/ratelimit` or redis. Magic-link and signup endpoints can be abused for spam/credential stuffing. Broader than the "Account Lockout" item below.
   - **Fix:** Add rate limiter middleware (per-IP + per-user) and apply to auth, magic-link send, and write-heavy routers.

@@ -2,6 +2,7 @@ import { Prisma, PrismaClient } from '@/generated/prisma'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 import { env } from '../config'
+import { hashWhereToken, restoreTokenFromMap } from './session-hash'
 import { hashSessionToken } from './session-token'
 
 // Parse URL and use explicit parameters to avoid connection string parsing issues
@@ -27,17 +28,6 @@ const baseClient = globalForPrisma.prisma || new PrismaClient({ adapter })
 
 if (env.NODE_ENV !== 'production') globalForPrisma.prisma = baseClient
 
-// Restore the raw token on a returned row so callers (better-auth) keep operating on raw tokens.
-// Without this, the hashed value leaks back out via session.token and gets written to the cookie,
-// breaking the next request because the cookie's hashed value gets hashed again on lookup.
-function restoreToken<T>(row: T, rawToken: string | null): T {
-  if (!rawToken || !row || typeof row !== 'object') return row
-  if ('token' in row && typeof (row as { token: unknown }).token === 'string') {
-    return { ...(row as object), token: rawToken } as T
-  }
-  return row
-}
-
 const sessionHashExtension = Prisma.defineExtension({
   name: 'session-token-hash',
   query: {
@@ -48,69 +38,42 @@ const sessionHashExtension = Prisma.defineExtension({
           args.data = { ...args.data, token: hashSessionToken(rawToken) }
         }
         const result = await query(args)
-        return restoreToken(result, rawToken)
+        return restoreTokenFromMap(result, rawToken ? new Map([[hashSessionToken(rawToken), rawToken]]) : null)
       },
       async findFirst({ args, query }) {
-        const rawToken = typeof args.where?.token === 'string' ? args.where.token : null
-        if (rawToken) {
-          args.where = { ...args.where, token: hashSessionToken(rawToken) }
-        }
+        const { where, restoreMap } = hashWhereToken(args.where)
+        args.where = where as typeof args.where
         const result = await query(args)
-        return restoreToken(result, rawToken)
+        return restoreTokenFromMap(result, restoreMap)
       },
       async findMany({ args, query }) {
-        const token = args.where?.token
-        let restoreMap: Map<string, string> | null = null
-        if (typeof token === 'string') {
-          const hashed = hashSessionToken(token)
-          args.where = { ...args.where, token: hashed }
-          restoreMap = new Map([[hashed, token]])
-        } else if (token !== null && typeof token === 'object' && Array.isArray(token.in)) {
-          restoreMap = new Map()
-          const hashedIn = token.in.map((t: string) => {
-            const h = hashSessionToken(t)
-            restoreMap!.set(h, t)
-            return h
-          })
-          args.where = { ...args.where, token: { ...token, in: hashedIn } }
-        }
+        const { where, restoreMap } = hashWhereToken(args.where)
+        args.where = where as typeof args.where
         const result = await query(args)
         if (Array.isArray(result) && restoreMap) {
-          return result.map((row) => {
-            if (row && typeof row === 'object' && 'token' in row && typeof (row as { token: unknown }).token === 'string') {
-              const raw = restoreMap!.get((row as { token: string }).token)
-              if (raw) return { ...(row as object), token: raw }
-            }
-            return row
-          })
+          return result.map((row) => restoreTokenFromMap(row, restoreMap))
         }
         return result
       },
       async update({ args, query }) {
-        // better-auth's updateSession uses WHERE token = ? (not by id)
-        const rawToken = typeof args.where?.token === 'string' ? args.where.token : null
-        if (rawToken) {
-          args.where = { ...args.where, token: hashSessionToken(rawToken) }
-        }
+        const { where, restoreMap } = hashWhereToken(args.where)
+        args.where = where as typeof args.where
         const result = await query(args)
-        return restoreToken(result, rawToken)
+        return restoreTokenFromMap(result, restoreMap)
       },
       async delete({ args, query }) {
-        const rawToken = typeof args.where?.token === 'string' ? args.where.token : null
-        if (rawToken) {
-          args.where = { ...args.where, token: hashSessionToken(rawToken) }
-        }
+        const { where, restoreMap } = hashWhereToken(args.where)
+        args.where = where as typeof args.where
         const result = await query(args)
-        return restoreToken(result, rawToken)
+        return restoreTokenFromMap(result, restoreMap)
       },
       async deleteMany({ args, query }) {
-        if (typeof args.where?.token === 'string') {
-          args.where = { ...args.where, token: hashSessionToken(args.where.token) }
-        }
+        const { where } = hashWhereToken(args.where)
+        args.where = where as typeof args.where
         return query(args)
-      },
-    },
-  },
+      }
+    }
+  }
 })
 
 // $extends returns a subtype TypeScript won't accept as PrismaClient without a cast.
