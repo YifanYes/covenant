@@ -1,3 +1,4 @@
+import { SentryProvider } from '@/components/common/sentry-provider.component'
 import ThemeProvider, { Theme } from '@/components/common/theme-provider.component'
 import Toaster from '@/components/ui/toaster.component'
 import { Faction } from '@shared/constants/factions'
@@ -64,12 +65,14 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${ebGaramond.variable} ${cinzel.variable} ${factionClass} antialiased`}
       >
         <I18nProvider initialLang={lang}>
-          <TRPCProvider>
-            <ThemeProvider initialTheme={theme as Theme} initialFaction={faction as Faction}>
-              <Toaster />
-              {children}
-            </ThemeProvider>
-          </TRPCProvider>
+          <SentryProvider>
+            <TRPCProvider>
+              <ThemeProvider initialTheme={theme as Theme} initialFaction={faction as Faction}>
+                <Toaster />
+                {children}
+              </ThemeProvider>
+            </TRPCProvider>
+          </SentryProvider>
         </I18nProvider>
       </body>
     </html>
