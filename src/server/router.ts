@@ -3,6 +3,7 @@ import { authRouter } from './routers/auth.router'
 import { characterRouter } from './routers/character.router'
 import { dashboardRouter } from './routers/dashboard.router'
 import { habitsRouter } from './routers/habits.router'
+import { journalingRouter } from './routers/journal.router'
 import { killRecordRouter } from './routers/kill-record.router'
 import { objectivesRouter } from './routers/objectives.router'
 import { questRouter } from './routers/quest.router'
@@ -22,6 +23,7 @@ export const appRouter = t.router({
   areas: areasRouter,
   tasks: tasksRouter,
   habits: habitsRouter,
+  journaling: journalingRouter,
   dashboard: dashboardRouter,
   quest: questRouter,
   killRecord: killRecordRouter,

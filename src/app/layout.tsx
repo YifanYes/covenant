@@ -63,6 +63,7 @@ export default async function RootLayout({
     <html lang={lang} className={`${theme} ${factionClass}`} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${ebGaramond.variable} ${cinzel.variable} ${factionClass} antialiased`}
+        suppressHydrationWarning
       >
         <I18nProvider initialLang={lang}>
           <SentryProvider>

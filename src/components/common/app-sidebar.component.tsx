@@ -15,7 +15,7 @@ import Sidebar, {
   SidebarTrigger
 } from '@/ui/sidebar.component'
 import Link from 'next/link'
-import { BookOpen, Bulletlist, Castle, Grid3x3, Settings2, Store, Suitcase, Trophy } from 'pixelarticons/react'
+import { BookOpen, Bulletlist, Calendar, Castle, Grid3x3, PenSquare, Settings2, Store, Suitcase, Trophy } from 'pixelarticons/react'
 import { useSyncExternalStore, type ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -86,6 +86,16 @@ export default function AppSidebar() {
         title: t('sidebar.habits'),
         url: '/habits',
         icon: BookOpen
+      },
+      {
+        title: t('sidebar.journaling'),
+        url: '/journaling',
+        icon: PenSquare
+      },
+      {
+        title: t('sidebar.calendar'),
+        url: '/calendar',
+        icon: Calendar
       }
     ],
     rpg: [

@@ -169,7 +169,13 @@
     "title": "Áreas"
   },
   "calendar": {
-    "today": "Hoy"
+    "title": "Calendario",
+    "today": "Hoy",
+    "no_tasks_for_day": "No hay tareas para este día",
+    "no_tasks_for_day_description": "Hasta los héroes necesitan descansar. Disfruta la calma antes de la próxima batalla.",
+    "no_habits_for_day": "No hay hábitos completados este día",
+    "no_habits_for_day_description": "La forja está fría. Mañana es otra oportunidad para entrenar.",
+    "no_journal_for_day_description": "Ninguna crónica escrita. La pluma del escriba espera tus hazañas."
   },
   "cancel": "Cancelar",
   "character_class": {
@@ -305,7 +311,8 @@
     "error": "Error al cargar datos",
     "failed": "Fallida",
     "loading": "Cargando...",
-    "back": "Volver"
+    "back": "Volver",
+    "none": "Ninguno"
   },
   "crafting": {
     "title": "Forja",
@@ -1401,6 +1408,63 @@
     "lore": "Los Seis Poderes Infernales han lanzado un ataque relámpago a Santa Cruz, la Sede Plateada. La Orden de los Caballeros Sagrados defiende cada muralla mientras los refuerzos vienen en camino. Si cae la Sede Plateada, cae el liderazgo de los Fieles.",
     "title": "Mapa del Mundo"
   },
+  "moods": {
+    "happy": "Feliz",
+    "sad": "Triste",
+    "angry": "Enfadado",
+    "disappointed": "Decepcionado",
+    "focused": "Concentrado",
+    "hopeful": "Esperanzado",
+    "depressed": "Deprimido",
+    "calm": "Tranquilo",
+    "anxious": "Ansioso",
+    "excited": "Emocionado",
+    "grateful": "Agradecido",
+    "tired": "Cansado"
+  },
+  "journaling": {
+    "title": "Diario",
+    "write_tab": "Escribir",
+    "calendar_tab": "Calendario",
+    "placeholder": "¿Cómo fue tu día?",
+    "save": "Guardar",
+    "update": "Actualizar",
+    "need_prompt": "¿Necesitas una idea?",
+    "streak": "Racha: {{count}} días",
+    "edit_entry": "Editar entrada",
+    "recent_entries": "Entradas recientes",
+    "no_entry_for_date": "No hay entrada para esta fecha",
+    "select_mood": "¿Cómo te sientes?",
+    "empty_state": {
+      "title": "Sin entradas aún",
+      "description": "Tu crónica está vacía. Escribe tu primera entrada y comienza tu leyenda.",
+      "action": "Escribe tu primera entrada"
+    },
+    "prompt": {
+      "0": "¿Por qué tres cosas estás agradecido hoy?",
+      "1": "¿Qué momento de hoy recordarás más?",
+      "2": "¿Cuál fue la parte más difícil de tu día?",
+      "3": "¿Qué esperas con ilusión para mañana?",
+      "4": "¿Cómo te sientes ahora mismo?"
+    },
+    "delete": {
+      "button": "Eliminar",
+      "title": "Eliminar entrada",
+      "description": "Esta acción es irreversible. Esto eliminará permanentemente la entrada."
+    },
+    "success": {
+      "create": "Entrada guardada exitosamente",
+      "update": "Entrada actualizada exitosamente",
+      "delete": "Entrada eliminada exitosamente"
+    },
+    "error": {
+      "internal": {
+        "create": "Ocurrió un error al guardar la entrada",
+        "update": "Ocurrió un error al actualizar la entrada",
+        "delete": "Ocurrió un error al eliminar la entrada"
+      }
+    }
+  },
   "more": "más",
   "objectives": {
     "add": "Añadir objetivo",
@@ -1518,7 +1582,7 @@
   "nav": {
     "quests": "Misiones"
   },
-  "sidebar": {
+    "sidebar": {
     "calendar": "Calendario",
     "close": "Colapsar menú",
     "crafting": "Forja",
@@ -1526,6 +1590,7 @@
     "habits": "Hábitos",
     "inventory": "Inventario",
     "investments": "Inversiones",
+    "journaling": "Diario",
     "objectives": "Objetivos y áreas",
     "open": "Expandir menú",
     "productivity": "Productividad",

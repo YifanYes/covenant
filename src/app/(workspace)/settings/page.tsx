@@ -50,7 +50,7 @@ export default function Settings() {
             placeholder={t('settings.default_tasks_view_placeholder')}
             value={defaultTasksView}
             onChange={handleDefaultViewChange}
-            options={['list', 'calendar', 'table', 'matrix'].map((value) => ({
+            options={['list', 'table', 'matrix'].map((value) => ({
               value,
               label: t(`tasks.tabs.${value}`)
             }))}
