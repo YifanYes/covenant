@@ -4,15 +4,19 @@ import { useTasksStore } from '@/stores/tasks.store'
 import TaskSummaryList from '@/tasks/task-summary-list.component'
 import type { Task as TaskType } from '@/types/models.types'
 import { getColorClasses } from '@/utils/theme.utils'
+import { MOOD_COLOR_MAP } from '@shared/constants/journal.constants'
 import dayjs from 'dayjs'
 
 interface CalendarDayProps {
   day: dayjs.Dayjs
   weekIndex: number
   tasks: TaskType[]
+  mood?: string | null
+  isSelected?: boolean
+  onSelect?: () => void
 }
 
-export default function CalendarDay({ day, weekIndex, tasks }: CalendarDayProps) {
+export default function CalendarDay({ day, weekIndex, tasks, mood, isSelected, onSelect }: CalendarDayProps) {
   const { setSelectedTask } = useTasksStore()
   const dayTasks = tasks.filter((task) => dayjs(task.dueDate).isSame(day, 'day'))
 
@@ -20,10 +24,19 @@ export default function CalendarDay({ day, weekIndex, tasks }: CalendarDayProps)
     day.isSame(dayjs(), 'day') ? 'bg-primary text-primary-foreground rounded-full w-7' : ''
 
   return (
-    <div className="flex flex-col border-2">
+    <div
+      className={cn('flex flex-col border-2', isSelected && 'ring-foreground ring-2')}
+      onClick={onSelect}
+    >
       <header className="flex flex-col items-center">
         {weekIndex === 0 && <p className="mt-1 text-sm">{day.format('ddd').toUpperCase()}</p>}
         <p className={cn('my-1 p-1 text-center text-sm', getCurrentDayClass())}>{day.format('D')}</p>
+        {mood && (
+          <span
+            className="mb-1 h-2 w-2 rounded-full"
+            style={{ backgroundColor: MOOD_COLOR_MAP.get(mood) || undefined }}
+          />
+        )}
       </header>
       <div className="flex flex-col gap-1 p-1">
         {dayTasks.slice(0, 2).map((task) => {

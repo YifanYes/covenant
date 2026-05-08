@@ -46,33 +46,35 @@ export class DiceService {
   }
 
   calculateHabitStreak(completions: { completedAt: Date }[]): number {
-    if (completions.length === 0) return 0
+    return this.calculateStreakFromDates(completions.map((c) => c.completedAt))
+  }
 
-    const sorted = [...completions].sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime())
+  calculateStreakFromDates(dates: Date[], timezoneOffset = 0): number {
+    if (dates.length === 0) return 0
 
-    let streak = 0
-    const currentDate = new Date()
-    currentDate.setHours(0, 0, 0, 0)
+    const toLocalDay = (d: Date) => {
+      const localTs = d.getTime() - timezoneOffset * 60 * 1000
+      const localDate = new Date(localTs)
+      return Date.UTC(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate())
+    }
 
-    const lastCompletionDate = new Date(sorted[0].completedAt)
-    lastCompletionDate.setHours(0, 0, 0, 0)
+    const sorted = [...dates].map(toLocalDay).sort((a, b) => b - a)
 
-    const diffDays = Math.floor((currentDate.getTime() - lastCompletionDate.getTime()) / (1000 * 60 * 60 * 24))
+    const currentDate = toLocalDay(new Date())
+
+    const diffDays = Math.floor((currentDate - sorted[0]) / (1000 * 60 * 60 * 24))
 
     if (diffDays > 1) return 0
 
-    streak = 1
-    let lastDate = lastCompletionDate
+    let streak = 1
+    let prevDate = sorted[0]
 
     for (let i = 1; i < sorted.length; i++) {
-      const nextDate = new Date(sorted[i].completedAt)
-      nextDate.setHours(0, 0, 0, 0)
-
-      const dayDiff = Math.floor((lastDate.getTime() - nextDate.getTime()) / (1000 * 60 * 60 * 24))
+      const dayDiff = Math.floor((prevDate - sorted[i]) / (1000 * 60 * 60 * 24))
 
       if (dayDiff === 1) {
         streak++
-        lastDate = nextDate
+        prevDate = sorted[i]
       } else if (dayDiff === 0) {
         continue
       } else {

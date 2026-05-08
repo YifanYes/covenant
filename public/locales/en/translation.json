@@ -169,7 +169,13 @@
     "title": "Areas"
   },
   "calendar": {
-    "today": "Today"
+    "title": "Calendar",
+    "today": "Today",
+    "no_tasks_for_day": "No tasks for this day",
+    "no_tasks_for_day_description": "Even heroes need rest. Enjoy the calm before the next battle.",
+    "no_habits_for_day": "No habits completed this day",
+    "no_habits_for_day_description": "The forge is cold. Tomorrow is another chance to train.",
+    "no_journal_for_day_description": "No chronicle written. The scribe's quill waits for your deeds."
   },
   "cancel": "Cancel",
   "character_class": {
@@ -305,7 +311,8 @@
     "error": "Error loading data",
     "failed": "Failed",
     "loading": "Loading...",
-    "back": "Back"
+    "back": "Back",
+    "none": "None"
   },
   "crafting": {
     "title": "Crafting",
@@ -1401,6 +1408,63 @@
     "lore": "The Six Infernal Powers have launched a lightning attack on Santa Cruz, the Silver Seat. The Order of Sacred Knights defends every wall while reinforcements are on the way. If the Silver Seat falls, the leadership of the Faithful falls.",
     "title": "World Map"
   },
+  "moods": {
+    "happy": "Happy",
+    "sad": "Sad",
+    "angry": "Angry",
+    "disappointed": "Disappointed",
+    "focused": "Focused",
+    "hopeful": "Hopeful",
+    "depressed": "Depressed",
+    "calm": "Calm",
+    "anxious": "Anxious",
+    "excited": "Excited",
+    "grateful": "Grateful",
+    "tired": "Tired"
+  },
+  "journaling": {
+    "title": "Journaling",
+    "write_tab": "Write",
+    "calendar_tab": "Calendar",
+    "placeholder": "How was your day?",
+    "save": "Save",
+    "update": "Update",
+    "need_prompt": "Need a prompt?",
+    "streak": "Streak: {{count}} days",
+    "edit_entry": "Edit entry",
+    "recent_entries": "Recent entries",
+    "no_entry_for_date": "No entry for this date",
+    "select_mood": "How are you feeling?",
+    "empty_state": {
+      "title": "No entries yet",
+      "description": "Your chronicle is empty. Scribe your first entry and begin your legend.",
+      "action": "Write your first entry"
+    },
+    "prompt": {
+      "0": "What are three things you're grateful for today?",
+      "1": "What moment from today will you remember most?",
+      "2": "What was the hardest part of your day?",
+      "3": "What are you looking forward to tomorrow?",
+      "4": "How are you feeling right now?"
+    },
+    "delete": {
+      "button": "Delete",
+      "title": "Delete entry",
+      "description": "This action is irreversible. This will permanently delete the entry."
+    },
+    "success": {
+      "create": "Entry saved successfully",
+      "update": "Entry updated successfully",
+      "delete": "Entry deleted successfully"
+    },
+    "error": {
+      "internal": {
+        "create": "An error occurred while saving the entry",
+        "update": "An error occurred while updating the entry",
+        "delete": "An error occurred while deleting the entry"
+      }
+    }
+  },
   "more": "more",
   "objectives": {
     "add": "Add objective",
@@ -1518,7 +1582,7 @@
   "nav": {
     "quests": "Quests"
   },
-  "sidebar": {
+    "sidebar": {
     "calendar": "Calendar",
     "close": "Collapse menu",
     "crafting": "Crafting",
@@ -1526,6 +1590,7 @@
     "habits": "Habits",
     "inventory": "Inventory",
     "investments": "Investments",
+    "journaling": "Journaling",
     "objectives": "Objectives and areas",
     "open": "Expand menu",
     "productivity": "Productivity",

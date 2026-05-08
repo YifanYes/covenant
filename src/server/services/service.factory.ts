@@ -4,6 +4,7 @@ import { CharacterQuestRepository } from '../repositories/character-quest.reposi
 import { CharacterRepository } from '../repositories/character.repository'
 import { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import { HabitRepository } from '../repositories/habit.repository'
+import { JournalRepository } from '../repositories/journal.repository'
 import { ObjectiveRepository } from '../repositories/objective.repository'
 import { TaskRepository } from '../repositories/task.repository'
 import { UserRepository } from '../repositories/user.repository'
@@ -14,6 +15,7 @@ import { CombatService } from './combat.service'
 import { DashboardService } from './dashboard.service'
 import { DiceService } from './dice.service'
 import { HabitService } from './habit.service'
+import { JournalService } from './journal.service'
 import { KillRecordService } from './kill-record.service'
 import { ObjectiveService } from './objective.service'
 import { QuestService } from './quest.service'
@@ -32,6 +34,7 @@ export class ServiceFactory {
   private _characterRepository?: CharacterRepository
   private _combatEnemyRepository?: CombatEnemyRepository
   private _habitRepository?: HabitRepository
+  private _journalRepository?: JournalRepository
   private _objectiveRepository?: ObjectiveRepository
   private _taskRepository?: TaskRepository
   private _userRepository?: UserRepository
@@ -44,6 +47,7 @@ export class ServiceFactory {
   private _dashboardService?: DashboardService
   private _diceService?: DiceService
   private _habitService?: HabitService
+  private _journalService?: JournalService
   private _killRecordService?: KillRecordService
   private _objectiveService?: ObjectiveService
   private _questService?: QuestService
@@ -72,6 +76,10 @@ export class ServiceFactory {
 
   private get habitRepository(): HabitRepository {
     return (this._habitRepository ??= new HabitRepository(this.prisma))
+  }
+
+  private get journalRepository(): JournalRepository {
+    return (this._journalRepository ??= new JournalRepository(this.prisma))
   }
 
   private get objectiveRepository(): ObjectiveRepository {
@@ -118,6 +126,10 @@ export class ServiceFactory {
 
   get habit(): HabitService {
     return (this._habitService ??= new HabitService(this.habitRepository, this.dice))
+  }
+
+  get journal(): JournalService {
+    return (this._journalService ??= new JournalService(this.prisma, this.journalRepository, this.dice))
   }
 
   get objective(): ObjectiveService {
