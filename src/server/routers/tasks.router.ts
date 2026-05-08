@@ -8,10 +8,10 @@ import {
   TaskStatus,
   updateTaskSchema
 } from '@shared/schemas/tasks.schemas'
-import { protectedProcedure, t } from '../trpc'
+import { protectedProcedure, rateLimit, RATE_LIMITS, t } from '../trpc'
 
 export const tasksRouter = t.router({
-  create: protectedProcedure.input(createTaskSchema).mutation(async ({ ctx, input }) => {
+  create: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(createTaskSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.task.create(ctx.user.id, input)
   }),
 
@@ -29,19 +29,19 @@ export const tasksRouter = t.router({
     return ctx.services.task.getByDate(ctx.user.id, year, monthIndex)
   }),
 
-  update: protectedProcedure.input(updateTaskSchema).mutation(async ({ ctx, input }) => {
+  update: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(updateTaskSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.task.update(ctx.user.id, input, TaskStatus.DONE)
   }),
 
-  bulkUpdate: protectedProcedure.input(bulkUpdateTasksSchema).mutation(async ({ ctx, input }) => {
+  bulkUpdate: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(bulkUpdateTasksSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.task.bulkUpdate(ctx.user.id, input.tasks)
   }),
 
-  delete: protectedProcedure.input(taskIdSchema).mutation(async ({ ctx, input }) => {
+  delete: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).input(taskIdSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.task.delete(ctx.user.id, input.id)
   }),
 
-  duplicate: protectedProcedure.input(duplicateTaskSchema).mutation(async ({ ctx, input }) => {
+  duplicate: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).input(duplicateTaskSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.task.duplicate(ctx.user.id, input.id, input.titleSuffix)
   })
 })

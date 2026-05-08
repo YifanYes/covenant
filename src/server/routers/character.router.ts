@@ -8,10 +8,10 @@ import {
   useConsumableSchema,
   useDoctrineSchema
 } from '@shared/schemas/character.schemas'
-import { protectedProcedure, t } from '../trpc'
+import { protectedProcedure, rateLimit, RATE_LIMITS, t } from '../trpc'
 
 export const characterRouter = t.router({
-  create: protectedProcedure.input(createCharacterSchema).mutation(async ({ ctx, input }) => {
+  create: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).input(createCharacterSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.character.createCharacter(ctx.user.id, input)
   }),
 
@@ -23,15 +23,15 @@ export const characterRouter = t.router({
     return ctx.services.character.getCurrentClass(ctx.user.id)
   }),
 
-  switchClass: protectedProcedure.input(switchClassSchema).mutation(async ({ ctx, input }) => {
+  switchClass: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(switchClassSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.character.switchClass(ctx.user.id, input.className)
   }),
 
-  equipItem: protectedProcedure.input(equipItemSchema).mutation(async ({ ctx, input }) => {
+  equipItem: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(equipItemSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.character.equipItem(ctx.user.id, input.itemId)
   }),
 
-  unequipItem: protectedProcedure.input(unequipItemSchema).mutation(async ({ ctx, input }) => {
+  unequipItem: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(unequipItemSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.character.unequipItem(ctx.user.id, input.slotType)
   }),
 
@@ -40,11 +40,11 @@ export const characterRouter = t.router({
     return { hasCharacter }
   }),
 
-  revive: protectedProcedure.mutation(async ({ ctx }) => {
+  revive: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).mutation(async ({ ctx }) => {
     return ctx.services.character.revive(ctx.user.id)
   }),
 
-  useConsumable: protectedProcedure.input(useConsumableSchema).mutation(async ({ ctx, input }) => {
+  useConsumable: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(useConsumableSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.combat.useConsumable(ctx.user.id, input.consumableId)
   }),
 
@@ -56,15 +56,15 @@ export const characterRouter = t.router({
     return ctx.services.character.getEquippedDoctrines(ctx.user.id)
   }),
 
-  equipDoctrine: protectedProcedure.input(equipDoctrineSchema).mutation(async ({ ctx, input }) => {
+  equipDoctrine: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(equipDoctrineSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.character.equipDoctrine(ctx.user.id, input.doctrineId)
   }),
 
-  unequipDoctrine: protectedProcedure.input(unequipDoctrineSchema).mutation(async ({ ctx, input }) => {
+  unequipDoctrine: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(unequipDoctrineSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.character.unequipDoctrine(ctx.user.id, input.doctrineId)
   }),
 
-  useDoctrine: protectedProcedure.input(useDoctrineSchema).mutation(async ({ ctx, input }) => {
+  useDoctrine: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(useDoctrineSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.combat.useDoctrine(ctx.user.id, input.doctrineId, input.participationId)
   })
 })
