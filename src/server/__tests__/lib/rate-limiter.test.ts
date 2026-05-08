@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { RateLimiter } from '../../lib/rate-limiter'
+import { checkRateLimit, RateLimiter } from '../../lib/rate-limiter'
 
 describe('RateLimiter', () => {
   let limiter: RateLimiter
@@ -57,11 +57,24 @@ describe('RateLimiter', () => {
     expect(store.size).toBeLessThanOrEqual(10_000)
   })
 
-  it('deletes key when all timestamps expire and limit is reached', () => {
+  it('always blocks when maxRequests is zero', () => {
     const config = { windowMs: 0, maxRequests: 0 }
-    limiter.isAllowed('key', config)
+    expect(limiter.isAllowed('key', config)).toBe(false)
 
     const store = (limiter as unknown as { store: Map<string, number[]> }).store
     expect(store.has('key')).toBe(false)
+  })
+})
+
+describe('checkRateLimit', () => {
+  it('falls back to in-memory limiter when redis is not configured', async () => {
+    const config = { windowMs: 10_000, maxRequests: 1 }
+    const key = 'fallback:test'
+
+    const first = await checkRateLimit(key, config)
+    expect(first).toBe(true)
+
+    const second = await checkRateLimit(key, config)
+    expect(second).toBe(false)
   })
 })

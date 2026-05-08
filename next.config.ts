@@ -2,13 +2,33 @@ import createMDX from '@next/mdx'
 import { withSentryConfig } from '@sentry/nextjs'
 import type { NextConfig } from 'next'
 
+// Baseline security headers applied to every route. CSP intentionally omitted for now
+// (Next.js + Google OAuth + Sentry tunneling each require allowlist work that's worth a
+// dedicated pass); revisit once those surface areas are stable.
+const securityHeaders = [
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload'
+  },
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  {
+    key: 'Permissions-Policy',
+    value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+  }
+]
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ['pg', 'pino', 'pino-pretty', 'node-cron'],
   experimental: {
     optimizePackageImports: ['pixelarticons/react', 'recharts']
   },
-  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx']
+  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  async headers() {
+    return [{ source: '/:path*', headers: securityHeaders }]
+  }
 }
 
 const withMDX = createMDX({})

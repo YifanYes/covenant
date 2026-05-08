@@ -1,6 +1,6 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import type { Context } from './context'
-import { rateLimiter, type RateLimitConfig } from './lib/rate-limiter'
+import { checkRateLimit, type RateLimitConfig } from './lib/rate-limiter'
 
 export const t = initTRPC.context<Context>().create()
 
@@ -21,12 +21,12 @@ export const isAuthed = t.middleware(({ ctx, next }) => {
 })
 
 export const rateLimit = (config: RateLimitConfig) =>
-  t.middleware(({ ctx, next }) => {
+  t.middleware(async ({ ctx, next }) => {
     const ip = ctx.ip
     const userId = ctx.user?.id
 
     if (userId) {
-      const allowed = rateLimiter.isAllowed(`user:${userId}`, config)
+      const allowed = await checkRateLimit(`user:${userId}`, config)
       if (!allowed) {
         throw new TRPCError({
           code: 'TOO_MANY_REQUESTS',
@@ -37,7 +37,7 @@ export const rateLimit = (config: RateLimitConfig) =>
     }
 
     if (ip) {
-      const allowed = rateLimiter.isAllowed(`ip:${ip}`, config)
+      const allowed = await checkRateLimit(`ip:${ip}`, config)
       if (!allowed) {
         throw new TRPCError({
           code: 'TOO_MANY_REQUESTS',

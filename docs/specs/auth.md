@@ -172,8 +172,60 @@ Email + password collapses all of that into one round-trip with no email depende
 
 ---
 
-## Out of scope (defer)
+## Hardening follow-up (delivered)
 
-- Password reset / "forgot password" flow.
-- Email verification on signup.
-- Rate limiting on sign-in attempts. **Note:** this is a mandatory fast-follow before any production traffic; without it the new email+password endpoints are trivially brute-forceable.
+The original "Out of scope" items below were closed in a follow-up audit pass. Summary of the additional surface introduced on top of the email+password switch:
+
+### Critical / High
+
+- **Email verification enforced.** `emailAndPassword.requireEmailVerification: true` and `emailVerification.sendVerificationEmail` are wired in `src/server/lib/auth.ts`. Sign-up creates the account, sends a verification email, and does **not** issue a session. `autoSignInAfterVerification: true` issues the session when the link is clicked.
+- **Account-linking takeover closed.** Explicit `account.accountLinking` config: `trustedProviders: ['google']`, `allowDifferentEmails: false`. Combined with email verification, a Google sign-in can no longer inherit an attacker's pre-registered unverified password account.
+- **Password reset flow delivered.** `emailAndPassword.sendResetPassword` callback + new pages `src/app/(auth)/forgot-password/page.tsx` and `src/app/(auth)/reset-password/page.tsx`. The forgot page calls `authClient.requestPasswordReset({ email, redirectTo: '/reset-password' })` and always shows the same "check your email" state to avoid enumeration. Reset page reads the token from the redirect query and calls `authClient.resetPassword`.
+- **Distributed rate limiting.** Both Better Auth's built-in limiter and the tRPC limiter now use Upstash Redis when `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` are set. Better Auth's `secondaryStorage` is wired to Upstash so its session/rate-limit state survives restarts and holds across replicas. The tRPC limiter (`src/server/lib/rate-limiter.ts`) exposes `checkRateLimit()` which prefers Upstash via `@upstash/ratelimit`'s sliding-window and falls back to in-memory when Redis is absent (dev/test).
+
+### Medium
+
+- **Email infrastructure restored.** `EmailService` (Brevo HTTP), `render-email.tsx`, and per-flow templates (`verification.email.tsx`, `password-reset.email.tsx`, plus the shared `components/logo-email.tsx`) reinstated under `src/server/emails/`. `BREVO_API_KEY` and `FROM_EMAIL` are optional in dev/test and required at runtime when a send is attempted in production.
+- **Security headers.** `next.config.ts` now sets `Strict-Transport-Security`, `X-Frame-Options: DENY`, `X-Content-Type-Options`, `Referrer-Policy`, and `Permissions-Policy`. CSP is intentionally deferred — Next.js + Google OAuth + Sentry tunneling each need allowlist work that's worth a dedicated pass.
+- **Dead-code cleanup.** Deleted the `signUp` / `login` / `loginWithGoogle` stub procedures from `src/server/routers/auth.router.ts` and the matching methods on `AuthService` — leftover from the magic-link migration; client never called them.
+
+### Low / informational
+
+- **2FA / TOTP** — not implemented; revisit when a B2C launch demands it.
+- **Account lockout** — not implemented; the distributed rate limit on `/sign-in` (3 req / 10s per IP) is the active brute-force defense.
+- **CAPTCHA on sign-up** — not implemented; rate limit covers spam at current scale.
+- **Session invalidation on password reset** — `emailAndPassword.revokeSessionsOnPasswordReset: true` is set, so resetting via the forgot-password flow drops every session for that user. The signed-in change-password flow (no UI yet) still needs an explicit `revokeOtherSessions: true` argument when it is built.
+- **HIBP password breach check** — deferred; the `min: 8` policy is unchanged.
+
+### Environment variables added
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `BREVO_API_KEY` | Production | Brevo HTTP API key for transactional email. |
+| `FROM_EMAIL` | Production | Verified sender address on a Brevo-authenticated domain. |
+| `UPSTASH_REDIS_REST_URL` | Production | Upstash Redis REST endpoint. |
+| `UPSTASH_REDIS_REST_TOKEN` | Production | Upstash Redis REST token. |
+
+All four are optional in dev/test and gracefully degrade (email send is skipped in dev with a warning; rate limiter falls back to per-instance memory).
+
+### Verification (hardening pass)
+
+1. `pnpm tsc --noEmit` — clean.
+2. `pnpm lint` — clean.
+3. `pnpm test:run` — all suites pass (rate-limiter tests still hit the in-memory implementation by design).
+4. `pnpm build` — clean; new routes `/forgot-password` and `/reset-password` are emitted.
+5. With `BREVO_API_KEY` + `FROM_EMAIL` + Upstash configured in `.env.local`:
+   - `/sign-up` → submits → "Check your email" state shown; verification email arrives.
+   - Click verification link → lands on `/dashboard` with a session.
+   - `/login` before verification → toast: "Verify your email before logging in."
+   - `/forgot-password` → submits → same "check your email" state regardless of whether the email exists.
+   - Click reset link → lands on `/reset-password?token=...` → submit new password → redirected to `/login` with success toast.
+   - `curl -I https://localhost:3000` → confirms `Strict-Transport-Security`, `X-Frame-Options: DENY`, etc. on every route.
+
+---
+
+## Original out of scope (now delivered above)
+
+- ~~Password reset / "forgot password" flow.~~
+- ~~Email verification on signup.~~
+- ~~Rate limiting on sign-in attempts.~~ (Closed in `e748e73`; promoted to distributed/Redis in this pass.)

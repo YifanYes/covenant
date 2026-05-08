@@ -1,141 +1,130 @@
 # TODOs
 
+> Tags: `[blocker]` legal/security/abuse · `[loop]` core validation hypothesis · `[retention]` keeps validated users · `[debt]` engineering hygiene
+>
+> Items in **Backlog (post-validation)** are not deleted — they're deferred until the core loop has been validated with real beta users. Re-evaluate based on retention/feedback signals.
+
 ## Critical Priority
 
-- [ ] Legal pages — Terms of Service, Privacy Policy, Cookie consent
+- [ ] Legal pages — Terms of Service, Privacy Policy, Cookie consent `[blocker]`
   - No `/tos`, `/privacy`, or consent banner exists. GDPR/CCPA exposure on EU/CA visitors. Required before public traffic.
 
-- [ ] Analyze game design loop
+- [ ] Account lockout — exponential backoff on failed logins `[blocker]`
+  - Email+password auth has no per-account failed-login throttling. Brute-force vector against any single account even with the global rate limit (3 sign-ins/10s/IP) in place — an attacker rotating IPs avoids the cap.
+  - **Fix:** track failed attempts per account in Redis; lock after N failures with exponential backoff; reset on successful login or password reset.
 
-- [ ] Email verification enforcement
-  - `emailVerified` field exists in Better Auth but is never checked. Users can sign up with any email and access the full app. Beta will leak fake accounts and break magic-link recovery.
-  - **Fix:** Gate protected routes on `emailVerified`; send verification email post-signup.
-
-- [ ] Error monitoring (extends Observability item below)
-  - No Sentry/Datadog. Production errors will be invisible. Pino logs locally but no remote sink. Logging, metrics, and tracing for backend services and frontend errors.
-  - **Fix:** Wire Sentry (or equivalent) for both server (tRPC error formatter) and client (React error boundaries).
+- [ ] Onboarding tutorial — explain the core loop `[loop]`
+  - Roadmap Phase 3: _"Introducción funcional: Explicación del loop y consecuencias (evitar lore pesado)"_. No in-app tutorial exists. Beta users will drop off if the dice → combat → tier → gear loop isn't immediately legible.
 
 ## High Priority
 
-- [ ] Refactor `/src/server/routers/quest.router.ts`. It's not using the layered architecture of services and repositories.
+- [ ] Guild system `[retention]`
+  - Users create their own guilds, invite friends, run guild-wide campaigns. Each guild has a social forum. Exclusive guild rewards.
+  - **Why high despite `mvp_scope_cut.md` cutting forum+factions:** Habitica's removal of guilds is documented as a major churn driver. Social retention is a non-negotiable companion hypothesis to the solo loop.
 
-- [ ] Simple feature flag
-  - Enable controlled rollout of new features without redeployments
+- [ ] PostHog integration — absorbs feature flags + analytics `[loop]`
+  - Single tool for product analytics + session replay + feature flags. Replaces three previously-separate items: standalone "feature flag" infra, roadmap _"Analytics implemented (GA + Mixpanel)"_, roadmap _"UTM parameters definidos por canal"_.
+  - **Fix:** Add `posthog-js` (client) + `posthog-node` (server). Capture pageviews and key events (task completion, combat start/end, quest claim). Wire feature flags via `posthog.isFeatureEnabled()`. Capture UTM on landing.
 
-- [ ] Add Github and X OAuth
+- [ ] Beta wipe tools `[loop]`
+  - Roadmap Phase 3: _"Herramientas para resetear el progreso de usuarios beta"_ + _"Capacidad de rollback o wipe controlado ante fallos graves"_. Required for controlled beta iteration.
 
-- [ ] PostHog integration
-  - Product analytics + session replay + feature flags in a single tool. Generous free tier covers small-scale usage. Could subsume the "Simple feature flag" item above.
-  - **Fix:** Add `posthog-js` (client) + `posthog-node` (server). Capture pageviews, key events (task completion, combat start/end, quest claim), and wire feature flags via `posthog.isFeatureEnabled()`.
+- [ ] Welcome email + email retry/throttle `[blocker]`
+  - `EmailService` is single-attempt with 5s timeout. Verification + password-reset endpoints are rate-limited via Better Auth (3 req / 10s per IP on sign-up, 3 req / 60s on `/forget-password`), but there is no per-recipient cap and no welcome email. Abuse vector + Brevo cost risk if a single email is targeted from many IPs.
+  - Also covers roadmap Phase 3: _"Email de bienvenida automatizado"_.
 
-- [ ] Fix npm warn Unknown project config "enable-pre-post-scripts". This will stop working in the next major version of npm.
+- [ ] Content Security Policy
+  - `next.config.ts` now sets HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy (all delivered in the auth hardening pass). CSP was intentionally deferred — needs allowlist work for Next.js inline scripts, Google OAuth, and Sentry tunneling. Worth a dedicated pass.
 
-- [ ] Guild system
-  - Users can create their own guilds, invite their friends, and start guild-wide campaigns. Each guild has a social forum. There are exclusive rewards for guild members.
+- [ ] Account management — profile edit, data export `[blocker]`
+  - Settings page covers email/language/theme/faction/logout/delete-account but lacks profile name/character edit and GDPR-compliant data export.
 
-- [ ] Analyze if implementing [NES.css](https://nostalgic-css.github.io/NES.css/) in the RPG modules would improve the user experience
+- [ ] Add Github and X OAuth `[loop]`
 
-- [ ] Mobile responsiveness — combat & RPG layout
-  - `combat-arena.component.tsx` uses fixed 12-col grid + `h-72`; `cart-panel.component.tsx` uses fixed `w-80`. Only ~23 responsive breakpoints across all workspace routes. Phone users cannot complete combat.
+- [ ] Render character with equipped items `[loop]`
+  - Roadmap Phase 2 still pending: _"Renderizar el personaje con los items equipados"_. Visual feedback closes the gear loop — without it, equipping a sword feels invisible.
 
-- [ ] Test coverage gaps for core gamification services
-  - Missing tests: `habit.service.ts` (streaks + dice rewards), `objective.service.ts`, `area.service.ts`, `auth.service.ts`, `kill-record.service.ts`. CLAUDE.md flags habits + tier progression as critical paths.
+- [ ] Define story decisions `[loop]`
+  - Roadmap Phase 2 pending: _"Definir decisiones de la historia"_. Story branches are the tier-progression payoff in the core loop.
 
-- [ ] i18n: translate hardcoded strings in error pages
-  - `src/app/error.tsx`, `src/app/not-found.tsx` have raw English ("Something went wrong!", "404 - Page Not Found", "Go to Dashboard"). Add to `en` + `es` locales.
-
-- [ ] SEO basics
-  - No `sitemap.ts`, no `robots.txt`, no per-page OG tags (only root `metadataBase`). Beta launch announcements will share unstyled link previews.
-
-- [ ] Per-route error boundaries
+- [ ] Per-route error boundaries `[loop]`
   - Only root `error.tsx` exists. Add `error.tsx` to `(workspace)/quests/`, `(workspace)/tasks/`, `(workspace)/habits/`, `(workspace)/objectives/`, `(workspace)/shop/`, `(workspace)/inventory/`.
 
-- [ ] Account management — profile, data export
-  - Settings page covers email/language/theme/faction/logout/delete-account but lacks: profile name/character edit, GDPR-compliant data export.
+- [ ] i18n: translate hardcoded strings in error pages `[blocker]`
+  - `src/app/error.tsx`, `src/app/not-found.tsx` have raw English ("Something went wrong!", "404 - Page Not Found", "Go to Dashboard"). Add to `en` + `es` locales.
 
-- [ ] Email retry + throttling
-  - `email.service.ts` is single-attempt with 5s timeout. Magic-link emails can be triggered repeatedly with no throttle (abuse vector + cost risk on Brevo).
+- [ ] SEO basics + press kit + 2-line pitch `[loop]`
+  - No `sitemap.ts`, no `robots.txt`, no per-page OG tags (only root `metadataBase`). Roadmap Phase 3 also calls for press kit (screenshots, descripción, logo) and a tested 2-line pitch.
 
-- [ ] Security headers
-  - `next.config.ts` has no CSP, HSTS, X-Frame-Options, or Permissions-Policy. No `middleware.ts` for global headers.
+- [ ] Discord setup — server, roles, welcome bot, weekly update template `[loop]`
+  - Roadmap Phase 3 infrastructure block (Discord servidor, roles configurados, bot de bienvenida, template para weekly update). Beta tester comms channel.
+
+- [ ] Refactor `/src/server/routers/quest.router.ts` to layered architecture `[debt]`
+  - Currently bypasses the service/repository layers used by the rest of the backend.
+
+- [ ] Test coverage gaps for core gamification services `[debt]`
+  - Missing tests: `habit.service.ts` (streaks + dice rewards), `objective.service.ts`, `area.service.ts`, `auth.service.ts`, `kill-record.service.ts`. CLAUDE.md flags habits + tier progression as critical paths.
 
 ## Medium Priority
 
-- [ ] Post-its board / card view in productivity section
-  - Kanban-style card view as an alternative layout for tasks in the productivity area
+- [ ] Security: error messages leak resource existence `[blocker]`
+  - Multiple service files distinguish "not found" from "forbidden" in their error messages, leaking existence of records the caller doesn't own.
+  - **Fix:** Use generic "Resource not found or access denied" messages.
 
-- [ ] Journaling module
-  - Daily/free-form journal entries linked to tasks, habits, and quests
+- [ ] Combat: race condition — enemy turn guard `[blocker]`
+  - `use-tactical-enemy-turn.hook.ts:29-31`. Bug in shipping code on the core loop.
+  - **Fix:** Use state flag + ref together; debounce effect.
 
-- [ ] Security: Error Messages Leak Resource Existence
-  - Multiple service files
-  - **Fix:** Use generic "Resource not found or access denied" messages
+- [ ] Combat: race condition — async state access `[blocker]`
+  - `use-tactical-enemy-turn.hook.ts:34`. Bug in shipping code on the core loop.
+  - **Fix:** Refresh state after each await in critical paths.
 
-- [ ] Conversation type quests: it's a dialog where you choose between different choices, each one has a different outcome.
-
-- [ ] Empty states for remaining views
+- [ ] Empty states for remaining views `[loop]`
   - Already shipped for habits/tasks/objectives. Still missing: shop filtered results (no matches), inventory Armory + Doctrines tabs.
 
-- [ ] Accessibility in combat
+- [ ] Accessibility in combat `[loop]`
   - Combat grid sprites are styled `div`s with no `role="img"`, `aria-label`, or alt text. No keyboard navigation for tactical grid. ~30 aria attributes across 78 components (~38% coverage).
 
-- [ ] Post-combat summary screen
-  - Victory/defeat dialogs exist but no XP/gold/loot summary between combat end and `/quests` redirect.
+- [ ] 404 / invalid ID handling `[loop]`
+  - Invalid quest/task IDs hit generic error boundary; no redirect to listing or "this doesn't exist" empty state.
 
-- [ ] Better-typed JSON fields (`inventory`, `loadout`)
-  - `character.repository.ts:107-108` casts to `any`. Replace with Zod-inferred types from `src/shared/schemas/`. Subset of "Type Safety Issues" below but specifically the JSON columns.
-
-- [ ] 404 / invalid ID handling
-  - Invalid quest/task IDs hit generic error boundary; no redirect to listing or "this quest doesn't exist" empty state.
-
-- [ ] Breadcrumbs on nested routes
-  - `/quests/[questId]`, `/inventory/[tab]` lack breadcrumbs.
-
-- [ ] Logout button in sidebar
+- [ ] Logout button in sidebar `[loop]`
   - Currently buried in `/settings`. Add to user dropdown in sidebar.
-
-- [ ] Toast / Sonner mobile placement
-  - Default top-right covers mobile action buttons. Configure responsive position.
-
-- [ ] Theme system option
-  - Settings offers light/dark only; add `system` (matches OS).
 
 ## Low Priority
 
-- [ ] Security: No Account Lockout
-  - **Fix:** Implement exponential backoff on failed logins
+- [ ] Security: type safety — replace `as any` usages `[debt]`
+  - Including the `inventory` / `loadout` JSON-field casts in `character.repository.ts:107-108` (replace with Zod-inferred types from `src/shared/schemas/`).
 
-- [ ] Security: Type Safety Issues
-  - Multiple `as any` usages
-  - **Fix:** Replace with proper types
+## Backlog (post-validation)
 
-- [ ] Combat: Duplicated Grid Logic
-  - `tactical-combat.store.ts:1025-1040, 1453-1468, 156-180`
-  - **Fix:** Extract to `shared/utils/grid.utils.ts`
+Deferred until the core loop has been validated with real beta users. Specs for some of these already exist (Journaling at `docs/specs/journaling.md`); the rest are real ideas, just wrong-time.
 
-- [ ] Combat: Magic Numbers
-  - Various files with hardcoded dice values
-  - **Fix:** Move to `shared/constants/combat-rules.ts`
-
-- [ ] Combat: Race - Enemy Turn Guard
-  - `use-tactical-enemy-turn.hook.ts:29-31`
-  - **Fix:** Use state flag + ref together; debounce effect
-
-- [ ] AI report of the month
-  - Monthly AI-generated summary of user productivity, habit streaks, and progress toward objectives
-
-- [ ] Combat: Race - Async State Access
-  - `use-tactical-enemy-turn.hook.ts:34`
-  - **Fix:** Refresh state after each await in critical paths
-
-- [ ] Map page interactivity
-  - `/map` is a static image + lore. No clickable regions, faction war state, or quest entry points.
-
-- [ ] Account deletion: pre-delete data export prompt
-  - Single-step delete with no offer to download data first.
-
+- [ ] Journaling module — daily/free-form entries linked to tasks, habits, quests. Spec: `docs/specs/journaling.md`
+- [ ] Conversation-type quests — dialog with branching choices and outcomes
+- [ ] Post-its board / Kanban card view in productivity section
+- [ ] AI report of the month — monthly AI-generated summary of productivity, streaks, objective progress
+- [ ] Map page interactivity — clickable regions, faction war state, quest entry points
 - [ ] Email change flow
-  - No way to change account email post-signup.
+- [ ] Account deletion: pre-delete data export prompt (folds into "Account management" data export)
+- [ ] Breadcrumbs on nested routes (`/quests/[questId]`, `/inventory/[tab]`)
+- [ ] Post-combat summary screen — XP/gold/loot between combat end and `/quests` redirect
+- [ ] N+1 risk in `dashboard.service.ts:149-206` — triple-nested in-memory loop, refactor before user counts grow
+- [ ] Theme system: OS-preference option (light/dark already exist)
 
-- [ ] N+1 risk in `dashboard.service.ts:149-206`
-  - Triple-nested in-memory loops over areas → objectives → tasks. Currently in-memory after batch fetch, but worth refactoring before user counts grow.
+## Removed
+
+Deleted from the active and backlog lists with rationale:
+
+- ~~Mobile responsiveness — combat & RPG layout~~ — target user base is not on mobile
+- ~~Toast / Sonner mobile placement~~ — same reason as above
+- ~~Error monitoring (Sentry)~~ — implemented (`sentry.shared.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`, `instrumentation-client.ts`)
+- ~~Fix npm warn `enable-pre-post-scripts`~~ — cosmetic warning, no user impact
+- ~~Analyze if implementing NES.css~~ — `DESIGN.md` already prescribes the NES.css + Tailwind approach; this is decided, not exploratory
+- ~~Combat: Duplicated Grid Logic~~ — pure refactor, no user signal
+- ~~Combat: Magic Numbers~~ — pure refactor, no user signal
+- ~~Analyze game design loop~~ — `docs/specs/mvp_scope_cut.md` is the output of this analysis. If something more specific is meant (empirical playtest, dice economy rebalance, story-branch design), it should be filed as that specific task
+- ~~Email verification enforcement~~ — delivered in the auth hardening pass; `requireEmailVerification: true` + `sendVerificationEmail` callback wired in `src/server/lib/auth.ts`, sign-up page now shows the "check your email" state. See `docs/specs/auth.md` § Hardening follow-up.
+- ~~Security headers (HSTS / X-Frame-Options / X-Content-Type-Options / Referrer-Policy / Permissions-Policy)~~ — delivered in the auth hardening pass via `next.config.ts` `headers()`. CSP remains an open follow-up (split out as its own item above).
+- ~~Distributed rate limiting~~ — delivered in the auth hardening pass; both Better Auth's `secondaryStorage` and the tRPC limiter use Upstash Redis when configured, with in-memory fallback for dev/test.
+- ~~Password reset flow~~ — delivered in the auth hardening pass; `/forgot-password` and `/reset-password` pages, `sendResetPassword` callback, locale-aware Brevo email.

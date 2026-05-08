@@ -10,7 +10,16 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).optional(),
-  CRON_SECRET: z.string().min(1).optional()
+  CRON_SECRET: z.string().min(1).optional(),
+  // Transactional email (Brevo HTTP API). Optional in dev/test so the app boots without
+  // credentials; verification and password-reset flows fail loudly if a send is attempted
+  // without them set.
+  BREVO_API_KEY: z.string().min(1).optional(),
+  FROM_EMAIL: z.email().optional(),
+  // Distributed rate-limit backing store (Upstash Redis REST API). Optional in dev/test;
+  // when unset, rate limiting falls back to in-memory per-instance state.
+  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional()
 })
 
 const _env = envSchema.safeParse(process.env)

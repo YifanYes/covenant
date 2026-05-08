@@ -12,8 +12,9 @@ import { toast } from 'sonner'
 import GoogleLoginButton from '../_components/google-login-button.component'
 
 export default function SignUp() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null)
 
   const {
     register,
@@ -29,7 +30,6 @@ export default function SignUp() {
     async (data: SignUpType) => {
       setIsLoading(true)
       try {
-        const locale = i18n.language || 'es'
         const result = await authClient.signUp.email({
           email: data.email,
           password: data.password,
@@ -43,15 +43,33 @@ export default function SignUp() {
           toast.error(t('sign_up.error.title'), { description })
           return
         }
-        window.location.assign(`/onboarding?locale=${locale}`)
+        // With requireEmailVerification: true, signup returns success but no session.
+        // The user must click the verification link before signing in.
+        setSubmittedEmail(data.email)
       } catch {
         toast.error(t('sign_up.error.title'), { description: t('sign_up.error.internal_error') })
       } finally {
         setIsLoading(false)
       }
     },
-    [t, i18n.language]
+    [t]
   )
+
+  if (submittedEmail) {
+    return (
+      <div className="flex w-md flex-col gap-3 text-center">
+        <h2>{t('sign_up.success.title')}</h2>
+        <p className="text-muted-foreground">
+          {t('sign_up.success.description', { email: submittedEmail })}
+        </p>
+        <p className="text-muted-foreground text-sm">{t('sign_up.success.spam_hint')}</p>
+        <div className="flex flex-row justify-center gap-1 pt-2">
+          <p>{t('sign_up.already_have_account')}</p>
+          <Link href="/login">{t('sign_up.login')}</Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex w-md flex-col gap-2.5">

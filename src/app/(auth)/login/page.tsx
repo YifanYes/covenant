@@ -72,8 +72,10 @@ export default function Login() {
       try {
         const result = await authClient.signIn.email({ email: data.email, password: data.password })
         if (result.error) {
-          const description =
-            result.error.status === 401
+          const isUnverified = result.error.code === 'EMAIL_NOT_VERIFIED'
+          const description = isUnverified
+            ? t('login.error.email_not_verified')
+            : result.error.status === 401
               ? t('login.error.invalid_credentials')
               : t('login.error.internal_error')
           toast.error(t('login.error.title'), { description })
@@ -144,6 +146,11 @@ export default function Login() {
         {...(errors.password?.message && { errorMessage: t(errors.password.message) })}
         required
       />
+      <div className="flex justify-end">
+        <Link href="/forgot-password" className="text-muted-foreground text-sm">
+          {t('login.recover_password')}
+        </Link>
+      </div>
       <LoaderButton
         disabled={!isValid || !isDirty}
         isLoading={isLoading}
