@@ -131,6 +131,7 @@ export class ServiceFactory {
   // Layer 3: Repository + Layer 2 service dependencies
   get auth(): AuthService {
     return (this._authService ??= new AuthService(
+      this.prisma,
       this.userRepository,
       this.characterRepository,
       this.habitRepository,

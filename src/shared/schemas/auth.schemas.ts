@@ -24,3 +24,19 @@ export const updateThemeSchema = z.object({
   theme: z.enum(Faction)
 })
 export type UpdateThemeType = z.infer<typeof updateThemeSchema>
+
+export const forgotPasswordSchema = z.object({
+  email: z.email('errors.invalid_email')
+})
+export type ForgotPasswordType = z.infer<typeof forgotPasswordSchema>
+
+export const resetPasswordSchema = z
+  .object({
+    password: z.string().min(8, 'errors.invalid_password_length'),
+    confirmPassword: z.string().min(8, 'errors.invalid_password_length')
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: 'errors.password_mismatch',
+    path: ['confirmPassword']
+  })
+export type ResetPasswordType = z.infer<typeof resetPasswordSchema>

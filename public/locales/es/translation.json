@@ -987,11 +987,45 @@
       }
     }
   },
+  "emails": {
+    "verification": {
+      "subject": "Verifica tu cuenta de Covenant",
+      "preview": "Verifica tu correo para entrar a la guerra.",
+      "heading": "Confirma tu pacto",
+      "body": "Haz clic en el sello para verificar tu correo y desbloquear tu cuenta. El enlace expira en 60 minutos.",
+      "cta": "Verificar correo",
+      "footer": "Si no creaste una cuenta de Covenant, puedes ignorar este mensaje sin problema."
+    },
+    "passwordReset": {
+      "subject": "Restablece tu contraseña de Covenant",
+      "preview": "Una nueva contraseña te espera.",
+      "heading": "Restablece tu contraseña",
+      "body": "Haz clic en el sello para elegir una nueva contraseña. El enlace expira en 60 minutos.",
+      "cta": "Restablecer contraseña",
+      "footer": "Si no solicitaste un restablecimiento, puedes ignorar este mensaje — tu contraseña no ha cambiado."
+    }
+  },
   "errors": {
     "invalid_email": "Correo electrónico no valido",
     "invalid_password_length": "La contraseña debe tener al menos 8 caracteres",
     "password_mismatch": "Las contraseñas no coinciden",
     "required_field": "Campo requerido"
+  },
+  "forgot_password": {
+    "title": "Recupera tu contraseña",
+    "description": "Ingresa el correo asociado a tu cuenta y te enviaremos un enlace de restablecimiento.",
+    "email": "Correo electrónico",
+    "button": "Enviar enlace",
+    "back_to_login": "Volver al inicio de sesión",
+    "error": {
+      "title": "Error",
+      "internal_error": "Ocurrió un error inesperado. Por favor, inténtalo más tarde."
+    },
+    "success": {
+      "title": "Revisa tu correo",
+      "description": "Si existe una cuenta para {{email}}, un enlace de restablecimiento está en camino.",
+      "spam_hint": "Puede tardar un minuto. Revisa tu carpeta de spam si no llega."
+    }
   },
   "factions": {
     "ALCHEMISTS_LEAGUE": "Liga de Alquimistas",
@@ -1326,7 +1360,8 @@
       "title": "Error",
       "google_unavailable": "El inicio de sesión con Google no está disponible actualmente, por favor inténtalo más tarde",
       "internal_error": "Ocurrió un error al iniciar sesión",
-      "invalid_credentials": "Credenciales inválidas. Por favor, verifica tu correo y contraseña."
+      "invalid_credentials": "Credenciales inválidas. Por favor, verifica tu correo y contraseña.",
+      "email_not_verified": "Verifica tu correo antes de iniciar sesión. Revisa tu bandeja de entrada para el enlace de verificación."
     },
     "google_button": "Iniciar sesión con Google",
     "or": "o",
@@ -1448,12 +1483,18 @@
     "title": "Crear tu personaje"
   },
   "recover_password": {
+    "back_to_login": "Volver al inicio de sesión",
     "button": "Restablecer contraseña",
     "confirm_password": "Confirmar contraseña",
+    "description": "Elige una nueva contraseña abajo. Se cerrarán tus otras sesiones cuando se cambie.",
     "error": {
-      "title": "Ocurrió un error al cambiar la contraseña de tu cuenta"
+      "title": "Ocurrió un error al cambiar la contraseña de tu cuenta",
+      "missing_token": "Este enlace de restablecimiento es inválido o le falta el token. Solicita uno nuevo desde la página de recuperación.",
+      "invalid_token": "Este enlace de restablecimiento ha expirado o ya fue usado. Solicita uno nuevo.",
+      "internal_error": "Ocurrió un error inesperado. Por favor, inténtalo más tarde."
     },
     "password": "Contraseña",
+    "request_new_link": "Solicitar un nuevo enlace",
     "success": {
       "title": "Contraseña restablecida con éxito"
     },
@@ -1507,6 +1548,11 @@
     "login": "Inicia sesión",
     "name": "Nombre",
     "password": "Contraseña",
+    "success": {
+      "title": "Revisa tu correo",
+      "description": "Enviamos un enlace de verificación a {{email}}. Haz clic para activar tu cuenta.",
+      "spam_hint": "Puede tardar un minuto. Revisa tu carpeta de spam si no llega."
+    },
     "title": "Crear una cuenta en Covenant"
   },
   "status_effects": {
