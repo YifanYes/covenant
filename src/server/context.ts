@@ -1,10 +1,30 @@
 import { headers } from 'next/headers'
-import { prisma } from './lib/prisma'
 import { auth } from './lib/auth'
-import { ServiceFactory } from './services/service.factory'
 import { logger } from './lib/logger'
+import { prisma } from './lib/prisma'
+import { ServiceFactory } from './services/service.factory'
 
-export async function createContext(_req: Request) {
+function getClientIp(req: Request): string | null {
+  // Prefer headers typically set by trusted infrastructure / load balancers
+  const realIp = req.headers.get('x-real-ip')
+  if (realIp) return realIp.trim()
+
+  const cfIp = req.headers.get('cf-connecting-ip')
+  if (cfIp) return cfIp.trim()
+
+  const forwarded = req.headers.get('x-forwarded-for')
+  if (forwarded) {
+    const ips = forwarded.split(',').map((ip) => ip.trim())
+    // Use the last IP (closest to the server / infra) to reduce spoofing risk.
+    // This assumes the app is behind a trusted proxy that sanitizes this header.
+    const lastIp = ips.at(-1)
+    if (lastIp) return lastIp
+  }
+
+  return null
+}
+
+export async function createContext(req: Request) {
   let user = null
 
   try {
@@ -18,8 +38,9 @@ export async function createContext(_req: Request) {
 
   const services = new ServiceFactory(prisma)
   const log = user ? logger.child({ userId: user.id }) : logger
+  const ip = getClientIp(req)
 
-  return { user, prisma, services, log }
+  return { user, prisma, services, log, ip }
 }
 
 export type Context = Awaited<ReturnType<typeof createContext>>

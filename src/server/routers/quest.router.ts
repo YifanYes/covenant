@@ -6,7 +6,7 @@ import {
 } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { protectedProcedure, t } from '../trpc'
+import { protectedProcedure, rateLimit, RATE_LIMITS, t } from '../trpc'
 
 export const questRouter = t.router({
   // Get tactical combat state for a quest
@@ -39,6 +39,7 @@ export const questRouter = t.router({
 
   // Start a quest for a character
   start: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
     .input(z.object({ questId: z.string(), characterId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const isOwner = await ctx.services.character.verifyCharacterOwnership(input.characterId, ctx.user.id)
@@ -50,6 +51,7 @@ export const questRouter = t.router({
 
   // Abandon an active quest
   abandon: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
     .input(z.object({ questId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       return ctx.services.quest.abandonQuest(input.questId, ctx.user.id)
@@ -68,6 +70,7 @@ export const questRouter = t.router({
 
   // Tactical combat: Execute attack
   executeTacticalAttack: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.combat))
     .input(
       z.object({
         questId: z.string(),
@@ -107,6 +110,7 @@ export const questRouter = t.router({
 
   // Tactical combat: Execute enemy AI turn
   executeTacticalEnemyTurn: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.combat))
     .input(
       z.object({
         questId: z.string(),
@@ -135,6 +139,7 @@ export const questRouter = t.router({
 
   // Tactical combat: Execute doctrine with targeting
   executeTacticalDoctrine: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
     .input(
       z.object({
         questId: z.string(),
@@ -183,6 +188,7 @@ export const questRouter = t.router({
 
   // Tactical combat: Use self-buff doctrine (no targeting required)
   useSelfBuffDoctrine: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
     .input(
       z.object({
         questId: z.string(),
@@ -227,6 +233,7 @@ export const questRouter = t.router({
 
   // Tactical combat: Use potion during combat
   usePotion: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
     .input(
       z.object({
         questId: z.string(),

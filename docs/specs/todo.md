@@ -7,19 +7,17 @@
 
 - [ ] Analyze game design loop
 
-- [ ] API rate limiting
-  - Zero rate limiting in tRPC routers, middleware, or auth endpoints. No `@upstash/ratelimit` or redis. Magic-link and signup endpoints can be abused for spam/credential stuffing. Broader than the "Account Lockout" item below.
-  - **Fix:** Add rate limiter middleware (per-IP + per-user) and apply to auth, magic-link send, and write-heavy routers.
-
 - [ ] Email verification enforcement
   - `emailVerified` field exists in Better Auth but is never checked. Users can sign up with any email and access the full app. Beta will leak fake accounts and break magic-link recovery.
   - **Fix:** Gate protected routes on `emailVerified`; send verification email post-signup.
 
 - [ ] Error monitoring (extends Observability item below)
-  - No Sentry/Datadog. Production errors will be invisible. Pino logs locally but no remote sink.
+  - No Sentry/Datadog. Production errors will be invisible. Pino logs locally but no remote sink. Logging, metrics, and tracing for backend services and frontend errors.
   - **Fix:** Wire Sentry (or equivalent) for both server (tRPC error formatter) and client (React error boundaries).
 
 ## High Priority
+
+- [ ] Refactor `/src/server/routers/quest.router.ts`. It's not using the layered architecture of services and repositories.
 
 - [ ] Simple feature flag
   - Enable controlled rollout of new features without redeployments
@@ -34,9 +32,6 @@
 
 - [ ] Guild system
   - Users can create their own guilds, invite their friends, and start guild-wide campaigns. Each guild has a social forum. There are exclusive rewards for guild members.
-
-- [ ] Observability
-  - Logging, metrics, and tracing for backend services and frontend errors
 
 - [ ] Analyze if implementing [NES.css](https://nostalgic-css.github.io/NES.css/) in the RPG modules would improve the user experience
 
