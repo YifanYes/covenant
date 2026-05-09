@@ -22,6 +22,20 @@ export class QuestService {
     private characterService: CharacterService
   ) {}
 
+  private async assertCharacterOwnership(characterId: string, userId: string): Promise<void> {
+    const isOwner = await this.characterService.verifyCharacterOwnership(characterId, userId)
+    if (!isOwner) {
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
+    }
+  }
+
+  private async assertQuestOwnership(questId: string, userId: string, message: string): Promise<void> {
+    const isOwner = await this.characterQuestRepository.verifyOwnership(questId, userId)
+    if (!isOwner) {
+      throw new TRPCError({ code: 'FORBIDDEN', message })
+    }
+  }
+
   private createInitialTacticalState(
     playerUnitId: string,
     playerName: string,
@@ -73,7 +87,9 @@ export class QuestService {
     }
   }
 
-  async startQuest(questId: string, characterId: string) {
+  async startQuest(questId: string, characterId: string, userId: string) {
+    await this.assertCharacterOwnership(characterId, userId)
+
     const template = getQuestById(questId)
     if (!template) {
       throw new TRPCError({ code: 'NOT_FOUND', message: `Quest ${questId} not found` })
@@ -153,7 +169,9 @@ export class QuestService {
     }
   }
 
-  async getActiveQuest(characterId: string) {
+  async getActiveQuest(characterId: string, userId: string) {
+    await this.assertCharacterOwnership(characterId, userId)
+
     const quest = await this.characterQuestRepository.findActiveByCharacterId(characterId)
     if (!quest) return null
 
@@ -181,10 +199,11 @@ export class QuestService {
     }
   }
 
-  async getAvailableQuests(characterId?: string) {
+  async getAvailableQuests(userId: string, characterId?: string) {
     let activeQuestTemplateId: string | null = null
     let activeCharacterQuestId: string | null = null
     if (characterId) {
+      await this.assertCharacterOwnership(characterId, userId)
       const active = await this.characterQuestRepository.findActiveByCharacterId(characterId)
       activeQuestTemplateId = active?.questId ?? null
       activeCharacterQuestId = active?.id ?? null
@@ -198,16 +217,16 @@ export class QuestService {
   }
 
   async abandonQuest(questId: string, userId: string) {
-    const isOwner = await this.characterQuestRepository.verifyOwnership(questId, userId)
-    if (!isOwner) {
-      throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to abandon this quest' })
-    }
-
+    await this.assertQuestOwnership(questId, userId, 'Not authorized to abandon this quest')
     await this.characterQuestRepository.abandon(questId)
   }
 
-  async getTacticalState(questId: string): Promise<TacticalStateData | null> {
+  async getTacticalState(questId: string, userId: string): Promise<TacticalStateData | null> {
+    await this.assertQuestOwnership(questId, userId, 'Not authorized to access this combat')
+
     const result = await this.characterQuestRepository.findByIdWithTacticalState(questId)
-    return result?.tacticalState ?? null
+    const state = result?.tacticalState ?? null
+    if (state && state.stateVersion !== TACTICAL_STATE_VERSION) return null
+    return state
   }
 }

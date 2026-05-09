@@ -1,10 +1,7 @@
 import {
-  TACTICAL_STATE_VERSION,
   type SelfBuffDoctrineResultWithMana,
-  type TacticalDoctrineResultWithMana,
-  type TacticalStateData
+  type TacticalDoctrineResultWithMana
 } from '@shared/types/tactical-combat.types'
-import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { protectedProcedure, rateLimit, RATE_LIMITS, t } from '../trpc'
 
@@ -13,28 +10,14 @@ export const questRouter = t.router({
   getTacticalState: protectedProcedure
     .input(z.object({ questId: z.string() }))
     .query(async ({ input, ctx }) => {
-      const isOwner = await ctx.services.characterQuest.verifyOwnership(input.questId, ctx.user.id)
-      if (!isOwner) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this combat' })
-      }
-
-      const result = await ctx.services.characterQuest.findByIdWithTacticalState(input.questId)
-      const state = result?.tacticalState as TacticalStateData | null
-      if (state && state.stateVersion !== TACTICAL_STATE_VERSION) return null
-      return state
+      return ctx.services.quest.getTacticalState(input.questId, ctx.user.id)
     }),
 
   // List available quest templates (with optional active-quest status for a character)
   list: protectedProcedure
     .input(z.object({ characterId: z.string().optional() }).optional())
     .query(async ({ ctx, input }) => {
-      if (input?.characterId) {
-        const isOwner = await ctx.services.character.verifyCharacterOwnership(input.characterId, ctx.user.id)
-        if (!isOwner) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
-        }
-      }
-      return ctx.services.quest.getAvailableQuests(input?.characterId)
+      return ctx.services.quest.getAvailableQuests(ctx.user.id, input?.characterId)
     }),
 
   // Start a quest for a character
@@ -42,11 +25,7 @@ export const questRouter = t.router({
     .use(rateLimit(RATE_LIMITS.write))
     .input(z.object({ questId: z.string(), characterId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const isOwner = await ctx.services.character.verifyCharacterOwnership(input.characterId, ctx.user.id)
-      if (!isOwner) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
-      }
-      return ctx.services.quest.startQuest(input.questId, input.characterId)
+      return ctx.services.quest.startQuest(input.questId, input.characterId, ctx.user.id)
     }),
 
   // Abandon an active quest
@@ -61,11 +40,7 @@ export const questRouter = t.router({
   getActive: protectedProcedure
     .input(z.object({ characterId: z.string() }))
     .query(async ({ input, ctx }) => {
-      const isOwner = await ctx.services.character.verifyCharacterOwnership(input.characterId, ctx.user.id)
-      if (!isOwner) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
-      }
-      return ctx.services.quest.getActiveQuest(input.characterId)
+      return ctx.services.quest.getActiveQuest(input.characterId, ctx.user.id)
     }),
 
   // Tactical combat: Execute attack
@@ -84,19 +59,8 @@ export const questRouter = t.router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const isOwner = await ctx.services.characterQuest.verifyOwnership(input.questId, ctx.user.id)
-      if (!isOwner) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
-      }
-
-      if (!input.attackerId.startsWith('player-')) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot attack with enemy units' })
-      }
-
-      const totalDiceUsed = input.attackRolls.length + input.defenseRolls.length
-      await ctx.services.dice.consumeDiceFromBank(ctx.user.id, totalDiceUsed)
-
-      return ctx.services.combat.executeTacticalAttack(
+      return ctx.services.combat.playerAttack(
+        ctx.user.id,
         input.questId,
         input.attackerId,
         input.targetId,
@@ -120,16 +84,8 @@ export const questRouter = t.router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const isOwner = await ctx.services.characterQuest.verifyOwnership(input.questId, ctx.user.id)
-      if (!isOwner) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
-      }
-
-      if (input.enemyId.startsWith('player-')) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot execute AI turn for player units' })
-      }
-
-      return ctx.services.combat.executeEnemyTurn(
+      return ctx.services.combat.playerEnemyTurn(
+        ctx.user.id,
         input.questId,
         input.enemyId,
         input.enemyAttackDice,
@@ -150,40 +106,14 @@ export const questRouter = t.router({
       })
     )
     .mutation(async ({ input, ctx }): Promise<TacticalDoctrineResultWithMana> => {
-      const isOwner = await ctx.services.characterQuest.verifyOwnership(input.questId, ctx.user.id)
-      if (!isOwner) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
-      }
-
-      if (!input.casterId.startsWith('player-')) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
-      }
-
-      const character = await ctx.services.character.getCurrentClass(ctx.user.id)
-      if (!character) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
-      }
-      const currentClass = character.classes.find((c) => c.className === character.currentClass)
-      if (!currentClass) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
-      }
-
-      const result = await ctx.services.combat.executeTacticalDoctrine(
+      return ctx.services.combat.playerCastDoctrine(
+        ctx.user.id,
         input.questId,
         input.casterId,
         input.doctrineId,
         input.targeting,
-        input.targetIds,
-        currentClass.mana
+        input.targetIds
       )
-
-      if (result.success) {
-        const newMana = currentClass.mana - result.manaCost
-        await ctx.services.character.updateHealth(currentClass.id, currentClass.health, newMana)
-        return { ...result, success: true as const, newMana }
-      }
-
-      return { ...result, success: false as const }
     }),
 
   // Tactical combat: Use self-buff doctrine (no targeting required)
@@ -197,38 +127,12 @@ export const questRouter = t.router({
       })
     )
     .mutation(async ({ input, ctx }): Promise<SelfBuffDoctrineResultWithMana> => {
-      const isOwner = await ctx.services.characterQuest.verifyOwnership(input.questId, ctx.user.id)
-      if (!isOwner) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
-      }
-
-      if (!input.casterId.startsWith('player-')) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
-      }
-
-      const character = await ctx.services.character.getCurrentClass(ctx.user.id)
-      if (!character) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
-      }
-      const currentClass = character.classes.find((c) => c.className === character.currentClass)
-      if (!currentClass) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
-      }
-
-      const result = await ctx.services.combat.useSelfBuffDoctrine(
+      return ctx.services.combat.playerCastSelfBuffDoctrine(
+        ctx.user.id,
         input.questId,
         input.casterId,
-        input.doctrineId,
-        currentClass.mana
+        input.doctrineId
       )
-
-      if (result.success) {
-        const newMana = currentClass.mana - result.manaCost
-        await ctx.services.character.updateHealth(currentClass.id, currentClass.health, newMana)
-        return { ...result, success: true as const, newMana }
-      }
-
-      return { ...result, success: false as const }
     }),
 
   // Tactical combat: Use potion during combat
@@ -241,25 +145,6 @@ export const questRouter = t.router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const isOwner = await ctx.services.characterQuest.verifyOwnership(input.questId, ctx.user.id)
-      if (!isOwner) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to control this combat' })
-      }
-
-      const quest = await ctx.services.characterQuest.findByIdWithTacticalState(input.questId)
-      if (quest?.tacticalState?.potionUsedThisTurn) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Already used a potion this turn' })
-      }
-
-      const result = await ctx.services.combat.useConsumable(ctx.user.id, input.consumableId)
-
-      if (result.success && quest?.tacticalState) {
-        await ctx.services.characterQuest.updateTacticalState(input.questId, {
-          ...quest.tacticalState,
-          potionUsedThisTurn: true
-        })
-      }
-
-      return result
+      return ctx.services.combat.playerUsePotion(ctx.user.id, input.questId, input.consumableId)
     })
 })

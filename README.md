@@ -140,20 +140,20 @@ const mutation = useMutation(
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Framework** | Next.js 16.1.4, React 19.2.3, TypeScript 5.9.3 |
-| **Styling** | TailwindCSS v4, shadcn/ui, Framer Motion |
-| **State** | TanStack Query, Zustand |
-| **Backend** | tRPC 11, Prisma 7.3.0, PostgreSQL |
-| **Auth** | Better Auth |
-| **Validation** | Zod 4.3.6 |
-| **i18n** | i18next, react-i18next |
-| **Testing** | Vitest 4.0.18 |
-| **Email** | React Email + Brevo |
-| **Icons** | pixelarticons |
-| **Charts** | Recharts |
-| **Logging** | Pino |
+| Layer          | Technology                                     |
+| -------------- | ---------------------------------------------- |
+| **Framework**  | Next.js 16.1.4, React 19.2.3, TypeScript 5.9.3 |
+| **Styling**    | TailwindCSS v4, shadcn/ui, Framer Motion       |
+| **State**      | TanStack Query, Zustand                        |
+| **Backend**    | tRPC 11, Prisma 7.3.0, PostgreSQL              |
+| **Auth**       | Better Auth                                    |
+| **Validation** | Zod 4.3.6                                      |
+| **i18n**       | i18next, react-i18next                         |
+| **Testing**    | Vitest 4.0.18                                  |
+| **Email**      | React Email + Brevo                            |
+| **Icons**      | pixelarticons                                  |
+| **Charts**     | Recharts                                       |
+| **Logging**    | Pino                                           |
 
 ## Database / Prisma
 
@@ -238,16 +238,16 @@ This project follows **Spec-Driven Development** principles:
 
 Key variables (see `.env.example` for full list):
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `DIRECT_URL` | Direct PostgreSQL connection (used by Prisma) |
-| `NEXT_PUBLIC_APP_URL` | Public app URL (e.g., `http://localhost:3000`) |
-| `JWT_SECRET` | Secret for JWT signing |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials |
-| `BREVO_API_KEY` | Brevo (Sendinblue) API key for emails |
-| `FROM_EMAIL` | Sender email address |
-| `LOG_LEVEL` | Logging level: `debug`, `info`, `warn`, `error` |
+| Variable                                    | Description                                     |
+| ------------------------------------------- | ----------------------------------------------- |
+| `DATABASE_URL`                              | PostgreSQL connection string                    |
+| `DIRECT_URL`                                | Direct PostgreSQL connection (used by Prisma)   |
+| `NEXT_PUBLIC_APP_URL`                       | Public app URL (e.g., `http://localhost:3000`)  |
+| `JWT_SECRET`                                | Secret for JWT signing                          |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials                        |
+| `BREVO_API_KEY`                             | Brevo (Sendinblue) API key for emails           |
+| `FROM_EMAIL`                                | Sender email address                            |
+| `LOG_LEVEL`                                 | Logging level: `debug`, `info`, `warn`, `error` |
 
 ## Important Gotchas
 
@@ -258,16 +258,16 @@ Key variables (see `.env.example` for full list):
 
 ## Documentation
 
-| File | Purpose |
-|------|---------|
-| `AGENTS.md` | Compact instructions for AI agents |
-| `CLAUDE.md` | Detailed architecture and conventions |
-| `DESIGN.md` | Visual identity, faction palettes, UI principles |
-| `mission.md` | Project mission and pillars |
-| `roadmap.md` | Project timeline and phases |
-| `docs/specs/` | Technical specifications (SDD) |
-| `docs/lore/` | Game lore, worldbuilding, mechanics |
-| `docs/product/` | Product and infrastructure docs |
+| File            | Purpose                                          |
+| --------------- | ------------------------------------------------ |
+| `AGENTS.md`     | Compact instructions for AI agents               |
+| `CLAUDE.md`     | Points to AGENTS.md                              |
+| `DESIGN.md`     | Visual identity, faction palettes, UI principles |
+| `mission.md`    | Project mission and pillars                      |
+| `roadmap.md`    | Project timeline and phases                      |
+| `docs/specs/`   | Technical specifications (SDD)                   |
+| `docs/lore/`    | Game lore, worldbuilding, mechanics              |
+| `docs/product/` | Product and infrastructure docs                  |
 
 ## License
 

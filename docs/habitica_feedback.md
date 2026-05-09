@@ -18,6 +18,12 @@ Compiled from Reddit community posts.
 
 > After leveling up to get all my skills, I don't really find enjoyment in only getting cosmetics. In general the gameplay loop becomes very boring for me. I don't have friends who want to play with me so I can't do quests and I've heard a lot of negative things about guilds that take the system way too seriously.
 
+> An alternative theme/reskin to their fantasy thing. For now, fantasy has very little allure for me. If they have a "solar punk" theme, I may be interested.
+
+> I used it daily for years until they got rid of the guilds and everyone had to set up Discord servers for the groups. To me personally, they lost the feel of the guilds in Discord and I rarely used Habatica consistently like before. Another part of the app that I don't bother with is the food, mounts etc because I found unless I did that daily it accumulated so it feels like a full time job catching up so I ignore it. To me the best part used to be challenges and discussing them in the guilds.
+
+> The commenter likes Habitica's flexibility and honesty-based design, but finds it motivationally weak. The core problem: the game mechanics (leveling, rewards) don't compel action the way simpler tools like streak counters do. Social features exist but feel optional. They conclude it only works for people who genuinely enjoy the grind itself—which isn't them, even though they want it to be.
+
 ## Feature Requests
 
 > A "last date completed" metric. So I can see I haven't painted in a month, for example. I'm keeping track of this manually, but it'd be nice for it to be tracked automatically.
@@ -87,10 +93,10 @@ The interface can be overwhelming. Understanding the difference between Habits, 
 
 ## Summary: Gaps Habitica Is Leaving
 
-| Gap | Description |
-|-----|-------------|
-| **Community need** | Users desperately seek spaces to share specific interests tied to productivity. |
-| **Productivity over cosmetics** | There is a market of users willing to pay for advanced data management and habit analytics — not just "pixel pets." |
-| **Mental flexibility** | Demand for apps that are "kind" on bad days, allowing pauses or difficulty adjustments without destructive penalties. |
+| Gap                             | Description                                                                                                           |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Community need**              | Users desperately seek spaces to share specific interests tied to productivity.                                       |
+| **Productivity over cosmetics** | There is a market of users willing to pay for advanced data management and habit analytics — not just "pixel pets."   |
+| **Mental flexibility**          | Demand for apps that are "kind" on bad days, allowing pauses or difficulty adjustments without destructive penalties. |
 
 Many users are migrating to alternatives like **Finch** (for mental health focus), **Amazing Marvin** (for task management power), or building their own systems in **Notion/Obsidian**.

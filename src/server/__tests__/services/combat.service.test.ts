@@ -14,6 +14,8 @@ describe('CombatService', () => {
   let combatService: CombatService
   let mockCharacterRepo: any
   let mockCharacterQuestRepo: any
+  let mockCharacterService: any
+  let mockDiceService: any
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -30,11 +32,29 @@ describe('CombatService', () => {
       findById: vi.fn(),
       findByIdWithDoctrines: vi.fn(),
       updateDoctrines: vi.fn(),
-      updateActiveDoctrines: vi.fn()
+      updateActiveDoctrines: vi.fn(),
+      verifyOwnership: vi.fn().mockResolvedValue(true),
+      findByIdWithTacticalState: vi.fn(),
+      findActiveByCharacterId: vi.fn(),
+      updateTacticalState: vi.fn()
+    }
+
+    mockCharacterService = {
+      getCurrentClass: vi.fn(),
+      updateHealth: vi.fn()
+    }
+
+    mockDiceService = {
+      consumeDiceFromBank: vi.fn()
     }
 
     // Inject the mock repositories directly
-    combatService = new CombatService(mockCharacterRepo, mockCharacterQuestRepo)
+    combatService = new CombatService(
+      mockCharacterRepo,
+      mockCharacterQuestRepo,
+      mockCharacterService,
+      mockDiceService
+    )
   })
 
   describe('dice mechanics', () => {
@@ -159,6 +179,8 @@ describe('CombatService', () => {
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
         mockCharacterQuestRepo,
+        mockCharacterService,
+        mockDiceService,
         mockCombatEnemyRepo as any
       )
 
@@ -502,6 +524,8 @@ describe('CombatService', () => {
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
         mockCharacterQuestRepo,
+        mockCharacterService,
+        mockDiceService,
         mockCombatEnemyRepo as any
       )
 
@@ -548,6 +572,8 @@ describe('CombatService', () => {
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
         mockCharacterQuestRepo,
+        mockCharacterService,
+        mockDiceService,
         mockCombatEnemyRepo as any
       )
 
@@ -593,6 +619,8 @@ describe('CombatService', () => {
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
         mockCharacterQuestRepo,
+        mockCharacterService,
+        mockDiceService,
         mockCombatEnemyRepo as any
       )
 
@@ -629,6 +657,8 @@ describe('CombatService', () => {
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
         mockCharacterQuestRepo,
+        mockCharacterService,
+        mockDiceService,
         mockCombatEnemyRepo as any
       )
 
@@ -721,6 +751,8 @@ describe('CombatService', () => {
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
         mockCharacterQuestRepo,
+        mockCharacterService,
+        mockDiceService,
         mockCombatEnemyRepo as any
       )
 
@@ -753,6 +785,8 @@ describe('CombatService', () => {
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
         mockCharacterQuestRepo,
+        mockCharacterService,
+        mockDiceService,
         mockCombatEnemyRepo as any
       )
 
@@ -801,6 +835,8 @@ describe('CombatService', () => {
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
         mockCharacterQuestRepo,
+        mockCharacterService,
+        mockDiceService,
         mockCombatEnemyRepo as any
       )
 
@@ -842,6 +878,8 @@ describe('CombatService', () => {
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
         mockCharacterQuestRepo,
+        mockCharacterService,
+        mockDiceService,
         mockCombatEnemyRepo as any
       )
 
@@ -885,6 +923,8 @@ describe('CombatService', () => {
       const combatServiceWithEnemyRepo = new CombatService(
         mockCharacterRepo,
         mockCharacterQuestRepo,
+        mockCharacterService,
+        mockDiceService,
         mockCombatEnemyRepo as any
       )
 
@@ -1169,6 +1209,313 @@ describe('CombatService', () => {
 
       // Should calculate based on tactical health (3), not database health (8)
       expect(result.healthRestored).toBe(3) // Can restore full 3 HP since 3 + 3 = 6 < 10
+    })
+  })
+
+  describe('player entry points', () => {
+    const mockCurrentClass = {
+      id: 'class-1',
+      className: 'knight',
+      health: 10,
+      mana: 8,
+      maxHealth: 10,
+      maxMana: 10,
+      tier: 1
+    }
+
+    const mockCharacterWithCurrentClass = {
+      id: 'char-1',
+      name: 'Test',
+      currentClass: 'knight',
+      classes: [mockCurrentClass]
+    }
+
+    describe('playerAttack', () => {
+      it('throws FORBIDDEN if user does not own the quest', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
+
+        await expect(
+          combatService.playerAttack('user-1', 'quest-1', 'player-1', 'enemy-1', [4], [3], 4, 4, 6)
+        ).rejects.toThrow('Not authorized to control this combat')
+        expect(mockDiceService.consumeDiceFromBank).not.toHaveBeenCalled()
+      })
+
+      it('throws FORBIDDEN if attackerId is not a player unit', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+
+        await expect(
+          combatService.playerAttack('user-1', 'quest-1', 'enemy-1', 'enemy-2', [4], [3], 4, 4, 6)
+        ).rejects.toThrow('Cannot attack with enemy units')
+        expect(mockDiceService.consumeDiceFromBank).not.toHaveBeenCalled()
+      })
+
+      it('consumes dice from bank for attack + defense rolls before executing', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+        const executeSpy = vi
+          .spyOn(combatService, 'executeTacticalAttack')
+          .mockResolvedValue({ success: true } as any)
+
+        await combatService.playerAttack(
+          'user-1',
+          'quest-1',
+          'player-1',
+          'enemy-1',
+          [4, 5, 6],
+          [3, 4],
+          4,
+          4,
+          6
+        )
+
+        expect(mockDiceService.consumeDiceFromBank).toHaveBeenCalledWith('user-1', 5)
+        expect(executeSpy).toHaveBeenCalled()
+      })
+    })
+
+    describe('playerEnemyTurn', () => {
+      it('throws FORBIDDEN if user does not own the quest', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
+
+        await expect(
+          combatService.playerEnemyTurn('user-1', 'quest-1', 'enemy-1', 3, 4)
+        ).rejects.toThrow('Not authorized to control this combat')
+      })
+
+      it('throws BAD_REQUEST if enemyId is a player unit', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+
+        await expect(
+          combatService.playerEnemyTurn('user-1', 'quest-1', 'player-1', 3, 4)
+        ).rejects.toThrow('Cannot execute AI turn for player units')
+      })
+    })
+
+    describe('playerCastDoctrine', () => {
+      it('throws FORBIDDEN if user does not own the quest', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
+
+        await expect(
+          combatService.playerCastDoctrine('user-1', 'quest-1', 'player-1', 'doctrine-x', 'single', ['enemy-1'])
+        ).rejects.toThrow('Not authorized to control this combat')
+        expect(mockCharacterService.getCurrentClass).not.toHaveBeenCalled()
+      })
+
+      it('throws FORBIDDEN if casterId is not a player unit', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+
+        await expect(
+          combatService.playerCastDoctrine('user-1', 'quest-1', 'enemy-1', 'doctrine-x', 'single', ['enemy-2'])
+        ).rejects.toThrow('Cannot cast doctrine with enemy units')
+        expect(mockCharacterService.getCurrentClass).not.toHaveBeenCalled()
+      })
+
+      it('throws NOT_FOUND if no current character', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+        mockCharacterService.getCurrentClass.mockResolvedValue(null)
+
+        await expect(
+          combatService.playerCastDoctrine('user-1', 'quest-1', 'player-1', 'doctrine-x', 'single', ['enemy-1'])
+        ).rejects.toThrow('Character not found')
+      })
+
+      it('deducts mana cost on success', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+        mockCharacterService.getCurrentClass.mockResolvedValue(mockCharacterWithCurrentClass)
+        vi.spyOn(combatService, 'executeTacticalDoctrine').mockResolvedValue({
+          success: true,
+          manaCost: 3
+        } as any)
+
+        const result = await combatService.playerCastDoctrine(
+          'user-1',
+          'quest-1',
+          'player-1',
+          'doctrine-x',
+          'single',
+          ['enemy-1']
+        )
+
+        expect(mockCharacterService.updateHealth).toHaveBeenCalledWith('class-1', 10, 5) // 8 - 3 = 5
+        expect((result as any).newMana).toBe(5)
+      })
+
+      it('does not deduct mana on failure', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+        mockCharacterService.getCurrentClass.mockResolvedValue(mockCharacterWithCurrentClass)
+        vi.spyOn(combatService, 'executeTacticalDoctrine').mockResolvedValue({
+          success: false,
+          manaCost: 3
+        } as any)
+
+        await combatService.playerCastDoctrine('user-1', 'quest-1', 'player-1', 'doctrine-x', 'single', ['enemy-1'])
+
+        expect(mockCharacterService.updateHealth).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('playerCastSelfBuffDoctrine', () => {
+      it('throws FORBIDDEN if user does not own the quest', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
+
+        await expect(
+          combatService.playerCastSelfBuffDoctrine('user-1', 'quest-1', 'player-1', 'doctrine-x')
+        ).rejects.toThrow('Not authorized to control this combat')
+      })
+
+      it('throws FORBIDDEN if casterId is not a player unit', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+
+        await expect(
+          combatService.playerCastSelfBuffDoctrine('user-1', 'quest-1', 'enemy-1', 'doctrine-x')
+        ).rejects.toThrow('Cannot cast doctrine with enemy units')
+      })
+
+      it('deducts mana cost on success', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+        mockCharacterService.getCurrentClass.mockResolvedValue(mockCharacterWithCurrentClass)
+        vi.spyOn(combatService, 'useSelfBuffDoctrine').mockResolvedValue({
+          success: true,
+          manaCost: 2
+        } as any)
+
+        const result = await combatService.playerCastSelfBuffDoctrine('user-1', 'quest-1', 'player-1', 'doctrine-x')
+
+        expect(mockCharacterService.updateHealth).toHaveBeenCalledWith('class-1', 10, 6) // 8 - 2 = 6
+        expect((result as any).newMana).toBe(6)
+      })
+    })
+
+    describe('playerUsePotion', () => {
+      it('throws FORBIDDEN if user does not own the quest', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
+
+        await expect(combatService.playerUsePotion('user-1', 'quest-1', 'health_potion')).rejects.toThrow(
+          'Not authorized to control this combat'
+        )
+      })
+
+      it('throws BAD_REQUEST if a potion was already used this turn (no inventory mutation)', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+        const inventory = [{ id: 'item-1', type: ItemType.CONSUMABLE, definitionId: 'health_potion' }]
+        mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue({
+          id: 'char-1',
+          name: 'Test',
+          currentClass: 'knight',
+          data: { diceBank: 0 },
+          inventory,
+          loadout: [],
+          classes: [{ id: 'class-1', className: 'knight', health: 5, maxHealth: 10, mana: 5, maxMana: 10, tier: 1 }]
+        })
+        mockCharacterQuestRepo.findActiveByCharacterId = vi.fn().mockResolvedValue({
+          id: 'quest-1',
+          characterId: 'char-1',
+          tacticalState: { potionUsedThisTurn: true, units: [] }
+        })
+
+        await expect(combatService.playerUsePotion('user-1', 'quest-1', 'health_potion')).rejects.toThrow(
+          'Already used a potion this turn'
+        )
+        // Inventory + DB stat write must not have happened.
+        expect(mockCharacterRepo.updateHealth).not.toHaveBeenCalled()
+        expect(mockCharacterRepo.updateInventoryAndLoadout).not.toHaveBeenCalled()
+        expect(mockCharacterQuestRepo.updateTacticalState).not.toHaveBeenCalled()
+      })
+
+      it('marks potionUsedThisTurn in a single tactical state write that also updates units', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+        const inventory = [{ id: 'item-1', type: ItemType.CONSUMABLE, definitionId: 'health_potion' }]
+        mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue({
+          id: 'char-1',
+          name: 'Test',
+          currentClass: 'knight',
+          data: { diceBank: 0 },
+          inventory,
+          loadout: [],
+          classes: [{ id: 'class-1', className: 'knight', health: 5, maxHealth: 10, mana: 5, maxMana: 10, tier: 1 }]
+        })
+        mockCharacterRepo.updateHealth = vi.fn()
+        mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
+        mockCharacterQuestRepo.findActiveByCharacterId = vi.fn().mockResolvedValue({
+          id: 'quest-1',
+          characterId: 'char-1',
+          tacticalState: {
+            stateVersion: TACTICAL_STATE_VERSION,
+            mapTemplateId: 'm',
+            gridWidth: 1,
+            gridHeight: 1,
+            tiles: [],
+            units: [
+              {
+                id: 'player-1',
+                name: 'P',
+                hasMoved: false,
+                hasActed: false,
+                currentHealth: 3,
+                maxHealth: 10
+              }
+            ],
+            turnOrder: ['player-1'],
+            currentTurnIndex: 0,
+            turnNumber: 1
+          }
+        })
+
+        await combatService.playerUsePotion('user-1', 'quest-1', 'health_potion')
+
+        // Single tactical state write that combines unit-health update AND potion marker.
+        expect(mockCharacterQuestRepo.updateTacticalState).toHaveBeenCalledTimes(1)
+        const [, payload] = mockCharacterQuestRepo.updateTacticalState.mock.calls[0]
+        expect(payload.potionUsedThisTurn).toBe(true)
+        const playerUnit = payload.units.find((u: any) => u.id === 'player-1')
+        expect(playerUnit.currentHealth).toBe(6) // 3 + 3
+      })
+
+      it('marks potionUsedThisTurn even when the potion restores no health (mana-only / capped)', async () => {
+        mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+        const inventory = [{ id: 'item-1', type: ItemType.CONSUMABLE, definitionId: 'mana_potion' }]
+        mockCharacterRepo.findWithClassesOrThrow = vi.fn().mockResolvedValue({
+          id: 'char-1',
+          name: 'Test',
+          currentClass: 'knight',
+          data: { diceBank: 0 },
+          inventory,
+          loadout: [],
+          classes: [{ id: 'class-1', className: 'knight', health: 10, maxHealth: 10, mana: 5, maxMana: 10, tier: 1 }]
+        })
+        mockCharacterRepo.updateHealth = vi.fn()
+        mockCharacterRepo.updateInventoryAndLoadout = vi.fn()
+        mockCharacterQuestRepo.findActiveByCharacterId = vi.fn().mockResolvedValue({
+          id: 'quest-1',
+          characterId: 'char-1',
+          tacticalState: {
+            stateVersion: TACTICAL_STATE_VERSION,
+            mapTemplateId: 'm',
+            gridWidth: 1,
+            gridHeight: 1,
+            tiles: [],
+            units: [
+              {
+                id: 'player-1',
+                name: 'P',
+                hasMoved: false,
+                hasActed: false,
+                currentHealth: 10,
+                maxHealth: 10
+              }
+            ],
+            turnOrder: ['player-1'],
+            currentTurnIndex: 0,
+            turnNumber: 1
+          }
+        })
+
+        await combatService.playerUsePotion('user-1', 'quest-1', 'mana_potion')
+
+        // Even with no health change, potion marker must be written (single write).
+        expect(mockCharacterQuestRepo.updateTacticalState).toHaveBeenCalledTimes(1)
+        const [, payload] = mockCharacterQuestRepo.updateTacticalState.mock.calls[0]
+        expect(payload.potionUsedThisTurn).toBe(true)
+      })
     })
   })
 })
