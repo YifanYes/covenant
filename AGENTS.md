@@ -154,6 +154,7 @@ When fixing bugs, trace **every** caller and reference to the affected logic and
 - Tests mock repositories by passing them directly into service constructors (no DI container)
 - Avoid `Omit<>` patterns that break implicit tRPC type resolution
 - **Never call `setState` synchronously inside `useEffect`**. It triggers cascading renders and fails the `react-hooks/set-state-in-effect` lint rule. Instead, initialise state with a lazy function: `useState(() => !safeGet())`.
+- **Better Auth user IDs are `text`, not `uuid`** (e.g. `f4FRrCSJBqVEU5WCOTBTaZSHY9NrxnkW`). In raw SQL, never cast `userId::uuid` — it throws `invalid input syntax for type uuid` and turns into a 500. Compare as text. Entity `id` columns (tasks, habits, etc.) ARE uuid and can be cast.
 
 ## References
 

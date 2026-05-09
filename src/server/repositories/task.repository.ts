@@ -171,7 +171,7 @@ export class TaskRepository {
       UPDATE "tasks" as t
       SET "status" = c.status, "order" = c."order"
       FROM (VALUES ${Prisma.join(values)}) as c(id, status, "order")
-      WHERE c.id = t.id AND "userId" = ${userId}::uuid
+      WHERE c.id = t.id AND "userId" = ${userId}
     `
 
     if (count !== tasks.length) {
