@@ -98,6 +98,11 @@
 - [ ] Logout button in sidebar `[loop]`
   - Currently buried in `/settings`. Add to user dropdown in sidebar.
 
+- [ ] Re-enable strict TLS verification on prod database `[debt]`
+  - `src/server/lib/prisma.ts` currently runs production with `ssl: { rejectUnauthorized: false }` (channel still encrypted, chain not validated). See `docs/specs/database_ssl.md`.
+  - Blocked on either: a Prisma 7 fix for the `@prisma/adapter-pg` regression (prisma/prisma#29060, #27611) — strict verification rejects Railway's cert chain even with `sslmode=verify-full` — or Railway publishing a CA bundle for managed Postgres so we can pin via `ssl.ca`.
+  - **Fix when unblocked:** flip `rejectUnauthorized` back to `true` (and add `ca: env.DATABASE_SSL_CA` if pinning); update `docs/specs/database_ssl.md`.
+
 ## Low Priority
 
 - [ ] Security: type safety — replace `as any` usages `[debt]`
