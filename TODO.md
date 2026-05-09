@@ -72,6 +72,10 @@
   - `use-tactical-enemy-turn.hook.ts:34`. Bug in shipping code on the core loop.
   - **Fix:** Refresh state after each await in critical paths.
 
+- [ ] Combat: doctrine cast clobbers stale `currentClass.health` `[debt]`
+  - `combat.service.ts` `playerCastDoctrine` / `playerCastSelfBuffDoctrine` snapshot `currentClass.health` and `currentClass.mana` BEFORE the doctrine executes, then write the snapshot back paired with `newMana`. Any doctrine that mutates DB health (self-damage, lifesteal) gets overwritten with the stale value. Latent today because no current doctrine touches DB health, but the foot-gun lives on the core combat path.
+  - **Fix:** Either re-fetch the class after `executeTacticalDoctrine` / `useSelfBuffDoctrine`, or split `characterRepository.updateHealth` into a dedicated `updateMana(classId, mana)` and only write the column we changed.
+
 - [ ] Empty states for remaining views `[loop]`
   - Already shipped for habits/tasks/objectives. Still missing: shop filtered results (no matches), inventory Armory + Doctrines tabs.
 

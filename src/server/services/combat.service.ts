@@ -7,14 +7,18 @@ import { ItemType } from '@shared/types/gamification.types'
 import {
   type AttackValidationResult,
   type EnemyTurnResult,
+  type SelfBuffDoctrineResultWithMana,
   type TacticalAttackResult,
   type TacticalDoctrineResult,
+  type TacticalDoctrineResultWithMana,
   type TacticalStateData
 } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
+import type { CharacterService } from './character.service'
+import type { DiceService } from './dice.service'
 import type { KillRecordService } from './kill-record.service'
 
 import * as attackResolution from '../utils/combat/attack-resolution'
@@ -28,9 +32,30 @@ export class CombatService {
   constructor(
     private characterRepository: CharacterRepository,
     private characterQuestRepository: CharacterQuestRepository,
+    private characterService: CharacterService,
+    private diceService: DiceService,
     private combatEnemyRepository?: CombatEnemyRepository,
     private killRecordService?: KillRecordService
   ) {}
+
+  private async assertQuestOwnership(questId: string, userId: string, message: string): Promise<void> {
+    const isOwner = await this.characterQuestRepository.verifyOwnership(questId, userId)
+    if (!isOwner) {
+      throw new TRPCError({ code: 'FORBIDDEN', message })
+    }
+  }
+
+  private async getCurrentClassForUser(userId: string) {
+    const character = await this.characterService.getCurrentClass(userId)
+    if (!character) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+    }
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
+    }
+    return currentClass
+  }
 
   private get repos(): CombatRewardDeps {
     return {
@@ -60,7 +85,8 @@ export class CombatService {
 
   async useConsumable(
     userId: string,
-    consumableId: string
+    consumableId: string,
+    opts?: { markPotionTurn?: boolean }
   ): Promise<{ success: boolean; healthRestored?: number; manaRestored?: number }> {
     const consumable = getConsumableById(consumableId)
     if (!consumable) {
@@ -84,6 +110,11 @@ export class CombatService {
     const participation: { id: string; tacticalState: TacticalStateData | null } | null = activeQuest
       ? { id: activeQuest.id, tacticalState: activeQuest.tacticalState }
       : null
+
+    // Per-turn potion guard for combat use. Throw before mutating inventory or stats.
+    if (opts?.markPotionTurn && participation?.tacticalState?.potionUsedThisTurn) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Already used a potion this turn' })
+    }
 
     const playerUnit = participation?.tacticalState?.units?.find((u) => u.id.startsWith('player-'))
 
@@ -115,20 +146,25 @@ export class CombatService {
       character.loadout as unknown as InventoryItem[]
     )
 
-    // Update tactical combat state if there's an active tactical combat
-    if (participation?.id && participation.tacticalState?.units && playerUnit && healthRestored > 0) {
-      const units = [...participation.tacticalState.units]
-      const playerUnitIndex = units.findIndex((u) => u.id.startsWith('player-'))
+    // Single merged write: combine any unit-health update with the optional potion-turn marker.
+    if (participation?.id && participation.tacticalState) {
+      const baseState = participation.tacticalState
+      const shouldUpdateUnits = !!playerUnit && healthRestored > 0
+      const shouldMarkPotion = !!opts?.markPotionTurn
 
-      if (playerUnitIndex !== -1) {
-        units[playerUnitIndex] = {
-          ...units[playerUnitIndex],
-          currentHealth: Math.min(playerUnit.currentHealth + healthRestored, playerUnit.maxHealth)
-        }
+      if (shouldUpdateUnits || shouldMarkPotion) {
+        const units = shouldUpdateUnits
+          ? baseState.units.map((u) =>
+              u.id.startsWith('player-')
+                ? { ...u, currentHealth: Math.min(u.currentHealth + healthRestored, u.maxHealth) }
+                : u
+            )
+          : baseState.units
 
         await this.characterQuestRepository.updateTacticalState(participation.id, {
-          ...participation.tacticalState,
-          units
+          ...baseState,
+          units,
+          ...(shouldMarkPotion ? { potionUsedThisTurn: true } : {})
         })
       }
     }
@@ -306,5 +342,125 @@ export class CombatService {
     unitActiveDoctrines: Record<string, ActiveStatusEffect> | undefined
   ): Record<string, ActiveStatusEffect> {
     return doctrineBuffs.clearConsumedDefenseDoctrines(unitActiveDoctrines)
+  }
+
+  // ============================================================
+  // PLAYER-FACING ENTRY POINTS (handle ownership, dice, mana, state)
+  // ============================================================
+
+  async playerAttack(
+    userId: string,
+    questId: string,
+    attackerId: string,
+    targetId: string,
+    attackRolls: number[],
+    defenseRolls: number[],
+    attackThreshold: number,
+    defenseThreshold: number,
+    attackCriticalThreshold: number = 6
+  ): Promise<TacticalAttackResult> {
+    await this.assertQuestOwnership(questId, userId, 'Not authorized to control this combat')
+
+    if (!attackerId.startsWith('player-')) {
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot attack with enemy units' })
+    }
+
+    const totalDiceUsed = attackRolls.length + defenseRolls.length
+    await this.diceService.consumeDiceFromBank(userId, totalDiceUsed)
+
+    return this.executeTacticalAttack(
+      questId,
+      attackerId,
+      targetId,
+      attackRolls,
+      defenseRolls,
+      attackThreshold,
+      defenseThreshold,
+      attackCriticalThreshold
+    )
+  }
+
+  async playerEnemyTurn(
+    userId: string,
+    questId: string,
+    enemyId: string,
+    enemyAttackDice: number,
+    enemyAttackThreshold: number
+  ): Promise<EnemyTurnResult> {
+    await this.assertQuestOwnership(questId, userId, 'Not authorized to control this combat')
+
+    if (enemyId.startsWith('player-')) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot execute AI turn for player units' })
+    }
+
+    return this.executeEnemyTurn(questId, enemyId, enemyAttackDice, enemyAttackThreshold)
+  }
+
+  async playerCastDoctrine(
+    userId: string,
+    questId: string,
+    casterId: string,
+    doctrineId: string,
+    targeting: 'single' | 'all',
+    targetIds: string[]
+  ): Promise<TacticalDoctrineResultWithMana> {
+    await this.assertQuestOwnership(questId, userId, 'Not authorized to control this combat')
+
+    if (!casterId.startsWith('player-')) {
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
+    }
+
+    const currentClass = await this.getCurrentClassForUser(userId)
+
+    const result = await this.executeTacticalDoctrine(
+      questId,
+      casterId,
+      doctrineId,
+      targeting,
+      targetIds,
+      currentClass.mana
+    )
+
+    if (result.success) {
+      const newMana = currentClass.mana - result.manaCost
+      await this.characterService.updateHealth(currentClass.id, currentClass.health, newMana)
+      return { ...result, success: true as const, newMana }
+    }
+
+    return { ...result, success: false as const }
+  }
+
+  async playerCastSelfBuffDoctrine(
+    userId: string,
+    questId: string,
+    casterId: string,
+    doctrineId: string
+  ): Promise<SelfBuffDoctrineResultWithMana> {
+    await this.assertQuestOwnership(questId, userId, 'Not authorized to control this combat')
+
+    if (!casterId.startsWith('player-')) {
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
+    }
+
+    const currentClass = await this.getCurrentClassForUser(userId)
+
+    const result = await this.useSelfBuffDoctrine(questId, casterId, doctrineId, currentClass.mana)
+
+    if (result.success) {
+      const newMana = currentClass.mana - result.manaCost
+      await this.characterService.updateHealth(currentClass.id, currentClass.health, newMana)
+      return { ...result, success: true as const, newMana }
+    }
+
+    return { ...result, success: false as const }
+  }
+
+  async playerUsePotion(
+    userId: string,
+    questId: string,
+    consumableId: string
+  ): Promise<{ success: boolean; healthRestored?: number; manaRestored?: number }> {
+    await this.assertQuestOwnership(questId, userId, 'Not authorized to control this combat')
+    return this.useConsumable(userId, consumableId, { markPotionTurn: true })
   }
 }

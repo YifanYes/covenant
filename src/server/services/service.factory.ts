@@ -96,11 +96,6 @@ export class ServiceFactory {
 
   // ============== Service Getters (public) ==============
 
-  // Repository access (for simple queries without business logic)
-  get characterQuest(): CharacterQuestRepository {
-    return this.characterQuestRepository
-  }
-
   // Layer 1: Repository-only dependencies
   get area(): AreaService {
     return (this._areaService ??= new AreaService(this.areaRepository))
@@ -119,6 +114,8 @@ export class ServiceFactory {
     return (this._combatService ??= new CombatService(
       this.characterRepository,
       this.characterQuestRepository,
+      this.character,
+      this.dice,
       this.combatEnemyRepository,
       this.killRecord
     ))
