@@ -153,7 +153,9 @@ const mutation = useMutation(
 | **Email**      | React Email + Brevo                            |
 | **Icons**      | pixelarticons                                  |
 | **Charts**     | Recharts                                       |
-| **Logging**    | Pino                                           |
+| **Logging**    | Pino (pretty in dev, JSON in prod)             |
+| **Monitoring** | Sentry (`@sentry/nextjs`)                      |
+| **Cache / Redis** | Upstash Redis + `@upstash/ratelimit`        |
 
 ## Database / Prisma
 
@@ -226,6 +228,42 @@ pnpm test          # Must pass before considering task complete
 - **Rule**: NEVER hardcode user-facing strings. Always use `useTranslation()`.
 - When adding new keys, add them to **both** `en` and `es` files.
 
+## Security & Observability
+
+### Account Lockout
+
+Repeated failed sign-ins are throttled to blunt credential-stuffing and brute-force attempts. Implementation lives in `src/server/lib/account-lockout.ts` and is wired into Better Auth via a `before` hook on sign-in.
+
+- **Key**: SHA-256 hash of the lowercased email (raw email never stored).
+- **Threshold**: 5 failures trigger the first lock.
+- **Backoff**: exponential — 60s → 120s → 300s → 900s → 1800s → 3600s (cap).
+- **Counter TTL**: 24h, set on the first failure of a streak; not refreshed by subsequent fails (a quiet account self-heals).
+- **Storage**: Upstash Redis when configured, else an in-memory `Map` per replica (dev/test fallback).
+- **Fail-open on Redis outage**: sign-in is allowed if Redis is unreachable, so an infra problem cannot lock every user out.
+- **Layered defense**: Better Auth's per-IP rate limit (3 req / 10s on `/sign-in/**`) caps the rate at which the failure counter can be driven.
+
+### Rate Limiting
+
+`src/server/lib/rate-limiter.ts` exposes `checkRateLimit(key, config)`. Uses `@upstash/ratelimit` sliding-window over Upstash Redis when credentials are present; falls back to an in-memory `RateLimiter` class otherwise. Limiter instances are cached per `(maxRequests, windowMs)` pair.
+
+### Logging (Pino)
+
+`src/server/lib/logger.ts` exports a `pino` logger.
+
+- **Level**: `LOG_LEVEL` env (`fatal|error|warn|info|debug|trace`); default `info` in prod, `debug` elsewhere.
+- **Transport**: `pino-pretty` (colorized, `SYS:HH:mm:ss.l`) in non-prod; raw JSON in prod for log aggregation.
+- Reads `process.env` directly to avoid a circular dep with `config.ts`.
+
+### Sentry
+
+Sentry is wired via `@sentry/nextjs`. Config files at the repo root:
+
+- `sentry.shared.config.ts` — shared `initServerSentry()` (DSN, environment, traces, `enableLogs`, `sendDefaultPii` in prod only).
+- `sentry.server.config.ts` / `sentry.edge.config.ts` — runtime-specific init.
+- `instrumentation-client.ts` — browser-side init.
+
+`tracesSampleRate` is `0.1` in production, `1.0` otherwise. `next.config.ts` lists `@sentry/cli` under `pnpm.onlyBuiltDependencies` for source-map upload.
+
 ## Spec-Driven Development (SDD)
 
 This project follows **Spec-Driven Development** principles:
@@ -248,6 +286,10 @@ Key variables (see `.env.example` for full list):
 | `BREVO_API_KEY`                             | Brevo (Sendinblue) API key for emails           |
 | `FROM_EMAIL`                                | Sender email address                            |
 | `LOG_LEVEL`                                 | Logging level: `debug`, `info`, `warn`, `error` |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST credentials. Required in production for shared rate-limit and account-lockout state across replicas; optional in dev/test (falls back to in-memory per-instance state). |
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN`     | Sentry DSN for server and client error reporting (optional in dev, required in prod) |
+| `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | Sentry build-time config for source-map upload |
+| `ENVIRONMENT` / `NEXT_PUBLIC_ENVIRONMENT`   | Overrides `NODE_ENV` in Sentry tags (e.g. `staging`, `preview`) |
 
 ## Important Gotchas
 
@@ -255,6 +297,8 @@ Key variables (see `.env.example` for full list):
 - Prisma client lives at `@/generated/prisma` — do not import from `@prisma/client` directly.
 - Tests mock repositories by passing them directly into service constructors (no DI container).
 - Avoid `Omit<>` patterns that break implicit tRPC type resolution.
+- `redis.ts` and `logger.ts` read `process.env` directly (not from `config.ts`) so they're safe to import in unit tests without loading the full validated env.
+- Without `UPSTASH_REDIS_REST_URL`/`TOKEN`, rate limiting and account lockout silently fall back to per-replica in-memory state — fine for dev, **not** for multi-replica prod.
 
 ## Documentation
 

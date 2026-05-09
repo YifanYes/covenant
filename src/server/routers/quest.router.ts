@@ -3,15 +3,13 @@ import {
   type TacticalDoctrineResultWithMana
 } from '@shared/types/tactical-combat.types'
 import { z } from 'zod'
-import { protectedProcedure, rateLimit, RATE_LIMITS, t } from '../trpc'
+import { protectedProcedure, RATE_LIMITS, rateLimit, t } from '../trpc'
 
 export const questRouter = t.router({
   // Get tactical combat state for a quest
-  getTacticalState: protectedProcedure
-    .input(z.object({ questId: z.string() }))
-    .query(async ({ input, ctx }) => {
-      return ctx.services.quest.getTacticalState(input.questId, ctx.user.id)
-    }),
+  getTacticalState: protectedProcedure.input(z.object({ questId: z.string() })).query(async ({ input, ctx }) => {
+    return ctx.services.quest.getTacticalState(input.questId, ctx.user.id)
+  }),
 
   // List available quest templates (with optional active-quest status for a character)
   list: protectedProcedure
@@ -37,11 +35,9 @@ export const questRouter = t.router({
     }),
 
   // Get active quest for a character
-  getActive: protectedProcedure
-    .input(z.object({ characterId: z.string() }))
-    .query(async ({ input, ctx }) => {
-      return ctx.services.quest.getActiveQuest(input.characterId, ctx.user.id)
-    }),
+  getActive: protectedProcedure.input(z.object({ characterId: z.string() })).query(async ({ input, ctx }) => {
+    return ctx.services.quest.getActiveQuest(input.characterId, ctx.user.id)
+  }),
 
   // Tactical combat: Execute attack
   executeTacticalAttack: protectedProcedure
