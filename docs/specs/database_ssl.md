@@ -2,44 +2,54 @@
 
 ## Overview
 
-The app connects to Postgres via the `pg` connection pool in `src/server/lib/prisma.ts`. SSL is enabled in production and disabled in development/test.
+The app connects to Postgres via the `pg` connection pool in `src/server/lib/prisma.ts`. TLS is enabled in production and disabled in development/test.
 
 ```ts
-ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : false,
+ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 ```
 
-## Why rejectUnauthorized Must Be true
+The production channel is encrypted, but the certificate chain is **not** verified. This is a deliberate trade-off — see "Why rejectUnauthorized is false" below.
 
-Setting `rejectUnauthorized: false` disables certificate verification entirely. Any server can present any certificate and the client will accept it, enabling man-in-the-middle attacks on the database connection. Credentials and query results travel over what appears to be an encrypted channel but can be intercepted.
+## Why rejectUnauthorized is false
 
-`rejectUnauthorized: true` (the Node.js default) ensures:
+Strict verification (`rejectUnauthorized: true`) does not work today against Railway's managed Postgres from a Prisma 7 client. Two compounding factors:
 
-- The server's certificate is signed by a trusted CA
-- The certificate has not expired
-- The hostname in the certificate matches the connection hostname
+1. **Railway does not publish a CA bundle for managed Postgres.** Railway's TCP proxy and internal endpoints both present a certificate chain that is not anchored in Node.js's default trust store. There is no `ca` PEM we can pin via `ssl.ca`. Railway staff confirm in their forum that for project-private connectivity, the recommendation is to skip strict verification; for the public proxy they have not exposed a trust anchor.
+2. **Open Prisma 7 regression.** `@prisma/adapter-pg` in the 7.x line stops trusting Railway-style chains that worked in Prisma 6.x, even with explicit pool options or `sslmode=verify-full`. Tracking issues:
+   - [prisma/prisma#29060](https://github.com/prisma/prisma/issues/29060) — "Error opening a TLS connection: self-signed certificate in certificate chain"
+   - [prisma/prisma#27611](https://github.com/prisma/prisma/issues/27611) — root duplicate, adapter-pg SSL handling
+   - [prisma/prisma#29252](https://github.com/prisma/prisma/issues/29252) — `PrismaPg` connectionString fails on SSL-required DBs
 
-## Railway-Specific Notes
+What we keep:
 
-Railway's managed Postgres instances use certificates signed by a trusted CA. No extra CA bundle configuration is needed — Node.js's built-in CA store trusts Railway certificates out of the box. `rejectUnauthorized: true` works without additional setup.
+- `ssl` is still an object (not `false`), so the connection still negotiates TLS — the wire is encrypted.
+- The pool uses Railway's network endpoint, which runs on Railway's private project network, not the public internet.
 
-Internal hostnames (`postgres.railway.internal`) are covered by Railway's certificate. Public hostnames are also covered. Either connection method is safe with strict verification enabled.
+What we lose:
+
+- We do not validate that the certificate chain is rooted in a trusted CA. A MITM attacker on the network path could in theory present any certificate.
+
+## Future Hardening (re-enable strict verification)
+
+Flip back to `{ rejectUnauthorized: true }` once **either** condition holds:
+
+1. **Prisma ships a fix** for #29060 / #27611 in the 7.x line that restores the 6.x behaviour — and we upgrade to that version.
+2. **Railway exposes a CA bundle** for managed Postgres. Then add `DATABASE_SSL_CA` to `src/server/config.ts` and:
+   ```ts
+   ssl: env.NODE_ENV === 'production'
+     ? { rejectUnauthorized: true, ca: env.DATABASE_SSL_CA }
+     : false,
+   ```
+
+Tracked in `docs/specs/todo.md` under `[debt]`.
 
 ## Common Failure Scenarios
 
 ### UNABLE_TO_VERIFY_LEAF_SIGNATURE / SELF_SIGNED_CERT_IN_CHAIN
 
-**Cause:** The database certificate is signed by a private CA not in Node.js's default trust store (common with some on-premise or misconfigured managed databases).
+**Cause:** The database certificate is signed by a private CA not in Node.js's default trust store. With `rejectUnauthorized: false` this no longer fails the handshake; it would resurface immediately if strict verification is re-enabled prematurely.
 
-**Fix:** Add the CA certificate via the `ssl.ca` option:
-
-```ts
-ssl: {
-  rejectUnauthorized: true,
-  ca: fs.readFileSync('/path/to/ca.pem').toString(),
-}
-```
-
-Or set via environment variable and pass it in:
+**Fix when a CA is available:**
 
 ```ts
 ssl: {
@@ -52,7 +62,7 @@ ssl: {
 
 **Cause:** The database's SSL certificate has passed its expiry date.
 
-**Fix:** Renew the certificate on the database server. On Railway this is handled automatically. On self-hosted Postgres, use certbot or your certificate provider to renew.
+**Fix:** Renew the certificate on the database server. On Railway this is handled automatically.
 
 ### ERR_TLS_CERT_ALTNAME_INVALID / Hostname Mismatch
 
@@ -70,14 +80,12 @@ ssl: {
 
 SSL remains disabled in `development` and `test` environments (the pool receives `ssl: false`). Local Postgres instances typically do not have SSL certificates configured, so no change is needed for local development.
 
-## Verifying SSL Is Active
+## Verifying the Connection Is Encrypted
 
-Connect with `psql` and run:
+Even with `rejectUnauthorized: false`, the channel is still TLS-encrypted. Confirm with:
 
 ```sql
 SELECT ssl, version FROM pg_stat_ssl WHERE pid = pg_backend_pid();
 ```
 
-If `ssl` is `t`, the connection is encrypted.
-
-Or check from Node.js by listening to the pool's `connect` event and inspecting `client.ssl`.
+If `ssl` is `t`, the connection is encrypted. The lost guarantee is *whose certificate* terminated the TLS, not whether TLS is present.
