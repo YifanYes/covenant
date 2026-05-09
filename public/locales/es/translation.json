@@ -23,7 +23,20 @@
       "news": "Noticias",
       "mechanics": "Mecánicas",
       "magic_nature": "Naturaleza Mágica",
-      "roadmap": "Hoja de Ruta"
+      "roadmap": "Hoja de Ruta",
+      "tos": "Términos del Servicio",
+      "privacy": "Política de Privacidad"
+    },
+    "footer": {
+      "copyright": "© {{year}} Covenant. Todos los derechos reservados.",
+      "tos": "Términos del Servicio",
+      "privacy": "Política de Privacidad"
+    },
+    "cookie_banner": {
+      "aria_label": "Consentimiento de cookies",
+      "message": "Usamos cookies esenciales para mantener tu sesión iniciada y recordar tu preferencia de idioma.",
+      "learn_more": "Más información",
+      "accept": "Aceptar"
     },
     "meta": {
       "title": "Covenant - Productividad Gamificada",

@@ -1,0 +1,106 @@
+# Política de Privacidad
+
+_Última actualización: 2026-05-09_
+
+Esta Política de Privacidad explica cómo **Yifan Ye Zhang** ("nosotros") recopila, utiliza y comparte datos personales cuando usas Covenant (el "Servicio"). Aplica a visitantes del sitio web y a usuarios registrados.
+
+Si estás en el Espacio Económico Europeo (EEE), Reino Unido o California, se describen derechos adicionales en la [Sección 8](#8-tus-derechos).
+
+## 1. Responsable del Tratamiento
+
+**Yifan Ye Zhang** es el responsable del tratamiento de los datos personales recopilados a través del Servicio. Contacto: **yifanyemontpe@gmail.com**.
+
+## 2. Datos que Recopilamos
+
+| Categoría | Ejemplos | Origen |
+|---|---|---|
+| Datos de cuenta | Correo, contraseña con hash, nombre, idioma, tema, facción, datos del personaje | Tú (registro, ajustes, juego) |
+| Datos de autenticación | Tokens de verificación de correo, tokens de restablecimiento, identificadores OAuth (Google) | Tú / proveedor OAuth |
+| Datos de juego | Tareas, hábitos, objetivos, entradas de diario, progreso de misiones, resultados de combate, inventario, oro, dados | Tú (juego) |
+| Datos técnicos | Dirección IP, agente de usuario, marcas de tiempo de las solicitudes, informes de errores | Automáticamente (vía tu navegador) |
+| Cookies | Cookies de sesión, preferencia de idioma, registro de consentimiento | Automáticamente (ver Política de Cookies abajo) |
+
+**No** recopilamos datos de pago — el Servicio es gratuito durante la beta.
+
+## 3. Cómo Usamos los Datos
+
+Usamos los datos personales para:
+
+- Prestar el Servicio: autenticarte, guardar tu progreso, renderizar el juego.
+- Comunicar: enviar correos transaccionales (verificación, restablecimiento de contraseña, avisos de cuenta).
+- Operar y proteger: limitación de tasa, prevención de fraude y abuso, monitoreo de errores.
+- Mejorar: análisis agregados de uso de funciones (sin identificar a usuarios individuales cuando sea factible).
+- Cumplir obligaciones legales.
+
+**Bases legales (RGPD):** ejecución de un contrato (cuenta, juego), interés legítimo (seguridad, prevención de abuso, mejora del producto), consentimiento (cookies no esenciales, marketing si lo hubiera), obligación legal.
+
+## 4. Comunicación de Datos
+
+Compartimos datos personales únicamente con encargados que nos ayudan a operar el Servicio, bajo obligaciones contractuales de confidencialidad y seguridad:
+
+| Encargado | Finalidad | Ubicación |
+|---|---|---|
+| Railway | Hosting y PostgreSQL gestionado | Estados Unidos |
+| Brevo (Sendinblue) | Envío de correo transaccional | Unión Europea |
+| Sentry | Monitoreo de errores | Estados Unidos / Unión Europea |
+| Upstash | Redis (limitación de tasa, sesiones) | Multi-región |
+| Google | Inicio de sesión OAuth (solo si eliges Google) | Global |
+
+No vendemos datos personales. Podemos divulgar datos cuando lo exija la ley o para proteger derechos y seguridad.
+
+## 5. Transferencias Internacionales
+
+Algunos encargados están ubicados fuera de tu país (notablemente EE. UU.). Cuando transferimos datos personales fuera del EEE o Reino Unido, nos basamos en garantías apropiadas como las Cláusulas Contractuales Tipo de la UE o el Marco UE-EE. UU. de Privacidad de Datos cuando aplique.
+
+## 6. Conservación
+
+- **Datos de cuenta:** conservados mientras tu cuenta esté activa. Eliminados dentro de los 30 días posteriores a la eliminación de la cuenta, salvo cuando la ley exija un plazo mayor.
+- **Datos de juego:** conservados junto con tu cuenta; eliminados con ella.
+- **Registros y datos de seguridad:** hasta 90 días, luego agregados o eliminados.
+- **Registros de correo:** conservados por Brevo según su política (típicamente 30 días).
+
+## 7. Seguridad
+
+Usamos medidas estándar de la industria: TLS en tránsito, contraseñas con hash (clase bcrypt), almacenamiento cifrado en base de datos, principio de mínimo privilegio para acceso del personal, cabeceras de seguridad (HSTS, X-Frame-Options, etc.), limitación de tasa y verificación de correo antes del inicio de sesión.
+
+Ningún sistema es perfectamente seguro. Si detectamos una brecha que afecte a tus datos, te notificaremos a ti y a las autoridades correspondientes según lo exija la ley.
+
+## 8. Tus Derechos
+
+Según tu jurisdicción, tienes derecho a:
+
+- **Acceder** a los datos personales que tenemos sobre ti.
+- **Rectificar** datos incorrectos (la mayoría de campos son editables en `/settings`).
+- **Suprimir** tus datos (eliminar tu cuenta en `/settings`; "derecho al olvido" bajo RGPD / CCPA).
+- **Portar** tus datos a otro servicio (la exportación está en desarrollo; mientras tanto, solicítalo por correo).
+- **Oponerte** al tratamiento basado en interés legítimo.
+- **Retirar el consentimiento** en cualquier momento (sin afectar al tratamiento ya realizado).
+- **Presentar una reclamación** ante tu autoridad local de protección de datos.
+
+Para ejercer tus derechos, escribe a **yifanyemontpe@gmail.com**. Respondemos en un plazo de 30 días.
+
+**California (CCPA/CPRA):** tienes los derechos anteriores, incluido el derecho a saber qué recopilamos, a eliminar y a optar por no participar en la "venta" o "compartición" — no vendemos ni compartimos datos personales según define la CCPA.
+
+## 9. Cookies
+
+El Servicio usa cookies solo para funciones esenciales:
+
+| Cookie | Finalidad | Duración |
+|---|---|---|
+| `better-auth.session_token` | Te mantiene con sesión iniciada | Sesión / 7 días |
+| `i18nextLng` | Recuerda tu idioma | 1 año |
+| `covenant.cookie_consent` | Registra tu consentimiento de cookies | 1 año |
+
+Las cookies esenciales no requieren consentimiento bajo RGPD. Actualmente no usamos cookies de analítica ni de marketing. Si las añadimos, actualizaremos esta política y solicitaremos consentimiento primero.
+
+## 10. Menores
+
+El Servicio no está dirigido a menores de 16 años. No recopilamos datos de menores a sabiendas. Si crees que un menor se ha registrado, contacta **yifanyemontpe@gmail.com** y eliminaremos la cuenta.
+
+## 11. Cambios
+
+Podemos actualizar esta Política de Privacidad. Los cambios materiales se anunciarán mediante el Servicio o por correo. La fecha "Última actualización" arriba refleja la revisión más reciente.
+
+## 12. Contacto
+
+Preguntas o para ejercer tus derechos: **yifanyemontpe@gmail.com**.

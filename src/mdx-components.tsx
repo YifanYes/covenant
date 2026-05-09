@@ -28,6 +28,20 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </blockquote>
     ),
     hr: () => <hr className="border-border my-8" />,
+    table: ({ children }) => (
+      <div className="mb-6 overflow-x-auto">
+        <table className="border-border w-full border-collapse border text-left text-sm">{children}</table>
+      </div>
+    ),
+    thead: ({ children }) => <thead className="bg-muted/50">{children}</thead>,
+    tbody: ({ children }) => <tbody>{children}</tbody>,
+    tr: ({ children }) => <tr className="border-border border-b last:border-0">{children}</tr>,
+    th: ({ children }) => (
+      <th className="font-title text-primary border-border border px-4 py-2 font-semibold">{children}</th>
+    ),
+    td: ({ children }) => (
+      <td className="font-body text-foreground border-border border px-4 py-2 align-top opacity-90">{children}</td>
+    ),
     ...components
   }
 }

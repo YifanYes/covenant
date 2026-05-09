@@ -6,9 +6,6 @@
 
 ## Critical Priority
 
-- [ ] Legal pages — Terms of Service, Privacy Policy, Cookie consent `[blocker]`
-  - No `/tos`, `/privacy`, or consent banner exists. GDPR/CCPA exposure on EU/CA visitors. Required before public traffic.
-
 - [ ] Account lockout — exponential backoff on failed logins `[blocker]`
   - Email+password auth has no per-account failed-login throttling. Brute-force vector against any single account even with the global rate limit (3 sign-ins/10s/IP) in place — an attacker rotating IPs avoids the cap.
   - **Fix:** track failed attempts per account in Redis; lock after N failures with exponential backoff; reset on successful login or password reset.
@@ -115,20 +112,3 @@ Deferred until the core loop has been validated with real beta users. Specs for 
 - [ ] Post-combat summary screen — XP/gold/loot between combat end and `/quests` redirect
 - [ ] N+1 risk in `dashboard.service.ts:149-206` — triple-nested in-memory loop, refactor before user counts grow
 - [ ] Theme system: OS-preference option (light/dark already exist)
-
-## Removed
-
-Deleted from the active and backlog lists with rationale:
-
-- ~~Mobile responsiveness — combat & RPG layout~~ — target user base is not on mobile
-- ~~Toast / Sonner mobile placement~~ — same reason as above
-- ~~Error monitoring (Sentry)~~ — implemented (`sentry.shared.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`, `instrumentation-client.ts`)
-- ~~Fix npm warn `enable-pre-post-scripts`~~ — cosmetic warning, no user impact
-- ~~Analyze if implementing NES.css~~ — `DESIGN.md` already prescribes the NES.css + Tailwind approach; this is decided, not exploratory
-- ~~Combat: Duplicated Grid Logic~~ — pure refactor, no user signal
-- ~~Combat: Magic Numbers~~ — pure refactor, no user signal
-- ~~Analyze game design loop~~ — `docs/specs/mvp_scope_cut.md` is the output of this analysis. If something more specific is meant (empirical playtest, dice economy rebalance, story-branch design), it should be filed as that specific task
-- ~~Email verification enforcement~~ — delivered in the auth hardening pass; `requireEmailVerification: true` + `sendVerificationEmail` callback wired in `src/server/lib/auth.ts`, sign-up page now shows the "check your email" state. See `docs/specs/auth.md` § Hardening follow-up.
-- ~~Security headers (HSTS / X-Frame-Options / X-Content-Type-Options / Referrer-Policy / Permissions-Policy)~~ — delivered in the auth hardening pass via `next.config.ts` `headers()`. CSP remains an open follow-up (split out as its own item above).
-- ~~Distributed rate limiting~~ — delivered in the auth hardening pass; both Better Auth's `secondaryStorage` and the tRPC limiter use Upstash Redis when configured, with in-memory fallback for dev/test.
-- ~~Password reset flow~~ — delivered in the auth hardening pass; `/forgot-password` and `/reset-password` pages, `sendResetPassword` callback, locale-aware Brevo email.

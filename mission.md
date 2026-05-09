@@ -1,25 +1,25 @@
 # Mission
 
-## 🎯 Propósito
+## Purpose
 
-Covenant es una plataforma de productividad gamificada diseñada para transformar la gestión de la vida diaria en una experiencia épica. Fusionamos herramientas de productividad de alto rendimiento con una narrativa profunda de temática bíblica basada en el Apocalipsis.
+Covenant is a gamified productivity platform designed to transform daily life management into an epic experience. We fuse high-performance productivity tools with a deep biblical narrative rooted in the Book of Revelation.
 
-## 🏛️ Pilares Fundamentales
+## Core Pillars
 
-### 1. Productividad de Alto Rendimiento
+### 1. High-Performance Productivity
 
-No solo es un juego; es una herramienta seria. Proporcionamos sistemas probados como la **Matriz de Eisenhower**, gestión de **Hábitos** y **Objetivos por Áreas** para asegurar que el usuario mantenga el control total sobre su tiempo y prioridades.
+This is not just a game — it's a serious tool. We provide proven systems like the **Eisenhower Matrix**, **Habit** management, and **Goal tracking by Life Areas** to ensure users maintain full control over their time and priorities.
 
-De nada sirve ser más productivo, si no eres más feliz.
+> Being more productive is pointless if you're not happier.
 
-### 2. Gamificación Narrativa e Inmersiva
+### 2. Immersive Narrative Gamification
 
-A diferencia de otras apps de hábitos, Covenant utiliza el progreso en la vida real para permitir que el usuario participe en la historia y el mundo en evolución. Las acciones que toman los jugadores influyen en el desarrollo de su personaje y la historia global. La narrativa avanza junto a la comunidad y sus decisiones.
+Unlike other habit apps, Covenant uses real-life progress to let users participate in an evolving story and world. Player actions influence character development and the global narrative. The story advances alongside the community and its decisions.
 
-### 3. Desarrollo Personal y Fe
+### 3. Personal Development and Faith
 
-Nuestra misión es ayudar al usuario a alcanzar su máximo potencial, mejorar su satisfacción vital e inspirar su crecimiento espiritual y personal a través de una experiencia que celebra la disciplina, la superación de desafíos, la fe y la pertenencia a una comunidad.
+Our mission is to help users reach their full potential, improve life satisfaction, and inspire spiritual and personal growth through an experience that celebrates discipline, overcoming challenges, faith, and community belonging.
 
-## 👁️ Visión
+## Vision
 
-Convertirnos en el compañero diario indispensable para quienes buscan orden en el caos, transformando la rutina en una misión trascendente y la disciplina en una aventura.
+To become the indispensable daily companion for those who seek order in chaos — transforming routine into a transcendent mission and discipline into an adventure.

@@ -23,7 +23,20 @@
       "news": "News",
       "mechanics": "Mechanics",
       "magic_nature": "Magic Nature",
-      "roadmap": "Roadmap"
+      "roadmap": "Roadmap",
+      "tos": "Terms of Service",
+      "privacy": "Privacy Policy"
+    },
+    "footer": {
+      "copyright": "© {{year}} Covenant. All rights reserved.",
+      "tos": "Terms of Service",
+      "privacy": "Privacy Policy"
+    },
+    "cookie_banner": {
+      "aria_label": "Cookie consent",
+      "message": "We use essential cookies to keep you signed in and remember your language preference.",
+      "learn_more": "Learn more",
+      "accept": "Accept"
     },
     "meta": {
       "title": "Covenant - Gamified Productivity",
