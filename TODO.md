@@ -6,10 +6,6 @@
 
 ## Critical Priority
 
-- [ ] Account lockout — exponential backoff on failed logins `[blocker]`
-  - Email+password auth has no per-account failed-login throttling. Brute-force vector against any single account even with the global rate limit (3 sign-ins/10s/IP) in place — an attacker rotating IPs avoids the cap.
-  - **Fix:** track failed attempts per account in Redis; lock after N failures with exponential backoff; reset on successful login or password reset.
-
 - [ ] Onboarding tutorial — explain the core loop `[loop]`
   - Roadmap Phase 3: _"Introducción funcional: Explicación del loop y consecuencias (evitar lore pesado)"_. No in-app tutorial exists. Beta users will drop off if the dice → combat → tier → gear loop isn't immediately legible.
 
