@@ -26,13 +26,6 @@
   - Single tool for product analytics + session replay + feature flags. Replaces three previously-separate items: standalone "feature flag" infra, roadmap _"Analytics implemented (GA + Mixpanel)"_, roadmap _"UTM parameters definidos por canal"_.
   - **Fix:** Add `posthog-js` (client) + `posthog-node` (server). Capture pageviews and key events (task completion, combat start/end, quest claim). Wire feature flags via `posthog.isFeatureEnabled()`. Capture UTM on landing.
 
-- [ ] Journaling MVP — daily entries with mood tracking and calendar view `[loop]`
-  - Validation experiment before building the full module. Spec: `docs/specs/journaling.md`
-  - **In scope:** plain-text entries, 12 moods, 5 random prompts, monthly mood calendar, 1 dice/day, streak display
-  - **Out of scope:** reviews, time capsule, mood mosaic, habit calendar, markdown editor, search, streak bonuses
-  - **Success criteria:** 30% activation, 25% 7-day retention, 40% mood adoption
-  - **Instrumentation:** log `journaling_nav_clicked`, `journal_entry_created`, `mood_selected`, `prompt_requested`, `calendar_viewed`, `calendar_day_clicked`
-
 - [ ] Beta wipe tools `[loop]`
   - Roadmap Phase 3: _"Herramientas para resetear el progreso de usuarios beta"_ + _"Capacidad de rollback o wipe controlado ante fallos graves"_. Required for controlled beta iteration.
 
@@ -111,7 +104,6 @@
 ## Backlog (post-validation)
 
 Deferred until the core loop has been validated with real beta users. Specs for some of these already exist (Journaling at `docs/specs/journaling.md`); the rest are real ideas, just wrong-time.
-
 
 - [ ] Conversation-type quests — dialog with branching choices and outcomes
 - [ ] Post-its board / Kanban card view in productivity section
