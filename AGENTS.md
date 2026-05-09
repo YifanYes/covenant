@@ -153,6 +153,7 @@ When fixing bugs, trace **every** caller and reference to the affected logic and
 - Prisma client lives at `@/generated/prisma` — do not import from `@prisma/client` directly
 - Tests mock repositories by passing them directly into service constructors (no DI container)
 - Avoid `Omit<>` patterns that break implicit tRPC type resolution
+- **Never call `setState` synchronously inside `useEffect`**. It triggers cascading renders and fails the `react-hooks/set-state-in-effect` lint rule. Instead, initialise state with a lazy function: `useState(() => !safeGet())`.
 
 ## References
 

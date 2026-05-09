@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import CookieBanner from './_components/cookie-banner.component'
+import Footer from './_components/footer.component'
 import Navbar from './_components/navbar.component'
 
 export const metadata: Metadata = {
@@ -43,6 +45,8 @@ export default function LandingLayout({
     <>
       <Navbar />
       {children}
+      <Footer />
+      <CookieBanner />
     </>
   )
 }

@@ -2,6 +2,7 @@
   "name": "covenant",
   "private": true,
   "version": "0.1.0",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "packageManager": "pnpm@10.4.1",
   "engines": {
@@ -83,6 +84,7 @@
     "react-hook-form": "^7.71.1",
     "react-i18next": "^16.5.3",
     "recharts": "^3.7.0",
+    "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.6",

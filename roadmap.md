@@ -1,61 +1,61 @@
 # Roadmap
 
-## Expansión de Mecánicas (Marzo 2026)
+## Mechanic Expansion (March 2026)
 
-- **Gamificación: Cierre del Bucle y Pulido**
-  - [ ] Definir decisiones de la historia
-  - [ ] Renderizar el personaje con los items equipados
+- **Gamification: Loop Closure and Polish**
+  - [ ] Define story decision points
+  - [ ] Render character with equipped items
 
-## 🎯 Fase 3: Requisitos Beta (Junio 2026)
+## Phase 3: Beta Requirements (June 2026)
 
-_Validar si el sistema se sostiene bajo uso real._
+_Validate whether the system holds up under real usage._
 
-### Onboarding Mínimo
+### Minimum Onboarding
 
-- [ ] **Introducción funcional:** Explicación del loop y consecuencias (evitar lore pesado).
-- [ ] **Estado inicial guiado:** Evitar decisiones irreversibles sin contexto previo.
-- [ ] **UI Anti-vacío:** Ninguna pantalla debe aparecer vacía o sin instrucciones.
+- [ ] **Functional introduction:** Explain the loop and consequences (avoid heavy lore).
+- [ ] **Guided initial state:** Prevent irreversible decisions without prior context.
+- [ ] **Anti-empty UI:** No screen should appear blank or without instructions.
 
-### Telemetría y Control
+### Telemetry and Control
 
-- [ ] **Wipe Tools:** Herramientas para resetear el progreso de usuarios beta.
-- [ ] **Rollback:** Capacidad de rollback o wipe controlado ante fallos graves.
+- [ ] **Wipe tools:** Ability to reset beta user progress.
+- [ ] **Rollback:** Controlled rollback or wipe capability in case of critical failures.
 
-### Alcance y Calidad
+### Scope and Quality
 
-- [ ] **Sistemas terminados:** Ninguna funcionalidad "a medio hacer" expuesta al usuario.
-- [ ] **Foco absoluto:** Eliminar cualquier elemento que no contribuya a validar el core.
-- [ ] **Módulo de Journaling (MVP):** Entradas diarias + calendario de ánimo. Validar retención antes de expansiones (revisiones, cápsula del tiempo, mosaico, editor markdown).
+- [ ] **Finished systems:** No half-built features exposed to users.
+- [ ] **Absolute focus:** Remove any element that doesn't help validate the core.
+- [ ] **Journaling module (MVP):** Daily entries + mood calendar. Validate retention before expanding (reviews, time capsule, mosaic, markdown editor).
 
-### Infraestructura
+### Infrastructure
 
-- [ ] Discord servidor configurado con canales
-- [ ] Email de bienvenida automatizado
-- [ ] Sistema de onboarding para beta testers
-- [ ] Analytics implementado (GA + Mixpanel)
-- [ ] UTM parameters definidos por canal
+- [ ] Discord server configured with channels
+- [ ] Automated welcome email
+- [ ] Onboarding system for beta testers
+- [ ] Analytics implemented (GA + Mixpanel)
+- [ ] UTM parameters defined per channel
 
-### Contenido Inicial
+### Launch Content
 
-- [ ] 3 posts/hilos preparados para semana 1
-- [ ] Bio y branding consistente en Twitter + Reddit
-- [ ] Press kit básico (screenshots, descripción, logo)
-- [ ] Pitch de 2 líneas definido y testeado
+- [ ] 3 posts/threads prepared for week 1
+- [ ] Consistent bio and branding on Twitter + Reddit
+- [ ] Basic press kit (screenshots, description, logo)
+- [ ] 2-line pitch defined and tested
 
-### Comunidad
+### Community
 
-- [ ] Roles de Discord configurados (Beta Tester, Early Adopter, etc.)
-- [ ] Reglas del servidor escritas
-- [ ] Bot de bienvenida configurado
-- [ ] Template para weekly update
+- [ ] Discord roles configured (Beta Tester, Early Adopter, etc.)
+- [ ] Server rules written
+- [ ] Welcome bot configured
+- [ ] Template for weekly updates
 
-## 🔮 Fase 4: Características Avanzadas (Futuro)
+## Phase 4: Advanced Features (Future)
 
-- [ ] **Sistema PvP**: Duelos entre jugadores usando el sistema de dados
-- [ ] **Leaderboards**: Tablas de clasificación para competencia entre usuarios
-- [ ] Definir accesorios
+- [ ] **PvP system:** Duels between players using the dice system
+- [ ] **Leaderboards:** Rankings for competition between users
+- [ ] Define accessories
 
-## 📝 Notas
+## Notes
 
-- **Tier 2 = Lanzamiento Beta cerrada**: Después de implementar Tier 2, se planificarán los próximos pasos de la aplicación en base al feedback obtenido.
-- **No Trading de Dados**: Los dados no se pueden intercambiar entre jugadores, ni se podrán comprar con dinero. Solo se obtienen por ser productivo.
+- **Tier 2 = Closed Beta Launch:** After implementing Tier 2, next steps will be planned based on feedback received.
+- **No Dice Trading:** Dice cannot be traded between players or purchased with real money. They are earned only through productivity.
