@@ -1,8 +1,9 @@
 import { betterAuth } from 'better-auth'
-import { createAuthMiddleware } from 'better-auth/api'
+import { APIError, createAuthMiddleware, isAPIError } from 'better-auth/api'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { nextCookies } from 'better-auth/next-js'
 import { env } from '../config'
+import { checkLockout, clearLockout, recordFailure } from './account-lockout'
 import { resolveCreateUserLocale, resolveEmailLocale } from './auth-locale.utils'
 import { logger } from './logger'
 import { prisma } from './prisma'
@@ -46,6 +47,15 @@ export const auth = betterAuth({
     // the reset-password page copy and closes the window where a stolen session token
     // would survive a credential rotation.
     revokeSessionsOnPasswordReset: true,
+    onPasswordReset: async ({ user }) => {
+      // A successful reset proves account ownership; drop any active lockout so the
+      // legitimate user can sign in immediately with the new password.
+      try {
+        await clearLockout(user.email)
+      } catch (err) {
+        logger.warn({ event: 'LOCKOUT_CLEAR_FAILED', userId: user.id, err }, 'Failed to clear lockout after password reset')
+      }
+    },
     sendResetPassword: async ({ user, url }) => {
       const locale = await resolveEmailLocale(user.email)
       const { subject, html } = await renderEmail({ type: 'passwordReset', url, locale })
@@ -149,8 +159,78 @@ export const auth = betterAuth({
     }
   },
   hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== '/sign-in/email') return
+      const body = ctx.body as { email?: unknown } | undefined
+      const email = typeof body?.email === 'string' ? body.email : ''
+      if (!email) return
+      // Fail-open: if Redis is unreachable, do NOT block sign-in. Brute-force protection
+      // degrades silently rather than locking out every legitimate user during an outage.
+      // The other rate limits (Better Auth's 3/10s/IP) still apply.
+      let status: Awaited<ReturnType<typeof checkLockout>>
+      try {
+        status = await checkLockout(email)
+      } catch (err) {
+        logger.error({ event: 'LOCKOUT_CHECK_FAILED', err }, 'Lockout check failed; allowing sign-in')
+        return
+      }
+      if (!status.locked) return
+      logger.warn(
+        { event: 'AUTH_LOCKOUT_BLOCK', path: ctx.path, retryAfterSeconds: status.retryAfterSeconds },
+        'Sign-in blocked: account temporarily locked'
+      )
+      throw new APIError(
+        'TOO_MANY_REQUESTS',
+        {
+          code: 'ACCOUNT_LOCKED',
+          message: 'Account temporarily locked due to too many failed sign-in attempts. Try again later.'
+        },
+        { 'Retry-After': String(status.retryAfterSeconds) }
+      )
+    }),
     after: createAuthMiddleware(async (ctx) => {
       const path = ctx.path
+
+      // Account-lockout bookkeeping for password sign-ins. Runs ahead of the AUTH_FAILURE
+      // logging block below so the `returned` shape is consumed in one place.
+      if (path === '/sign-in/email') {
+        const body = ctx.body as { email?: unknown } | undefined
+        const email = typeof body?.email === 'string' ? body.email : ''
+        if (email) {
+          const returnedForLockout = ctx.context.returned
+          // Bad credentials throw `APIError(UNAUTHORIZED)` with statusCode 401 — that is
+          // the only path counted as a brute-force signal. Unverified-email (403),
+          // disabled (400), and the lockout block itself (429) are intentionally ignored.
+          if (isAPIError(returnedForLockout) && returnedForLockout.statusCode === 401) {
+            try {
+              const result = await recordFailure(email)
+              if (result.transitionedToLocked && result.locked) {
+                logger.warn(
+                  {
+                    event: 'AUTH_LOCKOUT_APPLIED',
+                    failures: result.failures,
+                    retryAfterSeconds: result.retryAfterSeconds
+                  },
+                  'Account locked due to repeated failed sign-in attempts'
+                )
+              }
+            } catch (err) {
+              logger.warn({ event: 'LOCKOUT_RECORD_FAILED', err }, 'Failed to record sign-in failure')
+            }
+          } else if (returnedForLockout instanceof Response && returnedForLockout.status < 400) {
+            // Only clear on a confirmed successful HTTP response. Avoid wiping the
+            // lockout when `returned` is undefined or some other unexpected shape
+            // (e.g. middleware short-circuit, framework upgrade) — that would defeat
+            // the lockout silently.
+            try {
+              await clearLockout(email)
+            } catch (err) {
+              logger.warn({ event: 'LOCKOUT_CLEAR_FAILED', err }, 'Failed to clear lockout after sign-in')
+            }
+          }
+        }
+      }
+
       if (!path.startsWith('/sign-in') && !path.startsWith('/sign-up')) return
       // `ctx.context.returned` is an internal Better Auth response property used to
       // inspect the outcome of auth endpoints. This was verified against better-auth@1.6.9.
