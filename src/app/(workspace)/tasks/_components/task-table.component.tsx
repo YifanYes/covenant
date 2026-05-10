@@ -1,6 +1,7 @@
 'use client'
 import DatePicker from '@/forms/date-picker.component'
 import MultiSelect from '@/forms/multi-select.component'
+import { useDateFormat } from '@/hooks/use-date-format'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { cn } from '@/lib/cn.lib'
 import { useTasksStore } from '@/stores/tasks.store'
@@ -17,7 +18,6 @@ import EmptyState from '@/components/empty-state.component'
 import { ChevronLeft, ChevronRight, Cancel as Close, Bulletlist, Plus } from 'pixelarticons/react'
 import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -58,6 +58,7 @@ interface TaskRowProps {
 
 const TaskRow = memo(function TaskRow({ task, onSelect, onStatusChange, isUpdating }: TaskRowProps) {
   const { t } = useTranslation()
+  const { formatDate } = useDateFormat()
 
   return (
     <TableRow className="hover:bg-muted/50 cursor-pointer" onClick={() => !isUpdating && onSelect()}>
@@ -87,7 +88,7 @@ const TaskRow = memo(function TaskRow({ task, onSelect, onStatusChange, isUpdati
         </Select>
       </TableCell>
       <TableCell className="py-2 text-sm whitespace-nowrap">
-        {task.dueDate ? dayjs(task.dueDate).format('L') : '-'}
+        {task.dueDate ? formatDate(task.dueDate) : '-'}
       </TableCell>
     </TableRow>
   )

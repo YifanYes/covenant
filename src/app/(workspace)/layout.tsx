@@ -7,6 +7,7 @@ import useFactionTheme from '@/hooks/use-faction-theme'
 import { useSession } from '@/lib/auth.lib'
 import { useAuthStore } from '@/stores/auth.store'
 import { useTutorialStore } from '@/stores/tutorial.store'
+import { useUserPreferencesStore, type DateFormat } from '@/stores/user-preferences.store'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -40,6 +41,21 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
     ...trpcOptions.character.getCurrentClass.queryOptions(),
     enabled: !!session?.user
   })
+
+  const { data: profile } = useQuery({
+    ...trpcOptions.auth.getProfile.queryOptions(),
+    enabled: !!session?.user
+  })
+
+  const setPreferences = useUserPreferencesStore((s) => s.setPreferences)
+  useEffect(() => {
+    if (!profile) return
+    setPreferences({
+      language: profile.locale,
+      defaultTasksView: profile.defaultTasksView,
+      dateFormat: profile.dateFormat as DateFormat
+    })
+  }, [profile, setPreferences])
 
   const completeMutation = useMutation(
     trpcOptions.character.completeTutorial.mutationOptions({

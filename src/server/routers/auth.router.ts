@@ -1,4 +1,4 @@
-import { updateThemeSchema } from '@shared/schemas/auth.schemas'
+import { updateProfileSchema, updateThemeSchema } from '@shared/schemas/auth.schemas'
 import { protectedProcedure, rateLimit, RATE_LIMITS, t } from '../trpc'
 
 export const authRouter = t.router({
@@ -10,6 +10,13 @@ export const authRouter = t.router({
   updateTheme: protectedProcedure.input(updateThemeSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.auth.updateTheme(ctx.user.id, input)
   }),
+
+  updateProfile: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
+    .input(updateProfileSchema)
+    .mutation(async ({ ctx, input }) => {
+      return ctx.services.auth.updateProfile(ctx.user.id, input)
+    }),
 
   getProfile: protectedProcedure.query(async ({ ctx }) => {
     return ctx.services.auth.getProfile(ctx.user.id)

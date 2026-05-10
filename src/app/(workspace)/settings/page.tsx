@@ -1,95 +1,151 @@
 'use client'
 
 import LoaderButton from '@/common/loader-button.component'
-import ThemeToggle from '@/common/theme-toggle.component'
 import FactionColorSelector from '@/forms/faction-color-selector.component'
 import SingleSelect from '@/forms/single-select.component'
+import useFactionTheme, { STORAGE_KEY as FACTION_STORAGE_KEY, FACTION_TO_CLASS } from '@/hooks/use-faction-theme'
+import useTheme from '@/hooks/use-theme'
 import { useAuthStore } from '@/stores/auth.store'
 import { useTutorialStore } from '@/stores/tutorial.store'
-import { useUserPreferencesStore } from '@/stores/user-preferences.store'
+import { useUserPreferencesStore, type DateFormat } from '@/stores/user-preferences.store'
 import Button from '@/ui/button.component'
 import Input from '@/ui/input.component'
 import Label from '@/ui/label.component'
-import Skeleton from '@/ui/skeleton.component'
+import Switch from '@/ui/switch.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
+import { Faction } from '@shared/constants/factions'
+import { DATE_FORMATS } from '@shared/schemas/auth.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { useRouter } from 'next/navigation'
-import { Suspense, useCallback, useEffect, useState } from 'react'
+import { Moon, CloudSun as Sun } from 'pixelarticons/react'
+import { Suspense, useEffect, useRef } from 'react'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { ConfirmDeleteAccountDialog } from './_components/confirm-delete-account-dialog.component'
 
-function CharacterNameField({
-  characterName,
-  onDisabledChange
-}: {
+type SettingsFormValues = {
   characterName: string
-  onDisabledChange?: (disabled: boolean) => void
-}) {
-  const { t } = useTranslation()
+  language: string
+  defaultTasksView: string
+  dateFormat: DateFormat
+  theme: 'light' | 'dark'
+  faction: Faction
+}
 
-  const [name, setName] = useState(characterName)
+function applyThemeClass(value: 'light' | 'dark') {
+  const root = document.documentElement
+  root.classList.remove(value === 'dark' ? 'light' : 'dark')
+  root.classList.add(value)
+}
 
-  const updateNameMutation = useMutation(
-    trpcOptions.character.updateName.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
-        toast.success(t('settings.character_name_updated'))
-      },
-      onError: () => {
-        toast.error(t('settings.character_name_error'))
-      }
-    })
-  )
-
-  const trimmed = name.trim()
-  const isUnchanged = trimmed === characterName
-  const isDisabled = updateNameMutation.isPending || isUnchanged || trimmed === ''
-
-  useEffect(() => {
-    onDisabledChange?.(isDisabled)
-  }, [isDisabled, onDisabledChange])
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!isDisabled) updateNameMutation.mutate({ name: trimmed })
+function applyFactionClass(value: Faction) {
+  const root = document.documentElement
+  const body = document.body
+  Object.values(FACTION_TO_CLASS).forEach((cls) => {
+    root.classList.remove(cls)
+    body.classList.remove(cls)
+  })
+  const cls = FACTION_TO_CLASS[value]
+  if (cls) {
+    root.classList.add(cls)
+    body.classList.add(cls)
   }
-
-  return (
-    <form id="character-name-form" onSubmit={handleSubmit} className="flex flex-col gap-2">
-      <Label htmlFor="character-name">{t('settings.character_name_label')}</Label>
-      <Input
-        id="character-name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        disabled={updateNameMutation.isPending}
-        maxLength={255}
-      />
-    </form>
-  )
 }
 
-function CharacterNameFieldSkeleton() {
-  return (
-    <div className="flex flex-col gap-2">
-      <Skeleton className="h-4 w-32" />
-      <Skeleton className="h-9 w-full" />
-    </div>
-  )
+function persistFactionStorage(value: Faction) {
+  localStorage.setItem(FACTION_STORAGE_KEY, value)
+  document.cookie = `${FACTION_STORAGE_KEY}=${value}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax; Secure`
 }
 
-function SettingsContent() {
+function persistColorModeCookie(value: 'light' | 'dark') {
+  document.cookie = `theme=${value}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+}
+
+function persistLocaleCookie(value: string) {
+  document.cookie = `i18nextLng=${value}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+}
+
+export default function Settings() {
   const { t, i18n } = useTranslation()
   const router = useRouter()
   const { email, signOut } = useAuthStore()
-  const { language, defaultTasksView, setDefaultTasksView, setLanguage } = useUserPreferencesStore()
+  const { language, defaultTasksView, dateFormat, setLanguage, setDefaultTasksView, setDateFormat } =
+    useUserPreferencesStore()
+  const { theme, toggleTheme } = useTheme()
+  const { faction } = useFactionTheme()
   const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
   const reopen = useTutorialStore((s) => s.reopen)
-  const [saveDisabled, setSaveDisabled] = useState(true)
 
-  const handleSaveDisabledChange = useCallback((disabled: boolean) => {
-    setSaveDisabled(disabled)
-  }, [])
+  const characterName = characterData?.name ?? ''
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { isDirty, errors }
+  } = useForm<SettingsFormValues>({
+    mode: 'onChange',
+    defaultValues: {
+      characterName,
+      language,
+      defaultTasksView,
+      dateFormat,
+      theme,
+      faction
+    }
+  })
+
+  useEffect(() => {
+    if (!isDirty) {
+      reset({
+        characterName,
+        language,
+        defaultTasksView,
+        dateFormat,
+        theme,
+        faction
+      })
+    }
+  }, [characterName, language, defaultTasksView, dateFormat, theme, faction, isDirty, reset])
+
+  const watchedTheme = useWatch({ control, name: 'theme' })
+  const watchedFaction = useWatch({ control, name: 'faction' })
+  const watchedLanguage = useWatch({ control, name: 'language' })
+
+  const savedRef = useRef({ theme, faction, language })
+  useEffect(() => {
+    savedRef.current = { theme, faction, language }
+  }, [theme, faction, language])
+
+  useEffect(() => {
+    applyThemeClass(watchedTheme)
+  }, [watchedTheme])
+
+  useEffect(() => {
+    applyFactionClass(watchedFaction)
+  }, [watchedFaction])
+
+  useEffect(() => {
+    if (watchedLanguage && watchedLanguage !== i18n.language) {
+      i18n.changeLanguage(watchedLanguage)
+    }
+  }, [watchedLanguage, i18n])
+
+  useEffect(() => {
+    return () => {
+      const saved = savedRef.current
+      applyThemeClass(saved.theme)
+      applyFactionClass(saved.faction)
+      if (i18n.language !== saved.language) {
+        i18n.changeLanguage(saved.language)
+      }
+    }
+  }, [i18n])
+
+  const updateProfileMutation = useMutation(trpcOptions.auth.updateProfile.mutationOptions())
 
   const resetTutorialMutation = useMutation(
     trpcOptions.character.resetTutorial.mutationOptions({
@@ -103,28 +159,66 @@ function SettingsContent() {
     })
   )
 
-  const handleLanguageChange = (value: string | null) => {
-    if (value) {
-      setLanguage(value)
-      i18n.changeLanguage(value)
+  const onSubmit = async (values: SettingsFormValues) => {
+    try {
+      const trimmedName = values.characterName.trim()
+      const nameChanged = !!characterData?.name && !!trimmedName && trimmedName !== characterData.name
+      const factionChanged = values.faction !== faction
+      const languageChanged = values.language !== language
+      const defaultTasksViewChanged = values.defaultTasksView !== defaultTasksView
+      const dateFormatChanged = values.dateFormat !== dateFormat
+      const themeChanged = values.theme !== theme
+
+      const payload: Parameters<typeof updateProfileMutation.mutateAsync>[0] = {}
+      if (nameChanged) payload.characterName = trimmedName
+      if (factionChanged) payload.theme = values.faction
+      if (languageChanged) payload.locale = values.language as 'en' | 'es'
+      if (defaultTasksViewChanged) payload.defaultTasksView = values.defaultTasksView as 'list' | 'table' | 'matrix'
+      if (dateFormatChanged) payload.dateFormat = values.dateFormat
+      if (themeChanged) payload.colorMode = values.theme
+
+      if (Object.keys(payload).length > 0) {
+        await updateProfileMutation.mutateAsync(payload)
+      }
+
+      if (factionChanged) persistFactionStorage(values.faction)
+      if (themeChanged) persistColorModeCookie(values.theme)
+      if (languageChanged) persistLocaleCookie(values.language)
+
+      if (factionChanged || nameChanged) {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: trpcOptions.auth.getProfile.queryKey() }),
+          queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+        ])
+      }
+
+      if (languageChanged) setLanguage(values.language)
+      if (defaultTasksViewChanged) setDefaultTasksView(values.defaultTasksView)
+      if (dateFormatChanged) setDateFormat(values.dateFormat)
+      if (themeChanged) toggleTheme()
+
+      reset({ ...values, characterName: trimmedName })
+      toast.success(t('settings.saved_success'))
+    } catch {
+      toast.error(t('settings.save_error'))
     }
   }
 
-  const handleDefaultViewChange = (value: string | null) => value && setDefaultTasksView(value)
+  const isSubmitting = updateProfileMutation.isPending
+  const isSaveDisabled = !isDirty || isSubmitting || !!errors.characterName
 
   return (
-    <div className="min-h-screen w-full p-6">
+    <Suspense>
       <div className="flex max-w-md items-center justify-between">
         <h1 className="text-2xl font-semibold">{t('settings.title')}</h1>
-        <Button
-          type="submit"
-          form="character-name-form"
-          disabled={saveDisabled}
+        <LoaderButton
+          onClick={handleSubmit(onSubmit)}
+          isLoading={isSubmitting}
+          disabled={isSaveDisabled}
           variant="outline"
           className="cursor-pointer shrink-0"
-        >
-          {t('save_changes')}
-        </Button>
+          label={t('save_changes')}
+        />
       </div>
       <div className="flex max-w-md flex-col gap-6 py-6">
         <div className="flex flex-col gap-2">
@@ -132,40 +226,96 @@ function SettingsContent() {
           <Input id="email" type="email" value={email} disabled />
         </div>
         {characterData?.name && (
-          <Suspense fallback={<CharacterNameFieldSkeleton />}>
-            <CharacterNameField characterName={characterData.name} onDisabledChange={handleSaveDisabledChange} />
-          </Suspense>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="character-name">{t('settings.character_name_label')}</Label>
+            <Input
+              id="character-name"
+              maxLength={255}
+              disabled={isSubmitting}
+              {...register('characterName', {
+                validate: (v) => v.trim().length > 0
+              })}
+            />
+          </div>
         )}
-        <div className="flex flex-col gap-2">
-          <SingleSelect
-            label={t('settings.language_label')}
-            placeholder={t('settings.language_placeholder')}
-            value={language}
-            onChange={handleLanguageChange}
-            options={['en', 'es'].map((value) => ({ value, label: t(`languages.${value}`) }))}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <SingleSelect
-            label={t('settings.default_tasks_view_label')}
-            placeholder={t('settings.default_tasks_view_placeholder')}
-            value={defaultTasksView}
-            onChange={handleDefaultViewChange}
-            options={['list', 'table', 'matrix'].map((value) => ({
-              value,
-              label: t(`tasks.tabs.${value}`)
-            }))}
-          />
-        </div>
+        <Controller
+          name="language"
+          control={control}
+          render={({ field }) => (
+            <SingleSelect
+              label={t('settings.language_label')}
+              placeholder={t('settings.language_placeholder')}
+              value={field.value}
+              onChange={(v) => v && field.onChange(v)}
+              options={['en', 'es'].map((value) => ({ value, label: t(`languages.${value}`) }))}
+            />
+          )}
+        />
+        <Controller
+          name="defaultTasksView"
+          control={control}
+          render={({ field }) => (
+            <SingleSelect
+              label={t('settings.default_tasks_view_label')}
+              placeholder={t('settings.default_tasks_view_placeholder')}
+              value={field.value}
+              onChange={(v) => v && field.onChange(v)}
+              options={['list', 'table', 'matrix'].map((value) => ({
+                value,
+                label: t(`tasks.tabs.${value}`)
+              }))}
+            />
+          )}
+        />
+        <Controller
+          name="dateFormat"
+          control={control}
+          render={({ field }) => (
+            <SingleSelect
+              label={t('settings.date_format_label')}
+              placeholder={t('settings.date_format_placeholder')}
+              value={field.value}
+              onChange={(v) => {
+                if (v && (DATE_FORMATS as readonly string[]).includes(v)) field.onChange(v as DateFormat)
+              }}
+              options={DATE_FORMATS.map((value) => ({
+                value,
+                label: `${t(`settings.date_format_options.${value}`)} (${dayjs().format(value)})`
+              }))}
+            />
+          )}
+        />
         <div className="flex flex-col gap-2">
           <Label htmlFor="theme">{t('settings.mode_label')}</Label>
-          <ThemeToggle />
+          <Controller
+            name="theme"
+            control={control}
+            render={({ field }) => (
+              <div className="relative">
+                <Switch
+                  className="peer bg-input data-[state=checked]:bg-primary h-6 w-11 cursor-pointer [&>span]:hidden"
+                  checked={field.value === 'dark'}
+                  onCheckedChange={(checked) => field.onChange(checked ? 'dark' : 'light')}
+                />
+                <div className="bg-background text-foreground pointer-events-none absolute top-0.5 left-0.5 flex h-5 w-5 items-center justify-center rounded-full shadow transition-transform peer-data-[state=checked]:translate-x-5">
+                  {field.value === 'dark' ? (
+                    <Moon className="fill-foreground h-3.5 w-3.5" />
+                  ) : (
+                    <Sun className="fill-foreground h-3.5 w-3.5" />
+                  )}
+                </div>
+              </div>
+            )}
+          />
         </div>
-        <div className="flex flex-col gap-2">
-          <FactionColorSelector />
-        </div>
+        <Controller
+          name="faction"
+          control={control}
+          render={({ field }) => <FactionColorSelector value={field.value} onChange={field.onChange} />}
+        />
         <div className="pt-4">
           <Button
+            type="button"
             onClick={() =>
               signOut()
                 .then(() => router.push('/login'))
@@ -178,6 +328,7 @@ function SettingsContent() {
         </div>
         <div className="flex flex-col gap-4">
           <LoaderButton
+            type="button"
             onClick={() => resetTutorialMutation.mutate()}
             isLoading={resetTutorialMutation.isPending}
             className="w-fit cursor-pointer"
@@ -189,14 +340,6 @@ function SettingsContent() {
           <ConfirmDeleteAccountDialog />
         </div>
       </div>
-    </div>
-  )
-}
-
-export default function Settings() {
-  return (
-    <Suspense>
-      <SettingsContent />
     </Suspense>
   )
 }

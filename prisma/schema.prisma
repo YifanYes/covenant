@@ -16,6 +16,9 @@ model User {
   image          String?
   theme                String          @default("HOLY_KNIGHTS")
   locale               String          @default("es")
+  colorMode            String          @default("light")
+  defaultTasksView     String          @default("list")
+  dateFormat           String          @default("L")
   tutorialCompletedAt  DateTime?       @db.Timestamp(6)
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt

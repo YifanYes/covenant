@@ -3,6 +3,7 @@ import LoaderButton from '@/common/loader-button.component'
 import DatePicker from '@/forms/date-picker.component'
 import MultiSelect from '@/forms/multi-select.component'
 import TextInput from '@/forms/text-input.component'
+import { useDateFormat } from '@/hooks/use-date-format'
 import { areaSimpleStyles } from '@/types/colors.types'
 import { allIcons } from '@/types/icons.types'
 import type { Objective } from '@/types/models.types'
@@ -20,7 +21,6 @@ import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -31,6 +31,7 @@ import ObjectiveSummaryList from './objective-summary-list.component'
 
 export default function ObjectiveCard({ objective }: { objective: Objective }) {
   const { t } = useTranslation()
+  const { formatDate } = useDateFormat()
   const [open, setOpen] = useState(false)
 
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
@@ -94,7 +95,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
             <div className="flex flex-1 flex-col gap-1">
               <h4 className="text-sm leading-tight font-semibold">{objective.name}</h4>
               <div className="text-muted-foreground text-xs">
-                {objective.dueDate ? dayjs(objective.dueDate).format('L') : t('objectives.no_date')}
+                {objective.dueDate ? formatDate(objective.dueDate) : t('objectives.no_date')}
               </div>
             </div>
             {objective.areas && objective.areas.length > 0 && (

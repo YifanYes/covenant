@@ -1,9 +1,9 @@
 'use client'
+import { useDateFormat } from '@/hooks/use-date-format'
 import { useAuthStore } from '@/stores/auth.store'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { Calendar } from 'pixelarticons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
 import { startCase } from 'es-toolkit/compat'
 import { useTranslation } from 'react-i18next'
 import AreasDistribution from './_components/areas-distribution/areas-distribution.component'
@@ -17,9 +17,10 @@ export default function Dashboard() {
   const { t } = useTranslation()
   const { email } = useAuthStore()
   const { data: dashboardData } = useSuspenseQuery(trpcOptions.dashboard.get.queryOptions())
+  const { formatDate } = useDateFormat()
 
   const name = dashboardData.characterName || startCase(email ? email.split('@')[0] : '')
-  const date = dayjs().format('L')
+  const date = formatDate(new Date())
 
   return (
     <div className="flex flex-col gap-6 p-6">
