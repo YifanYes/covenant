@@ -14,6 +14,7 @@ import {
   type TacticalStateData
 } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
@@ -38,10 +39,10 @@ export class CombatService {
     private killRecordService?: KillRecordService
   ) {}
 
-  private async assertQuestOwnership(questId: string, userId: string, message: string): Promise<void> {
+  private async assertQuestOwnership(questId: string, userId: string): Promise<void> {
     const isOwner = await this.characterQuestRepository.verifyOwnership(questId, userId)
     if (!isOwner) {
-      throw new TRPCError({ code: 'FORBIDDEN', message })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
   }
 
@@ -359,7 +360,7 @@ export class CombatService {
     defenseThreshold: number,
     attackCriticalThreshold: number = 6
   ): Promise<TacticalAttackResult> {
-    await this.assertQuestOwnership(questId, userId, 'Not authorized to control this combat')
+    await this.assertQuestOwnership(questId, userId)
 
     if (!attackerId.startsWith('player-')) {
       throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot attack with enemy units' })
@@ -387,7 +388,7 @@ export class CombatService {
     enemyAttackDice: number,
     enemyAttackThreshold: number
   ): Promise<EnemyTurnResult> {
-    await this.assertQuestOwnership(questId, userId, 'Not authorized to control this combat')
+    await this.assertQuestOwnership(questId, userId)
 
     if (enemyId.startsWith('player-')) {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot execute AI turn for player units' })
@@ -404,7 +405,7 @@ export class CombatService {
     targeting: 'single' | 'all',
     targetIds: string[]
   ): Promise<TacticalDoctrineResultWithMana> {
-    await this.assertQuestOwnership(questId, userId, 'Not authorized to control this combat')
+    await this.assertQuestOwnership(questId, userId)
 
     if (!casterId.startsWith('player-')) {
       throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
@@ -436,7 +437,7 @@ export class CombatService {
     casterId: string,
     doctrineId: string
   ): Promise<SelfBuffDoctrineResultWithMana> {
-    await this.assertQuestOwnership(questId, userId, 'Not authorized to control this combat')
+    await this.assertQuestOwnership(questId, userId)
 
     if (!casterId.startsWith('player-')) {
       throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot cast doctrine with enemy units' })
@@ -460,7 +461,7 @@ export class CombatService {
     questId: string,
     consumableId: string
   ): Promise<{ success: boolean; healthRestored?: number; manaRestored?: number }> {
-    await this.assertQuestOwnership(questId, userId, 'Not authorized to control this combat')
+    await this.assertQuestOwnership(questId, userId)
     return this.useConsumable(userId, consumableId, { markPotionTurn: true })
   }
 }

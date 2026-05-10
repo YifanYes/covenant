@@ -12,6 +12,7 @@ import type {
 import { GuildRole, type GuildRoleType } from '@shared/schemas/guilds.schemas'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '@/generated/prisma'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { GuildInviteRepository } from '../repositories/guild-invite.repository'
 import type { GuildMemberRepository } from '../repositories/guild-member.repository'
@@ -34,7 +35,7 @@ const MAX_ACTIVE_INVITES_PER_GUILD = 5
 const PRISMA_UNIQUE_CONSTRAINT = 'P2002'
 
 const notFound = () =>
-  new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+  new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
 
 export class GuildService {
   constructor(

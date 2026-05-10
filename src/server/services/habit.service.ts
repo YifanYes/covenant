@@ -1,5 +1,6 @@
 import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { TRPCError } from '@trpc/server'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import type { HabitRepository } from '../repositories/habit.repository'
 import { logger } from '../lib/logger'
 import type { DiceService } from './dice.service'
@@ -26,11 +27,11 @@ export class HabitService {
     const habit = await this.habitRepository.findByIdWithDetails(id)
 
     if (!habit) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     if (habit.userId !== userId) {
       log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized habit access attempt')
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
 
     return { habit }
@@ -85,11 +86,11 @@ export class HabitService {
     const completion = await this.habitRepository.findCompletionById(completionId)
 
     if (!completion) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     if (completion.userId !== userId) {
       log.warn({ resourceId: completionId, requestingUserId: userId }, 'Unauthorized habit completion access attempt')
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
 
     await this.habitRepository.deleteCompletion(completionId)

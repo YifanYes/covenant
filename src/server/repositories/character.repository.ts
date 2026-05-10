@@ -5,6 +5,7 @@ import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
 
 const log = logger.child({ component: 'character-repository' })
@@ -55,11 +56,11 @@ export class CharacterRepository {
   async findByIdWithClassesOrThrow(id: string, userId?: string): Promise<CharacterWithClasses> {
     const character = await this.findByIdWithClasses(id)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     if (userId !== undefined && character.userId !== userId) {
       log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized character access attempt')
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     return character
   }

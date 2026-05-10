@@ -60,7 +60,7 @@ describe('Character Ownership Validation', () => {
     /**
      * This test documents the expected pattern used in routers:
      * 1. Call verifyCharacterOwnership
-     * 2. If false, throw FORBIDDEN error
+     * 2. If false, throw NOT_FOUND with a generic message (do not leak existence)
      * 3. If true, proceed with service call
      */
     it('should follow the router authorization pattern', async () => {
@@ -72,7 +72,7 @@ describe('Character Ownership Validation', () => {
       async function routerHandler(inputCharacterId: string, inputUserId: string) {
         const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
         if (!isOwner) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
         }
         return mockServiceMethod()
       }
@@ -86,7 +86,7 @@ describe('Character Ownership Validation', () => {
       expect(mockServiceMethod).toHaveBeenCalled()
     })
 
-    it('should throw FORBIDDEN when ownership check fails', async () => {
+    it('should throw NOT_FOUND when ownership check fails', async () => {
       const characterId = 'char-1'
       const userId = 'user-1'
       const mockServiceMethod = vi.fn()
@@ -95,7 +95,7 @@ describe('Character Ownership Validation', () => {
       async function routerHandler(inputCharacterId: string, inputUserId: string) {
         const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
         if (!isOwner) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
         }
         return mockServiceMethod()
       }
@@ -105,7 +105,7 @@ describe('Character Ownership Validation', () => {
 
       await expect(routerHandler(characterId, userId)).rejects.toThrow(TRPCError)
       await expect(routerHandler(characterId, userId)).rejects.toMatchObject({
-        code: 'FORBIDDEN'
+        code: 'NOT_FOUND'
       })
 
       // Verify service method was never called
@@ -124,7 +124,7 @@ describe('Character Ownership Validation', () => {
         if (inputCharacterId) {
           const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
           if (!isOwner) {
-            throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
           }
         }
         return mockActivityService.getActivities(inputCharacterId)
@@ -149,7 +149,7 @@ describe('Character Ownership Validation', () => {
         if (inputCharacterId) {
           const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
           if (!isOwner) {
-            throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
           }
         }
         return mockActivityService.getActivities(inputCharacterId)

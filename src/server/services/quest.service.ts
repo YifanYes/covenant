@@ -11,6 +11,7 @@ import {
 } from '@shared/types/tactical-combat.types'
 import type { CharacterClassType } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { CharacterService } from './character.service'
@@ -25,14 +26,14 @@ export class QuestService {
   private async assertCharacterOwnership(characterId: string, userId: string): Promise<void> {
     const isOwner = await this.characterService.verifyCharacterOwnership(characterId, userId)
     if (!isOwner) {
-      throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized to access this character' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
   }
 
-  private async assertQuestOwnership(questId: string, userId: string, message: string): Promise<void> {
+  private async assertQuestOwnership(questId: string, userId: string): Promise<void> {
     const isOwner = await this.characterQuestRepository.verifyOwnership(questId, userId)
     if (!isOwner) {
-      throw new TRPCError({ code: 'FORBIDDEN', message })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
   }
 
@@ -217,12 +218,12 @@ export class QuestService {
   }
 
   async abandonQuest(questId: string, userId: string) {
-    await this.assertQuestOwnership(questId, userId, 'Not authorized to abandon this quest')
+    await this.assertQuestOwnership(questId, userId)
     await this.characterQuestRepository.abandon(questId)
   }
 
   async getTacticalState(questId: string, userId: string): Promise<TacticalStateData | null> {
-    await this.assertQuestOwnership(questId, userId, 'Not authorized to access this combat')
+    await this.assertQuestOwnership(questId, userId)
 
     const result = await this.characterQuestRepository.findByIdWithTacticalState(questId)
     const state = result?.tacticalState ?? null
