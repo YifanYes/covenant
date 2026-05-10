@@ -102,7 +102,7 @@ export class ServiceFactory {
   }
 
   get character(): CharacterService {
-    return (this._characterService ??= new CharacterService(this.characterRepository))
+    return (this._characterService ??= new CharacterService(this.characterRepository, this.userRepository))
   }
 
   get dice(): DiceService {

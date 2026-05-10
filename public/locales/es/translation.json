@@ -1579,6 +1579,9 @@
   },
   "save_changes": "Guardar cambios",
   "settings": {
+    "character_name_label": "Nombre del personaje",
+    "character_name_updated": "Nombre del personaje actualizado",
+    "character_name_error": "Error al actualizar el nombre del personaje",
     "default_tasks_view_label": "Vista de tareas predeterminada",
     "default_tasks_view_placeholder": "Seleccionar vista predeterminada",
     "email_label": "Correo electrónico",
@@ -1590,12 +1593,14 @@
     "mode_label": "Modo",
     "theme_light": "Claro",
     "faction_theme_label": "Tema de Facción",
-    "title": "Configuración"
+    "title": "Configuración",
+    "replay_tutorial": "Repetir tutorial",
+    "replay_tutorial_error": "No se pudo reiniciar el tutorial. Inténtalo de nuevo."
   },
   "nav": {
     "quests": "Misiones"
   },
-    "sidebar": {
+  "sidebar": {
     "calendar": "Calendario",
     "close": "Colapsar menú",
     "crafting": "Forja",
@@ -1937,6 +1942,29 @@
     "defend_the_southern_wall": {
       "name": "Defensa: Muro Sur",
       "description": "Un asalto demoníaco implacable amenaza el muro sur. Elimina 10 atacantes para mantener la línea."
+    }
+  },
+  "tutorial": {
+    "skip": "Saltar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "done": "¡Entendido!",
+    "complete_failed": "No pudimos guardar tu progreso. Inténtalo de nuevo.",
+    "dice": {
+      "title": "Gana Dados",
+      "body": "Completa hábitos, tareas y objetivos para llenar tu banco de dados."
+    },
+    "combat": {
+      "title": "Lánzate al Combate",
+      "body": "Gasta dados en batallas de misión para atacar, defender y lanzar doctrinas."
+    },
+    "tier": {
+      "title": "Sube de Rango",
+      "body": "Derrota enemigos para subir el rango de tu clase. Rangos más altos desbloquean nuevo equipo y doctrinas."
+    },
+    "gear": {
+      "title": "Equipa tu Botín",
+      "body": "Compra equipo en la Tienda y equípalo desde tu Inventario. Mejor equipo, misiones más duras."
     }
   }
 }

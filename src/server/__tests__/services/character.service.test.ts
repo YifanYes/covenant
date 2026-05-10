@@ -7,11 +7,11 @@ import { mockCharacter, mockInventoryItem } from '../fixtures/character.fixtures
 describe('CharacterService', () => {
   let characterService: CharacterService
   let mockCharacterRepo: any
+  let mockUserRepo: any
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    // Create mock repository with mocked methods
     mockCharacterRepo = {
       findWithClasses: vi.fn(),
       findByUserIdOrThrow: vi.fn(),
@@ -25,8 +25,45 @@ describe('CharacterService', () => {
       updateDoctrines: vi.fn()
     }
 
-    // Inject the mock repository directly
-    characterService = new CharacterService(mockCharacterRepo)
+    mockUserRepo = {
+      setTutorialCompletedAt: vi.fn()
+    }
+
+    characterService = new CharacterService(mockCharacterRepo, mockUserRepo)
+  })
+
+  describe('tutorial', () => {
+    it('completeTutorial calls userRepo.setTutorialCompletedAt with a Date', async () => {
+      mockUserRepo.setTutorialCompletedAt.mockResolvedValue({ tutorialCompletedAt: new Date() })
+
+      await characterService.completeTutorial('user-1')
+
+      expect(mockUserRepo.setTutorialCompletedAt).toHaveBeenCalledWith('user-1', expect.any(Date))
+    })
+
+    it('resetTutorial calls userRepo.setTutorialCompletedAt with null', async () => {
+      mockUserRepo.setTutorialCompletedAt.mockResolvedValue({ tutorialCompletedAt: null })
+
+      await characterService.resetTutorial('user-1')
+
+      expect(mockUserRepo.setTutorialCompletedAt).toHaveBeenCalledWith('user-1', null)
+    })
+
+    it('getCurrentClass exposes tutorialCompletedAt from user', async () => {
+      const ts = new Date('2026-01-01')
+      const character = {
+        ...mockCharacter(),
+        factionName: 'HOLY_KNIGHTS',
+        title: null,
+        magicNature: null,
+        user: { tutorialCompletedAt: ts }
+      }
+      mockCharacterRepo.findWithClasses.mockResolvedValue(character)
+
+      const result = await characterService.getCurrentClass('user-1')
+
+      expect(result?.tutorialCompletedAt).toEqual(ts)
+    })
   })
 
   describe('item management', () => {

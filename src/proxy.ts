@@ -27,7 +27,7 @@ export function proxy(request: NextRequest) {
   }
 
   if (authRoutes.some((r) => pathname.startsWith(r)) && hasSession) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL('/objectives', request.url))
   }
 
   return NextResponse.next()

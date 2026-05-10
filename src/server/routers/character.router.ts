@@ -5,6 +5,7 @@ import {
   switchClassSchema,
   unequipDoctrineSchema,
   unequipItemSchema,
+  updateCharacterNameSchema,
   useConsumableSchema,
   useDoctrineSchema
 } from '@shared/schemas/character.schemas'
@@ -66,5 +67,17 @@ export const characterRouter = t.router({
 
   useDoctrine: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(useDoctrineSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.combat.useDoctrine(ctx.user.id, input.doctrineId, input.participationId)
-  })
+  }),
+
+  updateName: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(updateCharacterNameSchema).mutation(async ({ ctx, input }) => {
+    return ctx.services.character.updateName(ctx.user.id, input.name)
+  }),
+
+  completeTutorial: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).mutation(({ ctx }) =>
+    ctx.services.character.completeTutorial(ctx.user.id)
+  ),
+
+  resetTutorial: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).mutation(({ ctx }) =>
+    ctx.services.character.resetTutorial(ctx.user.id)
+  )
 })

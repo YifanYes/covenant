@@ -33,7 +33,10 @@ export interface CharacterType {
   updatedAt: Date
 }
 
-export type CharacterWithClasses = CharacterType & { classes: CharacterClassType[] }
+export type CharacterWithClasses = CharacterType & {
+  classes: CharacterClassType[]
+  user?: { tutorialCompletedAt: Date | null }
+}
 
 export interface CharacterProgress {
   currentClass: CharacterClassType | undefined

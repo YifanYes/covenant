@@ -21,4 +21,11 @@ export class UserRepository {
       data
     })
   }
+
+  async setTutorialCompletedAt(userId: string, value: Date | null): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { tutorialCompletedAt: value }
+    })
+  }
 }
