@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '@/generated/prisma'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
 
 const log = logger.child({ component: 'base-repository' })
@@ -37,7 +38,7 @@ export abstract class BaseRepository<T extends { id: string }> {
     if (!entity) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: 'Resource not found or access denied'
+        message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
       })
     }
     return entity
@@ -81,7 +82,7 @@ export abstract class UserScopedRepository<
     if (!entity) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: 'Resource not found or access denied'
+        message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
       })
     }
     return entity
@@ -94,11 +95,11 @@ export abstract class UserScopedRepository<
   async findByIdWithOwnershipOrThrow(id: string, userId: string): Promise<T> {
     const entity = await this.model.findUnique({ where: { id } })
     if (!entity) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     if (entity.userId !== userId) {
       log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized resource access attempt')
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     return entity
   }

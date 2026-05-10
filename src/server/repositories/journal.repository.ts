@@ -1,5 +1,6 @@
 import type { JournalEntry, PrismaClient } from '@/generated/prisma'
 import { TRPCError } from '@trpc/server'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 
 function getUtcDayBounds(date?: Date, timezoneOffset = 0) {
   const now = date || new Date()
@@ -66,7 +67,7 @@ export class JournalRepository {
   async findByIdOrThrow(id: string, userId: string, tx?: any): Promise<JournalEntry> {
     const entry = await this.findById(id, userId, tx)
     if (!entry) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     return entry
   }

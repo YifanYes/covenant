@@ -1,6 +1,7 @@
 import type { Objective, PrismaClient } from '@/generated/prisma'
 import type { CreateObjectiveBodyType, UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { TRPCError } from '@trpc/server'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
 
 const log = logger.child({ component: 'objective-repository' })
@@ -47,11 +48,11 @@ export class ObjectiveRepository {
   async update(id: string, userId: string, input: UpdateObjectiveBodyType): Promise<Objective> {
     const objective = await this.prisma.objective.findUnique({ where: { id } })
     if (!objective) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     if (objective.userId !== userId) {
       log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized objective access attempt')
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
 
     return this.prisma.objective.update({
@@ -71,11 +72,11 @@ export class ObjectiveRepository {
   async complete(id: string, userId: string): Promise<Objective> {
     const objective = await this.prisma.objective.findUnique({ where: { id } })
     if (!objective) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     if (objective.userId !== userId) {
       log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized objective access attempt')
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
 
     return this.prisma.objective.update({
@@ -87,11 +88,11 @@ export class ObjectiveRepository {
   async delete(id: string, userId: string): Promise<Objective> {
     const objective = await this.prisma.objective.findUnique({ where: { id } })
     if (!objective) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     if (objective.userId !== userId) {
       log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized objective access attempt')
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
 
     return this.prisma.objective.delete({
@@ -105,11 +106,11 @@ export class ObjectiveRepository {
     })
 
     if (!objective) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     if (objective.userId !== userId) {
       log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized objective access attempt')
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
 
     return objective

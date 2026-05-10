@@ -1,6 +1,7 @@
 import type { CreateJournalEntryType, UpdateJournalEntryType } from '@shared/schemas/journal.schemas'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '@/generated/prisma'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import type { JournalRepository } from '../repositories/journal.repository'
 import type { DiceService } from './dice.service'
 
@@ -58,7 +59,7 @@ export class JournalService {
   async getById(userId: string, id: string) {
     const entry = await this.journalRepository.findById(id, userId)
     if (!entry) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
     }
     return entry
   }

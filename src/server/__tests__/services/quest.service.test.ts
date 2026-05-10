@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../../lib/errors'
 import { QuestService } from '../../services/quest.service'
 import { mockCharacter } from '../fixtures/character.fixtures'
 import { mockCharacterQuest } from '../fixtures/quest.fixtures'
@@ -73,10 +74,13 @@ describe('QuestService', () => {
       expect(result.activeEnemy).toBeDefined()
     })
 
-    it('throws FORBIDDEN if user does not own the character', async () => {
+    it('throws NOT_FOUND if user does not own the character', async () => {
       mockCharacterService.verifyCharacterOwnership.mockResolvedValue(false)
 
-      await expect(questService.startQuest('patrol_north_gate', 'char-123', 'other-user')).rejects.toThrow(TRPCError)
+      await expect(questService.startQuest('patrol_north_gate', 'char-123', 'other-user')).rejects.toMatchObject({
+        code: 'NOT_FOUND',
+        message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
+      })
     })
 
     it('throws BAD_REQUEST if character already has an active quest', async () => {
@@ -137,10 +141,13 @@ describe('QuestService', () => {
       expect(result).toBeNull()
     })
 
-    it('throws FORBIDDEN if user does not own the character', async () => {
+    it('throws NOT_FOUND if user does not own the character', async () => {
       mockCharacterService.verifyCharacterOwnership.mockResolvedValue(false)
 
-      await expect(questService.getActiveQuest('char-123', 'other-user')).rejects.toThrow(TRPCError)
+      await expect(questService.getActiveQuest('char-123', 'other-user')).rejects.toMatchObject({
+        code: 'NOT_FOUND',
+        message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
+      })
     })
 
     it('returns quest with active enemy data', async () => {
@@ -176,10 +183,13 @@ describe('QuestService', () => {
       expect(mockCharacterQuestRepo.abandon).toHaveBeenCalledWith('quest-instance-1')
     })
 
-    it('throws FORBIDDEN if user does not own the quest', async () => {
+    it('throws NOT_FOUND if user does not own the quest', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
 
-      await expect(questService.abandonQuest('quest-instance-1', 'other-user')).rejects.toThrow(TRPCError)
+      await expect(questService.abandonQuest('quest-instance-1', 'other-user')).rejects.toMatchObject({
+        code: 'NOT_FOUND',
+        message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
+      })
     })
   })
 
@@ -205,10 +215,13 @@ describe('QuestService', () => {
       expect(active?.isActive).toBe(true)
     })
 
-    it('throws FORBIDDEN if user does not own the character', async () => {
+    it('throws NOT_FOUND if user does not own the character', async () => {
       mockCharacterService.verifyCharacterOwnership.mockResolvedValue(false)
 
-      await expect(questService.getAvailableQuests('other-user', 'char-123')).rejects.toThrow(TRPCError)
+      await expect(questService.getAvailableQuests('other-user', 'char-123')).rejects.toMatchObject({
+        code: 'NOT_FOUND',
+        message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
+      })
     })
 
     it('works without a characterId (no active quest lookup)', async () => {
@@ -249,10 +262,13 @@ describe('QuestService', () => {
       expect(result).toBeNull()
     })
 
-    it('throws FORBIDDEN if user does not own the quest', async () => {
+    it('throws NOT_FOUND if user does not own the quest', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
 
-      await expect(questService.getTacticalState('quest-instance-1', 'other-user')).rejects.toThrow(TRPCError)
+      await expect(questService.getTacticalState('quest-instance-1', 'other-user')).rejects.toMatchObject({
+        code: 'NOT_FOUND',
+        message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
+      })
     })
   })
 })

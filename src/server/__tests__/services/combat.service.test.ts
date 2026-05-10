@@ -1231,12 +1231,12 @@ describe('CombatService', () => {
     }
 
     describe('playerAttack', () => {
-      it('throws FORBIDDEN if user does not own the quest', async () => {
+      it('throws NOT_FOUND if user does not own the quest', async () => {
         mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
 
         await expect(
           combatService.playerAttack('user-1', 'quest-1', 'player-1', 'enemy-1', [4], [3], 4, 4, 6)
-        ).rejects.toThrow('Not authorized to control this combat')
+        ).rejects.toThrow('Resource not found or access denied')
         expect(mockDiceService.consumeDiceFromBank).not.toHaveBeenCalled()
       })
 
@@ -1273,12 +1273,12 @@ describe('CombatService', () => {
     })
 
     describe('playerEnemyTurn', () => {
-      it('throws FORBIDDEN if user does not own the quest', async () => {
+      it('throws NOT_FOUND if user does not own the quest', async () => {
         mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
 
         await expect(
           combatService.playerEnemyTurn('user-1', 'quest-1', 'enemy-1', 3, 4)
-        ).rejects.toThrow('Not authorized to control this combat')
+        ).rejects.toThrow('Resource not found or access denied')
       })
 
       it('throws BAD_REQUEST if enemyId is a player unit', async () => {
@@ -1291,12 +1291,12 @@ describe('CombatService', () => {
     })
 
     describe('playerCastDoctrine', () => {
-      it('throws FORBIDDEN if user does not own the quest', async () => {
+      it('throws NOT_FOUND if user does not own the quest', async () => {
         mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
 
         await expect(
           combatService.playerCastDoctrine('user-1', 'quest-1', 'player-1', 'doctrine-x', 'single', ['enemy-1'])
-        ).rejects.toThrow('Not authorized to control this combat')
+        ).rejects.toThrow('Resource not found or access denied')
         expect(mockCharacterService.getCurrentClass).not.toHaveBeenCalled()
       })
 
@@ -1354,12 +1354,12 @@ describe('CombatService', () => {
     })
 
     describe('playerCastSelfBuffDoctrine', () => {
-      it('throws FORBIDDEN if user does not own the quest', async () => {
+      it('throws NOT_FOUND if user does not own the quest', async () => {
         mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
 
         await expect(
           combatService.playerCastSelfBuffDoctrine('user-1', 'quest-1', 'player-1', 'doctrine-x')
-        ).rejects.toThrow('Not authorized to control this combat')
+        ).rejects.toThrow('Resource not found or access denied')
       })
 
       it('throws FORBIDDEN if casterId is not a player unit', async () => {
@@ -1386,11 +1386,11 @@ describe('CombatService', () => {
     })
 
     describe('playerUsePotion', () => {
-      it('throws FORBIDDEN if user does not own the quest', async () => {
+      it('throws NOT_FOUND if user does not own the quest', async () => {
         mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
 
         await expect(combatService.playerUsePotion('user-1', 'quest-1', 'health_potion')).rejects.toThrow(
-          'Not authorized to control this combat'
+          'Resource not found or access denied'
         )
       })
 
