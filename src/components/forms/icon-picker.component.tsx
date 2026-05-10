@@ -76,7 +76,7 @@ export default function IconPicker({
               id={fieldId}
               variant="outline"
               className={cn(
-                'hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 flex h-9 w-full items-center justify-between gap-2 font-normal transition-all duration-200',
+                'hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 dark:hover:text-foreground flex h-9 w-full items-center justify-between gap-2 font-normal transition-all duration-200',
                 required && !value ? 'text-destructive' : ''
               )}
               disabled={disabled}

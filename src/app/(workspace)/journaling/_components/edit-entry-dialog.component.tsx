@@ -1,6 +1,7 @@
 'use client'
 
 import { MOODS } from '@shared/constants/journal.constants'
+import LoaderButton from '@/common/loader-button.component'
 import Button from '@/components/ui/button.component'
 import Dialog, {
   DialogContent,
@@ -141,9 +142,12 @@ export default function EditEntryDialog({ entry, open, onOpenChange }: EditEntry
             >
               {t('journaling.delete.button')}
             </Button>
-            <Button onClick={handleSave} disabled={isLoading || !plainContent}>
-              {t('journaling.update')}
-            </Button>
+            <LoaderButton
+              onClick={handleSave}
+              isLoading={isLoading}
+              disabled={!plainContent}
+              label={t('journaling.update')}
+            />
           </div>
         </div>
       </DialogContent>

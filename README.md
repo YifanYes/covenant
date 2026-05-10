@@ -315,4 +315,4 @@ Key variables (see `.env.example` for full list):
 
 ## License
 
-[MIT](LICENSE)
+[AGPL-3.0](LICENSE)

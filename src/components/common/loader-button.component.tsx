@@ -1,34 +1,26 @@
 'use client'
 import Button from '@/ui/button.component'
 import { Loader } from 'pixelarticons/react'
+import type { ComponentProps, ReactNode } from 'react'
+
+type ButtonProps = ComponentProps<typeof Button>
+
+interface LoaderButtonProps extends Omit<ButtonProps, 'children'> {
+  isLoading: boolean
+  label?: string
+  icon?: ReactNode
+}
 
 export default function LoaderButton({
   disabled,
   isLoading,
   label,
-  onClick,
-  size,
-  className,
-  icon
-}: {
-  disabled?: boolean
-  isLoading: boolean
-  label: string
-  onClick: () => void
-  size?: 'default' | 'sm' | 'lg' | 'icon'
-  className?: string
-  icon?: React.ReactNode
-}) {
+  icon,
+  ...rest
+}: LoaderButtonProps) {
   return (
-    <Button
-      size={size}
-      disabled={disabled || isLoading}
-      onClick={onClick}
-      className={`${className || ''}`}
-      aria-busy={isLoading}
-    >
-      {isLoading && <Loader className="animate-spin" />}
-      {!isLoading && icon}
+    <Button {...rest} disabled={disabled || isLoading} aria-busy={isLoading}>
+      {isLoading ? <Loader className="animate-spin" /> : icon}
       {label}
     </Button>
   )

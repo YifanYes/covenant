@@ -11,9 +11,11 @@
 
 ## High Priority
 
-- [ ] Guild system `[retention]`
-  - Users create their own guilds, invite friends, run guild-wide campaigns. Each guild has a social forum. Exclusive guild rewards.
-  - **Why high despite `mvp_scope_cut.md` cutting forum+factions:** Habitica's removal of guilds is documented as a major churn driver. Social retention is a non-negotiable companion hypothesis to the solo loop.
+- [x] Guild system Phase 1 — guilds + members + invite-link + flat forum `[retention]`. Single-guild membership, role matrix (OWNER/OFFICER/MEMBER), shareable invite links, polled (7s) chat. Habitica's removal of guilds is a documented churn driver — Phase 1 ships the social retention surface.
+
+- [ ] Guild system Phase 2 — guild campaigns `[retention]`. Shared progress goals (e.g. "guild collectively defeats N enemies"). New `GuildCampaign` + `GuildCampaignProgress` entities; hook into `kill-record.service.ts`. Spec to live at `docs/specs/guild_campaigns.md`.
+
+- [ ] Guild system Phase 3 — exclusive rewards + progression bonuses `[retention]`. Guild-only items (`Item.guildExclusive` flag), guild-tier progression with member XP/gold modifiers. Touches store + character services. Defer until Phase 1+2 retention signal validated with beta cohort.
 
 - [ ] PostHog integration — absorbs feature flags + analytics `[loop]`
   - Single tool for product analytics + session replay + feature flags. Replaces three previously-separate items: standalone "feature flag" infra, roadmap _"Analytics implemented (GA + Mixpanel)"_, roadmap _"UTM parameters definidos por canal"_.
@@ -34,11 +36,9 @@
 
 - [ ] Add Github OAuth `[loop]`
 
-- [ ] Render character with equipped items `[loop]`
-  - Roadmap Phase 2 still pending: _"Renderizar el personaje con los items equipados"_. Visual feedback closes the gear loop — without it, equipping a sword feels invisible.
+- [ ] Render character with equipped items `[loop]`. Visual feedback closes the gear loop — without it, equipping a sword feels invisible.
 
-- [ ] Define story decisions `[loop]`
-  - Roadmap Phase 2 pending: _"Definir decisiones de la historia"_. Story branches are the tier-progression payoff in the core loop.
+- [ ] Define story decisions `[loop]`. Story branches are the tier-progression payoff in the core loop.
 
 - [ ] Per-route error boundaries `[loop]`
   - Only root `error.tsx` exists. Add `error.tsx` to `(workspace)/quests/`, `(workspace)/tasks/`, `(workspace)/habits/`, `(workspace)/objectives/`, `(workspace)/shop/`, `(workspace)/inventory/`.

@@ -112,7 +112,7 @@ export default function MultiSelect<TFieldValues extends FieldValues = FieldValu
                 type="button"
                 onClick={handleToggleOpen}
                 className={cn(
-                  'border-input dark:bg-input/30 ring-offset-background placeholder:text-muted-foreground focus:ring-ring hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 flex w-full items-center gap-2 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-all duration-200 focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+                  'border-input dark:bg-input/30 ring-offset-background placeholder:text-muted-foreground focus:ring-ring hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 dark:hover:text-foreground flex w-full items-center gap-2 rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-all duration-200 focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
                   value.length === 0 && required && 'text-destructive',
                   errorMessage && 'border-destructive'
                 )}
