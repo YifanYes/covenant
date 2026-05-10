@@ -15,7 +15,7 @@ import Sidebar, {
   SidebarTrigger
 } from '@/ui/sidebar.component'
 import Link from 'next/link'
-import { BookOpen, Bulletlist, Calendar, Castle, Grid3x3, PenSquare, Settings2, Store, Suitcase, Trophy } from 'pixelarticons/react'
+import { BookOpen, Bulletlist, Calendar, Castle, Grid3x3, PenSquare, Settings2, Shield, Store, Suitcase, Trophy } from 'pixelarticons/react'
 import { useSyncExternalStore, type ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -113,6 +113,11 @@ export default function AppSidebar() {
         title: t('sidebar.shop'),
         url: '/shop',
         icon: Store
+      },
+      {
+        title: t('sidebar.guilds'),
+        url: '/guilds',
+        icon: Shield
       }
     ],
     settings: [

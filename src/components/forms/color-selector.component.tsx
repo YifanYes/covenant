@@ -34,7 +34,7 @@ export default function ColorSelector({
       <Select value={value ?? ''} onValueChange={onChange}>
         <SelectTrigger
           className={cn(
-            'hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 transition-all duration-200',
+            'hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 dark:hover:text-foreground transition-all duration-200',
             className
           )}
           id={fieldId}

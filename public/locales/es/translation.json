@@ -1091,6 +1091,122 @@
     },
     "title": "Hábitos"
   },
+  "guilds": {
+    "title": "Gremios",
+    "back": "Volver a Gremios",
+    "leave": "Salir",
+    "dissolve": "Disolver",
+    "empty": {
+      "title": "¿Aún sin compañeros, lobo solitario?",
+      "description": "Funda tu propio gremio y reúne aliados, o pega un enlace de invitación de un amigo. El camino es más corto cuando se recorre juntos.",
+      "or": "o"
+    },
+    "create": {
+      "title": "Fundar un Gremio",
+      "description": "Planta tu estandarte. Recluta aliados. Construye algo legendario.",
+      "cta": "Fundar Gremio",
+      "submit": "Fundar",
+      "name_label": "Nombre del gremio",
+      "name_placeholder": "p. ej. La Orden del Farol",
+      "description_placeholder": "Describe el propósito de tu gremio (opcional)"
+    },
+    "tabs": {
+      "forum": "Foro",
+      "members": "Miembros",
+      "settings": "Ajustes"
+    },
+    "role": {
+      "owner": "Líder",
+      "officer": "Oficial",
+      "member": "Miembro"
+    },
+    "member": {
+      "you": "(tú)",
+      "joined": "Se unió",
+      "kick": "Expulsar del gremio",
+      "promote": "Promover a oficial",
+      "demote": "Degradar a miembro"
+    },
+    "forum": {
+      "empty": "Aún no hay mensajes. Sé el primero en romper el silencio.",
+      "placeholder": "Envía una misiva al gremio…",
+      "send": "Enviar",
+      "delete_message": "Eliminar mensaje",
+      "unknown_user": "Aventurero desconocido",
+      "relative": {
+        "just_now": "justo ahora",
+        "minutes": "{{count}} min",
+        "hours": "{{count}} h",
+        "days": "{{count}} d"
+      },
+      "error": {
+        "send": "No se pudo enviar el mensaje",
+        "delete": "No se pudo eliminar el mensaje"
+      }
+    },
+    "invite": {
+      "title": "Enlace de invitación",
+      "description": "Comparte este enlace con aliados de confianza. Expira en 7 días.",
+      "generate": "Generar enlace",
+      "revoke": "Revocar",
+      "copied": "Enlace de invitación copiado",
+      "copy_failed": "No se pudo copiar el enlace",
+      "created": "Nuevo enlace de invitación generado",
+      "revoked": "Enlace de invitación revocado",
+      "none": "Sin invitaciones activas. Genera una para reclutar aliados.",
+      "error_create": "No se pudo generar la invitación",
+      "error_revoke": "No se pudo revocar la invitación",
+      "expired": "Caducada",
+      "expires_in_days": "Caduca en {{count}} d",
+      "expires_in_hours": "Caduca en {{count}} h",
+      "expires_in_minutes": "Caduca en {{count}} min",
+      "uses_count": "{{used}} / {{max}} usos",
+      "unlimited": "∞"
+    },
+    "join": {
+      "cta": "Unirse al Gremio",
+      "invalid_title": "Invitación no disponible",
+      "invalid_description": "Esta invitación ya no es válida. Pide al gremio un nuevo enlace.",
+      "invalid_link": "Enlace de invitación inválido",
+      "paste_label": "Pega un enlace de invitación",
+      "paste_placeholder": "https://… o token de invitación",
+      "paste_cta": "Unirse",
+      "member_count": "{{count}} de {{capacity}} miembros",
+      "invalid_reason": {
+        "expired": "Esta invitación ha caducado.",
+        "revoked": "Esta invitación fue revocada por el gremio.",
+        "exhausted": "Esta invitación ha alcanzado su límite de usos.",
+        "unknown": "Esta invitación no está disponible."
+      }
+    },
+    "leave_confirm": {
+      "title": "¿Salir de este gremio?",
+      "description": "Perderás acceso al foro y a la lista de miembros. Podrás ser invitado de nuevo más tarde."
+    },
+    "dissolve_confirm": {
+      "title": "¿Disolver este gremio?",
+      "description": "Todos los miembros, mensajes e invitaciones se eliminarán permanentemente. Esta acción no se puede deshacer."
+    },
+    "success": {
+      "create": "Gremio fundado. Que tu estandarte ondee siempre.",
+      "leave": "Has abandonado el gremio.",
+      "dissolve": "Gremio disuelto.",
+      "join": "Bienvenido al gremio.",
+      "kick": "Miembro expulsado.",
+      "role": "Rol actualizado."
+    },
+    "error": {
+      "create": "No se pudo fundar el gremio",
+      "leave": "No se pudo salir del gremio",
+      "dissolve": "No se pudo disolver el gremio",
+      "join": "No se pudo unir al gremio",
+      "kick": "No se pudo expulsar al miembro",
+      "role": "No se pudo actualizar el rol"
+    },
+    "errors": {
+      "not_member": "Este gremio no existe o no eres miembro."
+    }
+  },
   "icons": {
     "not_found": "No se encontraron iconos",
     "placeholder": "Seleccionar un icono",
@@ -1617,7 +1733,8 @@
     "quests": "Misiones",
     "settings": "Configuración",
     "shop": "Tienda",
-    "tasks": "Tareas"
+    "tasks": "Tareas",
+    "guilds": "Gremios"
   },
   "sign_up": {
     "already_have_account": "¿Ya tienes cuenta?",

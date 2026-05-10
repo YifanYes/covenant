@@ -10,6 +10,8 @@ type EmptyStateProps = {
   action?: ReactNode
   size?: 'compact' | 'default'
   className?: string
+  descriptionClassName?: string
+  actionFullWidth?: boolean
 }
 
 export default function EmptyState({
@@ -18,7 +20,9 @@ export default function EmptyState({
   description,
   action,
   size = 'default',
-  className
+  className,
+  descriptionClassName,
+  actionFullWidth = false
 }: EmptyStateProps) {
   const isCompact = size === 'compact'
 
@@ -43,13 +47,14 @@ export default function EmptyState({
         <p
           className={cn(
             'text-muted-foreground whitespace-pre-line max-w-xs',
-            isCompact ? 'text-xs' : 'text-sm'
+            isCompact ? 'text-xs' : 'text-sm',
+            descriptionClassName
           )}
         >
           {description}
         </p>
       </div>
-      {action && <div>{action}</div>}
+      {action && <div className={cn(actionFullWidth && 'flex w-full justify-center')}>{action}</div>}
     </div>
   )
 }

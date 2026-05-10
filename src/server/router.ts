@@ -2,6 +2,7 @@ import { areasRouter } from './routers/areas.router'
 import { authRouter } from './routers/auth.router'
 import { characterRouter } from './routers/character.router'
 import { dashboardRouter } from './routers/dashboard.router'
+import { guildsRouter } from './routers/guilds.router'
 import { habitsRouter } from './routers/habits.router'
 import { journalingRouter } from './routers/journal.router'
 import { killRecordRouter } from './routers/kill-record.router'
@@ -27,7 +28,8 @@ export const appRouter = t.router({
   dashboard: dashboardRouter,
   quest: questRouter,
   killRecord: killRecordRouter,
-  store: storeRouter
+  store: storeRouter,
+  guilds: guildsRouter
 })
 
 export type AppRouter = typeof appRouter
