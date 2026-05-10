@@ -11,7 +11,8 @@ describe('CharacterRepository - Authorization', () => {
 
     mockPrisma = {
       character: {
-        findUnique: vi.fn()
+        findUnique: vi.fn(),
+        update: vi.fn()
       }
     }
 

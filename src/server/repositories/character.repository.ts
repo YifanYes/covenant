@@ -29,7 +29,7 @@ export class CharacterRepository {
   async findWithClasses(userId: string): Promise<CharacterWithClasses | null> {
     const character = await this.prisma.character.findUnique({
       where: { userId },
-      include: { classes: true }
+      include: { classes: true, user: { select: { tutorialCompletedAt: true } } }
     })
 
     return character as unknown as CharacterWithClasses | null
@@ -148,6 +148,13 @@ export class CharacterRepository {
     })
   }
 
+  async updateName(userId: string, name: string): Promise<Character> {
+    return this.prisma.character.update({
+      where: { userId },
+      data: { name }
+    })
+  }
+
   async updateCharacterData(characterId: string, data: any): Promise<Character> {
     return this.prisma.character.update({
       where: { id: characterId },
@@ -204,4 +211,5 @@ export class CharacterRepository {
       data: { factionName: faction }
     })
   }
+
 }

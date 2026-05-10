@@ -33,7 +33,8 @@ export default function SignUp() {
         const result = await authClient.signUp.email({
           email: data.email,
           password: data.password,
-          name: data.name
+          name: data.name,
+          callbackURL: '/objectives?tutorial=true'
         })
         if (result.error) {
           const description =

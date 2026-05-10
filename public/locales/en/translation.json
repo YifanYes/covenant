@@ -1579,6 +1579,9 @@
   },
   "save_changes": "Save changes",
   "settings": {
+    "character_name_label": "Character Name",
+    "character_name_updated": "Character name updated",
+    "character_name_error": "Failed to update character name",
     "default_tasks_view_label": "Default Tasks View",
     "default_tasks_view_placeholder": "Select default view",
     "email_label": "Email",
@@ -1590,12 +1593,14 @@
     "mode_label": "Mode",
     "theme_light": "Light",
     "faction_theme_label": "Faction Theme",
-    "title": "Settings"
+    "title": "Settings",
+    "replay_tutorial": "Replay tutorial",
+    "replay_tutorial_error": "Failed to reset tutorial. Please try again."
   },
   "nav": {
     "quests": "Quests"
   },
-    "sidebar": {
+  "sidebar": {
     "calendar": "Calendar",
     "close": "Collapse menu",
     "crafting": "Crafting",
@@ -1937,6 +1942,29 @@
     "defend_the_southern_wall": {
       "name": "Defense: Southern Wall",
       "description": "A relentless demonic assault threatens the southern wall. Eliminate 10 attackers to hold the line."
+    }
+  },
+  "tutorial": {
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Got it",
+    "complete_failed": "Couldn't save your progress. Please try again.",
+    "dice": {
+      "title": "Earn Dice",
+      "body": "Complete habits, tasks, and objectives to fill your dice bank."
+    },
+    "combat": {
+      "title": "Roll in Combat",
+      "body": "Spend dice in quest battles to attack, defend, and cast doctrines."
+    },
+    "tier": {
+      "title": "Tier Up",
+      "body": "Defeat enemies to climb your class tier. Higher tiers unlock new gear and doctrines."
+    },
+    "gear": {
+      "title": "Equip Gear",
+      "body": "Buy gear in the Shop and equip it from your Inventory. Stronger gear, tougher quests."
     }
   }
 }

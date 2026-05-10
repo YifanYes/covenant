@@ -145,7 +145,7 @@ describe('Authorization - Service Layer', () => {
         verifyOwnership: vi.fn()
       }
 
-      characterService = new CharacterService(mockCharacterRepo)
+      characterService = new CharacterService(mockCharacterRepo, { setTutorialCompletedAt: vi.fn() } as any)
     })
 
     describe('getCharacterById', () => {

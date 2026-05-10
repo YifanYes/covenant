@@ -7,10 +7,14 @@ import type { DoctrineDefinition } from '@shared/types/doctrine.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
+import type { UserRepository } from '../repositories/user.repository'
 import { getCharacterProgress } from '../utils/character.utils'
 
 export class CharacterService {
-  constructor(private characterRepository: CharacterRepository) {}
+  constructor(
+    private characterRepository: CharacterRepository,
+    private userRepository: UserRepository
+  ) {}
 
   getCharacterProgress(character: CharacterWithClasses) {
     return getCharacterProgress(character)
@@ -49,6 +53,7 @@ export class CharacterService {
       tier,
       inventory: character.inventory as unknown,
       loadout: character.loadout as unknown,
+      tutorialCompletedAt: character.user?.tutorialCompletedAt ?? null,
       classes: character.classes.map((c) => ({
         id: c.id,
         className: c.className,
@@ -65,6 +70,18 @@ export class CharacterService {
         equippedDoctrines: (c as any).equippedDoctrines || []
       }))
     }
+  }
+
+  async updateName(userId: string, name: string) {
+    return this.characterRepository.updateName(userId, name)
+  }
+
+  async completeTutorial(userId: string) {
+    return this.userRepository.setTutorialCompletedAt(userId, new Date())
+  }
+
+  async resetTutorial(userId: string) {
+    return this.userRepository.setTutorialCompletedAt(userId, null)
   }
 
   async switchClass(userId: string, className: string) {

@@ -32,7 +32,7 @@
 - [ ] Account management — profile edit, data export `[blocker]`
   - Settings page covers email/language/theme/faction/logout/delete-account but lacks profile name/character edit and GDPR-compliant data export.
 
-- [ ] Add Github and X OAuth `[loop]`
+- [ ] Add Github OAuth `[loop]`
 
 - [ ] Render character with equipped items `[loop]`
   - Roadmap Phase 2 still pending: _"Renderizar el personaje con los items equipados"_. Visual feedback closes the gear loop — without it, equipping a sword feels invisible.
@@ -52,11 +52,10 @@
 - [ ] Discord setup — server, roles, welcome bot, weekly update template `[loop]`
   - Roadmap Phase 3 infrastructure block (Discord servidor, roles configurados, bot de bienvenida, template para weekly update). Beta tester comms channel.
 
-- [ ] Refactor `/src/server/routers/quest.router.ts` to layered architecture `[debt]`
-  - Currently bypasses the service/repository layers used by the rest of the backend.
-
 - [ ] Test coverage gaps for core gamification services `[debt]`
   - Missing tests: `habit.service.ts` (streaks + dice rewards), `objective.service.ts`, `area.service.ts`, `auth.service.ts`, `kill-record.service.ts`. CLAUDE.md flags habits + tier progression as critical paths.
+
+  - [ ] Use [NES.css](https://nostalgic-css.github.io/NES.css/) or [RPGUI](https://ronenness.github.io/RPGUI/) for the RPG views.
 
 ## Medium Priority
 

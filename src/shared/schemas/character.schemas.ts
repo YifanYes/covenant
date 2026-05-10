@@ -45,3 +45,8 @@ export const useDoctrineSchema = z.object({
   participationId: z.string().min(1)
 })
 export type UseDoctrineType = z.infer<typeof useDoctrineSchema>
+
+export const updateCharacterNameSchema = z.object({
+  name: z.string().trim().min(1).max(255)
+})
+export type UpdateCharacterNameType = z.infer<typeof updateCharacterNameSchema>
