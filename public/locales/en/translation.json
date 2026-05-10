@@ -1098,7 +1098,8 @@
     "dissolve": "Dissolve",
     "empty": {
       "title": "No allies yet, lone wolf?",
-      "description": "Found your own guild and rally companions, or paste an invite link from a friend. The road is shorter when traveled together."
+      "description": "Found your own guild and rally companions, or paste an invite link from a friend. The road is shorter when traveled together.",
+      "or": "or"
     },
     "create": {
       "title": "Found a Guild",
@@ -1106,7 +1107,8 @@
       "cta": "Found a Guild",
       "submit": "Found",
       "name_label": "Guild name",
-      "name_placeholder": "e.g. The Lantern Order"
+      "name_placeholder": "e.g. The Lantern Order",
+      "description_placeholder": "Describe your guild's purpose (optional)"
     },
     "tabs": {
       "forum": "Forum",
@@ -1131,6 +1133,12 @@
       "send": "Send",
       "delete_message": "Delete message",
       "unknown_user": "Unknown adventurer",
+      "relative": {
+        "just_now": "just now",
+        "minutes": "{{count}}m",
+        "hours": "{{count}}h",
+        "days": "{{count}}d"
+      },
       "error": {
         "send": "Could not send message",
         "delete": "Could not delete message"
@@ -1142,16 +1150,27 @@
       "generate": "Generate link",
       "revoke": "Revoke",
       "copied": "Invite link copied",
+      "copy_failed": "Could not copy invite link",
       "created": "New invite link generated",
       "revoked": "Invite link revoked",
       "none": "No active invites. Generate one to recruit allies.",
       "error_create": "Could not generate invite",
-      "error_revoke": "Could not revoke invite"
+      "error_revoke": "Could not revoke invite",
+      "expired": "Expired",
+      "expires_in_days": "Expires in {{count}}d",
+      "expires_in_hours": "Expires in {{count}}h",
+      "expires_in_minutes": "Expires in {{count}}m",
+      "uses_count": "{{used}} / {{max}} uses",
+      "unlimited": "∞"
     },
     "join": {
       "cta": "Join Guild",
       "invalid_title": "Invite unavailable",
       "invalid_description": "This invite is no longer valid. Ask the guild for a fresh link.",
+      "invalid_link": "Invalid invite link",
+      "paste_label": "Paste an invite link",
+      "paste_placeholder": "https://… or invite token",
+      "paste_cta": "Join",
       "member_count": "{{count}} of {{capacity}} members",
       "invalid_reason": {
         "expired": "This invite has expired.",

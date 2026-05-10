@@ -7,6 +7,7 @@ import { Shield } from 'pixelarticons/react'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import CreateGuildDialog from './_components/create-guild-dialog.component'
+import JoinByLinkInput from './_components/join-by-link-input.component'
 
 export default function GuildsLandingPage() {
   const { t } = useTranslation()
@@ -32,7 +33,19 @@ export default function GuildsLandingPage() {
         icon={<Shield className="h-8 w-8" />}
         title={t('guilds.empty.title')}
         description={t('guilds.empty.description')}
-        action={<CreateGuildDialog />}
+        descriptionClassName="max-w-lg"
+        actionFullWidth
+        action={
+          <div className="flex w-full max-w-2xl flex-col items-center gap-4">
+            <CreateGuildDialog />
+            <div className="flex w-full items-center gap-3 text-muted-foreground text-md">
+              <div className="h-px flex-1 bg-border" />
+              <span>{t('guilds.empty.or')}</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            <JoinByLinkInput />
+          </div>
+        }
       />
     </div>
   )

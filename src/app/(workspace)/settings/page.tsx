@@ -1,5 +1,6 @@
 'use client'
 
+import LoaderButton from '@/common/loader-button.component'
 import ThemeToggle from '@/common/theme-toggle.component'
 import FactionColorSelector from '@/forms/faction-color-selector.component'
 import SingleSelect from '@/forms/single-select.component'
@@ -176,14 +177,13 @@ function SettingsContent() {
           </Button>
         </div>
         <div className="flex flex-col gap-4">
-          <Button
+          <LoaderButton
             onClick={() => resetTutorialMutation.mutate()}
-            disabled={resetTutorialMutation.isPending}
+            isLoading={resetTutorialMutation.isPending}
             className="w-fit cursor-pointer"
             variant="outline"
-          >
-            {t('settings.replay_tutorial')}
-          </Button>
+            label={t('settings.replay_tutorial')}
+          />
         </div>
         <div className="pt-4">
           <ConfirmDeleteAccountDialog />

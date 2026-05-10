@@ -1,8 +1,24 @@
 import type { GuildMessage, PrismaClient } from '@/generated/prisma'
 
 export type GuildMessageWithAuthor = GuildMessage & {
-  user: { id: string; name: string | null; image: string | null }
+  user: {
+    id: string
+    name: string | null
+    image: string | null
+    character: { name: string } | null
+  }
 }
+
+const authorInclude = {
+  user: {
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      character: { select: { name: true } }
+    }
+  }
+} as const
 
 export class GuildMessageRepository {
   constructor(private prisma: PrismaClient) {}
@@ -18,7 +34,7 @@ export class GuildMessageRepository {
         deletedAt: null,
         ...(options.before && { createdAt: { lt: options.before } })
       },
-      include: { user: { select: { id: true, name: true, image: true } } },
+      include: authorInclude,
       orderBy: { createdAt: 'desc' },
       take: limit
     })
@@ -31,7 +47,7 @@ export class GuildMessageRepository {
   async create(data: { guildId: string; userId: string; content: string }): Promise<GuildMessageWithAuthor> {
     return this.prisma.guildMessage.create({
       data,
-      include: { user: { select: { id: true, name: true, image: true } } }
+      include: authorInclude
     })
   }
 

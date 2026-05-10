@@ -25,6 +25,7 @@ Analyze the current git changes, propose a conventional-commits message, get use
 
 ## Rules
 
+- Always create a single commit, even when the changes span multiple concerns or file types — do not split into multiple commits
 - Never push unless the user explicitly asks
 - Never use `--no-verify` or skip hooks
 - Keep the subject ≤72 chars, imperative mood, lowercase after the type

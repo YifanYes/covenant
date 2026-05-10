@@ -15,7 +15,12 @@ export type GuildMemberWithGuildAndMembers = GuildMember & {
       userId: string
       role: string
       joinedAt: Date
-      user: { id: string; name: string | null; image: string | null }
+      user: {
+        id: string
+        name: string | null
+        image: string | null
+        character: { name: string } | null
+      }
     }>
   }
 }
@@ -34,7 +39,16 @@ export class GuildMemberRepository {
         guild: {
           include: {
             members: {
-              include: { user: { select: { id: true, name: true, image: true } } },
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    image: true,
+                    character: { select: { name: true } }
+                  }
+                }
+              },
               orderBy: { joinedAt: 'asc' }
             }
           }

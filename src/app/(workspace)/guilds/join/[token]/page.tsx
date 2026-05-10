@@ -1,4 +1,5 @@
 'use client'
+import LoaderButton from '@/common/loader-button.component'
 import Button from '@/ui/button.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -69,12 +70,12 @@ export default function JoinByTokenPage() {
         <Button variant="outline" onClick={() => router.push('/guilds')}>
           {t('guilds.back')}
         </Button>
-        <Button
-          disabled={!valid || joinMutation.isPending}
+        <LoaderButton
+          disabled={!valid}
+          isLoading={joinMutation.isPending}
           onClick={() => joinMutation.mutate({ token })}
-        >
-          {t('guilds.join.cta')}
-        </Button>
+          label={t('guilds.join.cta')}
+        />
       </div>
     </div>
   )

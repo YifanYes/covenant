@@ -1,6 +1,7 @@
 'use client'
 
 import { MOODS } from '@shared/constants/journal.constants'
+import LoaderButton from '@/common/loader-button.component'
 import Button from '@/components/ui/button.component'
 import TiptapEditor from '@/components/ui/tiptap-editor.component'
 import Select, {
@@ -128,9 +129,12 @@ export default function JournalEditor() {
               {t('journaling.streak', { count: streakData.streak })}
             </span>
           )}
-          <Button onClick={handleSave} disabled={isLoading || !plainContent}>
-            {t('journaling.save')}
-          </Button>
+          <LoaderButton
+            onClick={handleSave}
+            isLoading={isLoading}
+            disabled={!plainContent}
+            label={t('journaling.save')}
+          />
         </div>
       </div>
     </div>
