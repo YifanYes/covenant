@@ -6,8 +6,7 @@
 
 ## Critical Priority
 
-- [ ] Onboarding tutorial — explain the core loop `[loop]`
-  - Roadmap Phase 3: _"Introducción funcional: Explicación del loop y consecuencias (evitar lore pesado)"_. No in-app tutorial exists. Beta users will drop off if the dice → combat → tier → gear loop isn't immediately legible.
+- [ ]
 
 ## High Priority
 
