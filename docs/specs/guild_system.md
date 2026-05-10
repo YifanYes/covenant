@@ -13,6 +13,9 @@ Phase 1 ships the **smallest social retention surface** that lets a user create 
 | Membership | **Single guild per user** | Mirrors Character 1:1; simpler invariants. Unique constraint on `GuildMember.userId`. |
 | Discovery | **Invite-only via shareable link** | No public directory ⇒ no abuse surface (search, capacity floods, moderation queue). |
 | Forum delivery | **Polling 7s** | No SSE/WS infra spike. Existing tRPC + TanStack Query pattern. |
+| Active invites per guild | **Cap of 5** | Limits link sprawl + abuse blast radius without forcing single-link UX. |
+| Default invite expiry | **7 days (168h max)** | Long enough for async onboarding, short enough to bound stale-link risk. |
+| Faction inheritance | **Guild faction = creator's `User.theme`** (fallback `HOLY_KNIGHTS`) | Keeps cosmetic theme aligned with founding member; no extra picker UI. |
 | Slice | **Phase 1 only** | Campaigns + rewards explicitly deferred. |
 
 ## What Shipped (Phase 1)
@@ -24,42 +27,50 @@ Four new models, synced via `pnpm db:push` (matches prod `railway.toml` startCom
 - `Guild` — `id` (uuid), `name`, `description`, `ownerId` (text, Better Auth), `factionName`, `capacity` (default 50)
 - `GuildMember` — composite (`guildId`, `userId`, `role` ∈ `OWNER` | `OFFICER` | `MEMBER`), **unique on `userId`** (single-guild)
 - `GuildMessage` — chat messages, soft-deleted via `deletedAt`
-- `GuildInvite` — token-based shareable link, `expiresAt`, optional `maxUses`, `revokedAt`
+- `GuildInvite` — token-based shareable link, `expiresAt`, optional `maxUses`, `usedCount`, `revokedAt`
 
 `User` updated with reverse relations (`guildMembership`, `ownedGuilds`, `guildMessages`).
 
 ### Backend
 
-- **Schemas**: `src/shared/schemas/guilds.schemas.ts` — Zod for all inputs + `GuildRole` enum
+- **Schemas**: `src/shared/schemas/guilds.schemas.ts` — Zod for all inputs + `GuildRole` enum. `updateRoleSchema` restricts target role to `OFFICER | MEMBER` (owner role transitions go through `transferOwnership` only). `inviteTokenSchema` enforces `^[a-f0-9]{48}$`.
 - **Repositories** (`src/server/repositories/`): `guild`, `guild-member`, `guild-message`, `guild-invite`
 - **Service** (`src/server/services/guild.service.ts`):
   - `createGuild`, `getMyGuild`, `updateGuild`, `dissolveGuild`
   - `leaveGuild` (last-owner guard: blocks if other members exist; auto-dissolves if sole member)
-  - `transferOwnership` (demotes prior owner to OFFICER)
+  - `transferOwnership` (demotes prior owner to OFFICER; rejects self-transfer + ghost target)
   - `kickMember`, `updateRole` (role-matrix enforcement)
-  - `createInvite`, `revokeInvite`, `listInvites`, `getInvitePreview`, `joinByToken`
+  - `createInvite` (capped at `MAX_ACTIVE_INVITES_PER_GUILD = 5`), `revokeInvite`, `listInvites`, `getInvitePreview`, `joinByToken`
   - `getMessages`, `sendMessage`, `deleteMessage` (author / OFFICER / OWNER)
-  - Tokens: `crypto.randomBytes(24).toString('hex')`, default 7-day expiry
+  - Tokens: `crypto.randomBytes(24).toString('hex')` (48-hex), default 7-day expiry
+  - Atomic invite claim: `updateMany` with predicate-narrowed `where` (revokedAt null, expiresAt gt now, usedCount lt maxUses) — compare-and-swap before insert
   - Permission helper: `requireRole(guildId, userId, allowedRoles[])` — generic "Resource not found or access denied" errors per existing convention
+  - Prisma `P2002` (unique violation) translated to "You already belong to a guild" in `createGuild` + `joinByToken`
+  - Faction default: `user.theme ?? 'HOLY_KNIGHTS'`
 - **Service factory**: registered as L2 (`src/server/services/service.factory.ts`)
-- **Router** (`src/server/routers/guilds.router.ts`): 14 procedures, mutations rate-limited via `RATE_LIMITS.write` / `RATE_LIMITS.strict`
+- **Router** (`src/server/routers/guilds.router.ts`): **16 procedures**
+  - Queries: `getMyGuild`, `listInvites`, `getInvitePreview`, `getMessages`
+  - Mutations: `create`, `update`, `dissolve`, `leave`, `transferOwnership`, `kickMember`, `updateRole`, `createInvite`, `revokeInvite`, `joinByToken`, `sendMessage`, `deleteMessage`
+  - Rate limits: `RATE_LIMITS.strict` for guild lifecycle + invite preview/join; `RATE_LIMITS.write` for member/message/invite mgmt mutations
 
 ### Frontend
 
 Routes under `src/app/(workspace)/guilds/`:
 
-- `page.tsx` — landing: empty-state + Create dialog when unaffiliated; redirect to `[guildId]` otherwise
-- `[guildId]/page.tsx` — tabbed view: **Forum** (default) / **Members** / **Settings** (officer+ only). Header actions: Leave (members) or Dissolve (owner)
+- `page.tsx` — landing: empty-state + Create dialog + join-by-link input when unaffiliated; redirect to `[guildId]` otherwise
+- `[guildId]/page.tsx` — tabbed view: **Forum** (default) / **Members** / **Settings** (officer+ only). Header dropdown (`MoreVertical`) exposes Leave (members) or Dissolve (owner)
 - `join/[token]/page.tsx` — invite preview + accept
 
 Components in `_components/`:
 
 - `create-guild-dialog.component.tsx`
-- `guild-forum.component.tsx` — polled at 7s via TanStack `refetchInterval`, scroll-to-bottom on new messages, inline delete for moderators / authors
+- `guild-forum.component.tsx` — polled at 7s via TanStack `refetchInterval`, `refetchIntervalInBackground: false`, scroll-to-bottom on new messages, inline delete for moderators / authors
 - `member-list.component.tsx` — role badges, kick + promote/demote actions
 - `invite-link-card.component.tsx` — generate / copy / revoke
+- `join-by-link-input.component.tsx` — paste full URL or token, parses `/guilds/join/<token>` and routes to preview page
+- `user-avatar.component.tsx` — shared avatar primitive
 
-Sidebar entry added to **RPG** section (`Shield` icon). `/guilds` added to `RPG_ROUTES` in workspace layout.
+Sidebar entry added to **RPG** section (`Shield` icon). `/guilds` added to `RPG_ROUTES` in `src/app/(workspace)/layout.tsx`.
 
 ### i18n
 
@@ -67,22 +78,29 @@ Sidebar entry added to **RPG** section (`Shield` icon). `/guilds` added to `RPG_
 
 ### Tests
 
-`src/server/__tests__/services/guild.service.test.ts` — 25 vitest cases covering:
+`src/server/__tests__/services/guild.service.test.ts` — **48 vitest cases** covering:
 
-- `createGuild` — rejects already-affiliated user
-- `joinByToken` — rejects expired / revoked / exhausted / over-capacity / already-affiliated
-- `leaveGuild` — last-owner guard, sole-member dissolve, normal-leave
+- `createGuild` — rejects already-affiliated user, creates owner-membership atomically, translates P2002 to friendly error
+- `updateGuild` / `dissolveGuild` — owner-only enforcement
+- `joinByToken` — rejects expired / revoked / exhausted (pre-tx) / over-capacity (in-tx) / already-affiliated; verifies atomic claim returning count 0; verifies P2002-in-tx translation
+- `leaveGuild` — last-owner guard, sole-member dissolve, normal-leave, missing-membership
 - `kickMember` — full permission matrix (OWNER/OFFICER/MEMBER × OWNER/OFFICER/MEMBER target)
-- `deleteMessage` — author / OFFICER / OWNER allowed; plain MEMBER blocked
-- `transferOwnership` — happy path, self-transfer rejected, ghost target rejected
+- `updateRole` — self-role-change rejected, non-owner caller rejected, member→officer happy path
+- `deleteMessage` — author / OFFICER / OWNER allowed; plain MEMBER blocked; non-member blocked
+- `transferOwnership` — happy path (demotes prior owner), self-transfer rejected, ghost target rejected
+- `createInvite` — active-invite cap, below-cap creation
+- `revokeInvite` — missing invite, non-officer/owner rejected, officer happy path
+- `getInvitePreview` — missing token, valid active, expired flag, revoked flag, exhausted flag
 
-Full suite: **346 passed**. `pnpm lint` ✓ · `npx tsc --noEmit` ✓ · `pnpm build` ✓.
+Full suite green. `pnpm lint` ✓ · `npx tsc --noEmit` ✓ · `pnpm build` ✓.
 
 ## Known Caveats (inherited)
 
-- **Race in `joinByToken` capacity check** — `countByGuild` runs *outside* the `$transaction`. Two concurrent joiners can both pass the count before either inserts. Acceptable for Phase 1; harden with `SERIALIZABLE` or in-tx count if real-world abuse appears.
+- **Capacity-check phantom-read race in `joinByToken`** — `count` runs *inside* the `$transaction` but Prisma/Postgres default isolation (`READ COMMITTED`) does not lock the member set. Two concurrent joiners can each read `count < capacity` before either insert, allowing the guild to exceed `capacity` by 1. Fix when needed: bump tx isolation to `SERIALIZABLE`, take an advisory lock keyed on `guildId`, or add a partial-unique invariant. Phase 1-acceptable.
 - **`GuildInvite.createdBy` has no FK** — plain text, audit-only. Becomes dangling text if creator deletes account. Harmless.
 - **Owner account deletion cascades to guild** — `User → Guild.ownerId onDelete: Cascade`. Sole-owner closing account = guild gone. Intended for MVP.
+- **`transferOwnership` API-only** — no dedicated UI button in Phase 1. Test via tRPC devtools or defer until Phase 1.5.
+- **Header actions in dropdown** — Leave / Dissolve live behind `MoreVertical` rather than as primary buttons. Intentional to keep tablist + member-progress as the primary header content; revisit if discoverability complaints surface.
 
 ## UI Smoke Test Checklist
 
@@ -90,20 +108,22 @@ Two browsers (one + incognito), `pnpm dev`. Walk this in order:
 
 ### Solo path
 
-- [ ] `/guilds` shows empty state with "Found a Guild" CTA when user has no guild
+- [ ] `/guilds` shows empty state with "Found a Guild" CTA + join-by-link input when user has no guild
 - [ ] Open Create dialog → submit empty name → Zod blocks (name min 3)
 - [ ] Submit valid name → toast success → redirect to `/guilds/<id>`
 - [ ] Sidebar shows **Guilds** entry under RPG section, faction-themed
 - [ ] `/guilds` re-visit auto-redirects to `/guilds/<id>` (already affiliated)
-- [ ] Header shows guild name, member count `1 / 50`, **Dissolve** button (owner)
+- [ ] Header shows guild name, role badge, member progress `1 / 50`, dropdown with **Dissolve** (owner)
 
 ### Invite + join
 
 - [ ] **Settings** tab visible (owner sees it)
 - [ ] Generate invite link → URL appears with `/guilds/join/<token>`
 - [ ] Copy button → toast "copied"; verify clipboard contents
+- [ ] Generate 5 invites → 6th attempt rejected with active-invite cap message
 - [ ] Open invite URL in second browser (logged in as different user) → preview shows guild name + `1 / 50 members`
 - [ ] Click **Join Guild** → toast success → lands on `/guilds/<id>`
+- [ ] Alt path: paste invite URL into join-by-link input on `/guilds` empty state → routes to preview
 - [ ] First browser: refresh / re-fetch → member count = `2 / 50`, second user appears in **Members** tab
 
 ### Forum
@@ -127,13 +147,13 @@ Two browsers (one + incognito), `pnpm dev`. Walk this in order:
 
 ### Ownership transfer
 
-- [ ] Owner promotes B to OFFICER (required for ownership transfer flow if implemented; Phase 1 only exposes via API — UI button can be added)
-- [ ] Note: Phase 1 ships `transferOwnership` mutation but no dedicated UI button. Test via tRPC devtools or skip until Phase 1.5
+- [ ] Phase 1 ships `transferOwnership` mutation but no dedicated UI button. Test via tRPC devtools or skip until Phase 1.5.
 
 ### Leave + dissolve
 
-- [ ] B (member) clicks Leave → confirm dialog → leaves → routes to `/guilds` empty state
-- [ ] A (sole owner) clicks Leave — blocked? Phase 1 design: sole-owner Leave auto-dissolves; *with* other members the API throws "Transfer ownership before leaving"
+- [ ] B (member) opens dropdown → Leave → confirm dialog → leaves → routes to `/guilds` empty state
+- [ ] A (sole owner) Leave — auto-dissolves the guild
+- [ ] A with other members present clicks Leave — API throws "Transfer ownership before leaving"
 - [ ] A clicks Dissolve → confirm → guild deleted → routes to `/guilds` empty state
 - [ ] All members, messages, invites cascade-deleted (verify via DB or attempt re-visit `/guilds/<old-id>`)
 
@@ -143,7 +163,7 @@ Two browsers (one + incognito), `pnpm dev`. Walk this in order:
 - [ ] Wait past expiry (or set short expiry via API) → preview shows "expired"
 - [ ] Invite with `maxUses: 1` → first user joins fine; second hits "use limit"
 - [ ] User already in another guild → join attempt throws "You already belong to a guild"
-- [ ] Guild at `capacity` (50) → join throws "at capacity"
+- [ ] Guild at `capacity` (50) → join throws "Guild is at capacity"
 
 ### Auth + edge
 
