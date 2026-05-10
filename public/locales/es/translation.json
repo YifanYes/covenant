@@ -1091,6 +1091,103 @@
     },
     "title": "Hábitos"
   },
+  "guilds": {
+    "title": "Hermandades",
+    "back": "Volver a Hermandades",
+    "leave": "Salir",
+    "dissolve": "Disolver",
+    "empty": {
+      "title": "¿Aún sin compañeros, lobo solitario?",
+      "description": "Funda tu propia hermandad y reúne aliados, o pega un enlace de invitación de un amigo. El camino es más corto cuando se recorre juntos."
+    },
+    "create": {
+      "title": "Fundar una Hermandad",
+      "description": "Planta tu estandarte. Recluta aliados. Construye algo legendario.",
+      "cta": "Fundar Hermandad",
+      "submit": "Fundar",
+      "name_label": "Nombre de la hermandad",
+      "name_placeholder": "p. ej. La Orden del Farol"
+    },
+    "tabs": {
+      "forum": "Foro",
+      "members": "Miembros",
+      "settings": "Ajustes"
+    },
+    "role": {
+      "owner": "Líder",
+      "officer": "Oficial",
+      "member": "Miembro"
+    },
+    "member": {
+      "you": "(tú)",
+      "joined": "Se unió",
+      "kick": "Expulsar de la hermandad",
+      "promote": "Promover a oficial",
+      "demote": "Degradar a miembro"
+    },
+    "forum": {
+      "empty": "Aún no hay mensajes. Sé el primero en romper el silencio.",
+      "placeholder": "Envía una misiva a la hermandad…",
+      "send": "Enviar",
+      "delete_message": "Eliminar mensaje",
+      "unknown_user": "Aventurero desconocido",
+      "error": {
+        "send": "No se pudo enviar el mensaje",
+        "delete": "No se pudo eliminar el mensaje"
+      }
+    },
+    "invite": {
+      "title": "Enlace de invitación",
+      "description": "Comparte este enlace con aliados de confianza. Expira en 7 días.",
+      "generate": "Generar enlace",
+      "revoke": "Revocar",
+      "copied": "Enlace de invitación copiado",
+      "created": "Nuevo enlace de invitación generado",
+      "revoked": "Enlace de invitación revocado",
+      "none": "Sin invitaciones activas. Genera una para reclutar aliados.",
+      "error_create": "No se pudo generar la invitación",
+      "error_revoke": "No se pudo revocar la invitación"
+    },
+    "join": {
+      "cta": "Unirse a la Hermandad",
+      "invalid_title": "Invitación no disponible",
+      "invalid_description": "Esta invitación ya no es válida. Pide a la hermandad un nuevo enlace.",
+      "member_count": "{{count}} de {{capacity}} miembros",
+      "invalid_reason": {
+        "expired": "Esta invitación ha caducado.",
+        "revoked": "Esta invitación fue revocada por la hermandad.",
+        "exhausted": "Esta invitación ha alcanzado su límite de usos.",
+        "unknown": "Esta invitación no está disponible."
+      }
+    },
+    "leave_confirm": {
+      "title": "¿Salir de esta hermandad?",
+      "description": "Perderás acceso al foro y a la lista de miembros. Podrás ser invitado de nuevo más tarde."
+    },
+    "dissolve_confirm": {
+      "title": "¿Disolver esta hermandad?",
+      "description": "Todos los miembros, mensajes e invitaciones se eliminarán permanentemente. Esta acción no se puede deshacer."
+    },
+    "success": {
+      "create": "Hermandad fundada. Que tu estandarte ondee siempre.",
+      "leave": "Has abandonado la hermandad.",
+      "dissolve": "Hermandad disuelta.",
+      "join": "Bienvenido a la hermandad.",
+      "kick": "Miembro expulsado.",
+      "role": "Rol actualizado."
+    },
+    "error": {
+      "create": "No se pudo fundar la hermandad",
+      "leave": "No se pudo salir de la hermandad",
+      "dissolve": "No se pudo disolver la hermandad",
+      "join": "No se pudo unir a la hermandad",
+      "kick": "No se pudo expulsar al miembro",
+      "role": "No se pudo actualizar el rol"
+    },
+    "errors": {
+      "not_member": "Esta hermandad no existe o no eres miembro."
+    }
+  },
   "icons": {
     "not_found": "No se encontraron iconos",
     "placeholder": "Seleccionar un icono",
@@ -1617,7 +1714,8 @@
     "quests": "Misiones",
     "settings": "Configuración",
     "shop": "Tienda",
-    "tasks": "Tareas"
+    "tasks": "Tareas",
+    "guilds": "Hermandades"
   },
   "sign_up": {
     "already_have_account": "¿Ya tienes cuenta?",

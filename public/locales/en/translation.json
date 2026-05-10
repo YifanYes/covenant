@@ -1091,6 +1091,103 @@
     },
     "title": "Habits"
   },
+  "guilds": {
+    "title": "Guilds",
+    "back": "Back to Guilds",
+    "leave": "Leave",
+    "dissolve": "Dissolve",
+    "empty": {
+      "title": "No allies yet, lone wolf?",
+      "description": "Found your own guild and rally companions, or paste an invite link from a friend. The road is shorter when traveled together."
+    },
+    "create": {
+      "title": "Found a Guild",
+      "description": "Plant your banner. Recruit allies. Build something legendary.",
+      "cta": "Found a Guild",
+      "submit": "Found",
+      "name_label": "Guild name",
+      "name_placeholder": "e.g. The Lantern Order"
+    },
+    "tabs": {
+      "forum": "Forum",
+      "members": "Members",
+      "settings": "Settings"
+    },
+    "role": {
+      "owner": "Owner",
+      "officer": "Officer",
+      "member": "Member"
+    },
+    "member": {
+      "you": "(you)",
+      "joined": "Joined",
+      "kick": "Remove from guild",
+      "promote": "Promote to officer",
+      "demote": "Demote to member"
+    },
+    "forum": {
+      "empty": "No messages yet. Be the first to break the silence.",
+      "placeholder": "Send a missive to the guild…",
+      "send": "Send",
+      "delete_message": "Delete message",
+      "unknown_user": "Unknown adventurer",
+      "error": {
+        "send": "Could not send message",
+        "delete": "Could not delete message"
+      }
+    },
+    "invite": {
+      "title": "Invite link",
+      "description": "Share this link with allies you trust. It expires in 7 days.",
+      "generate": "Generate link",
+      "revoke": "Revoke",
+      "copied": "Invite link copied",
+      "created": "New invite link generated",
+      "revoked": "Invite link revoked",
+      "none": "No active invites. Generate one to recruit allies.",
+      "error_create": "Could not generate invite",
+      "error_revoke": "Could not revoke invite"
+    },
+    "join": {
+      "cta": "Join Guild",
+      "invalid_title": "Invite unavailable",
+      "invalid_description": "This invite is no longer valid. Ask the guild for a fresh link.",
+      "member_count": "{{count}} of {{capacity}} members",
+      "invalid_reason": {
+        "expired": "This invite has expired.",
+        "revoked": "This invite was revoked by the guild.",
+        "exhausted": "This invite has reached its use limit.",
+        "unknown": "This invite is not available."
+      }
+    },
+    "leave_confirm": {
+      "title": "Leave this guild?",
+      "description": "You'll lose access to the forum and member list. You can be re-invited later."
+    },
+    "dissolve_confirm": {
+      "title": "Dissolve this guild?",
+      "description": "All members, messages, and invites will be permanently removed. This cannot be undone."
+    },
+    "success": {
+      "create": "Guild founded. Long may your banner fly.",
+      "leave": "You have left the guild.",
+      "dissolve": "Guild dissolved.",
+      "join": "Welcome to the guild.",
+      "kick": "Member removed.",
+      "role": "Role updated."
+    },
+    "error": {
+      "create": "Could not found guild",
+      "leave": "Could not leave guild",
+      "dissolve": "Could not dissolve guild",
+      "join": "Could not join guild",
+      "kick": "Could not remove member",
+      "role": "Could not update role"
+    },
+    "errors": {
+      "not_member": "This guild does not exist or you are not a member."
+    }
+  },
   "icons": {
     "not_found": "No icons found",
     "placeholder": "Select an icon",
@@ -1617,7 +1714,8 @@
     "quests": "Quests",
     "settings": "Settings",
     "shop": "Shop",
-    "tasks": "Tasks"
+    "tasks": "Tasks",
+    "guilds": "Guilds"
   },
   "sign_up": {
     "already_have_account": "Already have an account?",

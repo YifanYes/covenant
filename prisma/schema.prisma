@@ -23,6 +23,9 @@ model User {
   accounts             Account[]
   character            Character?
   journalEntries       JournalEntry[]
+  guildMembership      GuildMember?
+  ownedGuilds          Guild[]         @relation("GuildOwner")
+  guildMessages        GuildMessage[]
 
   @@map("users")
 }
@@ -261,5 +264,67 @@ model JournalEntry {
   @@unique([userId, createdAt])
   @@index([userId, createdAt])
   @@map("journal_entries")
+}
+
+model Guild {
+  id          String         @id @default(uuid()) @db.Uuid
+  name        String         @db.VarChar(80)
+  description String?        @db.VarChar(500)
+  ownerId     String
+  factionName String         @default("HOLY_KNIGHTS")
+  capacity    Int            @default(50)
+  createdAt   DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime       @updatedAt @db.Timestamp(6)
+  members     GuildMember[]
+  messages    GuildMessage[]
+  invites     GuildInvite[]
+  owner       User           @relation("GuildOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+  @@map("guilds")
+}
+
+model GuildMember {
+  id       String   @id @default(uuid()) @db.Uuid
+  guildId  String   @db.Uuid
+  userId   String
+  role     String   @default("MEMBER") @db.VarChar(20)
+  joinedAt DateTime @default(now()) @db.Timestamp(6)
+  guild    Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@index([guildId])
+  @@map("guild_members")
+}
+
+model GuildMessage {
+  id        String    @id @default(uuid()) @db.Uuid
+  guildId   String    @db.Uuid
+  userId    String
+  content   String    @db.VarChar(2000)
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt DateTime? @db.Timestamp(6)
+  guild     Guild     @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([guildId, createdAt])
+  @@map("guild_messages")
+}
+
+model GuildInvite {
+  id        String    @id @default(uuid()) @db.Uuid
+  guildId   String    @db.Uuid
+  token     String    @unique @db.VarChar(64)
+  createdBy String
+  expiresAt DateTime  @db.Timestamp(6)
+  maxUses   Int?
+  usedCount Int       @default(0)
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  revokedAt DateTime? @db.Timestamp(6)
+  guild     Guild     @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId])
+  @@map("guild_invites")
 }
 

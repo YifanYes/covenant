@@ -3,6 +3,10 @@ import { AreaRepository } from '../repositories/area.repository'
 import { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import { CharacterRepository } from '../repositories/character.repository'
 import { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
+import { GuildInviteRepository } from '../repositories/guild-invite.repository'
+import { GuildMemberRepository } from '../repositories/guild-member.repository'
+import { GuildMessageRepository } from '../repositories/guild-message.repository'
+import { GuildRepository } from '../repositories/guild.repository'
 import { HabitRepository } from '../repositories/habit.repository'
 import { JournalRepository } from '../repositories/journal.repository'
 import { ObjectiveRepository } from '../repositories/objective.repository'
@@ -14,6 +18,7 @@ import { CharacterService } from './character.service'
 import { CombatService } from './combat.service'
 import { DashboardService } from './dashboard.service'
 import { DiceService } from './dice.service'
+import { GuildService } from './guild.service'
 import { HabitService } from './habit.service'
 import { JournalService } from './journal.service'
 import { KillRecordService } from './kill-record.service'
@@ -33,6 +38,10 @@ export class ServiceFactory {
   private _areaRepository?: AreaRepository
   private _characterRepository?: CharacterRepository
   private _combatEnemyRepository?: CombatEnemyRepository
+  private _guildRepository?: GuildRepository
+  private _guildMemberRepository?: GuildMemberRepository
+  private _guildMessageRepository?: GuildMessageRepository
+  private _guildInviteRepository?: GuildInviteRepository
   private _habitRepository?: HabitRepository
   private _journalRepository?: JournalRepository
   private _objectiveRepository?: ObjectiveRepository
@@ -46,6 +55,7 @@ export class ServiceFactory {
   private _combatService?: CombatService
   private _dashboardService?: DashboardService
   private _diceService?: DiceService
+  private _guildService?: GuildService
   private _habitService?: HabitService
   private _journalService?: JournalService
   private _killRecordService?: KillRecordService
@@ -72,6 +82,22 @@ export class ServiceFactory {
 
   private get combatEnemyRepository(): CombatEnemyRepository {
     return (this._combatEnemyRepository ??= new CombatEnemyRepository(this.prisma))
+  }
+
+  private get guildRepository(): GuildRepository {
+    return (this._guildRepository ??= new GuildRepository(this.prisma))
+  }
+
+  private get guildMemberRepository(): GuildMemberRepository {
+    return (this._guildMemberRepository ??= new GuildMemberRepository(this.prisma))
+  }
+
+  private get guildMessageRepository(): GuildMessageRepository {
+    return (this._guildMessageRepository ??= new GuildMessageRepository(this.prisma))
+  }
+
+  private get guildInviteRepository(): GuildInviteRepository {
+    return (this._guildInviteRepository ??= new GuildInviteRepository(this.prisma))
   }
 
   private get habitRepository(): HabitRepository {
@@ -118,6 +144,17 @@ export class ServiceFactory {
       this.dice,
       this.combatEnemyRepository,
       this.killRecord
+    ))
+  }
+
+  get guild(): GuildService {
+    return (this._guildService ??= new GuildService(
+      this.prisma,
+      this.guildRepository,
+      this.guildMemberRepository,
+      this.guildMessageRepository,
+      this.guildInviteRepository,
+      this.userRepository
     ))
   }
 
