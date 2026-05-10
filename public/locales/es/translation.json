@@ -1698,6 +1698,15 @@
     "character_name_label": "Nombre del personaje",
     "character_name_updated": "Nombre del personaje actualizado",
     "character_name_error": "Error al actualizar el nombre del personaje",
+    "date_format_label": "Formato de fecha",
+    "date_format_placeholder": "Seleccionar formato de fecha",
+    "date_format_options": {
+      "L": "Predeterminado del idioma",
+      "MM/DD/YYYY": "Mes/Día/Año",
+      "DD/MM/YYYY": "Día/Mes/Año",
+      "YYYY-MM-DD": "ISO (Año-Mes-Día)",
+      "DD MMM YYYY": "Día Mes Año"
+    },
     "default_tasks_view_label": "Vista de tareas predeterminada",
     "default_tasks_view_placeholder": "Seleccionar vista predeterminada",
     "email_label": "Correo electrónico",
@@ -1711,7 +1720,9 @@
     "faction_theme_label": "Tema de Facción",
     "title": "Configuración",
     "replay_tutorial": "Repetir tutorial",
-    "replay_tutorial_error": "No se pudo reiniciar el tutorial. Inténtalo de nuevo."
+    "replay_tutorial_error": "No se pudo reiniciar el tutorial. Inténtalo de nuevo.",
+    "saved_success": "Configuración guardada",
+    "save_error": "Error al guardar la configuración"
   },
   "nav": {
     "quests": "Misiones"

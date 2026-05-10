@@ -8,7 +8,7 @@ import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState
 
 export type FactionTheme = Faction
 
-const FACTION_TO_CLASS: Record<Faction, string> = {
+export const FACTION_TO_CLASS: Record<Faction, string> = {
   [Faction.HOLY_KNIGHTS]: 'faction-holy-knights',
   [Faction.LEGION]: 'faction-legion',
   [Faction.ALCHEMISTS_LEAGUE]: 'faction-alchemists-league',

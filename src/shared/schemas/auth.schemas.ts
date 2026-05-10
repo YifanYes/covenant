@@ -25,6 +25,25 @@ export const updateThemeSchema = z.object({
 })
 export type UpdateThemeType = z.infer<typeof updateThemeSchema>
 
+export const DATE_FORMATS = ['L', 'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', 'DD MMM YYYY'] as const
+export const TASKS_VIEWS = ['list', 'table', 'matrix'] as const
+export const LOCALES = ['en', 'es'] as const
+export const COLOR_MODES = ['light', 'dark'] as const
+
+export const updateProfileSchema = z
+  .object({
+    characterName: z.string().trim().min(1).max(255).optional(),
+    theme: z.enum(Faction).optional(),
+    locale: z.enum(LOCALES).optional(),
+    colorMode: z.enum(COLOR_MODES).optional(),
+    defaultTasksView: z.enum(TASKS_VIEWS).optional(),
+    dateFormat: z.enum(DATE_FORMATS).optional()
+  })
+  .refine((d) => Object.values(d).some((v) => v !== undefined), {
+    message: 'errors.no_fields_to_update'
+  })
+export type UpdateProfileType = z.infer<typeof updateProfileSchema>
+
 export const forgotPasswordSchema = z.object({
   email: z.email('errors.invalid_email')
 })

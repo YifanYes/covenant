@@ -1698,6 +1698,15 @@
     "character_name_label": "Character Name",
     "character_name_updated": "Character name updated",
     "character_name_error": "Failed to update character name",
+    "date_format_label": "Date Format",
+    "date_format_placeholder": "Select date format",
+    "date_format_options": {
+      "L": "Locale default",
+      "MM/DD/YYYY": "Month/Day/Year",
+      "DD/MM/YYYY": "Day/Month/Year",
+      "YYYY-MM-DD": "ISO (Year-Month-Day)",
+      "DD MMM YYYY": "Day Month Year"
+    },
     "default_tasks_view_label": "Default Tasks View",
     "default_tasks_view_placeholder": "Select default view",
     "email_label": "Email",
@@ -1711,7 +1720,9 @@
     "faction_theme_label": "Faction Theme",
     "title": "Settings",
     "replay_tutorial": "Replay tutorial",
-    "replay_tutorial_error": "Failed to reset tutorial. Please try again."
+    "replay_tutorial_error": "Failed to reset tutorial. Please try again.",
+    "saved_success": "Settings saved",
+    "save_error": "Failed to save settings"
   },
   "nav": {
     "quests": "Quests"

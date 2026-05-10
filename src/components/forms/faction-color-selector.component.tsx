@@ -1,6 +1,5 @@
 'use client'
 
-import useFactionTheme from '@/hooks/use-faction-theme'
 import { cn } from '@/lib/cn.lib'
 import Label from '@/ui/label.component'
 import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
@@ -16,25 +15,30 @@ const FACTION_COLORS: Record<Faction, string> = {
   [Faction.BLOOD_PACT]: '#8c1c1c'
 }
 
-export default function FactionColorSelector({ className }: { className?: string }) {
-  const { faction, setFaction } = useFactionTheme()
+interface FactionColorSelectorProps {
+  value: Faction
+  onChange: (faction: Faction) => void
+  className?: string
+}
+
+export default function FactionColorSelector({ value, onChange, className }: FactionColorSelectorProps) {
   const { t } = useTranslation()
 
   return (
     <div className={cn('flex flex-col gap-4', className)}>
       <div className="flex flex-col gap-2">
         <Label>{t('settings.faction_theme_label')}</Label>
-        <span className="text-muted-foreground text-xs uppercase tracking-medium">{t(`factions.${faction}`)}</span>
+        <span className="text-muted-foreground text-xs uppercase tracking-medium">{t(`factions.${value}`)}</span>
       </div>
       <div className="flex flex-wrap gap-4">
         {Object.values(Faction).map((f) => {
-          const isActive = faction === f
+          const isActive = value === f
           const factionName = t(`factions.${f}`)
           return (
             <Tooltip key={f}>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => setFaction(f)}
+                  onClick={() => onChange(f)}
                   className={cn(
                     'group relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:scale-110 active:scale-95',
                     isActive
