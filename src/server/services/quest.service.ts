@@ -3,13 +3,7 @@ import { applyStatScaling } from '@shared/constants/enemies'
 import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import type { EncounterState } from '@shared/types/combat.types'
-import {
-  PLAYER_TEMPLATE_ID,
-  TACTICAL_STATE_VERSION,
-  TerrainType,
-  type TacticalStateData,
-  type TileState
-} from '@shared/types/tactical-combat.types'
+import type { TacticalStateData } from '@shared/types/tactical-combat.types'
 import type { CharacterClassType } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
 import { aggregateLoadoutStats } from '@shared/constants/items'
@@ -63,23 +57,10 @@ export class QuestService {
     }
   }): TacticalStateData {
     const { player, enemy } = opts
-    const tiles: TileState[][] = [
-      [
-        {
-          position: { x: 0, y: 0 },
-          terrain: TerrainType.GRASS,
-          occupantId: null,
-          isWalkable: true
-        }
-      ]
-    ]
 
     const playerUnit = {
       id: player.unitId,
-      templateId: PLAYER_TEMPLATE_ID,
       name: player.name,
-      hasMoved: false,
-      hasActed: false,
       currentHealth: player.health.current,
       maxHealth: player.health.max,
       currentMana: player.mana.current,
@@ -95,8 +76,6 @@ export class QuestService {
       id: enemy.unitId,
       templateId: enemy.templateId,
       name: enemy.name,
-      hasMoved: false,
-      hasActed: false,
       currentHealth: enemy.health.current,
       maxHealth: enemy.health.max,
       currentMana: enemy.mana.current,
@@ -116,7 +95,6 @@ export class QuestService {
     const turnOrder = [...units]
       .sort((a, b) => {
         if (b.speed !== a.speed) return b.speed - a.speed
-        // Stable: player before enemy on ties
         if (a.id.startsWith('player-')) return -1
         if (b.id.startsWith('player-')) return 1
         return 0
@@ -124,15 +102,9 @@ export class QuestService {
       .map((u) => u.id)
 
     return {
-      stateVersion: TACTICAL_STATE_VERSION,
-      mapTemplateId: 'default',
-      gridWidth: 1,
-      gridHeight: 1,
-      tiles,
       units,
       turnOrder,
-      currentTurnIndex: 0,
-      turnNumber: 1
+      currentTurnIndex: 0
     }
   }
 
@@ -310,9 +282,40 @@ export class QuestService {
   async getTacticalState(questId: string, userId: string): Promise<TacticalStateData | null> {
     await this.assertQuestOwnership(questId, userId)
 
+    // Repository parses the JSON column through a tolerant schema, so legacy Phaser-grid
+    // fields (tiles, gridWidth, turnNumber, position, hasMoved, stateVersion…) are
+    // already stripped and malformed rows surface as `null` here.
     const result = await this.characterQuestRepository.findByIdWithTacticalState(questId)
-    const state = result?.tacticalState ?? null
-    if (state && state.stateVersion !== TACTICAL_STATE_VERSION) return null
-    return state
+    if (!result || !result.tacticalState) return null
+    const state = result.tacticalState
+
+    // Reconcile player unit's HP/MP caps against the live character class.
+    // The tactical state is a snapshot taken at quest start; if the character's
+    // maxHealth/maxMana changed afterwards (tier-up, revive, balance tuning),
+    // the snapshot drifts and the combat HUD shows stale numbers. Current HP/MP
+    // are kept in sync by move-resolution writing back to the character row after
+    // every move, so we only need to refresh the caps and clamp current values.
+    const character = await this.characterService.getCharacterById(result.characterId)
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) return state
+
+    const reconciledUnits = state.units.map((u) => {
+      if (!u.id.startsWith('player-')) return u
+      const maxHealth = currentClass.maxHealth
+      const maxMana = currentClass.maxMana
+      const currentHealth = Math.max(0, Math.min(currentClass.health, maxHealth))
+      const currentMana = Math.max(0, Math.min(currentClass.mana, maxMana))
+      if (
+        u.maxHealth === maxHealth &&
+        u.maxMana === maxMana &&
+        u.currentHealth === currentHealth &&
+        u.currentMana === currentMana
+      ) {
+        return u
+      }
+      return { ...u, maxHealth, maxMana, currentHealth, currentMana }
+    })
+
+    return { ...state, units: reconciledUnits }
   }
 }

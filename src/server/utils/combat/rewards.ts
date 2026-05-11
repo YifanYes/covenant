@@ -3,11 +3,7 @@ import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constan
 import { applyStatScaling, calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import type { EncounterState } from '@shared/types/combat.types'
-import {
-  TACTICAL_STATE_VERSION,
-  type TacticalStateData,
-  type TacticalUnitState
-} from '@shared/types/tactical-combat.types'
+import type { TacticalStateData, TacticalUnitState } from '@shared/types/tactical-combat.types'
 import type { CharacterQuestRepository } from '../../repositories/character-quest.repository'
 import type { CharacterRepository } from '../../repositories/character.repository'
 import type { CombatEnemyRepository } from '../../repositories/combat-enemy.repository'
@@ -227,7 +223,7 @@ export async function processEnemyDefeat(
  * happens in QuestService before this is called).
  */
 export function createTacticalStateWithNewEnemy(
-  currentState: TacticalStateData,
+  _currentState: TacticalStateData,
   playerUnit: TacticalUnitState,
   newEnemy: {
     id: string
@@ -240,18 +236,10 @@ export function createTacticalStateWithNewEnemy(
     moves: string[]
   }
 ): TacticalStateData {
-  const updatedPlayerUnit: TacticalUnitState = {
-    ...playerUnit,
-    hasMoved: false,
-    hasActed: false
-  }
-
   const newEnemyUnit: TacticalUnitState = {
     id: newEnemy.id,
     templateId: newEnemy.templateId,
     name: newEnemy.name,
-    hasMoved: false,
-    hasActed: false,
     currentHealth: newEnemy.health.current,
     maxHealth: newEnemy.health.max,
     currentMana: newEnemy.mana.current,
@@ -265,7 +253,7 @@ export function createTacticalStateWithNewEnemy(
     moves: newEnemy.moves
   }
 
-  const units = [updatedPlayerUnit, newEnemyUnit]
+  const units = [playerUnit, newEnemyUnit]
   // Pokémon-style turn order: higher speed acts first; on tie, player wins initiative
   // (deterministic to avoid race that throws "Not this unit's turn" on first click).
   const turnOrder = [...units]
@@ -278,14 +266,8 @@ export function createTacticalStateWithNewEnemy(
     .map((u) => u.id)
 
   return {
-    stateVersion: TACTICAL_STATE_VERSION,
-    mapTemplateId: currentState.mapTemplateId,
-    gridWidth: currentState.gridWidth,
-    gridHeight: currentState.gridHeight,
-    tiles: currentState.tiles,
     units,
     turnOrder,
-    currentTurnIndex: 0,
-    turnNumber: 1
+    currentTurnIndex: 0
   }
 }

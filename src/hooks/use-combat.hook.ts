@@ -59,7 +59,7 @@ export function useCombat(
             const nameParts = u.name.includes('|') ? u.name.split('|') : [u.name, '']
             return {
               id: u.id,
-              templateId: u.templateId,
+              templateId: u.templateId ?? '',
               currentHealth: u.currentHealth,
               maxHealth: u.maxHealth,
               currentMana: u.currentMana ?? 0,

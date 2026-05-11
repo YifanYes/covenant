@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@/generated/prisma'
 import type { ActiveStatusEffect } from '@shared/types/ability.types'
 import type { QuestStatus } from '@shared/constants/quests'
-import type { TacticalStateData } from '@shared/types/tactical-combat.types'
+import { parseTacticalState, type TacticalStateData } from '@shared/types/tactical-combat.types'
 
 export class CharacterQuestRepository {
   constructor(private prisma: PrismaClient) {}
@@ -44,7 +44,7 @@ export class CharacterQuestRepository {
       progress: result.progress,
       target: result.target,
       goldEarned: result.goldEarned,
-      tacticalState: result.tacticalState as unknown as TacticalStateData | null
+      tacticalState: parseTacticalState(result.tacticalState)
     }
   }
 
@@ -63,7 +63,7 @@ export class CharacterQuestRepository {
     return {
       id: result.id,
       characterId: result.characterId,
-      tacticalState: result.tacticalState as unknown as TacticalStateData | null
+      tacticalState: parseTacticalState(result.tacticalState)
     }
   }
 

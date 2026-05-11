@@ -132,7 +132,7 @@ describe('QuestService', () => {
       )
       expect(mockCharacterQuestRepo.updateTacticalState).toHaveBeenCalledWith(
         'new-quest-id',
-        expect.objectContaining({ stateVersion: 4 })
+        expect.objectContaining({ turnOrder: expect.any(Array), currentTurnIndex: 0 })
       )
     })
   })
@@ -236,16 +236,41 @@ describe('QuestService', () => {
   })
 
   describe('getTacticalState', () => {
+    const fullUnit = (over: Partial<Record<string, unknown>> & { id: string }) => ({
+      name: over.id,
+      currentHealth: 40,
+      maxHealth: 40,
+      currentMana: 5,
+      maxMana: 5,
+      speed: 1,
+      strengthAtk: 4,
+      strengthDef: 4,
+      magicAtk: 5,
+      magicDef: 5,
+      ...over
+    })
+
     it('returns the tactical state for a quest', async () => {
-      const tacticalState = { stateVersion: 4, units: [] }
+      const tacticalState = {
+        units: [fullUnit({ id: 'player-1' }), fullUnit({ id: 'enemy-1', templateId: 'shadow_demon' })],
+        turnOrder: ['player-1', 'enemy-1'],
+        currentTurnIndex: 0
+      }
       mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
         id: 'quest-instance-1',
         characterId: 'char-123',
         tacticalState
       })
+      mockCharacterService.getCharacterById.mockResolvedValue(
+        mockCharacter({
+          currentClass: 'TEMPLAR',
+          classes: [{ id: 'class-1', className: 'TEMPLAR', tier: 1, health: 40, maxHealth: 40, mana: 5, maxMana: 5 }]
+        })
+      )
 
       const result = await questService.getTacticalState('quest-instance-1', 'user-123')
-      expect(result).toEqual(tacticalState)
+      expect(result?.turnOrder).toEqual(['player-1', 'enemy-1'])
+      expect(result?.units).toHaveLength(2)
     })
 
     it('returns null if quest not found', async () => {
@@ -255,15 +280,49 @@ describe('QuestService', () => {
       expect(result).toBeNull()
     })
 
-    it('returns null if state version mismatches', async () => {
+    it('returns null when repo surfaces null tacticalState (parse failed at boundary)', async () => {
       mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
         id: 'quest-instance-1',
         characterId: 'char-123',
-        tacticalState: { stateVersion: 1, units: [] }
+        tacticalState: null
       })
 
       const result = await questService.getTacticalState('quest-instance-1', 'user-123')
       expect(result).toBeNull()
+    })
+
+    it('reconciles stale player HP/MP caps against the live character class', async () => {
+      const staleState = {
+        units: [
+          fullUnit({ id: 'player-1', currentHealth: 0, maxHealth: 8, currentMana: 2, maxMana: 3 }),
+          fullUnit({ id: 'enemy-1', currentHealth: 5, maxHealth: 10, templateId: 'shadow_demon' })
+        ],
+        turnOrder: ['player-1', 'enemy-1'],
+        currentTurnIndex: 0
+      }
+      mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
+        id: 'quest-instance-1',
+        characterId: 'char-123',
+        tacticalState: staleState
+      })
+      mockCharacterService.getCharacterById.mockResolvedValue(
+        mockCharacter({
+          currentClass: 'TEMPLAR',
+          classes: [{ id: 'class-1', className: 'TEMPLAR', tier: 1, health: 40, maxHealth: 40, mana: 5, maxMana: 5 }]
+        })
+      )
+
+      const result = await questService.getTacticalState('quest-instance-1', 'user-123')
+      const player = result!.units.find((u) => u.id === 'player-1')!
+      expect(player.maxHealth).toBe(40)
+      expect(player.currentHealth).toBe(40)
+      expect(player.maxMana).toBe(5)
+      expect(player.currentMana).toBe(5)
+
+      const enemy = result!.units.find((u) => u.id === 'enemy-1')!
+      expect(enemy.maxHealth).toBe(10)
+      expect(enemy.currentHealth).toBe(5)
+      expect(enemy.templateId).toBe('shadow_demon')
     })
 
     it('throws NOT_FOUND if user does not own the quest', async () => {

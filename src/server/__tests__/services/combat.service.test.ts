@@ -1,10 +1,5 @@
 import { ItemType } from '@shared/types/gamification.types'
-import {
-  PLAYER_TEMPLATE_ID,
-  TACTICAL_STATE_VERSION,
-  type TacticalStateData,
-  type TileState
-} from '@shared/types/tactical-combat.types'
+import type { TacticalStateData } from '@shared/types/tactical-combat.types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CombatService } from '../../services/combat.service'
 
@@ -42,37 +37,25 @@ const createMockCharacter = (
   ]
 })
 
-const createTacticalStateForConsumable = (playerHealth: number, maxHealth: number): TacticalStateData => {
-  const tiles: TileState[][] = []
-  return {
-    stateVersion: TACTICAL_STATE_VERSION,
-    mapTemplateId: 'test-map',
-    gridWidth: 1,
-    gridHeight: 1,
-    tiles,
-    units: [
-      {
-        id: 'player-1',
-        templateId: PLAYER_TEMPLATE_ID,
-        name: 'Player',
-        hasMoved: false,
-        hasActed: false,
-        currentHealth: playerHealth,
-        maxHealth,
-        currentMana: 0,
-        maxMana: 0,
-        speed: 1,
-        strengthAtk: 5,
-        strengthDef: 5,
-        magicAtk: 5,
-        magicDef: 5
-      }
-    ],
-    turnOrder: ['player-1'],
-    currentTurnIndex: 0,
-    turnNumber: 1
-  }
-}
+const createTacticalStateForConsumable = (playerHealth: number, maxHealth: number): TacticalStateData => ({
+  units: [
+    {
+      id: 'player-1',
+      name: 'Player',
+      currentHealth: playerHealth,
+      maxHealth,
+      currentMana: 0,
+      maxMana: 0,
+      speed: 1,
+      strengthAtk: 5,
+      strengthDef: 5,
+      magicAtk: 5,
+      magicDef: 5
+    }
+  ],
+  turnOrder: ['player-1'],
+  currentTurnIndex: 0
+})
 
 describe('CombatService (Phase 2A)', () => {
   let combatService: CombatService

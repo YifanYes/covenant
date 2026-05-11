@@ -12,4 +12,3 @@ The Pokémon-style combat rewrite (formerly Phase 2 sub-phases 2a + 2b + 2c) mer
 
 - Single big diff (~25 modified files, several deletes, two new services). Reviewers need to walk by commit, not file.
 - No partial rollback: reverting the combat rewrite reverts everything in 2A together. Acceptable because the resource model swap is one logical unit.
-- The `TACTICAL_STATE_VERSION` bump in 2A (3 → 4) invalidates in-flight Encounters at deploy. Beta-acceptable.

@@ -364,7 +364,7 @@ export async function executeMove(args: {
     }
   }
 
-  // Mark caster as acted; decrement their buffs (single-turn buffs expire after action).
+  // Decrement caster's buffs (single-turn buffs expire after action).
   {
     const ci = findUnitIndex(state, casterId)
     if (ci >= 0) {
@@ -372,7 +372,6 @@ export async function executeMove(args: {
       state = {
         ...state,
         units: withUpdated(state, ci, {
-          hasActed: true,
           activeAbilities: decremented.activeAbilities
         })
       }
@@ -382,9 +381,17 @@ export async function executeMove(args: {
   // Filter out dead enemies; keep dead players for death dialog.
   const aliveUnits = state.units.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0)
   const aliveTurnOrder = state.turnOrder.filter((id) => aliveUnits.find((u) => u.id === id && u.currentHealth > 0))
-  let currentIdx = state.currentTurnIndex
-  if (currentIdx >= aliveTurnOrder.length) currentIdx = 0
-  state = { ...state, units: aliveUnits, turnOrder: aliveTurnOrder, currentTurnIndex: currentIdx }
+  // Advance pointer to the next living unit (Pokémon-style round robin) so the
+  // next call to executeMove — typically the enemy AI turn — passes the turn check.
+  let nextTurnIndex = 0
+  if (aliveTurnOrder.length > 0) {
+    const casterPos = aliveTurnOrder.indexOf(casterId)
+    nextTurnIndex =
+      casterPos < 0
+        ? state.currentTurnIndex % aliveTurnOrder.length
+        : (casterPos + 1) % aliveTurnOrder.length
+  }
+  state = { ...state, units: aliveUnits, turnOrder: aliveTurnOrder, currentTurnIndex: nextTurnIndex }
 
   await repos.characterQuestRepository.updateTacticalState(participationId, state)
 
@@ -501,7 +508,7 @@ export async function executeEnemyMove(args: {
   if (enemyIdx >= 0) {
     const e = state.units[enemyIdx]
     let dotDamage = 0
-    const isDemon = e.templateId.includes('demon')
+    const isDemon = e.templateId?.includes('demon') ?? false
     for (const eff of e.activeEffects ?? []) {
       if (eff.remainingTurns <= 0) continue
       if (eff.effect === StatusEffect.BURNING && !isDemon) dotDamage += 5
