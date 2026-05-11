@@ -17,7 +17,7 @@ If you only read one section, make it the security one. The features are fun, bu
 
 ### Magic links → email + password
 
-For the first few months Covenant used Better Auth's magic-link flow. It was a great way to get to a working login screen without writing a password form. It was also wrong for our users. Heroes do not want to context-switch into their inbox every time they want to log a habit, and our retention numbers showed it.
+For the first few months Covenant used Better Auth's magic-link flow. It was a great way to get to a working login screen without writing a password form. It is also the wrong default for this product. Covenant is not open to users yet, but a habit tracker that forces you into your inbox every time you want to log a habit is dead on arrival, and I would rather not ship that.
 
 So we ripped it out. Two commits did the heavy lifting:
 
@@ -32,7 +32,7 @@ Better Auth handles the hashing (argon2id) and token generation; we own the emai
 
 Once you have password login, you also have password brute force. Two follow-ups closed the obvious holes:
 
-- `7ec2057 feat: add account lockout for repeated failed sign-ins` — after N failed attempts within a window, the account is temporarily locked. The counter is per-account, not per-IP, because IP-based locks are trivially bypassed and punish users behind shared NATs.
+- `7ec2057 feat: add account lockout for repeated failed sign-ins` — after N failed attempts within a window, the account is temporarily locked. The counter is per-account, not per-IP, because IP-based locks are trivially bypassed and punish anyone behind a shared NAT.
 - `e748e73 feat: add in-memory rate limiting to tRPC endpoints` — a process-local token bucket sitting in front of the tRPC router. It is intentionally in-memory: we are still on a single Railway service, so a Redis hop would be more latency than security. When we scale horizontally we will swap the implementation behind the same interface.
 
 Both ship with audit log entries, which leads to:
@@ -42,7 +42,7 @@ Both ship with audit log entries, which leads to:
 - `d58dd90 feat: add audit logging for auth events`
 - `f44e8f8 feat: migrate transactional email to brevo, add auth logging, and consolidate agent docs`
 
-Every sign-in, sign-out, failed attempt, password change, and lockout now writes a structured audit row. The schema is intentionally narrow (actor, event type, ip, user agent, timestamp, metadata JSON) so we do not regret the shape later. The immediate use is incident response; the longer-term use is user-visible "recent activity" panels in account settings.
+Every sign-in, sign-out, failed attempt, password change, and lockout now writes a structured audit row. The schema is intentionally narrow (actor, event type, ip, user agent, timestamp, metadata JSON) so I do not regret the shape later. The immediate use is incident response when the app opens up; the longer-term use is user-visible "recent activity" panels in account settings.
 
 ### Hashing session tokens at rest
 
@@ -54,7 +54,7 @@ This is the change I am most proud of from the week. Better Auth stores session 
 
 - `5efc494 feat: extend session expiration from 7 to 30 days`
 
-A one-line change, but a deliberate one. With password auth, hashed tokens at rest, lockout, and audit logging in place, the security cost of a longer session is much lower than it was a week ago. The UX cost of a 7-day session is high — productivity tools punish you every time they log you out. 30 days is the new default.
+A one-line change, but a deliberate one. With password auth, hashed tokens at rest, lockout, and audit logging in place, the security cost of a longer session is much lower than it was a week ago. The UX cost of a 7-day session is high — a productivity tool that logs you out every week is a productivity tool you abandon. 30 days is the new default.
 
 ---
 
@@ -74,7 +74,7 @@ If you are building on tRPC and have not done a pass like this, do it this week.
 
 > `7dc71e0 feat: guilds phase 1 (#138)` — 49 files, +3,330 lines
 
-Guilds are Covenant's social layer. A guild is a small group of players who share a forum, can see each other's progress at a coarse level, and (in later phases) will share quest objectives.
+Guilds are Covenant's social layer. A guild will be a small group of players who share a forum, can see each other's progress at a coarse level, and (in later phases) will share quest objectives.
 
 Phase 1 ships:
 
@@ -114,7 +114,7 @@ Daily journaling is the habit-tracker feature I have been wanting since day one.
 - A mood selector (1–5 scale, with emoji) that feeds a calendar heatmap.
 - A dice roll on save: a small chance of a bonus reward to make the act of writing feel like an event.
 
-The dice roll is deliberately stingy. The point of the reward is to celebrate the act of showing up, not to grind for. If players start optimizing journaling for loot, we have failed at the design.
+The dice roll is deliberately stingy. The point of the reward is to celebrate the act of showing up, not to grind for. If players ever start optimizing journaling for loot, the design has failed.
 
 Spec at `docs/product/journaling.md`.
 
@@ -124,7 +124,7 @@ Spec at `docs/product/journaling.md`.
 
 > `6883155 feat: redesign combat UI with Pokémon-style arena layout and menu-driven action bar`
 
-The previous combat screen was a side-scrolling experiment that nobody loved. The new one is a fixed two-character arena (player left, monster right) with a menu-driven action bar at the bottom. If you grew up on Game Boy RPGs, you will recognize the layout.
+The previous combat screen was a side-scrolling experiment that never quite clicked for me. The new one is a fixed two-character arena (player left, monster right) with a menu-driven action bar at the bottom. If you grew up on Game Boy RPGs, you will recognize the layout.
 
 Why this layout: it scales from mobile to desktop without a separate design pass, it makes the available actions obvious (no hunting for buttons), and it gives us a stable canvas for future animations. Spec at `docs/product/combat_ui_pokemon-style.md`.
 
@@ -136,7 +136,7 @@ The combat sprite was also optimized in `2a71b94` — a small change that knocke
 
 > `d88b185 feat: add onboarding tutorial dialog and character name editing`
 
-New users were dropping off the onboarding funnel between "create character" and "first action". The tutorial dialog walks them through the four core verbs (task, habit, objective, quest) with a single-screen overlay that they can dismiss at any time.
+Walking through the app from a cold start, the gap between "create character" and "first action" felt brutal — nothing on screen told a new player what to do next. The tutorial dialog walks through the four core verbs (task, habit, objective, quest) with a single-screen overlay that can be dismissed at any time.
 
 Character name editing was a bug in disguise: the onboarding form let you set a name once and never change it, which was not intentional. It is now a normal field on the settings page.
 
@@ -151,9 +151,9 @@ Three commits in a row:
 - `68c7d8a feat: add empty state to objectives page`
 - `a1946f9 feat: add RPG-themed empty states across tasks and habits views`
 
-A blank list with no copy is the worst onboarding experience there is. Every list view in the workspace now has an empty state that tells the user (a) what this section is for, (b) what to do first, and (c) a tonal nudge in the direction of "you are a hero on a quest." The copy follows the tone guide in AGENTS.md.
+A blank list with no copy is the worst possible first impression. Every list view in the workspace now has an empty state that tells the user (a) what this section is for, (b) what to do first, and (c) a tonal nudge in the direction of "you are a hero on a quest." The copy follows the tone guide in AGENTS.md.
 
-This is the kind of work that does not show up in feature lists but moves activation rates more than any single feature.
+This is the kind of work that does not show up in feature lists but will matter on day one when the app opens.
 
 ---
 
@@ -161,7 +161,7 @@ This is the kind of work that does not show up in feature lists but moves activa
 
 > `0434c12 feat: unify settings form and add date format preference`
 
-The settings page used to be three separate forms with three separate save buttons and three different validation patterns. It is now one form, one schema, one button. We also added a `dateFormat` preference (ISO, US, EU) that flows through to every date display in the app via a single formatter helper.
+The settings page used to be three separate forms with three separate save buttons and three different validation patterns. It is now one form, one schema, one button. A `dateFormat` preference (ISO, US, EU) was added in the same pass, flowing through to every date display in the app via a single formatter helper.
 
 ---
 
@@ -169,7 +169,7 @@ The settings page used to be three separate forms with three separate save butto
 
 > `66fe568 feat: pixelarticons (#137)` — 93 files
 
-We swapped the icon library for [pixelarticons](https://pixelarticons.com/) across the entire workspace. The previous library was tonally inconsistent — some icons were flat, some were outlined, some had drop shadows. Pixelarticons gives us a single visual language that matches the pixel-RPG identity of the rest of the product.
+The icon library was swapped for [pixelarticons](https://pixelarticons.com/) across the entire workspace. The previous library was tonally inconsistent — some icons were flat, some were outlined, some had drop shadows. Pixelarticons gives a single visual language that matches the pixel-RPG identity of the rest of the product.
 
 This was the longest-running open PR of the week because every icon import had to be reviewed by hand. Worth it.
 
@@ -182,9 +182,9 @@ Three commits:
 - `f44e8f8 feat: migrate transactional email to brevo, add auth logging, and consolidate agent docs`
 - `14a4900 feat: add locale-aware themed transactional emails with i18n support`
 
-We moved transactional email off the previous provider onto Brevo. The trigger was deliverability — magic-link emails were landing in spam for a non-trivial fraction of new users, and we have no patience for that. Brevo's free tier covers our current volume comfortably.
+Transactional email was moved off the previous provider onto Brevo. The trigger was deliverability — test sends of magic-link emails were landing in spam often enough that the same problem would absolutely bite real users on launch day. Brevo's free tier covers the foreseeable volume comfortably.
 
-The locale-aware templates render the email in the user's language (English or Spanish for now) using the same i18n keys as the app. This is one of those changes that is mostly invisible until your first non-English user signs up and their welcome email is in Spanish, and then it is delightful.
+The locale-aware templates render the email in the user's language (English or Spanish for now) using the same i18n keys as the app. This is one of those changes that will be invisible until the first non-English user signs up and gets their welcome email in Spanish, and then it will be delightful.
 
 ---
 
@@ -203,21 +203,21 @@ Two commits:
 - `5f7c087 feat: integrate sentry for error monitoring and restructure docs`
 - `adb4e0c fix: only use sentry in prod`
 
-Sentry was added on May 8, then immediately scoped to production three days later. The development environment was firing Sentry events on every hot-reload error, which is not useful and burns your free quota. The fix wraps the Sentry init in `if (process.env.NODE_ENV === 'production')` and short-circuits the SDK calls otherwise. Net diff: -1,082 lines, because the dev paths no longer needed the Sentry-aware error handling.
+Sentry was added on May 8, then immediately scoped to production three days later. The development environment was firing Sentry events on every hot-reload error, which is not useful and burns the free quota. The fix wraps the Sentry init in `if (process.env.NODE_ENV === 'production')` and short-circuits the SDK calls otherwise. Net diff: -1,082 lines, because the dev paths no longer needed the Sentry-aware error handling.
 
 ---
 
 ## 14. Infrastructure: CI, pre-push hook, Next.js bump
 
-- `2015fd6 chore: add ci pipeline, husky pre-push hook, and fix lint warnings` — every push now runs the same `pnpm install --frozen-lockfile && prisma generate && lint && tsc && build && test:run` chain that Railway runs on deploy. If your push lands, your Railway build will land. Local feedback loop matters more than CI feedback loop, so the same chain runs in a Husky `pre-push` hook.
+- `2015fd6 chore: add ci pipeline, husky pre-push hook, and fix lint warnings` — every push now runs the same `pnpm install --frozen-lockfile && prisma generate && lint && tsc && build && test:run` chain that Railway runs on deploy. If a push lands, the Railway build will land. Local feedback loop matters more than CI feedback loop, so the same chain runs in a Husky `pre-push` hook.
 - `088e135 chore: bump next.js from 16.1.4 to 16.2.6` — point release, no API changes, but it picks up a fix in the App Router that was causing intermittent 404s on dynamic routes during dev.
-- `dd20080 fix: disable strict db ssl verification for railway prisma 7 compat` — Railway's managed Postgres uses a self-signed cert that Prisma 7 rejects by default. We set `sslmode=require` instead of `verify-full`. This is acceptable here because the connection is over Railway's private network.
+- `dd20080 fix: disable strict db ssl verification for railway prisma 7 compat` — Railway's managed Postgres uses a self-signed cert that Prisma 7 rejects by default. Set `sslmode=require` instead of `verify-full`. Acceptable here because the connection is over Railway's private network.
 
 ---
 
 ## 15. Small but worth noting
 
-- `f45324e fix: remove invalid userId uuid cast in task reorder query` — Better Auth user IDs are `text`, not `uuid`. Casting `userId::uuid` in a raw SQL query throws `invalid input syntax for type uuid` and 500s the request. The fix removes the cast. Documented in AGENTS.md so we never do it again.
+- `f45324e fix: remove invalid userId uuid cast in task reorder query` — Better Auth user IDs are `text`, not `uuid`. Casting `userId::uuid` in a raw SQL query throws `invalid input syntax for type uuid` and 500s the request. The fix removes the cast. Documented in AGENTS.md so this never happens again.
 - `b0cf515 fix: replace any types with generic react-hook-form types in form selectors` — small but it unblocked the `no-explicit-any` lint rule from being turned on in CI.
 - `a5b0237 fix: use explicit dimensions in chart ResponsiveContainer` — Recharts' `ResponsiveContainer` measures its parent on mount, and if the parent is `display: none` (collapsed accordion, hidden tab) it measures zero and never recovers. Explicit dimensions sidestep the issue.
 - `312efcb feat: add opengraph image for landing page` — link previews on Twitter, Slack, and Discord no longer look like a placeholder.

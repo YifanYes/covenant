@@ -161,3 +161,17 @@ When fixing bugs, trace **every** caller and reference to the affected logic and
 - `CLAUDE.md` — detailed architecture and conventions (preserves more context)
 - `README.md` — outdated; describes a split front/server setup that no longer exists. Trust `package.json` scripts and this file instead.
 - `.cursorrules` — points to `CLAUDE.md` and `CONVENTIONS.md`
+
+## Agent skills
+
+### Issue tracker
+
+GitHub issues at `YifanYes/covenant` via `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical defaults — `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout at repo root (`CONTEXT.md` + `docs/adr/`). See `docs/agents/domain.md`.
