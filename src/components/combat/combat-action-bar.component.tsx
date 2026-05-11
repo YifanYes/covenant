@@ -1,61 +1,47 @@
 'use client'
-import DiceResult from '@/app/(workspace)/map/_components/dice-result.component'
-import DiceRoller from '@/app/(workspace)/map/_components/dice-roller.component'
 import { panelChrome } from '@/components/combat/combat-styles'
-import DoctrinePanel from '@/components/doctrine-panel.component'
 import { cn } from '@/lib/cn.lib'
 import Button from '@/ui/button.component'
+import { BASIC_STRIKE_ID, DOCTRINES } from '@shared/constants/doctrines'
 import { getConsumableById } from '@shared/constants/items'
-import type { DoctrineDefinition } from '@shared/types/doctrine.types'
 import { ItemType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-type ActionView = 'menu' | 'attack' | 'doctrine' | 'item'
+type ActionView = 'menu' | 'moves' | 'item'
 
 interface CombatActionBarProps {
   character: InventoryCharacter
-  diceBank: number
-  attackRolls: number[] | null
-  defenseRolls: number[] | null
-  isRolling: boolean
-  onRollDice: () => void
-  onAttack: (targetId: string) => void
-  onSelectDoctrine: (doctrineId: string) => void
+  currentMana: number
+  onSelectMove: (moveId: string) => void
   onUsePotion: (consumableId: string) => void
-  onCancelDoctrine: () => void
-  selectedDoctrineId: string | null
+  onCancelMove: () => void
+  selectedMoveId: string | null
   targetingMode: 'single' | 'all' | null
   potionUsedThisTurn: boolean
   isLoading: boolean
   disabled: boolean
-  enemies: { id: string; currentHealth: number }[]
   className?: string
 }
 
 export default function CombatActionBar({
   character,
-  diceBank,
-  attackRolls,
-  defenseRolls,
-  isRolling,
-  onRollDice,
-  onAttack,
-  onSelectDoctrine,
+  currentMana,
+  onSelectMove,
   onUsePotion,
-  onCancelDoctrine,
-  selectedDoctrineId,
+  onCancelMove,
+  selectedMoveId,
   targetingMode,
   potionUsedThisTurn,
   isLoading,
   disabled,
-  enemies,
   className
 }: CombatActionBarProps) {
   const { t } = useTranslation()
   const [view, setView] = useState<ActionView>('menu')
 
   const currentClass = character.classes.find((c) => c.className === character.currentClass)!
+  const equippedMoves = (currentClass.equippedDoctrines ?? []).map((id) => DOCTRINES[id]).filter(Boolean)
 
   const groupedConsumables = (character.inventory ?? [])
     .filter((item: InventoryItem) => item.type === ItemType.CONSUMABLE)
@@ -69,44 +55,26 @@ export default function CombatActionBar({
       return acc
     }, {})
 
-  // Reset to menu when turn ends or rolls/doctrine clear
   useEffect(() => {
     if (disabled) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven UI reset: component must return to menu when disabled
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven reset to menu when turn ends
       setView('menu')
     }
   }, [disabled])
 
   useEffect(() => {
-    if (attackRolls === null) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven UI reset: return to menu after attack rolls clear
+    if (selectedMoveId === null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven reset after cancel
       setView('menu')
     }
-  }, [attackRolls])
+  }, [selectedMoveId])
 
-  useEffect(() => {
-    if (selectedDoctrineId === null) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven UI reset: return to menu when doctrine is cancelled
-      setView('menu')
-    }
-  }, [selectedDoctrineId])
-
-  const handleDoctrineUse = (doctrine: DoctrineDefinition) => {
-    onSelectDoctrine(doctrine.id)
-  }
-
-  const handleConfirmAttack = () => {
-    const living = enemies.filter((e) => e.currentHealth > 0)
-    if (living.length === 1) onAttack(living[0].id)
-  }
-
-  // Targeting collapse: full-width cancel tile replaces 1×3 row
   if (targetingMode) {
     return (
       <div className={cn(panelChrome, 'flex overflow-hidden', className)}>
         <button
           className="flex h-full w-full items-center justify-center text-sm font-medium transition-colors hover:bg-primary/10 active:bg-primary active:text-primary-foreground"
-          onClick={onCancelDoctrine}
+          onClick={onCancelMove}
         >
           {t('combat.targeting.cancel')}
         </button>
@@ -124,7 +92,7 @@ export default function CombatActionBar({
               'hover:bg-primary/10 active:bg-primary active:text-primary-foreground',
               disabled && 'cursor-not-allowed opacity-50'
             )}
-            onClick={() => setView('attack')}
+            onClick={() => onSelectMove(BASIC_STRIKE_ID)}
             disabled={disabled}
           >
             {t('combat.action.attack')}
@@ -135,10 +103,10 @@ export default function CombatActionBar({
               'hover:bg-primary/10 active:bg-primary active:text-primary-foreground',
               disabled && 'cursor-not-allowed opacity-50'
             )}
-            onClick={() => setView('doctrine')}
+            onClick={() => setView('moves')}
             disabled={disabled}
           >
-            {t('combat.action.doctrine')}
+            {t('combat.action.ability')}
           </button>
           <button
             className={cn(
@@ -154,58 +122,32 @@ export default function CombatActionBar({
         </div>
       )}
 
-      {view === 'attack' && (
+      {view === 'moves' && (
         <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-3">
-          {!attackRolls && (
-            <DiceRoller
-              diceBank={diceBank}
-              attackDiceCount={currentClass.strengthAtk}
-              defenseDiceCount={currentClass.strengthDef}
-              onRoll={onRollDice}
-              isRolling={isRolling}
-              compact
-            />
-          )}
-
-          {attackRolls && defenseRolls && (
-            <div className="flex flex-col gap-2">
-              <div>
-                <span className="text-muted-foreground mb-1 block text-xs">{t('combat.attack_rolls')}</span>
-                <div className="flex flex-wrap gap-1">
-                  {attackRolls.map((value, i) => (
-                    <DiceResult key={`atk-${i}`} value={value} isSuccess={value >= 4} isCritical={value === 6} />
-                  ))}
-                </div>
-              </div>
-              <div>
-                <span className="text-muted-foreground mb-1 block text-xs">{t('combat.defense_rolls')}</span>
-                <div className="flex flex-wrap gap-1">
-                  {defenseRolls.map((value, i) => (
-                    <DiceResult key={`def-${i}`} value={value} isSuccess={value >= 4} isCritical={value === 6} />
-                  ))}
-                </div>
-              </div>
-              <Button onClick={handleConfirmAttack} disabled={isLoading || disabled} className="w-full" size="sm">
-                {t('combat.action.attack')}
-              </Button>
+          {equippedMoves.length === 0 ? (
+            <p className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
+              {t('doctrines.empty_equipped')}
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              {equippedMoves.map((move) => {
+                const canUse = currentMana >= move.manaCost
+                return (
+                  <Button
+                    key={move.id}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onSelectMove(move.id)}
+                    disabled={!canUse || isLoading || disabled}
+                    className={cn('justify-between', !canUse && 'opacity-50')}
+                  >
+                    <span>{t(move.nameKey)}</span>
+                    <span className="text-xs text-blue-400">{move.manaCost} MP</span>
+                  </Button>
+                )
+              })}
             </div>
           )}
-
-          <Button variant="ghost" size="sm" onClick={() => setView('menu')} className="mt-auto w-full">
-            {t('common.back')}
-          </Button>
-        </div>
-      )}
-
-      {view === 'doctrine' && (
-        <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-3">
-          <DoctrinePanel
-            showUseControls
-            currentMana={currentClass.mana}
-            onUseDoctrine={handleDoctrineUse}
-            isUsingDoctrine={isLoading}
-            horizontal
-          />
           <Button variant="ghost" size="sm" onClick={() => setView('menu')} className="mt-auto w-full">
             {t('common.back')}
           </Button>
@@ -235,9 +177,6 @@ export default function CombatActionBar({
                   <span className="text-muted-foreground ml-1 text-xs">x{count}</span>
                   {consumable.effect.healHealth && (
                     <span className="ml-auto text-xs text-emerald-400">+{consumable.effect.healHealth} HP</span>
-                  )}
-                  {consumable.effect.healMana && (
-                    <span className="ml-auto text-xs text-blue-400">+{consumable.effect.healMana} MP</span>
                   )}
                 </Button>
               )

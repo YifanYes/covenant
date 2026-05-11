@@ -3,14 +3,14 @@ import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import type { HabitRepository } from '../repositories/habit.repository'
 import { logger } from '../lib/logger'
-import type { DiceService } from './dice.service'
+import type { ManaService } from './mana.service'
 
 const log = logger.child({ service: 'habit' })
 
 export class HabitService {
   constructor(
     private habitRepository: HabitRepository,
-    private diceService: DiceService
+    private manaService: ManaService
   ) {}
 
   async create(userId: string, input: CreateHabitType) {
@@ -66,18 +66,14 @@ export class HabitService {
     const completion = await this.habitRepository.createCompletion(habitId, userId)
 
     const completions = await this.habitRepository.findCompletions(habitId, userId)
-    const streak = this.diceService.calculateHabitStreak(completions)
+    const streak = this.manaService.calculateHabitStreak(completions)
 
-    let diceToAward = 2
-    if (streak >= 21) diceToAward += 3
-    else if (streak >= 14) diceToAward += 2
-    else if (streak >= 7) diceToAward += 1
-
-    const result = await this.diceService.addDiceToBank(userId, diceToAward)
+    const result = await this.manaService.addManaFromCompletion(userId, 'habit')
 
     return {
       completion,
-      diceEarned: result.earned,
+      manaEarned: result.manaApplied,
+      reserveGained: result.reserveGained,
       streak
     }
   }

@@ -14,8 +14,10 @@ import Sidebar, {
   SidebarMenuItem,
   SidebarTrigger
 } from '@/ui/sidebar.component'
+import { trpcOptions } from '@/utils/trpc.utils'
+import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { BookOpen, Bulletlist, Calendar, Castle, Grid3x3, PenSquare, Settings2, Shield, Store, Suitcase, Trophy } from 'pixelarticons/react'
+import { Battery, BookOpen, Bulletlist, Calendar, Castle, Grid3x3, PenSquare, Settings2, Shield, Store, Suitcase, Trophy } from 'pixelarticons/react'
 import { useSyncExternalStore, type ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -44,6 +46,27 @@ function SidebarSection({ title, items }: { title?: string; items: SidebarItem[]
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
+  )
+}
+
+function ManaIndicator() {
+  const { t } = useTranslation()
+  const { data: character } = useQuery({ ...trpcOptions.character.getCurrentClass.queryOptions() })
+  if (!character) return null
+  const currentClass = character.classes.find((c) => c.className === character.currentClass)
+  if (!currentClass) return null
+  return (
+    <div className="flex items-center gap-2 px-2 py-1 group-data-[collapsible=icon]:hidden" title={t('combat.mana_reserve_tooltip', { reserve: character.manaReserve ?? 0 })}>
+      <Battery className="h-3 w-3 text-blue-400" />
+      <span className="text-xs font-medium">
+        {currentClass.mana}/{currentClass.maxMana}
+      </span>
+      {(character.manaReserve ?? 0) > 0 && (
+        <span className="rounded bg-blue-500/20 px-1 text-[10px] font-bold text-blue-300">
+          +{character.manaReserve}
+        </span>
+      )}
+    </div>
   )
 }
 
@@ -148,6 +171,7 @@ export default function AppSidebar() {
       <SidebarContent>
         <SidebarSection title={t('sidebar.productivity')} items={sidebarItems.productivity} />
         <SidebarSection title={t('sidebar.rpg')} items={sidebarItems.rpg} />
+        <ManaIndicator />
         <Separator />
         <SidebarSection items={sidebarItems.settings} />
       </SidebarContent>

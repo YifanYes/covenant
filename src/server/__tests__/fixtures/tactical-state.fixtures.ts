@@ -37,6 +37,11 @@ export function createTestUnit(overrides: Partial<TacticalUnitState> & { id: str
     maxHealth: 10,
     currentMana: 0,
     maxMana: 0,
+    speed: 1,
+    strengthAtk: 5,
+    strengthDef: 5,
+    magicAtk: 5,
+    magicDef: 5,
     ...overrides
   }
 }

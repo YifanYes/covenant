@@ -44,6 +44,8 @@ export default function JournalEditor() {
         await queryClient.invalidateQueries({ queryKey: trpcOptions.journaling.getStreak.queryKey() })
         await queryClient.invalidateQueries({ queryKey: trpcOptions.journaling.getAll.queryKey() })
         await queryClient.invalidateQueries({ queryKey: trpcOptions.journaling.getMoodCalendar.queryKey() })
+        // Phase 2A: creating a journal entry grants mana; refresh sidebar indicator.
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
       },
       onError: (error) => toast.error(t('journaling.error.internal.create'), { description: error.message })
     })

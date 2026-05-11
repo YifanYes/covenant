@@ -9,7 +9,7 @@ interface HealthBarProps {
 }
 
 export default function HealthBar({ current, max, className, showLabel = true }: HealthBarProps) {
-  const percentage = Math.max(0, Math.min(100, (current / max) * 100))
+  const percentage = max > 0 ? Math.max(0, Math.min(100, (current / max) * 100)) : 0
 
   const getBarColor = () => {
     if (percentage > 60) return 'bg-emerald-500'

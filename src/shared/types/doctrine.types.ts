@@ -1,22 +1,17 @@
 import type { CharacterClassName, MagicNature } from '../constants/classes'
 
 export const DoctrineEffectType = {
-  // Adds extra power dice to attack or defense
   POWER_MODIFIER: 'POWER_MODIFIER',
-  // Modifies the threshold for success (e.g., 3+ instead of 4+)
   THRESHOLD_MODIFIER: 'THRESHOLD_MODIFIER',
-  // Guarantees a critical hit (natural 6)
   GUARANTEED_CRITICAL: 'GUARANTEED_CRITICAL',
-  // Negates a fixed number of hits received
   NEGATE_HITS: 'NEGATE_HITS',
-  // Applies a status effect to target
   APPLY_STATUS: 'APPLY_STATUS',
-  // Heals health or mana
   HEAL: 'HEAL',
-  // Deals direct damage ignoring defense
   DIRECT_DAMAGE: 'DIRECT_DAMAGE'
 } as const
 export type DoctrineEffectType = (typeof DoctrineEffectType)[keyof typeof DoctrineEffectType]
+
+export type MoveDamageType = 'PHYSICAL' | 'MAGIC'
 
 export const StatusEffect = {
   // Target loses their next action phase
@@ -95,8 +90,8 @@ export interface DoctrineDefinition {
   nameKey: string
   descriptionKey: string
   flavorTextKey: string
-  className: CharacterClassName
-  magicNature: MagicNature
+  className: CharacterClassName | 'universal'
+  magicNature: MagicNature | 'universal'
   attribute: DoctrineAttributeType
   tier: number
   manaCost: number
@@ -105,6 +100,12 @@ export interface DoctrineDefinition {
   // Pokemon-style targeting: 'single' (1 enemy) or 'all' (all enemies, 0.6x damage)
   // Omitted for pure self-buff doctrines
   targeting?: 'single' | 'all'
+  // Pokémon-style damage move: routes through Gen-1 formula in combat-formula.ts
+  // Side-effect-only moves omit these and route through tactical-doctrine.ts
+  power?: number
+  damageType?: MoveDamageType
+  // Recoil damage as percent of damage dealt (reckless_strike: 25 = 25%)
+  recoilPercent?: number
 }
 
 /**

@@ -157,11 +157,13 @@ export default function DoctrinePanel({
               <Zap className="h-3 w-3" />
               {t('doctrines.mana_cost', { cost: doctrine.manaCost })}
             </span>
-            <span
-              className={`rounded-full border border-current/20 px-2 py-0.5 text-xs font-bold capitalize ${MAGIC_NATURE_COLORS[doctrine.magicNature]}`}
-            >
-              {t(`doctrines.magic_nature.${doctrine.magicNature}`)}
-            </span>
+            {doctrine.magicNature !== 'universal' && (
+              <span
+                className={`rounded-full border border-current/20 px-2 py-0.5 text-xs font-bold capitalize ${MAGIC_NATURE_COLORS[doctrine.magicNature]}`}
+              >
+                {t(`doctrines.magic_nature.${doctrine.magicNature}`)}
+              </span>
+            )}
             <span
               className={`rounded-full border border-current/20 px-2 py-0.5 text-xs font-bold capitalize ${ATTRIBUTE_COLORS[doctrine.attribute]}`}
             >

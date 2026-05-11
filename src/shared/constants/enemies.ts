@@ -15,7 +15,7 @@ export type EnemyType = (typeof EnemyType)[keyof typeof EnemyType]
 export interface EnemyTemplate {
   id: string
   name: string
-  imageId: string // imagege asset ID (allows variants to share images)
+  imageId: string // image asset ID (allows variants to share images)
   tier: number
   type: EnemyType
   health: number
@@ -27,13 +27,13 @@ export interface EnemyTemplate {
   magicAtk: number
   magicDef: number
   manaRegen: number
-  // Combat dice
-  attackDice: number
-  defenseDice: number
+  // Pool of move IDs the AI may pick from this turn. Always include 'basic_strike' as fallback.
+  moves: string[]
   // Gold reward range on defeat
   goldReward: { min: number; max: number }
 }
 
+// Phase 2A: HP literals ×5 vs. pre-redesign values. Balance pass is Phase 2B.
 export const ENEMIES: Record<string, EnemyTemplate> = {
   // Tier 1
   skeleton: {
@@ -42,7 +42,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'skeleton',
     tier: 1,
     type: EnemyType.MINION,
-    health: 3,
+    health: 15,
     mana: 0,
     speed: 1,
     damageType: DamageType.PHYSICAL,
@@ -51,8 +51,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 6,
     magicDef: 6,
     manaRegen: 0,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 8, max: 12 }
   },
   bandit_chief: {
@@ -61,7 +60,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'bandit_chief',
     tier: 1,
     type: EnemyType.ELITE,
-    health: 5,
+    health: 25,
     mana: 0,
     speed: 1,
     damageType: DamageType.PHYSICAL,
@@ -70,8 +69,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 6,
     magicDef: 5,
     manaRegen: 0,
-    attackDice: 3,
-    defenseDice: 2,
+    moves: ['basic_strike'],
     goldReward: { min: 15, max: 25 }
   },
   bandit_runic: {
@@ -80,7 +78,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'bandit_runic',
     tier: 1,
     type: EnemyType.MINION,
-    health: 4,
+    health: 20,
     mana: 3,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -89,8 +87,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 4,
     magicDef: 3,
     manaRegen: 1,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 10, max: 15 }
   },
   bandit_stalker: {
@@ -99,7 +96,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'bandit_stalker',
     tier: 1,
     type: EnemyType.MINION,
-    health: 4,
+    health: 20,
     mana: 0,
     speed: 1,
     damageType: DamageType.PHYSICAL,
@@ -108,8 +105,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 6,
     magicDef: 5,
     manaRegen: 0,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 10, max: 14 }
   },
   fallen_templar: {
@@ -118,7 +114,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'heretic_templar',
     tier: 1,
     type: EnemyType.MINION,
-    health: 4,
+    health: 20,
     mana: 2,
     speed: 1,
     damageType: DamageType.PHYSICAL,
@@ -127,8 +123,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 5,
     magicDef: 5,
     manaRegen: 1,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 10, max: 15 }
   },
   ghost: {
@@ -137,7 +132,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'ghost',
     tier: 1,
     type: EnemyType.MINION,
-    health: 2,
+    health: 10,
     mana: 3,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -146,8 +141,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 4,
     magicDef: 4,
     manaRegen: 1,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 8, max: 12 }
   },
   giant_spider: {
@@ -156,7 +150,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'spider',
     tier: 1,
     type: EnemyType.MINION,
-    health: 4,
+    health: 20,
     mana: 0,
     speed: 1,
     damageType: DamageType.PHYSICAL,
@@ -165,8 +159,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 6,
     magicDef: 6,
     manaRegen: 0,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 10, max: 14 }
   },
   magma_demon: {
@@ -175,7 +168,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'magma_demon',
     tier: 1,
     type: EnemyType.MINION,
-    health: 8,
+    health: 40,
     mana: 4,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -184,8 +177,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 4,
     magicDef: 5,
     manaRegen: 1,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 12, max: 18 }
   },
   shadow_demon: {
@@ -194,7 +186,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'shadow_demon',
     tier: 1,
     type: EnemyType.MINION,
-    health: 6,
+    health: 30,
     mana: 5,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -203,8 +195,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 3,
     magicDef: 3,
     manaRegen: 2,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 12, max: 18 }
   },
   // Tier 2
@@ -214,7 +205,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'heretic_templar',
     tier: 2,
     type: EnemyType.MINION,
-    health: 5,
+    health: 25,
     mana: 4,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -223,8 +214,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 4,
     magicDef: 3,
     manaRegen: 2,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 15, max: 22 }
   },
   armored_templar: {
@@ -233,7 +223,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'heretic_templar',
     tier: 2,
     type: EnemyType.ELITE,
-    health: 7,
+    health: 35,
     mana: 2,
     speed: 1,
     damageType: DamageType.PHYSICAL,
@@ -242,8 +232,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 6,
     magicDef: 5,
     manaRegen: 1,
-    attackDice: 3,
-    defenseDice: 2,
+    moves: ['basic_strike'],
     goldReward: { min: 20, max: 30 }
   },
   werewolf: {
@@ -252,7 +241,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'young_werewolf',
     tier: 2,
     type: EnemyType.MINION,
-    health: 6,
+    health: 30,
     mana: 0,
     speed: 1,
     damageType: DamageType.PHYSICAL,
@@ -261,8 +250,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 6,
     magicDef: 5,
     manaRegen: 0,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 15, max: 22 }
   },
   werewolf_alpha: {
@@ -271,7 +259,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'alpha_werewolf',
     tier: 2,
     type: EnemyType.BOSS,
-    health: 12,
+    health: 60,
     mana: 0,
     speed: 1,
     damageType: DamageType.PHYSICAL,
@@ -280,18 +268,17 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 5,
     magicDef: 4,
     manaRegen: 0,
-    attackDice: 4,
-    defenseDice: 3,
+    moves: ['basic_strike'],
     goldReward: { min: 35, max: 50 }
   },
-  // Tier 3 Enemies
+  // Tier 3
   elite_armored_templar: {
     id: 'elite_armored_templar',
     name: 'enemies.elite_armored_templar',
     imageId: 'heretic_templar',
     tier: 3,
     type: EnemyType.BOSS,
-    health: 14,
+    health: 70,
     mana: 4,
     speed: 1,
     damageType: DamageType.PHYSICAL,
@@ -300,8 +287,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 5,
     magicDef: 4,
     manaRegen: 1,
-    attackDice: 4,
-    defenseDice: 3,
+    moves: ['basic_strike'],
     goldReward: { min: 40, max: 60 }
   },
   shadow_demon_elite: {
@@ -310,7 +296,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'shadow_demon',
     tier: 3,
     type: EnemyType.MINION,
-    health: 5,
+    health: 25,
     mana: 5,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -319,8 +305,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 3,
     magicDef: 3,
     manaRegen: 2,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 18, max: 28 }
   },
   minor_demon: {
@@ -329,7 +314,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'shadow_demon',
     tier: 3,
     type: EnemyType.MINION,
-    health: 4,
+    health: 20,
     mana: 3,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -338,8 +323,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 4,
     magicDef: 4,
     manaRegen: 1,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 18, max: 25 }
   },
   elite_demon: {
@@ -348,7 +332,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'elite_demon',
     tier: 3,
     type: EnemyType.ELITE,
-    health: 9,
+    health: 45,
     mana: 6,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -357,8 +341,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 3,
     magicDef: 3,
     manaRegen: 2,
-    attackDice: 3,
-    defenseDice: 2,
+    moves: ['basic_strike'],
     goldReward: { min: 25, max: 40 }
   },
   demon_lord: {
@@ -367,7 +350,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'demon_lord',
     tier: 3,
     type: EnemyType.BOSS,
-    health: 16,
+    health: 80,
     mana: 10,
     speed: 1,
     damageType: DamageType.BOTH,
@@ -376,8 +359,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 3,
     magicDef: 3,
     manaRegen: 3,
-    attackDice: 4,
-    defenseDice: 3,
+    moves: ['basic_strike'],
     goldReward: { min: 45, max: 70 }
   },
   fallen_inquisitor_boss: {
@@ -386,7 +368,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'heretic_templar',
     tier: 3,
     type: EnemyType.BOSS,
-    health: 14,
+    health: 70,
     mana: 8,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -395,8 +377,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 2,
     magicDef: 2,
     manaRegen: 3,
-    attackDice: 4,
-    defenseDice: 3,
+    moves: ['basic_strike'],
     goldReward: { min: 40, max: 60 }
   },
   vampire: {
@@ -405,7 +386,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'vampire',
     tier: 3,
     type: EnemyType.MINION,
-    health: 5,
+    health: 25,
     mana: 4,
     speed: 1,
     damageType: DamageType.BOTH,
@@ -414,8 +395,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 4,
     magicDef: 4,
     manaRegen: 1,
-    attackDice: 2,
-    defenseDice: 1,
+    moves: ['basic_strike'],
     goldReward: { min: 20, max: 30 }
   },
   vampire_count: {
@@ -424,7 +404,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'vampire',
     tier: 3,
     type: EnemyType.BOSS,
-    health: 15,
+    health: 75,
     mana: 10,
     speed: 1,
     damageType: DamageType.BOTH,
@@ -433,8 +413,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 3,
     magicDef: 3,
     manaRegen: 3,
-    attackDice: 4,
-    defenseDice: 3,
+    moves: ['basic_strike'],
     goldReward: { min: 45, max: 70 }
   },
   nephilim: {
@@ -443,7 +422,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'nephilim',
     tier: 3,
     type: EnemyType.BOSS,
-    health: 18,
+    health: 90,
     mana: 12,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -452,18 +431,17 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 2,
     magicDef: 2,
     manaRegen: 3,
-    attackDice: 4,
-    defenseDice: 3,
+    moves: ['basic_strike'],
     goldReward: { min: 50, max: 80 }
   },
-  // Tier 4
+  // Tier 4 (post-beta)
   belphegor_avatar: {
     id: 'belphegor_avatar',
     name: 'enemies.belphegor_avatar',
     imageId: 'demon_lord',
     tier: 4,
     type: EnemyType.BOSS,
-    health: 30,
+    health: 150,
     mana: 15,
     speed: 1,
     damageType: DamageType.BOTH,
@@ -472,8 +450,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 2,
     magicDef: 2,
     manaRegen: 4,
-    attackDice: 5,
-    defenseDice: 4,
+    moves: ['basic_strike'],
     goldReward: { min: 80, max: 120 }
   },
   behemoth: {
@@ -482,7 +459,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'nephilim',
     tier: 4,
     type: EnemyType.BOSS,
-    health: 40,
+    health: 200,
     mana: 0,
     speed: 1,
     damageType: DamageType.PHYSICAL,
@@ -491,8 +468,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 6,
     magicDef: 4,
     manaRegen: 0,
-    attackDice: 5,
-    defenseDice: 4,
+    moves: ['basic_strike'],
     goldReward: { min: 100, max: 150 }
   },
   fallen_angel: {
@@ -501,7 +477,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     imageId: 'nephilim',
     tier: 4,
     type: EnemyType.BOSS,
-    health: 25,
+    health: 125,
     mana: 20,
     speed: 1,
     damageType: DamageType.MAGIC,
@@ -510,8 +486,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     magicAtk: 1,
     magicDef: 1,
     manaRegen: 5,
-    attackDice: 5,
-    defenseDice: 4,
+    moves: ['basic_strike'],
     goldReward: { min: 90, max: 140 }
   }
 }
@@ -535,20 +510,12 @@ export const TIER_SCALING_MULTIPLIERS: Record<number, number> = {
   3: 1.35
 }
 
-/**
- * Get the stat scaling multiplier for a given tier difference
- */
 export function getStatScalingMultiplier(characterTier: number, enemyTier: number): number {
   const tierDiff = Math.max(0, characterTier - enemyTier)
-  // Cap at 3 for the highest multiplier
   const cappedDiff = Math.min(tierDiff, 3)
   return TIER_SCALING_MULTIPLIERS[cappedDiff] || 1.0
 }
 
-/**
- * Apply stat scaling to an enemy template based on character tier
- * Returns a new template with scaled stats (does not modify the original)
- */
 export function applyStatScaling(template: EnemyTemplate, characterTier: number): EnemyTemplate {
   const multiplier = getStatScalingMultiplier(characterTier, template.tier)
 
@@ -569,9 +536,6 @@ export function applyStatScaling(template: EnemyTemplate, characterTier: number)
   }
 }
 
-/**
- * Calculate a random gold reward from an enemy's reward range
- */
 export function calculateGoldReward(enemy: EnemyTemplate): number {
   const { min, max } = enemy.goldReward
   return Math.floor(Math.random() * (max - min + 1)) + min

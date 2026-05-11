@@ -6,8 +6,7 @@ import {
   unequipDoctrineSchema,
   unequipItemSchema,
   updateCharacterNameSchema,
-  useConsumableSchema,
-  useDoctrineSchema
+  useConsumableSchema
 } from '@shared/schemas/character.schemas'
 import { protectedProcedure, rateLimit, RATE_LIMITS, t } from '../trpc'
 
@@ -63,10 +62,6 @@ export const characterRouter = t.router({
 
   unequipDoctrine: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(unequipDoctrineSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.character.unequipDoctrine(ctx.user.id, input.doctrineId)
-  }),
-
-  useDoctrine: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(useDoctrineSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.combat.useDoctrine(ctx.user.id, input.doctrineId, input.participationId)
   }),
 
   updateName: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(updateCharacterNameSchema).mutation(async ({ ctx, input }) => {

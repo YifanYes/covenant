@@ -73,7 +73,7 @@ describe('Authorization - Service Layer', () => {
   describe('ObjectiveService', () => {
     let objectiveService: ObjectiveService
     let mockObjectiveRepo: any
-    let mockDiceService: any
+    let mockManaService: any
 
     beforeEach(() => {
       vi.clearAllMocks()
@@ -84,11 +84,18 @@ describe('Authorization - Service Layer', () => {
         delete: vi.fn()
       }
 
-      mockDiceService = {
-        addDiceToBank: vi.fn().mockResolvedValue({ earned: 6 })
+      mockManaService = {
+        addManaFromCompletion: vi.fn().mockResolvedValue({
+          success: true,
+          amount: 10,
+          manaApplied: 10,
+          reserveGained: 0,
+          newMana: 10,
+          newReserve: 0
+        })
       }
 
-      objectiveService = new ObjectiveService(mockObjectiveRepo, mockDiceService)
+      objectiveService = new ObjectiveService(mockObjectiveRepo, mockManaService)
     })
 
     describe('update', () => {

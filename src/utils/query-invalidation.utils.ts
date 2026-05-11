@@ -14,7 +14,9 @@ export const invalidators = {
   tasks: async (monthIndex?: MonthIndexParams) => {
     const promises = [
       queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() }),
-      queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getFiltered.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getFiltered.queryKey() }),
+      // Phase 2A: completing a task grants mana; sidebar/dashboard indicators must refresh.
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
     ]
     if (monthIndex) {
       promises.push(
@@ -31,7 +33,11 @@ export const invalidators = {
    * Use after creating, updating, completing, or deleting habits.
    */
   habits: async () => {
-    await queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() }),
+      // Phase 2A: habit completion grants mana; surface live in sidebar.
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+    ])
   },
 
   /**
@@ -39,7 +45,11 @@ export const invalidators = {
    * Use after creating, updating, completing, or deleting objectives.
    */
   objectives: async () => {
-    await queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() })
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() }),
+      // Phase 2A: completing an objective grants mana.
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+    ])
   },
 
   /**

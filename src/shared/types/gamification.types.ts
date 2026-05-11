@@ -161,6 +161,7 @@ export interface InventoryCharacterClass {
   magicAtk: number
   magicDef: number
   manaRegen: number
+  speed: number
   equippedDoctrines: string[]
 }
 
@@ -174,6 +175,7 @@ export interface InventoryCharacter {
   currentClass: string
   data: Record<string, unknown>
   gold: number
+  manaReserve: number
   tier: number
   inventory: InventoryItem[]
   loadout: InventoryItem[]

@@ -17,11 +17,11 @@ import { AuthService } from './auth.service'
 import { CharacterService } from './character.service'
 import { CombatService } from './combat.service'
 import { DashboardService } from './dashboard.service'
-import { DiceService } from './dice.service'
 import { GuildService } from './guild.service'
 import { HabitService } from './habit.service'
 import { JournalService } from './journal.service'
 import { KillRecordService } from './kill-record.service'
+import { ManaService } from './mana.service'
 import { ObjectiveService } from './objective.service'
 import { QuestService } from './quest.service'
 import { StoreService } from './store.services'
@@ -54,11 +54,11 @@ export class ServiceFactory {
   private _characterService?: CharacterService
   private _combatService?: CombatService
   private _dashboardService?: DashboardService
-  private _diceService?: DiceService
   private _guildService?: GuildService
   private _habitService?: HabitService
   private _journalService?: JournalService
   private _killRecordService?: KillRecordService
+  private _manaService?: ManaService
   private _objectiveService?: ObjectiveService
   private _questService?: QuestService
   private _storeService?: StoreService
@@ -128,11 +128,11 @@ export class ServiceFactory {
   }
 
   get character(): CharacterService {
-    return (this._characterService ??= new CharacterService(this.characterRepository, this.userRepository))
+    return (this._characterService ??= new CharacterService(this.characterRepository, this.userRepository, this.mana))
   }
 
-  get dice(): DiceService {
-    return (this._diceService ??= new DiceService(this.characterRepository))
+  get mana(): ManaService {
+    return (this._manaService ??= new ManaService(this.characterRepository, this.prisma))
   }
 
   // Layer 2: Repository + Layer 1 service dependencies
@@ -141,7 +141,6 @@ export class ServiceFactory {
       this.characterRepository,
       this.characterQuestRepository,
       this.character,
-      this.dice,
       this.combatEnemyRepository,
       this.killRecord
     ))
@@ -159,19 +158,19 @@ export class ServiceFactory {
   }
 
   get habit(): HabitService {
-    return (this._habitService ??= new HabitService(this.habitRepository, this.dice))
+    return (this._habitService ??= new HabitService(this.habitRepository, this.mana))
   }
 
   get journal(): JournalService {
-    return (this._journalService ??= new JournalService(this.prisma, this.journalRepository, this.dice))
+    return (this._journalService ??= new JournalService(this.prisma, this.journalRepository, this.mana))
   }
 
   get objective(): ObjectiveService {
-    return (this._objectiveService ??= new ObjectiveService(this.objectiveRepository, this.dice))
+    return (this._objectiveService ??= new ObjectiveService(this.objectiveRepository, this.mana))
   }
 
   get task(): TaskService {
-    return (this._taskService ??= new TaskService(this.taskRepository, this.dice))
+    return (this._taskService ??= new TaskService(this.taskRepository, this.mana))
   }
 
   // Layer 3: Repository + Layer 2 service dependencies
@@ -205,7 +204,8 @@ export class ServiceFactory {
     return (this._questService ??= new QuestService(
       this.characterQuestRepository,
       this.combatEnemyRepository,
-      this.character
+      this.character,
+      this.mana
     ))
   }
 

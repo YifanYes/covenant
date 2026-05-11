@@ -9,11 +9,13 @@ import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { UserRepository } from '../repositories/user.repository'
 import { getCharacterProgress } from '../utils/character.utils'
+import type { ManaService } from './mana.service'
 
 export class CharacterService {
   constructor(
     private characterRepository: CharacterRepository,
-    private userRepository: UserRepository
+    private userRepository: UserRepository,
+    private manaService?: ManaService
   ) {}
 
   getCharacterProgress(character: CharacterWithClasses) {
@@ -36,8 +38,14 @@ export class CharacterService {
   }
 
   async getCurrentClass(userId: string) {
-    const character = await this.characterRepository.findWithClasses(userId)
+    let character = await this.characterRepository.findWithClasses(userId)
     if (!character) return null
+
+    // One-time backfill for pre-Phase-2A characters. Flag check first so the hot path is a no-op.
+    if (this.manaService && (character.data as { scrubbedManaPotions?: boolean })?.scrubbedManaPotions !== true) {
+      await this.manaService.scrubManaPotions(userId)
+      character = (await this.characterRepository.findWithClasses(userId)) ?? character
+    }
 
     const { tier } = getCharacterProgress(character)
 
@@ -50,6 +58,7 @@ export class CharacterService {
       currentClass: character.currentClass,
       data: character.data as any,
       gold: character.gold,
+      manaReserve: character.manaReserve ?? 0,
       tier,
       inventory: character.inventory as unknown,
       loadout: character.loadout as unknown,
@@ -67,7 +76,8 @@ export class CharacterService {
         magicAtk: c.magicAtk,
         magicDef: c.magicDef,
         manaRegen: c.manaRegen,
-        equippedDoctrines: (c as any).equippedDoctrines || []
+        speed: (c as { speed?: number }).speed ?? 1,
+        equippedDoctrines: (c as { equippedDoctrines?: string[] }).equippedDoctrines || []
       }))
     }
   }

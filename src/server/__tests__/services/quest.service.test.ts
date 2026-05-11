@@ -43,7 +43,11 @@ describe('QuestService', () => {
       verifyCharacterOwnership: vi.fn().mockResolvedValue(true)
     }
 
-    questService = new QuestService(mockCharacterQuestRepo, mockCombatEnemyRepo, mockCharacterService)
+    const mockManaService = {
+      topUpFromReserve: vi.fn().mockResolvedValue({ added: 0, newMana: 0, newReserve: 0 })
+    }
+
+    questService = new QuestService(mockCharacterQuestRepo, mockCombatEnemyRepo, mockCharacterService, mockManaService as any)
   })
 
   describe('startQuest', () => {
@@ -128,7 +132,7 @@ describe('QuestService', () => {
       )
       expect(mockCharacterQuestRepo.updateTacticalState).toHaveBeenCalledWith(
         'new-quest-id',
-        expect.objectContaining({ stateVersion: 3 })
+        expect.objectContaining({ stateVersion: 4 })
       )
     })
   })
@@ -233,7 +237,7 @@ describe('QuestService', () => {
 
   describe('getTacticalState', () => {
     it('returns the tactical state for a quest', async () => {
-      const tacticalState = { stateVersion: 3, units: [] }
+      const tacticalState = { stateVersion: 4, units: [] }
       mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
         id: 'quest-instance-1',
         characterId: 'char-123',

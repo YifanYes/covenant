@@ -40,8 +40,8 @@ export default function UpdateTaskDialog() {
 
   const updateMutation = useMutation(
     trpcOptions.tasks.update.mutationOptions({
-      onSuccess: async (data: { diceEarned: number }) => {
-        toast.success(t('tasks.success.update', { diceReward: getRewardText(data.diceEarned) }))
+      onSuccess: async (data: { manaEarned: number; reserveGained: number }) => {
+        toast.success(t('tasks.success.update', { diceReward: getRewardText(data.manaEarned, data.reserveGained) }))
         await invalidators.tasks(monthIndexParams)
         await invalidators.character()
         setSelectedTask(undefined)

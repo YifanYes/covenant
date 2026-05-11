@@ -304,9 +304,12 @@
     "action": {
       "attack": "Atacar",
       "doctrine": "Doctrina",
+      "ability": "Habilidades",
       "item": "Objeto",
       "select_target": "Seleccionar objetivo"
     },
+    "mana_reserve": "Reserva",
+    "mana_reserve_tooltip": "Reserva: {{reserve}} maná guardado para futuros combates",
     "targeting": {
       "single": "Selecciona un objetivo",
       "all": "Atacando a todos los enemigos",
@@ -843,6 +846,11 @@
     },
     "tier_required": "Requiere Tier {{tier}}",
     "title": "Doctrinas",
+    "basic_strike": {
+      "description": "Un ataque físico estándar. No cuesta maná.",
+      "flavor": "Golpea rápido, golpea certero.",
+      "name": "Golpe Básico"
+    },
     "transfusion": {
       "description": "Sacrifica 2 Heridas para recuperar 6 de Maná.",
       "flavor": "La magia fluye mejor cuando se mezcla con sangre.",
@@ -1289,12 +1297,16 @@
     },
     "revive": "Revivir",
     "stats": {
-      "attack_dice": "Dados de Ataque",
+      "attack_bonus": "Ataque",
+      "magic_atk_bonus": "Ataque Mágico",
+      "phys_def_bonus": "Def Física",
+      "magic_def_bonus": "Def Mágica",
       "damage_type": "Tipo de Daño",
+      "speed": "Velocidad",
+      "attack_dice": "Dados de Ataque",
       "magic_def": "Def Mágica",
       "phys_def": "Def Física",
-      "range": "Alcance",
-      "speed": "Velocidad"
+      "range": "Alcance"
     },
     "stats_title": "Estadísticas",
     "strength_atk": "Ataque Físico",

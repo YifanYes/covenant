@@ -12,6 +12,7 @@ export interface CharacterClassType {
   magicAtk: number
   magicDef: number
   manaRegen: number
+  speed: number
   equippedDoctrines: string[] // Array of doctrine IDs, max 2
   createdAt: Date
   updatedAt: Date
@@ -27,6 +28,7 @@ export interface CharacterType {
   data: any
   userId: string
   gold: number
+  manaReserve: number
   inventory: any
   loadout: any
   createdAt: Date
@@ -41,5 +43,5 @@ export type CharacterWithClasses = CharacterType & {
 export interface CharacterProgress {
   currentClass: CharacterClassType | undefined
   tier: number
-  diceBank: number
+  manaReserve: number
 }

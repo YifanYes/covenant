@@ -6,12 +6,18 @@ export const WeaponDamageType = {
 } as const
 export type WeaponDamageType = (typeof WeaponDamageType)[keyof typeof WeaponDamageType]
 
+/**
+ * Item stat bonuses (post Phase 2A redesign).
+ * Weapons grant flat ATK; armor grants flat DEF. `speed` adds to TacticalUnitState.speed
+ * for Pokémon-style turn order (higher acts first). `damageType` routes a weapon's
+ * `attackBonus` to either strengthAtkBonus or magicAtkBonus at equip time.
+ */
 export interface ItemStats {
-  attackDice?: number
-  physicalDefDice?: number
-  magicDefDice?: number
+  strengthAtkBonus?: number
+  strengthDefBonus?: number
+  magicAtkBonus?: number
+  magicDefBonus?: number
   speed?: number
-  range?: number
   damageType?: WeaponDamageType
 }
 
@@ -27,7 +33,6 @@ export interface ItemDefinition {
 
 export interface ConsumableEffect {
   healHealth?: number
-  healMana?: number
 }
 
 export interface ConsumableDefinition extends ItemDefinition {
@@ -35,7 +40,7 @@ export interface ConsumableDefinition extends ItemDefinition {
   stackable: boolean
 }
 
-// Tier 1 Weapons
+// Tier 1 Weapons (×1 scaling vs. old attackDice values; calibrated against HP×5)
 export const TIER_1_WEAPONS: Record<string, ItemDefinition> = {
   infantry_sword: {
     id: 'infantry_sword',
@@ -43,7 +48,7 @@ export const TIER_1_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.infantry_sword.description',
     type: ItemType.WEAPON_MELEE,
     tier: 1,
-    stats: { attackDice: 2, speed: 2, range: 1, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 2, speed: 2, damageType: WeaponDamageType.PHYSICAL },
     price: 0
   },
   lucerne_hammer: {
@@ -52,7 +57,7 @@ export const TIER_1_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.lucerne_hammer.description',
     type: ItemType.WEAPON_MELEE,
     tier: 1,
-    stats: { attackDice: 3, speed: 1, range: 1, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 3, speed: 1, damageType: WeaponDamageType.PHYSICAL },
     price: 0
   },
   spark_pistol: {
@@ -61,7 +66,7 @@ export const TIER_1_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.spark_pistol.description',
     type: ItemType.WEAPON_RANGED,
     tier: 1,
-    stats: { attackDice: 2, speed: 2, range: 2, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 2, speed: 2, damageType: WeaponDamageType.PHYSICAL },
     price: 0
   },
   spark_musket: {
@@ -70,7 +75,7 @@ export const TIER_1_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.spark_musket.description',
     type: ItemType.WEAPON_RANGED,
     tier: 1,
-    stats: { attackDice: 3, speed: 1, range: 3, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 3, speed: 1, damageType: WeaponDamageType.PHYSICAL },
     price: 0
   },
   willow_wand: {
@@ -79,7 +84,7 @@ export const TIER_1_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.willow_wand.description',
     type: ItemType.WEAPON_MAGIC,
     tier: 1,
-    stats: { attackDice: 2, speed: 2, range: 2, damageType: WeaponDamageType.MAGIC },
+    stats: { magicAtkBonus: 2, speed: 2, damageType: WeaponDamageType.MAGIC },
     price: 0
   },
   recruit_grimoire: {
@@ -88,7 +93,7 @@ export const TIER_1_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.recruit_grimoire.description',
     type: ItemType.WEAPON_MAGIC,
     tier: 1,
-    stats: { attackDice: 3, speed: 1, range: 3, damageType: WeaponDamageType.MAGIC },
+    stats: { magicAtkBonus: 3, speed: 1, damageType: WeaponDamageType.MAGIC },
     price: 0
   }
 }
@@ -101,7 +106,7 @@ export const TIER_2_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.official_sabre.description',
     type: ItemType.WEAPON_MELEE,
     tier: 2,
-    stats: { attackDice: 3, speed: 2, range: 1, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 3, speed: 2, damageType: WeaponDamageType.PHYSICAL },
     price: 50
   },
   great_war_axe: {
@@ -110,7 +115,7 @@ export const TIER_2_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.great_war_axe.description',
     type: ItemType.WEAPON_MELEE,
     tier: 2,
-    stats: { attackDice: 4, speed: 1, range: 1, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 4, speed: 1, damageType: WeaponDamageType.PHYSICAL },
     price: 50
   },
   advanced_revolver: {
@@ -119,7 +124,7 @@ export const TIER_2_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.advanced_revolver.description',
     type: ItemType.WEAPON_RANGED,
     tier: 2,
-    stats: { attackDice: 3, speed: 2, range: 3, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 3, speed: 2, damageType: WeaponDamageType.PHYSICAL },
     price: 50
   },
   marksman_musket: {
@@ -128,7 +133,7 @@ export const TIER_2_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.marksman_musket.description',
     type: ItemType.WEAPON_RANGED,
     tier: 2,
-    stats: { attackDice: 4, speed: 2, range: 4, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 4, speed: 2, damageType: WeaponDamageType.PHYSICAL },
     price: 50
   },
   ebony_staff: {
@@ -137,7 +142,7 @@ export const TIER_2_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.ebony_staff.description',
     type: ItemType.WEAPON_MAGIC,
     tier: 2,
-    stats: { attackDice: 3, speed: 2, range: 2, damageType: WeaponDamageType.MAGIC },
+    stats: { magicAtkBonus: 3, speed: 2, damageType: WeaponDamageType.MAGIC },
     price: 50
   },
   arcanist_codex: {
@@ -146,7 +151,7 @@ export const TIER_2_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.arcanist_codex.description',
     type: ItemType.WEAPON_MAGIC,
     tier: 2,
-    stats: { attackDice: 4, speed: 1, range: 3, damageType: WeaponDamageType.MAGIC },
+    stats: { magicAtkBonus: 4, speed: 1, damageType: WeaponDamageType.MAGIC },
     price: 50
   }
 }
@@ -159,7 +164,7 @@ export const TIER_3_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.water_drop.description',
     type: ItemType.WEAPON_MELEE,
     tier: 3,
-    stats: { attackDice: 4, speed: 2, range: 1, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 4, speed: 2, damageType: WeaponDamageType.PHYSICAL },
     price: 150
   },
   war_breaker: {
@@ -168,7 +173,7 @@ export const TIER_3_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.war_breaker.description',
     type: ItemType.WEAPON_MELEE,
     tier: 3,
-    stats: { attackDice: 5, speed: 1, range: 1, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 5, speed: 1, damageType: WeaponDamageType.PHYSICAL },
     price: 150
   },
   wind_color: {
@@ -177,7 +182,7 @@ export const TIER_3_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.wind_color.description',
     type: ItemType.WEAPON_RANGED,
     tier: 3,
-    stats: { attackDice: 4, speed: 2, range: 3, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 4, speed: 2, damageType: WeaponDamageType.PHYSICAL },
     price: 150
   },
   the_verdict: {
@@ -186,7 +191,7 @@ export const TIER_3_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.the_verdict.description',
     type: ItemType.WEAPON_RANGED,
     tier: 3,
-    stats: { attackDice: 5, speed: 1, range: 4, damageType: WeaponDamageType.PHYSICAL },
+    stats: { strengthAtkBonus: 5, speed: 1, damageType: WeaponDamageType.PHYSICAL },
     price: 150
   },
   ether_whisper: {
@@ -195,7 +200,7 @@ export const TIER_3_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.ether_whisper.description',
     type: ItemType.WEAPON_MAGIC,
     tier: 3,
-    stats: { attackDice: 4, speed: 2, range: 2, damageType: WeaponDamageType.MAGIC },
+    stats: { magicAtkBonus: 4, speed: 2, damageType: WeaponDamageType.MAGIC },
     price: 150
   },
   compendium_of_truths: {
@@ -204,7 +209,7 @@ export const TIER_3_WEAPONS: Record<string, ItemDefinition> = {
     descriptionKey: 'items.compendium_of_truths.description',
     type: ItemType.WEAPON_MAGIC,
     tier: 3,
-    stats: { attackDice: 5, speed: 1, range: 3, damageType: WeaponDamageType.MAGIC },
+    stats: { magicAtkBonus: 5, speed: 1, damageType: WeaponDamageType.MAGIC },
     price: 150
   }
 }
@@ -217,7 +222,7 @@ export const TIER_1_ARMOR: Record<string, ItemDefinition> = {
     descriptionKey: 'items.chainmail.description',
     type: ItemType.ARMOR,
     tier: 1,
-    stats: { physicalDefDice: 2, magicDefDice: 1 },
+    stats: { strengthDefBonus: 2, magicDefBonus: 1 },
     price: 0
   },
   copper_plate_armor: {
@@ -226,7 +231,7 @@ export const TIER_1_ARMOR: Record<string, ItemDefinition> = {
     descriptionKey: 'items.copper_plate_armor.description',
     type: ItemType.ARMOR,
     tier: 1,
-    stats: { physicalDefDice: 1, magicDefDice: 2 },
+    stats: { strengthDefBonus: 1, magicDefBonus: 2 },
     price: 0
   }
 }
@@ -239,7 +244,7 @@ export const TIER_2_ARMOR: Record<string, ItemDefinition> = {
     descriptionKey: 'items.full_plate_armor.description',
     type: ItemType.ARMOR,
     tier: 2,
-    stats: { physicalDefDice: 3, magicDefDice: 1 },
+    stats: { strengthDefBonus: 3, magicDefBonus: 1 },
     price: 50
   },
   bronze_plate_armor: {
@@ -248,7 +253,7 @@ export const TIER_2_ARMOR: Record<string, ItemDefinition> = {
     descriptionKey: 'items.bronze_plate_armor.description',
     type: ItemType.ARMOR,
     tier: 2,
-    stats: { physicalDefDice: 1, magicDefDice: 3 },
+    stats: { strengthDefBonus: 1, magicDefBonus: 3 },
     price: 50
   }
 }
@@ -261,7 +266,7 @@ export const TIER_3_ARMOR: Record<string, ItemDefinition> = {
     descriptionKey: 'items.gothic_armor.description',
     type: ItemType.ARMOR,
     tier: 3,
-    stats: { physicalDefDice: 4, magicDefDice: 2 },
+    stats: { strengthDefBonus: 4, magicDefBonus: 2 },
     price: 150
   },
   gold_plate_armor: {
@@ -270,12 +275,14 @@ export const TIER_3_ARMOR: Record<string, ItemDefinition> = {
     descriptionKey: 'items.gold_plate_armor.description',
     type: ItemType.ARMOR,
     tier: 3,
-    stats: { physicalDefDice: 2, magicDefDice: 4 },
+    stats: { strengthDefBonus: 2, magicDefBonus: 4 },
     price: 150
   }
 }
 
 // Consumables
+// NOTE: mana_potion removed in Phase 2A. Per-fight mana budget = maxMana exactly; Reserve tops
+// up only at Encounter start. Existing inventory entries are scrubbed and 25g refunded per row.
 export const CONSUMABLES: Record<string, ConsumableDefinition> = {
   health_potion: {
     id: 'health_potion',
@@ -285,18 +292,7 @@ export const CONSUMABLES: Record<string, ConsumableDefinition> = {
     tier: 1,
     stats: {},
     price: 25,
-    effect: { healHealth: 3 },
-    stackable: true
-  },
-  mana_potion: {
-    id: 'mana_potion',
-    nameKey: 'items.mana_potion.name',
-    descriptionKey: 'items.mana_potion.description',
-    type: ItemType.CONSUMABLE,
-    tier: 1,
-    stats: {},
-    price: 25,
-    effect: { healMana: 3 },
+    effect: { healHealth: 15 },
     stackable: true
   }
 }
@@ -366,18 +362,41 @@ export function applyRarityToStats(stats: ItemStats, rarity: ItemRarity): ItemSt
   const multiplier = RARITY_STAT_MULTIPLIERS[rarity]
   const newStats: ItemStats = { ...stats }
 
-  // Apply multiplier only to dice-based stats
-  if (stats.attackDice !== undefined) {
-    newStats.attackDice = Math.floor(stats.attackDice * multiplier)
+  if (stats.strengthAtkBonus !== undefined) {
+    newStats.strengthAtkBonus = Math.floor(stats.strengthAtkBonus * multiplier)
   }
-
-  if (stats.physicalDefDice !== undefined) {
-    newStats.physicalDefDice = Math.floor(stats.physicalDefDice * multiplier)
+  if (stats.magicAtkBonus !== undefined) {
+    newStats.magicAtkBonus = Math.floor(stats.magicAtkBonus * multiplier)
   }
-
-  if (stats.magicDefDice !== undefined) {
-    newStats.magicDefDice = Math.floor(stats.magicDefDice * multiplier)
+  if (stats.strengthDefBonus !== undefined) {
+    newStats.strengthDefBonus = Math.floor(stats.strengthDefBonus * multiplier)
+  }
+  if (stats.magicDefBonus !== undefined) {
+    newStats.magicDefBonus = Math.floor(stats.magicDefBonus * multiplier)
   }
 
   return newStats
+}
+
+/**
+ * Aggregate loadout stats. Returns flat ATK/DEF/speed bonuses to be merged with class base stats.
+ */
+export function aggregateLoadoutStats(loadout: InventoryItem[]): Required<ItemStats> {
+  const totals: Required<ItemStats> = {
+    strengthAtkBonus: 0,
+    strengthDefBonus: 0,
+    magicAtkBonus: 0,
+    magicDefBonus: 0,
+    speed: 0,
+    damageType: WeaponDamageType.PHYSICAL
+  }
+  for (const item of loadout) {
+    const stats = (item.stats ?? {}) as Record<string, number | undefined>
+    if (typeof stats.strengthAtkBonus === 'number') totals.strengthAtkBonus += stats.strengthAtkBonus
+    if (typeof stats.strengthDefBonus === 'number') totals.strengthDefBonus += stats.strengthDefBonus
+    if (typeof stats.magicAtkBonus === 'number') totals.magicAtkBonus += stats.magicAtkBonus
+    if (typeof stats.magicDefBonus === 'number') totals.magicDefBonus += stats.magicDefBonus
+    if (typeof stats.speed === 'number') totals.speed += stats.speed
+  }
+  return totals
 }

@@ -1,5 +1,5 @@
 'use client'
-import CombatLog from '@/app/(workspace)/map/_components/combat-log.component'
+import CombatLog from '@/components/combat/combat-log.component'
 import { cn } from '@/lib/cn.lib'
 import Dialog, { DialogContent, DialogHeader, DialogTitle } from '@/ui/dialog.component'
 import { EnemyType, getEnemy } from '@shared/constants/enemies'

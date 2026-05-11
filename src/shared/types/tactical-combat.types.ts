@@ -161,7 +161,17 @@ export interface TacticalUnitState {
   maxHealth: number
   currentMana: number
   maxMana: number
-  // Active doctrine buffs (for self-buff doctrines like Stellar Collapse)
+  // Pokémon-style turn order; higher acts first, ties random.
+  speed: number
+  // Stat snapshot at combat init (item bonuses + class base); used by combat-formula.
+  strengthAtk: number
+  strengthDef: number
+  magicAtk: number
+  magicDef: number
+  // Enemy-only: pool of move IDs the AI can pick from.
+  moves?: string[]
+  tier?: number
+  // Active doctrine buffs (for self-buff doctrines like audacity / inspiration / Protect)
   activeDoctrines?: Record<string, ActiveStatusEffect>
   // Active status effects (burning, stunned, etc.)
   activeEffects?: ActiveStatusEffect[]
@@ -170,7 +180,7 @@ export interface TacticalUnitState {
 // Tactical state stored in database (JSON field)
 // Version for tactical state schema - increment when unit templates or state structure changes
 // This prevents hydrating stale state that may reference deleted/changed templates
-export const TACTICAL_STATE_VERSION = 3
+export const TACTICAL_STATE_VERSION = 4
 
 export interface TacticalStateData {
   stateVersion: number // Must match TACTICAL_STATE_VERSION for hydration to succeed
@@ -323,6 +333,51 @@ export interface SelfBuffDoctrineResultBase {
 export interface SelfBuffDoctrineResult extends SelfBuffDoctrineResultBase {
   success: boolean
 }
+
+// Phase 2A: Unified move-resolution result. Returned by executeMove (replaces executeTacticalAttack / executeTacticalDoctrine).
+export interface MoveEffectResult {
+  unitId: string
+  damageDealt?: number
+  healthRestored?: number
+  statusApplied?: string
+  killed?: boolean
+  isCritical?: boolean
+}
+
+export interface TacticalMoveResultBase {
+  casterId: string
+  moveId: string
+  targeting: 'single' | 'all'
+  affectedUnitIds: string[]
+  effects: MoveEffectResult[]
+  manaCost: number
+  updatedState: TacticalStateData
+  logEntries: CombatLogEntry[]
+  recoilDamage?: number
+  casterKilled?: boolean
+  goldReward?: number
+  nextEnemy?: {
+    id: string
+    templateId: string
+    name: string
+    currentHealth: number
+    maxHealth: number
+    currentMana: number
+    maxMana: number
+  }
+  tierProgression?: { oldTier: number; newTier: number }
+}
+
+export interface TacticalMoveResultSuccess extends TacticalMoveResultBase {
+  success: true
+  newMana: number
+}
+
+export interface TacticalMoveResultFailure extends TacticalMoveResultBase {
+  success: false
+}
+
+export type TacticalMoveResult = TacticalMoveResultSuccess | TacticalMoveResultFailure
 
 // Discriminated union types for router returns (with newMana on success)
 

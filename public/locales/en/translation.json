@@ -304,9 +304,12 @@
     "action": {
       "attack": "Attack",
       "doctrine": "Doctrine",
+      "ability": "Abilities",
       "item": "Item",
       "select_target": "Select target"
     },
+    "mana_reserve": "Reserve",
+    "mana_reserve_tooltip": "Reserve: {{reserve}} mana saved for future fights",
     "targeting": {
       "single": "Select a target",
       "all": "Targeting all enemies",
@@ -843,6 +846,11 @@
     },
     "tier_required": "Requires Tier {{tier}}",
     "title": "Doctrines",
+    "basic_strike": {
+      "description": "A standard physical attack. Costs no mana.",
+      "flavor": "Strike fast, strike true.",
+      "name": "Basic Strike"
+    },
     "transfusion": {
       "description": "Sacrifice 2 Wounds to restore 6 Mana.",
       "flavor": "Magic flows better when mixed with blood.",
@@ -1289,12 +1297,16 @@
     },
     "revive": "Revive",
     "stats": {
-      "attack_dice": "Attack Dice",
+      "attack_bonus": "Attack",
+      "magic_atk_bonus": "Magic Atk",
+      "phys_def_bonus": "Phys Def",
+      "magic_def_bonus": "Magic Def",
       "damage_type": "Damage Type",
+      "speed": "Speed",
+      "attack_dice": "Attack Dice",
       "magic_def": "Magic Def",
       "phys_def": "Phys Def",
-      "range": "Range",
-      "speed": "Speed"
+      "range": "Range"
     },
     "stats_title": "Stats",
     "strength_atk": "Strength Atk",

@@ -246,9 +246,9 @@ export class DashboardService {
       this.characterRepository.findWithClasses(userId)
     ])
 
-    const { currentClass, diceBank } = character
+    const { currentClass, manaReserve } = character
       ? this.characterService.getCharacterProgress(character)
-      : { currentClass: undefined, diceBank: 0 }
+      : { currentClass: undefined, manaReserve: 0 }
 
     const { completedToday, totalDaily, meanHabitRate } = this.getHabitMetrics(habits as any, now)
     const { mostCommonType, mostFocusedArea, mostFocusedObjective } = this.getEfficiencyMetrics(metricsTasks as any)
@@ -260,9 +260,11 @@ export class DashboardService {
       character: character
         ? {
             gold: character.gold,
-            diceBank,
-            health: currentClass?.health || 5,
-            mana: currentClass?.mana || 5
+            manaReserve,
+            health: currentClass?.health ?? 0,
+            maxHealth: currentClass?.maxHealth ?? 0,
+            mana: currentClass?.mana ?? 0,
+            maxMana: currentClass?.maxMana ?? 0
           }
         : null,
       upcomingTasks: parsedUpcomingTasks,

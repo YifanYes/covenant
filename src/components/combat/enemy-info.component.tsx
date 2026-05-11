@@ -1,5 +1,5 @@
 'use client'
-import HealthBar from '@/app/(workspace)/map/_components/health-bar.component'
+import HealthBar from '@/components/combat/health-bar.component'
 import ManaBar from '@/components/combat/mana-bar.component'
 import { panelChrome } from '@/components/combat/combat-styles'
 import { cn } from '@/lib/cn.lib'

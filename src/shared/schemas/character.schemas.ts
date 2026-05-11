@@ -40,12 +40,6 @@ export const unequipDoctrineSchema = z.object({
 })
 export type UnequipDoctrineType = z.infer<typeof unequipDoctrineSchema>
 
-export const useDoctrineSchema = z.object({
-  doctrineId: z.string().min(1),
-  participationId: z.string().min(1)
-})
-export type UseDoctrineType = z.infer<typeof useDoctrineSchema>
-
 export const updateCharacterNameSchema = z.object({
   name: z.string().trim().min(1).max(255)
 })

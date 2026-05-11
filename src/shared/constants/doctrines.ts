@@ -9,20 +9,48 @@ import { CharacterClassName, MagicNature } from './classes'
 
 export const MAX_EQUIPPED_DOCTRINES = 2
 
-/** Effect types that qualify a doctrine as a self-buff (no targeting required) */
-export const SELF_BUFF_EFFECT_TYPES: DoctrineEffectType[] = [
-  DoctrineEffectType.POWER_MODIFIER,
-  DoctrineEffectType.THRESHOLD_MODIFIER,
-  DoctrineEffectType.NEGATE_HITS,
-  DoctrineEffectType.GUARANTEED_CRITICAL
-]
+/** ID of the always-available, mana-free fallback move. */
+export const BASIC_STRIKE_ID = 'basic_strike'
 
-/** Doctrines that are self-buffs but don't match the standard effect-type + SELF target pattern */
-export const SPECIAL_SELF_BUFF_DOCTRINES = ['karmic_retribution', 'nullify', 'retaliation']
-
+/**
+ * Phase 2A: Pokémon-style move catalog. Each entry is either a damage move (has `power`/`damageType`)
+ * routed through combat-formula, a side-effect move (buff/protect/thorns/cleanse) routed through
+ * tactical-doctrine, or a damage move with a side-effect rider (status, debuff, recoil).
+ *
+ * Re-interpreted DoctrineEffect semantics in Phase 2A:
+ *   POWER_MODIFIER target=SELF, value=N, duration=D → +N% ATK buff for D turns
+ *   POWER_MODIFIER target=ENEMY, value=N, duration=D → −N% ATK debuff for D turns (negative value)
+ *   THRESHOLD_MODIFIER target=SELF, value=N, duration=D → +N% DEF buff for D turns
+ *   GUARANTEED_CRITICAL target=SELF, value=1 → 100% crit chance for the next damage move
+ *   GUARANTEED_CRITICAL target=SELF, value=N (>=2) → +N% crit chance for the next damage move
+ *   NEGATE_HITS target=SELF, value>=1 → Protect (full block) for 1 turn
+ *   NEGATE_HITS target=SELF, value=0, thornsDamage=D → reflect D damage for 2 turns
+ *   APPLY_STATUS → applies StatusEffect to target (PURIFIED, IMMOBILIZED, WEAKENED, etc.)
+ *   HEAL target=SELF, value=0 → cleanse own debuffs (nullify)
+ */
 export const DOCTRINES: Record<string, DoctrineDefinition> = {
   // ═══════════════════════════════════════
-  // TEMPLAR - TIER 1 - FORM
+  // UNIVERSAL — always-available fallback
+  // ═══════════════════════════════════════
+  basic_strike: {
+    id: 'basic_strike',
+    nameKey: 'doctrines.basic_strike.name',
+    descriptionKey: 'doctrines.basic_strike.description',
+    flavorTextKey: 'doctrines.basic_strike.flavor',
+    className: 'universal',
+    magicNature: 'universal',
+    attribute: DoctrineAttributeType.METAL,
+    tier: 1,
+    manaCost: 0,
+    isUltimate: false,
+    targeting: 'single',
+    effects: [],
+    power: 35,
+    damageType: 'PHYSICAL'
+  },
+
+  // ═══════════════════════════════════════
+  // TEMPLAR — TIER 1
   // ═══════════════════════════════════════
   truth_blade: {
     id: 'truth_blade',
@@ -41,9 +69,11 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
         type: DoctrineEffectType.APPLY_STATUS,
         target: DoctrineTarget.ENEMY,
         statusEffect: StatusEffect.PURIFIED,
-        duration: 2 // Apply PURIFIED for 2 turns (holy damage, affects demons)
+        duration: 2
       }
-    ]
+    ],
+    power: 30,
+    damageType: 'MAGIC'
   },
   miraculous_protection: {
     id: 'miraculous_protection',
@@ -61,14 +91,11 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.NEGATE_HITS,
         target: DoctrineTarget.SELF,
-        value: 1 // Negate 1 hit
+        value: 1,
+        duration: 1
       }
     ]
   },
-
-  // ═══════════════════════════════════════
-  // TEMPLAR - TIER 1 - VOID
-  // ═══════════════════════════════════════
   shoulder_charge: {
     id: 'shoulder_charge',
     nameKey: 'doctrines.shoulder_charge.name',
@@ -81,13 +108,9 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     manaCost: 2,
     isUltimate: false,
     targeting: 'single',
-    effects: [
-      {
-        type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.SELF,
-        value: 1
-      }
-    ]
+    effects: [],
+    power: 50,
+    damageType: 'PHYSICAL'
   },
   reckless_strike: {
     id: 'reckless_strike',
@@ -101,17 +124,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     manaCost: 3,
     isUltimate: false,
     targeting: 'single',
-    effects: [
-      {
-        type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.SELF,
-        value: 2 // +2 power dice, defense becomes 0
-      }
-    ]
+    effects: [],
+    power: 70,
+    damageType: 'PHYSICAL',
+    recoilPercent: 25
   },
 
   // ═══════════════════════════════════════
-  // TEMPLAR - TIER 2 - FORM
+  // TEMPLAR — TIER 2
   // ═══════════════════════════════════════
   light_shield: {
     id: 'light_shield',
@@ -129,15 +149,11 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.THRESHOLD_MODIFIER,
         target: DoctrineTarget.SELF,
-        value: -1,
-        duration: 1
+        value: 50,
+        duration: 2
       }
     ]
   },
-
-  // ═══════════════════════════════════════
-  // TEMPLAR - TIER 2 - VOID
-  // ═══════════════════════════════════════
   precise_strike: {
     id: 'precise_strike',
     nameKey: 'doctrines.precise_strike.name',
@@ -154,9 +170,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.GUARANTEED_CRITICAL,
         target: DoctrineTarget.SELF,
-        value: 5
+        value: 50,
+        duration: 1
       }
-    ]
+    ],
+    power: 50,
+    damageType: 'PHYSICAL'
   },
   audacity: {
     id: 'audacity',
@@ -174,13 +193,14 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.SELF,
-        value: 2
+        value: 50,
+        duration: 2
       }
     ]
   },
 
   // ═══════════════════════════════════════
-  // TEMPLAR - TIER 3 - FORM
+  // TEMPLAR — TIER 3
   // ═══════════════════════════════════════
   iron_bastion: {
     id: 'iron_bastion',
@@ -198,7 +218,8 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.NEGATE_HITS,
         target: DoctrineTarget.SELF,
-        value: 99
+        value: 99,
+        duration: 1
       }
     ]
   },
@@ -214,18 +235,10 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     manaCost: 7,
     isUltimate: true,
     targeting: 'single',
-    effects: [
-      {
-        type: DoctrineEffectType.THRESHOLD_MODIFIER,
-        target: DoctrineTarget.SELF,
-        value: -2
-      }
-    ]
+    effects: [],
+    power: 90,
+    damageType: 'PHYSICAL'
   },
-
-  // ═══════════════════════════════════════
-  // TEMPLAR - TIER 3 - VOID
-  // ═══════════════════════════════════════
   wrath_avatar: {
     id: 'wrath_avatar',
     nameKey: 'doctrines.wrath_avatar.name',
@@ -242,9 +255,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.GUARANTEED_CRITICAL,
         target: DoctrineTarget.SELF,
-        value: 1
+        value: 1,
+        duration: 1
       }
-    ]
+    ],
+    power: 100,
+    damageType: 'PHYSICAL'
   },
   karmic_retribution: {
     id: 'karmic_retribution',
@@ -264,13 +280,13 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
         target: DoctrineTarget.SELF,
         value: 0,
         duration: 2,
-        thornsDamage: 2
+        thornsDamage: 10
       }
     ]
   },
 
   // ═══════════════════════════════════════
-  // HERALD - TIER 1 - VOID
+  // HERALD — TIER 1
   // ═══════════════════════════════════════
   plasma_missile: {
     id: 'plasma_missile',
@@ -284,17 +300,81 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     manaCost: 3,
     isUltimate: false,
     targeting: 'single',
+    effects: [],
+    power: 50,
+    damageType: 'MAGIC'
+  },
+  ice_lance: {
+    id: 'ice_lance',
+    nameKey: 'doctrines.ice_lance.name',
+    descriptionKey: 'doctrines.ice_lance.description',
+    flavorTextKey: 'doctrines.ice_lance.flavor',
+    className: CharacterClassName.HERALD,
+    magicNature: MagicNature.FORM,
+    attribute: DoctrineAttributeType.ICE,
+    tier: 1,
+    manaCost: 3,
+    isUltimate: false,
+    targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.POWER_MODIFIER,
+        type: DoctrineEffectType.APPLY_STATUS,
+        target: DoctrineTarget.ENEMY,
+        statusEffect: StatusEffect.IMMOBILIZED,
+        duration: 1
+      }
+    ],
+    power: 40,
+    damageType: 'MAGIC'
+  },
+  mana_barrier: {
+    id: 'mana_barrier',
+    nameKey: 'doctrines.mana_barrier.name',
+    descriptionKey: 'doctrines.mana_barrier.description',
+    flavorTextKey: 'doctrines.mana_barrier.flavor',
+    className: CharacterClassName.HERALD,
+    magicNature: MagicNature.FORM,
+    attribute: DoctrineAttributeType.LIGHT,
+    tier: 1,
+    manaCost: 3,
+    isUltimate: false,
+    targeting: 'single',
+    effects: [
+      {
+        type: DoctrineEffectType.NEGATE_HITS,
         target: DoctrineTarget.SELF,
-        value: 4
+        value: 1,
+        duration: 1
       }
     ]
   },
+  frost_bite: {
+    id: 'frost_bite',
+    nameKey: 'doctrines.frost_bite.name',
+    descriptionKey: 'doctrines.frost_bite.description',
+    flavorTextKey: 'doctrines.frost_bite.flavor',
+    className: CharacterClassName.HERALD,
+    magicNature: MagicNature.VOID,
+    attribute: DoctrineAttributeType.ICE,
+    tier: 1,
+    manaCost: 3,
+    isUltimate: false,
+    targeting: 'single',
+    effects: [
+      {
+        type: DoctrineEffectType.POWER_MODIFIER,
+        target: DoctrineTarget.ENEMY,
+        value: -30,
+        duration: 1,
+        debuffType: 'attack'
+      }
+    ],
+    power: 30,
+    damageType: 'MAGIC'
+  },
 
   // ═══════════════════════════════════════
-  // HERALD - TIER 2 - FORM
+  // HERALD — TIER 2
   // ═══════════════════════════════════════
   nullify: {
     id: 'nullify',
@@ -318,7 +398,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
 
   // ═══════════════════════════════════════
-  // HERALD - TIER 3 - FORM
+  // HERALD — TIER 3
   // ═══════════════════════════════════════
   inspiration: {
     id: 'inspiration',
@@ -336,15 +416,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
       {
         type: DoctrineEffectType.POWER_MODIFIER,
         target: DoctrineTarget.SELF,
-        value: 4,
+        value: 25,
+        duration: 2,
         scalesWithEnemyTier: true
       }
     ]
   },
-
-  // ═══════════════════════════════════════
-  // HERALD - TIER 3 - VOID
-  // ═══════════════════════════════════════
   stellar_collapse: {
     id: 'stellar_collapse',
     nameKey: 'doctrines.stellar_collapse.name',
@@ -357,14 +434,9 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
     manaCost: 10,
     isUltimate: true,
     targeting: 'single',
-    effects: [
-      {
-        type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.SELF,
-        value: 10,
-        sixesGenerateExtraHits: 1
-      }
-    ]
+    effects: [],
+    power: 110,
+    damageType: 'MAGIC'
   },
   retaliation: {
     id: 'retaliation',
@@ -384,78 +456,7 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
         target: DoctrineTarget.SELF,
         value: 0,
         duration: 2,
-        thornsDamage: 2
-      }
-    ]
-  },
-
-  // ═══════════════════════════════════════
-  // HERALD - TIER 1 - FORM
-  // ═══════════════════════════════════════
-  ice_lance: {
-    id: 'ice_lance',
-    nameKey: 'doctrines.ice_lance.name',
-    descriptionKey: 'doctrines.ice_lance.description',
-    flavorTextKey: 'doctrines.ice_lance.flavor',
-    className: CharacterClassName.HERALD,
-    magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.ICE,
-    tier: 1,
-    manaCost: 3,
-    isUltimate: false,
-    targeting: 'single',
-    effects: [
-      {
-        type: DoctrineEffectType.APPLY_STATUS,
-        target: DoctrineTarget.ENEMY,
-        statusEffect: StatusEffect.IMMOBILIZED,
-        duration: 1
-      }
-    ]
-  },
-  mana_barrier: {
-    id: 'mana_barrier',
-    nameKey: 'doctrines.mana_barrier.name',
-    descriptionKey: 'doctrines.mana_barrier.description',
-    flavorTextKey: 'doctrines.mana_barrier.flavor',
-    className: CharacterClassName.HERALD,
-    magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.LIGHT,
-    tier: 1,
-    manaCost: 3,
-    isUltimate: false,
-    targeting: 'single',
-    effects: [
-      {
-        type: DoctrineEffectType.NEGATE_HITS,
-        target: DoctrineTarget.SELF,
-        value: 1 // Negate first magic hit
-      }
-    ]
-  },
-
-  // ═══════════════════════════════════════
-  // HERALD - TIER 1 - VOID
-  // ═══════════════════════════════════════
-  frost_bite: {
-    id: 'frost_bite',
-    nameKey: 'doctrines.frost_bite.name',
-    descriptionKey: 'doctrines.frost_bite.description',
-    flavorTextKey: 'doctrines.frost_bite.flavor',
-    className: CharacterClassName.HERALD,
-    magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.ICE,
-    tier: 1,
-    manaCost: 3,
-    isUltimate: false,
-    targeting: 'single',
-    effects: [
-      {
-        type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.ENEMY,
-        value: -2, // Enemy -2 power dice
-        duration: 1,
-        debuffType: 'attack'
+        thornsDamage: 10
       }
     ]
   }
@@ -475,9 +476,16 @@ export function getAvailableDoctrines(
   magicNature?: MagicNature
 ): DoctrineDefinition[] {
   return Object.values(DOCTRINES).filter((d) => {
+    if (d.id === BASIC_STRIKE_ID) return false
+    if (d.className === 'universal') return false
     const matchesClass = d.className === className
     const matchesTier = d.tier <= tier
-    const matchesNature = !magicNature || d.magicNature === magicNature
+    const matchesNature = !magicNature || d.magicNature === magicNature || d.magicNature === 'universal'
     return matchesClass && matchesTier && matchesNature
   })
+}
+
+/** Whether the move resolves damage via combat-formula. */
+export function isDamageMove(doctrine: DoctrineDefinition): boolean {
+  return doctrine.power !== undefined && doctrine.damageType !== undefined
 }

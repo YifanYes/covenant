@@ -7,9 +7,9 @@ export const mockCharacter = (overrides = {}) => ({
   userId: 'user-123',
   name: 'Test Character',
   gold: 100,
+  manaReserve: 0,
   currentClass: CharacterClassName.TEMPLAR,
   data: {
-    diceBank: 5,
     equippedDoctrines: []
   },
   classes: [
@@ -18,7 +18,16 @@ export const mockCharacter = (overrides = {}) => ({
       className: CharacterClassName.TEMPLAR,
       tier: 1,
       health: 100,
-      mana: 50
+      maxHealth: 100,
+      mana: 50,
+      maxMana: 50,
+      strengthAtk: 5,
+      strengthDef: 5,
+      magicAtk: 5,
+      magicDef: 5,
+      manaRegen: 1,
+      speed: 1,
+      equippedDoctrines: []
     }
   ],
   inventory: [],

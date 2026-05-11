@@ -1,6 +1,6 @@
 'use client'
-import HealthBar from '@/app/(workspace)/map/_components/health-bar.component'
 import TierBadge from '@/common/tier-badge.component'
+import HealthBar from '@/components/combat/health-bar.component'
 import ManaBar from '@/components/combat/mana-bar.component'
 import { panelChrome } from '@/components/combat/combat-styles'
 import { cn } from '@/lib/cn.lib'
@@ -15,6 +15,7 @@ interface PlayerInfoProps {
   maxHealth: number
   mana: number
   maxMana: number
+  manaReserve?: number
   className?: string
 }
 
@@ -26,6 +27,7 @@ export default function PlayerInfo({
   maxHealth,
   mana,
   maxMana,
+  manaReserve = 0,
   className
 }: PlayerInfoProps) {
   const { t } = useTranslation()
@@ -48,6 +50,14 @@ export default function PlayerInfo({
         <Battery className="h-3 w-3 shrink-0 text-blue-400" />
         <span className="text-[10px] font-bold tracking-widest text-primary">MP</span>
         <ManaBar current={mana} max={maxMana} className="flex-1" />
+        {manaReserve > 0 && (
+          <span
+            className="rounded bg-blue-500/20 px-1 text-[10px] font-bold text-blue-300"
+            title={t('combat.mana_reserve_tooltip', { reserve: manaReserve })}
+          >
+            +{manaReserve}
+          </span>
+        )}
       </div>
     </div>
   )

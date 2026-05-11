@@ -86,11 +86,12 @@ model Character {
   title       String?          @db.VarChar(255)
   factionName String           @default("HOLY_KNIGHTS")
   currentClass String          @db.VarChar(50)
-  data        Json?            @default("{\"diceBank\": 0}")
+  data        Json?            @default("{}")
   createdAt   DateTime         @default(now()) @db.Timestamp(6)
   updatedAt   DateTime         @updatedAt @db.Timestamp(6)
   userId      String           @unique
   gold        Int              @default(0)
+  manaReserve Int              @default(0)
   inventory   Json?            @default("[]")
   loadout     Json?            @default("[]")
   magicNature         String?          @db.VarChar(50)
@@ -105,7 +106,7 @@ model CharacterClass {
   id                String    @id @default(uuid()) @db.Uuid
   characterId       String    @db.Uuid
   className         String    @db.VarChar(50)
-  health            Int       @default(5)
+  health            Int       @default(30)
   mana              Int       @default(5)
   createdAt         DateTime  @default(now()) @db.Timestamp(6)
   updatedAt         DateTime  @updatedAt @db.Timestamp(6)
@@ -115,8 +116,9 @@ model CharacterClass {
   strengthDef       Int       @default(4)
   manaRegen         Int       @default(1)
   tier              Int       @default(1)
-  maxHealth         Int       @default(5)
+  maxHealth         Int       @default(30)
   maxMana           Int       @default(5)
+  speed             Int       @default(1)
   equippedDoctrines String[]  @default([])
   character         Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
