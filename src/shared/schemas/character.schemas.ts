@@ -30,15 +30,15 @@ export const useConsumableSchema = z.object({
 })
 export type UseConsumableType = z.infer<typeof useConsumableSchema>
 
-export const equipDoctrineSchema = z.object({
-  doctrineId: z.string().min(1)
+export const equipAbilitySchema = z.object({
+  abilityId: z.string().min(1)
 })
-export type EquipDoctrineType = z.infer<typeof equipDoctrineSchema>
+export type EquipAbilityType = z.infer<typeof equipAbilitySchema>
 
-export const unequipDoctrineSchema = z.object({
-  doctrineId: z.string().min(1)
+export const unequipAbilitySchema = z.object({
+  abilityId: z.string().min(1)
 })
-export type UnequipDoctrineType = z.infer<typeof unequipDoctrineSchema>
+export type UnequipAbilityType = z.infer<typeof unequipAbilitySchema>
 
 export const updateCharacterNameSchema = z.object({
   name: z.string().trim().min(1).max(255)

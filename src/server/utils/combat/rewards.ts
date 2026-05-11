@@ -46,7 +46,7 @@ export interface EnemyDefeatResult {
 
 /**
  * Process enemy defeat: award gold, check tier progression, spawn next enemy.
- * Unified logic extracted from executeTacticalAttack and executeTacticalDoctrine.
+ * Unified logic extracted from executeTacticalAttack and executeTacticalAbility.
  */
 export async function processEnemyDefeat(
   questId: string,

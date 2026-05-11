@@ -50,7 +50,7 @@ lore/
 ### Mecánicas
 
 - **[Mecánicas](Mecanicas/Mecanicas.md)** - Sistema de combate y turnos para el juego de mesa
-- **[Clases](Mecanicas/Clases.md)** - Las 4 clases jugables con doctrinas por naturaleza de magia
+- **[Clases](Mecanicas/Clases.md)** - Las 4 clases jugables con habilidades por naturaleza de magia
 - **[Economía](Mecanicas/Economia.md)** - Recompensas, costes y progresión económica
 - **[Inversiones](Mecanicas/Inversiones.md)** - Proyectos colectivos que alteran el mundo
 - **[Títulos](Mecanicas/Titulos.md)** - Sistema de rangos y logros
@@ -80,4 +80,4 @@ lore/
 
 ⚠️ **Aviso importante**
 
-Esta obra es una historia de ficción inspirada en los relatos del Apocalipsis y otros pasajes bíblicos. Aunque utiliza nombres, eventos y símbolos tomados de las Sagradas Escrituras, no pretende reinterpretar ni sustituir el mensaje original de la Biblia, ni representar doctrina teológica alguna. Todos los personajes, fechas y acontecimientos descritos forman parte de una narrativa creativa y simbólica, elaborada con fines literarios y artísticos.
+Esta obra es una historia de ficción inspirada en los relatos del Apocalipsis y otros pasajes bíblicos. Aunque utiliza nombres, eventos y símbolos tomados de las Sagradas Escrituras, no pretende reinterpretar ni sustituir el mensaje original de la Biblia, ni representar habilidad teológica alguna. Todos los personajes, fechas y acontecimientos descritos forman parte de una narrativa creativa y simbólica, elaborada con fines literarios y artísticos.

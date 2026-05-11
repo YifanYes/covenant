@@ -10,8 +10,8 @@ export const mockCharacterQuest = (overrides: Record<string, unknown> = {}) => (
   goldEarned: 0,
   startedAt: new Date('2026-01-01T00:00:00Z'),
   completedAt: null,
-  activeDoctrines: {},
-  enemyActiveDoctrines: {},
+  activeAbilities: {},
+  enemyActiveAbilities: {},
   combatStats: {},
   tacticalState: null,
   ...overrides

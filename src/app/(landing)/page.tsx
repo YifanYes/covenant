@@ -127,8 +127,8 @@ function CharacterSection() {
     },
     {
       icon: BookOpen,
-      title: t('landing.character.doctrines.title'),
-      body: t('landing.character.doctrines.body')
+      title: t('landing.character.abilities.title'),
+      body: t('landing.character.abilities.body')
     },
     {
       icon: User,

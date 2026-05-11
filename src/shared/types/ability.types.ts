@@ -1,6 +1,6 @@
 import type { CharacterClassName, MagicNature } from '../constants/classes'
 
-export const DoctrineEffectType = {
+export const AbilityEffectType = {
   POWER_MODIFIER: 'POWER_MODIFIER',
   THRESHOLD_MODIFIER: 'THRESHOLD_MODIFIER',
   GUARANTEED_CRITICAL: 'GUARANTEED_CRITICAL',
@@ -9,7 +9,7 @@ export const DoctrineEffectType = {
   HEAL: 'HEAL',
   DIRECT_DAMAGE: 'DIRECT_DAMAGE'
 } as const
-export type DoctrineEffectType = (typeof DoctrineEffectType)[keyof typeof DoctrineEffectType]
+export type AbilityEffectType = (typeof AbilityEffectType)[keyof typeof AbilityEffectType]
 
 export type MoveDamageType = 'PHYSICAL' | 'MAGIC'
 
@@ -26,8 +26,8 @@ export const StatusEffect = {
   POISONED: 'POISONED',
   // Target has reduced attack or defense dice
   WEAKENED: 'WEAKENED',
-  // Placeholder for active doctrines with immediate effects
-  DOCTRINE_ACTIVE: 'DOCTRINE_ACTIVE'
+  // Placeholder for active abilities with immediate effects
+  ABILITY_ACTIVE: 'ABILITY_ACTIVE'
 } as const
 export type StatusEffect = (typeof StatusEffect)[keyof typeof StatusEffect]
 
@@ -41,7 +41,7 @@ export const NEGATIVE_STATUSES: StatusEffect[] = [
   StatusEffect.WEAKENED
 ]
 
-export const DoctrineAttributeType = {
+export const AbilityAttributeType = {
   LIGHT: 'LIGHT',
   FIRE: 'FIRE',
   METAL: 'METAL',
@@ -53,18 +53,18 @@ export const DoctrineAttributeType = {
   ICE: 'ICE',
   MIND: 'MIND'
 } as const
-export type DoctrineAttributeType = (typeof DoctrineAttributeType)[keyof typeof DoctrineAttributeType]
+export type AbilityAttributeType = (typeof AbilityAttributeType)[keyof typeof AbilityAttributeType]
 
-export const DoctrineTarget = {
+export const AbilityTarget = {
   SELF: 'SELF',
   ENEMY: 'ENEMY',
   ALL_ENEMIES: 'ALL_ENEMIES'
 } as const
-export type DoctrineTarget = (typeof DoctrineTarget)[keyof typeof DoctrineTarget]
+export type AbilityTarget = (typeof AbilityTarget)[keyof typeof AbilityTarget]
 
-export interface DoctrineEffect {
-  type: DoctrineEffectType
-  target: DoctrineTarget
+export interface AbilityEffect {
+  type: AbilityEffectType
+  target: AbilityTarget
   // Value for the effect (e.g., dice bonus, heal amount, damage)
   value?: number
   // Duration in turns for status effects
@@ -85,23 +85,22 @@ export interface DoctrineEffect {
   sixesGenerateExtraHits?: number
 }
 
-export interface DoctrineDefinition {
+export interface AbilityDefinition {
   id: string
   nameKey: string
   descriptionKey: string
   flavorTextKey: string
   className: CharacterClassName | 'universal'
   magicNature: MagicNature | 'universal'
-  attribute: DoctrineAttributeType
+  attribute: AbilityAttributeType
   tier: number
   manaCost: number
   isUltimate: boolean
-  effects: DoctrineEffect[]
+  effects: AbilityEffect[]
   // Pokemon-style targeting: 'single' (1 enemy) or 'all' (all enemies, 0.6x damage)
-  // Omitted for pure self-buff doctrines
+  // Omitted for pure self-buff abilities
   targeting?: 'single' | 'all'
   // Pokémon-style damage move: routes through Gen-1 formula in combat-formula.ts
-  // Side-effect-only moves omit these and route through tactical-doctrine.ts
   power?: number
   damageType?: MoveDamageType
   // Recoil damage as percent of damage dealt (reckless_strike: 25 = 25%)
@@ -111,14 +110,14 @@ export interface DoctrineDefinition {
 /**
  * Represents an active status effect on a combat unit.
  * NOTE: This type serves double duty — it stores both simple statuses (BURNING, STUNNED)
- * and doctrine-specific metadata (pending enemy status, WEAKENED params). Consider splitting
+ * and ability-specific metadata (pending enemy status, WEAKENED params). Consider splitting
  * into discriminated union types if more variants are added.
  */
 export interface ActiveStatusEffect {
   effect: StatusEffect
   remainingTurns: number
-  sourceDoctrineId: string
-  // For mixed SELF+ENEMY doctrines: enemy status to apply on next attack hit
+  sourceAbilityId: string
+  // For mixed SELF+ENEMY abilities: enemy status to apply on next attack hit
   pendingEnemyStatus?: StatusEffect
   pendingEnemyStatusDuration?: number
   // For WEAKENED status: whether it reduces attack or defense, and by how much
@@ -126,10 +125,10 @@ export interface ActiveStatusEffect {
   debuffValue?: number
 }
 
-export interface CombatDoctrineState {
-  equippedDoctrines: string[]
+export interface CombatAbilityState {
+  equippedAbilities: string[]
   activeEffects: Record<string, ActiveStatusEffect>
-  doctrinesUsedThisTurn: string[]
+  abilitiesUsedThisTurn: string[]
 }
 
 export interface EnemyStatusState {

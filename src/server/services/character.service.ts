@@ -1,9 +1,9 @@
 import type { CharacterClassName, MagicNature } from '@shared/constants/classes'
-import { getAvailableDoctrines, getDoctrineById, MAX_EQUIPPED_DOCTRINES } from '@shared/constants/doctrines'
+import { getAvailableAbilities, getAbilityById, MAX_EQUIPPED_ABILITIES } from '@shared/constants/abilities'
 import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import type { CharacterWithClasses } from '@shared/types/character.types'
-import type { DoctrineDefinition } from '@shared/types/doctrine.types'
+import type { AbilityDefinition } from '@shared/types/ability.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
@@ -77,7 +77,7 @@ export class CharacterService {
         magicDef: c.magicDef,
         manaRegen: c.manaRegen,
         speed: (c as { speed?: number }).speed ?? 1,
-        equippedDoctrines: (c as { equippedDoctrines?: string[] }).equippedDoctrines || []
+        equippedAbilities: (c as { equippedAbilities?: string[] }).equippedAbilities || []
       }))
     }
   }
@@ -222,7 +222,7 @@ export class CharacterService {
     return ItemType.ACCESSORY
   }
 
-  async getAvailableDoctrinesForCharacter(userId: string): Promise<DoctrineDefinition[]> {
+  async getAvailableAbilitiesForCharacter(userId: string): Promise<AbilityDefinition[]> {
     const character = await this.characterRepository.getCharacterWithClasses(userId)
     if (!character) {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
@@ -233,14 +233,14 @@ export class CharacterService {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
     }
 
-    return getAvailableDoctrines(
+    return getAvailableAbilities(
       currentClass.className as CharacterClassName,
       currentClass.tier,
       character.magicNature as MagicNature | undefined
     )
   }
 
-  async getEquippedDoctrines(userId: string): Promise<DoctrineDefinition[]> {
+  async getEquippedAbilities(userId: string): Promise<AbilityDefinition[]> {
     const character = await this.characterRepository.getCharacterWithClasses(userId)
     if (!character) {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
@@ -251,11 +251,11 @@ export class CharacterService {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
     }
 
-    const equippedIds = (currentClass as unknown as { equippedDoctrines: string[] }).equippedDoctrines || []
-    return equippedIds.map((id) => getDoctrineById(id)).filter((d): d is DoctrineDefinition => d !== undefined)
+    const equippedIds = (currentClass as unknown as { equippedAbilities: string[] }).equippedAbilities || []
+    return equippedIds.map((id) => getAbilityById(id)).filter((d): d is AbilityDefinition => d !== undefined)
   }
 
-  async equipDoctrine(userId: string, doctrineId: string): Promise<{ success: boolean; equippedDoctrines: string[] }> {
+  async equipAbility(userId: string, abilityId: string): Promise<{ success: boolean; equippedAbilities: string[] }> {
     const character = await this.characterRepository.getCharacterWithClasses(userId)
     if (!character) {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
@@ -266,46 +266,46 @@ export class CharacterService {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
     }
 
-    // Validate doctrine exists
-    const doctrine = getDoctrineById(doctrineId)
-    if (!doctrine) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Doctrine not found' })
+    // Validate ability exists
+    const ability = getAbilityById(abilityId)
+    if (!ability) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Ability not found' })
     }
 
-    // Validate doctrine is for this class
-    if (doctrine.className !== currentClass.className) {
-      throw new TRPCError({ code: 'FORBIDDEN', message: 'Doctrine not available for this class' })
+    // Validate ability is for this class
+    if (ability.className !== currentClass.className) {
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Ability not available for this class' })
     }
 
     // Validate tier requirement
-    if (doctrine.tier > currentClass.tier) {
+    if (ability.tier > currentClass.tier) {
       throw new TRPCError({ code: 'FORBIDDEN', message: 'Tier requirement not met' })
     }
 
-    // Check max equipped doctrines
-    const equippedDoctrines = (currentClass as unknown as { equippedDoctrines: string[] }).equippedDoctrines || []
-    if (equippedDoctrines.length >= MAX_EQUIPPED_DOCTRINES) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Maximum equipped doctrines reached' })
+    // Check max equipped abilities
+    const equippedAbilities = (currentClass as unknown as { equippedAbilities: string[] }).equippedAbilities || []
+    if (equippedAbilities.length >= MAX_EQUIPPED_ABILITIES) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Maximum equipped abilities reached' })
     }
 
     // Check if already equipped
-    if (equippedDoctrines.includes(doctrineId)) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Doctrine already equipped' })
+    if (equippedAbilities.includes(abilityId)) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Ability already equipped' })
     }
 
-    // Equip the doctrine
-    const newEquippedDoctrines = [...equippedDoctrines, doctrineId]
+    // Equip the ability
+    const newEquippedAbilities = [...equippedAbilities, abilityId]
     await this.characterRepository.updateCharacterClass(currentClass.id, {
-      equippedDoctrines: newEquippedDoctrines
+      equippedAbilities: newEquippedAbilities
     })
 
-    return { success: true, equippedDoctrines: newEquippedDoctrines }
+    return { success: true, equippedAbilities: newEquippedAbilities }
   }
 
-  async unequipDoctrine(
+  async unequipAbility(
     userId: string,
-    doctrineId: string
-  ): Promise<{ success: boolean; equippedDoctrines: string[] }> {
+    abilityId: string
+  ): Promise<{ success: boolean; equippedAbilities: string[] }> {
     const character = await this.characterRepository.getCharacterWithClasses(userId)
     if (!character) {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
@@ -316,17 +316,17 @@ export class CharacterService {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
     }
 
-    const equippedDoctrines = (currentClass as unknown as { equippedDoctrines: string[] }).equippedDoctrines || []
-    if (!equippedDoctrines.includes(doctrineId)) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Doctrine not equipped' })
+    const equippedAbilities = (currentClass as unknown as { equippedAbilities: string[] }).equippedAbilities || []
+    if (!equippedAbilities.includes(abilityId)) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Ability not equipped' })
     }
 
-    // Remove the doctrine
-    const newEquippedDoctrines = equippedDoctrines.filter((id) => id !== doctrineId)
+    // Remove the ability
+    const newEquippedAbilities = equippedAbilities.filter((id) => id !== abilityId)
     await this.characterRepository.updateCharacterClass(currentClass.id, {
-      equippedDoctrines: newEquippedDoctrines
+      equippedAbilities: newEquippedAbilities
     })
 
-    return { success: true, equippedDoctrines: newEquippedDoctrines }
+    return { success: true, equippedAbilities: newEquippedAbilities }
   }
 }

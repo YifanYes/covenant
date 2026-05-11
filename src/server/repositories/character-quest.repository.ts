@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@/generated/prisma'
-import type { ActiveStatusEffect } from '@shared/types/doctrine.types'
+import type { ActiveStatusEffect } from '@shared/types/ability.types'
 import type { QuestStatus } from '@shared/constants/quests'
 import type { TacticalStateData } from '@shared/types/tactical-combat.types'
 
@@ -67,22 +67,22 @@ export class CharacterQuestRepository {
     }
   }
 
-  async findByIdWithDoctrines(id: string): Promise<{
+  async findByIdWithAbilities(id: string): Promise<{
     id: string
-    activeDoctrines: Record<string, ActiveStatusEffect> | null
-    enemyActiveDoctrines: Record<string, ActiveStatusEffect> | null
+    activeAbilities: Record<string, ActiveStatusEffect> | null
+    enemyActiveAbilities: Record<string, ActiveStatusEffect> | null
   } | null> {
     const result = await this.prisma.characterQuest.findUnique({
       where: { id },
-      select: { id: true, activeDoctrines: true, enemyActiveDoctrines: true }
+      select: { id: true, activeAbilities: true, enemyActiveAbilities: true }
     })
 
     if (!result) return null
 
     return {
       id: result.id,
-      activeDoctrines: result.activeDoctrines as unknown as Record<string, ActiveStatusEffect> | null,
-      enemyActiveDoctrines: result.enemyActiveDoctrines as unknown as Record<string, ActiveStatusEffect> | null
+      activeAbilities: result.activeAbilities as unknown as Record<string, ActiveStatusEffect> | null,
+      enemyActiveAbilities: result.enemyActiveAbilities as unknown as Record<string, ActiveStatusEffect> | null
     }
   }
 
@@ -130,24 +130,24 @@ export class CharacterQuestRepository {
     })
   }
 
-  async updateDoctrines(
+  async updateAbilities(
     id: string,
-    activeDoctrines: Record<string, ActiveStatusEffect>,
-    enemyActiveDoctrines: Record<string, ActiveStatusEffect>
+    activeAbilities: Record<string, ActiveStatusEffect>,
+    enemyActiveAbilities: Record<string, ActiveStatusEffect>
   ): Promise<void> {
     await this.prisma.characterQuest.update({
       where: { id },
       data: {
-        activeDoctrines: activeDoctrines as unknown as object,
-        enemyActiveDoctrines: enemyActiveDoctrines as unknown as object
+        activeAbilities: activeAbilities as unknown as object,
+        enemyActiveAbilities: enemyActiveAbilities as unknown as object
       }
     })
   }
 
-  async updateActiveDoctrines(id: string, activeDoctrines: Record<string, ActiveStatusEffect>): Promise<void> {
+  async updateActiveAbilities(id: string, activeAbilities: Record<string, ActiveStatusEffect>): Promise<void> {
     await this.prisma.characterQuest.update({
       where: { id },
-      data: { activeDoctrines: activeDoctrines as unknown as object }
+      data: { activeAbilities: activeAbilities as unknown as object }
     })
   }
 

@@ -13,7 +13,7 @@ export interface CharacterClassType {
   magicDef: number
   manaRegen: number
   speed: number
-  equippedDoctrines: string[] // Array of doctrine IDs, max 2
+  equippedAbilities: string[] // Array of ability IDs, max 2
   createdAt: Date
   updatedAt: Date
 }

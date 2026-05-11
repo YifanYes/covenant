@@ -19,8 +19,8 @@ Replaces the `MapActivity`/`ActivityParticipation` shared-event system with indi
 | goldEarned           | Int      | Gold accumulated                  |
 | startedAt            | DateTime |                                   |
 | completedAt          | DateTime | nullable                          |
-| activeDoctrines      | Json     | Player doctrine state             |
-| enemyActiveDoctrines | Json     | Enemy doctrine state              |
+| activeAbilities      | Json     | Player ability state             |
+| enemyActiveAbilities | Json     | Enemy ability state              |
 | combatStats          | Json     | Encounter pattern state           |
 | tacticalState        | Json     | Full tactical combat snapshot     |
 

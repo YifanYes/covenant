@@ -22,7 +22,7 @@ describe('CharacterService', () => {
       updateHealth: vi.fn(),
       equipItem: vi.fn(),
       unequipItem: vi.fn(),
-      updateDoctrines: vi.fn()
+      updateAbilities: vi.fn()
     }
 
     mockUserRepo = {
@@ -82,8 +82,8 @@ describe('CharacterService', () => {
     })
   })
 
-  describe('doctrine management', () => {
-    it('should equip a doctrine if slots are available', async () => {
+  describe('ability management', () => {
+    it('should equip a ability if slots are available', async () => {
       // Mock character with Tier 1 (1 slot) and 0 equipped
       const character = mockCharacter({
         classes: [{ tier: 1, className: CharacterClassName.TEMPLAR }]
@@ -91,31 +91,31 @@ describe('CharacterService', () => {
       mockCharacterRepo.getCharacterWithClasses.mockResolvedValue(character)
       mockCharacterRepo.updateCharacterClass.mockResolvedValue(undefined)
 
-      const doctrineId = 'truth_blade'
+      const abilityId = 'truth_blade'
 
-      const result = await characterService.equipDoctrine('user-1', doctrineId)
+      const result = await characterService.equipAbility('user-1', abilityId)
 
       expect(result.success).toBe(true)
-      expect(result.equippedDoctrines).toContain(doctrineId)
+      expect(result.equippedAbilities).toContain(abilityId)
     })
 
     it('should fail to equip if slots are full', async () => {
       // Mock character with Tier 1 (1 slot) and 1 already equipped
-      const existingDoctrine = 'some-doctrine'
+      const existingAbility = 'some-ability'
       const character = mockCharacter({
         classes: [
           {
             tier: 1,
             className: CharacterClassName.TEMPLAR,
-            equippedDoctrines: [existingDoctrine, 'another-one']
+            equippedAbilities: [existingAbility, 'another-one']
           }
         ]
       })
       mockCharacterRepo.getCharacterWithClasses.mockResolvedValue(character)
 
-      const doctrineId = 'truth_blade'
+      const abilityId = 'truth_blade'
 
-      await expect(characterService.equipDoctrine('user-1', doctrineId)).rejects.toThrow(/Maximum.*reached/)
+      await expect(characterService.equipAbility('user-1', abilityId)).rejects.toThrow(/Maximum.*reached/)
     })
   })
 })

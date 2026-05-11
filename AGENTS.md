@@ -56,6 +56,7 @@ To bypass the hook in emergencies: `git push --no-verify`
   - `pnpm db:migrate` → `prisma migrate deploy`
   - `npx prisma generate` → regenerate client only
 - Config reads `DIRECT_URL` from `.env.local` via `prisma.config.ts`
+- **Current development workflow**: use `pnpm db:push` followed by `npx prisma generate` for schema changes. Do not generate migrations with `prisma migrate dev` during active development.
 
 ## Architecture
 

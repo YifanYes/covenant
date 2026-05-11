@@ -1,6 +1,6 @@
 import type { EnemyTemplate } from '../constants/enemies'
 import type { WeaponDamageType } from '../constants/items'
-import type { ActiveStatusEffect } from './doctrine.types'
+import type { ActiveStatusEffect } from './ability.types'
 
 export const ItemType = {
   WEAPON_MELEE: 'WEAPON_MELEE',
@@ -88,7 +88,7 @@ export const CombatLogType = {
   PLAYER_DEFEATED: 'PLAYER_DEFEATED',
   PHASE_COMPLETE: 'PHASE_COMPLETE',
   STATUS_EFFECT: 'STATUS_EFFECT',
-  DOCTRINE_EFFECT: 'DOCTRINE_EFFECT',
+  ABILITY_EFFECT: 'ABILITY_EFFECT',
   STATUS_EXPIRED: 'STATUS_EXPIRED'
 } as const
 export type CombatLogType = (typeof CombatLogType)[keyof typeof CombatLogType]
@@ -142,8 +142,8 @@ export interface CombatTurnResult {
   logEntries: CombatLogEntry[]
   playerWonInitiative: boolean
   criticalThreshold: number
-  updatedActiveDoctrines: Record<string, ActiveStatusEffect>
-  updatedEnemyActiveDoctrines: Record<string, ActiveStatusEffect>
+  updatedActiveAbilities: Record<string, ActiveStatusEffect>
+  updatedEnemyActiveAbilities: Record<string, ActiveStatusEffect>
 }
 
 // Character class info for inventory view
@@ -162,7 +162,7 @@ export interface InventoryCharacterClass {
   magicDef: number
   manaRegen: number
   speed: number
-  equippedDoctrines: string[]
+  equippedAbilities: string[]
 }
 
 // Character data returned by getCurrentClass endpoint

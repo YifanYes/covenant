@@ -1,7 +1,7 @@
 'use client'
 import { useCombatAnimations } from '@/hooks/use-combat-animations.hook'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import { BASIC_STRIKE_ID, DOCTRINES, isDamageMove } from '@shared/constants/doctrines'
+import { BASIC_STRIKE_ID, ABILITIES, isDamageMove } from '@shared/constants/abilities'
 import { getEnemy } from '@shared/constants/enemies'
 import type { CombatLogEntry, EnemyState, InventoryCharacter } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -83,7 +83,7 @@ export function useCombat(
     })
   }, [questId])
 
-  // Phase 2A: single executeMove mutation replaces attack/doctrine/self-buff trio.
+  // Phase 2A: single executeMove mutation replaces attack/ability/self-buff trio.
   const moveMutation = useMutation(
     trpcOptions.quest.executeMove.mutationOptions({
       onSuccess: async (result) => {
@@ -228,7 +228,7 @@ export function useCombat(
 
   const selectMove = useCallback(
     (moveId: string) => {
-      const def = DOCTRINES[moveId]
+      const def = ABILITIES[moveId]
       if (!def) return
       // Damage moves and ENEMY-targeted moves need targeting; pure self-effects fire immediately.
       const needsEnemyTarget = isDamageMove(def) || def.effects.some((e) => e.target === 'ENEMY')

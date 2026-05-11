@@ -18,7 +18,7 @@ Helldivers 2 es el estándar de oro actual para la narrativa comunitaria ("Galac
 **Aplicación en ARQ:**
 
 - Las **"Misiones de Temporada"** en la App deben ser Órdenes Mayores.
-- Ejemplo: _Temporada 1: El Asedio de Santa Cruz._ Si la comunidad completa 10.000 hábitos de "Lectura", se descifra un tomo antiguo y ganan una doctrina de Luz global. Si fallan, el enemigo gana resistencia a la Luz en la siguiente temporada.
+- Ejemplo: _Temporada 1: El Asedio de Santa Cruz._ Si la comunidad completa 10.000 hábitos de "Lectura", se descifra un tomo antiguo y ganan una habilidad de Luz global. Si fallan, el enemigo gana resistencia a la Luz en la siguiente temporada.
 
 ## Clichés de Fantasía Medieval (A Evitar o Invertir)
 
@@ -49,19 +49,19 @@ Para que ARQ se sienta único y bíblico/apocalíptico, evita estos tropos:
 
 ### Simplificación del "Mana Burn" (Sobrecarga)
 
-**Problema:** Contar doctrinas por turno es tedioso en mesa.
+**Problema:** Contar habilidades por turno es tedioso en mesa.
 **Solución: El Dado de Desgaste (Usage Die).**
 
 - Esta mecánica es popular en _The Black Hack_.
 - **En Mesa:** Tienes un dado de "Reserva" (ej. D6).
-- Cada vez que lanzas una doctrina potente, tiras el dado de Reserva.
+- Cada vez que lanzas una habilidad potente, tiras el dado de Reserva.
   - Si sale 1-2: El dado "baja de tamaño" (D6 -> D4 -> Agotado/Sobrecarga).
 - **En App:** Se calcula automáticamente con contadores precisos.
 
 **Alternativa Visual (Propuesta elegida): Contadores de Calor.**
 
-- Lanzar doctrina básica: +0 Calor.
-- Lanzar doctrina fuerte: +1 Calor.
+- Lanzar habilidad básica: +0 Calor.
+- Lanzar habilidad fuerte: +1 Calor.
 - Si Calor > Tier del personaje: **Quemadura** (1 daño por cada punto extra).
 - Se limpia al final del turno.
 - _En mesa:_ Simplemente pones un token rojo cada vez que usas una skill fuerte. Si tienes más tokens que tu Tier, te haces daño. Súper visual y simple.

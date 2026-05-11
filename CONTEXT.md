@@ -16,9 +16,9 @@ A single character's instanced run through an ordered sequence of combat encount
 
 One combat instance inside a Quest. Has its own `tacticalState` snapshot. Mana is topped up from reserve at encounter start (see Mana / Reserve).
 
-### Ability (UI) / Doctrine (code)
+### Ability (UI) / Ability (code)
 
-A player-castable combat move with a `manaCost`. **UI-facing label is "Ability"; code identifier is `doctrine` / `DOCTRINES`**. The split is intentional and load-bearing — renaming the code symbol is deferred to avoid a file-wide churn that doesn't change behavior.
+A player-castable combat move with a `manaCost`. **UI-facing label is "Ability"; code identifier is `ability` / `ABILITIES`**. The split is intentional and load-bearing — renaming the code symbol is deferred to avoid a file-wide churn that doesn't change behavior.
 
 ### Mana
 
@@ -38,7 +38,7 @@ Productivity-views set: `/tasks`, `/habits`, `/dashboard`, `/settings`, `/journa
 
 ### Beta scope (combat redesign)
 
-- **Released classes:** Templar, Herald. Inquisitor and Demon Hunter are defined in `classes.ts` but have no Abilities (`doctrines.ts`) — both are pre-release and out of beta scope.
+- **Released classes:** Templar, Herald. Inquisitor and Demon Hunter are defined in `classes.ts` but have no Abilities (`abilities.ts`) — both are pre-release and out of beta scope.
 - **Released tiers:** 1–3. Tier 4 (`level = 50`) is not in the beta; no T4 Abilities exist. Damage-formula tier→level mapping (`tier*10 + 10`) reserves L50 for post-beta content.
 
 ### Item stats (post-redesign)

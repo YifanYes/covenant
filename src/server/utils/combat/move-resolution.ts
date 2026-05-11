@@ -1,11 +1,11 @@
-import { DOCTRINES, isDamageMove } from '@shared/constants/doctrines'
+import { ABILITIES, isDamageMove } from '@shared/constants/abilities'
 import {
-  DoctrineEffectType,
-  DoctrineTarget,
+  AbilityEffectType,
+  AbilityTarget,
   NEGATIVE_STATUSES,
   StatusEffect,
   type ActiveStatusEffect
-} from '@shared/types/doctrine.types'
+} from '@shared/types/ability.types'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { CombatLogType, type CombatLogEntry } from '@shared/types/gamification.types'
 import type {
@@ -48,53 +48,53 @@ function applyAppliedStatusToTarget(
   const next: ActiveStatusEffect = {
     effect,
     remainingTurns: duration,
-    sourceDoctrineId: sourceMoveId
+    sourceAbilityId: sourceMoveId
   }
   return { ...state, units: withUpdated(state, idx, { activeEffects: [...existing, next] }) }
 }
 
-function applyDebuffActiveDoctrineToTarget(
+function applyDebuffActiveAbilityToTarget(
   state: TacticalStateData,
   targetId: string,
-  doctrineId: string,
+  abilityId: string,
   duration: number
 ): TacticalStateData {
   const idx = findUnitIndex(state, targetId)
   if (idx < 0) return state
-  const existing = state.units[idx].activeDoctrines ?? {}
+  const existing = state.units[idx].activeAbilities ?? {}
   return {
     ...state,
     units: withUpdated(state, idx, {
-      activeDoctrines: {
+      activeAbilities: {
         ...existing,
-        [doctrineId]: {
-          effect: StatusEffect.DOCTRINE_ACTIVE,
+        [abilityId]: {
+          effect: StatusEffect.ABILITY_ACTIVE,
           remainingTurns: duration,
-          sourceDoctrineId: doctrineId
+          sourceAbilityId: abilityId
         }
       }
     })
   }
 }
 
-function applySelfBuffActiveDoctrine(
+function applySelfBuffActiveAbility(
   state: TacticalStateData,
   casterId: string,
-  doctrineId: string,
+  abilityId: string,
   duration: number
 ): TacticalStateData {
   const idx = findUnitIndex(state, casterId)
   if (idx < 0) return state
-  const existing = state.units[idx].activeDoctrines ?? {}
+  const existing = state.units[idx].activeAbilities ?? {}
   return {
     ...state,
     units: withUpdated(state, idx, {
-      activeDoctrines: {
+      activeAbilities: {
         ...existing,
-        [doctrineId]: {
-          effect: StatusEffect.DOCTRINE_ACTIVE,
+        [abilityId]: {
+          effect: StatusEffect.ABILITY_ACTIVE,
           remainingTurns: duration,
-          sourceDoctrineId: doctrineId
+          sourceAbilityId: abilityId
         }
       }
     })
@@ -109,14 +109,14 @@ function cleanseDebuffs(state: TacticalStateData, casterId: string): TacticalSta
 }
 
 function dropExpiredBuffs(unit: TacticalUnitState): TacticalUnitState {
-  if (!unit.activeDoctrines) return unit
+  if (!unit.activeAbilities) return unit
   const next: Record<string, ActiveStatusEffect> = {}
-  for (const [id, eff] of Object.entries(unit.activeDoctrines)) {
+  for (const [id, eff] of Object.entries(unit.activeAbilities)) {
     if (eff.remainingTurns > 1) {
       next[id] = { ...eff, remainingTurns: eff.remainingTurns - 1 }
     }
   }
-  return { ...unit, activeDoctrines: next }
+  return { ...unit, activeAbilities: next }
 }
 
 function decrementStatusEffects(unit: TacticalUnitState): TacticalUnitState {
@@ -128,7 +128,7 @@ function decrementStatusEffects(unit: TacticalUnitState): TacticalUnitState {
 }
 
 /**
- * Execute a Pokémon-style move (formerly `executeTacticalAttack` + `executeTacticalDoctrine`).
+ * Execute a Pokémon-style move (formerly `executeTacticalAttack` + `executeTacticalAbility`).
  *
  * Flow:
  *   1. Validate ownership, mana, turn.
@@ -166,7 +166,7 @@ export async function executeMove(args: {
     throw new TRPCError({ code: 'BAD_REQUEST', message: "Not this unit's turn" })
   }
 
-  const move = DOCTRINES[moveId]
+  const move = ABILITIES[moveId]
   if (!move) {
     throw new TRPCError({ code: 'NOT_FOUND', message: `Move ${moveId} not found` })
   }
@@ -233,8 +233,8 @@ export async function executeMove(args: {
       // Apply move side-effects on hit (status, debuff). Per spec, statuses apply only on damaging hits.
       if (dmg > 0 && !result.protected) {
         for (const e of move.effects) {
-          if (e.target === DoctrineTarget.ENEMY) {
-            if (e.type === DoctrineEffectType.APPLY_STATUS && e.statusEffect) {
+          if (e.target === AbilityTarget.ENEMY) {
+            if (e.type === AbilityEffectType.APPLY_STATUS && e.statusEffect) {
               const existingEffects = units[tIdx].activeEffects ?? []
               units = units.map((u, i) =>
                 i === tIdx
@@ -245,25 +245,25 @@ export async function executeMove(args: {
                         {
                           effect: e.statusEffect!,
                           remainingTurns: e.duration ?? 1,
-                          sourceDoctrineId: moveId
+                          sourceAbilityId: moveId
                         } as ActiveStatusEffect
                       ]
                     }
                   : u
               )
               effects.push({ unitId: tid, statusApplied: e.statusEffect })
-            } else if (e.type === DoctrineEffectType.POWER_MODIFIER) {
-              const existing = units[tIdx].activeDoctrines ?? {}
+            } else if (e.type === AbilityEffectType.POWER_MODIFIER) {
+              const existing = units[tIdx].activeAbilities ?? {}
               units = units.map((u, i) =>
                 i === tIdx
                   ? {
                       ...u,
-                      activeDoctrines: {
+                      activeAbilities: {
                         ...existing,
                         [moveId]: {
-                          effect: StatusEffect.DOCTRINE_ACTIVE,
+                          effect: StatusEffect.ABILITY_ACTIVE,
                           remainingTurns: e.duration ?? 1,
-                          sourceDoctrineId: moveId
+                          sourceAbilityId: moveId
                         }
                       }
                     }
@@ -329,18 +329,18 @@ export async function executeMove(args: {
   // Side-effect-only moves (or side-effect riders not tied to damage)
   if (!stunned) {
     for (const e of move.effects) {
-      if (e.target === DoctrineTarget.SELF) {
+      if (e.target === AbilityTarget.SELF) {
         if (
-          e.type === DoctrineEffectType.POWER_MODIFIER ||
-          e.type === DoctrineEffectType.THRESHOLD_MODIFIER ||
-          e.type === DoctrineEffectType.GUARANTEED_CRITICAL ||
-          e.type === DoctrineEffectType.NEGATE_HITS
+          e.type === AbilityEffectType.POWER_MODIFIER ||
+          e.type === AbilityEffectType.THRESHOLD_MODIFIER ||
+          e.type === AbilityEffectType.GUARANTEED_CRITICAL ||
+          e.type === AbilityEffectType.NEGATE_HITS
         ) {
-          state = applySelfBuffActiveDoctrine(state, casterId, moveId, e.duration ?? 1)
-        } else if (e.type === DoctrineEffectType.HEAL && (e.value ?? 0) === 0) {
+          state = applySelfBuffActiveAbility(state, casterId, moveId, e.duration ?? 1)
+        } else if (e.type === AbilityEffectType.HEAL && (e.value ?? 0) === 0) {
           // Cleanse
           state = cleanseDebuffs(state, casterId)
-        } else if (e.type === DoctrineEffectType.HEAL && (e.value ?? 0) > 0) {
+        } else if (e.type === AbilityEffectType.HEAL && (e.value ?? 0) > 0) {
           // Direct heal (legacy path, not used in beta)
           const ci = findUnitIndex(state, casterId)
           if (ci >= 0) {
@@ -350,14 +350,14 @@ export async function executeMove(args: {
             effects.push({ unitId: casterId, healthRestored: newHp - u.currentHealth })
           }
         }
-      } else if (e.target === DoctrineTarget.ENEMY && !damageMove) {
+      } else if (e.target === AbilityTarget.ENEMY && !damageMove) {
         // Pure status / debuff applied without a damage roll (no such moves in beta — defensive).
         for (const tid of targetIds) {
-          if (e.type === DoctrineEffectType.APPLY_STATUS && e.statusEffect) {
+          if (e.type === AbilityEffectType.APPLY_STATUS && e.statusEffect) {
             state = applyAppliedStatusToTarget(state, tid, e.statusEffect, e.duration ?? 1, moveId)
             effects.push({ unitId: tid, statusApplied: e.statusEffect })
-          } else if (e.type === DoctrineEffectType.POWER_MODIFIER) {
-            state = applyDebuffActiveDoctrineToTarget(state, tid, moveId, e.duration ?? 1)
+          } else if (e.type === AbilityEffectType.POWER_MODIFIER) {
+            state = applyDebuffActiveAbilityToTarget(state, tid, moveId, e.duration ?? 1)
           }
         }
       }
@@ -373,7 +373,7 @@ export async function executeMove(args: {
         ...state,
         units: withUpdated(state, ci, {
           hasActed: true,
-          activeDoctrines: decremented.activeDoctrines
+          activeAbilities: decremented.activeAbilities
         })
       }
     }
@@ -564,11 +564,11 @@ export async function executeEnemyMove(args: {
   // Move selection: pick cheapest affordable move from enemy.moves[]; fall back to basic_strike.
   const currentEnemy = state.units.find((u) => u.id === enemyId)!
   const pool = ((currentEnemy.moves && currentEnemy.moves.length > 0 ? currentEnemy.moves : ['basic_strike']) ?? [])
-    .map((id) => DOCTRINES[id])
+    .map((id) => ABILITIES[id])
     .filter((d): d is NonNullable<typeof d> => !!d && d.manaCost <= currentEnemy.currentMana)
-  const chosen = pool[0] ?? DOCTRINES['basic_strike']
+  const chosen = pool[0] ?? ABILITIES['basic_strike']
   if (!chosen) {
-    throw new TRPCError({ code: 'NOT_FOUND', message: 'basic_strike not in DOCTRINES' })
+    throw new TRPCError({ code: 'NOT_FOUND', message: 'basic_strike not in ABILITIES' })
   }
 
   return executeMove({

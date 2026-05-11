@@ -35,7 +35,7 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
       case CombatLogType.PHASE_COMPLETE:
         return Flag
       case CombatLogType.STATUS_EFFECT:
-      case CombatLogType.DOCTRINE_EFFECT:
+      case CombatLogType.ABILITY_EFFECT:
         return Zap
       case CombatLogType.STATUS_EXPIRED:
         return Shield
@@ -66,7 +66,7 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
         return 'text-yellow-500'
       case CombatLogType.STATUS_EFFECT:
         return 'text-amber-500'
-      case CombatLogType.DOCTRINE_EFFECT:
+      case CombatLogType.ABILITY_EFFECT:
         return 'text-purple-500'
       case CombatLogType.STATUS_EXPIRED:
         return 'text-slate-400'
@@ -112,8 +112,8 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
         const effectKey = (data.effect as string)?.toLowerCase() ?? 'unknown'
         const targetKey = data.target === 'player' ? 'ti' : (data.target as string)
 
-        if (effectKey === 'doctrine_active') {
-          return t('combat.log.doctrine_active', {
+        if (effectKey === 'ability_active') {
+          return t('combat.log.ability_active', {
             effect: t(`status_effects.${effectKey}`, { defaultValue: effectKey })
           })
         }
@@ -123,18 +123,18 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
           target: targetKey === 'ti' ? 'ti' : translateEnemyName(targetKey)
         })
       }
-      case CombatLogType.DOCTRINE_EFFECT: {
-        const doctrineId = (data.doctrine as string)?.toLowerCase() ?? 'unknown'
+      case CombatLogType.ABILITY_EFFECT: {
+        const abilityId = (data.ability as string)?.toLowerCase() ?? 'unknown'
         const effectName = (data.effect as string)?.toLowerCase()
-        const doctrineName = t(`doctrines.${doctrineId}.name`, { defaultValue: doctrineId })
+        const abilityName = t(`abilities.${abilityId}.name`, { defaultValue: abilityId })
 
-        // If no effect specified, just show the doctrine name
+        // If no effect specified, just show the ability name
         if (!effectName) {
-          return t('combat.log.doctrine_cast', { doctrine: doctrineName })
+          return t('combat.log.ability_cast', { ability: abilityName })
         }
 
-        return t('combat.log.doctrine_effect', {
-          doctrine: doctrineName,
+        return t('combat.log.ability_effect', {
+          ability: abilityName,
           effect: t(`status_effects.${effectName}`, { defaultValue: effectName })
         })
       }

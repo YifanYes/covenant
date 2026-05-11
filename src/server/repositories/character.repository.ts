@@ -207,7 +207,7 @@ export class CharacterRepository {
     return this.findWithClasses(userId)
   }
 
-  async updateCharacterClass(classId: string, data: { equippedDoctrines?: string[] }): Promise<void> {
+  async updateCharacterClass(classId: string, data: { equippedAbilities?: string[] }): Promise<void> {
     await this.prisma.characterClass.update({
       where: { id: classId },
       data

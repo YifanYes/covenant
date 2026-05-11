@@ -79,11 +79,11 @@ Presenta la experiencia RPG personal: avatar, estadísticas y habilidades.
 - **Titular:** `landing.character.stats.title`
 - **Cuerpo:** `landing.character.stats.body`
 
-### Sistema de Doctrinas y Maná
+### Sistema de Habilidades y Maná
 
 - **Icono:** BookOpen
-- **Titular:** `landing.character.doctrines.title`
-- **Cuerpo:** `landing.character.doctrines.body`
+- **Titular:** `landing.character.abilities.title`
+- **Cuerpo:** `landing.character.abilities.body`
 
 ### Clases con Identidad
 

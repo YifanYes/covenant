@@ -36,10 +36,10 @@ Los atributos determinan el poder y la capacidad de reacción del personaje. Cad
   - **Ataque:** Para impactar con armas físicas (ej. espadas, hachas, pistolas).
   - **Defensa:** Para bloquear impactos físicos.
 - **Magia:** **Umbral de Éxito** para acciones mágicas.
-  - **Ataque:** Para impactar con doctrinas o armas mágicas (ej. varas, grimorios).
+  - **Ataque:** Para impactar con habilidades o armas mágicas (ej. varas, grimorios).
   - **Defensa:** Para bloquear impactos mágicos.
 
-> **Regla de Oro:** Los **Atributos** definen tu **Umbral de Éxito** (Número a superar). El **Equipo y Doctrinas** definen tu **Potencia** (Cantidad de dados). A menor atributo, mayor es tu maestría (necesitas un resultado menor para tener éxito).
+> **Regla de Oro:** Los **Atributos** definen tu **Umbral de Éxito** (Número a superar). El **Equipo y Habilidades** definen tu **Potencia** (Cantidad de dados). A menor atributo, mayor es tu maestría (necesitas un resultado menor para tener éxito).
 
 ## 4. Fórmulas de Vitalidad
 
@@ -50,17 +50,17 @@ Los atributos determinan el poder y la capacidad de reacción del personaje. Cad
 
 Con esta fórmula intentamos mantener la letalidad constante: mueres en 3-4 golpes limpios.
 
-- **Maná (Recursos):** Determinado por la clase. Puntos para poder usar doctrinas. Ver [Clases.md](./Clases.md) para detalles específicos de cada clase.
+- **Maná (Recursos):** Determinado por la clase. Puntos para poder usar habilidades. Ver [Clases.md](./Clases.md) para detalles específicos de cada clase.
 
 ## 5. Sistema de Combate Simétrico
 
 El combate se resuelve comparando **Impactos** (ataque exitoso) contra **Bloqueos** (defensa exitosa). Si sale un 6, se considera un crítico. Solo puede ser defendido por otro 6.
 
-- **Potencia:** puede ser de ataque o defensa. Se refiere al total de dados que se lanzan, después de tener en cuenta los atributos, el equipamiento y las doctrinas.
+- **Potencia:** puede ser de ataque o defensa. Se refiere al total de dados que se lanzan, después de tener en cuenta los atributos, el equipamiento y las habilidades.
 
 ### Paso 1: Ataque
 
-El atacante lanza una cantidad de dados igual a su **Potencia de Ataque** (Dados del Arma + Dados de Doctrina).
+El atacante lanza una cantidad de dados igual a su **Potencia de Ataque** (Dados del Arma + Dados de Habilidad).
 
 - **Éxito:** Cada dado que sea **igual o mayor** a su **Umbral de Ataque** (Fuerza o Magia) genera **1 Impacto**.
 

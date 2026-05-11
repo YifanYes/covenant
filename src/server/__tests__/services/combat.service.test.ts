@@ -37,7 +37,7 @@ const createMockCharacter = (
       magicDef: 5,
       speed: 1,
       manaRegen: 0,
-      equippedDoctrines: []
+      equippedAbilities: []
     }
   ]
 })

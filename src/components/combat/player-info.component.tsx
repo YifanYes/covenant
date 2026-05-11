@@ -37,7 +37,7 @@ export default function PlayerInfo({
       <div className="flex items-center gap-2">
         <span className="text-sm font-bold">{name}</span>
         {magicNature && (
-          <span className="text-muted-foreground text-xs">{t(`doctrines.magic_nature.${magicNature}`)}</span>
+          <span className="text-muted-foreground text-xs">{t(`abilities.magic_nature.${magicNature}`)}</span>
         )}
         <TierBadge tier={tier} />
       </div>

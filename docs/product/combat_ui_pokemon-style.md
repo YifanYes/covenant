@@ -9,11 +9,11 @@ This is a **view-layer transformation only**. No changes to `useCombat` hook, mu
 ## Goals
 
 - Diagonal battle layout: enemy info top-left, enemy sprite top-right, player sprite middle-left, player info middle-right (all four pieces inside the battle-scene grid; the action region sits below).
-- Bottom UI: message box (left) + 1×3 horizontal command row (right) — Atacar / Doctrina / Objeto.
+- Bottom UI: message box (left) + 1×3 horizontal command row (right) — Atacar / Habilidad / Objeto.
 - Per-quest scenic background art with graceful fallback when assets are missing.
 - Faction-aware accent coloring via existing CSS variable system (no per-faction conditionals in component code).
 - Pokémon-style chrome on every panel: 2px border, hard offset shadow, rounded corners.
-- All current functionality preserved (roll → results → attack, doctrine targeting, potions, victory/defeat dialogs, animations, damage numbers).
+- All current functionality preserved (roll → results → attack, ability targeting, potions, victory/defeat dialogs, animations, damage numbers).
 
 ## Non-Goals
 
@@ -37,7 +37,7 @@ This is a **view-layer transformation only**. No changes to `useCombat` hook, mu
 │           ╰───◯────╯                             │
 ├──────────────────────────────────────────────────┤
 │  ╭──────────────────╮  ╭──────┬──────────┬─────╮ │
-│  │ Tu turno         │  │Atacar│ Doctrina │Obje.│ │
+│  │ Tu turno         │  │Atacar│ Habilidad │Obje.│ │
 │  │ Banco: 999       │  │      │          │     │ │
 │  ╰──────────────────╯  ╰──────┴──────────┴─────╯ │
 └──────────────────────────────────────────────────┘
@@ -93,22 +93,22 @@ Default export. Tiny presentational component that renders the absolute-position
 
 ### `src/components/combat/combat-action-bar.component.tsx`
 
-Replace left-tabs/right-content layout. Single `view` state: `'menu' | 'attack' | 'doctrine' | 'item'`.
+Replace left-tabs/right-content layout. Single `view` state: `'menu' | 'attack' | 'ability' | 'item'`.
 
 | View             | Renders                                                                                                                                                                                      |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `menu` (default) | 1×3 row of pixel-bordered command buttons: Atacar, Doctrina, Objeto. Each `flex-1 h-full`, hover → `bg-primary/10`, active → `bg-primary text-primary-foreground`. Disabled when `disabled`. |
+| `menu` (default) | 1×3 row of pixel-bordered command buttons: Atacar, Habilidad, Objeto. Each `flex-1 h-full`, hover → `bg-primary/10`, active → `bg-primary text-primary-foreground`. Disabled when `disabled`. |
 | `attack`         | `DiceRoller` + roll button → after `attackRolls` exists, swap to `DiceResult` rows + Confirm Attack. Volver pill (`t('common.back')`) returns to `menu`.                                     |
-| `doctrine`       | `DoctrinePanel` + Volver pill.                                                                                                                                                               |
+| `ability`       | `AbilityPanel` + Volver pill.                                                                                                                                                               |
 | `item`           | Existing consumables list + Volver pill.                                                                                                                                                     |
 
 **`view` lifecycle**: the only writes to `view` are (a) the user clicking a command tile in `menu` (set), (b) the user clicking the Volver pill (set to `menu`), (c) `useEffect`-driven resets to `menu` when any of the following happen, so a stale sub-screen never lingers across turns:
 
 - `disabled` flips from `false` → `true` (turn handed to enemy)
 - `attackRolls` transitions from non-null → null after a confirm-attack
-- `selectedDoctrineId` transitions from non-null → null after a doctrine cast or cancel
+- `selectedAbilityId` transitions from non-null → null after a ability cast or cancel
 
-**Targeting collapse**: when `targetingMode` is set (i.e., a doctrine has been selected and is awaiting a target click on an enemy sprite), the action bar replaces the 1×3 row with a single full-width tile bound to `onCancelDoctrine`, labeled with `t('combat.targeting.cancel')`. The MessageBox owns the prompt copy ("Selecciona objetivo…") — there is no duplicate prompt inside the action bar.
+**Targeting collapse**: when `targetingMode` is set (i.e., a ability has been selected and is awaiting a target click on an enemy sprite), the action bar replaces the 1×3 row with a single full-width tile bound to `onCancelAbility`, labeled with `t('combat.targeting.cancel')`. The MessageBox owns the prompt copy ("Selecciona objetivo…") — there is no duplicate prompt inside the action bar.
 
 Dice bank counter is **removed** from this component (now lives in `MessageBox`).
 
@@ -155,10 +155,10 @@ Fallback: missing scene → gradient only. Implementation ships with the `onErro
 
 All user-facing strings go through `t()`. Add to BOTH `public/locales/en/translation.json` and `public/locales/es/translation.json`:
 
-- `common.back` — Volver pill label inside `attack`/`doctrine`/`item` sub-views. Currently absent from the `common` namespace (a `back` key exists under `onboarding` but is not reusable). Add `"back": "Back"` / `"back": "Volver"`.
+- `common.back` — Volver pill label inside `attack`/`ability`/`item` sub-views. Currently absent from the `common` namespace (a `back` key exists under `onboarding` but is not reusable). Add `"back": "Back"` / `"back": "Volver"`.
 - `combat.targeting.cancel` — full-width cancel tile shown in place of the 1×3 row when targeting is active. Add `"cancel": "Cancel selection"` / `"cancel": "Cancelar selección"`. (Reusing `common.cancel` would also work, but the targeting affordance benefits from a more specific verb.)
 
-All other keys reused as-is: `combat.player_turn`, `combat.enemy_turn`, `combat.action.attack/doctrine/item`, `combat.attack_rolls`, `combat.defense_rolls`, `combat.results`, `combat.targeting.single`, `combat.targeting.all`, `inventory.dice_bank`, etc.
+All other keys reused as-is: `combat.player_turn`, `combat.enemy_turn`, `combat.action.attack/ability/item`, `combat.attack_rolls`, `combat.defense_rolls`, `combat.results`, `combat.targeting.single`, `combat.targeting.all`, `inventory.dice_bank`, etc.
 
 ## Out of Scope (Preserved)
 
@@ -167,7 +167,7 @@ These remain untouched:
 - `use-combat.hook.ts`, `use-combat-animations.hook.ts`
 - `src/components/combat/combat-unit-sprite.component.tsx`, `src/components/combat/damage-number.component.tsx`
 - `src/app/(workspace)/map/_components/dice-result.component.tsx`, `src/app/(workspace)/map/_components/dice-roller.component.tsx`, `src/app/(workspace)/map/_components/health-bar.component.tsx` (reused from the map module — keep importing from this path)
-- `src/components/doctrine-panel.component.tsx`
+- `src/components/ability-panel.component.tsx`
 - All server services, routers, schemas
 - Sprite assets (`/assets/classes/*`, `/assets/enemies/*`)
 - Victory/defeat alert dialogs
@@ -180,7 +180,7 @@ These remain untouched:
    - Scenic background: renders gradient fallback when no PNG present (verify by visiting before assets ship); renders scene image at 60% opacity when PNG is added; `onError` on the `<Image>` flips a state flag and the image vanishes leaving the gradient.
    - Sprite platforms visible under both sprites; sprites still face each other.
    - Faction colors: change `<html>` class (e.g. `class="dark faction-legion"`) → info boxes / commands / chrome re-tint to faction primary.
-   - Command flow: Atacar → DiceRoller → roll → results → Confirm Attack → action bar resets to `menu`. Doctrina → list → cast → message box prompt appears, action bar collapses to single full-width Cancel tile → click enemy sprite to target → action bar resets to `menu`. Objeto → potions → resets to `menu`.
+   - Command flow: Atacar → DiceRoller → roll → results → Confirm Attack → action bar resets to `menu`. Habilidad → list → cast → message box prompt appears, action bar collapses to single full-width Cancel tile → click enemy sprite to target → action bar resets to `menu`. Objeto → potions → resets to `menu`.
    - `view` lifecycle: end of player turn (disabled flips true) snaps back to `menu`; you cannot land on enemy turn with a stale `attack` sub-screen.
    - Message box updates per phase, shows targeting prompt during targeting, shows dice bank counter, shows latest combat-log entry as secondary line. Hidden during victory/defeat (dialog overlays).
    - Damage numbers, animation states, HP/MP bars, victory/defeat dialogs unchanged.

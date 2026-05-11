@@ -1,13 +1,13 @@
 import {
-  DoctrineAttributeType,
-  DoctrineEffectType,
-  DoctrineTarget,
+  AbilityAttributeType,
+  AbilityEffectType,
+  AbilityTarget,
   StatusEffect,
-  type DoctrineDefinition
-} from '../types/doctrine.types'
+  type AbilityDefinition
+} from '../types/ability.types'
 import { CharacterClassName, MagicNature } from './classes'
 
-export const MAX_EQUIPPED_DOCTRINES = 2
+export const MAX_EQUIPPED_ABILITIES = 2
 
 /** ID of the always-available, mana-free fallback move. */
 export const BASIC_STRIKE_ID = 'basic_strike'
@@ -15,9 +15,9 @@ export const BASIC_STRIKE_ID = 'basic_strike'
 /**
  * Phase 2A: Pokémon-style move catalog. Each entry is either a damage move (has `power`/`damageType`)
  * routed through combat-formula, a side-effect move (buff/protect/thorns/cleanse) routed through
- * tactical-doctrine, or a damage move with a side-effect rider (status, debuff, recoil).
+ * tactical-ability, or a damage move with a side-effect rider (status, debuff, recoil).
  *
- * Re-interpreted DoctrineEffect semantics in Phase 2A:
+ * Re-interpreted AbilityEffect semantics in Phase 2A:
  *   POWER_MODIFIER target=SELF, value=N, duration=D → +N% ATK buff for D turns
  *   POWER_MODIFIER target=ENEMY, value=N, duration=D → −N% ATK debuff for D turns (negative value)
  *   THRESHOLD_MODIFIER target=SELF, value=N, duration=D → +N% DEF buff for D turns
@@ -28,18 +28,18 @@ export const BASIC_STRIKE_ID = 'basic_strike'
  *   APPLY_STATUS → applies StatusEffect to target (PURIFIED, IMMOBILIZED, WEAKENED, etc.)
  *   HEAL target=SELF, value=0 → cleanse own debuffs (nullify)
  */
-export const DOCTRINES: Record<string, DoctrineDefinition> = {
+export const ABILITIES: Record<string, AbilityDefinition> = {
   // ═══════════════════════════════════════
   // UNIVERSAL — always-available fallback
   // ═══════════════════════════════════════
   basic_strike: {
     id: 'basic_strike',
-    nameKey: 'doctrines.basic_strike.name',
-    descriptionKey: 'doctrines.basic_strike.description',
-    flavorTextKey: 'doctrines.basic_strike.flavor',
+    nameKey: 'abilities.basic_strike.name',
+    descriptionKey: 'abilities.basic_strike.description',
+    flavorTextKey: 'abilities.basic_strike.flavor',
     className: 'universal',
     magicNature: 'universal',
-    attribute: DoctrineAttributeType.METAL,
+    attribute: AbilityAttributeType.METAL,
     tier: 1,
     manaCost: 0,
     isUltimate: false,
@@ -54,20 +54,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   // ═══════════════════════════════════════
   truth_blade: {
     id: 'truth_blade',
-    nameKey: 'doctrines.truth_blade.name',
-    descriptionKey: 'doctrines.truth_blade.description',
-    flavorTextKey: 'doctrines.truth_blade.flavor',
+    nameKey: 'abilities.truth_blade.name',
+    descriptionKey: 'abilities.truth_blade.description',
+    flavorTextKey: 'abilities.truth_blade.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.LIGHT,
+    attribute: AbilityAttributeType.LIGHT,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.APPLY_STATUS,
-        target: DoctrineTarget.ENEMY,
+        type: AbilityEffectType.APPLY_STATUS,
+        target: AbilityTarget.ENEMY,
         statusEffect: StatusEffect.PURIFIED,
         duration: 2
       }
@@ -77,20 +77,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   miraculous_protection: {
     id: 'miraculous_protection',
-    nameKey: 'doctrines.miraculous_protection.name',
-    descriptionKey: 'doctrines.miraculous_protection.description',
-    flavorTextKey: 'doctrines.miraculous_protection.flavor',
+    nameKey: 'abilities.miraculous_protection.name',
+    descriptionKey: 'abilities.miraculous_protection.description',
+    flavorTextKey: 'abilities.miraculous_protection.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.LIGHT,
+    attribute: AbilityAttributeType.LIGHT,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.NEGATE_HITS,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.NEGATE_HITS,
+        target: AbilityTarget.SELF,
         value: 1,
         duration: 1
       }
@@ -98,12 +98,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   shoulder_charge: {
     id: 'shoulder_charge',
-    nameKey: 'doctrines.shoulder_charge.name',
-    descriptionKey: 'doctrines.shoulder_charge.description',
-    flavorTextKey: 'doctrines.shoulder_charge.flavor',
+    nameKey: 'abilities.shoulder_charge.name',
+    descriptionKey: 'abilities.shoulder_charge.description',
+    flavorTextKey: 'abilities.shoulder_charge.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.EARTH,
+    attribute: AbilityAttributeType.EARTH,
     tier: 1,
     manaCost: 2,
     isUltimate: false,
@@ -114,12 +114,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   reckless_strike: {
     id: 'reckless_strike',
-    nameKey: 'doctrines.reckless_strike.name',
-    descriptionKey: 'doctrines.reckless_strike.description',
-    flavorTextKey: 'doctrines.reckless_strike.flavor',
+    nameKey: 'abilities.reckless_strike.name',
+    descriptionKey: 'abilities.reckless_strike.description',
+    flavorTextKey: 'abilities.reckless_strike.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.METAL,
+    attribute: AbilityAttributeType.METAL,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -135,20 +135,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   // ═══════════════════════════════════════
   light_shield: {
     id: 'light_shield',
-    nameKey: 'doctrines.light_shield.name',
-    descriptionKey: 'doctrines.light_shield.description',
-    flavorTextKey: 'doctrines.light_shield.flavor',
+    nameKey: 'abilities.light_shield.name',
+    descriptionKey: 'abilities.light_shield.description',
+    flavorTextKey: 'abilities.light_shield.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.LIGHT,
+    attribute: AbilityAttributeType.LIGHT,
     tier: 2,
     manaCost: 3,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.THRESHOLD_MODIFIER,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.THRESHOLD_MODIFIER,
+        target: AbilityTarget.SELF,
         value: 50,
         duration: 2
       }
@@ -156,20 +156,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   precise_strike: {
     id: 'precise_strike',
-    nameKey: 'doctrines.precise_strike.name',
-    descriptionKey: 'doctrines.precise_strike.description',
-    flavorTextKey: 'doctrines.precise_strike.flavor',
+    nameKey: 'abilities.precise_strike.name',
+    descriptionKey: 'abilities.precise_strike.description',
+    flavorTextKey: 'abilities.precise_strike.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.EARTH,
+    attribute: AbilityAttributeType.EARTH,
     tier: 2,
     manaCost: 3,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.GUARANTEED_CRITICAL,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.GUARANTEED_CRITICAL,
+        target: AbilityTarget.SELF,
         value: 50,
         duration: 1
       }
@@ -179,20 +179,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   audacity: {
     id: 'audacity',
-    nameKey: 'doctrines.audacity.name',
-    descriptionKey: 'doctrines.audacity.description',
-    flavorTextKey: 'doctrines.audacity.flavor',
+    nameKey: 'abilities.audacity.name',
+    descriptionKey: 'abilities.audacity.description',
+    flavorTextKey: 'abilities.audacity.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.METAL,
+    attribute: AbilityAttributeType.METAL,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.POWER_MODIFIER,
+        target: AbilityTarget.SELF,
         value: 50,
         duration: 2
       }
@@ -204,20 +204,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   // ═══════════════════════════════════════
   iron_bastion: {
     id: 'iron_bastion',
-    nameKey: 'doctrines.iron_bastion.name',
-    descriptionKey: 'doctrines.iron_bastion.description',
-    flavorTextKey: 'doctrines.iron_bastion.flavor',
+    nameKey: 'abilities.iron_bastion.name',
+    descriptionKey: 'abilities.iron_bastion.description',
+    flavorTextKey: 'abilities.iron_bastion.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.WATER,
+    attribute: AbilityAttributeType.WATER,
     tier: 3,
     manaCost: 6,
     isUltimate: true,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.NEGATE_HITS,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.NEGATE_HITS,
+        target: AbilityTarget.SELF,
         value: 99,
         duration: 1
       }
@@ -225,12 +225,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   kings_sword: {
     id: 'kings_sword',
-    nameKey: 'doctrines.kings_sword.name',
-    descriptionKey: 'doctrines.kings_sword.description',
-    flavorTextKey: 'doctrines.kings_sword.flavor',
+    nameKey: 'abilities.kings_sword.name',
+    descriptionKey: 'abilities.kings_sword.description',
+    flavorTextKey: 'abilities.kings_sword.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.LIGHT,
+    attribute: AbilityAttributeType.LIGHT,
     tier: 3,
     manaCost: 7,
     isUltimate: true,
@@ -241,20 +241,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   wrath_avatar: {
     id: 'wrath_avatar',
-    nameKey: 'doctrines.wrath_avatar.name',
-    descriptionKey: 'doctrines.wrath_avatar.description',
-    flavorTextKey: 'doctrines.wrath_avatar.flavor',
+    nameKey: 'abilities.wrath_avatar.name',
+    descriptionKey: 'abilities.wrath_avatar.description',
+    flavorTextKey: 'abilities.wrath_avatar.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.LIGHTNING,
+    attribute: AbilityAttributeType.LIGHTNING,
     tier: 3,
     manaCost: 8,
     isUltimate: true,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.GUARANTEED_CRITICAL,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.GUARANTEED_CRITICAL,
+        target: AbilityTarget.SELF,
         value: 1,
         duration: 1
       }
@@ -264,20 +264,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   karmic_retribution: {
     id: 'karmic_retribution',
-    nameKey: 'doctrines.karmic_retribution.name',
-    descriptionKey: 'doctrines.karmic_retribution.description',
-    flavorTextKey: 'doctrines.karmic_retribution.flavor',
+    nameKey: 'abilities.karmic_retribution.name',
+    descriptionKey: 'abilities.karmic_retribution.description',
+    flavorTextKey: 'abilities.karmic_retribution.flavor',
     className: CharacterClassName.TEMPLAR,
     magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.DARKNESS,
+    attribute: AbilityAttributeType.DARKNESS,
     tier: 3,
     manaCost: 8,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.NEGATE_HITS,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.NEGATE_HITS,
+        target: AbilityTarget.SELF,
         value: 0,
         duration: 2,
         thornsDamage: 10
@@ -290,12 +290,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   // ═══════════════════════════════════════
   plasma_missile: {
     id: 'plasma_missile',
-    nameKey: 'doctrines.plasma_missile.name',
-    descriptionKey: 'doctrines.plasma_missile.description',
-    flavorTextKey: 'doctrines.plasma_missile.flavor',
+    nameKey: 'abilities.plasma_missile.name',
+    descriptionKey: 'abilities.plasma_missile.description',
+    flavorTextKey: 'abilities.plasma_missile.flavor',
     className: CharacterClassName.HERALD,
     magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.FIRE,
+    attribute: AbilityAttributeType.FIRE,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
@@ -306,20 +306,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   ice_lance: {
     id: 'ice_lance',
-    nameKey: 'doctrines.ice_lance.name',
-    descriptionKey: 'doctrines.ice_lance.description',
-    flavorTextKey: 'doctrines.ice_lance.flavor',
+    nameKey: 'abilities.ice_lance.name',
+    descriptionKey: 'abilities.ice_lance.description',
+    flavorTextKey: 'abilities.ice_lance.flavor',
     className: CharacterClassName.HERALD,
     magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.ICE,
+    attribute: AbilityAttributeType.ICE,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.APPLY_STATUS,
-        target: DoctrineTarget.ENEMY,
+        type: AbilityEffectType.APPLY_STATUS,
+        target: AbilityTarget.ENEMY,
         statusEffect: StatusEffect.IMMOBILIZED,
         duration: 1
       }
@@ -329,20 +329,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   mana_barrier: {
     id: 'mana_barrier',
-    nameKey: 'doctrines.mana_barrier.name',
-    descriptionKey: 'doctrines.mana_barrier.description',
-    flavorTextKey: 'doctrines.mana_barrier.flavor',
+    nameKey: 'abilities.mana_barrier.name',
+    descriptionKey: 'abilities.mana_barrier.description',
+    flavorTextKey: 'abilities.mana_barrier.flavor',
     className: CharacterClassName.HERALD,
     magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.LIGHT,
+    attribute: AbilityAttributeType.LIGHT,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.NEGATE_HITS,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.NEGATE_HITS,
+        target: AbilityTarget.SELF,
         value: 1,
         duration: 1
       }
@@ -350,20 +350,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   frost_bite: {
     id: 'frost_bite',
-    nameKey: 'doctrines.frost_bite.name',
-    descriptionKey: 'doctrines.frost_bite.description',
-    flavorTextKey: 'doctrines.frost_bite.flavor',
+    nameKey: 'abilities.frost_bite.name',
+    descriptionKey: 'abilities.frost_bite.description',
+    flavorTextKey: 'abilities.frost_bite.flavor',
     className: CharacterClassName.HERALD,
     magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.ICE,
+    attribute: AbilityAttributeType.ICE,
     tier: 1,
     manaCost: 3,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.ENEMY,
+        type: AbilityEffectType.POWER_MODIFIER,
+        target: AbilityTarget.ENEMY,
         value: -30,
         duration: 1,
         debuffType: 'attack'
@@ -378,20 +378,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   // ═══════════════════════════════════════
   nullify: {
     id: 'nullify',
-    nameKey: 'doctrines.nullify.name',
-    descriptionKey: 'doctrines.nullify.description',
-    flavorTextKey: 'doctrines.nullify.flavor',
+    nameKey: 'abilities.nullify.name',
+    descriptionKey: 'abilities.nullify.description',
+    flavorTextKey: 'abilities.nullify.flavor',
     className: CharacterClassName.HERALD,
     magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.WATER,
+    attribute: AbilityAttributeType.WATER,
     tier: 2,
     manaCost: 4,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.HEAL,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.HEAL,
+        target: AbilityTarget.SELF,
         value: 0
       }
     ]
@@ -402,20 +402,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   // ═══════════════════════════════════════
   inspiration: {
     id: 'inspiration',
-    nameKey: 'doctrines.inspiration.name',
-    descriptionKey: 'doctrines.inspiration.description',
-    flavorTextKey: 'doctrines.inspiration.flavor',
+    nameKey: 'abilities.inspiration.name',
+    descriptionKey: 'abilities.inspiration.description',
+    flavorTextKey: 'abilities.inspiration.flavor',
     className: CharacterClassName.HERALD,
     magicNature: MagicNature.FORM,
-    attribute: DoctrineAttributeType.MIND,
+    attribute: AbilityAttributeType.MIND,
     tier: 3,
     manaCost: 6,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.POWER_MODIFIER,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.POWER_MODIFIER,
+        target: AbilityTarget.SELF,
         value: 25,
         duration: 2,
         scalesWithEnemyTier: true
@@ -424,12 +424,12 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   stellar_collapse: {
     id: 'stellar_collapse',
-    nameKey: 'doctrines.stellar_collapse.name',
-    descriptionKey: 'doctrines.stellar_collapse.description',
-    flavorTextKey: 'doctrines.stellar_collapse.flavor',
+    nameKey: 'abilities.stellar_collapse.name',
+    descriptionKey: 'abilities.stellar_collapse.description',
+    flavorTextKey: 'abilities.stellar_collapse.flavor',
     className: CharacterClassName.HERALD,
     magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.DARKNESS,
+    attribute: AbilityAttributeType.DARKNESS,
     tier: 3,
     manaCost: 10,
     isUltimate: true,
@@ -440,20 +440,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   },
   retaliation: {
     id: 'retaliation',
-    nameKey: 'doctrines.retaliation.name',
-    descriptionKey: 'doctrines.retaliation.description',
-    flavorTextKey: 'doctrines.retaliation.flavor',
+    nameKey: 'abilities.retaliation.name',
+    descriptionKey: 'abilities.retaliation.description',
+    flavorTextKey: 'abilities.retaliation.flavor',
     className: CharacterClassName.HERALD,
     magicNature: MagicNature.VOID,
-    attribute: DoctrineAttributeType.DARKNESS,
+    attribute: AbilityAttributeType.DARKNESS,
     tier: 3,
     manaCost: 8,
     isUltimate: false,
     targeting: 'single',
     effects: [
       {
-        type: DoctrineEffectType.NEGATE_HITS,
-        target: DoctrineTarget.SELF,
+        type: AbilityEffectType.NEGATE_HITS,
+        target: AbilityTarget.SELF,
         value: 0,
         duration: 2,
         thornsDamage: 10
@@ -462,20 +462,20 @@ export const DOCTRINES: Record<string, DoctrineDefinition> = {
   }
 }
 
-export function getDoctrineById(id: string): DoctrineDefinition | undefined {
-  return DOCTRINES[id]
+export function getAbilityById(id: string): AbilityDefinition | undefined {
+  return ABILITIES[id]
 }
 
-export function getDoctrinesForClass(className: CharacterClassName, maxTier: number): DoctrineDefinition[] {
-  return Object.values(DOCTRINES).filter((d) => d.className === className && d.tier <= maxTier)
+export function getAbilitiesForClass(className: CharacterClassName, maxTier: number): AbilityDefinition[] {
+  return Object.values(ABILITIES).filter((d) => d.className === className && d.tier <= maxTier)
 }
 
-export function getAvailableDoctrines(
+export function getAvailableAbilities(
   className: CharacterClassName,
   tier: number,
   magicNature?: MagicNature
-): DoctrineDefinition[] {
-  return Object.values(DOCTRINES).filter((d) => {
+): AbilityDefinition[] {
+  return Object.values(ABILITIES).filter((d) => {
     if (d.id === BASIC_STRIKE_ID) return false
     if (d.className === 'universal') return false
     const matchesClass = d.className === className
@@ -486,6 +486,6 @@ export function getAvailableDoctrines(
 }
 
 /** Whether the move resolves damage via combat-formula. */
-export function isDamageMove(doctrine: DoctrineDefinition): boolean {
-  return doctrine.power !== undefined && doctrine.damageType !== undefined
+export function isDamageMove(ability: AbilityDefinition): boolean {
+  return ability.power !== undefined && ability.damageType !== undefined
 }

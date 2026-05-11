@@ -119,7 +119,7 @@ model CharacterClass {
   maxHealth         Int       @default(30)
   maxMana           Int       @default(5)
   speed             Int       @default(1)
-  equippedDoctrines String[]  @default([])
+  equippedAbilities String[]  @default([])
   character         Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@unique([characterId, className])
@@ -136,8 +136,8 @@ model CharacterQuest {
   goldEarned           Int           @default(0)
   startedAt            DateTime      @default(now()) @db.Timestamp(6)
   completedAt          DateTime?     @db.Timestamp(6)
-  activeDoctrines      Json?         @default("{}")
-  enemyActiveDoctrines Json?         @default("{}")
+  activeAbilities      Json?         @default("{}")
+  enemyActiveAbilities Json?         @default("{}")
   combatStats          Json?         @default("{}")
   tacticalState        Json?         @default("{}")
   enemies              CombatEnemy[]

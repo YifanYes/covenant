@@ -1,9 +1,9 @@
 import {
   createCharacterSchema,
-  equipDoctrineSchema,
+  equipAbilitySchema,
   equipItemSchema,
   switchClassSchema,
-  unequipDoctrineSchema,
+  unequipAbilitySchema,
   unequipItemSchema,
   updateCharacterNameSchema,
   useConsumableSchema
@@ -48,20 +48,20 @@ export const characterRouter = t.router({
     return ctx.services.combat.useConsumable(ctx.user.id, input.consumableId)
   }),
 
-  getAvailableDoctrines: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.services.character.getAvailableDoctrinesForCharacter(ctx.user.id)
+  getAvailableAbilities: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.services.character.getAvailableAbilitiesForCharacter(ctx.user.id)
   }),
 
-  equippedDoctrines: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.services.character.getEquippedDoctrines(ctx.user.id)
+  equippedAbilities: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.services.character.getEquippedAbilities(ctx.user.id)
   }),
 
-  equipDoctrine: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(equipDoctrineSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.character.equipDoctrine(ctx.user.id, input.doctrineId)
+  equipAbility: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(equipAbilitySchema).mutation(async ({ ctx, input }) => {
+    return ctx.services.character.equipAbility(ctx.user.id, input.abilityId)
   }),
 
-  unequipDoctrine: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(unequipDoctrineSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.character.unequipDoctrine(ctx.user.id, input.doctrineId)
+  unequipAbility: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(unequipAbilitySchema).mutation(async ({ ctx, input }) => {
+    return ctx.services.character.unequipAbility(ctx.user.id, input.abilityId)
   }),
 
   updateName: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(updateCharacterNameSchema).mutation(async ({ ctx, input }) => {

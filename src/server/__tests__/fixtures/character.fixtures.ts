@@ -10,7 +10,7 @@ export const mockCharacter = (overrides = {}) => ({
   manaReserve: 0,
   currentClass: CharacterClassName.TEMPLAR,
   data: {
-    equippedDoctrines: []
+    equippedAbilities: []
   },
   classes: [
     {
@@ -27,7 +27,7 @@ export const mockCharacter = (overrides = {}) => ({
       magicDef: 5,
       manaRegen: 1,
       speed: 1,
-      equippedDoctrines: []
+      equippedAbilities: []
     }
   ],
   inventory: [],

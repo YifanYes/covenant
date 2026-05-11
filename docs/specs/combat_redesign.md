@@ -19,7 +19,7 @@ A user tested the app and gave feedback covering bugs, design pivots, and one fe
 - **"Doesn't feel gamy" is not a dice problem.** It's animations / sound / lore / juice / world-building. Replacing dice will not fix the vibe complaint. That work is a separate Phase 3 (deferred — not in this plan).
 - **Phase 1 ships independently in days.** Bugs + date format do not depend on combat redesign. Branch off `main`, not the current `feat/guilds` branch.
 - **`/map` is deprecated and deleted as part of this rewrite.** `health-bar.component.tsx` (currently at `src/app/(workspace)/map/_components/health-bar.component.tsx`) must be relocated to `src/components/combat/` before `/map` deletion, since combat imports it.
-- **Inquisitor and Demon Hunter classes have no Abilities defined** in `src/shared/constants/doctrines.ts`. Both are out of beta scope. **Tier 4 is post-beta**; no T4 Abilities exist for any class.
+- **Inquisitor and Demon Hunter classes have no Abilities defined** in `src/shared/constants/abilities.ts`. Both are out of beta scope. **Tier 4 is post-beta**; no T4 Abilities exist for any class.
 - **"Enemy MP bar" the tester reported is ambiguous.** Enemies have no MP bar in code today. Treated as a feature request (correct fit for Pokémon-style combat where enemies use moves). Phase 1 fixes the _player_ MP NaN bug regardless.
 
 ### Locked decisions
@@ -67,9 +67,9 @@ Applies to:
 
 Mana values are **not** rescaled; `maxMana` stays in the 5–14 range across class/tier.
 
-#### Doctrine translation table
+#### Ability translation table
 
-Beta scope: 19 doctrines, Templar + Herald only. Each entry receives `power`, `damageType`, `recoilPercent` (where applicable). Add `basic_strike` as the 20th catalog entry.
+Beta scope: 19 abilities, Templar + Herald only. Each entry receives `power`, `damageType`, `recoilPercent` (where applicable). Add `basic_strike` as the 20th catalog entry.
 
 | ID                      | T   | Class       | Mana | Old effect                         | New `power` | `damageType` | `recoilPercent` | Side-effect / notes                   |
 | ----------------------- | --- | ----------- | ---- | ---------------------------------- | ----------- | ------------ | --------------- | ------------------------------------- |
@@ -107,7 +107,7 @@ Distribution: 10 damage moves, 3 buffs (light_shield, audacity, inspiration), 3 
 
 #### Naming
 
-- **UI label: "Abilities"** (was "Doctrines" in copy). Code identifiers (`DOCTRINES`, `doctrine.types.ts`, `getDoctrineById`, etc.) stay unchanged — UI/i18n strings only. Internal symbol rename deferred.
+- **UI label: "Abilities"** (was "Abilities" in copy). Code identifiers (`ABILITIES`, `ability.types.ts`, `getAbilityById`, etc.) stay unchanged — UI/i18n strings only. Internal symbol rename deferred.
 
 #### NES.css migration
 
@@ -264,7 +264,7 @@ Recorded after landing Phase 1. Spec text above is the original plan; the deltas
 - **Prisma migration 2:** drop `data.diceBank` from `Character.data` JSON default — `prisma/schema.prisma:86` `@default("{\"diceBank\": 0}")` → `@default("{}")`. Existing rows' `data.diceBank` becomes ignored on read. Can be folded into migration 1 if the migrations land together.
 - **Data scrub (Phase 2A migration):** scan all `Character.inventory` and `Character.loadout` JSON for entries with `definitionId === 'mana_potion'`. Remove them and credit `gold += 25 × count` per character. Runs once on deploy; log a count for audit.
 - `TacticalUnitState` extended in Phase 1C already includes `currentMana`/`maxMana`. Phase 2A extends it with `speed` if missing.
-- `DoctrineDefinition` (`src/shared/types/doctrine.types.ts`) extended with optional `power?: number`, `damageType?: 'PHYSICAL' | 'MAGIC'`, `recoilPercent?: number`.
+- `AbilityDefinition` (`src/shared/types/ability.types.ts`) extended with optional `power?: number`, `damageType?: 'PHYSICAL' | 'MAGIC'`, `recoilPercent?: number`.
 - `EnemyTemplate.moves: string[]` — code-only field in `src/shared/constants/enemies.ts`. `EnemyTemplate.mana` already exists; hydrate it into `TacticalUnitState`.
 - **Items schema:** drop `attackDice`/`physicalDefDice`/`magicDefDice` from `src/shared/constants/items.ts`. Add `strengthAtkBonus`/`strengthDefBonus`/`magicAtkBonus`/`magicDefBonus` (Int). Drop `range`. Keep `speed` (repurposed for turn order).
 - `CLASS_INITIAL_STATS` and `CLASS_BASE_STATS` gain a `speed: number` base value (proposed: Templar 1, Herald 3, Inquisitor 2, Demon Hunter 3).
@@ -274,26 +274,26 @@ Recorded after landing Phase 1. Spec text above is the original plan; the deltas
 Recorded after landing Phase 2A. Spec text below is the original plan; the deltas here are what actually shipped and why.
 
 - **`/map` deleted in 2A instead of 2C.** Spec staged the `/map` directory deletion in Phase 2C, but the obsolete `dice-roller`/`dice-result`/`enemy-card`/`combat-log` components inside `map/_components/` referenced types (`DiceRollResult`, `attackRolls`) that 2A removes. Either keep ghost files with broken imports (no, won't compile) or delete `/map` now. Chose the latter. `health-bar.component.tsx` was relocated to `src/components/combat/` (per spec); `combat-log.component.tsx` was also relocated there since `inventory/kill-record-detail-dialog.component.tsx` still imports it.
-- **`combat.service.ts` reshaped to a thin client of `move-resolution`.** Old wrappers (`executeTacticalAttack`/`executeTacticalDoctrine`/`useSelfBuffDoctrine`/`useDoctrine`/`getActiveDoctrineBuffs`/`clearConsumedDoctrines`/`rollDice`/`calculateHitsWithCount`) all dropped. Surface now: `useConsumable`, `playerExecuteMove`, `playerEnemyTurn`, `playerUsePotion`. `useDoctrine` (legacy non-tactical doctrine endpoint) and `useDoctrineSchema` were both unused by clients, so the `character.useDoctrine` tRPC route was removed too.
-- **Doctrine effect semantics re-interpreted in place.** Rather than introducing new effect-type variants, Phase 2A reuses the existing `DoctrineEffectType` enum with new meaning: `POWER_MODIFIER` (SELF) is `+N% ATK` (was: `+N dice`), `THRESHOLD_MODIFIER` (SELF) is `+N% DEF`, `GUARANTEED_CRITICAL` value 1 = guaranteed crit, value ≥ 2 = `+N% crit chance`, `NEGATE_HITS` value ≥ 1 = Protect for 1 turn (full block), `NEGATE_HITS` value 0 + `thornsDamage` = thorns reflect, `HEAL` value 0 = cleanse. Doctrines also carry new top-level `power` / `damageType` / `recoilPercent` fields when they resolve damage via the formula. Renaming the enum members across the file would have churned tests and i18n without changing runtime behavior; left for future cleanup.
-- **`basic_strike` lives in `DOCTRINES` (universal).** `DoctrineDefinition.className` widened to `CharacterClassName | 'universal'` and `magicNature` widened to `MagicNature | 'universal'` so `basic_strike` can coexist with class-bound abilities. `getAvailableDoctrines` filters out universal entries so it doesn't show up in inventory equip lists.
+- **`combat.service.ts` reshaped to a thin client of `move-resolution`.** Old wrappers (`executeTacticalAttack`/`executeTacticalAbility`/`useSelfBuffAbility`/`useAbility`/`getActiveAbilityBuffs`/`clearConsumedAbilities`/`rollDice`/`calculateHitsWithCount`) all dropped. Surface now: `useConsumable`, `playerExecuteMove`, `playerEnemyTurn`, `playerUsePotion`. `useAbility` (legacy non-tactical ability endpoint) and `useAbilitySchema` were both unused by clients, so the `character.useAbility` tRPC route was removed too.
+- **Ability effect semantics re-interpreted in place.** Rather than introducing new effect-type variants, Phase 2A reuses the existing `AbilityEffectType` enum with new meaning: `POWER_MODIFIER` (SELF) is `+N% ATK` (was: `+N dice`), `THRESHOLD_MODIFIER` (SELF) is `+N% DEF`, `GUARANTEED_CRITICAL` value 1 = guaranteed crit, value ≥ 2 = `+N% crit chance`, `NEGATE_HITS` value ≥ 1 = Protect for 1 turn (full block), `NEGATE_HITS` value 0 + `thornsDamage` = thorns reflect, `HEAL` value 0 = cleanse. Abilities also carry new top-level `power` / `damageType` / `recoilPercent` fields when they resolve damage via the formula. Renaming the enum members across the file would have churned tests and i18n without changing runtime behavior; left for future cleanup.
+- **`basic_strike` lives in `ABILITIES` (universal).** `AbilityDefinition.className` widened to `CharacterClassName | 'universal'` and `magicNature` widened to `MagicNature | 'universal'` so `basic_strike` can coexist with class-bound abilities. `getAvailableAbilities` filters out universal entries so it doesn't show up in inventory equip lists.
 - **NES.css scope: PostCSS prefix-selector wired; layout segment NOT created.** Spec called for a new `(rpg)` route group layout. The existing `rpg-layout.tsx` (already gating the workspace's RPG views) is the more pragmatic place to load NES.css + the two `next/font/google` fonts and apply the `.rpg-ui` class. PostCSS config (`postcss.config.mjs`) now rewrites every selector from `nes.css/css/nes.min.css` to live under `.rpg-ui`, including the `html`/`body`/`*` resets. Productivity routes (`/tasks`, `/dashboard`, etc.) flow through `productivity-layout.tsx` unchanged.
 - **Schema strategy: `prisma db push`, no SQL migration file authored.** Schema now has `Character.manaReserve Int @default(0)`, `Character.data` default `"{}"`, and `CharacterClass.speed Int @default(1)`. Following Phase 1's pattern (project uses `db push`), no file was added under `prisma/migrations/`. **`mana_potion` scrub is a runtime, idempotent op** in `ManaService.scrubManaPotions` — guarded by `Character.data.scrubbedManaPotions=true`, called from… nowhere automatically. To run it for an existing user, invoke via a one-off script or call site (e.g. add to `CharacterService.getCurrentClass`). Left explicitly uncalled because the dev DB likely has no real `mana_potion` rows.
 - **Player class-stat snapshot at combat init, not live-recompute.** `TacticalUnitState` now carries `speed`, `strengthAtk`, `strengthDef`, `magicAtk`, `magicDef`, optional `tier`/`moves`. These are populated once in `QuestService.createInitialTacticalState` (and `createTacticalStateWithNewEnemy` for spawns) from the character class + loadout aggregate. Combat-formula reads these directly instead of looking up the character or re-aggregating items each turn.
 - **Enemy AI: pick cheapest affordable move from `enemy.moves[]`.** All tier 1–4 enemies currently have `moves: ['basic_strike']` (curated pool deferred to Phase 2B per spec). Combat will work but enemy variety is poor until 2B's balance pass.
-- **Tests: deleted `dice.test.ts`, `doctrine-buffs.test.ts`, `dice.service.test.ts`. Rewrote `combat.service.test.ts` to a small smoke covering `useConsumable` + player entry-point validation (the old 1500-line file was almost entirely dice-coupled). Added `move-resolution.test.ts` (formula bounds: crit doubling, variance window, DEF floor, level scaling).** Full move-resolution integration coverage (status side-effects, recoil math, thorns reflect, AoE 0.6x) intentionally omitted in 2A — the formula util is exercised; the orchestration is verified by manual playthrough.
+- **Tests: deleted `dice.test.ts`, `ability-buffs.test.ts`, `dice.service.test.ts`. Rewrote `combat.service.test.ts` to a small smoke covering `useConsumable` + player entry-point validation (the old 1500-line file was almost entirely dice-coupled). Added `move-resolution.test.ts` (formula bounds: crit doubling, variance window, DEF floor, level scaling).** Full move-resolution integration coverage (status side-effects, recoil math, thorns reflect, AoE 0.6x) intentionally omitted in 2A — the formula util is exercised; the orchestration is verified by manual playthrough.
 - **No browser playthrough was done as part of this implementation.** Per `CLAUDE.md`, frontend visual changes (NES.css scoping, RPG fonts, move grid action bar, Reserve `+N` badge, sidebar mana indicator) must be exercised in `pnpm dev`. `pnpm lint && npx tsc --noEmit && pnpm test:run && pnpm build` all pass. Manual playthrough of the combat flow + sidebar refresh after task/habit completion still required before declaring 2A visually correct.
-- **`BuffManagementService` (under `src/server/services/combat/`) deleted as a duplicate of `doctrine-buffs.ts`.** It wasn't referenced by anything live; left over from an earlier refactor pass.
+- **`BuffManagementService` (under `src/server/services/combat/`) deleted as a duplicate of `ability-buffs.ts`.** It wasn't referenced by anything live; left over from an earlier refactor pass.
 
 ### Phase 2A — manual testing plan
 
-Run `pnpm dev` with a Templar test character that has equipped doctrines. Seven smoke checks cover the core loop. Each lists **action** → **pass condition**.
+Run `pnpm dev` with a Templar test character that has equipped abilities. Seven smoke checks cover the core loop. Each lists **action** → **pass condition**.
 
 1. **Mana grant updates sidebar.** Complete a task on `/tasks` → sidebar mana count increases within ~100ms, no refresh needed. Repeat for habit, objective, journal entry (the four grant paths).
 2. **Reserve overflow.** Complete grants past `maxMana` → `+N` Reserve badge appears next to `{mana}/{maxMana}` in sidebar. Hover badge → tooltip shows today's breakdown.
 3. **Start quest, kill enemy, spawn next.** `/quests` → start → first move click works (no "Not this unit's turn"). Kill enemy → gold credited, next enemy spawns with full HP/MP, Reserve drains into mana at the encounter boundary.
 4. **Player takes damage, HP persists.** Let enemy hit you → refresh page mid-fight → arena re-hydrates with the damaged HP (not reset to max). Confirms `CharacterClass.health` syncs on enemy-cast moves.
-5. **Move grid + mana cost.** Open "Abilities" → equipped doctrines show with mana costs; greyed when `currentMana < cost`. `basic_strike` always free. Damage numbers float over enemy; fights end in roughly 3–4 turns at parity tier.
+5. **Move grid + mana cost.** Open "Abilities" → equipped abilities show with mana costs; greyed when `currentMana < cost`. `basic_strike` always free. Damage numbers float over enemy; fights end in roughly 3–4 turns at parity tier.
 6. **Item flat stats + `mana_potion` scrub.** Open `/inventory` → weapon shows `+N strengthAtk` or `+N magicAtk` (no dice notation). Pre-2A characters: `mana_potion` rows gone, 25g credited per row. Refresh — no double-credit.
 7. **NES.css scoped.** `/quests/[id]` renders with pixel borders + Pixelify Sans / Press Start 2P. `/tasks`, `/dashboard`, `/settings` look unchanged (Tailwind intact, no font bleed).
 
@@ -308,20 +308,20 @@ This is the load-bearing PR. Three former sub-phases merged because none of them
 #### Server engine
 
 - New `src/server/utils/combat/combat-formula.ts` — pure damage calc per the locked formula. Pre-multiplies HP literals at the source (see HP rescale ×5 in Locked decisions).
-- New `src/server/utils/combat/move-resolution.ts` — resolves a move (damage path → formula; side-effect path → existing tactical-doctrine dispatcher).
-- New tRPC procedure `quest.executeMove(questId, moveId, casterId, targetIds)` in `src/server/routers/quest.router.ts`. **Replaces** `executeTacticalAttack` and `executeTacticalDoctrine`; both are deleted.
-- Add `basic_strike` to `DOCTRINES` catalog (power 35, PHYSICAL, 0 mana).
-- Apply the full doctrine translation table (above) to `src/shared/constants/doctrines.ts`. Each entry gains `power`/`damageType`/`recoilPercent` as applicable; effect rows for buff/protect/thorns/cleanse stay.
+- New `src/server/utils/combat/move-resolution.ts` — resolves a move (damage path → formula; side-effect path → existing tactical-ability dispatcher).
+- New tRPC procedure `quest.executeMove(questId, moveId, casterId, targetIds)` in `src/server/routers/quest.router.ts`. **Replaces** `executeTacticalAttack` and `executeTacticalAbility`; both are deleted.
+- Add `basic_strike` to `ABILITIES` catalog (power 35, PHYSICAL, 0 mana).
+- Apply the full ability translation table (above) to `src/shared/constants/abilities.ts`. Each entry gains `power`/`damageType`/`recoilPercent` as applicable; effect rows for buff/protect/thorns/cleanse stay.
 - Delete `src/server/utils/combat/dice.ts` and `src/server/utils/combat/attack-resolution.ts`.
-- Delete dice-coupled fields on `BuffManagementService.getActiveDoctrineBuffs`: `bonusDice`, `thresholdMod`, `guaranteedCritical`, `criticalThresholdMod`, `sixesGenerateExtraHits`, `onesHurtSelf`.
+- Delete dice-coupled fields on `BuffManagementService.getActiveAbilityBuffs`: `bonusDice`, `thresholdMod`, `guaranteedCritical`, `criticalThresholdMod`, `sixesGenerateExtraHits`, `onesHurtSelf`.
 - **Turn order:** wire `TacticalUnitState.speed` into the existing turn-resolution code path. Higher speed acts first; ties broken randomly.
-- **HP×5 rescale:** edit `CLASS_BASE_STATS[*].baseHealth` and `ENEMIES[*].health` literals in source. Also `BURNING`/`PURIFIED`/`POISONED` DOT ticks in `src/server/utils/combat/enemy-ai.ts` (and any matching player-turn path), `thornsDamage` in `doctrines.ts`, and `health_potion.healHealth` in `items.ts`.
+- **HP×5 rescale:** edit `CLASS_BASE_STATS[*].baseHealth` and `ENEMIES[*].health` literals in source. Also `BURNING`/`PURIFIED`/`POISONED` DOT ticks in `src/server/utils/combat/enemy-ai.ts` (and any matching player-turn path), `thornsDamage` in `abilities.ts`, and `health_potion.healHealth` in `items.ts`.
 - Bump `TACTICAL_STATE_VERSION` 3 → 4.
 - Tests: new `src/server/__tests__/utils/combat/move-resolution.test.ts` covers variance bounds (±15%), crit rate (1/16), recoil math, defender DEF floor at 1, status side-effects firing, `basic_strike` with 0 mana, turn-order resolution. Delete `dice.test.ts`. Rewrite `attack-resolution.test.ts` → `move-resolution.test.ts`.
 
 #### Client UI
 
-- Rewrite `src/components/combat/combat-action-bar.component.tsx`: drop `DiceRoller`/`DiceResult`; render NES.css `nes-container` with ability grid (name + mana cost; `nes-btn is-disabled` when `currentMana < cost`). Fold `doctrine` view into one menu.
+- Rewrite `src/components/combat/combat-action-bar.component.tsx`: drop `DiceRoller`/`DiceResult`; render NES.css `nes-container` with ability grid (name + mana cost; `nes-btn is-disabled` when `currentMana < cost`). Fold `ability` view into one menu.
 - `src/components/combat/player-info.component.tsx` / `enemy-info.component.tsx`: replace `panelChrome` with `nes-container is-rounded`; HP/MP bars use `nes-progress is-success` / `is-primary`. Reserve `+N` badge styled as `nes-badge` with hover tooltip showing today's breakdown.
 - `src/components/combat/combat-arena.component.tsx`: NES.css `nes-container` for arena frame. Sprites stay as-is.
 - `src/hooks/use-combat.hook.ts`: drop `rollDice`/`attackRolls`/`defenseRolls`/`diceBank`; add `useMove(moveId, targetIds)`. Server returns `wasCritical: boolean`. Drop `diceBank` from `useCombat()` signature; add `manaReserve` and `reserveBreakdown`.
@@ -372,7 +372,7 @@ This is the load-bearing PR. Three former sub-phases merged because none of them
 
 - 1 Prisma migration (add `Character.manaReserve`, change `Character.data` default, scrub `mana_potion` entries).
 - `TACTICAL_STATE_VERSION` 3 → 4.
-- New: 2 server utils (combat-formula, move-resolution), 1 service (mana), 2 shared constants edits (doctrines table, items rewrite, rewards), 1 layout segment, 1 stylesheet, 1 PostCSS plugin wired.
+- New: 2 server utils (combat-formula, move-resolution), 1 service (mana), 2 shared constants edits (abilities table, items rewrite, rewards), 1 layout segment, 1 stylesheet, 1 PostCSS plugin wired.
 - Deleted: `dice.ts`, `attack-resolution.ts`, `dice.service.ts`, `dice-roller.component.tsx`, `dice-result.component.tsx`, `mana_potion` entry, `extractDiceBank`.
 - Modified: ~25 files (combat hook, action bar, info components, item-stats display, dashboard service, 4 grant call sites, character utils, schema, quest service).
 
@@ -385,7 +385,7 @@ This is the load-bearing PR. Three former sub-phases merged because none of them
   - `combat.log.player_hits` → "Critical hit!" / damage line
   - `inventory.dice_bank` → repurpose as `mana_reserve` (or remove if Reserve UI doesn't need a label)
   - `inventory.stats.attack_dice` / `phys_def_dice` / `magic_def_dice` → flat-stat copy (`attack_bonus`, `def_bonus`, etc.)
-  - **"Doctrines" → "Abilities"** — every UI-facing string. Keys may keep `doctrine` token to avoid file-wide rename; values change. Sweep: `grep -ri 'octrine' public/locales/`.
+  - **"Abilities" → "Abilities"** — every UI-facing string. Keys may keep `ability` token to avoid file-wide rename; values change. Sweep: `grep -ri 'octrine' public/locales/`.
   - Add `combat.mana_reserve_badge` and `combat.mana_reserve_tooltip` for the `+N` indicator and breakdown line.
   - Settings/dashboard strings referencing dice.
 - Greppable cleanup: `dice` and `attackRolls` should not appear outside historical commits and tests intentionally renamed. Run `grep -ri 'dice' src/ --exclude-dir=__tests__` and verify only intentional matches remain.
@@ -448,11 +448,11 @@ Delete `panelChrome` export once all consumers are migrated (`src/components/com
 - `src/server/utils/combat/combat-formula.ts` (NEW)
 - `src/server/utils/combat/attack-resolution.ts` (DELETE)
 - `src/server/utils/combat/dice.ts` (DELETE)
-- `src/server/utils/combat/doctrine-buffs.ts` (drop dice-coupled buff fields)
-- `src/shared/constants/doctrines.ts` (full translation table + `basic_strike`)
+- `src/server/utils/combat/ability-buffs.ts` (drop dice-coupled buff fields)
+- `src/shared/constants/abilities.ts` (full translation table + `basic_strike`)
 - `src/shared/constants/enemies.ts` (add `moves: string[]`; HP×5 rescale)
 - `src/shared/constants/classes.ts` (HP×5 on `baseHealth`; new `speed` base stat)
-- `src/shared/types/doctrine.types.ts` (`DoctrineDefinition` extension)
+- `src/shared/types/ability.types.ts` (`AbilityDefinition` extension)
 - `src/server/routers/quest.router.ts` (`executeMove` procedure; delete legacy)
 - `src/components/combat/combat-action-bar.component.tsx` (move grid)
 - `src/components/combat/player-info.component.tsx` (NES.css + reserve badge + tooltip)
@@ -489,7 +489,7 @@ Delete `panelChrome` export once all consumers are migrated (`src/components/com
 
 - `src/server/utils/combat/enemy-ai.ts` (move selection; HP×5 already done in 2A but DOT damage uses literal-scaled values)
 - `src/shared/constants/enemies.ts` (balance pass on tier 1–3)
-- `public/locales/en/translation.json` + `public/locales/es/translation.json` (full dice → mana sweep + Doctrines → Abilities)
+- `public/locales/en/translation.json` + `public/locales/es/translation.json` (full dice → mana sweep + Abilities → Abilities)
 
 ### Phase 2C — NES.css migration for remaining RPG views
 
@@ -502,7 +502,7 @@ Delete `panelChrome` export once all consumers are migrated (`src/components/com
 
 ### Reuse (do not reinvent)
 
-- Status effect engine: `src/shared/types/doctrine.types.ts` (`StatusEffect`, `ActiveStatusEffect`)
+- Status effect engine: `src/shared/types/ability.types.ts` (`StatusEffect`, `ActiveStatusEffect`)
 - Defeat handling: `src/server/utils/combat/rewards.ts` (`processEnemyDefeat`)
 - Animations: `src/hooks/use-combat-animations.hook.ts` (damage numbers, attack/heal/death)
 - HP bar: `src/components/combat/health-bar.component.tsx` (relocated in 2A from `map/_components/`)
@@ -527,7 +527,7 @@ Delete `panelChrome` export once all consumers are migrated (`src/components/com
 - Move grid appears; greyed when mana low; `basic_strike` free; mana drops on use; damage numbers display; crits show CRIT badge. Pixelify Sans renders for ability names + HP/MP labels; Press Start 2P only on screen titles.
 - Complete a task / habit / objective / journal → mana indicator on sidebar updates within ~100ms. Surplus past `maxMana` accumulates in `Character.manaReserve`; `+N` badge appears. Hover badge → tooltip lists today's grants by source.
 - Spend mana in a fight → win → next Encounter top-up drains Reserve back into mana. Dashboard shows mana, not dice. Item tooltips show flat stats. Equip an item → character class stats change. Faster wielder acts first; equal speed → tie order varies across runs.
-- UI reads "Abilities" everywhere "Doctrines" used to appear in user-facing copy.
+- UI reads "Abilities" everywhere "Abilities" used to appear in user-facing copy.
 - Verify `mana_potion` migration: count and gold refund logged; no character has a `mana_potion` entry post-deploy.
 - HP×5 verification: T1 fights last 3–4 turns at parity tier; one-shot scenarios are rare (crits only).
 - Visit `/tasks`/`/dashboard` — Tailwind style intact, no NES.css leak.

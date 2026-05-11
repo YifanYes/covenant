@@ -37,7 +37,7 @@ const LOG_TYPE_TO_KEY: Partial<Record<CombatLogType, string>> = {
   [CombatLogType.MANA_REGEN]: 'combat.log.mana_regen',
   [CombatLogType.ENEMY_DEFEATED]: 'combat.log.enemy_defeated',
   [CombatLogType.STATUS_EFFECT]: 'combat.log.status_effect',
-  [CombatLogType.DOCTRINE_EFFECT]: 'combat.log.doctrine_effect',
+  [CombatLogType.ABILITY_EFFECT]: 'combat.log.ability_effect',
   [CombatLogType.STATUS_EXPIRED]: 'combat.log.status_expired'
 }
 

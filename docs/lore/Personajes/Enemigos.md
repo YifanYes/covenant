@@ -1,10 +1,10 @@
 # Enemigos
 
-Los enemigos se rigen por las mismas **Mecánicas** que los jugadores: tienen Atributos que definen sus Umbrales de Éxito y Equipamiento/Doctrinas que definen su Potencia (Dados).
+Los enemigos se rigen por las mismas **Mecánicas** que los jugadores: tienen Atributos que definen sus Umbrales de Éxito y Equipamiento/Habilidades que definen su Potencia (Dados).
 
 > **Nota:** La **Potencia** indicada incluye los dados base del arma natural o equipada.
 
-> **Demonios:** Los demonios son **humanos poseídos** por entidades infernales. Tienen tres formas: **Humana** (apariencia normal, infiltración), **Híbrida** (rasgos demoníacos parciales — venas negras, ojos rojos, garras — pero conservan equipamiento humano) y **Demoníaca** (transformación completa, bestial). En forma humana e híbrida, usan **armas y armaduras** convencionales potenciadas por su corrupción. Son inmunes al fuego mundano, pero son **vulnerables a la Luz Sagrada**. Las doctrinas del Inquisidor infligen daño de Luz Sagrada, lo que les permite dañar efectivamente a los demonios. Reciben +1 Impacto adicional por cada ataque de Luz Sagrada.
+> **Demonios:** Los demonios son **humanos poseídos** por entidades infernales. Tienen tres formas: **Humana** (apariencia normal, infiltración), **Híbrida** (rasgos demoníacos parciales — venas negras, ojos rojos, garras — pero conservan equipamiento humano) y **Demoníaca** (transformación completa, bestial). En forma humana e híbrida, usan **armas y armaduras** convencionales potenciadas por su corrupción. Son inmunes al fuego mundano, pero son **vulnerables a la Luz Sagrada**. Las habilidades del Inquisidor infligen daño de Luz Sagrada, lo que les permite dañar efectivamente a los demonios. Reciben +1 Impacto adicional por cada ataque de Luz Sagrada.
 
 ---
 
@@ -62,7 +62,7 @@ Humanos desesperados o crueles.
 
 ## **Intermedios (Tier 2 - 3)**
 
-Requieren táctica y uso de doctrinas para ser derrotados sin sufrir grandes daños.
+Requieren táctica y uso de habilidades para ser derrotados sin sufrir grandes daños.
 
 ### **🐺 Hombre Lobo**
 
@@ -74,7 +74,7 @@ Bestias rápidas y brutales. Bajo la luna llena son imparables.
   - **Ataque (Físico):** 3 Dados (Garras desgarradoras). **Rango: 1**.
   - **Defensa (Física):** 4 Dados (Pelaje duro).
   - **Defensa (Mágica):** 1 Dado.
-  - **Doctrina Especial:** **Regeneración.** Recupera 1 Herida al inicio de su turno si no recibió daño de Plata o Magia el turno anterior.
+  - **Habilidad Especial:** **Regeneración.** Recupera 1 Herida al inicio de su turno si no recibió daño de Plata o Magia el turno anterior.
 
 ### **🌑 Templario Caído (Demonio Inferior)**
 
@@ -93,7 +93,7 @@ Humanos poseídos y corrompidos por Lucifer. En forma híbrida conservan su arma
     - **Defensa (Física):** 2 Dados (Túnica).
     - **Defensa (Mágica):** **3 Dados** (Aura de Rechazo).
     - _Estrategia: **Débil a Físico**._
-- **Doctrinas:**
+- **Habilidades:**
   - **Humo Tóxico (Pasiva):** Al morir, la casilla en la que se encuentra cambia a negra.
 
 ### **😈 Demonio Menor**
@@ -113,7 +113,7 @@ Humanos poseídos por entidades infernales de bajo rango, usados como soldados r
 
 ## **Difíciles (Tier 4+)**
 
-Jefes o enemigos de élite. Tienen acceso a Ultimates y doctrinas "Legado".
+Jefes o enemigos de élite. Tienen acceso a Ultimates y habilidades "Legado".
 
 ### **🦇 Vampiro**
 
@@ -126,7 +126,7 @@ Aristócratas de la noche. Maestros de la magia y el combate.
   - **Ataque (Mágico):** 4 Dados (Sangre Maldita). **Rango: 1-3**.
   - **Defensa (Física):** 3 Dados (Esquiva sobrenatural).
   - **Defensa (Mágica):** 3 Dados (Magia de sangre).
-- **Doctrinas:**
+- **Habilidades:**
   - **Prisión de Sangre (Var. Prisión de Cristal):** Inmoviliza al objetivo.
   - **Drenaje (Pasiva):** Por cada Herida que inflige cuerpo a cuerpo, recupera 1 Herida.
 
@@ -139,7 +139,7 @@ Monstruosidad de fuerza bruta imparable.
   - **Ataque (Físico):** 5 Dados (Golpe Sísmico). **Rango: 1**.
   - **Defensa (Física):** 4 Dados (Piel de Roca).
   - **Defensa (Mágica):** 3 Dados.
-- **Doctrina Legado:** **Carga Relámpago (Var. Pesada):** Atraviesa obstáculos y enemigos. Crítico asegurado en el primer impacto.
+- **Habilidad Legado:** **Carga Relámpago (Var. Pesada):** Atraviesa obstáculos y enemigos. Crítico asegurado en el primer impacto.
 
 ### **⚔️ Campeón Demoníaco (Nefilim)**
 
@@ -148,7 +148,7 @@ Híbridos de ángel y humano, poseídos por las entidades demoníacas más poder
 - **Atributos:** Fuerza 2/2 | Magia 2/2 | Vida 15 | Maná 20
 - **Debilidad:** Vulnerable a **Luz Sagrada**.
 - **Equipo:** Tier 4 (Artesanía Mágica - Dagas de Vidrio Fantasma).
-- **Doctrinas:** Acceso a todas las doctrinas de \"Caos\" de Templario y Heraldo, más **Singularidad** y **Colapso Estelar**. Algunos solo pueden ser dañados por ciertas armas o doctrinas. **Rango: Especial**.
+- **Habilidades:** Acceso a todas las habilidades de \"Caos\" de Templario y Heraldo, más **Singularidad** y **Colapso Estelar**. Algunos solo pueden ser dañados por ciertas armas o habilidades. **Rango: Especial**.
   - **Embate de Sombras:** Re-roll de ataques fallidos. **Rango: 1**.
   - **Bastión de Hierro (Oscuro):** Inmunidad a control y anula 4 impactos.
 
@@ -169,4 +169,4 @@ Gobernantes del infierno.
 - **Atributos:** 1 en su especialidad, 2 en resto | Vida 25 | Maná 25.
 - **Debilidad:** Vulnerable a **Luz Sagrada** (todos los éxitos cuentan como Críticos).
 - **Ataque:** 6 Dados (Poder Primordial). **Rango: 1-5**.
-- **Doctrinas:** Acceso a todas las doctrinas del "Vacío" de Templario y Heraldo, más **Singularidad** y **Colapso Estelar**. Algunos solo pueden ser dañados por ciertas armas o doctrinas. **Rango: Especial**.
+- **Habilidades:** Acceso a todas las habilidades del "Vacío" de Templario y Heraldo, más **Singularidad** y **Colapso Estelar**. Algunos solo pueden ser dañados por ciertas armas o habilidades. **Rango: Especial**.

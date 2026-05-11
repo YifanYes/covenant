@@ -2,7 +2,7 @@
 import { panelChrome } from '@/components/combat/combat-styles'
 import { cn } from '@/lib/cn.lib'
 import Button from '@/ui/button.component'
-import { BASIC_STRIKE_ID, DOCTRINES } from '@shared/constants/doctrines'
+import { BASIC_STRIKE_ID, ABILITIES } from '@shared/constants/abilities'
 import { getConsumableById } from '@shared/constants/items'
 import { ItemType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
 import { useEffect, useState } from 'react'
@@ -41,7 +41,7 @@ export default function CombatActionBar({
   const [view, setView] = useState<ActionView>('menu')
 
   const currentClass = character.classes.find((c) => c.className === character.currentClass)!
-  const equippedMoves = (currentClass.equippedDoctrines ?? []).map((id) => DOCTRINES[id]).filter(Boolean)
+  const equippedMoves = (currentClass.equippedAbilities ?? []).map((id) => ABILITIES[id]).filter(Boolean)
 
   const groupedConsumables = (character.inventory ?? [])
     .filter((item: InventoryItem) => item.type === ItemType.CONSUMABLE)
@@ -126,7 +126,7 @@ export default function CombatActionBar({
         <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-3">
           {equippedMoves.length === 0 ? (
             <p className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
-              {t('doctrines.empty_equipped')}
+              {t('abilities.empty_equipped')}
             </p>
           ) : (
             <div className="grid grid-cols-2 gap-2">

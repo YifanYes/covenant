@@ -1,4 +1,4 @@
-import type { ActiveStatusEffect } from './doctrine.types'
+import type { ActiveStatusEffect } from './ability.types'
 import type { CombatLogEntry } from './gamification.types'
 
 // Grid position
@@ -21,7 +21,7 @@ export type TerrainType = (typeof TerrainType)[keyof typeof TerrainType]
 export const TileHighlightType = {
   MOVEMENT: 'MOVEMENT',
   ATTACK: 'ATTACK',
-  DOCTRINE: 'DOCTRINE',
+  ABILITY: 'ABILITY',
   SELECTED: 'SELECTED',
   HOVER: 'HOVER',
   PATH: 'PATH'
@@ -87,7 +87,7 @@ export type TacticalPhase = (typeof TacticalPhase)[keyof typeof TacticalPhase]
 export const TacticalActionType = {
   MOVE: 'move',
   ATTACK: 'attack',
-  DOCTRINE: 'doctrine',
+  ABILITY: 'ability',
   ITEM: 'item',
   WAIT: 'wait'
 } as const
@@ -97,9 +97,9 @@ export type TacticalActionType = (typeof TacticalActionType)[keyof typeof Tactic
 export interface TacticalAction {
   type: TacticalActionType
   path?: GridPosition[] // For movement
-  targetPosition?: GridPosition // For attacks/doctrines
+  targetPosition?: GridPosition // For attacks/abilities
   targetUnitIds?: string[] // Affected units
-  doctrineId?: string
+  abilityId?: string
   itemId?: string
 }
 
@@ -171,8 +171,8 @@ export interface TacticalUnitState {
   // Enemy-only: pool of move IDs the AI can pick from.
   moves?: string[]
   tier?: number
-  // Active doctrine buffs (for self-buff doctrines like audacity / inspiration / Protect)
-  activeDoctrines?: Record<string, ActiveStatusEffect>
+  // Active ability buffs (for self-buff abilities like audacity / inspiration / Protect)
+  activeAbilities?: Record<string, ActiveStatusEffect>
   // Active status effects (burning, stunned, etc.)
   activeEffects?: ActiveStatusEffect[]
 }
@@ -281,23 +281,23 @@ export interface EnemyTurnResult {
   diedFromStatusEffect?: boolean
 }
 
-// Doctrine effect result per unit
-export interface DoctrineEffectResult {
+// Ability effect result per unit
+export interface AbilityEffectResult {
   unitId: string
   damageDealt?: number
   healthRestored?: number
   statusApplied?: string
   killed?: boolean
-  bonusDice?: number // For inspiration doctrine (scales with enemy tier)
+  bonusDice?: number // For inspiration ability (scales with enemy tier)
 }
 
-// Base tactical doctrine result (without success discriminant)
-export interface TacticalDoctrineResultBase {
+// Base tactical ability result (without success discriminant)
+export interface TacticalAbilityResultBase {
   casterId: string
-  doctrineId: string
+  abilityId: string
   targeting: 'single' | 'all'
   affectedUnitIds: string[]
-  effects: DoctrineEffectResult[]
+  effects: AbilityEffectResult[]
   manaCost: number
   updatedState: TacticalStateData
   logEntries: CombatLogEntry[]
@@ -316,25 +316,25 @@ export interface TacticalDoctrineResultBase {
   tierProgression?: { oldTier: number; newTier: number }
 }
 
-// Tactical doctrine execution result
-export interface TacticalDoctrineResult extends TacticalDoctrineResultBase {
+// Tactical ability execution result
+export interface TacticalAbilityResult extends TacticalAbilityResultBase {
   success: boolean
 }
 
-// Self-buff doctrine result base (without success discriminant)
-export interface SelfBuffDoctrineResultBase {
-  doctrineId: string
+// Self-buff ability result base (without success discriminant)
+export interface SelfBuffAbilityResultBase {
+  abilityId: string
   manaCost: number
   bonusDice: number
   updatedState: TacticalStateData
 }
 
-// Self-buff doctrine result
-export interface SelfBuffDoctrineResult extends SelfBuffDoctrineResultBase {
+// Self-buff ability result
+export interface SelfBuffAbilityResult extends SelfBuffAbilityResultBase {
   success: boolean
 }
 
-// Phase 2A: Unified move-resolution result. Returned by executeMove (replaces executeTacticalAttack / executeTacticalDoctrine).
+// Phase 2A: Unified move-resolution result. Returned by executeMove (replaces executeTacticalAttack / executeTacticalAbility).
 export interface MoveEffectResult {
   unitId: string
   damageDealt?: number
@@ -381,30 +381,30 @@ export type TacticalMoveResult = TacticalMoveResultSuccess | TacticalMoveResultF
 
 // Discriminated union types for router returns (with newMana on success)
 
-// Success variant for TacticalDoctrineResult - includes newMana
-export interface TacticalDoctrineResultSuccess extends TacticalDoctrineResultBase {
+// Success variant for TacticalAbilityResult - includes newMana
+export interface TacticalAbilityResultSuccess extends TacticalAbilityResultBase {
   success: true
   newMana: number
 }
 
-// Failure variant for TacticalDoctrineResult - no newMana
-export interface TacticalDoctrineResultFailure extends TacticalDoctrineResultBase {
+// Failure variant for TacticalAbilityResult - no newMana
+export interface TacticalAbilityResultFailure extends TacticalAbilityResultBase {
   success: false
 }
 
-// Union type for executeTacticalDoctrine router return
-export type TacticalDoctrineResultWithMana = TacticalDoctrineResultSuccess | TacticalDoctrineResultFailure
+// Union type for executeTacticalAbility router return
+export type TacticalAbilityResultWithMana = TacticalAbilityResultSuccess | TacticalAbilityResultFailure
 
-// Success variant for SelfBuffDoctrineResult - includes newMana
-export interface SelfBuffDoctrineResultSuccess extends SelfBuffDoctrineResultBase {
+// Success variant for SelfBuffAbilityResult - includes newMana
+export interface SelfBuffAbilityResultSuccess extends SelfBuffAbilityResultBase {
   success: true
   newMana: number
 }
 
-// Failure variant for SelfBuffDoctrineResult - no newMana
-export interface SelfBuffDoctrineResultFailure extends SelfBuffDoctrineResultBase {
+// Failure variant for SelfBuffAbilityResult - no newMana
+export interface SelfBuffAbilityResultFailure extends SelfBuffAbilityResultBase {
   success: false
 }
 
-// Union type for useSelfBuffDoctrine router return
-export type SelfBuffDoctrineResultWithMana = SelfBuffDoctrineResultSuccess | SelfBuffDoctrineResultFailure
+// Union type for useSelfBuffAbility router return
+export type SelfBuffAbilityResultWithMana = SelfBuffAbilityResultSuccess | SelfBuffAbilityResultFailure

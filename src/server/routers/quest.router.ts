@@ -31,7 +31,7 @@ export const questRouter = t.router({
     return ctx.services.quest.getActiveQuest(input.characterId, ctx.user.id)
   }),
 
-  // Phase 2A: unified Pokémon-style move execution. Replaces executeTacticalAttack + executeTacticalDoctrine.
+  // Phase 2A: unified Pokémon-style move execution. Replaces executeTacticalAttack + executeTacticalAbility.
   executeMove: protectedProcedure
     .use(rateLimit(RATE_LIMITS.combat))
     .input(

@@ -55,8 +55,8 @@ Cada elemento común tiene 2–3 fortalezas y 2–3 debilidades. Luz y Oscuridad
 La Forma da estructura a lo amorfo. Impone patrones, crea límites, define la realidad. Es la magia de la civilización, la protección y la justicia.
 
 - **Filosofía:** La Forma toma lo que carece de definición y le otorga propósito. Donde hay caos molecular, la Forma impone estructura celular. Donde hay energía dispersa, la Forma la concentra en un punto. Para la Forma, la magia es una herramienta para perfeccionar el mundo y mantenerlo a salvo de la degradación.
-- **Estilo:** Disciplinado y preciso. Las doctrinas de Forma suelen manifestarse con formas geométricas perfectas, runas brillantes y una luz blanca o dorada. Es predecible pero extremadamente sólido.
-- **Doctrinas típicas:**
+- **Estilo:** Disciplinado y preciso. Las habilidades de Forma suelen manifestarse con formas geométricas perfectas, runas brillantes y una luz blanca o dorada. Es predecible pero extremadamente sólido.
+- **Habilidades típicas:**
   - **Oxigenación (Curación):** Estructura el flujo sanguíneo, optimiza la respiración celular, impone un patrón de regeneración ordenado en los tejidos dañados.
   - **Prisión de Cristal (Tierra/Hielo):** Atrapa al enemigo en estructuras moleculares rígidas.
   - **Rayo Dirigido (Rayo):** Hace vibrar las partículas del aire para crear un potencial eléctrico con trayectoria precisa hacia el objetivo.
@@ -72,8 +72,8 @@ La Forma da estructura a lo amorfo. Impone patrones, crea límites, define la re
 El Vacío retorna las cosas al potencial puro. Disuelve estructuras, transforma materia en energía, libera lo que estaba contenido. Es la magia de la naturaleza indómita, la pasión y la entropía.
 
 - **Filosofía:** El Vacío es el estado primordial del universo, anterior a toda forma. Sus usuarios no destruyen: _liberan_. Disuelven los enlaces que mantienen unida la materia, retornándola a su estado de máximo potencial. Para el Vacío, las estructuras son prisiones temporales de la energía.
-- **Estilo:** Errático, explosivo y devastador. Las doctrinas de Vacío se manifiestan como llamas oscuras, rayos negros, fracturas en el espacio y sombras líquidas. Es visualmente salvaje y difícil de controlar.
-- **Doctrinas típicas:**
+- **Estilo:** Errático, explosivo y devastador. Las habilidades de Vacío se manifiestan como llamas oscuras, rayos negros, fracturas en el espacio y sombras líquidas. Es visualmente salvaje y difícil de controlar.
+- **Habilidades típicas:**
   - **Sacrificio (Curación):** Restaura la vida drenándola de enemigos, aliados o del propio entorno. La curación es rápida pero violenta y a menudo deja cicatrices.
   - **Combustión Interna (Fuego):** Usa el oxígeno del cuerpo del enemigo para quemarlo desde dentro, liberando la energía almacenada en sus células.
   - **Disolución (Rayo):** Libera los enlaces electroquímicos del cuerpo del enemigo, disolviendo su estructura molecular.
@@ -131,7 +131,7 @@ La magia no es infinita ni gratuita. Cada acto de voluntad que altera la realida
 
 El maná es la energía mental y espiritual disponible.
 
-- **Recuperación:** El maná se regenera lentamente (salvo doctrinas específicas). También se puede recuperar con pociones.
+- **Recuperación:** El maná se regenera lentamente (salvo habilidades específicas). También se puede recuperar con pociones.
 - **Agotamiento:** Llegar a 0 de maná causa "Fatiga Mágica" (Silencio total y -50% de movimiento por 1 turno).
 
 ### **2. Riesgo (Sobrecarga de Naturaleza)**
@@ -140,22 +140,22 @@ Usar magia intensamente acumula "Residuo" en el alma. Si se supera el límite de
 
 | Nivel de Sobrecarga              | Efecto Forma (Estasis)                                        | Efecto Vacío (Retroceso)                                               |
 | :------------------------------- | :------------------------------------------------------------ | :--------------------------------------------------------------------- |
-| **Leve** (3 doctrinas/turno)     | -10% Velocidad de Movimiento.                                 | 5% de daño a la salud propia.                                          |
-| **Moderada** (6 doctrinas/turno) | **Rigidez:** No puedes esquivar (Evasión = 0).                | **Sangrado Mágico:** Pierdes 5% de salud por turno.                    |
-| **Crítica** (Uso de Ultimate)    | **Cristalización:** Aturdido 1 turno al terminar la doctrina. | **Colapso:** Recibes el doble de daño de cualquier fuente por 1 turno. |
+| **Leve** (3 habilidades/turno)     | -10% Velocidad de Movimiento.                                 | 5% de daño a la salud propia.                                          |
+| **Moderada** (6 habilidades/turno) | **Rigidez:** No puedes esquivar (Evasión = 0).                | **Sangrado Mágico:** Pierdes 5% de salud por turno.                    |
+| **Crítica** (Uso de Ultimate)    | **Cristalización:** Aturdido 1 turno al terminar la habilidad. | **Colapso:** Recibes el doble de daño de cualquier fuente por 1 turno. |
 
 ### **3. Mitigación (Focos)**
 
 El equipamiento mágico (Varas, Libros, Talismanes) actúa como un disipador de calor para el alma.
 
-- Un buen foco permite lanzar más doctrinas antes de sufrir Sobrecarga.
+- Un buen foco permite lanzar más habilidades antes de sufrir Sobrecarga.
 - Lanzar magia sin un foco (manos desnudas) cuesta un +50% de maná y genera Sobrecarga inmediata.
 
 ---
 
 ## **Física de la Magia**
 
-¿Qué pasa cuando una doctrina golpea una armadura o un escudo?
+¿Qué pasa cuando una habilidad golpea una armadura o un escudo?
 
 ### **Tabla de Interacción: Magia vs Materia**
 
@@ -168,4 +168,4 @@ El equipamiento mágico (Varas, Libros, Talismanes) actúa como un disipador de 
 ---
 
 **¿Las personas nacen con él?**
-Sí. Cada ser vivo nace con una "chispa" alineada. Un individuo de la Forma nunca podrá lanzar una doctrina del Vacío, y viceversa. Esta afinidad es absoluta y define el camino del usuario en el mundo.
+Sí. Cada ser vivo nace con una "chispa" alineada. Un individuo de la Forma nunca podrá lanzar una habilidad del Vacío, y viceversa. Esta afinidad es absoluta y define el camino del usuario en el mundo.

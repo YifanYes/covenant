@@ -72,13 +72,13 @@ export const invalidators = {
   },
 
   /**
-   * Invalidate doctrine-related queries.
-   * Use after equipping or unequipping doctrines.
+   * Invalidate ability-related queries.
+   * Use after equipping or unequipping abilities.
    */
-  doctrines: async () => {
+  abilities: async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.equippedDoctrines.queryKey() }),
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getAvailableDoctrines.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.equippedAbilities.queryKey() }),
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getAvailableAbilities.queryKey() })
     ])
   },
 

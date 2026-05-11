@@ -1,7 +1,7 @@
-import type { DoctrineDefinition, MoveDamageType } from '@shared/types/doctrine.types'
-import { DoctrineEffectType, DoctrineTarget } from '@shared/types/doctrine.types'
+import type { AbilityDefinition, MoveDamageType } from '@shared/types/ability.types'
+import { AbilityEffectType, AbilityTarget } from '@shared/types/ability.types'
 import type { TacticalUnitState } from '@shared/types/tactical-combat.types'
-import { DOCTRINES } from '@shared/constants/doctrines'
+import { ABILITIES } from '@shared/constants/abilities'
 
 export const CRIT_RATE = 1 / 16 // Pokémon Gen-1 base critical chance (6.25%)
 export const VARIANCE_MIN = 0.85
@@ -43,7 +43,7 @@ export function rollVariance(): number {
 }
 
 /**
- * Read caster active doctrines and aggregate the POWER_MODIFIER%/THRESHOLD_MODIFIER%/crit bonuses.
+ * Read caster active abilities and aggregate the POWER_MODIFIER%/THRESHOLD_MODIFIER%/crit bonuses.
  * - POWER_MODIFIER (SELF) → +% ATK
  * - GUARANTEED_CRITICAL value=1 → guaranteed crit this hit
  * - GUARANTEED_CRITICAL value>=2 → +N% crit chance bonus this hit
@@ -56,23 +56,23 @@ export function aggregateCasterBuffs(
   let atkPct = 0
   let critChanceBonus = 0
   let guaranteedCrit = false
-  const active = caster.activeDoctrines
+  const active = caster.activeAbilities
   if (!active) return { atkPct, critChanceBonus, guaranteedCrit }
 
-  for (const [doctrineId, eff] of Object.entries(active)) {
+  for (const [abilityId, eff] of Object.entries(active)) {
     if (eff.remainingTurns <= 0) continue
-    const def = DOCTRINES[doctrineId]
+    const def = ABILITIES[abilityId]
     if (!def) continue
     for (const e of def.effects) {
-      if (e.target !== DoctrineTarget.SELF) continue
-      if (e.type === DoctrineEffectType.POWER_MODIFIER) {
+      if (e.target !== AbilityTarget.SELF) continue
+      if (e.type === AbilityEffectType.POWER_MODIFIER) {
         const base = e.value ?? 0
         if (e.scalesWithEnemyTier && enemyTier && enemyTier > 1) {
           atkPct += base * enemyTier
         } else {
           atkPct += base
         }
-      } else if (e.type === DoctrineEffectType.GUARANTEED_CRITICAL) {
+      } else if (e.type === AbilityEffectType.GUARANTEED_CRITICAL) {
         const v = e.value ?? 0
         if (v === 1) guaranteedCrit = true
         else if (v >= 2) critChanceBonus += v
@@ -83,7 +83,7 @@ export function aggregateCasterBuffs(
 }
 
 /**
- * Read target active doctrines for DEF buffs and Protect.
+ * Read target active abilities for DEF buffs and Protect.
  * - THRESHOLD_MODIFIER (SELF, value=N) → +N% DEF
  * - NEGATE_HITS (SELF, value>=1) → Protect (zero incoming damage once; consumed by caller)
  * - NEGATE_HITS (SELF, value=0, thornsDamage=D) → thorns reflect; not Protect
@@ -96,18 +96,18 @@ export function aggregateTargetBuffs(target: TacticalUnitState): {
   let defPct = 0
   let protect = false
   let thornsDamage = 0
-  const active = target.activeDoctrines
+  const active = target.activeAbilities
   if (!active) return { defPct, protect, thornsDamage }
 
-  for (const [doctrineId, eff] of Object.entries(active)) {
+  for (const [abilityId, eff] of Object.entries(active)) {
     if (eff.remainingTurns <= 0) continue
-    const def = DOCTRINES[doctrineId]
+    const def = ABILITIES[abilityId]
     if (!def) continue
     for (const e of def.effects) {
-      if (e.target !== DoctrineTarget.SELF) continue
-      if (e.type === DoctrineEffectType.THRESHOLD_MODIFIER) {
+      if (e.target !== AbilityTarget.SELF) continue
+      if (e.type === AbilityEffectType.THRESHOLD_MODIFIER) {
         defPct += e.value ?? 0
-      } else if (e.type === DoctrineEffectType.NEGATE_HITS) {
+      } else if (e.type === AbilityEffectType.NEGATE_HITS) {
         const v = e.value ?? 0
         if (v >= 1) {
           protect = true
@@ -122,19 +122,19 @@ export function aggregateTargetBuffs(target: TacticalUnitState): {
 
 /**
  * Active debuffs sitting on a unit reduce that unit's ATK (frost_bite leaves an
- * activeDoctrine on the enemy with POWER_MODIFIER target=ENEMY value<0).
+ * activeAbility on the enemy with POWER_MODIFIER target=ENEMY value<0).
  */
 export function aggregateAtkDebuffPct(unit: TacticalUnitState): number {
   let pct = 0
-  const active = unit.activeDoctrines
+  const active = unit.activeAbilities
   if (!active) return pct
-  for (const [doctrineId, eff] of Object.entries(active)) {
+  for (const [abilityId, eff] of Object.entries(active)) {
     if (eff.remainingTurns <= 0) continue
-    const def = DOCTRINES[doctrineId]
+    const def = ABILITIES[abilityId]
     if (!def) continue
     for (const e of def.effects) {
-      if (e.target !== DoctrineTarget.ENEMY) continue
-      if (e.type === DoctrineEffectType.POWER_MODIFIER) {
+      if (e.target !== AbilityTarget.ENEMY) continue
+      if (e.type === AbilityEffectType.POWER_MODIFIER) {
         pct += e.value ?? 0
       }
     }
@@ -149,7 +149,7 @@ export function aggregateAtkDebuffPct(unit: TacticalUnitState): number {
 export function resolveDamageMove(args: {
   caster: TacticalUnitState
   target: TacticalUnitState
-  move: DoctrineDefinition
+  move: AbilityDefinition
   casterTier: number
   targetTier: number
 }): { damage: number; isCrit: boolean; protected: boolean; thornsDamage: number } {

@@ -1,4 +1,4 @@
-import type { ActiveStatusEffect } from './doctrine.types'
+import type { ActiveStatusEffect } from './ability.types'
 import type { CombatLogEntry } from './gamification.types'
 
 // Combat unit representing player or enemy (no grid position)
@@ -15,8 +15,8 @@ export interface CombatUnit {
   hasMoved: boolean
   hasActed: boolean
 
-  // Active doctrine buffs (for self-buff doctrines)
-  activeDoctrines?: Record<string, ActiveStatusEffect>
+  // Active ability buffs (for self-buff abilities)
+  activeAbilities?: Record<string, ActiveStatusEffect>
   // Active status effects (burning, stunned, etc.)
   activeEffects?: ActiveStatusEffect[]
 }
@@ -99,11 +99,11 @@ export interface CombatEnemyTurnResult {
   diedFromStatusEffect?: boolean
 }
 
-// Doctrine result from server
-export interface CombatDoctrineResult {
+// Ability result from server
+export interface CombatAbilityResult {
   success: boolean
   casterId: string
-  doctrineId: string
+  abilityId: string
   targeting: 'single' | 'all'
   affectedUnitIds: string[]
   effects: {
