@@ -68,6 +68,8 @@ export interface EnemyState {
   templateId: string
   currentHealth: number
   maxHealth: number
+  currentMana: number
+  maxMana: number
   namePrefix?: string
   nameSuffix?: string
 }

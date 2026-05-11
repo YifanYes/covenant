@@ -7,7 +7,7 @@ tags: [release-notes, security, features, infra]
 
 # A Week in Covenant: Guilds, Quests, and a Security Overhaul
 
-The past seven days were the busiest stretch this project has seen. We shipped two major systems (Guilds and Quests), redesigned combat, rebuilt the entire authentication stack, and hardened the backend against a class of bugs that has been quietly nagging at me for weeks. This post walks through what changed and — more importantly — why.
+The past seven days were the busiest stretch this project has seen. I shipped two major systems (Guilds and Quests), redesigned combat, rebuilt the entire authentication stack, and hardened the backend against a class of bugs that has been quietly nagging at me for weeks. This post walks through what changed and — more importantly — why.
 
 If you only read one section, make it the security one. The features are fun, but the security work is what lets the features exist without keeping me up at night.
 
@@ -19,21 +19,21 @@ If you only read one section, make it the security one. The features are fun, bu
 
 For the first few months Covenant used Better Auth's magic-link flow. It was a great way to get to a working login screen without writing a password form. It is also the wrong default for this product. Covenant is not open to users yet, but a habit tracker that forces you into your inbox every time you want to log a habit is dead on arrival, and I would rather not ship that.
 
-So we ripped it out. Two commits did the heavy lifting:
+So I ripped it out. Two commits did the heavy lifting:
 
 - `04bbda5 feat: switch authentication from magic-link to email + password`
 - `72e69fc feat: replace magic-link auth with email+password, verification, and password reset`
 
 The first commit landed the schema change and primary login path. The second filled in the rest of the lifecycle: email verification on sign-up, password reset via signed token, and the UI flows for both. Net diff: roughly 6,000 lines moved around to delete the magic-link code, add the verification routes, and reshape the onboarding screens.
 
-Better Auth handles the hashing (argon2id) and token generation; we own the email rendering and the routing. The existing magic-link templates were repurposed into verification and reset templates so the visual identity stayed consistent.
+Better Auth handles the hashing (argon2id) and token generation; I own the email rendering and the routing. The existing magic-link templates were repurposed into verification and reset templates so the visual identity stayed consistent.
 
 ### Account lockout and rate limiting
 
 Once you have password login, you also have password brute force. Two follow-ups closed the obvious holes:
 
 - `7ec2057 feat: add account lockout for repeated failed sign-ins` — after N failed attempts within a window, the account is temporarily locked. The counter is per-account, not per-IP, because IP-based locks are trivially bypassed and punish anyone behind a shared NAT.
-- `e748e73 feat: add in-memory rate limiting to tRPC endpoints` — a process-local token bucket sitting in front of the tRPC router. It is intentionally in-memory: we are still on a single Railway service, so a Redis hop would be more latency than security. When we scale horizontally we will swap the implementation behind the same interface.
+- `e748e73 feat: add in-memory rate limiting to tRPC endpoints` — a process-local token bucket sitting in front of the tRPC router. It is intentionally in-memory: I'm still on a single Railway service, so a Redis hop would be more latency than security. When I scale horizontally I'll swap the implementation behind the same interface.
 
 Both ship with audit log entries, which leads to:
 
@@ -48,7 +48,7 @@ Every sign-in, sign-out, failed attempt, password change, and lockout now writes
 
 - `84c1f05 feat: hash session tokens at rest via prisma client extension`
 
-This is the change I am most proud of from the week. Better Auth stores session tokens in plaintext by default, which is the industry norm but still uncomfortable: a read-only database leak hands an attacker live sessions. We added a Prisma client extension that transparently hashes tokens on write and looks them up by hash on read. The application code never knows the difference. The trade-off is that you cannot reverse-lookup a token from a row, which we have no need to do.
+This is the change I am most proud of from the week. Better Auth stores session tokens in plaintext by default, which is the industry norm but still uncomfortable: a read-only database leak hands an attacker live sessions. I added a Prisma client extension that transparently hashes tokens on write and looks them up by hash on read. The application code never knows the difference. The trade-off is that you cannot reverse-lookup a token from a row, which I have no need to do.
 
 ### Session expiration: 7 → 30 days
 
@@ -64,7 +64,7 @@ A one-line change, but a deliberate one. With password auth, hashed tokens at re
 
 IDOR — insecure direct object reference — is the bug where the server trusts the ID in the request without checking whether the caller is allowed to touch that ID. It is the most common vulnerability in tRPC apps because the framework gives you typed parameters and a logged-in user, and it is very easy to use the first without checking against the second.
 
-We had a `UserScopedRepository` base class that was supposed to prevent this, but the audit found three places where services were calling raw `findById` on entities they should have been scoping. Fixed all three, then went through every other repository to verify the pattern was consistent. Tests were updated to assert that cross-user access throws.
+I had a `UserScopedRepository` base class that was supposed to prevent this, but the audit found three places where services were calling raw `findById` on entities they should have been scoping. Fixed all three, then went through every other repository to verify the pattern was consistent. Tests were updated to assert that cross-user access throws.
 
 If you are building on tRPC and have not done a pass like this, do it this week. The bugs are not subtle but they are invisible until you look.
 
@@ -83,7 +83,7 @@ Phase 1 ships:
 - **A grouped forum** — posts thread by day so the feed stays readable in low-activity guilds.
 - **A member list** with avatars, levels, and last-active timestamps.
 
-The architecture is the standard four-layer split (router → service → repository → Prisma). The interesting wrinkle is the invite flow: the join page is unauthenticated so a logged-out user can preview the guild, but the actual `join` mutation requires auth. This means the page has to gracefully handle "you must sign in first" without losing the invite token. We solved it by stashing the token in the URL through the auth redirect.
+The architecture is the standard four-layer split (router → service → repository → Prisma). The interesting wrinkle is the invite flow: the join page is unauthenticated so a logged-out user can preview the guild, but the actual `join` mutation requires auth. This means the page has to gracefully handle "you must sign in first" without losing the invite token. I solved it by stashing the token in the URL through the auth redirect.
 
 Spec is at `docs/specs/guild_system.md` if you want the detail.
 
@@ -126,7 +126,7 @@ Spec at `docs/product/journaling.md`.
 
 The previous combat screen was a side-scrolling experiment that never quite clicked for me. The new one is a fixed two-character arena (player left, monster right) with a menu-driven action bar at the bottom. If you grew up on Game Boy RPGs, you will recognize the layout.
 
-Why this layout: it scales from mobile to desktop without a separate design pass, it makes the available actions obvious (no hunting for buttons), and it gives us a stable canvas for future animations. Spec at `docs/product/combat_ui_pokemon-style.md`.
+Why this layout: it scales from mobile to desktop without a separate design pass, it makes the available actions obvious (no hunting for buttons), and it gives me a stable canvas for future animations. Spec at `docs/product/combat_ui_pokemon-style.md`.
 
 The combat sprite was also optimized in `2a71b94` — a small change that knocked a meaningful chunk off the initial-load JS for that route.
 
@@ -221,7 +221,7 @@ Sentry was added on May 8, then immediately scoped to production three days late
 - `b0cf515 fix: replace any types with generic react-hook-form types in form selectors` — small but it unblocked the `no-explicit-any` lint rule from being turned on in CI.
 - `a5b0237 fix: use explicit dimensions in chart ResponsiveContainer` — Recharts' `ResponsiveContainer` measures its parent on mount, and if the parent is `display: none` (collapsed accordion, hidden tab) it measures zero and never recovers. Explicit dimensions sidestep the issue.
 - `312efcb feat: add opengraph image for landing page` — link previews on Twitter, Slack, and Discord no longer look like a placeholder.
-- `1b024e8 chore: delete cron route` — the route was a leftover from a feature we no longer ship. Removing it cut a non-trivial chunk of cold-start cost on the workspace bundle.
+- `1b024e8 chore: delete cron route` — the route was a leftover from a feature I no longer ship. Removing it cut a non-trivial chunk of cold-start cost on the workspace bundle.
 
 ---
 
@@ -242,6 +242,8 @@ Second, the ratio of refactor commits to feature commits matters. The quest rout
 - **Mobile polish**: the new combat UI works on mobile, but a few of the legacy screens still do not.
 - **A second language pass**: Spanish translation coverage is at ~85%, target is 100% for shipped features.
 
-Thanks for reading. If you spot something in here that is wrong, broken, or just confusing, the issue tracker is open.
+Thanks for reading. I'm so excited about the project. I hope it will help people achieve their objectives in a fun, approachable way.
+
+See you at the trenches.
 
 — Yifan

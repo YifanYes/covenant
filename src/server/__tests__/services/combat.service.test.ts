@@ -2,6 +2,7 @@ import { DOCTRINES } from '@shared/constants/doctrines'
 import { DoctrineEffectType, DoctrineTarget, StatusEffect, type ActiveStatusEffect } from '@shared/types/doctrine.types'
 import { ItemType } from '@shared/types/gamification.types'
 import {
+  PLAYER_TEMPLATE_ID,
   TACTICAL_STATE_VERSION,
   TerrainType,
   type TacticalStateData,
@@ -122,21 +123,27 @@ describe('CombatService', () => {
         units: [
           {
             id: 'player-1',
+            templateId: PLAYER_TEMPLATE_ID,
             name: 'Test Player',
             position: { x: 1, y: 1 },
             hasMoved: false,
             hasActed: false,
             currentHealth: 10,
-            maxHealth: 10
+            maxHealth: 10,
+            currentMana: 0,
+            maxMana: 0
           },
           {
             id: 'enemy-1',
+            templateId: 'skeleton',
             name: 'Test Enemy',
             position: { x: 2, y: 1 },
             hasMoved: false,
             hasActed: false,
             currentHealth: 10,
-            maxHealth: 10
+            maxHealth: 10,
+            currentMana: 0,
+            maxMana: 0
           }
         ],
         turnOrder: ['player-1', 'enemy-1'],
@@ -479,12 +486,15 @@ describe('CombatService', () => {
         units: [
           {
             id: 'player-1',
+            templateId: PLAYER_TEMPLATE_ID,
             name: 'Test Player',
             position: { x: 1, y: 1 },
             hasMoved: false,
             hasActed: false,
             currentHealth: 10,
             maxHealth: 10,
+            currentMana: 0,
+            maxMana: 0,
             activeDoctrines: {
               precise_strike: {
                 effect: StatusEffect.DOCTRINE_ACTIVE,
@@ -495,12 +505,15 @@ describe('CombatService', () => {
           },
           {
             id: 'enemy-1',
+            templateId: 'skeleton',
             name: 'Test Enemy',
             position: { x: 2, y: 1 },
             hasMoved: false,
             hasActed: false,
             currentHealth: 10,
-            maxHealth: 10
+            maxHealth: 10,
+            currentMana: 0,
+            maxMana: 0
           }
         ],
         turnOrder: ['player-1', 'enemy-1'],
@@ -713,21 +726,27 @@ describe('CombatService', () => {
         units: [
           {
             id: 'player-1',
+            templateId: PLAYER_TEMPLATE_ID,
             name: 'Test Player',
             position: { x: 1, y: 1 },
             hasMoved: false,
             hasActed: false,
             currentHealth: 10,
-            maxHealth: 10
+            maxHealth: 10,
+            currentMana: 0,
+            maxMana: 0
           },
           {
             id: 'enemy-1',
+            templateId: 'skeleton',
             name: 'Test Enemy',
             position: { x: 2, y: 1 },
             hasMoved: false,
             hasActed: false,
             currentHealth: 10,
-            maxHealth: 10
+            maxHealth: 10,
+            currentMana: 0,
+            maxMana: 0
           }
         ],
         turnOrder: ['player-1', 'enemy-1'],
@@ -812,12 +831,15 @@ describe('CombatService', () => {
       stateWithDeadEnemy.tiles[1][3].occupantId = 'enemy-2'
       stateWithDeadEnemy.units.push({
         id: 'enemy-2',
+        templateId: 'skeleton',
         name: 'Dead Enemy',
         position: { x: 3, y: 1 },
         hasMoved: false,
         hasActed: false,
         currentHealth: 0, // Dead
-        maxHealth: 10
+        maxHealth: 10,
+        currentMana: 0,
+        maxMana: 0
       })
 
       const mockCombatEnemyRepo = {
@@ -1005,21 +1027,27 @@ describe('CombatService', () => {
         units: [
           {
             id: 'player-1',
+            templateId: PLAYER_TEMPLATE_ID,
             name: 'Test Player',
             position: { x: 1, y: 1 },
             hasMoved: false,
             hasActed: false,
             currentHealth: playerHealth,
-            maxHealth
+            maxHealth,
+            currentMana: 0,
+            maxMana: 0
           },
           {
             id: 'enemy-1',
+            templateId: 'skeleton',
             name: 'Test Enemy',
             position: { x: 2, y: 1 },
             hasMoved: false,
             hasActed: false,
             currentHealth: 10,
-            maxHealth: 10
+            maxHealth: 10,
+            currentMana: 0,
+            maxMana: 0
           }
         ],
         turnOrder: ['player-1', 'enemy-1'],
@@ -1447,11 +1475,14 @@ describe('CombatService', () => {
             units: [
               {
                 id: 'player-1',
+                templateId: PLAYER_TEMPLATE_ID,
                 name: 'P',
                 hasMoved: false,
                 hasActed: false,
                 currentHealth: 3,
-                maxHealth: 10
+                maxHealth: 10,
+                currentMana: 0,
+                maxMana: 0
               }
             ],
             turnOrder: ['player-1'],
@@ -1496,11 +1527,14 @@ describe('CombatService', () => {
             units: [
               {
                 id: 'player-1',
+                templateId: PLAYER_TEMPLATE_ID,
                 name: 'P',
                 hasMoved: false,
                 hasActed: false,
                 currentHealth: 10,
-                maxHealth: 10
+                maxHealth: 10,
+                currentMana: 0,
+                maxMana: 0
               }
             ],
             turnOrder: ['player-1'],

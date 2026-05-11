@@ -33,6 +33,8 @@ export default function QuestDetailPage() {
   const activeEnemy = activeQuest?.activeEnemy
   const combatLog = useMemo<CombatLogEntry[]>(() => [], [])
 
+  // Initial placeholder enemy. Mana is unknown until useCombat syncs from tactical state
+  // (the authoritative source for current/max mana mid-fight), so seed as 0 here.
   const currentEnemy = useMemo((): EnemyState | null => {
     if (!activeEnemy) return null
     return {
@@ -40,6 +42,8 @@ export default function QuestDetailPage() {
       templateId: activeEnemy.templateId,
       currentHealth: activeEnemy.currentHealth,
       maxHealth: activeEnemy.maxHealth,
+      currentMana: 0,
+      maxMana: 0,
       namePrefix: activeEnemy.namePrefix,
       nameSuffix: activeEnemy.nameSuffix
     }

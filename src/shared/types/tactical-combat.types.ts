@@ -34,10 +34,13 @@ export interface HighlightedTile {
   type: TileHighlightType
 }
 
+// Template ID used for the player unit (enemies use their enemy template ID)
+export const PLAYER_TEMPLATE_ID = 'player'
+
 // Tactical unit representing player or enemy on the grid
 export interface TacticalUnit {
   id: string
-  templateId: string // Enemy template ID or 'player'
+  templateId: string // Enemy template ID or PLAYER_TEMPLATE_ID
   name: string
   position: GridPosition
   isPlayer: boolean
@@ -149,12 +152,15 @@ export interface TacticalInitData {
 // Unit state stored in tactical state (database JSON)
 export interface TacticalUnitState {
   id: string
+  templateId: string // Enemy template ID or PLAYER_TEMPLATE_ID
   name: string
   position?: GridPosition
   hasMoved: boolean
   hasActed: boolean
   currentHealth: number
   maxHealth: number
+  currentMana: number
+  maxMana: number
   // Active doctrine buffs (for self-buff doctrines like Stellar Collapse)
   activeDoctrines?: Record<string, ActiveStatusEffect>
   // Active status effects (burning, stunned, etc.)
@@ -164,7 +170,7 @@ export interface TacticalUnitState {
 // Tactical state stored in database (JSON field)
 // Version for tactical state schema - increment when unit templates or state structure changes
 // This prevents hydrating stale state that may reference deleted/changed templates
-export const TACTICAL_STATE_VERSION = 2
+export const TACTICAL_STATE_VERSION = 3
 
 export interface TacticalStateData {
   stateVersion: number // Must match TACTICAL_STATE_VERSION for hydration to succeed
@@ -224,6 +230,8 @@ export interface TacticalAttackResult {
     name: string
     currentHealth: number
     maxHealth: number
+    currentMana: number
+    maxMana: number
   }
   // Self-damage from rolling 1s (plasma_missile, audacity)
   selfDamageFromOnes?: number
@@ -292,6 +300,8 @@ export interface TacticalDoctrineResultBase {
     name: string
     currentHealth: number
     maxHealth: number
+    currentMana: number
+    maxMana: number
   }
   tierProgression?: { oldTier: number; newTier: number }
 }

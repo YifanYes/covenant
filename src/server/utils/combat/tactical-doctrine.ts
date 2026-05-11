@@ -522,7 +522,9 @@ export async function executeTacticalDoctrine(
 
   // Handle enemy defeats and spawn next enemy
   let goldReward = 0
-  let nextEnemy: { id: string; templateId: string; name: string; currentHealth: number; maxHealth: number } | undefined
+  let nextEnemy:
+    | { id: string; templateId: string; name: string; currentHealth: number; maxHealth: number; currentMana: number; maxMana: number }
+    | undefined
   let tierProgression: { oldTier: number; newTier: number } | undefined
 
   // Check if any enemy was killed

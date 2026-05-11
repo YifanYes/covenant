@@ -38,10 +38,12 @@ export function useCombat(
   const [targetingMode, setTargetingMode] = useState<'single' | 'all' | null>(null)
   const [selectedDoctrineId, setSelectedDoctrineId] = useState<string | null>(null)
 
-  // Derive player health from tactical state
+  // Derive player health + mana from tactical state
   const playerUnit = tacticalState?.units?.find((u) => u.id.startsWith('player-'))
   const playerHealth = playerUnit?.currentHealth ?? currentClass.health
   const playerMaxHealth = playerUnit?.maxHealth ?? currentClass.maxHealth
+  const playerMana = playerUnit?.currentMana ?? currentClass.mana
+  const playerMaxMana = playerUnit?.maxMana ?? currentClass.maxMana
 
   // Dice roll state
   const [attackRolls, setAttackRolls] = useState<number[] | null>(null)
@@ -65,14 +67,15 @@ export function useCombat(
         const newEnemies: EnemyState[] = enemyUnits
           .filter((u) => u.currentHealth > 0)
           .map((u) => {
-            // Try to find the existing enemy with the same ID to keep its template data
             const existing = localEnemies.find((e) => e.id === u.id)
             const nameParts = u.name.includes('|') ? u.name.split('|') : [u.name, '']
             return {
               id: u.id,
-              templateId: existing?.templateId ?? '',
+              templateId: u.templateId,
               currentHealth: u.currentHealth,
               maxHealth: u.maxHealth,
+              currentMana: u.currentMana,
+              maxMana: u.maxMana,
               namePrefix: existing?.namePrefix ?? nameParts[0],
               nameSuffix: existing?.nameSuffix ?? nameParts[1]
             }
@@ -138,6 +141,8 @@ export function useCombat(
               templateId: result.nextEnemy.templateId,
               currentHealth: result.nextEnemy.currentHealth,
               maxHealth: result.nextEnemy.maxHealth,
+              currentMana: result.nextEnemy.currentMana,
+              maxMana: result.nextEnemy.maxMana,
               namePrefix: nameParts[0],
               nameSuffix: nameParts[1]
             }
@@ -257,6 +262,8 @@ export function useCombat(
               templateId: result.nextEnemy.templateId,
               currentHealth: result.nextEnemy.currentHealth,
               maxHealth: result.nextEnemy.maxHealth,
+              currentMana: result.nextEnemy.currentMana,
+              maxMana: result.nextEnemy.maxMana,
               namePrefix: nameParts[0],
               nameSuffix: nameParts[1]
             }
@@ -498,8 +505,8 @@ export function useCombat(
     phase,
     playerHealth,
     playerMaxHealth,
-    playerMana: currentClass.mana,
-    playerMaxMana: currentClass.maxMana,
+    playerMana,
+    playerMaxMana,
     enemies: localEnemies,
     combatLog: localLog,
     potionUsedThisTurn,

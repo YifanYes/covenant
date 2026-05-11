@@ -1,10 +1,11 @@
 'use client'
 import HealthBar from '@/app/(workspace)/map/_components/health-bar.component'
+import ManaBar from '@/components/combat/mana-bar.component'
 import { panelChrome } from '@/components/combat/combat-styles'
 import { cn } from '@/lib/cn.lib'
 import { EnemyType, getEnemy } from '@shared/constants/enemies'
 import type { EnemyState } from '@shared/types/gamification.types'
-import { Heart } from 'pixelarticons/react'
+import { Battery, Heart } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 
 interface EnemyInfoProps {
@@ -46,6 +47,13 @@ export default function EnemyInfo({ enemy, className }: EnemyInfoProps) {
         <span className="text-[10px] font-bold tracking-widest text-primary">HP</span>
         <HealthBar current={enemy.currentHealth} max={enemy.maxHealth} className="flex-1" />
       </div>
+      {enemy.maxMana > 0 && (
+        <div className="flex items-center gap-1.5">
+          <Battery className="h-3 w-3 shrink-0 text-blue-400" />
+          <span className="text-[10px] font-bold tracking-widest text-primary">MP</span>
+          <ManaBar current={enemy.currentMana} max={enemy.maxMana} className="flex-1" />
+        </div>
+      )}
     </div>
   )
 }

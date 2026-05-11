@@ -1,4 +1,5 @@
 import {
+  PLAYER_TEMPLATE_ID,
   TACTICAL_STATE_VERSION,
   TerrainType,
   type GridPosition,
@@ -27,12 +28,15 @@ export function createTestGrid(width: number = 8, height: number = 7, overrides?
 
 export function createTestUnit(overrides: Partial<TacticalUnitState> & { id: string }): TacticalUnitState {
   return {
+    templateId: overrides.id.startsWith('player') ? PLAYER_TEMPLATE_ID : overrides.id,
     name: overrides.id,
     position: { x: 0, y: 0 },
     hasMoved: false,
     hasActed: false,
     currentHealth: 10,
     maxHealth: 10,
+    currentMana: 0,
+    maxMana: 0,
     ...overrides
   }
 }

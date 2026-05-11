@@ -4,6 +4,7 @@ import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constan
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import type { EncounterState } from '@shared/types/combat.types'
 import {
+  PLAYER_TEMPLATE_ID,
   TACTICAL_STATE_VERSION,
   TerrainType,
   type TacticalStateData,
@@ -37,14 +38,22 @@ export class QuestService {
     }
   }
 
-  private createInitialTacticalState(
-    playerUnitId: string,
-    playerName: string,
-    playerHealth: { current: number; max: number },
-    enemyUnitId: string,
-    enemyName: string,
-    enemyHealth: { current: number; max: number }
-  ): TacticalStateData {
+  private createInitialTacticalState(opts: {
+    player: {
+      unitId: string
+      name: string
+      health: { current: number; max: number }
+      mana: { current: number; max: number }
+    }
+    enemy: {
+      unitId: string
+      templateId: string
+      name: string
+      health: { current: number; max: number }
+      mana: { current: number; max: number }
+    }
+  }): TacticalStateData {
+    const { player, enemy } = opts
     const tiles: TileState[][] = [
       [
         {
@@ -58,20 +67,26 @@ export class QuestService {
 
     const units = [
       {
-        id: playerUnitId,
-        name: playerName,
+        id: player.unitId,
+        templateId: PLAYER_TEMPLATE_ID,
+        name: player.name,
         hasMoved: false,
         hasActed: false,
-        currentHealth: playerHealth.current,
-        maxHealth: playerHealth.max
+        currentHealth: player.health.current,
+        maxHealth: player.health.max,
+        currentMana: player.mana.current,
+        maxMana: player.mana.max
       },
       {
-        id: enemyUnitId,
-        name: enemyName,
+        id: enemy.unitId,
+        templateId: enemy.templateId,
+        name: enemy.name,
         hasMoved: false,
         hasActed: false,
-        currentHealth: enemyHealth.current,
-        maxHealth: enemyHealth.max
+        currentHealth: enemy.health.current,
+        maxHealth: enemy.health.max,
+        currentMana: enemy.mana.current,
+        maxMana: enemy.mana.max
       }
     ]
 
@@ -82,7 +97,7 @@ export class QuestService {
       gridHeight: 1,
       tiles,
       units,
-      turnOrder: [playerUnitId, enemyUnitId],
+      turnOrder: [player.unitId, enemy.unitId],
       currentTurnIndex: 0,
       turnNumber: 1
     }
@@ -142,14 +157,23 @@ export class QuestService {
       const maxHealth = currentClass?.maxHealth ?? initialHealth
 
       const enemyName = `${nameKeys.prefix}|${nameKeys.suffix}`
-      const tacticalState = this.createInitialTacticalState(
-        'player-1',
-        character.name,
-        { current: initialHealth, max: maxHealth },
-        activeEnemy.id,
-        enemyName,
-        { current: scaledTemplate.health, max: scaledTemplate.health }
-      )
+      const playerManaCurrent = currentClass?.mana ?? 0
+      const playerManaMax = currentClass?.maxMana ?? 0
+      const tacticalState = this.createInitialTacticalState({
+        player: {
+          unitId: 'player-1',
+          name: character.name,
+          health: { current: initialHealth, max: maxHealth },
+          mana: { current: playerManaCurrent, max: playerManaMax }
+        },
+        enemy: {
+          unitId: activeEnemy.id,
+          templateId: selected.enemyId,
+          name: enemyName,
+          health: { current: scaledTemplate.health, max: scaledTemplate.health },
+          mana: { current: scaledTemplate.mana, max: scaledTemplate.mana }
+        }
+      })
       await this.characterQuestRepository.updateTacticalState(quest.id, tacticalState)
 
       return {

@@ -36,6 +36,8 @@ export interface EnemyDefeatResult {
     name: string
     currentHealth: number
     maxHealth: number
+    currentMana: number
+    maxMana: number
   }
   tierProgression?: { oldTier: number; newTier: number }
 }
@@ -169,19 +171,21 @@ export async function processEnemyDefeat(
       templateId: selected.enemyId,
       name: newEnemyName,
       currentHealth: scaledTemplate.health,
-      maxHealth: scaledTemplate.health
+      maxHealth: scaledTemplate.health,
+      currentMana: scaledTemplate.mana,
+      maxMana: scaledTemplate.mana
     }
 
     // Reinitialize tactical state with new enemy
     const playerUnit = updatedState.units.find((u) => u.id.startsWith('player-'))
     if (playerUnit) {
-      const newTacticalState = createTacticalStateWithNewEnemy(
-        updatedState,
-        playerUnit,
-        newEnemy.id,
-        newEnemyName,
-        { current: scaledTemplate.health, max: scaledTemplate.health }
-      )
+      const newTacticalState = createTacticalStateWithNewEnemy(updatedState, playerUnit, {
+        id: newEnemy.id,
+        templateId: selected.enemyId,
+        name: newEnemyName,
+        health: { current: scaledTemplate.health, max: scaledTemplate.health },
+        mana: { current: scaledTemplate.mana, max: scaledTemplate.mana }
+      })
       await repos.characterQuestRepository.updateTacticalState(questId, newTacticalState)
     }
   }
@@ -196,9 +200,13 @@ export async function processEnemyDefeat(
 export function createTacticalStateWithNewEnemy(
   currentState: TacticalStateData,
   playerUnit: TacticalUnitState,
-  newEnemyId: string,
-  newEnemyName: string,
-  newEnemyHealth: { current: number; max: number }
+  newEnemy: {
+    id: string
+    templateId: string
+    name: string
+    health: { current: number; max: number }
+    mana: { current: number; max: number }
+  }
 ): TacticalStateData {
   const updatedPlayerUnit: TacticalUnitState = {
     ...playerUnit,
@@ -207,16 +215,19 @@ export function createTacticalStateWithNewEnemy(
   }
 
   const newEnemyUnit: TacticalUnitState = {
-    id: newEnemyId,
-    name: newEnemyName,
+    id: newEnemy.id,
+    templateId: newEnemy.templateId,
+    name: newEnemy.name,
     hasMoved: false,
     hasActed: false,
-    currentHealth: newEnemyHealth.current,
-    maxHealth: newEnemyHealth.max
+    currentHealth: newEnemy.health.current,
+    maxHealth: newEnemy.health.max,
+    currentMana: newEnemy.mana.current,
+    maxMana: newEnemy.mana.max
   }
 
   const units = [updatedPlayerUnit, newEnemyUnit]
-  const turnOrder = [playerUnit.id, newEnemyId]
+  const turnOrder = [playerUnit.id, newEnemy.id]
 
   return {
     stateVersion: TACTICAL_STATE_VERSION,

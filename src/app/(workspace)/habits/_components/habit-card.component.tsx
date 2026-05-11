@@ -1,4 +1,5 @@
 'use client'
+import { useDateFormat } from '@/hooks/use-date-format'
 import type { Habit } from '@/types/models.types'
 import Button from '@/ui/button.component'
 import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/tooltip.component'
@@ -24,6 +25,7 @@ const timespanUnits: Record<HabitTimespan, OpUnitType> = {
 const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttributes<HTMLDivElement>>(
   ({ habit: { completions = [], recurrence = 1, id, name, description, timespan }, ...props }, ref) => {
     const { t } = useTranslation()
+    const { formatDate } = useDateFormat()
     const timespanUnit = timespanUnits[timespan as HabitTimespan]
 
     const createCompletion = useMutation(
@@ -48,21 +50,21 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
       const completionCounts = new Map<string, number>()
 
       completions.forEach((completion) => {
-        const dateStr = dayjs(completion?.completedAt).format('L')
+        const dateStr = formatDate(completion?.completedAt)
         completionCounts.set(dateStr, (completionCounts.get(dateStr) || 0) + 1)
       })
 
       return Array.from({ length: 36 }).map((_, i) => {
         const date = dayjs().subtract(35 - i, 'day')
-        const count = completionCounts.get(date.format('L')) || 0
+        const count = completionCounts.get(formatDate(date)) || 0
         return {
-          date: date.format('L'),
+          date: formatDate(date),
           count,
           style: count > 0 ? { opacity: Math.max(0.3, Math.min(count / recurrence, 1)) } : {},
           background: date.isAfter(dayjs(), 'day') ? 'bg-muted/10' : count > 0 ? 'bg-primary' : 'bg-muted/30'
         }
       })
-    }, [completions, recurrence])
+    }, [completions, recurrence, formatDate])
 
     const { periodCompletions, isPeriodCompleted } = useMemo(() => {
       const completionsInPeriod = completions.filter((c) => dayjs(c.completedAt).isSame(dayjs(), timespanUnit))

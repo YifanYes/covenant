@@ -128,7 +128,7 @@ describe('QuestService', () => {
       )
       expect(mockCharacterQuestRepo.updateTacticalState).toHaveBeenCalledWith(
         'new-quest-id',
-        expect.objectContaining({ stateVersion: 2 })
+        expect.objectContaining({ stateVersion: 3 })
       )
     })
   })
@@ -233,7 +233,7 @@ describe('QuestService', () => {
 
   describe('getTacticalState', () => {
     it('returns the tactical state for a quest', async () => {
-      const tacticalState = { stateVersion: 2, units: [] }
+      const tacticalState = { stateVersion: 3, units: [] }
       mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
         id: 'quest-instance-1',
         characterId: 'char-123',

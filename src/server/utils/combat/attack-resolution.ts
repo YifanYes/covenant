@@ -392,7 +392,9 @@ export async function executeTacticalAttack(
 
   // Sync CombatEnemy record and handle defeat
   let goldReward = 0
-  let nextEnemy: { id: string; templateId: string; name: string; currentHealth: number; maxHealth: number } | undefined
+  let nextEnemy:
+    | { id: string; templateId: string; name: string; currentHealth: number; maxHealth: number; currentMana: number; maxMana: number }
+    | undefined
   let tierProgression: { oldTier: number; newTier: number } | undefined
 
   if (repos.combatEnemyRepository) {
