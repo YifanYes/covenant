@@ -142,7 +142,9 @@ export class ServiceFactory {
       this.characterQuestRepository,
       this.character,
       this.combatEnemyRepository,
-      this.killRecord
+      this.killRecord,
+      undefined,
+      this.prisma
     ))
   }
 

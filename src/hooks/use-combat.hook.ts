@@ -1,9 +1,10 @@
 'use client'
 import { useCombatAnimations } from '@/hooks/use-combat-animations.hook'
+import { translateEnemyName } from '@/components/combat/translate-enemy-name.utils'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { BASIC_STRIKE_ID, ABILITIES, isDamageMove } from '@shared/constants/abilities'
 import { getEnemy } from '@shared/constants/enemies'
-import type { CombatLogEntry, EnemyState, InventoryCharacter } from '@shared/types/gamification.types'
+import { CombatLogType, type CombatLogEntry, type EnemyState, type InventoryCharacter } from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -109,7 +110,9 @@ export function useCombat(
           setLocalLog((prev) => [...prev, ...result.logEntries])
         }
         if (result.goldReward && result.goldReward > 0) {
-          toast.success(t('combat.enemy_defeated_reward', { gold: result.goldReward }))
+          const defeatedEntry = result.logEntries?.find((e) => e.type === CombatLogType.ENEMY_DEFEATED)
+          const defeatedName = translateEnemyName(t, defeatedEntry?.data?.enemy as string | undefined)
+          toast.success(t('combat.enemy_defeated_reward', { enemy: defeatedName, gold: result.goldReward }))
         }
         if (result.tierProgression) {
           toast.success(t('character.tier_up', { tier: result.tierProgression.newTier }))

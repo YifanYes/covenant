@@ -1,6 +1,14 @@
 import { ItemType } from '@shared/types/gamification.types'
-import type { TacticalStateData } from '@shared/types/tactical-combat.types'
+import type { TacticalMoveResult, TacticalStateData } from '@shared/types/tactical-combat.types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const executeMoveMock = vi.fn()
+const executeEnemyMoveMock = vi.fn()
+vi.mock('../../utils/combat/move-resolution', () => ({
+  executeMove: (args: unknown) => executeMoveMock(args),
+  executeEnemyMove: (args: unknown) => executeEnemyMoveMock(args)
+}))
+
 import { CombatService } from '../../services/combat.service'
 
 const createMockCharacter = (
@@ -139,6 +147,187 @@ describe('CombatService (Phase 2A)', () => {
       await expect(combatService.useConsumable('user-1', 'health_potion', { markPotionTurn: true })).rejects.toThrow(
         'Already used a potion this turn'
       )
+    })
+  })
+
+  describe('playerExecuteMove (turn pointer recovery)', () => {
+    const stuckState: TacticalStateData = {
+      units: [
+        {
+          id: 'player-1',
+          name: 'Player',
+          currentHealth: 40,
+          maxHealth: 40,
+          currentMana: 2,
+          maxMana: 5,
+          speed: 1,
+          strengthAtk: 4,
+          strengthDef: 4,
+          magicAtk: 5,
+          magicDef: 5
+        },
+        {
+          id: 'enemy-spawn-1',
+          name: 'Shadow Demon',
+          templateId: 'shadow_demon',
+          currentHealth: 14,
+          maxHealth: 30,
+          currentMana: 5,
+          maxMana: 5,
+          speed: 1,
+          strengthAtk: 5,
+          strengthDef: 4,
+          magicAtk: 3,
+          magicDef: 3,
+          moves: ['basic_strike']
+        }
+      ],
+      turnOrder: ['player-1', 'enemy-spawn-1'],
+      currentTurnIndex: 1
+    }
+
+    const mkEnemyResult = (overrides: Partial<TacticalMoveResult> = {}): TacticalMoveResult => ({
+      success: true as const,
+      casterId: 'enemy-spawn-1',
+      moveId: 'basic_strike',
+      targeting: 'single',
+      affectedUnitIds: ['player-1'],
+      effects: [{ unitId: 'player-1', damageDealt: 4 }],
+      manaCost: 0,
+      updatedState: {
+        ...stuckState,
+        units: stuckState.units.map((u) => (u.id === 'player-1' ? { ...u, currentHealth: 36 } : u)),
+        currentTurnIndex: 0
+      },
+      logEntries: [],
+      newMana: 5,
+      ...overrides
+    })
+
+    const mkPlayerResult = (): TacticalMoveResult => ({
+      success: true as const,
+      casterId: 'player-1',
+      moveId: 'basic_strike',
+      targeting: 'single',
+      affectedUnitIds: ['enemy-spawn-1'],
+      effects: [{ unitId: 'enemy-spawn-1', damageDealt: 10 }],
+      manaCost: 0,
+      updatedState: stuckState,
+      logEntries: [],
+      newMana: 2
+    })
+
+    beforeEach(() => {
+      executeMoveMock.mockReset()
+      executeEnemyMoveMock.mockReset()
+      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+        id: 'quest-1',
+        characterId: 'char-1',
+        tacticalState: stuckState
+      })
+      mockCharacterService.getCurrentClass.mockResolvedValue({
+        id: 'char-1',
+        currentClass: 'templar',
+        classes: [
+          {
+            id: 'class-1',
+            className: 'templar',
+            health: 40,
+            maxHealth: 40,
+            mana: 2,
+            maxMana: 5,
+            tier: 1,
+            strengthAtk: 4,
+            strengthDef: 4,
+            magicAtk: 5,
+            magicDef: 5,
+            speed: 1,
+            manaRegen: 1,
+            equippedAbilities: ['truth_blade']
+          }
+        ]
+      })
+    })
+
+    it('auto-runs the pending enemy turn when player calls executeMove on the enemy pointer', async () => {
+      executeEnemyMoveMock.mockResolvedValue(mkEnemyResult())
+      executeMoveMock.mockResolvedValue(mkPlayerResult())
+
+      const result = await combatService.playerExecuteMove(
+        'user-1',
+        'quest-1',
+        'player-1',
+        'basic_strike',
+        ['enemy-spawn-1']
+      )
+
+      expect(executeEnemyMoveMock).toHaveBeenCalledTimes(1)
+      expect(executeEnemyMoveMock.mock.calls[0][0]).toMatchObject({
+        participationId: 'quest-1',
+        enemyId: 'enemy-spawn-1'
+      })
+      expect(executeMoveMock).toHaveBeenCalledTimes(1)
+      expect(executeMoveMock.mock.calls[0][0]).toMatchObject({
+        participationId: 'quest-1',
+        casterId: 'player-1',
+        moveId: 'basic_strike'
+      })
+      expect(result.casterId).toBe('player-1')
+    })
+
+    it('short-circuits with the enemy result when the auto-run kills the player', async () => {
+      const lethal = mkEnemyResult({
+        updatedState: {
+          ...stuckState,
+          units: stuckState.units.map((u) => (u.id === 'player-1' ? { ...u, currentHealth: 0 } : u))
+        }
+      })
+      executeEnemyMoveMock.mockResolvedValue(lethal)
+
+      const result = await combatService.playerExecuteMove(
+        'user-1',
+        'quest-1',
+        'player-1',
+        'basic_strike',
+        ['enemy-spawn-1']
+      )
+
+      expect(executeEnemyMoveMock).toHaveBeenCalledTimes(1)
+      expect(executeMoveMock).not.toHaveBeenCalled()
+      expect(result).toBe(lethal)
+    })
+
+    it('skips recovery when turn pointer is already on the player', async () => {
+      mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
+        id: 'quest-1',
+        characterId: 'char-1',
+        tacticalState: { ...stuckState, currentTurnIndex: 0 }
+      })
+      executeMoveMock.mockResolvedValue(mkPlayerResult())
+
+      await combatService.playerExecuteMove('user-1', 'quest-1', 'player-1', 'basic_strike', ['enemy-spawn-1'])
+
+      expect(executeEnemyMoveMock).not.toHaveBeenCalled()
+      expect(executeMoveMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('skips recovery when the pending unit is already dead', async () => {
+      mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
+        id: 'quest-1',
+        characterId: 'char-1',
+        tacticalState: {
+          ...stuckState,
+          units: stuckState.units.map((u) =>
+            u.id === 'enemy-spawn-1' ? { ...u, currentHealth: 0 } : u
+          )
+        }
+      })
+      executeMoveMock.mockResolvedValue(mkPlayerResult())
+
+      await combatService.playerExecuteMove('user-1', 'quest-1', 'player-1', 'basic_strike', ['enemy-spawn-1'])
+
+      expect(executeEnemyMoveMock).not.toHaveBeenCalled()
+      expect(executeMoveMock).toHaveBeenCalledTimes(1)
     })
   })
 

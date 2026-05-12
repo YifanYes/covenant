@@ -5,6 +5,7 @@ import EnemyInfo from '@/components/combat/enemy-info.component'
 import EnemySprite from '@/components/combat/enemy-sprite.component'
 import PlayerInfo from '@/components/combat/player-info.component'
 import PlayerSprite from '@/components/combat/player-sprite.component'
+import { translateEnemyName } from '@/components/combat/translate-enemy-name.utils'
 import { useCombat } from '@/hooks/use-combat.hook'
 import { cn } from '@/lib/cn.lib'
 import AlertDialog, {
@@ -72,7 +73,12 @@ function MessageBox({ phase, targetingMode, combatLog, manaReserve, className }:
       <p className="text-sm font-medium">{primaryText}</p>
       {logKey && (
         <p className="text-muted-foreground line-clamp-2 text-xs">
-          {t(logKey, latestLog.data as Record<string, unknown>)}
+          {t(logKey, {
+            ...(latestLog.data as Record<string, unknown>),
+            ...(typeof latestLog.data?.enemy === 'string' && {
+              enemy: translateEnemyName(t, latestLog.data.enemy)
+            })
+          })}
         </p>
       )}
       <p className="text-primary mt-auto text-[10px] font-bold tracking-widest">

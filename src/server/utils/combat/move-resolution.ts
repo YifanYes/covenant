@@ -393,6 +393,13 @@ export async function executeMove(args: {
   }
   state = { ...state, units: aliveUnits, turnOrder: aliveTurnOrder, currentTurnIndex: nextTurnIndex }
 
+  // Reset the once-per-turn potion gate at the end of the enemy's turn — that's the
+  // moment the player's next turn begins. Without this, the flag persists in DB and
+  // blocks the player from using a potion ever again until a new encounter spawns.
+  if (!isCasterPlayer && state.potionUsedThisTurn) {
+    state = { ...state, potionUsedThisTurn: false }
+  }
+
   await repos.characterQuestRepository.updateTacticalState(participationId, state)
 
   // Sync player class HP/mana to DB after any move that touched the player.
@@ -526,7 +533,46 @@ export async function executeEnemyMove(args: {
       )
     }
     if (newHp <= 0) {
+      // DOT kill: filter the dead enemy out of units/turnOrder so the next player
+      // attack passes the turn check, persist, then run defeat handling so the
+      // next enemy spawns and gold/tier rewards fire (same as a player kill).
+      const aliveUnits = state.units.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0)
+      const aliveTurnOrder = state.turnOrder.filter((id) =>
+        aliveUnits.find((u) => u.id === id && u.currentHealth > 0)
+      )
+      const playerIdx = aliveTurnOrder.findIndex((id) => id.startsWith('player-'))
+      state = {
+        ...state,
+        units: aliveUnits,
+        turnOrder: aliveTurnOrder,
+        currentTurnIndex: playerIdx >= 0 ? playerIdx : 0,
+        ...(state.potionUsedThisTurn ? { potionUsedThisTurn: false } : {})
+      }
       await repos.characterQuestRepository.updateTacticalState(participationId, state)
+
+      const dotLogEntries: CombatLogEntry[] = [
+        {
+          timestamp: Date.now(),
+          type: CombatLogType.ENEMY_DEFEATED,
+          data: { enemy: e.name, source: 'status_effect' }
+        }
+      ]
+
+      let goldReward = 0
+      let nextEnemy: TacticalMoveResult['nextEnemy']
+      let tierProgression: { oldTier: number; newTier: number } | undefined
+
+      if (repos.combatEnemyRepository) {
+        const activeEnemy = await repos.combatEnemyRepository.getActiveEnemy(participationId)
+        if (activeEnemy) {
+          await repos.combatEnemyRepository.appendToCombatLog(activeEnemy.id, dotLogEntries)
+        }
+        const defeat = await processEnemyDefeat(participationId, state, [enemyId], repos)
+        goldReward = defeat.goldReward
+        nextEnemy = defeat.nextEnemy
+        tierProgression = defeat.tierProgression
+      }
+
       return {
         success: true as const,
         casterId: enemyId,
@@ -536,14 +582,11 @@ export async function executeEnemyMove(args: {
         effects: [{ unitId: enemyId, damageDealt: dotDamage, killed: true }],
         manaCost: 0,
         updatedState: state,
-        logEntries: [
-          {
-            timestamp: Date.now(),
-            type: CombatLogType.ENEMY_DEFEATED,
-            data: { enemy: e.name, source: 'status_effect' }
-          }
-        ],
-        newMana: e.currentMana
+        logEntries: dotLogEntries,
+        newMana: e.currentMana,
+        goldReward: goldReward > 0 ? goldReward : undefined,
+        nextEnemy,
+        tierProgression
       }
     }
   }

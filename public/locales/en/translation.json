@@ -27,6 +27,10 @@
       "tos": "Terms of Service",
       "privacy": "Privacy Policy"
     },
+    "news": {
+      "title": "News",
+      "subtitle": "Development updates, feature releases, and behind-the-scenes notes from building Covenant."
+    },
     "footer": {
       "copyright": "© {{year}} Covenant. All rights reserved.",
       "tos": "Terms of Service",

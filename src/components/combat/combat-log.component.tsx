@@ -1,4 +1,5 @@
 'use client'
+import { translateEnemyName } from '@/components/combat/translate-enemy-name.utils'
 import { cn } from '@/lib/cn.lib'
 import Separator from '@/ui/separator.component'
 import { SquareAlert as Alert, Battery, Target as Bullseye, Flag, Heart, Shield, Trophy, Zap } from 'pixelarticons/react'
@@ -75,16 +76,6 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
     }
   }
 
-  // Helper to translate enemy name (handles prefix|suffix format)
-  const translateEnemyName = (name: string | undefined): string => {
-    if (!name) return t('combat.unknown_enemy')
-    if (name.includes('|')) {
-      const [prefix, suffix] = name.split('|')
-      return `${t(prefix)} ${t(suffix)}`
-    }
-    return t(name)
-  }
-
   const formatEntry = (entry: CombatLogEntry): string => {
     const data = entry.data
     switch (entry.type) {
@@ -99,11 +90,11 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
       case CombatLogType.PLAYER_DEFENDS:
         return t('combat.log.player_defends', { blocks: data.blocks })
       case CombatLogType.DAMAGE_TO_ENEMY:
-        return t('combat.log.damage_to_enemy', { enemy: translateEnemyName(data.enemy as string), damage: data.damage })
+        return t('combat.log.damage_to_enemy', { enemy: translateEnemyName(t,data.enemy as string), damage: data.damage })
       case CombatLogType.DAMAGE_TO_PLAYER:
         return t('combat.log.damage_to_player', { damage: data.damage })
       case CombatLogType.ENEMY_DEFEATED:
-        return t('combat.log.enemy_defeated', { enemy: translateEnemyName(data.enemy as string) })
+        return t('combat.log.enemy_defeated', { enemy: translateEnemyName(t,data.enemy as string) })
       case CombatLogType.MANA_REGEN:
         return t('combat.log.mana_regen', { mana: data.mana })
       case CombatLogType.PHASE_COMPLETE:
@@ -120,7 +111,7 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
 
         return t('combat.log.status_effect', {
           effect: t(`status_effects.${effectKey}`, { defaultValue: effectKey }),
-          target: targetKey === 'ti' ? 'ti' : translateEnemyName(targetKey)
+          target: targetKey === 'ti' ? 'ti' : translateEnemyName(t,targetKey)
         })
       }
       case CombatLogType.ABILITY_EFFECT: {

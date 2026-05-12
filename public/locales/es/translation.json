@@ -27,6 +27,10 @@
       "tos": "Términos del Servicio",
       "privacy": "Política de Privacidad"
     },
+    "news": {
+      "title": "Noticias",
+      "subtitle": "Actualizaciones de desarrollo, lanzamientos de funciones y notas internas de la construcción de Covenant."
+    },
     "footer": {
       "copyright": "© {{year}} Covenant. Todos los derechos reservados.",
       "tos": "Términos del Servicio",
