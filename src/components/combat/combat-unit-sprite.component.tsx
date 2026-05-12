@@ -85,6 +85,7 @@ export default function CombatUnitSprite({
         src={imageUrl}
         alt={alt}
         fill
+        sizes="112px"
         className="object-contain"
         style={{ imageRendering: 'pixelated' }}
         onError={(e) => {

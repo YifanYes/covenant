@@ -17,11 +17,11 @@ type Props = {
   onComplete: () => void
 }
 
-const slides = ['dice', 'combat', 'tier', 'gear'] as const
+const slides = ['mana', 'combat', 'tier', 'gear'] as const
 type Slide = (typeof slides)[number]
 
 const SlideIcon: Record<Slide, React.ComponentType<{ className?: string }>> = {
-  dice: Gamepad,
+  mana: Gamepad,
   combat: Sword,
   tier: Trophy,
   gear: Shield

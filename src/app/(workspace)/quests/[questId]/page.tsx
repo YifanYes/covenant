@@ -105,6 +105,7 @@ export default function QuestDetailPage() {
           enemies={[currentEnemy]}
           combatLog={combatLog}
           questId={questId}
+          sceneId={questTemplate?.id}
           className="min-h-0 flex-1"
         />
       )}

@@ -169,6 +169,70 @@ describe('executeMove — potionUsedThisTurn reset', () => {
   })
 })
 
+describe('executeEnemyMove — mana drain + AI selection', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('decrements caster currentMana on the tactical unit after a move', async () => {
+    const initial: TacticalStateData = {
+      units: [
+        playerUnit(),
+        enemyUnit({ currentMana: 6, maxMana: 6, moves: ['plasma_missile', 'basic_strike'] })
+      ],
+      turnOrder: ['player-1', 'enemy-1'],
+      currentTurnIndex: 1
+    }
+    const { stateRef, repos } = makeRepos(initial)
+
+    await executeEnemyMove({ participationId: 'quest-1', enemyId: 'enemy-1', repos })
+
+    const enemy = stateRef.current.units.find((u) => u.id === 'enemy-1')!
+    // plasma_missile costs 3; enemy starts at 6 → expect 3 left.
+    expect(enemy.currentMana).toBe(3)
+  })
+
+  it('falls back to basic_strike once mana is exhausted across turns', async () => {
+    // 3 mana, plasma_missile costs 3 — first turn casts plasma, second turn must
+    // pick basic_strike (the only affordable move at 0 mana).
+    const initial: TacticalStateData = {
+      units: [
+        playerUnit(),
+        enemyUnit({ currentMana: 3, maxMana: 3, moves: ['plasma_missile', 'basic_strike'] })
+      ],
+      turnOrder: ['player-1', 'enemy-1'],
+      currentTurnIndex: 1
+    }
+    const { stateRef, repos } = makeRepos(initial)
+
+    const first = await executeEnemyMove({ participationId: 'quest-1', enemyId: 'enemy-1', repos })
+    expect(first.moveId).toBe('plasma_missile')
+    expect(stateRef.current.units.find((u) => u.id === 'enemy-1')!.currentMana).toBe(0)
+
+    // Rewind turn pointer so the second call resolves cleanly.
+    stateRef.current = {
+      ...stateRef.current,
+      turnOrder: ['player-1', 'enemy-1'],
+      currentTurnIndex: 1
+    }
+
+    const second = await executeEnemyMove({ participationId: 'quest-1', enemyId: 'enemy-1', repos })
+    expect(second.moveId).toBe('basic_strike')
+  })
+
+  it('logs an enemy-cast move as ENEMY_ATTACKS, not PLAYER_ATTACK', async () => {
+    const initial: TacticalStateData = {
+      units: [playerUnit(), enemyUnit({ moves: ['basic_strike'] })],
+      turnOrder: ['player-1', 'enemy-1'],
+      currentTurnIndex: 1
+    }
+    const { repos } = makeRepos(initial)
+
+    const result = await executeEnemyMove({ participationId: 'quest-1', enemyId: 'enemy-1', repos })
+
+    const opener = result.logEntries[0]
+    expect(opener.type).toBe('ENEMY_ATTACKS')
+  })
+})
+
 describe('executeEnemyMove — DOT-kill spawn', () => {
   beforeEach(() => vi.clearAllMocks())
 

@@ -1,14 +1,19 @@
 # Roadmap
 
-## Mechanic Expansion (March 2026)
+_Last reviewed: 2026-05-12_
 
-- **Gamification: Loop Closure and Polish**
-  - [ ] Define story decision points
-  - [ ] Render character with equipped items
+Phases are gated by readiness, not calendar. Target dates are aspirational and shift as scope clarifies.
 
-## Phase 3: Beta Requirements (June 2026)
+## Phase 2 (current): Mechanic Expansion
 
-_Validate whether the system holds up under real usage._
+_Goal: close the gamification loop so progress feels consequential before exposing it to beta testers._
+
+- [ ] Define story decision points
+- [ ] Render character with equipped items
+
+## Phase 3: Beta Requirements (target: June 2026)
+
+_Goal: validate whether the system holds up under real usage._
 
 ### Minimum Onboarding
 
@@ -49,7 +54,7 @@ _Validate whether the system holds up under real usage._
 - [ ] Welcome bot configured
 - [ ] Template for weekly updates
 
-## Phase 4: Advanced Features (Future)
+## Phase 4: Post-Beta (planned after Phase 3 feedback)
 
 - [ ] **PvP system:** Duels between players using the dice system
 - [ ] **Leaderboards:** Rankings for competition between users
@@ -57,5 +62,5 @@ _Validate whether the system holds up under real usage._
 
 ## Notes
 
-- **Tier 2 = Closed Beta Launch:** After implementing Tier 2, next steps will be planned based on feedback received.
+- **Phase 3 = Closed Beta Launch.** Phase 4 scope will be re-planned based on beta feedback rather than committed up front.
 - **No Dice Trading:** Dice cannot be traded between players or purchased with real money. They are earned only through productivity.

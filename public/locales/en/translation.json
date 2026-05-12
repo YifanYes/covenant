@@ -88,16 +88,16 @@
     },
     "combat": {
       "title": "Combat System",
-      "dice": {
-        "title": "Dice System",
-        "body": "Complete tasks → Earn dice → Roll dice → Kill demons",
+      "mana": {
+        "title": "Mana Economy",
+        "body": "Complete real-life tasks → Earn mana → Spend on abilities → Kill demons",
         "table": {
           "action": "Action",
-          "dice": "Dice",
+          "mana": "Mana",
           "daily_habit": "Daily habit",
           "high_impact_task": "High impact task",
           "completed_objective": "Completed objective",
-          "habit_streak": "Habit streak (21 days)"
+          "journal_entry": "Journal entry"
         }
       },
       "quests": {
@@ -105,8 +105,8 @@
         "body": "Pick a quest from the board and hunt the enemies it lists. Every completed mission grants gold and equipment to outfit your character."
       },
       "reactive": {
-        "title": "Reactive Combat",
-        "body": "Roll dice to fight against the armies of evil. Simultaneous attack and defense. Each roll has visual and narrative weight."
+        "title": "Tactical Combat",
+        "body": "Pokémon-style turn-based combat. Pick moves, manage mana, exploit stat matchups against the armies of evil."
       },
       "equipment": {
         "title": "Equipment and Loadout",
@@ -122,7 +122,7 @@
         },
         "pvp": {
           "title": "PvP: Duels",
-          "description": "Challenge other players using the dice system. Your real consistency against theirs."
+          "description": "Challenge other players head-to-head. Your real consistency against theirs."
         },
         "leaderboards": {
           "title": "Leaderboards",
@@ -145,7 +145,7 @@
     "closing": {
       "line1": "Covenant doesn't push you to do more.",
       "line2": "It forces you to do what you say matters.",
-      "line3": "Every completed task is dice. Every die is a roll. Every roll is an impact, both in the story and in your life.",
+      "line3": "Every completed task is mana. Every spell is an impact, both in the story and in your life.",
       "line4": "Your productivity has consequences. Make them count.",
       "cta": "BEGIN MY LEGEND"
     },
@@ -229,18 +229,14 @@
   },
   "combat": {
     "attack_rolls": "Attacks",
-    "attack_set": "Attack set: {{count}} dice",
     "criticals": "Criticals",
-    "ability_activated": "{{name}} activated! +{{dice}} power dice to next attack",
+    "ability_activated": "{{name}} activated!",
     "ability_activated_buff": "{{name}} activated! Next attack ignores enemy defense",
     "death_dialog": {
       "continue": "Continue",
       "description": "Your character has fallen in battle.",
       "title": "Character Defeated"
     },
-    "defense_rolls": "Defense",
-    "defense_set": "Defense set: {{count}} dice",
-    "dice_to_spend": "Dice to spend",
     "enemies": "Enemies",
     "enemies_defeated": "Enemies Defeated",
     "enemy_defeated_reward": "{{enemy}} defeated! +{{gold}} gold",
@@ -271,18 +267,18 @@
       "ability_cast": "Ability: {{ability}} cast",
       "ability_effect": "Ability: {{ability}} applies {{effect}}",
       "empty": "No combat events yet",
-      "enemy_attacks": "Enemy attacks with {{hits}} hits",
+      "enemy_attacks": "Enemy used {{ability}}!",
       "enemy_defeated": "{{enemy}} is defeated!",
-      "enemy_defends": "Enemy blocks {{blocks}}",
-      "mana_regen": "+{{mana}} mana regenerated",
-      "player_attack": "You attack with {{dice}} dice",
-      "player_defends": "You block {{blocks}}",
-      "player_hits": "You score {{hits}} hits",
+      "enemy_defends": "Enemy blocks the hit",
+      "mana_regen": "+{{mana}} mana restored",
+      "player_attack": "You used {{ability}}!",
+      "player_defends": "You block the hit",
+      "player_hits": "Critical hit!",
       "status_effect": "Effect: {{effect}} on {{target}}",
       "status_expired": "Effect expired: {{effect}}"
     },
     "no_attacks_yet": "No attacks yet",
-    "no_dice": "No dice available",
+    "no_mana": "No mana available",
     "resolve_turn": "Resolve Turn",
     "resolving_turn": "Resolving turn...",
     "result_dialog": {
@@ -291,17 +287,10 @@
       "success_title": "Victory!",
       "success_description": "All enemies have been defeated!"
     },
-    "roll_attack": "Prepare Attack",
-    "roll_defense": "Prepare Defense",
-    "roll_dice": "Roll Dice",
-    "roll_dice_action": "Roll dice!",
-    "rolling": "Rolling",
     "target": "Target",
     "to_battle": "To Battle!",
     "results": "Results",
-    "roll_dice_prompt": "Roll the dice to begin",
     "turn_summary": "Turn Summary",
-    "use_dice_roller": "Use the Dice Roller to attack!",
     "your_hits": "Your Hits",
     "enemy_turn": "Enemy turn...",
     "player_turn": "Your turn",
@@ -312,6 +301,7 @@
       "select_target": "Select target"
     },
     "mana_reserve": "Reserve",
+    "mana_reserve_badge": "+{{reserve}}",
     "mana_reserve_tooltip": "Reserve: {{reserve}} mana saved for future fights",
     "targeting": {
       "single": "Select a target",
@@ -321,7 +311,7 @@
     "potion_used": "Used",
     "potion_healed": "+{{amount}} HP restored",
     "potion_mana": "+{{amount}} MP restored",
-    "ability_buff_applied": "Ability active! +{{dice}} bonus dice",
+    "ability_buff_applied": "Ability active",
     "no_items": "No items available"
   },
   "common": {
@@ -605,9 +595,9 @@
       "name": "Arcane Push"
     },
     "audacity": {
-      "description": "+2 Power dice. Your defense becomes 0. 1s hurt you.",
+      "description": "+50% Attack for 2 turns.",
       "flavor": "Only those willing to die deserve victory.",
-      "name": "Meteor Strike"
+      "name": "Audacity"
     },
     "available": "Available Abilities",
     "battle_fervor": {
@@ -666,7 +656,7 @@
       "name": "Rain of Fire"
     },
     "retaliation": {
-      "description": "For 2 turns, deal 2 Wounds to any attacker that hits you.",
+      "description": "For 2 turns, reflect 10 damage to anyone who hits you.",
       "flavor": "Every wound you inflict on me will be yours too.",
       "name": "Retaliation"
     },
@@ -681,14 +671,14 @@
       "name": "Wind Blade"
     },
     "frost_bite": {
-      "description": "Enemy loses -2 Power dice for 1 turn.",
+      "description": "30 magic damage. Enemy attack -30% for 1 turn.",
       "flavor": "The cold numbs everything, even the will to fight.",
       "name": "Frost Bite"
     },
     "ice_lance": {
-      "description": "Target is Immobilized for 1 turn.",
+      "description": "40 magic damage. Target Immobilized for 1 turn.",
       "flavor": "Stone holds what flesh cannot.",
-      "name": "Petrification"
+      "name": "Ice Lance"
     },
     "igneous_cut": {
       "description": "+1 Power die. Apply Burning for 1 turn.",
@@ -696,14 +686,14 @@
       "name": "Searing Cut"
     },
     "inspiration": {
-      "description": "Gain +2 Power dice per enemy tier.",
+      "description": "+25% Attack for 2 turns, scaling with enemy tier.",
       "flavor": "Your strength is my best teacher.",
-      "name": "Perfect Replication"
+      "name": "Inspiration"
     },
     "iron_bastion": {
-      "description": "Ultimate. Negate all hits received this turn. Costs 1 Wound.",
+      "description": "Ultimate. Block all damage for 1 turn.",
       "flavor": "I am the wall against which the sea breaks.",
-      "name": "Tidal Mantle"
+      "name": "Iron Bastion"
     },
     "judgment_aurora": {
       "description": "Ultimate. All successes count as Criticals. Costs 1 Wound.",
@@ -711,12 +701,12 @@
       "name": "Judgment Aurora"
     },
     "karmic_retribution": {
-      "description": "For 2 turns, deal 2 Wounds to any attacker that hits you.",
+      "description": "For 2 turns, reflect 10 damage to anyone who hits you.",
       "flavor": "An eye for an eye, a tooth for a tooth.",
-      "name": "Reprisal"
+      "name": "Karmic Retribution"
     },
     "kings_sword": {
-      "description": "Ultimate. Reduce Attack Threshold to 2+ this turn.",
+      "description": "Ultimate. 90 physical damage.",
       "flavor": "For the glory of those who came before.",
       "name": "King's Sword"
     },
@@ -726,7 +716,7 @@
       "name": "Law Hammer"
     },
     "light_shield": {
-      "description": "Reduce Defense Threshold by 1 until next turn.",
+      "description": "+50% Defense for 2 turns.",
       "flavor": "Faith is the most resistant shield.",
       "name": "Light Shield"
     },
@@ -753,15 +743,15 @@
       "form": "Form"
     },
     "mana_barrier": {
-      "description": "Negate the first hit received.",
+      "description": "Block all damage for 1 turn.",
       "flavor": "Will is an impenetrable weave.",
-      "name": "Miraculous Barrier"
+      "name": "Mana Barrier"
     },
     "mana_cost": "Cost: {{cost}} Mana",
     "tier": "Tier {{tier}}",
     "max_equipped": "You can only equip 2 abilities",
     "miraculous_protection": {
-      "description": "Negate 1 hit received this turn.",
+      "description": "Block all damage for 1 turn.",
       "flavor": "No one falls while I still stand.",
       "name": "Miraculous Protection"
     },
@@ -769,7 +759,7 @@
     "nullify": {
       "description": "Remove all negative status effects.",
       "flavor": "Logic dispels chaos.",
-      "name": "Aquatic Purification"
+      "name": "Nullify"
     },
     "oracle_eye": {
       "description": "Reduce Magic Threshold by 1 for your next ability.",
@@ -777,19 +767,19 @@
       "name": "Oracle's Eye"
     },
     "plasma_missile": {
-      "description": "Gain +4 Power dice. Natural 1s hurt you.",
+      "description": "50 magic damage.",
       "flavor": "Pure power, hard to contain.",
-      "name": "Dragonbreath"
+      "name": "Plasma Missile"
     },
     "precise_strike": {
-      "description": "Results of 5 and 6 count as Criticals.",
+      "description": "50 physical damage. +50% crit chance this hit.",
       "flavor": "Look for the crack, not the heavy blow.",
-      "name": "Gigalithic Fist"
+      "name": "Precise Strike"
     },
     "reckless_strike": {
-      "description": "Gain +2 Power dice, but your Defense becomes 0.",
+      "description": "70 physical damage. 25% of damage recoils on you.",
       "flavor": "Attacking without fear is the only way to win.",
-      "name": "Zornhau"
+      "name": "Reckless Strike"
     },
     "righteous_charge": {
       "description": "+2 Power dice. If you hit, enemy is Stunned.",
@@ -807,9 +797,9 @@
       "name": "Steel Charge"
     },
     "shoulder_charge": {
-      "description": "+1 Power die. Pushes enemy 1 tile.",
+      "description": "50 physical damage.",
       "flavor": "Get out of my way.",
-      "name": "Seismic Rush"
+      "name": "Shoulder Charge"
     },
     "silence_vortex": {
       "description": "Target is Stunned.",
@@ -817,7 +807,7 @@
       "name": "Vow of Silence"
     },
     "stellar_collapse": {
-      "description": "Ultimate. Roll 10 Power dice. 6s generate extra hits. Costs 1 Wound.",
+      "description": "Ultimate. 110 magic damage.",
       "flavor": "The weight of a dead star on your shoulders.",
       "name": "Stellar Collapse"
     },
@@ -860,9 +850,9 @@
       "name": "Transfusion"
     },
     "truth_blade": {
-      "description": "Apply Purified for 2 turns (holy damage each turn).",
+      "description": "30 magic damage. Apply Purified for 2 turns (holy damage each turn).",
       "flavor": "Lies crumble before blessed steel.",
-      "name": "Blade of Light"
+      "name": "Truth Blade"
     },
     "ultimate": "Ultimate",
     "unbreakable_formation": {
@@ -883,9 +873,9 @@
       "name": "War Pyre"
     },
     "wrath_avatar": {
-      "description": "Ultimate. All attacks are automatic Criticals. Costs 1 Wound.",
+      "description": "Ultimate. 100 physical damage. Guaranteed critical hit.",
       "flavor": "I am no longer a man, I am the tempest.",
-      "name": "Thunder Swarm"
+      "name": "Wrath Avatar"
     }
   },
   "enemies": {
@@ -1091,8 +1081,8 @@
     "success": {
       "create": "Habit created successfully",
       "delete": "Habit deleted successfully",
-      "progress": "Habit progress registered successfully",
-      "target_met": "Habit completed successfully! Great job!",
+      "progress": "Habit progress registered successfully{{manaReward}}",
+      "target_met": "Habit completed successfully! Great job!{{manaReward}}",
       "update": "Habit updated successfully"
     },
     "timespan": {
@@ -1231,7 +1221,7 @@
       "MAGIC": "Magic",
       "PHYSICAL": "Physical"
     },
-    "dice_bank": "Dice Bank",
+    "mana_reserve": "Mana Reserve",
     "divine_quotes": [
       "“You will rise again, my son, for your duty is not yet finished...”",
       "“Death is but a bridge to a greater purpose. Step back into the light...”",
@@ -1305,11 +1295,7 @@
       "phys_def_bonus": "Phys Def",
       "magic_def_bonus": "Magic Def",
       "damage_type": "Damage Type",
-      "speed": "Speed",
-      "attack_dice": "Attack Dice",
-      "magic_def": "Magic Def",
-      "phys_def": "Phys Def",
-      "range": "Range"
+      "speed": "Speed"
     },
     "stats_title": "Stats",
     "strength_atk": "Strength Atk",
@@ -1616,7 +1602,7 @@
       "button": "Complete",
       "description": "Are you sure you want to mark this objective as completed?",
       "error": "An error occurred while completing the objective",
-      "success": "Objective completed successfully",
+      "success": "Objective completed successfully{{manaReward}}",
       "title": "Complete objective?"
     },
     "delete": {
@@ -1925,7 +1911,7 @@
       "create": "Task created successfully",
       "delete": "Task deleted successfully",
       "duplicate": "Task duplicated successfully",
-      "update": "Task updated successfully"
+      "update": "Task updated successfully{{manaReward}}"
     },
     "table": {
       "dueDate": "Due Date",
@@ -2093,13 +2079,13 @@
     "next": "Next",
     "done": "Got it",
     "complete_failed": "Couldn't save your progress. Please try again.",
-    "dice": {
-      "title": "Earn Dice",
-      "body": "Complete habits, tasks, and objectives to fill your dice bank."
+    "mana": {
+      "title": "Earn Mana",
+      "body": "Complete habits, tasks, and objectives to earn mana. Surplus flows into your Reserve for future fights."
     },
     "combat": {
-      "title": "Roll in Combat",
-      "body": "Spend dice in quest battles to attack, defend, and cast abilities."
+      "title": "Move in Combat",
+      "body": "Pick abilities to attack, buff, or defend. Each move costs mana. Basic Strike is always free."
     },
     "tier": {
       "title": "Tier Up",

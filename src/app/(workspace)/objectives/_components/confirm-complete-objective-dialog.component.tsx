@@ -23,7 +23,7 @@ export default function ConfirmCompleteObjectiveDialog({ objective, onCompleteSu
   const completeMutation = useMutation(
     trpcOptions.objectives.complete.mutationOptions({
       onSuccess: async (data) => {
-        toast.success(t('objectives.complete.success', { diceReward: getRewardText(data.manaEarned, data.reserveGained) }))
+        toast.success(t('objectives.complete.success', { manaReward: getRewardText(data.manaEarned, data.reserveGained) }))
         await queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() })
         await invalidators.character()
         setOpen(false)

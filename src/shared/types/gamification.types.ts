@@ -1,7 +1,3 @@
-import type { EnemyTemplate } from '../constants/enemies'
-import type { WeaponDamageType } from '../constants/items'
-import type { ActiveStatusEffect } from './ability.types'
-
 export const ItemType = {
   WEAPON_MELEE: 'WEAPON_MELEE',
   WEAPON_RANGED: 'WEAPON_RANGED',
@@ -97,53 +93,6 @@ export interface CombatLogEntry {
   timestamp: number
   type: CombatLogType
   data: Record<string, unknown>
-}
-
-// Combat types
-export interface DiceRollResult {
-  value: number
-  isSuccess: boolean
-  isCritical: boolean
-}
-
-// Parameters for resolving a combat turn
-export interface ResolveCombatParams {
-  attackRolls: number[]
-  defenseRolls: number[]
-  targetEnemyId: string
-  playerStrengthAtk: number
-  playerStrengthDef: number
-  playerMagicAtk: number
-  playerMagicDef: number
-  playerManaRegen: number
-  weaponDamageType: WeaponDamageType
-  weaponSpeed: number
-  enemy: EnemyTemplate
-  questId: string
-}
-
-export interface CombatTurnResult {
-  playerAttackRolls: DiceRollResult[]
-  enemyDefenseRolls: DiceRollResult[]
-  enemyAttackRolls: DiceRollResult[]
-  playerDefenseRolls: DiceRollResult[]
-  playerHits: number
-  enemyBlocks: number
-  enemyHits: number
-  playerBlocks: number
-  damageToEnemy: number
-  damageToPlayer: number
-  manaRegenerated: number
-  healthRestored: number
-  burningDamageToPlayer: number
-  burningDamageToEnemy: number
-  directDamageToEnemy: number
-  targetEnemyId: string
-  logEntries: CombatLogEntry[]
-  playerWonInitiative: boolean
-  criticalThreshold: number
-  updatedActiveAbilities: Record<string, ActiveStatusEffect>
-  updatedEnemyActiveAbilities: Record<string, ActiveStatusEffect>
 }
 
 // Character class info for inventory view

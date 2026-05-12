@@ -182,11 +182,11 @@ function CharacterSection() {
 function CombatSection() {
   const { t } = useTranslation()
 
-  const diceTable = [
-    { action: t('landing.combat.dice.table.daily_habit'), dice: '2' },
-    { action: t('landing.combat.dice.table.high_impact_task'), dice: '4' },
-    { action: t('landing.combat.dice.table.completed_objective'), dice: '6' },
-    { action: t('landing.combat.dice.table.habit_streak'), dice: '5' }
+  const manaTable = [
+    { action: t('landing.combat.mana.table.daily_habit'), mana: '+2' },
+    { action: t('landing.combat.mana.table.high_impact_task'), mana: '+5' },
+    { action: t('landing.combat.mana.table.completed_objective'), mana: '+10' },
+    { action: t('landing.combat.mana.table.journal_entry'), mana: '+1' }
   ]
 
   const combatFeatures = [
@@ -220,18 +220,18 @@ function CombatSection() {
               <div className="bg-primary/10 mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
                 <Gamepad className="text-primary h-6 w-6" />
               </div>
-              <CardTitle>{t('landing.combat.dice.title')}</CardTitle>
+              <CardTitle>{t('landing.combat.mana.title')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="mb-6 text-base">{t('landing.combat.dice.body')}</CardDescription>
+              <CardDescription className="mb-6 text-base">{t('landing.combat.mana.body')}</CardDescription>
               <div className="space-y-3">
-                {diceTable.map((row, index) => (
+                {manaTable.map((row, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between border-b border-border/50 pb-2 last:border-0 last:pb-0"
                   >
                     <span className="text-muted-foreground text-sm">{row.action}</span>
-                    <span className="text-primary font-bold">{row.dice}</span>
+                    <span className="text-primary font-bold">{row.mana}</span>
                   </div>
                 ))}
               </div>

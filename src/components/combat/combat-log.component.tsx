@@ -79,16 +79,22 @@ export default function CombatLog({ entries, className }: CombatLogProps) {
   const formatEntry = (entry: CombatLogEntry): string => {
     const data = entry.data
     switch (entry.type) {
-      case CombatLogType.PLAYER_ATTACK:
-        return t('combat.log.player_attack', { dice: data.dice })
+      case CombatLogType.PLAYER_ATTACK: {
+        const abilityId = (data.ability as string)?.toLowerCase() ?? 'basic_strike'
+        const abilityName = t(`abilities.${abilityId}.name`, { defaultValue: abilityId })
+        return t('combat.log.player_attack', { ability: abilityName })
+      }
       case CombatLogType.PLAYER_HITS:
-        return t('combat.log.player_hits', { hits: data.hits })
+        return t('combat.log.player_hits')
       case CombatLogType.ENEMY_DEFENDS:
-        return t('combat.log.enemy_defends', { blocks: data.blocks })
-      case CombatLogType.ENEMY_ATTACKS:
-        return t('combat.log.enemy_attacks', { hits: data.hits })
+        return t('combat.log.enemy_defends')
+      case CombatLogType.ENEMY_ATTACKS: {
+        const abilityId = (data.ability as string)?.toLowerCase() ?? 'basic_strike'
+        const abilityName = t(`abilities.${abilityId}.name`, { defaultValue: abilityId })
+        return t('combat.log.enemy_attacks', { ability: abilityName })
+      }
       case CombatLogType.PLAYER_DEFENDS:
-        return t('combat.log.player_defends', { blocks: data.blocks })
+        return t('combat.log.player_defends')
       case CombatLogType.DAMAGE_TO_ENEMY:
         return t('combat.log.damage_to_enemy', { enemy: translateEnemyName(t,data.enemy as string), damage: data.damage })
       case CombatLogType.DAMAGE_TO_PLAYER:

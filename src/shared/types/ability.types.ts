@@ -24,7 +24,7 @@ export const StatusEffect = {
   PURIFIED: 'PURIFIED',
   // Target takes 2 damage at start of turn
   POISONED: 'POISONED',
-  // Target has reduced attack or defense dice
+  // Target has reduced attack or defense stat
   WEAKENED: 'WEAKENED',
   // Placeholder for active abilities with immediate effects
   ABILITY_ACTIVE: 'ABILITY_ACTIVE'
@@ -65,7 +65,7 @@ export type AbilityTarget = (typeof AbilityTarget)[keyof typeof AbilityTarget]
 export interface AbilityEffect {
   type: AbilityEffectType
   target: AbilityTarget
-  // Value for the effect (e.g., dice bonus, heal amount, damage)
+  // Value for the effect (e.g., % stat modifier, heal amount, damage)
   value?: number
   // Duration in turns for status effects
   duration?: number
@@ -73,16 +73,14 @@ export interface AbilityEffect {
   statusEffect?: StatusEffect
   // Execute threshold: kills target if currentHealth < maxHealth * healthThreshold (0.25 = 25%)
   healthThreshold?: number
-  // If true, the effect value scales with enemy tier (tier * 2 dice)
+  // If true, the effect value scales with enemy tier (POWER_MODIFIER: base% × enemy tier)
   scalesWithEnemyTier?: boolean
   // Thorns damage: flat damage dealt to attackers when the buff holder is hit (karmic_retribution)
   thornsDamage?: number
   // Duration of BURNING applied to attacker by thorns (retaliation)
   thornsBurnDuration?: number
-  // Whether this debuff reduces 'attack' or 'defense' dice (for WEAKENED status)
+  // Whether this debuff reduces 'attack' or 'defense' stat (for WEAKENED status)
   debuffType?: 'attack' | 'defense'
-  // Extra hits generated per 6 rolled (stellar_collapse)
-  sixesGenerateExtraHits?: number
 }
 
 export interface AbilityDefinition {

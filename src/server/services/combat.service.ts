@@ -242,7 +242,7 @@ export class CombatService {
       return fn()
     }
     return this.prisma.$transaction(async (tx) => {
-      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${questId}))`
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${questId}))`
       return fn()
     })
   }

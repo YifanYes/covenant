@@ -198,7 +198,7 @@ export async function executeMove(args: {
 
   logEntries.push({
     timestamp,
-    type: CombatLogType.PLAYER_ATTACK,
+    type: isCasterPlayer ? CombatLogType.PLAYER_ATTACK : CombatLogType.ENEMY_ATTACKS,
     data: { moveId, caster: caster.name, targetCount: targetIds.length, ability: moveId }
   })
 
@@ -364,15 +364,21 @@ export async function executeMove(args: {
     }
   }
 
-  // Decrement caster's buffs (single-turn buffs expire after action).
+  // Decrement caster's mana + buffs (single-turn buffs expire after action).
+  // Enemy mana lives only on tactical state; player mana also gets persisted to
+  // the character row below, but updating the unit here keeps state internally
+  // consistent for the rest of this resolve and is reconciled on read for the
+  // player via QuestService.getTacticalState.
   {
     const ci = findUnitIndex(state, casterId)
     if (ci >= 0) {
       const decremented = dropExpiredBuffs(state.units[ci])
+      const newCasterMana = Math.max(0, state.units[ci].currentMana - (stunned ? 0 : move.manaCost))
       state = {
         ...state,
         units: withUpdated(state, ci, {
-          activeAbilities: decremented.activeAbilities
+          activeAbilities: decremented.activeAbilities,
+          currentMana: newCasterMana
         })
       }
     }
@@ -611,12 +617,26 @@ export async function executeEnemyMove(args: {
     }
   }
 
-  // Move selection: pick cheapest affordable move from enemy.moves[]; fall back to basic_strike.
+  // Move selection (Pokémon-style AI):
+  //  1. Pool = enemy.moves[] (always falls back to basic_strike if empty).
+  //  2. Drop anything we can't afford.
+  //  3. If HP ≤ 30% of max, restrict to damage moves so the enemy doesn't waste
+  //     turns buffing while bleeding out.
+  //  4. Pick the most-expensive-affordable (best move we can pay for); fall
+  //     back to basic_strike when nothing else is in budget.
   const currentEnemy = state.units.find((u) => u.id === enemyId)!
-  const pool = ((currentEnemy.moves && currentEnemy.moves.length > 0 ? currentEnemy.moves : ['basic_strike']) ?? [])
+  const hpLow = currentEnemy.maxHealth > 0 && currentEnemy.currentHealth / currentEnemy.maxHealth <= 0.3
+  const moveIds = currentEnemy.moves && currentEnemy.moves.length > 0 ? currentEnemy.moves : ['basic_strike']
+  const affordable = moveIds
     .map((id) => ABILITIES[id])
     .filter((d): d is NonNullable<typeof d> => !!d && d.manaCost <= currentEnemy.currentMana)
-  const chosen = pool[0] ?? ABILITIES['basic_strike']
+  const filtered = hpLow ? affordable.filter((d) => isDamageMove(d)) : affordable
+  const pool = filtered.length > 0 ? filtered : affordable
+  // Prefer the costliest move; ties broken by random pick.
+  const sorted = [...pool].sort((a, b) => b.manaCost - a.manaCost)
+  const topCost = sorted[0]?.manaCost ?? 0
+  const topTier = sorted.filter((d) => d.manaCost === topCost)
+  const chosen = topTier.length > 0 ? topTier[Math.floor(Math.random() * topTier.length)] : ABILITIES['basic_strike']
   if (!chosen) {
     throw new TRPCError({ code: 'NOT_FOUND', message: 'basic_strike not in ABILITIES' })
   }

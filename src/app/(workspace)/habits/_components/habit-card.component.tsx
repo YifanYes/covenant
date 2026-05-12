@@ -35,7 +35,7 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
             completions.filter(({ completedAt }) => dayjs().isSame(completedAt, timespanUnit)).length + 1
           toast.success(
             t(currentCount >= recurrence ? 'habits.success.target_met' : 'habits.success.progress', {
-              diceReward: getRewardText(data.manaEarned, data.reserveGained)
+              manaReward: getRewardText(data.manaEarned, data.reserveGained)
             })
           )
           await queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })

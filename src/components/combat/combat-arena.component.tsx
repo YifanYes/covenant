@@ -93,6 +93,7 @@ interface CombatArenaProps {
   enemies: EnemyState[]
   combatLog: CombatLogEntry[]
   questId: string
+  sceneId?: string
   failureText?: string
   className?: string
 }
@@ -102,6 +103,7 @@ export default function CombatArena({
   enemies,
   combatLog,
   questId,
+  sceneId,
   failureText,
   className
 }: CombatArenaProps) {
@@ -133,16 +135,21 @@ export default function CombatArena({
       <div className="relative h-72 w-full overflow-hidden rounded-lg">
         <div className="absolute inset-0 bg-gradient-to-b from-card via-background to-muted" />
 
-        {!imageError && (
+        {!imageError && sceneId && (
           <Image
             fill
-            src={`/assets/scenes/${questId}.png`}
+            priority
+            src={`/assets/scenes/${sceneId}.png`}
             alt=""
-            className="object-cover opacity-60"
+            className="object-cover"
             sizes="100vw"
             onError={() => setImageError(true)}
           />
         )}
+
+        {/* Sprite-contrast overlay: dims top + bottom of scene so HP bars
+            and sprites read clearly, leaves mid-band scenery visible. */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/10 to-black/55" />
 
         <div className="relative grid h-full grid-cols-12 grid-rows-6 gap-2 p-4">
           <div className="col-start-1 col-end-6 row-start-1 row-end-3 flex flex-col gap-1">

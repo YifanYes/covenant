@@ -13,7 +13,6 @@ export interface QuestObjective {
 
 export interface QuestReward {
   gold: { min: number; max: number }
-  dice?: number
 }
 
 export interface QuestTemplate {

@@ -88,16 +88,16 @@
     },
     "combat": {
       "title": "Sistema de Combate",
-      "dice": {
-        "title": "Sistema de Dados",
-        "body": "Completa tareas → Gana dados → Tira dados → Mata demonios",
+      "mana": {
+        "title": "Economía de Maná",
+        "body": "Completa tareas reales → Gana maná → Gasta en habilidades → Mata demonios",
         "table": {
           "action": "Acción",
-          "dice": "Dados",
+          "mana": "Maná",
           "daily_habit": "Hábito diario",
           "high_impact_task": "Tarea de alto impacto",
           "completed_objective": "Objetivo completado",
-          "habit_streak": "Racha de hábito (21 días)"
+          "journal_entry": "Entrada de diario"
         }
       },
       "quests": {
@@ -105,8 +105,8 @@
         "body": "Elige una misión del tablero y caza a los enemigos que lista. Cada misión completada otorga oro y equipamiento para tu personaje."
       },
       "reactive": {
-        "title": "Combate Reactivo",
-        "body": "Lanza dados para luchar contra los ejércitos del mal. Ataque y defensa simultánea. Cada tirada tiene peso visual y narrativo."
+        "title": "Combate Táctico",
+        "body": "Combate por turnos estilo Pokémon. Elige movimientos, gestiona el maná, explota las ventajas de stats contra los ejércitos del mal."
       },
       "equipment": {
         "title": "Equipamiento y Loadout",
@@ -122,7 +122,7 @@
         },
         "pvp": {
           "title": "PvP: Duelos",
-          "description": "Reta a otros jugadores usando el sistema de dados. Tu consistencia real contra la de otro."
+          "description": "Reta a otros jugadores cara a cara. Tu consistencia real contra la de otro."
         },
         "leaderboards": {
           "title": "Leaderboards",
@@ -145,7 +145,7 @@
     "closing": {
       "line1": "Covenant no te empuja a hacer más.",
       "line2": "Te obliga a hacer lo que dices que importa.",
-      "line3": "Cada tarea completada son dados. Cada dado es una tirada. Cada tirada es un impacto, tanto en la historia como en tu vida.",
+      "line3": "Cada tarea completada es maná. Cada hechizo es un impacto, tanto en la historia como en tu vida.",
       "line4": "Tu productividad tiene consecuencias. Hazlas contar.",
       "cta": "COMENZAR MI LEYENDA"
     },
@@ -229,18 +229,14 @@
   },
   "combat": {
     "attack_rolls": "Ataques",
-    "attack_set": "Ataque preparado: {{count}} dados",
     "criticals": "Críticos",
-    "ability_activated": "¡{{name}} activada! +{{dice}} dados de poder en el próximo ataque",
+    "ability_activated": "¡{{name}} activada!",
     "ability_activated_buff": "¡{{name}} activada! El próximo ataque ignora la defensa enemiga",
     "death_dialog": {
       "continue": "Continuar",
       "description": "Tu personaje ha caído en batalla.",
       "title": "Personaje Derrotado"
     },
-    "defense_rolls": "Defensas",
-    "defense_set": "Defensa preparada: {{count}} dados",
-    "dice_to_spend": "Dados a gastar",
     "enemies": "Enemigos",
     "enemies_defeated": "Enemigos Derrotados",
     "enemy_defeated_reward": "¡{{enemy}} derrotado! +{{gold}} oro",
@@ -271,18 +267,18 @@
       "ability_cast": "Habilidad: {{ability}} lanzada",
       "ability_effect": "Habilidad: {{ability}} aplica {{effect}}",
       "empty": "Sin eventos de combate aún",
-      "enemy_attacks": "El enemigo ataca con {{hits}} impactos",
+      "enemy_attacks": "¡El enemigo usó {{ability}}!",
       "enemy_defeated": "¡{{enemy}} ha sido derrotado!",
-      "enemy_defends": "El enemigo bloquea {{blocks}}",
-      "mana_regen": "+{{mana}} maná regenerado",
-      "player_attack": "Atacas con {{dice}} dados",
-      "player_defends": "Bloqueas {{blocks}}",
-      "player_hits": "Consigues {{hits}} impactos",
+      "enemy_defends": "El enemigo bloquea el golpe",
+      "mana_regen": "+{{mana}} maná restaurado",
+      "player_attack": "¡Usaste {{ability}}!",
+      "player_defends": "Bloqueas el golpe",
+      "player_hits": "¡Golpe crítico!",
       "status_effect": "Efecto: {{effect}} sobre {{target}}",
       "status_expired": "Efecto expirado: {{effect}}"
     },
     "no_attacks_yet": "Sin ataques aún",
-    "no_dice": "Sin dados disponibles",
+    "no_mana": "Sin maná disponible",
     "resolve_turn": "Resolver Turno",
     "resolving_turn": "Resolviendo turno...",
     "result_dialog": {
@@ -291,17 +287,10 @@
       "success_title": "¡Victoria!",
       "success_description": "¡Todos los enemigos han sido derrotados!"
     },
-    "roll_attack": "Preparar Ataque",
-    "roll_defense": "Preparar Defensa",
-    "roll_dice": "Lanzar Dados",
-    "roll_dice_action": "¡Lanzar dados!",
-    "rolling": "Lanzando",
     "target": "Objetivo",
     "to_battle": "¡Al ataque!",
     "results": "Resultados",
-    "roll_dice_prompt": "Lanza los dados para comenzar",
     "turn_summary": "Resumen del Turno",
-    "use_dice_roller": "¡Usa el Lanzador de Dados para atacar!",
     "your_hits": "Tus Impactos",
     "enemy_turn": "Turno enemigo...",
     "player_turn": "Tu turno",
@@ -312,6 +301,7 @@
       "select_target": "Seleccionar objetivo"
     },
     "mana_reserve": "Reserva",
+    "mana_reserve_badge": "+{{reserve}}",
     "mana_reserve_tooltip": "Reserva: {{reserve}} maná guardado para futuros combates",
     "targeting": {
       "single": "Selecciona un objetivo",
@@ -321,7 +311,7 @@
     "potion_used": "Usada",
     "potion_healed": "+{{amount}} PV restaurados",
     "potion_mana": "+{{amount}} PM restaurados",
-    "ability_buff_applied": "¡Habilidad activa! +{{dice}} dados de bonificación",
+    "ability_buff_applied": "Habilidad activa",
     "no_items": "Sin objetos disponibles"
   },
   "common": {
@@ -605,9 +595,9 @@
       "name": "Empuje Arcano"
     },
     "audacity": {
-      "description": "+2 dados de Potencia. Tu defensa se reduce a 0. Los 1 te hieren.",
+      "description": "+50% de Ataque durante 2 turnos.",
       "flavor": "Solo los que están dispuestos a morir merecen la victoria.",
-      "name": "Meteoimpacto"
+      "name": "Audacia"
     },
     "available": "Habilidades Disponibles",
     "battle_fervor": {
@@ -666,7 +656,7 @@
       "name": "Lluvia de Fuego"
     },
     "retaliation": {
-      "description": "Durante 2 turnos, cualquier enemigo que te inflija daño recibe automáticamente 2 Heridas de retroceso.",
+      "description": "Durante 2 turnos, refleja 10 de daño a quien te golpee.",
       "flavor": "Cada herida que me inflijas será tuya también.",
       "name": "Represalia"
     },
@@ -681,14 +671,14 @@
       "name": "Cuchilla de Viento"
     },
     "frost_bite": {
-      "description": "El enemigo pierde -2 dados de Potencia durante 1 turno.",
+      "description": "30 de daño mágico. El ataque enemigo -30% durante 1 turno.",
       "flavor": "El frío lo adormece todo, incluso la voluntad de luchar.",
-      "name": "Frío Polar"
+      "name": "Mordisco Helado"
     },
     "ice_lance": {
-      "description": "El objetivo queda Inmovilizado durante 1 turno.",
+      "description": "40 de daño mágico. El objetivo queda Inmovilizado durante 1 turno.",
       "flavor": "La piedra retiene lo que la carne no puede.",
-      "name": "Petrificación"
+      "name": "Lanza de Hielo"
     },
     "igneous_cut": {
       "description": "+1 dado de Potencia. Aplica Quemadura durante 1 turno.",
@@ -696,14 +686,14 @@
       "name": "Corte Abrasador"
     },
     "inspiration": {
-      "description": "Gana +2 dados de Potencia por tier del enemigo.",
+      "description": "+25% de Ataque durante 2 turnos, escalando con el tier del enemigo.",
       "flavor": "Tu fuerza es mi mejor maestra.",
-      "name": "Replicación Perfecta"
+      "name": "Inspiración"
     },
     "iron_bastion": {
-      "description": "Ultimate. Anula todos los Impactos recibidos este turno. Cuesta 1 Herida.",
+      "description": "Ultimate. Bloquea todo el daño durante 1 turno.",
       "flavor": "Soy la muralla contra la que rompe el mar.",
-      "name": "Manto de Mareas"
+      "name": "Bastión de Hierro"
     },
     "judgment_aurora": {
       "description": "Ultimate. Todos los éxitos cuentan como Críticos. Cuesta 1 Herida.",
@@ -711,12 +701,12 @@
       "name": "Aurora del Juicio"
     },
     "karmic_retribution": {
-      "description": "Durante 2 turnos, infliges 2 Heridas a cualquier atacante que te golpee.",
+      "description": "Durante 2 turnos, refleja 10 de daño a quien te golpee.",
       "flavor": "Ojo por ojo, diente por diente.",
-      "name": "Represalia"
+      "name": "Retribución Kármica"
     },
     "kings_sword": {
-      "description": "Ultimate. Reduce el Umbral de Ataque a 2+ este turno.",
+      "description": "Ultimate. 90 de daño físico.",
       "flavor": "Por la gloria de los que nos precedieron.",
       "name": "Espada del Rey"
     },
@@ -726,7 +716,7 @@
       "name": "Martillo de la Ley"
     },
     "light_shield": {
-      "description": "Reduce el Umbral de Defensa en 1 hasta el siguiente turno.",
+      "description": "+50% de Defensa durante 2 turnos.",
       "flavor": "La fe es el escudo más resistente.",
       "name": "Escudo de Luz"
     },
@@ -753,15 +743,15 @@
       "form": "Forma"
     },
     "mana_barrier": {
-      "description": "Anula el primer Impacto recibido.",
+      "description": "Bloquea todo el daño durante 1 turno.",
       "flavor": "La voluntad es un tejido impenetrable.",
-      "name": "Protección Milagrosa"
+      "name": "Barrera de Maná"
     },
     "mana_cost": "Coste: {{cost}} Maná",
     "tier": "Tier {{tier}}",
     "max_equipped": "Solo puedes equipar 2 habilidades",
     "miraculous_protection": {
-      "description": "Anula 1 Impacto recibido en el turno actual.",
+      "description": "Bloquea todo el daño durante 1 turno.",
       "flavor": "Nadie cae mientras yo siga en pie.",
       "name": "Protección Milagrosa"
     },
@@ -769,7 +759,7 @@
     "nullify": {
       "description": "Elimina todos los efectos de estado perjudiciales.",
       "flavor": "La lógica disipa el caos.",
-      "name": "Purificación Acuática"
+      "name": "Anular"
     },
     "oracle_eye": {
       "description": "Reduce el Umbral de Magia en 1 para tu siguiente habilidad.",
@@ -777,19 +767,19 @@
       "name": "Ojo del Oráculo"
     },
     "plasma_missile": {
-      "description": "Suma +4 dados de Potencia. Los 1 naturales te hieren.",
+      "description": "50 de daño mágico.",
       "flavor": "Poder puro, difícil de contener.",
-      "name": "Dracoaliento"
+      "name": "Misil de Plasma"
     },
     "precise_strike": {
-      "description": "Los resultados de 5 y 6 cuentan como Críticos.",
+      "description": "50 de daño físico. +50% de probabilidad de crítico en este golpe.",
       "flavor": "Busca la grieta, no el golpe fuerte.",
-      "name": "Puño Gigalítico"
+      "name": "Golpe Preciso"
     },
     "reckless_strike": {
-      "description": "Suma +2 dados de Potencia, pero tu Defensa se reduce a 0.",
+      "description": "70 de daño físico. El 25% del daño infligido te rebota.",
       "flavor": "Atacar sin miedo es la única forma de vencer.",
-      "name": "Zornhau"
+      "name": "Golpe Temerario"
     },
     "righteous_charge": {
       "description": "+2 dados de Potencia. Si impactas, el enemigo queda Aturdido.",
@@ -807,9 +797,9 @@
       "name": "Embate de Acero"
     },
     "shoulder_charge": {
-      "description": "+1 dado de Potencia. Empuja al enemigo 1 casilla.",
+      "description": "50 de daño físico.",
       "flavor": "Quítate de mi camino.",
-      "name": "Embestida Sísmica"
+      "name": "Embestida"
     },
     "silence_vortex": {
       "description": "El objetivo queda Aturdido.",
@@ -817,7 +807,7 @@
       "name": "Voto de Silencio"
     },
     "stellar_collapse": {
-      "description": "Ultimate. Lanza 10 dados de Potencia. Los 6 generan impactos extra. Cuesta 1 Herida.",
+      "description": "Ultimate. 110 de daño mágico.",
       "flavor": "El peso de una estrella muerta sobre tus hombros.",
       "name": "Colapso Estelar"
     },
@@ -860,9 +850,9 @@
       "name": "Transfusión"
     },
     "truth_blade": {
-      "description": "Aplica Purificado durante 2 turnos (daño sagrado cada turno).",
+      "description": "30 de daño mágico. Aplica Purificado durante 2 turnos (daño sagrado cada turno).",
       "flavor": "La mentira se deshace ante el acero bendito.",
-      "name": "Filo de la Luz"
+      "name": "Filo de la Verdad"
     },
     "ultimate": "Ultimate",
     "unbreakable_formation": {
@@ -883,9 +873,9 @@
       "name": "Pira de Guerra"
     },
     "wrath_avatar": {
-      "description": "Ultimate. Todos los ataques son Críticos automáticos. Cuesta 1 Herida.",
+      "description": "Ultimate. 100 de daño físico. Crítico garantizado.",
       "flavor": "Ya no soy un hombre, soy la tempestad.",
-      "name": "Enjambre de Truenos"
+      "name": "Avatar de Ira"
     }
   },
   "enemies": {
@@ -1091,8 +1081,8 @@
     "success": {
       "create": "Hábito creado exitosamente",
       "delete": "Hábito eliminado exitosamente",
-      "progress": "Progreso de hábito registrado exitosamente {{diceReward}}",
-      "target_met": "¡Hábito completado exitosamente! ¡Buen trabajo! {{diceReward}}",
+      "progress": "Progreso de hábito registrado exitosamente {{manaReward}}",
+      "target_met": "¡Hábito completado exitosamente! ¡Buen trabajo! {{manaReward}}",
       "update": "Hábito actualizado exitosamente"
     },
     "timespan": {
@@ -1231,7 +1221,7 @@
       "MAGIC": "Mágico",
       "PHYSICAL": "Físico"
     },
-    "dice_bank": "Banco de Dados",
+    "mana_reserve": "Reserva de Maná",
     "divine_quotes": [
       "“Te levantarás de nuevo, hijo mío, pues tu deber aún no ha terminado...”",
       "“La muerte no es más que un puente hacia un propósito mayor. Regresa a la luz...”",
@@ -1305,11 +1295,7 @@
       "phys_def_bonus": "Def Física",
       "magic_def_bonus": "Def Mágica",
       "damage_type": "Tipo de Daño",
-      "speed": "Velocidad",
-      "attack_dice": "Dados de Ataque",
-      "magic_def": "Def Mágica",
-      "phys_def": "Def Física",
-      "range": "Alcance"
+      "speed": "Velocidad"
     },
     "stats_title": "Estadísticas",
     "strength_atk": "Ataque Físico",
@@ -1616,7 +1602,7 @@
       "button": "Completar",
       "description": "¿Estás seguro de que quieres marcar este objetivo como completado?",
       "error": "Ocurrió un error al completar el objetivo",
-      "success": "Objetivo completado exitosamente {{diceReward}}",
+      "success": "Objetivo completado exitosamente {{manaReward}}",
       "title": "¿Completar objetivo?"
     },
     "delete": {
@@ -1925,7 +1911,7 @@
       "create": "Tarea creada exitosamente",
       "delete": "Tarea eliminada exitosamente",
       "duplicate": "Tarea duplicada exitosamente",
-      "update": "Tarea actualizada exitosamente {{diceReward}}"
+      "update": "Tarea actualizada exitosamente {{manaReward}}"
     },
     "table": {
       "dueDate": "Fecha de entrega",
@@ -2093,13 +2079,13 @@
     "next": "Siguiente",
     "done": "¡Entendido!",
     "complete_failed": "No pudimos guardar tu progreso. Inténtalo de nuevo.",
-    "dice": {
-      "title": "Gana Dados",
-      "body": "Completa hábitos, tareas y objetivos para llenar tu banco de dados."
+    "mana": {
+      "title": "Gana Maná",
+      "body": "Completa hábitos, tareas y objetivos para ganar maná. El excedente fluye a tu Reserva para futuros combates."
     },
     "combat": {
-      "title": "Lánzate al Combate",
-      "body": "Gasta dados en batallas de misión para atacar, defender y lanzar habilidades."
+      "title": "Combate por Turnos",
+      "body": "Elige habilidades para atacar, potenciar o defender. Cada movimiento cuesta maná. El Golpe Básico siempre es gratis."
     },
     "tier": {
       "title": "Sube de Rango",
