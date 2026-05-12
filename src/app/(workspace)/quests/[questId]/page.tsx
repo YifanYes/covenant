@@ -8,6 +8,7 @@ import { Progress } from '@/ui/progress.component'
 import { useSidebar } from '@/ui/sidebar.component'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { ChevronLeft } from 'pixelarticons/react'
+import { getEnemy } from '@shared/constants/enemies'
 import { getQuestById } from '@shared/constants/quests'
 import { type CombatLogEntry, type EnemyState, type InventoryCharacter } from '@shared/types/gamification.types'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -33,13 +34,20 @@ export default function QuestDetailPage() {
   const activeEnemy = activeQuest?.activeEnemy
   const combatLog = useMemo<CombatLogEntry[]>(() => [], [])
 
+  // Hydrate mana from the enemy template so the MP bar renders even when the persisted
+  // tactical state is stale (version mismatch returns null). useCombat overwrites with
+  // the server-authoritative value once tactical state syncs.
   const currentEnemy = useMemo((): EnemyState | null => {
     if (!activeEnemy) return null
+    const template = getEnemy(activeEnemy.templateId)
+    const enemyMana = template?.mana ?? 0
     return {
       id: activeEnemy.id,
       templateId: activeEnemy.templateId,
       currentHealth: activeEnemy.currentHealth,
       maxHealth: activeEnemy.maxHealth,
+      currentMana: enemyMana,
+      maxMana: enemyMana,
       namePrefix: activeEnemy.namePrefix,
       nameSuffix: activeEnemy.nameSuffix
     }
@@ -96,7 +104,6 @@ export default function QuestDetailPage() {
           character={character}
           enemies={[currentEnemy]}
           combatLog={combatLog}
-          diceBank={(character.data as Record<string, unknown>)?.diceBank as number ?? 0}
           questId={questId}
           className="min-h-0 flex-1"
         />

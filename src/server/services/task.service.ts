@@ -1,4 +1,3 @@
-import { DICE_REWARDS } from '@shared/constants/dice.constants'
 import type {
   BulkUpdateTaskItem,
   CreateTaskType,
@@ -6,12 +5,12 @@ import type {
   UpdateTaskType
 } from '@shared/schemas/tasks.schemas'
 import type { TaskRepository } from '../repositories/task.repository'
-import type { DiceService } from './dice.service'
+import type { ManaService } from './mana.service'
 
 export class TaskService {
   constructor(
     private taskRepository: TaskRepository,
-    private diceService: DiceService
+    private manaService: ManaService
   ) {}
 
   async create(userId: string, input: CreateTaskType) {
@@ -76,14 +75,15 @@ export class TaskService {
 
     const task = await this.taskRepository.update(input.id, input, isCompleting)
 
-    let diceEarned = 0
+    let manaEarned = 0
+    let reserveGained = 0
     if (isCompleting) {
-      const diceToAward = task.impact === 'HIGH' ? DICE_REWARDS.TASK_HIGH_IMPACT : DICE_REWARDS.TASK_LOW_IMPACT
-      const result = await this.diceService.addDiceToBank(userId, diceToAward)
-      diceEarned = result.earned
+      const result = await this.manaService.addManaFromCompletion(userId, 'task', { impact: task.impact })
+      manaEarned = result.manaApplied
+      reserveGained = result.reserveGained
     }
 
-    return { task, diceEarned }
+    return { task, manaEarned, reserveGained }
   }
 
   async bulkUpdate(userId: string, tasks: BulkUpdateTaskItem[]) {

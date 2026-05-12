@@ -3,15 +3,12 @@ import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constan
 import { applyStatScaling, calculateGoldReward, getEnemy } from '@shared/constants/enemies'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import type { EncounterState } from '@shared/types/combat.types'
-import {
-  TACTICAL_STATE_VERSION,
-  type TacticalStateData,
-  type TacticalUnitState
-} from '@shared/types/tactical-combat.types'
+import type { TacticalStateData, TacticalUnitState } from '@shared/types/tactical-combat.types'
 import type { CharacterQuestRepository } from '../../repositories/character-quest.repository'
 import type { CharacterRepository } from '../../repositories/character.repository'
 import type { CombatEnemyRepository } from '../../repositories/combat-enemy.repository'
 import type { KillRecordService } from '../../services/kill-record.service'
+import type { ManaService } from '../../services/mana.service'
 
 /** Minimal repo set used by functions that only read/write combat state (no reward processing). */
 export interface CombatStateRepos {
@@ -23,6 +20,7 @@ export interface CombatStateRepos {
 /** Extended repo set for functions that also process rewards, gold, and tier progression. */
 export interface CombatRewardDeps extends CombatStateRepos {
   killRecordService?: KillRecordService
+  manaService?: ManaService
 }
 
 /** @deprecated Use CombatStateRepos or CombatRewardDeps instead. */
@@ -36,13 +34,15 @@ export interface EnemyDefeatResult {
     name: string
     currentHealth: number
     maxHealth: number
+    currentMana: number
+    maxMana: number
   }
   tierProgression?: { oldTier: number; newTier: number }
 }
 
 /**
  * Process enemy defeat: award gold, check tier progression, spawn next enemy.
- * Unified logic extracted from executeTacticalAttack and executeTacticalDoctrine.
+ * Unified logic extracted from executeTacticalAttack and executeTacticalAbility.
  */
 export async function processEnemyDefeat(
   questId: string,
@@ -169,19 +169,47 @@ export async function processEnemyDefeat(
       templateId: selected.enemyId,
       name: newEnemyName,
       currentHealth: scaledTemplate.health,
-      maxHealth: scaledTemplate.health
+      maxHealth: scaledTemplate.health,
+      currentMana: scaledTemplate.mana,
+      maxMana: scaledTemplate.mana
     }
 
-    // Reinitialize tactical state with new enemy
+    // Reinitialize tactical state with new enemy. Player mana is refreshed from the latest
+    // CharacterClass row (the player may have taken damage or burned mana mid-fight and the
+    // Reserve top-up below brings active mana back up to maxMana).
     const playerUnit = updatedState.units.find((u) => u.id.startsWith('player-'))
     if (playerUnit) {
-      const newTacticalState = createTacticalStateWithNewEnemy(
-        updatedState,
-        playerUnit,
-        newEnemy.id,
-        newEnemyName,
-        { current: scaledTemplate.health, max: scaledTemplate.health }
-      )
+      let refreshedPlayer = playerUnit
+      if (repos.manaService) {
+        await repos.manaService.topUpFromReserve(quest.characterId)
+      }
+      const char = await repos.characterRepository.findByIdWithClasses(quest.characterId)
+      const cls = char?.classes.find((c) => c.className === char.currentClass)
+      if (cls) {
+        refreshedPlayer = {
+          ...playerUnit,
+          currentHealth: Math.min(playerUnit.currentHealth, cls.maxHealth),
+          maxHealth: cls.maxHealth,
+          currentMana: cls.mana,
+          maxMana: cls.maxMana
+        }
+      }
+      const newTacticalState = createTacticalStateWithNewEnemy(updatedState, refreshedPlayer, {
+        id: newEnemy.id,
+        templateId: selected.enemyId,
+        name: newEnemyName,
+        health: { current: scaledTemplate.health, max: scaledTemplate.health },
+        mana: { current: scaledTemplate.mana, max: scaledTemplate.mana },
+        stats: {
+          strengthAtk: scaledTemplate.strengthAtk,
+          strengthDef: scaledTemplate.strengthDef,
+          magicAtk: scaledTemplate.magicAtk,
+          magicDef: scaledTemplate.magicDef,
+          speed: scaledTemplate.speed
+        },
+        tier: scaledTemplate.tier,
+        moves: scaledTemplate.moves
+      })
       await repos.characterQuestRepository.updateTacticalState(questId, newTacticalState)
     }
   }
@@ -191,42 +219,55 @@ export async function processEnemyDefeat(
 
 /**
  * Create a new tactical state with a new enemy spawned.
- * Preserves player state.
+ * Preserves player state; refreshes player mana from CharacterClass for the next encounter (top-up
+ * happens in QuestService before this is called).
  */
 export function createTacticalStateWithNewEnemy(
-  currentState: TacticalStateData,
+  _currentState: TacticalStateData,
   playerUnit: TacticalUnitState,
-  newEnemyId: string,
-  newEnemyName: string,
-  newEnemyHealth: { current: number; max: number }
+  newEnemy: {
+    id: string
+    templateId: string
+    name: string
+    health: { current: number; max: number }
+    mana: { current: number; max: number }
+    stats: { strengthAtk: number; strengthDef: number; magicAtk: number; magicDef: number; speed: number }
+    tier: number
+    moves: string[]
+  }
 ): TacticalStateData {
-  const updatedPlayerUnit: TacticalUnitState = {
-    ...playerUnit,
-    hasMoved: false,
-    hasActed: false
-  }
-
   const newEnemyUnit: TacticalUnitState = {
-    id: newEnemyId,
-    name: newEnemyName,
-    hasMoved: false,
-    hasActed: false,
-    currentHealth: newEnemyHealth.current,
-    maxHealth: newEnemyHealth.max
+    id: newEnemy.id,
+    templateId: newEnemy.templateId,
+    name: newEnemy.name,
+    currentHealth: newEnemy.health.current,
+    maxHealth: newEnemy.health.max,
+    currentMana: newEnemy.mana.current,
+    maxMana: newEnemy.mana.max,
+    strengthAtk: newEnemy.stats.strengthAtk,
+    strengthDef: newEnemy.stats.strengthDef,
+    magicAtk: newEnemy.stats.magicAtk,
+    magicDef: newEnemy.stats.magicDef,
+    speed: newEnemy.stats.speed,
+    tier: newEnemy.tier,
+    moves: newEnemy.moves
   }
 
-  const units = [updatedPlayerUnit, newEnemyUnit]
-  const turnOrder = [playerUnit.id, newEnemyId]
+  const units = [playerUnit, newEnemyUnit]
+  // Pokémon-style turn order: higher speed acts first; on tie, player wins initiative
+  // (deterministic to avoid race that throws "Not this unit's turn" on first click).
+  const turnOrder = [...units]
+    .sort((a, b) => {
+      if (b.speed !== a.speed) return b.speed - a.speed
+      if (a.id.startsWith('player-')) return -1
+      if (b.id.startsWith('player-')) return 1
+      return 0
+    })
+    .map((u) => u.id)
 
   return {
-    stateVersion: TACTICAL_STATE_VERSION,
-    mapTemplateId: currentState.mapTemplateId,
-    gridWidth: currentState.gridWidth,
-    gridHeight: currentState.gridHeight,
-    tiles: currentState.tiles,
     units,
     turnOrder,
-    currentTurnIndex: 0,
-    turnNumber: 1
+    currentTurnIndex: 0
   }
 }

@@ -2,7 +2,7 @@
 
 import Button from '@/components/ui/button.component'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const STORAGE_KEY = 'covenant.cookie_consent'
@@ -23,24 +23,31 @@ const safeSet = (value: string): void => {
   }
 }
 
+const subscribe = (onChange: () => void): (() => void) => {
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === STORAGE_KEY || e.key === null) onChange()
+  }
+  window.addEventListener('storage', onStorage)
+  window.addEventListener('covenant.cookie_consent.changed', onChange)
+  return () => {
+    window.removeEventListener('storage', onStorage)
+    window.removeEventListener('covenant.cookie_consent.changed', onChange)
+  }
+}
+
+const getClientSnapshot = (): string | null => safeGet()
+const getServerSnapshot = (): string | null => null
+
 export default function CookieBanner() {
   const { t } = useTranslation()
-  const [visible, setVisible] = useState(() => !safeGet())
+  const consent = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot)
 
-  useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setVisible(!e.newValue)
-    }
-    window.addEventListener('storage', onStorage)
-    return () => window.removeEventListener('storage', onStorage)
+  const accept = useCallback(() => {
+    safeSet(JSON.stringify({ acceptedAt: new Date().toISOString() }))
+    window.dispatchEvent(new Event('covenant.cookie_consent.changed'))
   }, [])
 
-  if (!visible) return null
-
-  const accept = () => {
-    safeSet(JSON.stringify({ acceptedAt: new Date().toISOString() }))
-    setVisible(false)
-  }
+  if (consent) return null
 
   return (
     <div
@@ -55,7 +62,7 @@ export default function CookieBanner() {
             {t('landing.cookie_banner.learn_more')}
           </Link>
         </p>
-        <Button size="sm" onClick={accept} className="shrink-0">
+        <Button type="button" size="sm" onClick={accept} className="shrink-0">
           {t('landing.cookie_banner.accept')}
         </Button>
       </div>

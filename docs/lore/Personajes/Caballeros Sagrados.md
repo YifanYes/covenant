@@ -35,7 +35,7 @@ _Nota: Al primer y segundo usuario con más nivel de cada orden se le recompensa
 
 ## Lista de Caballeros Sagrados
 
-- Ezequiel: protagonista de la primera novela. Hijo de un panadero. Era un negado para ser Caballero: lento, débil y con menos coordinación que un ciervo en una pista de hielo. Pero tenía algo que lo hacía especial: disciplina, concentración y voluntad. Recién ordenado, porta cota de malla, Espada de Infantería, escudo y pistola de chispa. Conoce las doctrinas "Golpe Preciso", "Corte en Abanico" y "Osadía". Su filosofía: "Solo los que están dispuestos a morir merecen la victoria."
+- Ezequiel: protagonista de la primera novela. Hijo de un panadero. Era un negado para ser Caballero: lento, débil y con menos coordinación que un ciervo en una pista de hielo. Pero tenía algo que lo hacía especial: disciplina, concentración y voluntad. Recién ordenado, porta cota de malla, Espada de Infantería, escudo y pistola de chispa. Conoce las habilidades "Golpe Preciso", "Corte en Abanico" y "Osadía". Su filosofía: "Solo los que están dispuestos a morir merecen la victoria."
 - Jeremías: antiguo Gran Maestre de la Iglesia de la Sagrada Lanza. Se sacrificó en Providencia. Tiene una estatua en la Plaza de Santa Cruz.
 - Miguel: Gran Maestre actual de la Iglesia de la Sagrada Lanza. Tiene un estilo ortodoxo, preciso y eficiente. Porta una Armadura de Acero Sagrado, un escudo y una la Espada del Juramento. Puede usar ambas naturalezas a la vez.
-- Natán: compañero de Ezequiel. Especialista en magia arcana y de apoyo. Conoce las doctrinas "Barrera de Maná", "Combustión" y "Paso Sombrío". Sarcástico y con buen humor incluso en situaciones desesperadas. Confía ciegamente en Ezequiel.
+- Natán: compañero de Ezequiel. Especialista en magia arcana y de apoyo. Conoce las habilidades "Barrera de Maná", "Combustión" y "Paso Sombrío". Sarcástico y con buen humor incluso en situaciones desesperadas. Confía ciegamente en Ezequiel.

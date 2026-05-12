@@ -24,7 +24,7 @@
 | :----- | :---------: | :---------: | :-------------- |
 |        |             |             |                 |
 
-## ✨ Doctrinas
+## ✨ Habilidades
 
 **Rama Elegida:** [Forma / Vacío]
 

@@ -2,13 +2,13 @@
 
 En la versión actual (Beta), las únicas clases disponibles son **Templario** y **Heraldo**.
 
-_Regla de Selección:_ Un personaje puede equipar un máximo de **2 doctrinas** en total, independientemente de su tier. Puede equipar una doctrina de un tier anterior. Solo puede tener una ultimate en total.
+_Regla de Selección:_ Un personaje puede equipar un máximo de **2 habilidades** en total, independientemente de su tier. Puede equipar una habilidad de un tier anterior. Solo puede tener una ultimate en total.
 
-Los iconos de las doctrinas hacen referencia a `arq/front/public/assets/doctrines`.
+Los iconos de las habilidades hacen referencia a `arq/front/public/assets/abilities`.
 
 ## Tiers de Poder
 
-Subir de tier desbloquea nuevas doctrinas, permite adquirir ítems de mayor poder y permite enfrentarse a enemigos más poderosos.
+Subir de tier desbloquea nuevas habilidades, permite adquirir ítems de mayor poder y permite enfrentarse a enemigos más poderosos.
 
 ### Juego de Mesa
 
@@ -44,28 +44,28 @@ En la app, el progreso se basa en **enemigos derrotados** de tu tier actual. Cad
 
 > **Nota:** Los valores de enemigos requeridos son provisionales y se ajustarán.
 
-### Categorías de Doctrinas
+### Categorías de Habilidades
 
-- **Básicas:** Doctrinas de uso frecuente con costes de maná bajos o medios. Son el núcleo de la estrategia turno a turno.
+- **Básicas:** Habilidades de uso frecuente con costes de maná bajos o medios. Son el núcleo de la estrategia turno a turno.
 - **Ultimate:** La técnica suprema de la rama. Tiene un coste de maná muy elevado y suele requerir un **Sacrificio**. Diseñada para cambiar el curso de la batalla en un solo turno.
 
-### Tipos de doctrinas
+### Tipos de habilidades
 
-Las doctrinas se dividen según su impacto mecánico en el juego:
+Las habilidades se dividen según su impacto mecánico en el juego:
 
-- **Modificadores de Potencia:** Doctrinas que añaden **Dados de Potencia** extras a la tirada de ataque o defensa. Son las más comunes y directas.
+- **Modificadores de Potencia:** Habilidades que añaden **Dados de Potencia** extras a la tirada de ataque o defensa. Son las más comunes y directas.
   - _Ejemplo: "+2 Dados de Potencia en el próximo ataque"._
 - **Manipuladores de Umbral:** Alteran el número necesario para tener un éxito. Son extremadamente poderosas ya que aumentan la probabilidad de cada dado de forma individual.
   - _Ejemplo: "Reduce el Umbral de Fuerza (Ataque) en 1" (haciendo que un 3+ pase a ser un 2+)._
-- **Doctrinas de Crítico:** Doctrinas que aseguran un 6 natural o que permiten que otros resultados (como un 5) cuenten como **Críticos** (ignorando la defensa normal).
-- **Nulificación de Impactos:** En lugar de lanzar dados de defensa, estas doctrinas anulan directamente un número fijo de **Impactos** recibidos.
-- **Desplazamiento y Posicionamiento:** Doctrinas que mueven al usuario o al enemigo una cantidad de casillas determinada, ignorando o provocando ataques de oportunidad.
+- **Habilidades de Crítico:** Habilidades que aseguran un 6 natural o que permiten que otros resultados (como un 5) cuenten como **Críticos** (ignorando la defensa normal).
+- **Nulificación de Impactos:** En lugar de lanzar dados de defensa, estas habilidades anulan directamente un número fijo de **Impactos** recibidos.
+- **Desplazamiento y Posicionamiento:** Habilidades que mueven al usuario o al enemigo una cantidad de casillas determinada, ignorando o provocando ataques de oportunidad.
   - _Tipos: Empuje, Tracción (Tirar hacia ti) o Teletransporte._
 - **Daño Residual (DOTs):** Aplica estados que restan **Heridas** al inicio de cada turno (Fase de Efectos). Los más comunes son Quemadura, Purificado y Veneno.
-- **Control de Masas (CC):** Doctrinas que bloquean la capacidad de actuar del enemigo.
+- **Control de Masas (CC):** Habilidades que bloquean la capacidad de actuar del enemigo.
   - _Aturdido:_ Pierde su siguiente fase de acción.
   - _Inmovilizado:_ Su velocidad se reduce a 0.
-- **Sustento y Recursos:** Doctrinas que recuperan **Heridas** o **Maná**. Algunas pueden requerir un robo de vida (dañar para curar) o un sacrificio (perder vida para ganar maná).
+- **Sustento y Recursos:** Habilidades que recuperan **Heridas** o **Maná**. Algunas pueden requerir un robo de vida (dañar para curar) o un sacrificio (perder vida para ganar maná).
 
 ### Efectos de Estado
 
@@ -98,7 +98,7 @@ Sus habilidades incluyen modificadores de potencia, manipuladores de umbral, des
   - **Maná:** `4 + Tier` (Inicia en 5 en Tier 1).
   - **Regeneración de Maná:** 1 (Recupera 1 de Maná al inicio de cada turno).
 
-### Doctrinas
+### Habilidades
 
 #### Tier 1
 
@@ -323,7 +323,7 @@ Un erudito de las artes mágicas y las energías celestiales. Prefiere la distan
 
 Muchos de ellos eran antiguos sabios, eruditos, ingenieros y estrategas que respondieron al Llamado para proteger el saber sagrado frente a la destrucción demoníaca.
 
-Sus doctrinas incluyen control de masas, desplazamiento (teletransporte), manipulación de umbrales y daño residual.
+Sus habilidades incluyen control de masas, desplazamiento (teletransporte), manipulación de umbrales y daño residual.
 
 ### Características
 
@@ -336,7 +336,7 @@ Sus doctrinas incluyen control de masas, desplazamiento (teletransporte), manipu
   - **Maná:** `10 + Tier` (Inicia en 11 en Tier 1).
   - **Regeneración de Maná:** 2 (Recuperas 2 de Maná al inicio de cada turno).
 
-### Doctrinas
+### Habilidades
 
 #### Tier 1
 
@@ -396,7 +396,7 @@ Sus doctrinas incluyen control de masas, desplazamiento (teletransporte), manipu
   - Coste Maná: 3
   - Atributo: Rayo
   - Icono: lightning_burst
-  - Mecánica: Otorga +2 dados de **Potencia** al siguiente doctrina de ataque.
+  - Mecánica: Otorga +2 dados de **Potencia** al siguiente habilidad de ataque.
   - Descripción: Una descarga súbita de energía eléctrica que salta de tus dedos buscando el metal del enemigo.
   - Flavor text: _"El relámpago no avisa, solo castiga."_
 
@@ -416,7 +416,7 @@ Sus doctrinas incluyen control de masas, desplazamiento (teletransporte), manipu
   - Coste Maná: 4
   - Atributo: Mente
   - Icono: oracle_eye
-  - Mecánica: Reduce el **Umbral de Magia (Ataque)** en 1 para tu siguiente doctrina.
+  - Mecánica: Reduce el **Umbral de Magia (Ataque)** en 1 para tu siguiente habilidad.
   - Descripción: Tu tercer ojo se abre y percibe las líneas de fuerza del enemigo, revelando los puntos exactos donde tu magia será más devastadora.
   - Flavor text: _"Veo tus debilidades como constelaciones en la oscuridad."_
 
@@ -487,7 +487,7 @@ Sus doctrinas incluyen control de masas, desplazamiento (teletransporte), manipu
   - Atributo: Luz
   - Icono: judgment_aurora
   - Sacrificio: No puedes moverte este turno.
-  - Mecánica: Todos los dados de esta doctrina que obtengan un éxito cuentan como **Críticos**.
+  - Mecánica: Todos los dados de esta habilidad que obtengan un éxito cuentan como **Críticos**.
   - Descripción: El cielo se abre para liberar una columna de luz pura que desintegra cualquier rastro de oscuridad.
   - Flavor text: _"La luz no deja sombras donde esconderse."_
 
@@ -561,9 +561,9 @@ Un ejecutor implacable que fusiona la devoción marcial con el fuego purificador
 
 Son jueces y verdugos, encargados de erradicar la corrupción allí donde se esconda, sea en la carne o en el espíritu.
 
-Sus doctrinas incluyen modificadores de potencia, control de masas, efectos de quemadura y protección divina.
+Sus habilidades incluyen modificadores de potencia, control de masas, efectos de quemadura y protección divina.
 
-> **Tipo de Daño:** Las doctrinas del Inquisidor infligen daño de **Luz Sagrada**. Esto les permite dañar efectivamente a los demonios, naturalmente resistentes al fuego.
+> **Tipo de Daño:** Las habilidades del Inquisidor infligen daño de **Luz Sagrada**. Esto les permite dañar efectivamente a los demonios, naturalmente resistentes al fuego.
 
 ### Características
 
@@ -576,7 +576,7 @@ Sus doctrinas incluyen modificadores de potencia, control de masas, efectos de q
   - **Maná:** `6 + Tier` (Inicia en 7 en Tier 1).
   - **Regeneración de Maná:** 2 (Recuperas 2 de Maná al inicio de cada turno).
 
-### Doctrinas
+### Habilidades
 
 #### Tier 1
 
@@ -586,7 +586,7 @@ Sus doctrinas incluyen modificadores de potencia, control de masas, efectos de q
   - Coste Maná: 3
   - Atributo: Metal
   - Icono: law_hammer
-  - Mecánica: Tu siguiente doctrina de **Ataque** suma +1 dado de **Potencia**. Si el objetivo es un ser de oscuridad o demonio, suma +2 dados.
+  - Mecánica: Tu siguiente habilidad de **Ataque** suma +1 dado de **Potencia**. Si el objetivo es un ser de oscuridad o demonio, suma +2 dados.
   - Descripción: Levantas tu arma y la imbuyes con la resonancia del metal puro, dictando un veredicto de hierro antes de golpear.
   - Flavor text: _"La ley es pesada, pero el metal más."_
 
@@ -801,7 +801,7 @@ Un cazador insaciable impulsado por un odio inextinguible hacia lo abisal. Utili
 
 Este grupo está formado por aquellas personas cuyas ciudades fueron arrasadas por los demonios. Su odio y su sed de venganza les ciega, buscando la aniquilación total de la estirpe demoníaca.
 
-Sus doctrinas incluyen críticos asegurados, estados alterados (sangrado y veneno), trampas de control y alta movilidad.
+Sus habilidades incluyen críticos asegurados, estados alterados (sangrado y veneno), trampas de control y alta movilidad.
 
 ### Características
 
@@ -814,7 +814,7 @@ Sus doctrinas incluyen críticos asegurados, estados alterados (sangrado y venen
   - **Maná:** `6 + Tier` (Inicia en 7 en Tier 1).
   - **Regeneración de Maná:** 1 (Recuperas 1 de Maná al inicio de cada turno).
 
-### Doctrinas
+### Habilidades
 
 #### Tier 1
 
@@ -1036,9 +1036,9 @@ El regreso de la muerte siempre tiene un precio.
 - **Forma:** Pérdida de atributos temporales y deuda de oro/servicio.
 - **Vacío:** Corrupción física (cicatrices, mutaciones) y riesgo de locura.
 
-## Archivo de Doctrinas
+## Archivo de Habilidades
 
-Estas doctrinas rompen las reglas convencionales del combate y solo deben otorgarse en circunstancias excepcionales o niveles más allá del Tier 10.
+Estas habilidades rompen las reglas convencionales del combate y solo deben otorgarse en circunstancias excepcionales o niveles más allá del Tier 10.
 
 - **Sobretensión**
   - Coste Maná: 10
@@ -1079,7 +1079,7 @@ Estas doctrinas rompen las reglas convencionales del combate y solo deben otorga
 
 ### Legados
 
-Estos rasgos y doctrinas ancestrales se desbloquearán en fases avanzadas del proyecto. Se conservan aquí por su relevancia narrativa.
+Estos rasgos y habilidades ancestrales se desbloquearán en fases avanzadas del proyecto. Se conservan aquí por su relevancia narrativa.
 
 #### Templario
 
@@ -1122,7 +1122,7 @@ Estos rasgos y doctrinas ancestrales se desbloquearán en fases avanzadas del pr
   - Tipo: Pasiva
   - Atributo: Luz
   - Icono: blinding_faith
-  - Mecánica: Todas las doctrinas que apliquen **Purificado** duran un turno adicional y causan +1 Impacto contra demonios.
+  - Mecánica: Todas las habilidades que apliquen **Purificado** duran un turno adicional y causan +1 Impacto contra demonios.
 
 - **Mártir de la Luz**
   - Tipo: Reacción

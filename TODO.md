@@ -70,12 +70,12 @@
   - `use-tactical-enemy-turn.hook.ts:34`. Bug in shipping code on the core loop.
   - **Fix:** Refresh state after each await in critical paths.
 
-- [ ] Combat: doctrine cast clobbers stale `currentClass.health` `[debt]`
-  - `combat.service.ts` `playerCastDoctrine` / `playerCastSelfBuffDoctrine` snapshot `currentClass.health` and `currentClass.mana` BEFORE the doctrine executes, then write the snapshot back paired with `newMana`. Any doctrine that mutates DB health (self-damage, lifesteal) gets overwritten with the stale value. Latent today because no current doctrine touches DB health, but the foot-gun lives on the core combat path.
-  - **Fix:** Either re-fetch the class after `executeTacticalDoctrine` / `useSelfBuffDoctrine`, or split `characterRepository.updateHealth` into a dedicated `updateMana(classId, mana)` and only write the column we changed.
+- [ ] Combat: ability cast clobbers stale `currentClass.health` `[debt]`
+  - `combat.service.ts` `playerCastAbility` / `playerCastSelfBuffAbility` snapshot `currentClass.health` and `currentClass.mana` BEFORE the ability executes, then write the snapshot back paired with `newMana`. Any ability that mutates DB health (self-damage, lifesteal) gets overwritten with the stale value. Latent today because no current ability touches DB health, but the foot-gun lives on the core combat path.
+  - **Fix:** Either re-fetch the class after `executeTacticalAbility` / `useSelfBuffAbility`, or split `characterRepository.updateHealth` into a dedicated `updateMana(classId, mana)` and only write the column we changed.
 
 - [ ] Empty states for remaining views `[loop]`
-  - Already shipped for habits/tasks/objectives. Still missing: shop filtered results (no matches), inventory Armory + Doctrines tabs.
+  - Already shipped for habits/tasks/objectives. Still missing: shop filtered results (no matches), inventory Armory + Abilities tabs.
 
 - [ ] Accessibility in combat `[loop]`
   - Combat grid sprites are styled `div`s with no `role="img"`, `aria-label`, or alt text. No keyboard navigation for tactical grid. ~30 aria attributes across 78 components (~38% coverage).

@@ -1,7 +1,7 @@
 'use client'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import Separator from '@/ui/separator.component'
-import { Heart, Money, FileText as ScriptText, Shield, Zap } from 'pixelarticons/react'
+import { Battery, Heart, Money, FileText as ScriptText, Shield, Zap } from 'pixelarticons/react'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 import CharacterDeathOverlay from './character-death-overlay.component'
@@ -94,14 +94,10 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center rounded-md bg-purple-400/10 p-1">
-              <span className="text-[10px]">🎲</span>
-            </div>
-            <span className="text-sm font-medium">{t('inventory.dice_bank')}</span>
+            <Battery className="h-4 w-4 text-blue-300" />
+            <span className="text-sm font-medium">{t('combat.mana_reserve')}</span>
           </div>
-          <span className="text-sm font-black text-purple-400/90">
-            {(character.data?.diceBank as number) || 0}
-          </span>
+          <span className="text-sm font-black text-blue-300/90">{character.manaReserve ?? 0}</span>
         </div>
       </CardContent>
 

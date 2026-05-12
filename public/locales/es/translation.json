@@ -27,6 +27,10 @@
       "tos": "Términos del Servicio",
       "privacy": "Política de Privacidad"
     },
+    "news": {
+      "title": "Noticias",
+      "subtitle": "Actualizaciones de desarrollo, lanzamientos de funciones y notas internas de la construcción de Covenant."
+    },
     "footer": {
       "copyright": "© {{year}} Covenant. Todos los derechos reservados.",
       "tos": "Términos del Servicio",
@@ -73,13 +77,13 @@
         "title": "Estadísticas Vivas",
         "body": "No es un avatar decorativo. Tu personaje refleja tu comportamiento real: estadísticas de Fuerza, Magia, Vida y Maná que evolucionan según lo que haces."
       },
-      "doctrines": {
-        "title": "Sistema de Doctrinas y Maná",
-        "body": "Desbloquea habilidades especiales según tu clase. Cada doctrina tiene coste de maná—úsalas estratégicamente o quédate sin recursos."
+      "abilities": {
+        "title": "Sistema de Habilidades y Maná",
+        "body": "Desbloquea habilidades especiales según tu clase. Cada habilidad tiene coste de maná—úsalas estratégicamente o quédate sin recursos."
       },
       "classes": {
         "title": "Clases con Identidad",
-        "body": "Tu clase define tus doctrinas y estilo de combate. Sin boosts artificiales. No hay atajos. Solo trabajo."
+        "body": "Tu clase define tus habilidades y estilo de combate. Sin boosts artificiales. No hay atajos. Solo trabajo."
       }
     },
     "combat": {
@@ -227,8 +231,8 @@
     "attack_rolls": "Ataques",
     "attack_set": "Ataque preparado: {{count}} dados",
     "criticals": "Críticos",
-    "doctrine_activated": "¡{{name}} activada! +{{dice}} dados de poder en el próximo ataque",
-    "doctrine_activated_buff": "¡{{name}} activada! El próximo ataque ignora la defensa enemiga",
+    "ability_activated": "¡{{name}} activada! +{{dice}} dados de poder en el próximo ataque",
+    "ability_activated_buff": "¡{{name}} activada! El próximo ataque ignora la defensa enemiga",
     "death_dialog": {
       "continue": "Continuar",
       "description": "Tu personaje ha caído en batalla.",
@@ -245,10 +249,10 @@
     "error": {
       "attack": "El ataque falló",
       "attack_failed": "El ataque falló",
-      "doctrine_failed": "Falló el lanzamiento de doctrina",
-      "doctrine_not_found": "Doctrina no encontrada",
+      "ability_failed": "Falló el lanzamiento de habilidad",
+      "ability_not_found": "Habilidad no encontrada",
       "invalid_attack": "Objetivo de ataque inválido",
-      "invalid_doctrine": "Objetivo de doctrina inválido",
+      "invalid_ability": "Objetivo de habilidad inválido",
       "invalid_move": "Movimiento inválido",
       "move_failed": "El movimiento falló",
       "no_active_unit": "No hay unidad activa seleccionada",
@@ -263,9 +267,9 @@
     "log": {
       "damage_to_enemy": "{{enemy}} recibe {{damage}} de daño",
       "damage_to_player": "Recibes {{damage}} de daño",
-      "doctrine_active": "Doctrina activa: {{effect}}",
-      "doctrine_cast": "Doctrina: {{doctrine}} lanzada",
-      "doctrine_effect": "Doctrina: {{doctrine}} aplica {{effect}}",
+      "ability_active": "Habilidad activa: {{effect}}",
+      "ability_cast": "Habilidad: {{ability}} lanzada",
+      "ability_effect": "Habilidad: {{ability}} aplica {{effect}}",
       "empty": "Sin eventos de combate aún",
       "enemy_attacks": "El enemigo ataca con {{hits}} impactos",
       "enemy_defeated": "¡{{enemy}} ha sido derrotado!",
@@ -303,10 +307,12 @@
     "player_turn": "Tu turno",
     "action": {
       "attack": "Atacar",
-      "doctrine": "Doctrina",
+      "ability": "Habilidades",
       "item": "Objeto",
       "select_target": "Seleccionar objetivo"
     },
+    "mana_reserve": "Reserva",
+    "mana_reserve_tooltip": "Reserva: {{reserve}} maná guardado para futuros combates",
     "targeting": {
       "single": "Selecciona un objetivo",
       "all": "Atacando a todos los enemigos",
@@ -315,7 +321,7 @@
     "potion_used": "Usada",
     "potion_healed": "+{{amount}} PV restaurados",
     "potion_mana": "+{{amount}} PM restaurados",
-    "doctrine_buff_applied": "¡Doctrina activa! +{{dice}} dados de bonificación",
+    "ability_buff_applied": "¡Habilidad activa! +{{dice}} dados de bonificación",
     "no_items": "Sin objetos disponibles"
   },
   "common": {
@@ -592,7 +598,7 @@
     }
   },
   "delete": "Eliminar",
-  "doctrines": {
+  "abilities": {
     "arcane_push": {
       "description": "Empuja al enemigo 3 casillas.",
       "flavor": "Necesito concentrarme, aléjate.",
@@ -603,7 +609,7 @@
       "flavor": "Solo los que están dispuestos a morir merecen la victoria.",
       "name": "Meteoimpacto"
     },
-    "available": "Doctrinas Disponibles",
+    "available": "Habilidades Disponibles",
     "battle_fervor": {
       "description": "Recuperas 1 Herida por cada Impacto causado (máx 3).",
       "flavor": "Tu dolor es mi fuerza.",
@@ -634,20 +640,20 @@
       "flavor": "Un torbellino de acero y determinación.",
       "name": "Tormenta de Ruptura"
     },
-    "empty_equipped": "No tienes doctrinas equipadas",
+    "empty_equipped": "No tienes habilidades equipadas",
     "entropic_acceleration": {
       "description": "Aplica Quemadura al objetivo durante 2 turnos.",
       "flavor": "El tiempo se acelera donde reina la entropía.",
       "name": "Aceleración Entrópica"
     },
     "equip": "Equipar",
-    "equipped": "Doctrinas Equipadas",
+    "equipped": "Habilidades Equipadas",
     "error": {
-      "equip": "Error al equipar doctrina",
-      "failed": "Error al usar la doctrina",
+      "equip": "Error al equipar habilidad",
+      "failed": "Error al usar la habilidad",
       "not_enough_mana": "Maná insuficiente",
-      "unequip": "Error al desequipar doctrina",
-      "use": "Error al usar doctrina"
+      "unequip": "Error al desequipar habilidad",
+      "use": "Error al usar habilidad"
     },
     "fan_cut": {
       "description": "Ataca a hasta 2 enemigos. Empuja a los objetivos.",
@@ -753,20 +759,20 @@
     },
     "mana_cost": "Coste: {{cost}} Maná",
     "tier": "Tier {{tier}}",
-    "max_equipped": "Solo puedes equipar 2 doctrinas",
+    "max_equipped": "Solo puedes equipar 2 habilidades",
     "miraculous_protection": {
       "description": "Anula 1 Impacto recibido en el turno actual.",
       "flavor": "Nadie cae mientras yo siga en pie.",
       "name": "Protección Milagrosa"
     },
-    "no_doctrines": "No hay doctrinas disponibles",
+    "no_abilities": "No hay habilidades disponibles",
     "nullify": {
       "description": "Elimina todos los efectos de estado perjudiciales.",
       "flavor": "La lógica disipa el caos.",
       "name": "Purificación Acuática"
     },
     "oracle_eye": {
-      "description": "Reduce el Umbral de Magia en 1 para tu siguiente doctrina.",
+      "description": "Reduce el Umbral de Magia en 1 para tu siguiente habilidad.",
       "flavor": "Veo el fin antes de que empiece.",
       "name": "Ojo del Oráculo"
     },
@@ -816,10 +822,10 @@
       "name": "Colapso Estelar"
     },
     "success": {
-      "equip": "¡Doctrina equipada!",
-      "unequip": "Doctrina desequipada",
-      "use": "¡Doctrina usada!",
-      "used": "¡Doctrina activada!"
+      "equip": "¡Habilidad equipada!",
+      "unequip": "Habilidad desequipada",
+      "use": "¡Habilidad usada!",
+      "used": "¡Habilidad activada!"
     },
     "summary_execution": {
       "description": "Mata instantáneamente a un enemigo por debajo del 25% de salud.",
@@ -842,7 +848,12 @@
       "name": "Golpe de Marea"
     },
     "tier_required": "Requiere Tier {{tier}}",
-    "title": "Doctrinas",
+    "title": "Habilidades",
+    "basic_strike": {
+      "description": "Un ataque físico estándar. No cuesta maná.",
+      "flavor": "Golpea rápido, golpea certero.",
+      "name": "Golpe Básico"
+    },
     "transfusion": {
       "description": "Sacrifica 2 Heridas para recuperar 6 de Maná.",
       "flavor": "La magia fluye mejor cuando se mezcla con sangre.",
@@ -1289,12 +1300,16 @@
     },
     "revive": "Revivir",
     "stats": {
-      "attack_dice": "Dados de Ataque",
+      "attack_bonus": "Ataque",
+      "magic_atk_bonus": "Ataque Mágico",
+      "phys_def_bonus": "Def Física",
+      "magic_def_bonus": "Def Mágica",
       "damage_type": "Tipo de Daño",
+      "speed": "Velocidad",
+      "attack_dice": "Dados de Ataque",
       "magic_def": "Def Mágica",
       "phys_def": "Def Física",
-      "range": "Alcance",
-      "speed": "Velocidad"
+      "range": "Alcance"
     },
     "stats_title": "Estadísticas",
     "strength_atk": "Ataque Físico",
@@ -1307,7 +1322,7 @@
     "tabs": {
       "armory": "Armería y Equipamiento",
       "character": "Personaje",
-      "doctrines": "Doctrinas",
+      "abilities": "Habilidades",
       "kill_record": "Historial de Batallas"
     },
     "kill_record": {
@@ -1395,15 +1410,15 @@
       "name": "Cota de Malla"
     },
     "compendium_of_truths": {
-      "description": "Secretos fundamentales. Al lanzar una doctrina, lanza 1 dado extra.",
+      "description": "Secretos fundamentales. Al lanzar una habilidad, lanza 1 dado extra.",
       "name": "Compendio de Verdades"
     },
     "copper_plate_armor": {
-      "description": "Mejora ligeramente la canalización de maná al lanzar doctrinas.",
+      "description": "Mejora ligeramente la canalización de maná al lanzar habilidades.",
       "name": "Armadura de Placas de Cobre"
     },
     "ebony_staff": {
-      "description": "Madera oscura. Reduce en 1 el coste de maná de la primera doctrina usada.",
+      "description": "Madera oscura. Reduce en 1 el coste de maná de la primera habilidad usada.",
       "name": "Báculo de Ébano"
     },
     "ether_whisper": {
@@ -1510,7 +1525,7 @@
       "Consultando los tomos de sabiduría...",
       "Desplegando mapas de la región...",
       "Encendiendo las antorchas del santuario...",
-      "Meditando sobre las Doctrinas del Orden...",
+      "Meditando sobre las Habilidades del Orden...",
       "Preparando el incienso ritual...",
       "Reuniendo suministros para la expedición...",
       "Vigilando las sombras en busca de herejía..."
@@ -1771,7 +1786,7 @@
     "critical_threshold": "Umbral Crítico",
     "damage_negation": "Negación de Daño",
     "direct_damage": "Daño Directo",
-    "doctrine_active": "Doctrina Activa",
+    "ability_active": "Habilidad Activa",
     "enemy_power_reduction": "Reducción de Potencia Enemiga",
     "guaranteed_critical": "Crítico Garantizado",
     "heal": "Curación",
@@ -1977,8 +1992,8 @@
       "zoom": "Scroll: Zoom"
     },
     "casting": "Lanzando...",
-    "click_confirm_doctrine": "Haz clic en Confirmar para lanzar",
-    "click_to_target_doctrine": "Haz clic en una casilla para apuntar",
+    "click_confirm_ability": "Haz clic en Confirmar para lanzar",
+    "click_to_target_ability": "Haz clic en una casilla para apuntar",
     "moving": "Moviendo...",
     "pattern": "Patrón",
     "pattern_circle": "Círculo",
@@ -2084,11 +2099,11 @@
     },
     "combat": {
       "title": "Lánzate al Combate",
-      "body": "Gasta dados en batallas de misión para atacar, defender y lanzar doctrinas."
+      "body": "Gasta dados en batallas de misión para atacar, defender y lanzar habilidades."
     },
     "tier": {
       "title": "Sube de Rango",
-      "body": "Derrota enemigos para subir el rango de tu clase. Rangos más altos desbloquean nuevo equipo y doctrinas."
+      "body": "Derrota enemigos para subir el rango de tu clase. Rangos más altos desbloquean nuevo equipo y habilidades."
     },
     "gear": {
       "title": "Equipa tu Botín",

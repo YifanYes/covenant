@@ -3,24 +3,23 @@ import { applyStatScaling } from '@shared/constants/enemies'
 import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
 import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
 import type { EncounterState } from '@shared/types/combat.types'
-import {
-  TACTICAL_STATE_VERSION,
-  TerrainType,
-  type TacticalStateData,
-  type TileState
-} from '@shared/types/tactical-combat.types'
+import type { TacticalStateData } from '@shared/types/tactical-combat.types'
 import type { CharacterClassType } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
+import { aggregateLoadoutStats } from '@shared/constants/items'
+import type { InventoryItem } from '@shared/types/gamification.types'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { CharacterService } from './character.service'
+import type { ManaService } from './mana.service'
 
 export class QuestService {
   constructor(
     private characterQuestRepository: CharacterQuestRepository,
     private combatEnemyRepository: CombatEnemyRepository,
-    private characterService: CharacterService
+    private characterService: CharacterService,
+    private manaService: ManaService
   ) {}
 
   private async assertCharacterOwnership(characterId: string, userId: string): Promise<void> {
@@ -37,54 +36,75 @@ export class QuestService {
     }
   }
 
-  private createInitialTacticalState(
-    playerUnitId: string,
-    playerName: string,
-    playerHealth: { current: number; max: number },
-    enemyUnitId: string,
-    enemyName: string,
-    enemyHealth: { current: number; max: number }
-  ): TacticalStateData {
-    const tiles: TileState[][] = [
-      [
-        {
-          position: { x: 0, y: 0 },
-          terrain: TerrainType.GRASS,
-          occupantId: null,
-          isWalkable: true
-        }
-      ]
-    ]
+  private createInitialTacticalState(opts: {
+    player: {
+      unitId: string
+      name: string
+      health: { current: number; max: number }
+      mana: { current: number; max: number }
+      stats: { strengthAtk: number; strengthDef: number; magicAtk: number; magicDef: number; speed: number }
+      tier: number
+    }
+    enemy: {
+      unitId: string
+      templateId: string
+      name: string
+      health: { current: number; max: number }
+      mana: { current: number; max: number }
+      stats: { strengthAtk: number; strengthDef: number; magicAtk: number; magicDef: number; speed: number }
+      tier: number
+      moves: string[]
+    }
+  }): TacticalStateData {
+    const { player, enemy } = opts
 
-    const units = [
-      {
-        id: playerUnitId,
-        name: playerName,
-        hasMoved: false,
-        hasActed: false,
-        currentHealth: playerHealth.current,
-        maxHealth: playerHealth.max
-      },
-      {
-        id: enemyUnitId,
-        name: enemyName,
-        hasMoved: false,
-        hasActed: false,
-        currentHealth: enemyHealth.current,
-        maxHealth: enemyHealth.max
-      }
-    ]
+    const playerUnit = {
+      id: player.unitId,
+      name: player.name,
+      currentHealth: player.health.current,
+      maxHealth: player.health.max,
+      currentMana: player.mana.current,
+      maxMana: player.mana.max,
+      strengthAtk: player.stats.strengthAtk,
+      strengthDef: player.stats.strengthDef,
+      magicAtk: player.stats.magicAtk,
+      magicDef: player.stats.magicDef,
+      speed: player.stats.speed,
+      tier: player.tier
+    }
+    const enemyUnit = {
+      id: enemy.unitId,
+      templateId: enemy.templateId,
+      name: enemy.name,
+      currentHealth: enemy.health.current,
+      maxHealth: enemy.health.max,
+      currentMana: enemy.mana.current,
+      maxMana: enemy.mana.max,
+      strengthAtk: enemy.stats.strengthAtk,
+      strengthDef: enemy.stats.strengthDef,
+      magicAtk: enemy.stats.magicAtk,
+      magicDef: enemy.stats.magicDef,
+      speed: enemy.stats.speed,
+      tier: enemy.tier,
+      moves: enemy.moves
+    }
+
+    // Pokémon-style turn order: higher speed acts first; on tie, player wins initiative
+    // (deterministic to avoid race that throws "Not this unit's turn" on first click).
+    const units = [playerUnit, enemyUnit]
+    const turnOrder = [...units]
+      .sort((a, b) => {
+        if (b.speed !== a.speed) return b.speed - a.speed
+        if (a.id.startsWith('player-')) return -1
+        if (b.id.startsWith('player-')) return 1
+        return 0
+      })
+      .map((u) => u.id)
 
     return {
-      stateVersion: TACTICAL_STATE_VERSION,
-      mapTemplateId: 'default',
-      gridWidth: 1,
-      gridHeight: 1,
-      tiles,
       units,
-      turnOrder: [playerUnitId, enemyUnitId],
-      currentTurnIndex: 0,
-      turnNumber: 1
+      turnOrder,
+      currentTurnIndex: 0
     }
   }
 
@@ -136,20 +156,57 @@ export class QuestService {
         currentHealth: scaledTemplate.health
       })
 
-      const initialHealth = currentClass
-        ? Math.min(currentClass.health, currentClass.maxHealth)
+      // Top up player's active mana from Reserve before the first encounter starts.
+      await this.manaService.topUpFromReserve(characterId)
+
+      // Re-read character to pick up the post-topup mana value.
+      const refreshed = await this.characterService.getCharacterById(characterId)
+      const refreshedClass: CharacterClassType | undefined = refreshed.classes.find(
+        (c) => c.className === refreshed.currentClass
+      )
+
+      const initialHealth = refreshedClass
+        ? Math.min(refreshedClass.health, refreshedClass.maxHealth)
         : 10
-      const maxHealth = currentClass?.maxHealth ?? initialHealth
+      const maxHealth = refreshedClass?.maxHealth ?? initialHealth
 
       const enemyName = `${nameKeys.prefix}|${nameKeys.suffix}`
-      const tacticalState = this.createInitialTacticalState(
-        'player-1',
-        character.name,
-        { current: initialHealth, max: maxHealth },
-        activeEnemy.id,
-        enemyName,
-        { current: scaledTemplate.health, max: scaledTemplate.health }
-      )
+      const playerManaCurrent = refreshedClass?.mana ?? 0
+      const playerManaMax = refreshedClass?.maxMana ?? 0
+      const loadout = (refreshed.loadout as unknown as InventoryItem[]) ?? []
+      const loadoutTotals = aggregateLoadoutStats(loadout)
+      const tacticalState = this.createInitialTacticalState({
+        player: {
+          unitId: 'player-1',
+          name: refreshed.name,
+          health: { current: initialHealth, max: maxHealth },
+          mana: { current: playerManaCurrent, max: playerManaMax },
+          stats: {
+            strengthAtk: (refreshedClass?.strengthAtk ?? 0) + loadoutTotals.strengthAtkBonus,
+            strengthDef: (refreshedClass?.strengthDef ?? 0) + loadoutTotals.strengthDefBonus,
+            magicAtk: (refreshedClass?.magicAtk ?? 0) + loadoutTotals.magicAtkBonus,
+            magicDef: (refreshedClass?.magicDef ?? 0) + loadoutTotals.magicDefBonus,
+            speed: ((refreshedClass as unknown as { speed?: number })?.speed ?? 1) + loadoutTotals.speed
+          },
+          tier: refreshedClass?.tier ?? 1
+        },
+        enemy: {
+          unitId: activeEnemy.id,
+          templateId: selected.enemyId,
+          name: enemyName,
+          health: { current: scaledTemplate.health, max: scaledTemplate.health },
+          mana: { current: scaledTemplate.mana, max: scaledTemplate.mana },
+          stats: {
+            strengthAtk: scaledTemplate.strengthAtk,
+            strengthDef: scaledTemplate.strengthDef,
+            magicAtk: scaledTemplate.magicAtk,
+            magicDef: scaledTemplate.magicDef,
+            speed: scaledTemplate.speed
+          },
+          tier: scaledTemplate.tier,
+          moves: scaledTemplate.moves
+        }
+      })
       await this.characterQuestRepository.updateTacticalState(quest.id, tacticalState)
 
       return {
@@ -225,9 +282,40 @@ export class QuestService {
   async getTacticalState(questId: string, userId: string): Promise<TacticalStateData | null> {
     await this.assertQuestOwnership(questId, userId)
 
+    // Repository parses the JSON column through a tolerant schema, so legacy Phaser-grid
+    // fields (tiles, gridWidth, turnNumber, position, hasMoved, stateVersion…) are
+    // already stripped and malformed rows surface as `null` here.
     const result = await this.characterQuestRepository.findByIdWithTacticalState(questId)
-    const state = result?.tacticalState ?? null
-    if (state && state.stateVersion !== TACTICAL_STATE_VERSION) return null
-    return state
+    if (!result || !result.tacticalState) return null
+    const state = result.tacticalState
+
+    // Reconcile player unit's HP/MP caps against the live character class.
+    // The tactical state is a snapshot taken at quest start; if the character's
+    // maxHealth/maxMana changed afterwards (tier-up, revive, balance tuning),
+    // the snapshot drifts and the combat HUD shows stale numbers. Current HP/MP
+    // are kept in sync by move-resolution writing back to the character row after
+    // every move, so we only need to refresh the caps and clamp current values.
+    const character = await this.characterService.getCharacterById(result.characterId)
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) return state
+
+    const reconciledUnits = state.units.map((u) => {
+      if (!u.id.startsWith('player-')) return u
+      const maxHealth = currentClass.maxHealth
+      const maxMana = currentClass.maxMana
+      const currentHealth = Math.max(0, Math.min(currentClass.health, maxHealth))
+      const currentMana = Math.max(0, Math.min(currentClass.mana, maxMana))
+      if (
+        u.maxHealth === maxHealth &&
+        u.maxMana === maxMana &&
+        u.currentHealth === currentHealth &&
+        u.currentMana === currentMana
+      ) {
+        return u
+      }
+      return { ...u, maxHealth, maxMana, currentHealth, currentMana }
+    })
+
+    return { ...state, units: reconciledUnits }
   }
 }

@@ -43,8 +43,8 @@ Friendly, energetic, RPG-themed (per AGENTS.md "Copy Tone"). One headline, one l
 | #   | Icon (pixelarticons) | Headline (EN)  | Body (EN)                                                                             |
 | --- | -------------------- | -------------- | ------------------------------------------------------------------------------------- |
 | 1   | `Dice`               | Earn Dice      | Complete habits, tasks, and objectives to fill your dice bank.                        |
-| 2   | `Sword`              | Roll in Combat | Spend dice in quest battles to attack, defend, and cast doctrines.                    |
-| 3   | `Trophy`             | Tier Up        | Defeat enemies to climb your class tier. Higher tiers unlock new gear and doctrines.  |
+| 2   | `Sword`              | Roll in Combat | Spend dice in quest battles to attack, defend, and cast abilities.                    |
+| 3   | `Trophy`             | Tier Up        | Defeat enemies to climb your class tier. Higher tiers unlock new gear and abilities.  |
 | 4   | `Shield`             | Equip Gear     | Buy gear in the Shop and equip it from your Inventory. Stronger gear, tougher quests. |
 
 Spanish copy lives next to the English copy in `public/locales/es/translation.json`. Tone: same friendly RPG voice (e.g. "Lánzate al combate", not literal-formal).
@@ -281,8 +281,8 @@ const resetMutation = useMutation(
   "done": "Got it",
   "complete_failed": "Couldn't save your progress. Please try again.",
   "dice":   { "title": "Earn Dice",       "body": "Complete habits, tasks, and objectives to fill your dice bank." },
-  "combat": { "title": "Roll in Combat",  "body": "Spend dice in quest battles to attack, defend, and cast doctrines." },
-  "tier":   { "title": "Tier Up",         "body": "Defeat enemies to climb your class tier. Higher tiers unlock new gear and doctrines." },
+  "combat": { "title": "Roll in Combat",  "body": "Spend dice in quest battles to attack, defend, and cast abilities." },
+  "tier":   { "title": "Tier Up",         "body": "Defeat enemies to climb your class tier. Higher tiers unlock new gear and abilities." },
   "gear":   { "title": "Equip Gear",      "body": "Buy gear in the Shop and equip it from your Inventory. Stronger gear, tougher quests." }
 },
 "settings": {
@@ -300,8 +300,8 @@ const resetMutation = useMutation(
   "done": "¡Entendido!",
   "complete_failed": "No pudimos guardar tu progreso. Inténtalo de nuevo.",
   "dice":   { "title": "Gana Dados",       "body": "Completa hábitos, tareas y objetivos para llenar tu banco de dados." },
-  "combat": { "title": "Lánzate al Combate", "body": "Gasta dados en batallas de misión para atacar, defender y lanzar doctrinas." },
-  "tier":   { "title": "Sube de Rango",    "body": "Derrota enemigos para subir el rango de tu clase. Rangos más altos desbloquean nuevo equipo y doctrinas." },
+  "combat": { "title": "Lánzate al Combate", "body": "Gasta dados en batallas de misión para atacar, defender y lanzar habilidades." },
+  "tier":   { "title": "Sube de Rango",    "body": "Derrota enemigos para subir el rango de tu clase. Rangos más altos desbloquean nuevo equipo y habilidades." },
   "gear":   { "title": "Equipa tu Botín",  "body": "Compra equipo en la Tienda y equípalo desde tu Inventario. Mejor equipo, misiones más duras." }
 },
 "settings": {

@@ -24,7 +24,7 @@
 | :-------------------------- | :---------: | :---------: | :----------------------------- |
 | Armadura de Placas de Cobre |      1      |      2      | Mejora la canalización de maná |
 
-## ✨ Doctrinas
+## ✨ Habilidades
 
 **Rama Elegida:** Forma
 

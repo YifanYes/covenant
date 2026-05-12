@@ -27,6 +27,10 @@
       "tos": "Terms of Service",
       "privacy": "Privacy Policy"
     },
+    "news": {
+      "title": "News",
+      "subtitle": "Development updates, feature releases, and behind-the-scenes notes from building Covenant."
+    },
     "footer": {
       "copyright": "© {{year}} Covenant. All rights reserved.",
       "tos": "Terms of Service",
@@ -73,13 +77,13 @@
         "title": "Living Stats",
         "body": "It's not a decorative avatar. Your character reflects your real behavior: Strength, Magic, Health, and Mana stats that evolve according to what you do."
       },
-      "doctrines": {
-        "title": "Doctrines and Mana System",
-        "body": "Unlock special abilities based on your class. Each doctrine has a mana cost—use them strategically or run out of resources."
+      "abilities": {
+        "title": "Abilities and Mana System",
+        "body": "Unlock special abilities based on your class. Each ability has a mana cost—use them strategically or run out of resources."
       },
       "classes": {
         "title": "Classes with Identity",
-        "body": "Your class defines your doctrines and combat style. No artificial boosts. No shortcuts. Only work."
+        "body": "Your class defines your abilities and combat style. No artificial boosts. No shortcuts. Only work."
       }
     },
     "combat": {
@@ -227,8 +231,8 @@
     "attack_rolls": "Attacks",
     "attack_set": "Attack set: {{count}} dice",
     "criticals": "Criticals",
-    "doctrine_activated": "{{name}} activated! +{{dice}} power dice to next attack",
-    "doctrine_activated_buff": "{{name}} activated! Next attack ignores enemy defense",
+    "ability_activated": "{{name}} activated! +{{dice}} power dice to next attack",
+    "ability_activated_buff": "{{name}} activated! Next attack ignores enemy defense",
     "death_dialog": {
       "continue": "Continue",
       "description": "Your character has fallen in battle.",
@@ -245,10 +249,10 @@
     "error": {
       "attack": "Attack failed",
       "attack_failed": "Attack failed",
-      "doctrine_failed": "Doctrine cast failed",
-      "doctrine_not_found": "Doctrine not found",
+      "ability_failed": "Ability cast failed",
+      "ability_not_found": "Ability not found",
       "invalid_attack": "No valid attack target",
-      "invalid_doctrine": "No valid doctrine target",
+      "invalid_ability": "No valid ability target",
       "invalid_move": "Invalid move action",
       "move_failed": "Movement failed",
       "no_active_unit": "No active unit selected",
@@ -263,9 +267,9 @@
     "log": {
       "damage_to_enemy": "{{enemy}} takes {{damage}} damage",
       "damage_to_player": "You take {{damage}} damage",
-      "doctrine_active": "Doctrine active: {{effect}}",
-      "doctrine_cast": "Doctrine: {{doctrine}} cast",
-      "doctrine_effect": "Doctrine: {{doctrine}} applies {{effect}}",
+      "ability_active": "Ability active: {{effect}}",
+      "ability_cast": "Ability: {{ability}} cast",
+      "ability_effect": "Ability: {{ability}} applies {{effect}}",
       "empty": "No combat events yet",
       "enemy_attacks": "Enemy attacks with {{hits}} hits",
       "enemy_defeated": "{{enemy}} is defeated!",
@@ -303,10 +307,12 @@
     "player_turn": "Your turn",
     "action": {
       "attack": "Attack",
-      "doctrine": "Doctrine",
+      "ability": "Abilities",
       "item": "Item",
       "select_target": "Select target"
     },
+    "mana_reserve": "Reserve",
+    "mana_reserve_tooltip": "Reserve: {{reserve}} mana saved for future fights",
     "targeting": {
       "single": "Select a target",
       "all": "Targeting all enemies",
@@ -315,7 +321,7 @@
     "potion_used": "Used",
     "potion_healed": "+{{amount}} HP restored",
     "potion_mana": "+{{amount}} MP restored",
-    "doctrine_buff_applied": "Doctrine active! +{{dice}} bonus dice",
+    "ability_buff_applied": "Ability active! +{{dice}} bonus dice",
     "no_items": "No items available"
   },
   "common": {
@@ -592,7 +598,7 @@
     }
   },
   "delete": "Delete",
-  "doctrines": {
+  "abilities": {
     "arcane_push": {
       "description": "Push enemy 3 tiles away.",
       "flavor": "I need to concentrate, step back.",
@@ -603,7 +609,7 @@
       "flavor": "Only those willing to die deserve victory.",
       "name": "Meteor Strike"
     },
-    "available": "Available Doctrines",
+    "available": "Available Abilities",
     "battle_fervor": {
       "description": "Recover 1 Wound per hit caused (max 3).",
       "flavor": "Your pain is my strength.",
@@ -634,20 +640,20 @@
       "flavor": "A whirlwind of steel and determination.",
       "name": "Disruption Storm"
     },
-    "empty_equipped": "No doctrines equipped",
+    "empty_equipped": "No abilities equipped",
     "entropic_acceleration": {
       "description": "Apply Burning for 2 turns to target.",
       "flavor": "Time accelerates where entropy reigns.",
       "name": "Entropic Acceleration"
     },
     "equip": "Equip",
-    "equipped": "Equipped Doctrines",
+    "equipped": "Equipped Abilities",
     "error": {
-      "equip": "Failed to equip doctrine",
-      "failed": "Failed to use doctrine",
+      "equip": "Failed to equip ability",
+      "failed": "Failed to use ability",
       "not_enough_mana": "Not enough mana",
-      "unequip": "Failed to unequip doctrine",
-      "use": "Failed to use doctrine"
+      "unequip": "Failed to unequip ability",
+      "use": "Failed to use ability"
     },
     "fan_cut": {
       "description": "Attack up to 2 enemies. Pushes targets.",
@@ -753,20 +759,20 @@
     },
     "mana_cost": "Cost: {{cost}} Mana",
     "tier": "Tier {{tier}}",
-    "max_equipped": "You can only equip 2 doctrines",
+    "max_equipped": "You can only equip 2 abilities",
     "miraculous_protection": {
       "description": "Negate 1 hit received this turn.",
       "flavor": "No one falls while I still stand.",
       "name": "Miraculous Protection"
     },
-    "no_doctrines": "No doctrines available",
+    "no_abilities": "No abilities available",
     "nullify": {
       "description": "Remove all negative status effects.",
       "flavor": "Logic dispels chaos.",
       "name": "Aquatic Purification"
     },
     "oracle_eye": {
-      "description": "Reduce Magic Threshold by 1 for your next doctrine.",
+      "description": "Reduce Magic Threshold by 1 for your next ability.",
       "flavor": "I see the end before it begins.",
       "name": "Oracle's Eye"
     },
@@ -816,10 +822,10 @@
       "name": "Stellar Collapse"
     },
     "success": {
-      "equip": "Doctrine equipped!",
-      "unequip": "Doctrine unequipped",
-      "use": "Doctrine used!",
-      "used": "Doctrine activated!"
+      "equip": "Ability equipped!",
+      "unequip": "Ability unequipped",
+      "use": "Ability used!",
+      "used": "Ability activated!"
     },
     "summary_execution": {
       "description": "Instantly kill an enemy below 25% health.",
@@ -842,7 +848,12 @@
       "name": "Tidal Strike"
     },
     "tier_required": "Requires Tier {{tier}}",
-    "title": "Doctrines",
+    "title": "Abilities",
+    "basic_strike": {
+      "description": "A standard physical attack. Costs no mana.",
+      "flavor": "Strike fast, strike true.",
+      "name": "Basic Strike"
+    },
     "transfusion": {
       "description": "Sacrifice 2 Wounds to restore 6 Mana.",
       "flavor": "Magic flows better when mixed with blood.",
@@ -1289,12 +1300,16 @@
     },
     "revive": "Revive",
     "stats": {
-      "attack_dice": "Attack Dice",
+      "attack_bonus": "Attack",
+      "magic_atk_bonus": "Magic Atk",
+      "phys_def_bonus": "Phys Def",
+      "magic_def_bonus": "Magic Def",
       "damage_type": "Damage Type",
+      "speed": "Speed",
+      "attack_dice": "Attack Dice",
       "magic_def": "Magic Def",
       "phys_def": "Phys Def",
-      "range": "Range",
-      "speed": "Speed"
+      "range": "Range"
     },
     "stats_title": "Stats",
     "strength_atk": "Strength Atk",
@@ -1307,7 +1322,7 @@
     "tabs": {
       "armory": "Armory & Loadout",
       "character": "Character",
-      "doctrines": "Doctrines",
+      "abilities": "Abilities",
       "kill_record": "Kill Record"
     },
     "kill_record": {
@@ -1395,15 +1410,15 @@
       "name": "Chainmail"
     },
     "compendium_of_truths": {
-      "description": "Fundamental secrets. When casting a doctrine, roll 1 extra die.",
+      "description": "Fundamental secrets. When casting a ability, roll 1 extra die.",
       "name": "Compendium of Truths"
     },
     "copper_plate_armor": {
-      "description": "Slightly improves mana channeling when casting doctrines.",
+      "description": "Slightly improves mana channeling when casting abilities.",
       "name": "Copper Plate Armor"
     },
     "ebony_staff": {
-      "description": "Dark wood. Reduces the mana cost of the first doctrine used by 1.",
+      "description": "Dark wood. Reduces the mana cost of the first ability used by 1.",
       "name": "Ebony Staff"
     },
     "ether_whisper": {
@@ -1510,7 +1525,7 @@
       "Consulting tomes of wisdom...",
       "Unrolling regional maps...",
       "Lighting sanctuary torches...",
-      "Meditating on the Doctrines of Order...",
+      "Meditating on the Abilities of Order...",
       "Preparing ritual incense...",
       "Gathering supplies for the expedition...",
       "Watching the shadows for heresy..."
@@ -1771,7 +1786,7 @@
     "critical_threshold": "Critical Threshold",
     "damage_negation": "Damage Negation",
     "direct_damage": "Direct Damage",
-    "doctrine_active": "Doctrine Active",
+    "ability_active": "Ability Active",
     "enemy_power_reduction": "Enemy Power Reduction",
     "guaranteed_critical": "Guaranteed Critical",
     "heal": "Healing",
@@ -1977,8 +1992,8 @@
       "zoom": "Scroll: Zoom"
     },
     "casting": "Casting...",
-    "click_confirm_doctrine": "Click Confirm to cast",
-    "click_to_target_doctrine": "Click a tile to target",
+    "click_confirm_ability": "Click Confirm to cast",
+    "click_to_target_ability": "Click a tile to target",
     "moving": "Moving...",
     "pattern": "Pattern",
     "pattern_circle": "Circle",
@@ -2084,11 +2099,11 @@
     },
     "combat": {
       "title": "Roll in Combat",
-      "body": "Spend dice in quest battles to attack, defend, and cast doctrines."
+      "body": "Spend dice in quest battles to attack, defend, and cast abilities."
     },
     "tier": {
       "title": "Tier Up",
-      "body": "Defeat enemies to climb your class tier. Higher tiers unlock new gear and doctrines."
+      "body": "Defeat enemies to climb your class tier. Higher tiers unlock new gear and abilities."
     },
     "gear": {
       "title": "Equip Gear",

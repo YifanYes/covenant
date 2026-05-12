@@ -10,43 +10,43 @@ export default function ItemStatsDisplay({ stats }: ItemStatsDisplayProps) {
   const { t } = useTranslation()
 
   return (
-    <div className='flex flex-wrap gap-x-4 gap-y-1 text-xs'>
-      {stats.attackDice && (
-        <div className='flex gap-1'>
-          <span className='text-zinc-400'>{t('inventory.stats.attack_dice')}</span>
-          <span className='font-medium text-red-400'>{stats.attackDice}</span>
+    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+      {stats.strengthAtkBonus !== undefined && stats.strengthAtkBonus !== 0 && (
+        <div className="flex gap-1">
+          <span className="text-zinc-400">{t('inventory.stats.attack_bonus')}</span>
+          <span className="font-medium text-red-400">+{stats.strengthAtkBonus}</span>
+        </div>
+      )}
+      {stats.magicAtkBonus !== undefined && stats.magicAtkBonus !== 0 && (
+        <div className="flex gap-1">
+          <span className="text-zinc-400">{t('inventory.stats.magic_atk_bonus')}</span>
+          <span className="font-medium text-purple-400">+{stats.magicAtkBonus}</span>
         </div>
       )}
       {stats.damageType && (
-        <div className='flex gap-1'>
-          <span className='text-zinc-400'>{t('inventory.stats.damage_type')}</span>
-          <span className='font-medium text-zinc-200'>
+        <div className="flex gap-1">
+          <span className="text-zinc-400">{t('inventory.stats.damage_type')}</span>
+          <span className="font-medium text-zinc-200">
             {t(`inventory.damage_type.${stats.damageType}`)}
           </span>
         </div>
       )}
-      {stats.physicalDefDice && (
-        <div className='flex gap-1'>
-          <span className='text-zinc-400'>{t('inventory.stats.phys_def')}</span>
-          <span className='font-medium text-orange-400'>{stats.physicalDefDice}</span>
+      {stats.strengthDefBonus !== undefined && stats.strengthDefBonus !== 0 && (
+        <div className="flex gap-1">
+          <span className="text-zinc-400">{t('inventory.stats.phys_def_bonus')}</span>
+          <span className="font-medium text-orange-400">+{stats.strengthDefBonus}</span>
         </div>
       )}
-      {stats.magicDefDice && (
-        <div className='flex gap-1'>
-          <span className='text-zinc-400'>{t('inventory.stats.magic_def')}</span>
-          <span className='font-medium text-blue-400'>{stats.magicDefDice}</span>
+      {stats.magicDefBonus !== undefined && stats.magicDefBonus !== 0 && (
+        <div className="flex gap-1">
+          <span className="text-zinc-400">{t('inventory.stats.magic_def_bonus')}</span>
+          <span className="font-medium text-blue-400">+{stats.magicDefBonus}</span>
         </div>
       )}
-      {stats.speed && (
-        <div className='flex gap-1'>
-          <span className='text-zinc-400'>{t('inventory.stats.speed')}</span>
-          <span className='font-medium text-green-400'>{stats.speed}</span>
-        </div>
-      )}
-      {stats.range && (
-        <div className='flex gap-1'>
-          <span className='text-zinc-400'>{t('inventory.stats.range')}</span>
-          <span className='font-medium text-cyan-400'>{stats.range}</span>
+      {stats.speed !== undefined && stats.speed !== 0 && (
+        <div className="flex gap-1">
+          <span className="text-zinc-400">{t('inventory.stats.speed')}</span>
+          <span className="font-medium text-green-400">+{stats.speed}</span>
         </div>
       )}
     </div>

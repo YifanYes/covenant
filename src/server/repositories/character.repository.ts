@@ -125,8 +125,9 @@ export class CharacterRepository {
         factionName: Faction.HOLY_KNIGHTS,
         currentClass: input.className,
         magicNature: input.magicNature,
-        data: { diceBank: 0 },
+        data: {},
         gold: 0,
+        manaReserve: 0,
         inventory: [],
         loadout: [],
         classes: {
@@ -139,6 +140,13 @@ export class CharacterRepository {
       include: {
         classes: true
       }
+    })
+  }
+
+  async updateManaReserve(characterId: string, manaReserve: number): Promise<void> {
+    await this.prisma.character.update({
+      where: { id: characterId },
+      data: { manaReserve }
     })
   }
 
@@ -199,7 +207,7 @@ export class CharacterRepository {
     return this.findWithClasses(userId)
   }
 
-  async updateCharacterClass(classId: string, data: { equippedDoctrines?: string[] }): Promise<void> {
+  async updateCharacterClass(classId: string, data: { equippedAbilities?: string[] }): Promise<void> {
     await this.prisma.characterClass.update({
       where: { id: classId },
       data

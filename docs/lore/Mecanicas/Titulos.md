@@ -59,7 +59,7 @@ Los títulos de logro se obtienen mediante hazañas específicas en combate, mis
 | :----------------------- | :-------------------------------------- | :---------------------------------------------- |
 | **Piromante**            | Causar 100 puntos de daño por Quemadura | _"El fuego purificador no conoce la piedad."_   |
 | **Tejedor de Sombras**   | Usar Teletransporte 50 veces            | _"El espacio es una sugerencia, no una regla."_ |
-| **Maestro de las Artes** | Usar 15 doctrinas diferentes en combate | _"Cada situación merece una respuesta única."_  |
+| **Maestro de las Artes** | Usar 15 habilidades diferentes en combate | _"Cada situación merece una respuesta única."_  |
 
 ### Combate - Situaciones Especiales
 
@@ -90,7 +90,7 @@ Los títulos de logro se obtienen mediante hazañas específicas en combate, mis
 | :----------------------- | :------------------------------------------------ | :--------------------------------------------------- |
 | **Manchado de Sangre**   | Matar a 10 enemigos usando Sacrificios            | _"El precio es alto, pero el poder es mayor."_       |
 | **Devorador**            | Recuperar vida de enemigos 50 veces               | _"Tu esencia me pertenece."_                         |
-| **Caminante del Abismo** | Usar 30 doctrinas de la rama del Vacío            | _"El borde del precipicio es donde me siento vivo."_ |
+| **Caminante del Abismo** | Usar 30 habilidades de la rama del Vacío            | _"El borde del precipicio es donde me siento vivo."_ |
 | **Corrupto**             | Alcanzar una Moralidad inferior a 25              | _"El fin justifica los medios, siempre."_            |
 | **Ángel Caído**          | Matar a un aliado (accidental o intencionalmente) | _"Algunos sacrificios son... necesarios."_           |
 
@@ -99,7 +99,7 @@ Los títulos de logro se obtienen mediante hazañas específicas en combate, mis
 | Título               | Requisito                                          | Descripción                                    |
 | :------------------- | :------------------------------------------------- | :--------------------------------------------- |
 | **Paladín Virtuoso** | Alcanzar una Moralidad superior a 75               | _"La luz guía cada uno de mis pasos."_         |
-| **Santo Guerrero**   | Completar 10 misiones sin usar doctrinas del Vacío | _"El poder verdadero viene de la disciplina."_ |
+| **Santo Guerrero**   | Completar 10 misiones sin usar habilidades del Vacío | _"El poder verdadero viene de la disciplina."_ |
 
 ## 📜 Títulos Legendarios
 

@@ -348,7 +348,7 @@ Asmodeo soltó una carcajada genuina.
 
 —Me caes bien, humano. Es una pena. —alzó una mano. Un grimorio apareció flotando a su lado, sus páginas pasándose solas. — _Falx Foenaria_.
 
-Jeremías conocía esa doctrina. La Guadaña del Segador. Un hechizo diseñado específicamente para matar humanos. Ignoraba toda defensa. Cortaba el alma directamente del cuerpo.
+Jeremías conocía esa habilidad. La Guadaña del Segador. Un hechizo diseñado específicamente para matar humanos. Ignoraba toda defensa. Cortaba el alma directamente del cuerpo.
 
 No había forma de bloquearlo.
 
@@ -1202,7 +1202,7 @@ Saúl entrecerró los ojos bajo el yelmo.
 
 —Ah. Todavía te queda algo en el depósito.
 
-Ezequiel atacó. Un tajo ascendente, potenciado por la doctrina. Saúl bloqueó con el martillo, pero la fuerza del impacto lo hizo retroceder un paso.
+Ezequiel atacó. Un tajo ascendente, potenciado por la habilidad. Saúl bloqueó con el martillo, pero la fuerza del impacto lo hizo retroceder un paso.
 
 Por primera vez en todo el duelo.
 

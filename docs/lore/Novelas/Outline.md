@@ -36,7 +36,7 @@ Las descripciones sensoriales son precisas y breves. No hay párrafos largos de 
 
 ### Combate con Sistema Visible
 
-Las doctrinas tienen nombres entre comillas ("Corte Ascendente", "Protección Milagrosa", "Golpe Temerario"). Las guardias de esgrima histórica (del buey, del arado, del loco) anclan la acción en una tradición marcial reconocible.
+Las habilidades tienen nombres entre comillas ("Corte Ascendente", "Protección Milagrosa", "Golpe Temerario"). Las guardias de esgrima histórica (del buey, del arado, del loco) anclan la acción en una tradición marcial reconocible.
 
 El maná funciona como recurso cuantificable. Los personajes calculan cuánto les quedan, lo que añade tensión táctica a los duelos.
 

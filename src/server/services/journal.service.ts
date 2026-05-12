@@ -3,27 +3,28 @@ import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '@/generated/prisma'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import type { JournalRepository } from '../repositories/journal.repository'
-import type { DiceService } from './dice.service'
+import type { ManaService } from './mana.service'
 
 export class JournalService {
   constructor(
     private prisma: PrismaClient,
     private journalRepository: JournalRepository,
-    private diceService: DiceService
+    private manaService: ManaService
   ) {}
 
   async create(userId: string, input: CreateJournalEntryType) {
-    let diceEarned = 0
+    let manaEarned = 0
+    let reserveGained = 0
+    let createdNew = false
     let entry: Awaited<ReturnType<typeof this.journalRepository.create>>
 
     try {
       entry = await this.prisma.$transaction(async (tx) => {
         return this.journalRepository.create(userId, input.content, input.mood, input.color, tx)
       })
-      diceEarned = 1
+      createdNew = true
     } catch (error) {
       if (error instanceof Error && (error as any).code === 'P2002') {
-        diceEarned = 0
         const entries = await this.journalRepository.findByDate(userId, new Date(), input.timezoneOffset)
         entry = entries[0]
       } else {
@@ -31,19 +32,18 @@ export class JournalService {
       }
     }
 
-    if (diceEarned === 1) {
-      const result = await this.diceService.addDiceToBank(userId, 1)
+    if (createdNew) {
+      const result = await this.manaService.addManaFromCompletion(userId, 'journal')
       if (result.success) {
-        diceEarned = result.earned
-      } else {
-        diceEarned = 0
+        manaEarned = result.manaApplied
+        reserveGained = result.reserveGained
       }
     }
 
     const dates = await this.journalRepository.findEntryDates(userId, 1000)
-    const streak = this.diceService.calculateStreakFromDates(dates, input.timezoneOffset)
+    const streak = this.manaService.calculateStreakFromDates(dates, input.timezoneOffset)
 
-    return { entry, diceEarned, streak }
+    return { entry, manaEarned, reserveGained, streak }
   }
 
   async update(userId: string, input: UpdateJournalEntryType) {
@@ -97,7 +97,7 @@ export class JournalService {
 
   async getStreak(userId: string, timezoneOffset = 0) {
     const dates = await this.journalRepository.findEntryDates(userId, 1000)
-    const streak = this.diceService.calculateStreakFromDates(dates, timezoneOffset)
+    const streak = this.manaService.calculateStreakFromDates(dates, timezoneOffset)
     const hasEntryToday = await this.journalRepository.hasEntryToday(userId, timezoneOffset)
     return { streak, hasEntryToday }
   }

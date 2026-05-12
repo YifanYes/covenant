@@ -1,5 +1,5 @@
 'use client'
-import DoctrinePanel from '@/components/doctrine-panel.component'
+import AbilityPanel from '@/components/ability-panel.component'
 import OnboardingRedirect from '@/components/shared/onboarding-redirect'
 import Tabs, { TabsContent, TabsList, TabsTrigger } from '@/ui/tabs.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
@@ -67,7 +67,7 @@ export default function Inventory() {
         <TabsList className="shrink-0">
           <TabsTrigger value="character">{t('inventory.tabs.character')}</TabsTrigger>
           <TabsTrigger value="armory">{t('inventory.tabs.armory')}</TabsTrigger>
-          <TabsTrigger value="doctrines">{t('inventory.tabs.doctrines')}</TabsTrigger>
+          <TabsTrigger value="abilities">{t('inventory.tabs.abilities')}</TabsTrigger>
           <TabsTrigger value="kill_record">{t('inventory.tabs.kill_record')}</TabsTrigger>
         </TabsList>
 
@@ -79,8 +79,8 @@ export default function Inventory() {
           <ArmoryTab character={character} onEquipItem={handleEquipItem} onUnequipItem={handleUnequipItem} />
         </TabsContent>
 
-        <TabsContent value="doctrines" className="mt-4 flex-1 overflow-auto">
-          <DoctrinePanel showEquipControls />
+        <TabsContent value="abilities" className="mt-4 flex-1 overflow-auto">
+          <AbilityPanel showEquipControls />
         </TabsContent>
 
         <TabsContent value="kill_record" className="mt-4 flex-1 overflow-auto">

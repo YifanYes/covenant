@@ -5,7 +5,7 @@ describe('JournalService', () => {
   let journalService: JournalService
   let mockPrisma: any
   let mockJournalRepo: any
-  let mockDiceService: any
+  let mockManaService: any
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -31,16 +31,23 @@ describe('JournalService', () => {
       deleteManyByUserId: vi.fn()
     }
 
-    mockDiceService = {
-      addDiceToBank: vi.fn().mockResolvedValue({ success: true, earned: 1, total: 1 }),
+    mockManaService = {
+      addManaFromCompletion: vi.fn().mockResolvedValue({
+        success: true,
+        amount: 1,
+        manaApplied: 1,
+        reserveGained: 0,
+        newMana: 1,
+        newReserve: 0
+      }),
       calculateStreakFromDates: vi.fn().mockReturnValue(3)
     }
 
-    journalService = new JournalService(mockPrisma, mockJournalRepo, mockDiceService)
+    journalService = new JournalService(mockPrisma, mockJournalRepo, mockManaService)
   })
 
   describe('create', () => {
-    it('should create entry and award dice on first entry of the day', async () => {
+    it('should create entry and award mana on first entry of the day', async () => {
       mockJournalRepo.create.mockResolvedValue({ id: 'entry-1', content: 'Hello', mood: 'happy', color: '#FFD700' })
       mockJournalRepo.findEntryDates.mockResolvedValue([
         new Date(),
@@ -56,17 +63,17 @@ describe('JournalService', () => {
       })
 
       expect(result.entry).toEqual({ id: 'entry-1', content: 'Hello', mood: 'happy', color: '#FFD700' })
-      expect(result.diceEarned).toBe(1)
+      expect(result.manaEarned).toBe(1)
       expect(result.streak).toBe(3)
-      expect(mockDiceService.addDiceToBank).toHaveBeenCalledWith('user-1', 1)
+      expect(mockManaService.addManaFromCompletion).toHaveBeenCalledWith('user-1', 'journal')
       expect(mockJournalRepo.findEntryDates).toHaveBeenCalledWith('user-1', 1000)
-      expect(mockDiceService.calculateStreakFromDates).toHaveBeenCalledWith(expect.any(Array), 0)
+      expect(mockManaService.calculateStreakFromDates).toHaveBeenCalledWith(expect.any(Array), 0)
     })
 
-    it('should not award dice when dice service fails', async () => {
+    it('should not award mana when grant fails', async () => {
       mockJournalRepo.create.mockResolvedValue({ id: 'entry-1', content: 'Hello' })
       mockJournalRepo.findEntryDates.mockResolvedValue([new Date()])
-      mockDiceService.addDiceToBank.mockResolvedValue({ success: false, earned: 0 })
+      mockManaService.addManaFromCompletion.mockResolvedValue({ success: false, amount: 0, manaApplied: 0, reserveGained: 0, newMana: 0, newReserve: 0 })
 
       const result = await journalService.create('user-1', {
         content: 'Hello',
@@ -75,8 +82,8 @@ describe('JournalService', () => {
         timezoneOffset: 0
       })
 
-      expect(result.diceEarned).toBe(0)
-      expect(mockDiceService.addDiceToBank).toHaveBeenCalledWith('user-1', 1)
+      expect(result.manaEarned).toBe(0)
+      expect(mockManaService.addManaFromCompletion).toHaveBeenCalledWith('user-1', 'journal')
     })
 
     it('should handle race condition when duplicate entry is created concurrently', async () => {
@@ -92,9 +99,9 @@ describe('JournalService', () => {
         timezoneOffset: 0
       })
 
-      expect(result.diceEarned).toBe(0)
+      expect(result.manaEarned).toBe(0)
       expect(result.entry).toEqual(existingEntry)
-      expect(mockDiceService.addDiceToBank).not.toHaveBeenCalled()
+      expect(mockManaService.addManaFromCompletion).not.toHaveBeenCalled()
     })
   })
 
@@ -194,7 +201,7 @@ describe('JournalService', () => {
       expect(result.hasEntryToday).toBe(true)
       expect(mockJournalRepo.findEntryDates).toHaveBeenCalledWith('user-1', 1000)
       expect(mockJournalRepo.hasEntryToday).toHaveBeenCalledWith('user-1', 0)
-      expect(mockDiceService.calculateStreakFromDates).toHaveBeenCalledWith(expect.any(Array), 0)
+      expect(mockManaService.calculateStreakFromDates).toHaveBeenCalledWith(expect.any(Array), 0)
     })
   })
 })

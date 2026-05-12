@@ -33,13 +33,13 @@ Esta configuración optimiza costes de producción y reduce el tiempo de prepara
 
 - **4x Tableros de Jugador:** Cartón compacto.
 - **8x Diales Giratorios:** Insertados en el tablero para llevar la cuenta de Vida y Maná (Elimina los 80 cubos de plástico).
-- **Ranuras:** Para insertar la Tarjeta de Clase y Cartas de Equipo/Doctrina activas.
+- **Ranuras:** Para insertar la Tarjeta de Clase y Cartas de Equipo/Habilidad activas.
 
 #### 4. Cartas
 
 - **16x Tarjetas de Clase:** (4 sets de las 4 clases).
 - **Mazos de Juego (Poker/Mini):**
-  - Doctrinas (Habilidades).
+  - Habilidades (Habilidades).
   - Equipo (Armas/Armaduras).
   - Enemigos (IA y Stats).
   - Loot y Eventos.

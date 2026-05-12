@@ -39,7 +39,7 @@ const variants = {
     scale: 0.8,
     transition: { duration: 0.6 }
   },
-  'doctrine-cast': {
+  'ability-cast': {
     filter: ['brightness(1)', 'brightness(1.5)', 'brightness(1)'],
     scale: [1, 1.05, 1],
     transition: { duration: 0.5 }
@@ -69,8 +69,8 @@ export default function CombatUnitSprite({
           ? 'hurt'
           : !isPlayer && animation === 'player-attack'
             ? 'hurt'
-            : animation === 'doctrine-cast'
-              ? 'doctrine-cast'
+            : animation === 'ability-cast'
+              ? 'ability-cast'
               : animation === 'heal' && isPlayer
                 ? 'heal'
                 : 'idle'

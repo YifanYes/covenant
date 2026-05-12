@@ -5,6 +5,7 @@ import EnemyInfo from '@/components/combat/enemy-info.component'
 import EnemySprite from '@/components/combat/enemy-sprite.component'
 import PlayerInfo from '@/components/combat/player-info.component'
 import PlayerSprite from '@/components/combat/player-sprite.component'
+import { translateEnemyName } from '@/components/combat/translate-enemy-name.utils'
 import { useCombat } from '@/hooks/use-combat.hook'
 import { cn } from '@/lib/cn.lib'
 import AlertDialog, {
@@ -37,7 +38,7 @@ const LOG_TYPE_TO_KEY: Partial<Record<CombatLogType, string>> = {
   [CombatLogType.MANA_REGEN]: 'combat.log.mana_regen',
   [CombatLogType.ENEMY_DEFEATED]: 'combat.log.enemy_defeated',
   [CombatLogType.STATUS_EFFECT]: 'combat.log.status_effect',
-  [CombatLogType.DOCTRINE_EFFECT]: 'combat.log.doctrine_effect',
+  [CombatLogType.ABILITY_EFFECT]: 'combat.log.ability_effect',
   [CombatLogType.STATUS_EXPIRED]: 'combat.log.status_expired'
 }
 
@@ -45,11 +46,11 @@ interface MessageBoxProps {
   phase: string
   targetingMode: 'single' | 'all' | null
   combatLog: CombatLogEntry[]
-  diceBank: number
+  manaReserve: number
   className?: string
 }
 
-function MessageBox({ phase, targetingMode, combatLog, diceBank, className }: MessageBoxProps) {
+function MessageBox({ phase, targetingMode, combatLog, manaReserve, className }: MessageBoxProps) {
   const { t } = useTranslation()
 
   if (phase === 'victory' || phase === 'defeat') return null
@@ -72,11 +73,16 @@ function MessageBox({ phase, targetingMode, combatLog, diceBank, className }: Me
       <p className="text-sm font-medium">{primaryText}</p>
       {logKey && (
         <p className="text-muted-foreground line-clamp-2 text-xs">
-          {t(logKey, latestLog.data as Record<string, unknown>)}
+          {t(logKey, {
+            ...(latestLog.data as Record<string, unknown>),
+            ...(typeof latestLog.data?.enemy === 'string' && {
+              enemy: translateEnemyName(t, latestLog.data.enemy)
+            })
+          })}
         </p>
       )}
       <p className="text-primary mt-auto text-[10px] font-bold tracking-widest">
-        {t('inventory.dice_bank')}: {diceBank}
+        {t('combat.mana_reserve')}: {manaReserve}
       </p>
     </div>
   )
@@ -86,7 +92,6 @@ interface CombatArenaProps {
   character: InventoryCharacter
   enemies: EnemyState[]
   combatLog: CombatLogEntry[]
-  diceBank: number
   questId: string
   failureText?: string
   className?: string
@@ -96,7 +101,6 @@ export default function CombatArena({
   character,
   enemies,
   combatLog,
-  diceBank,
   questId,
   failureText,
   className
@@ -105,15 +109,15 @@ export default function CombatArena({
   const router = useRouter()
   const [imageError, setImageError] = useState(false)
 
-  const combat = useCombat(character, questId, enemies, combatLog, diceBank)
+  const combat = useCombat(character, questId, enemies, combatLog)
 
   const handleTargetSelect = (targetIdOrAll: string) => {
-    if (combat.selectedDoctrineId) {
+    if (combat.selectedMoveId) {
       if (targetIdOrAll === 'all') {
         const allEnemyIds = combat.enemies.filter((e) => e.currentHealth > 0).map((e) => e.id)
-        combat.castDoctrine(combat.selectedDoctrineId, allEnemyIds)
+        combat.executeMove(combat.selectedMoveId, allEnemyIds)
       } else {
-        combat.castDoctrine(combat.selectedDoctrineId, [targetIdOrAll])
+        combat.executeMove(combat.selectedMoveId, [targetIdOrAll])
       }
     } else {
       combat.attack(targetIdOrAll)
@@ -121,18 +125,14 @@ export default function CombatArena({
   }
 
   const isPlayerTurn = combat.phase === 'player_input'
-  // Sprites are clickable during both doctrine targeting AND after dice roll
   const spriteTargetingMode: 'single' | 'all' | null =
-    isPlayerTurn && (combat.targetingMode || combat.attackRolls) ? (combat.targetingMode ?? 'single') : null
+    isPlayerTurn && combat.targetingMode ? (combat.targetingMode ?? 'single') : null
 
   return (
     <div className={cn('flex flex-col gap-3 overflow-hidden', className)}>
-      {/* Battle Scene */}
       <div className="relative h-72 w-full overflow-hidden rounded-lg">
-        {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-card via-background to-muted" />
 
-        {/* Scenic image — skipped on load error */}
         {!imageError && (
           <Image
             fill
@@ -144,16 +144,13 @@ export default function CombatArena({
           />
         )}
 
-        {/* 12×6 grid — sits above gradient and image */}
         <div className="relative grid h-full grid-cols-12 grid-rows-6 gap-2 p-4">
-          {/* Enemy info — rows 1–2, col 1–5 */}
           <div className="col-start-1 col-end-6 row-start-1 row-end-3 flex flex-col gap-1">
             {combat.enemies.map((enemy) => (
               <EnemyInfo key={enemy.id} enemy={enemy} />
             ))}
           </div>
 
-          {/* Enemy sprites — rows 2–3, col 8–12 */}
           <div className="col-start-8 col-end-13 row-start-2 row-end-4 flex items-end justify-center gap-2">
             {combat.enemies.map((enemy) => (
               <EnemySprite
@@ -167,7 +164,6 @@ export default function CombatArena({
             ))}
           </div>
 
-          {/* Player sprite — rows 4–5, col 1–4 */}
           <div className="col-start-1 col-end-5 row-start-4 row-end-6 flex items-end justify-center">
             <PlayerSprite
               currentClass={character.currentClass}
@@ -177,7 +173,6 @@ export default function CombatArena({
             />
           </div>
 
-          {/* Player info — row 5, col 7–12 */}
           <div className="col-start-7 col-end-13 row-start-5 row-end-7 flex items-end">
             <PlayerInfo
               name={character.name}
@@ -187,43 +182,36 @@ export default function CombatArena({
               maxHealth={combat.playerMaxHealth}
               mana={combat.playerMana}
               maxMana={combat.playerMaxMana}
+              manaReserve={combat.manaReserve}
               className="w-full"
             />
           </div>
         </div>
       </div>
 
-      {/* Action Region */}
       <div className="flex min-h-28 shrink-0 items-stretch gap-3">
         <MessageBox
           phase={combat.phase}
           targetingMode={combat.targetingMode}
           combatLog={combat.combatLog}
-          diceBank={combat.diceBank}
+          manaReserve={combat.manaReserve}
           className="flex-[2]"
         />
         <CombatActionBar
           character={character}
-          diceBank={combat.diceBank}
-          attackRolls={combat.attackRolls}
-          defenseRolls={combat.defenseRolls}
-          isRolling={combat.isRolling}
-          onRollDice={combat.rollDice}
-          onAttack={combat.attack}
-          onSelectDoctrine={combat.selectDoctrine}
+          currentMana={combat.playerMana}
+          onSelectMove={combat.selectMove}
           onUsePotion={combat.usePotion}
-          onCancelDoctrine={combat.cancelDoctrine}
-          selectedDoctrineId={combat.selectedDoctrineId}
+          onCancelMove={combat.cancelMove}
+          selectedMoveId={combat.selectedMoveId}
           targetingMode={combat.targetingMode}
           potionUsedThisTurn={combat.potionUsedThisTurn}
           isLoading={combat.isLoading}
           disabled={!isPlayerTurn}
-          enemies={combat.enemies}
           className="flex-[1.2]"
         />
       </div>
 
-      {/* Victory Dialog */}
       <AlertDialog open={combat.phase === 'victory'}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -238,7 +226,6 @@ export default function CombatArena({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Defeat Dialog */}
       <AlertDialog open={combat.phase === 'defeat'}>
         <AlertDialogContent>
           <AlertDialogHeader>

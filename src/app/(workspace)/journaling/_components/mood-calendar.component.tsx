@@ -3,6 +3,7 @@
 import { MOOD_COLOR_MAP } from '@shared/constants/journal.constants'
 import JournalContent from './journal-content.component'
 import { getMonth } from '@/utils/calendar.utils'
+import { useDateFormat } from '@/hooks/use-date-format'
 import Button from '@/ui/button.component'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -13,6 +14,7 @@ import { useTranslation } from 'react-i18next'
 
 function DayEntryPanel({ date, timezoneOffset }: { date: string; timezoneOffset: number }) {
   const { t } = useTranslation()
+  const { formatDate } = useDateFormat()
   const { data: entries } = useSuspenseQuery(
     trpcOptions.journaling.getByDate.queryOptions({ date, timezoneOffset })
   )
@@ -29,14 +31,7 @@ function DayEntryPanel({ date, timezoneOffset }: { date: string; timezoneOffset:
     <div className="space-y-3">
       {entries.map((entry) => (
         <div key={entry.id} className="rounded-xl border bg-background p-4">
-          <p className="text-muted-foreground text-xs font-medium">
-            {new Date(entry.createdAt).toLocaleDateString(undefined, {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
-          </p>
+          <p className="text-muted-foreground text-xs font-medium">{formatDate(entry.createdAt)}</p>
           <JournalContent html={entry.content} className="mt-2 text-sm" />
           {entry.mood && (
             <div className="mt-3 flex items-center gap-2">

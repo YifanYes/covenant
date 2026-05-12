@@ -148,7 +148,7 @@ Deep imports preferred over barrel files — better tree-shaking, clearer owners
 shared/
 ├── schemas/     # Zod validation schemas (input/output)
 ├── constants/   # Game constants (classes, enemies, quests, items, factions)
-└── types/       # TypeScript types (character, combat, doctrine, etc.)
+└── types/       # TypeScript types (character, combat, ability, etc.)
 ```
 
 ## SSR / SEO

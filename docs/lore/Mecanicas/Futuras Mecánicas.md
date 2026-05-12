@@ -116,9 +116,9 @@ Los jugadores tienen acceso a localizaciones entre misiones:
 
 _Pros: Añade sensación de progresión, world-building._
 
-### Doctrinas de Curación ✨
+### Habilidades de Curación ✨
 
-Añadir doctrinas específicas para las clases:
+Añadir habilidades específicas para las clases:
 
 **Para Heraldo:**
 
@@ -153,4 +153,4 @@ _Pros: Refuerza la filosofía core del juego, gamificación._
 **Fase 2 (Futuro):**
 
 1. Sistema de Campamento + Cocina
-2. Doctrinas de Curación (diferencia las clases)
+2. Habilidades de Curación (diferencia las clases)

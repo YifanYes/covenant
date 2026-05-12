@@ -4,22 +4,22 @@
 
 ## Stack
 
-| Layer | Tech | Version |
-|---|---|---|
-| **Runtime** | Node.js | 22+ |
-| **Framework** | Next.js API routes | 16.2.6 |
-| **API** | tRPC | 11.8.1 |
-| **ORM** | Prisma | 7.3.0 |
-| **DB Driver** | pg (native pool) | 8.17.2 |
-| **Auth** | Better Auth | ~1.6.9 |
-| **Validation** | Zod | 4.3.6 |
-| **Logging** | Pino | 10.3.1 |
-| **Caching** | Upstash Redis | 1.38.0 |
-| **Rate Limiting** | Upstash Ratelimit | 2.0.8 |
-| **Email** | React Email + Brevo | @react-email/* |
-| **Testing** | Vitest | 4.0.18 |
-| **Error Tracking** | Sentry | 10.52.0 |
-| **Cron** | node-cron | 4.2.1 |
+| Layer              | Tech                | Version         |
+| ------------------ | ------------------- | --------------- |
+| **Runtime**        | Node.js             | 22+             |
+| **Framework**      | Next.js API routes  | 16.2.6          |
+| **API**            | tRPC                | 11.8.1          |
+| **ORM**            | Prisma              | 7.3.0           |
+| **DB Driver**      | pg (native pool)    | 8.17.2          |
+| **Auth**           | Better Auth         | ~1.6.9          |
+| **Validation**     | Zod                 | 4.3.6           |
+| **Logging**        | Pino                | 10.3.1          |
+| **Caching**        | Upstash Redis       | 1.38.0          |
+| **Rate Limiting**  | Upstash Ratelimit   | 2.0.8           |
+| **Email**          | React Email + Brevo | @react-email/\* |
+| **Testing**        | Vitest              | 4.0.18          |
+| **Error Tracking** | Sentry              | 10.52.0         |
+| **Cron**           | node-cron           | 4.2.1           |
 
 ## Architecture Layers
 
@@ -107,11 +107,10 @@ src/server/
 │   ├── character.utils.ts
 │   └── combat/             # Pure combat logic modules
 │       ├── dice.ts
-│       ├── doctrine-buffs.ts
+│       ├── ability-buffs.ts
 │       ├── attack-resolution.ts
 │       ├── enemy-ai.ts
-│       ├── rewards.ts
-│       └── tactical-doctrine.ts
+│       └──  rewards.ts
 │
 ├── lib/                    # Infrastructure
 │   ├── auth.ts             # Better Auth config
@@ -179,22 +178,24 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 
 Rate limiting applied per-procedure:
 
-| Config | Limit | Window | Used for |
-|---|---|---|---|
-| `auth` | 5 requests | 60s | sign-in, sign-up |
-| `write` | 30 requests | 60s | CRUD mutations |
-| `strict` | 10 requests | 60s | sensitive ops |
-| `combat` | 60 requests | 60s | combat actions |
+| Config   | Limit       | Window | Used for         |
+| -------- | ----------- | ------ | ---------------- |
+| `auth`   | 5 requests  | 60s    | sign-in, sign-up |
+| `write`  | 30 requests | 60s    | CRUD mutations   |
+| `strict` | 10 requests | 60s    | sensitive ops    |
+| `combat` | 60 requests | 60s    | combat actions   |
 
 ## Authentication (Better Auth)
 
 Auth library: **Better Auth v1.6.9** (not Supabase, not custom JWT).
 
 **Supported methods:**
+
 - Email/password (with email verification, password reset)
 - Google OAuth (trusted provider, auto-links verified emails)
 
 **Security features:**
+
 - Account lockout: 3 failures / 10s → locked (Redis-backed, `account-lockout.ts`)
 - Session token hashing at DB layer (Prisma extension in `prisma.ts`)
 - Optional Redis secondary session storage (distributed sessions)
@@ -202,6 +203,7 @@ Auth library: **Better Auth v1.6.9** (not Supabase, not custom JWT).
 - Rate limiting on all auth endpoints
 
 **Session storage:**
+
 - Primary: PostgreSQL (`Session` table, managed by Better Auth)
 - Secondary (optional): Upstash Redis (survives restarts, shared across replicas)
 
@@ -219,22 +221,22 @@ Generated client: /generated/prisma
 
 **Schema models (14):**
 
-| Model | Purpose |
-|---|---|
-| `User` | Auth user + preferences (theme, locale, tutorialCompletedAt) |
-| `Session` | Better Auth session (token hashed) |
-| `Account` | OAuth provider link |
-| `Verification` | Email verification tokens |
-| `Character` | Player RPG character (class, gold, inventory, loadout) |
-| `CharacterClass` | Character stats per class (health, mana, equippedDoctrines) |
-| `CharacterQuest` | Active quest progress (status, combatStats JSON) |
-| `CombatEnemy` | Quest enemy instance (health, combatLog JSON) |
-| `Objective` | Goal/project (dueDate, many-to-many with areas/tasks/habits) |
-| `Area` | Context/category (name, color, icon) |
-| `Task` | To-do (status, order, effort/impact, dueDate) |
-| `Habit` | Recurring behavior (recurrence, timespan, soft-delete) |
-| `HabitCompletion` | Habit log entry |
-| `JournalEntry` | Diary entry (mood, color, unique per userId+day) |
+| Model             | Purpose                                                      |
+| ----------------- | ------------------------------------------------------------ |
+| `User`            | Auth user + preferences (theme, locale, tutorialCompletedAt) |
+| `Session`         | Better Auth session (token hashed)                           |
+| `Account`         | OAuth provider link                                          |
+| `Verification`    | Email verification tokens                                    |
+| `Character`       | Player RPG character (class, gold, inventory, loadout)       |
+| `CharacterClass`  | Character stats per class (health, mana, equippedAbilities)  |
+| `CharacterQuest`  | Active quest progress (status, combatStats JSON)             |
+| `CombatEnemy`     | Quest enemy instance (health, combatLog JSON)                |
+| `Objective`       | Goal/project (dueDate, many-to-many with areas/tasks/habits) |
+| `Area`            | Context/category (name, color, icon)                         |
+| `Task`            | To-do (status, order, effort/impact, dueDate)                |
+| `Habit`           | Recurring behavior (recurrence, timespan, soft-delete)       |
+| `HabitCompletion` | Habit log entry                                              |
+| `JournalEntry`    | Diary entry (mood, color, unique per userId+day)             |
 
 ## Logging
 
@@ -251,6 +253,7 @@ Pino structured logging, server-side only.
 React Email components rendered to HTML, sent via Brevo SMTP.
 
 Templates:
+
 - `verification.email.tsx` — email verification link
 - `password-reset.email.tsx` — password reset link
 
@@ -260,19 +263,19 @@ Locale-aware: resolves user locale from user record or Accept-Language header.
 
 Validated at startup with Zod (`src/server/config.ts`):
 
-| Variable | Required | Purpose |
-|---|---|---|
-| `DATABASE_URL` | Yes | Prisma connection (pooled) |
-| `DIRECT_URL` | Yes | Direct connection (migrations) |
-| `NEXT_PUBLIC_APP_URL` | Yes | App base URL |
-| `JWT_SECRET` | Yes | Session signing (Better Auth) |
-| `GOOGLE_CLIENT_ID` | Yes | Google OAuth |
-| `GOOGLE_CLIENT_SECRET` | Yes | Google OAuth |
-| `CRON_SECRET` | Yes | Cron job auth |
-| `BREVO_API_KEY` | Optional | Transactional email |
-| `FROM_EMAIL` | Optional | Sender address |
-| `UPSTASH_REDIS_REST_URL` | Optional | Distributed cache/rate-limit |
-| `UPSTASH_REDIS_REST_TOKEN` | Optional | Distributed cache/rate-limit |
+| Variable                   | Required | Purpose                        |
+| -------------------------- | -------- | ------------------------------ |
+| `DATABASE_URL`             | Yes      | Prisma connection (pooled)     |
+| `DIRECT_URL`               | Yes      | Direct connection (migrations) |
+| `NEXT_PUBLIC_APP_URL`      | Yes      | App base URL                   |
+| `JWT_SECRET`               | Yes      | Session signing (Better Auth)  |
+| `GOOGLE_CLIENT_ID`         | Yes      | Google OAuth                   |
+| `GOOGLE_CLIENT_SECRET`     | Yes      | Google OAuth                   |
+| `CRON_SECRET`              | Yes      | Cron job auth                  |
+| `BREVO_API_KEY`            | Optional | Transactional email            |
+| `FROM_EMAIL`               | Optional | Sender address                 |
+| `UPSTASH_REDIS_REST_URL`   | Optional | Distributed cache/rate-limit   |
+| `UPSTASH_REDIS_REST_TOKEN` | Optional | Distributed cache/rate-limit   |
 
 ## Testing
 

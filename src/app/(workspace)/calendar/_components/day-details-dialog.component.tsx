@@ -5,6 +5,7 @@ import JournalContent from '@/app/(workspace)/journaling/_components/journal-con
 import EmptyState from '@/components/empty-state.component'
 import Dialog, { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog.component'
 import Task from '@/components/tasks/task.component'
+import { useDateFormat } from '@/hooks/use-date-format'
 import { useTasksStore } from '@/stores/tasks.store'
 import { type Habit, type Task as TaskType } from '@/types/models.types'
 import { trpcOptions } from '@/utils/trpc.utils'
@@ -24,6 +25,7 @@ interface DayDetailsDialogProps {
 
 export default function DayDetailsDialog({ date, open, onOpenChange, tasks, habits }: DayDetailsDialogProps) {
   const { t } = useTranslation()
+  const { formatDate } = useDateFormat()
   const { setSelectedTask } = useTasksStore()
   const timezoneOffset = new Date().getTimezoneOffset()
 
@@ -48,13 +50,8 @@ export default function DayDetailsDialog({ date, open, onOpenChange, tasks, habi
 
   const formattedDate = useMemo(() => {
     if (!date) return ''
-    return new Date(date).toLocaleDateString(undefined, {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }, [date])
+    return formatDate(date)
+  }, [date, formatDate])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -1,0 +1,212 @@
+# Una semana en Covenant: Gremios, Misiones y una renovación de seguridad
+
+Dos ideas recorren el trabajo de esta semana, y vale la pena enunciarlas desde el principio.
+
+**Las mejoras de seguridad se acumulan.** Hashear los tokens de sesión en reposo es algo pequeño por sí solo. Lo mismo ocurre con el bloqueo de cuentas. Y con la limitación de tasa. Y con el registro de auditoría. Apiladas juntas, desplazan el perfil de riesgo del proyecto lo suficiente como para que ampliar las sesiones de 7 a 30 días se convirtiera en una decisión cómoda — hace un mes no lo habría sido.
+
+**Las refactorizaciones pagaron las funcionalidades.** La limpieza del enrutador de misiones (`d4e885a`) y la unificación del formulario de configuración (`0434c12`) no añadieron ni una sola capacidad visible para el usuario. Hicieron que todo lo que había a su alrededor fuera más fácil de cambiar. Los gremios y el diario — las dos funcionalidades más grandes de la semana — se publicaron más rápido porque semanas anteriores habían tenido sus propias refactorizaciones que ahora estaban dando frutos.
+
+El resto del artículo recorre los cambios. La seguridad primero, porque ahí es donde vive el interés compuesto.
+
+---
+
+## 1. Autenticación e IDOR, reconstruidos
+
+### Magic links → correo electrónico + contraseña
+
+Durante los primeros meses, Covenant usó el flujo de magic links de Better Auth. Una forma excelente de evitar escribir un formulario de contraseñas, y el predeterminado incorrecto para este producto. Un rastreador de hábitos que te obliga a ir a tu bandeja de entrada cada vez que quieres registrar un hábito no va a ningún lado.
+
+Dos commits hicieron el trabajo pesado:
+
+- `04bbda5 feat: switch authentication from magic-link to email + password`
+- `72e69fc feat: replace magic-link auth with email+password, verification, and password reset`
+
+El primero incorporó el cambio de esquema y el flujo de inicio de sesión principal. El segundo completó el ciclo de vida: verificación de correo electrónico al registrarse, restablecimiento de contraseña mediante token firmado y los flujos de interfaz para ambos. Diferencia neta: aproximadamente 6.000 líneas reorganizadas para eliminar el código de magic links, añadir las rutas de verificación y rediseñar el proceso de incorporación.
+
+Better Auth gestiona el hasheo (argon2id) y la generación de tokens; yo me encargo de la renderización y el enrutamiento de correos. Las plantillas existentes de magic links se reutilizaron como plantillas de verificación y restablecimiento para mantener la identidad visual coherente.
+
+### Bloqueo y limitación de tasa
+
+El inicio de sesión con contraseña implica ataques de fuerza bruta. Dos seguimientos cerraron los agujeros obvios:
+
+- `7ec2057 feat: add account lockout for repeated failed sign-ins` — N intentos fallidos dentro de una ventana de tiempo bloquean la cuenta. El contador es por cuenta, no por IP, porque los bloqueos basados en IP se eluden trivialmente y penalizan a cualquiera detrás de un NAT compartido.
+- `e748e73 feat: add in-memory rate limiting to tRPC endpoints` — un token bucket en memoria local del proceso frente al enrutador tRPC. Intencionalmente en memoria: todavía estoy en un único servicio de Railway, por lo que un salto a Redis añadiría más latencia que seguridad. Cuando escale horizontalmente, cambiaré la implementación detrás de la misma interfaz.
+
+### Registro de auditoría
+
+- `d58dd90 feat: add audit logging for auth events`
+- `f44e8f8 feat: migrate transactional email to brevo, add auth logging, and consolidate agent docs`
+
+Cada inicio de sesión, cierre de sesión, intento fallido, cambio de contraseña y bloqueo ahora escribe una fila de auditoría estructurada. El esquema es intencionalmente estrecho — actor, tipo de evento, ip, agente de usuario, marca de tiempo, JSON de metadatos — para no arrepentirme de la forma más adelante. Uso inmediato: respuesta a incidentes cuando la aplicación abra al público. A largo plazo: un panel de "actividad reciente" en la configuración de la cuenta.
+
+### Tokens de sesión, hasheados en reposo
+
+- `84c1f05 feat: hash session tokens at rest via prisma client extension`
+
+El cambio del que más orgulloso estoy esta semana. Better Auth almacena los tokens de sesión en texto plano de forma predeterminada — la norma del sector, aunque sigue siendo incómodo. Una fuga de base de datos de solo lectura entregaría a un atacante sesiones activas. La solución es una extensión de cliente Prisma que hashea los tokens de forma transparente al escribir y los busca por hash al leer. El código de la aplicación nunca se entera de la diferencia. La contrapartida es que no se puede hacer una búsqueda inversa de un token a partir de una fila, algo que no tengo necesidad de hacer.
+
+### Expiración de sesión: 7 → 30 días
+
+- `5efc494 feat: extend session expiration from 7 to 30 days`
+
+Un cambio de una línea, pero deliberado. Con autenticación por contraseña, tokens hasheados en reposo, bloqueo y registro de auditoría en su lugar, el coste de seguridad de una sesión más larga es mucho menor que hace una semana. El coste de experiencia de usuario de una sesión de 7 días es alto — una herramienta de productividad que te cierra la sesión cada semana es una herramienta de productividad que acabas abandonando.
+
+### Cerrando los agujeros de IDOR
+
+> `e127fbd security: harden IDOR protection across repositories and services`
+
+IDOR — referencia directa a objeto insegura — es el error en el que el servidor confía en el ID de la solicitud sin verificar si quien llama tiene permiso para acceder a ese ID. Es fácil introducirlo en aplicaciones tRPC, porque el framework te proporciona parámetros tipados y un usuario autenticado, y es tentador usar los primeros sin comprobarlos frente al segundo.
+
+Tenía una clase base `UserScopedRepository` que se suponía que debía prevenir exactamente esto, pero la auditoría encontró tres lugares donde los servicios llamaban a `findById` en bruto sobre entidades que deberían haber estado limitadas por scope. Corregí los tres, luego revisé todos los demás repositorios para verificar el patrón. Las pruebas ahora aseguran que el acceso entre usuarios lanza un error.
+
+Si construyes sobre tRPC y no has hecho una revisión así, hazla esta semana. Los errores no son sutiles, pero son invisibles hasta que los buscas.
+
+---
+
+## 2. Gremios, fase 1
+
+> `7dc71e0 feat: guilds phase 1 (#138)` — 49 archivos, +3.330 líneas
+
+Los gremios son la capa social de Covenant. Un gremio es un pequeño grupo de jugadores que comparten un foro, pueden ver el progreso de los demás a nivel general y (en fases posteriores) compartirán objetivos de misiones.
+
+La fase 1 incluye:
+
+- Crear, unirse y abandonar con tres roles: `OWNER`, `OFFICER`, `MEMBER`.
+- Invitaciones por enlace con número máximo de usos y expiración opcionales. Los tokens son cadenas aleatorias de 32 bytes en base64url, buscadas por hash.
+- Un foro agrupado donde las publicaciones se hilan por día para que el feed sea legible en gremios con poca actividad.
+- Una lista de miembros con avatares, niveles y marcas de tiempo de último acceso.
+
+La arquitectura sigue la división estándar en cuatro capas: enrutador → servicio → repositorio → Prisma. El detalle interesante es el flujo de invitaciones. La página de unión no requiere autenticación para que un usuario no autenticado pueda previsualizar el gremio, pero la mutación `join` requiere autenticación. La página tiene que gestionar de forma fluida el mensaje "debes iniciar sesión primero" sin perder el token de invitación. Solución: almacenar el token en la URL a través de la redirección de autenticación.
+
+El spec vive en `docs/specs/guild_system.md`.
+
+---
+
+## 3. Misiones, más la inevitable refactorización
+
+Dos commits, con seis días de diferencia:
+
+- `8011f2d feat: quests (#136)` — el sistema inicial.
+- `d4e885a refactor: quest router` — la inevitable limpieza.
+
+Las misiones convierten los objetivos en viajes estructurados. Una misión es un árbol de objetivos con recompensas (XP, oro, objetos) en cada nodo. Completar un hijo acumula el progreso en el padre.
+
+El primer commit publicó el modelo de datos y el enrutador básico. La refactorización dividió un enrutador de 600 líneas en una capa tRPC delgada más un `QuestService` que posee la lógica de acumulación. Este es el patrón que usa el resto del backend, y el enrutador de misiones era el último rezagado. Con la refactorización hecha, las misiones son comprobables sin levantar un contexto tRPC.
+
+La página de inicio se realineó en torno a las misiones en `129aa26` para que el texto de marketing coincida de verdad con el producto.
+
+---
+
+## 4. Diario con registro de humor y recompensas de dados
+
+> `c8f710f feat: add journaling system with mood calendar and dice rewards`
+
+El diario diario es la funcionalidad de rastreador de hábitos que he querido desde el primer día. Lo que se publicó:
+
+- Editor de Markdown con guardado automático.
+- Un selector de humor (escala 1–5, con emoji) que alimenta un mapa de calor calendario.
+- Un lanzamiento de dados al guardar: una pequeña posibilidad de una recompensa extra para hacer que el acto de escribir se sienta como un evento.
+
+El lanzamiento de dados es deliberadamente tacaño. El objetivo de la recompensa es celebrar que apareces, no fomentar el grinding. Si alguna vez los jugadores empiezan a optimizar el diario por el botín, el diseño habrá fallado.
+
+Spec en `docs/product/journaling.md`.
+
+---
+
+## 5. Interfaz de combate, rediseñada
+
+> `6883155 feat: redesign combat UI with Pokémon-style arena layout and menu-driven action bar`
+
+La pantalla de combate anterior era un experimento de desplazamiento lateral que nunca terminó de funcionar. La nueva es una arena fija de dos personajes (jugador a la izquierda, monstruo a la derecha) con una barra de acciones basada en menú en la parte inferior. Cualquiera que haya crecido jugando a RPGs de Game Boy reconocerá el diseño de inmediato.
+
+Por qué este diseño: escala de móvil a escritorio sin una pasada de diseño separada, las acciones disponibles son obvias (sin buscar botones) y proporciona un lienzo estable para futuras animaciones. Spec en `docs/product/combat_ui_pokemon-style.md`.
+
+El sprite de combate se optimizó en `2a71b94` — un cambio pequeño que recortó una parte significativa del JS de carga inicial para esa ruta.
+
+---
+
+## 6. Pulido del proceso de incorporación
+
+Tres hilos convergiendo en el mismo objetivo: hacer que los primeros treinta segundos de la aplicación se sientan intencionales.
+
+- `d88b185 feat: add onboarding tutorial dialog and character name editing` — al recorrer la aplicación desde cero, la brecha entre "crear personaje" y "primera acción" se sentía brutal. Nada en la pantalla le decía al nuevo jugador qué hacer a continuación. El diálogo de tutorial cubre los cuatro verbos principales (tarea, hábito, objetivo, misión) con una superposición de una sola pantalla que puede cerrarse en cualquier momento. La edición del nombre del personaje era un error disfrazado: el formulario de incorporación permitía establecer un nombre una vez y nunca cambiarlo, lo cual no era intencional. Ahora es un campo normal en la página de configuración.
+- `68c7d8a feat: add empty state to objectives page`
+- `a1946f9 feat: add RPG-themed empty states across tasks and habits views`
+
+Una lista en blanco sin texto es la peor primera impresión posible. Cada vista de lista en el workspace ahora tiene un estado vacío que le dice al usuario (a) para qué sirve esta sección, (b) qué hacer primero y (c) un empuje tonal en la dirección de "eres un héroe en una misión". Este es el tipo de trabajo que no aparece en las listas de funcionalidades, pero que importará el primer día cuando la aplicación abra.
+
+Spec en `docs/product/tutorial_dialog.md`.
+
+---
+
+## 7. Configuración, unificada
+
+> `0434c12 feat: unify settings form and add date format preference`
+
+La página de configuración solía tener tres formularios separados con tres botones de guardar separados y tres patrones de validación diferentes. Ahora es un formulario, un esquema, un botón. En la misma pasada se añadió una preferencia de `dateFormat` (ISO, US, EU), que fluye a cada visualización de fecha en la aplicación a través de un único helper de formato.
+
+---
+
+## 8. Pixelarticons en todas partes
+
+> `66fe568 feat: pixelarticons (#137)` — 93 archivos
+
+La biblioteca de iconos se cambió a [pixelarticons](https://pixelarticons.com/) en todo el workspace. La biblioteca anterior era tonalmente inconsistente — algunos iconos planos, algunos con contorno, algunos con sombra paralela. Pixelarticons proporciona un único lenguaje visual que encaja con la identidad de RPG de píxeles del resto del producto.
+
+Este fue el PR de mayor duración de la semana porque cada importación de icono tuvo que revisarse a mano. Valió la pena.
+
+---
+
+## 9. Renovación del correo transaccional
+
+Dos commits:
+
+- `f44e8f8 feat: migrate transactional email to brevo, add auth logging, and consolidate agent docs`
+- `14a4900 feat: add locale-aware themed transactional emails with i18n support`
+
+El correo se migró del proveedor anterior a Brevo. El detonante fue la entregabilidad — los envíos de prueba de los correos de magic link acababan en spam con suficiente frecuencia como para que el mismo problema hubiera afectado definitivamente a usuarios reales en el día del lanzamiento. El plan gratuito de Brevo cubre cómodamente el volumen previsible.
+
+Las plantillas con conciencia de localización se renderizan en el idioma del usuario (inglés o español por ahora) usando las mismas claves i18n que la aplicación. Uno de esos cambios que es invisible hasta que el primer usuario no anglohablante se registra y recibe un correo de bienvenida en español — y entonces es delicioso.
+
+---
+
+## 10. Fontanería
+
+Todo lo demás que llegó esta semana y que importa para que el producto se publique.
+
+### Páginas legales, pie de página, banner de cookies
+
+> `31ed265 feat: add legal pages, footer, cookie banner, and MDX table support`
+
+La infraestructura aburrida de ser un producto real. Un pie de página con los enlaces correctos, un banner de cookies que respeta "do not track", páginas de privacidad y términos renderizadas desde MDX. El runtime de MDX recibió soporte de tablas en el mismo commit porque las páginas legales los necesitaban.
+
+### Sentry, limitado a producción
+
+- `5f7c087 feat: integrate sentry for error monitoring and restructure docs`
+- `adb4e0c fix: only use sentry in prod`
+
+Sentry se añadió el 8 de mayo, luego se limitó a producción dos días después. El entorno de desarrollo estaba disparando eventos de Sentry en cada error de hot-reload, lo cual no es útil y agota la cuota gratuita. La solución envuelve la inicialización de Sentry en `if (process.env.NODE_ENV === 'production')` y cortocircuita las llamadas al SDK en caso contrario. Diferencia neta: -1.082 líneas, porque las rutas de desarrollo ya no necesitaban el manejo de errores consciente de Sentry.
+
+### CI, hook pre-push, Next.js bump, Railway TLS
+
+- `2015fd6 chore: add ci pipeline, husky pre-push hook, and fix lint warnings` — cada push ahora ejecuta la misma cadena `pnpm install --frozen-lockfile && prisma generate && lint && tsc && build && test:run` que ejecuta Railway en el despliegue. Si un push llega, el build de Railway llegará. El bucle de retroalimentación local importa más que el de CI, por lo que la misma cadena se ejecuta en un hook `pre-push` de Husky.
+- `088e135 chore: bump next.js from 16.1.4 to 16.2.6` — versión de parche, sin cambios de API, pero recoge una corrección en el App Router que estaba causando 404s intermitentes en rutas dinámicas durante el desarrollo.
+- `dd20080 fix: disable strict db ssl verification for railway prisma 7 compat` — el Postgres gestionado de Railway usa un certificado autofirmado que Prisma 7 rechaza por defecto. Se configuró `sslmode=require` en lugar de `verify-full`. Aceptable aquí porque la conexión está en la red privada de Railway.
+
+### Un puñado de correcciones de errores que vale la pena conservar
+
+- `f45324e fix: remove invalid userId uuid cast in task reorder query` — los IDs de usuario de Better Auth son `text`, no `uuid`. Convertir `userId::uuid` en una consulta SQL sin procesar lanza `invalid input syntax for type uuid` y genera un error 500. La corrección elimina el cast.
+- `a5b0237 fix: use explicit dimensions in chart ResponsiveContainer` — el `ResponsiveContainer` de Recharts mide su padre al montarse, y si el padre está `display: none` (acordeón colapsado, pestaña oculta), mide cero y nunca se recupera. Las dimensiones explícitas evitan el problema.
+- `312efcb feat: add opengraph image for landing page` — las vistas previas de enlaces en Twitter, Slack y Discord ya no parecen un marcador de posición.
+- `1b024e8 chore: delete cron route` — sobrante de una funcionalidad que ya no publico. Eliminarlo recortó una parte no trivial del coste de arranque en frío del bundle del workspace.
+
+---
+
+## Qué sigue
+
+- **Gremios fase 2**: objetivos de misiones compartidos y un fondo de XP a nivel de gremio.
+- **Notificaciones**: un centro de notificaciones real, que reemplaza el uso ad hoc de toasts.
+- **Pulido móvil**: la nueva interfaz de combate funciona en móvil, pero algunas pantallas antiguas todavía no.
+- **Una segunda pasada de idioma**: la cobertura de traducción al español está al ~85%, el objetivo es el 100% para las funcionalidades publicadas.
+
+— Yifan

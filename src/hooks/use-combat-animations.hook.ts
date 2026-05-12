@@ -7,7 +7,7 @@ export type CombatAnimationState =
   | 'enemy-attack'
   | 'damage-number'
   | 'death'
-  | 'doctrine-cast'
+  | 'ability-cast'
   | 'heal'
 
 interface DamageNumberData {
@@ -36,7 +36,7 @@ export function useCombatAnimations() {
 
   const playDeathAnimation = useCallback(() => playAnimation('death', 800), [playAnimation])
 
-  const playDoctrineAnimation = useCallback(() => playAnimation('doctrine-cast', 700), [playAnimation])
+  const playAbilityAnimation = useCallback(() => playAnimation('ability-cast', 700), [playAnimation])
 
   const playHealAnimation = useCallback(() => playAnimation('heal', 500), [playAnimation])
 
@@ -63,7 +63,7 @@ export function useCombatAnimations() {
     playAttackAnimation,
     playEnemyAttackAnimation,
     playDeathAnimation,
-    playDoctrineAnimation,
+    playAbilityAnimation,
     playHealAnimation,
     showDamageNumber
   }

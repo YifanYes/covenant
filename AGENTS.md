@@ -36,6 +36,7 @@ To bypass the hook in emergencies: `git push --no-verify`
 - **Healthcheck**: `/api/health` with 100s timeout
 - **Preview environments**: Enable in Railway dashboard under Project Settings → Environments → "Generate Environments for PRs". This creates isolated preview deployments for every pull request using real Railway infrastructure.
 - **CI**: `.github/workflows/pr.yml` runs lint, TypeScript, build, and tests on every PR
+- **Prod user base**: zero real users. Beta-only. Destructive schema changes (column renames, dropped defaults, `db push --accept-data-loss`) are acceptable; no data-preservation migration SQL required for renames.
 
 ## Testing
 
@@ -56,6 +57,7 @@ To bypass the hook in emergencies: `git push --no-verify`
   - `pnpm db:migrate` → `prisma migrate deploy`
   - `npx prisma generate` → regenerate client only
 - Config reads `DIRECT_URL` from `.env.local` via `prisma.config.ts`
+- **Current development workflow**: use `pnpm db:push` followed by `npx prisma generate` for schema changes. Do not generate migrations with `prisma migrate dev` during active development.
 
 ## Architecture
 

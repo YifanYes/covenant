@@ -1,3 +1,16 @@
+/* Phase 2A: scope NES.css + RPG fonts under .rpg-ui. PostCSS prefix-selector handles nes.css; this block scopes our own fonts. */
+.rpg-ui {
+  font-family: var(--font-rpg-body, ui-sans-serif), system-ui, sans-serif;
+}
+
+.rpg-ui h1,
+.rpg-ui h2,
+.rpg-ui h3,
+.rpg-ui .rpg-display {
+  font-family: var(--font-rpg-display, var(--font-title)), monospace;
+  letter-spacing: 0.02em;
+}
+
 /* Containers (Matches standard cards) */
 
 .rpg-container {

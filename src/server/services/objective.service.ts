@@ -1,11 +1,11 @@
 import type { CreateObjectiveBodyType, UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import type { ObjectiveRepository } from '../repositories/objective.repository'
-import type { DiceService } from './dice.service'
+import type { ManaService } from './mana.service'
 
 export class ObjectiveService {
   constructor(
     private objectiveRepository: ObjectiveRepository,
-    private diceService: DiceService
+    private manaService: ManaService
   ) {}
 
   async create(userId: string, input: CreateObjectiveBodyType) {
@@ -25,11 +25,12 @@ export class ObjectiveService {
 
   async complete(userId: string, id: string) {
     const objective = await this.objectiveRepository.complete(id, userId)
-    const result = await this.diceService.addDiceToBank(userId, 6)
+    const result = await this.manaService.addManaFromCompletion(userId, 'objective')
 
     return {
       objective,
-      diceEarned: result.earned
+      manaEarned: result.manaApplied,
+      reserveGained: result.reserveGained
     }
   }
 

@@ -2,9 +2,11 @@ export interface DashboardData {
   characterName: string | null
   character: {
     gold: number
-    diceBank: number
+    manaReserve: number
     health: number
+    maxHealth: number
     mana: number
+    maxMana: number
   } | null
   upcomingTasks: UpdatedTask[]
   statusStats: {

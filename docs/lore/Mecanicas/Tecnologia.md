@@ -26,7 +26,7 @@ En este documento exploramos los avances tecnológicos militares, tomando como p
 ### Mágico (Arcano/Fe)
 
 - ✨ **Ligeras (Rango 1-4, Velocidad 2):** Armas mágicas que canalizan el maná para ataques rápidos. Incluyen varas de sauce, báculos, cetros y orbes.
-- 📘 **Pesadas (Rango 2-5, Velocidad 1):** Libros que contienen doctrinas complejas y poderosas. Estas doctrinas se tardan más en canalizar. Incluyen manuales, codex, compendios y tratados.
+- 📘 **Pesadas (Rango 2-5, Velocidad 1):** Libros que contienen habilidades complejas y poderosas. Estas habilidades se tardan más en canalizar. Incluyen manuales, codex, compendios y tratados.
 
 ## Materiales
 
@@ -39,7 +39,7 @@ Los cimientos de todo equipamiento militar. Accesibles, confiables y dominados p
 | Material                    | Descripción                                                                                                                                                     | Notas Mecánicas                                                                                                                            |
 | :-------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
 | **Acero Funcional**         | Hierro purificado con carbón, templado en aceite. Resistente a la corrosión si se mantiene engrasado. El estándar de cualquier ejército.                        | Calidad militar estándar. Sin bonificaciones ni penalizaciones. Disponible en cualquier herrería. Coste base para equipamiento superior.   |
-| **Madera de Sauce / Cobre** | El sauce crece en riberas con alta concentración de maná; su madera porosa absorbe energía mágica. El cobre conduce el maná de forma similar a la electricidad. | Sustrato canalizador básico. Permite doctrinas de Tier 1-2. Sauce para báculos/varas; cobre para cetros/orbes. Pérdida energética del 20%. |
+| **Madera de Sauce / Cobre** | El sauce crece en riberas con alta concentración de maná; su madera porosa absorbe energía mágica. El cobre conduce el maná de forma similar a la electricidad. | Sustrato canalizador básico. Permite habilidades de Tier 1-2. Sauce para báculos/varas; cobre para cetros/orbes. Pérdida energética del 20%. |
 | **Cristal de Cuarzo**       | Formaciones hexagonales de cuevas profundas donde el maná cristaliza. Los más puros son transparentes; los impuros causan fluctuaciones peligrosas.             | Estabiliza flujos de maná y regula la combustión mágica. Reduce fallos de ignición en 50%. Requerido en armas de fuego encantadas.         |
 
 ### Tier 2: Materiales Tratados
@@ -60,7 +60,7 @@ Materiales raros que requieren conocimientos arcanos o bendiciones eclesiástica
 | **Acero Sagrado** | Forjado con ayuno, rezos y templado en agua consagrada por un obispo. Brilla con luz propia en presencia del mal y corta la carne corrupta como mantequilla. | +2 dados vs. demonios, no-muertos y corruptos. Emite luz tenue (5m) ante el mal. Inmune a corrupción. Requiere herrero de Fe y clérigo episcopal.        |
 | **Plata / Oro**   | Metales con afinidad natural hacia frecuencias específicas de maná. La plata resuena con la luz lunar y el Rayo; el oro con la luz solar y la Luz.           | Rayo/Luz: +2 dados si el objetivo porta estos metales. Plata: +3 dados vs. licántropos. Oro: +1 herida en curación. Blandos — requieren núcleo de acero. |
 | **Éter**          | Sustancia astral semisólida de donde el Velo se adelgaza. Líquido plateado que desafía la gravedad. Retiene encantamientos permanentemente.                  | Sustrato canalizador noble. Encantamientos permanentes sin recarga. Ignora resistencia mágica de espíritus. Pérdida energética <5%. Extremadamente raro. |
-| **Iridio**        | Metal plateado-azulado de meteoritos, "lágrimas de estrellas". Mejor conductor de maná mortal, superior a la plata sin su blandura.                          | Pérdida energética <2%. Doctrinas cuestan -1 maná (mín. 1). Duro pero quebradizo. Solo de meteoritos o comercio enano.                                   |
+| **Iridio**        | Metal plateado-azulado de meteoritos, "lágrimas de estrellas". Mejor conductor de maná mortal, superior a la plata sin su blandura.                          | Pérdida energética <2%. Habilidades cuestan -1 maná (mín. 1). Duro pero quebradizo. Solo de meteoritos o comercio enano.                                   |
 
 ### Tiers 4-6: Materiales Exóticos
 
@@ -81,9 +81,9 @@ Sustancias extraídas de entidades o fenómenos que desafían la naturaleza. Por
 | Material                  | Descripción                                                                                                                                         | Notas Mecánicas                                                                                                                               |
 | :------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Hueso de Archidemonio** | Osamentas de los generales del Infierno. Negro como el vacío, caliente al tacto, susurra promesas de venganza. Las armas desarrollan hambre propia. | +1 dado por enemigo muerto (máx. +3). Test de Voluntad tras combate o drena 1 herida. Susurra en infernal. Corrompe a portadores de Fe débil. |
-| **Hidrógeno Metálico**    | Metal formado bajo presiones de gigantes gaseosos. Superconductor perfecto: cero resistencia al paso de energía. Brilla plateado y flota en agua.   | Pérdida energética: 0%. Doctrinas +1 dado. Requiere portales dimensionales o alquimia legendaria. Pierde propiedades si se sobrecalienta.     |
+| **Hidrógeno Metálico**    | Metal formado bajo presiones de gigantes gaseosos. Superconductor perfecto: cero resistencia al paso de energía. Brilla plateado y flota en agua.   | Pérdida energética: 0%. Habilidades +1 dado. Requiere portales dimensionales o alquimia legendaria. Pierde propiedades si se sobrecalienta.     |
 | **Llama Eterna**          | Fuego primordial anterior a la creación. No consume combustible ni produce humo — arde porque es su naturaleza.                                     | Sustrato canalizador ígneo. +2 dados fuego, ignora resistencias. Heridas arden: 1 herida/turno hasta apagarse mágicamente. Inextinguible.     |
-| **Icor del Vacío**        | Sangre de demonios superiores — es un líquido no newtoniano (viscosidad no constante). Corroe materiales ordinarios en segundos.                    | Sustrato canalizador demoníaco. +2 dados doctrinas oscuras. Solo en recipientes de hierro frío o vidrio fantasma. Contacto: 1 herida/turno.   |
+| **Icor del Vacío**        | Sangre de demonios superiores — es un líquido no newtoniano (viscosidad no constante). Corroe materiales ordinarios en segundos.                    | Sustrato canalizador demoníaco. +2 dados habilidades oscuras. Solo en recipientes de hierro frío o vidrio fantasma. Contacto: 1 herida/turno.   |
 
 ### Tiers 8-10: Materiales Trascendentales
 
@@ -91,11 +91,11 @@ Sustancias que desafían las leyes de la realidad. Solo los héroes legendarios 
 
 | Material                     | Descripción                                                                                                                                                    | Notas Mecánicas                                                                                                                                             |
 | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Icor Primordial**          | Sangre de entidades cósmicas anteriores a los demonios. El contacto directo destroza la cordura.                                                               | Doctrinas ignoran toda resistencia. 1/combate: revela una debilidad del enemigo. Test de Voluntad por contacto o locura temporal.                           |
+| **Icor Primordial**          | Sangre de entidades cósmicas anteriores a los demonios. El contacto directo destroza la cordura.                                                               | Habilidades ignoran toda resistencia. 1/combate: revela una debilidad del enemigo. Test de Voluntad por contacto o locura temporal.                           |
 | **Plumas de Ángel**          | Luz pura solidificada de ángeles mensajeros. Cada pluma contiene un fragmento del mensaje de la creación. Suaves como seda, duras como diamante.               | +3 dados vs. demonios/no-muertos. Inmune a miedo, control mental, posesión. Aliados rango 3: +1 moral. Solo por intervención divina.                        |
 | **Neutrones**                | Materia del corazón de estrellas muertas. Una cucharada pesa como una montaña, estabilizada en volumen normal.                                                 | Ignora toda defensa física (excepto materiales equivalentes). +4 dados contundente. Inmune a daño físico.                                                   |
 | **Antimateria Estabilizada** | Partículas de carga invertida contenidas en prisiones mágicas. Al liberarse, la aniquilación con la materia normal produce la explosión más poderosa conocida. | Daño en área: 6 dados objetivo, 4 dados rango 1, 2 dados rango 2. Sin defensa posible. Cada proyectil requiere años de fabricación.                         |
-| **Singularidad**             | Agujero negro microscópico estabilizado. Elimina la existencia en esta dimensión. La luz se curva a su alrededor.                                              | Sustrato cósmico. Doctrinas +3 dados. Enemigos rango 1: -1 Velocidad. Si falla contención: consume todo en rango 10.                                        |
+| **Singularidad**             | Agujero negro microscópico estabilizado. Elimina la existencia en esta dimensión. La luz se curva a su alrededor.                                              | Sustrato cósmico. Habilidades +3 dados. Enemigos rango 1: -1 Velocidad. Si falla contención: consume todo en rango 10.                                        |
 | **Divinidad**                | La sustancia del Cielo metafísico. Luz, música y verdad en forma sólida. Los mortales no pueden mirarlo sin desintegrarse.                                     | Inmune a daño no-divino Tier < 9. Vuelo y Visión Verdadera. +5 dados vs. mal. Requiere pureza moral absoluta o la divinidad abandona (y juzga) al portador. |
 | **La Palabra**               | Conceptos puros — "Justicia", "Verdad", "Muerte" — manifestados físicamente. No son objetos sino ideas con forma.                                              | Sustrato divino. El arma actúa sobre el concepto directamente. Elige a su portador. Traicionar el concepto = destrucción. Único e irreproducible.           |
 
@@ -146,7 +146,7 @@ El combate evoluciona para dar respuesta a la nueva letalidad de los proyectiles
 - Armaduras con capas disipadoras y superficies curvas
 - Tácticas de avance en zigzag y coberturas móviles
 - Uso de escudos direccionales para cerrar la distancia
-- Doctrina de apertura basada en 1-3 disparos decisivos
+- Habilidad de apertura basada en 1-3 disparos decisivos
 
 ## El flujo de una batalla típica
 
@@ -176,7 +176,7 @@ La guerra entre humanos y demonios ha forjado una escalada doctrinal que define 
 
 > _"La guadaña de heno"_
 
-Los demonios menores portan una doctrina diseñada específicamente para exterminar humanos. Esta doctrina explota las debilidades mortales. Fue una sentencia de muerte para cualquier humano sin protección divina. Los demonios la llaman _Falx Foenaria_ — la guadaña de segar heno — porque así ven a la humanidad: hierba que cortar.
+Los demonios menores portan una habilidad diseñada específicamente para exterminar humanos. Esta habilidad explota las debilidades mortales. Fue una sentencia de muerte para cualquier humano sin protección divina. Los demonios la llaman _Falx Foenaria_ — la guadaña de segar heno — porque así ven a la humanidad: hierba que cortar.
 
 | Aspecto       | Descripción                                                               |
 | :------------ | :------------------------------------------------------------------------ |
@@ -189,11 +189,11 @@ Los demonios menores portan una doctrina diseñada específicamente para extermi
 
 > _"El martillo"_
 
-Los cazadores, inquisidores y caballeros sagrados estudiaron conjuntamente los patrones de la _Falx Foenaria_ — a menudo a costa de sus propias vidas. Generación tras generación, los supervivientes documentaron las tácticas demoníacas y desarrollaron una contradoctrina: el _Malleus_. Donde la guadaña siega, el martillo destroza.
+Los cazadores, inquisidores y caballeros sagrados estudiaron conjuntamente los patrones de la _Falx Foenaria_ — a menudo a costa de sus propias vidas. Generación tras generación, los supervivientes documentaron las tácticas demoníacas y desarrollaron una contrahabilidad: el _Malleus_. Donde la guadaña siega, el martillo destroza.
 
 El _Malleus_ invierte los principios infernales:
 
-| Principio Infernal      | Contradoctrina Humana                                   |
+| Principio Infernal      | Contrahabilidad Humana                                   |
 | :---------------------- | :------------------------------------------------------ |
 | Atacar el miedo         | Entrenamiento en resistencia mental y fe inquebrantable |
 | Corromper el alma       | Protecciones sacramentales y hierro frío                |
@@ -203,9 +203,9 @@ El _Malleus_ invierte los principios infernales:
 
 ### Implicaciones Mecánicas
 
-- **Falx Foenaria (Tier 1-3):** Los demonios que usan esta doctrina siguen tácticas predecibles una vez estudiadas. Los cazadores experimentados ganan +1 dado de defensa contra ataques demoníacos estándar.
+- **Falx Foenaria (Tier 1-3):** Los demonios que usan esta habilidad siguen tácticas predecibles una vez estudiadas. Los cazadores experimentados ganan +1 dado de defensa contra ataques demoníacos estándar.
 - **Malleus:** Los humanos entrenados en el _Malleus_ ganan +1 dado de ataque contra demonios que no esperan resistencia organizada.
-- **Escalada:** Los demonios de Tier 4+ han desarrollado contradoctrinas propias, reiniciando el ciclo de adaptación.
+- **Escalada:** Los demonios de Tier 4+ han desarrollado contrahabilidades propias, reiniciando el ciclo de adaptación.
 
 > _"El demonio que me mató enseñó a mi hijo cómo matar demonios."_ — Epitafio común en cementerios de cazadores
 
@@ -220,7 +220,7 @@ El armamento en Arq evoluciona a través de tres generaciones tecnológicas. Cad
 | **Gen 3**  |  5-7  | Semiautomática | Dragontino            |           8 / 9            |
 | **Gen 4**  | 8-10  | Trascendental  | Neutrones / Divinidad |          12 / 15           |
 
-> **Límite de Dados:** El máximo de dados de ataque que el arma puede lanzar en un solo turno, independientemente de bonificaciones por estadísticas o doctrinas.
+> **Límite de Dados:** El máximo de dados de ataque que el arma puede lanzar en un solo turno, independientemente de bonificaciones por estadísticas o habilidades.
 
 ### Generación 1: Fundamentos (Tiers 1-2)
 
@@ -256,9 +256,9 @@ El estándar de cualquier ejército. Producción para las masas, funcional sin s
 | 🔨 Melee  | Martillo de Lucerna         |   3   |   1   |  1  | Dos manos, penetra armaduras                           |
 | 🔨 Melee  | Maza de Armas               |   2   |   1   |  2  | Ignora 1 dado de defensa física                        |
 | ✨ Mágica | Vara de Sauce               |   2   |   2   |  2  | Vara flexible que canaliza los primeros brotes de maná |
-| ✨ Mágica | Vara de Cobre               |   2   |   1   |  2  | Doctrinas de Rayo +1 dado                              |
+| ✨ Mágica | Vara de Cobre               |   2   |   1   |  2  | Habilidades de Rayo +1 dado                              |
 | 📘 Mágica | Grimorio de Recluta         |   3   |   3   |  1  | Fórmulas mágicas básicas y directas                    |
-| 📘 Mágica | Manual de Primeros Auxilios |   2   |   2   |  1  | Doctrinas de curación restauran +1 herida              |
+| 📘 Mágica | Manual de Primeros Auxilios |   2   |   2   |  1  | Habilidades de curación restauran +1 herida              |
 
 **Armaduras Tier 1:**
 
@@ -268,7 +268,7 @@ El estándar de cualquier ejército. Producción para las masas, funcional sin s
 | 🛡️ Física | Brigantina                  |      2      |      0      | Placas remachadas sobre cuero, +1 Velocidad vs. armadura completa                    |
 | 🛡️ Física | Jubón Acolchado             |      1      |      1      | Ligero, no penaliza sigilo ni movimiento                                             |
 | 🌟 Mágica | Armadura de Placas de Cobre |      1      |      2      | Mejora canalización de maná, material blando                                         |
-| 🌟 Mágica | Coraza de Escamas de Cuarzo |      1      |      2      | Escamas cristalinas entrelazadas que resuenan con el maná, -1 coste primera doctrina |
+| 🌟 Mágica | Coraza de Escamas de Cuarzo |      1      |      2      | Escamas cristalinas entrelazadas que resuenan con el maná, -1 coste primera habilidad |
 
 **Tecnología disponible:**
 
@@ -292,10 +292,10 @@ Armas personalizadas para líderes y especialistas. Mejor templado, mejor ergono
 | 🔨 Melee  | Gran Hacha de Guerra |   4   |   1   |  1  | Críticos ignoran 1 dado de defensa                                |
 | 🔨 Melee  | Mayal de Guerra      |   3   |   1   |  1  | Ignora escudos y paradas                                          |
 | 🔨 Melee  | Pico de Cuervo       |   3   |   1   |  2  | +2 dados vs. enemigos con armadura pesada                         |
-| ✨ Mágica | Báculo de Ébano      |   3   |   2   |  2  | Madera oscura que absorbe luz, -1 coste primera doctrina          |
-| ✨ Mágica | Vara de Cristal      |   3   |   2   |  2  | Si la doctrina causa daño, el siguiente ataque aliado +1 dado     |
+| ✨ Mágica | Báculo de Ébano      |   3   |   2   |  2  | Madera oscura que absorbe luz, -1 coste primera habilidad          |
+| ✨ Mágica | Vara de Cristal      |   3   |   2   |  2  | Si la habilidad causa daño, el siguiente ataque aliado +1 dado     |
 | 📘 Mágica | Codex de Arcanista   |   4   |   3   |  1  | +1 Impacto si el atacante no se movió este turno                  |
-| 📘 Mágica | Libro de Oraciones   |   3   |   2   |  1  | Doctrinas de Fe curan 1 herida adicional a aliados                |
+| 📘 Mágica | Libro de Oraciones   |   3   |   2   |  1  | Habilidades de Fe curan 1 herida adicional a aliados                |
 
 **Armaduras Tier 2:**
 
@@ -303,9 +303,9 @@ Armas personalizadas para líderes y especialistas. Mejor templado, mejor ergono
 | :-------- | :--------------------------- | :---------: | :---------: | :------------------------------------------------------------------------------------------- |
 | 🛡️ Física | Armadura de Placas Completa  |      3      |      1      | +1 Heridas máximas mientras se porte                                                         |
 | 🛡️ Física | Coraza de Oficial            |      3      |      0      | Protege torso, permite movimiento completo de brazos                                         |
-| 🛡️ Física | Armadura de Hierro Frío      |      2      |      2      | Resistencia mágica natural, -1 dado a doctrinas enemigas contra ti                           |
+| 🛡️ Física | Armadura de Hierro Frío      |      2      |      2      | Resistencia mágica natural, -1 dado a habilidades enemigas contra ti                           |
 | 🌟 Mágica | Armadura de Placas de Bronce |      1      |      3      | Restaura 1 maná al comienzo de cada encuentro                                                |
-| 🌟 Mágica | Loriga de Cristal Líquido    |      1      |      3      | Placas de cristal suspendidas en gel etéreo, las doctrinas de protección duran 1 turno extra |
+| 🌟 Mágica | Loriga de Cristal Líquido    |      1      |      3      | Placas de cristal suspendidas en gel etéreo, las habilidades de protección duran 1 turno extra |
 
 **Tecnología disponible:**
 
@@ -347,9 +347,9 @@ El pináculo de la artesanía tradicional potenciada por magia. Cada pieza es ú
 | 🔨 Melee  | Rompe-Guerras          |   5   |   1   |  1  | Crítico aturde (Velocidad 0 siguiente turno)                              |
 | 🔨 Melee  | Puño del Herrero       |   4   |   1   |  1  | Destruye equipo enemigo con crítico (eliges arma o armadura)              |
 | ✨ Mágica | Susurro del Éter       |   4   |   2   |  2  | Ataques teledirigidos si aliado tiene línea de visión                     |
-| ✨ Mágica | Rama del Árbol Madre   |   4   |   2   |  2  | Doctrinas de naturaleza crean terreno difícil en casilla objetivo         |
+| ✨ Mágica | Rama del Árbol Madre   |   4   |   2   |  2  | Habilidades de naturaleza crean terreno difícil en casilla objetivo         |
 | ✨ Mágica | Bastón del Ermitaño    |   5   |   1   |  2  | +2 dados si no hay aliados en rango 3                                     |
-| 📘 Mágica | Compendio de Verdades  |   5   |   3   |  1  | +1 dado extra; si sale 6, doctrina no consume maná                        |
+| 📘 Mágica | Compendio de Verdades  |   5   |   3   |  1  | +1 dado extra; si sale 6, habilidad no consume maná                        |
 | 📘 Mágica | Tratado de las Sombras |   4   |   3   |  1  | Puede atacar desde cobertura sin revelarse                                |
 
 **Armaduras Tier 3:**
@@ -390,7 +390,7 @@ Armas diseñadas para matar algo específico. Comienza el vínculo entre arma y 
 | ✨ Mágica | Cetro del Equilibrio |   5   |   2   |  2  | Puede redirigir 1 impacto recibido a enemigo en rango                         |
 | ✨ Mágica | Vara Gemela          |   4   |   2   |  2  | Vinculada a otra vara; ambos portadores comparten maná                        |
 | 📘 Mágica | Libro de Nombres     |   5   |   3   |  1  | Conocer el nombre verdadero: +1 dado permanente vs. ese enemigo               |
-| 📘 Mágica | Evangelio de Fuego   |   6   |   4   |  1  | Doctrinas de fuego incendian el área (1 herida/turno a quien permanezca)      |
+| 📘 Mágica | Evangelio de Fuego   |   6   |   4   |  1  | Habilidades de fuego incendian el área (1 herida/turno a quien permanezca)      |
 
 **Armaduras Tier 4:**
 
@@ -399,7 +399,7 @@ Armas diseñadas para matar algo específico. Comienza el vínculo entre arma y 
 | 🛡️ Física | Armadura de Acero Sagrado |      5      |      2      | Inmune a efectos de miedo y desmoralización                                             |
 | 🛡️ Física | Armadura del Cazador      |      4      |      3      | +2 Def. Física vs. el tipo de enemigo vinculado                                         |
 | 🛡️ Física | Coraza de Plata Pura      |      4      |      3      | +2 Def. Física vs. demonios y no-muertos; brilla en la oscuridad                        |
-| 🌟 Mágica | Cota de Placas de Iridio  |      2      |      5      | Todas las doctrinas cuestan -1 maná                                                     |
+| 🌟 Mágica | Cota de Placas de Iridio  |      2      |      5      | Todas las habilidades cuestan -1 maná                                                     |
 | 🌟 Mágica | Cota de Ámbar del Pacto   |      3      |      5      | Eslabones de ámbar fosilizado con sangre sellada, si otro la usa, sufre 2 heridas/turno |
 
 **Tecnología disponible:**
@@ -447,10 +447,10 @@ El mecanismo de cerrojo y los cargadores extraíbles permiten una precisión y f
 | 🔨 Melee  | Aplastacráneos                |   7   |   1   |  1  | Daño masivo, mata instantáneamente enemigos con 1 herida restante                    |
 | 🔨 Melee  | Martillo Sísmico              |   6   |   1   |  1  | Golpea el suelo: todos en rango 1 deben superar prueba o caen                        |
 | ✨ Mágica | Vara de Dragontino            |   6   |   3   |  2  | Se autorrefuerza en combate, +1 dado tras 3 turnos                                   |
-| ✨ Mágica | Cetro Tormentoso              |   6   |   4   |  2  | Doctrinas de rayo saltan a 1 enemigo adicional con mitad de dados                    |
-| ✨ Mágica | Vara del Espejo               |   5   |   2   |  2  | Copia la última doctrina usada por un enemigo                                        |
-| 📘 Mágica | Grimorio de Escamas           |   6   |   4   |  1  | Páginas de hechizos escritas en sangre de dragón, doctrinas de fuego cuestan -2 maná |
-| 📘 Mágica | Atlas de los Campos Cuánticos |   6   |   3   |  1  | En lugares de poder, todas las doctrinas +2 dados                                    |
+| ✨ Mágica | Cetro Tormentoso              |   6   |   4   |  2  | Habilidades de rayo saltan a 1 enemigo adicional con mitad de dados                    |
+| ✨ Mágica | Vara del Espejo               |   5   |   2   |  2  | Copia la última habilidad usada por un enemigo                                        |
+| 📘 Mágica | Grimorio de Escamas           |   6   |   4   |  1  | Páginas de hechizos escritas en sangre de dragón, habilidades de fuego cuestan -2 maná |
+| 📘 Mágica | Atlas de los Campos Cuánticos |   6   |   3   |  1  | En lugares de poder, todas las habilidades +2 dados                                    |
 
 **Armaduras Tier 5:**
 
@@ -459,7 +459,7 @@ El mecanismo de cerrojo y los cargadores extraíbles permiten una precisión y f
 | 🛡️ Física | Coraza de Dragontino        |      6      |      3      | Se autorrefuerza: +1 Def. Física temporal tras recibir un golpe (máx. 2)                                         |
 | 🛡️ Física | Armadura de Acero Estelar   |      5      |      4      | Parcialmente incorpórea: 50% de ignorar el primer golpe de cada combate                                          |
 | 🛡️ Física | Exoesqueleto de Combate     |      6      |      2      | +1 Fuerza mientras se porte; permite portar armas pesadas con una mano                                           |
-| 🌟 Mágica | Armadura de Vidrio Fantasma |      3      |      6      | Sincroniza con el arma mágica equipada, +1 dado a doctrinas ofensivas                                            |
+| 🌟 Mágica | Armadura de Vidrio Fantasma |      3      |      6      | Sincroniza con el arma mágica equipada, +1 dado a habilidades ofensivas                                            |
 | 🌟 Mágica | Loriga de Plumas de Serafín |      4      |      6      | Plumas ígneas superpuestas como escamas, resistente al fuego absoluto; regenera 1 herida al comienzo de tu turno |
 
 **Tecnología disponible:**
@@ -489,8 +489,8 @@ Las armas comienzan a drenar y dar. La regeneración tiene un costo.
 | ✨ Mágica | Cetro Simbiótico            |   7   |   3   |  2  | Regenera encantamientos, drena 1 maná/turno del portador                 |
 | ✨ Mágica | Bastón del Nigromante       |   7   |   3   |  2  | Enemigos muertos se levantan como espectros aliados (1 herida, 2 dados)  |
 | ✨ Mágica | Orbe de Control             |   6   |   4   |  2  | Puede dominar 1 enemigo menor por combate (test de Voluntad)             |
-| 📘 Mágica | Códice de Vidrio Fantasma   |   7   |   4   |  1  | Sincroniza doctrinas: lanza 2 doctrinas como 1 acción                    |
-| 📘 Mágica | Archivo de las Tormentas    |   7   |   5   |  1  | Doctrinas de agua/rayo crean tormenta: -2 a ataques a distancia enemigos |
+| 📘 Mágica | Códice de Vidrio Fantasma   |   7   |   4   |  1  | Sincroniza habilidades: lanza 2 habilidades como 1 acción                    |
+| 📘 Mágica | Archivo de las Tormentas    |   7   |   5   |  1  | Habilidades de agua/rayo crean tormenta: -2 a ataques a distancia enemigos |
 
 **Armaduras Tier 6:**
 
@@ -523,14 +523,14 @@ Armas que desafían la mortalidad. Algunas eligieron a sus portadores.
 | ⚔️ Melee  | Espada de Acero Sagrado         |   8   |   1   |  2  | Purifica corrupción, daño verdadero vs. mal                                              |
 | ⚔️ Melee  | Guadaña del Archidiablo         |   9   |   2   |  1  | Cosecha almas, restaura 1 herida por muerte                                              |
 | ⚔️ Melee  | Filo de la Memoria              |   8   |   1   |  2  | Recuerda cada enemigo cortado; +1 dado permanente vs. esa especie                        |
-| ⚔️ Melee  | Colmillos de Hidrógeno Metálico |   8   |   1   |  2  | Dagas superconductoras, las doctrinas canalizadas +3 dados                               |
+| ⚔️ Melee  | Colmillos de Hidrógeno Metálico |   8   |   1   |  2  | Dagas superconductoras, las habilidades canalizadas +3 dados                               |
 | 🔨 Melee  | Yunque Ambulante                |   9   |   1   |  1  | Cada golpe reduce permanentemente Def. Física del objetivo en 1                          |
 | 🔨 Melee  | Martillo del Hereje             |   8   |   1   |  1  | Anula todos los encantamientos activos del objetivo con crítico                          |
 | ✨ Mágica | Báculo de la Alianza Eterna     |   8   |   4   |  2  | Consciencia propia, +3 dados si el báculo aprueba el objetivo                            |
 | ✨ Mágica | Cayado del Oráculo              |   8   |   3   |  2  | Ve 1 turno en el futuro: conoce la próxima acción del objetivo                           |
 | ✨ Mágica | Rama del Árbol de la Vida       |   8   |   4   |  2  | Conecta con otros portadores de ramas: teleportación entre ellos                         |
-| 📘 Mágica | Pergaminos del Sheol            |   9   |   5   |  1  | Doctrinas de Muerte cuestan 0 maná, drena 1 herida por uso                               |
-| 📘 Mágica | Crónicas del Vacío              |   8   |   4   |  1  | Las doctrinas tienen efectos aleatorios adicionales (tira en tabla)                      |
+| 📘 Mágica | Pergaminos del Sheol            |   9   |   5   |  1  | Habilidades de Muerte cuestan 0 maná, drena 1 herida por uso                               |
+| 📘 Mágica | Crónicas del Vacío              |   8   |   4   |  1  | Las habilidades tienen efectos aleatorios adicionales (tira en tabla)                      |
 
 **Armaduras Tier 7:**
 
@@ -539,7 +539,7 @@ Armas que desafían la mortalidad. Algunas eligieron a sus portadores.
 | 🛡️ Física | Cota de Hueso de Archidemonio |      8      |      4      | Cada enemigo muerto cerca otorga +1 Def. Física temporal (máx. 3)                                                                          |
 | 🛡️ Física | Armadura del Pacto Sangriento |      8      |      5      | Indestructible mientras el portador tenga heridas; drena 1 herida por combate                                                              |
 | 🛡️ Física | Caparazón de Llama Eterna     |      7      |      5      | Envuelta en fuego: enemigos en rango 1 sufren 1 herida al final de su turno                                                                |
-| 🌟 Mágica | Cota de Hidrógeno Metálico    |      4      |      8      | Si se lanza un 6, la doctrina no consume maná                                                                                              |
+| 🌟 Mágica | Cota de Hidrógeno Metálico    |      4      |      8      | Si se lanza un 6, la habilidad no consume maná                                                                                              |
 | 🌟 Mágica | Peto de Coral Vidente         |      5      |      8      | Coral vivo que crece sobre el portador y susurra profecías, ve todos los ataques antes de que ocurran: puede redistribuir dados de defensa |
 
 **Tecnología disponible:**
@@ -580,13 +580,13 @@ Las armas de Tier 8 exigen sacrificio. Cada una porta una entidad menor que dema
 | ⚔️ Melee  | Devorador de Linajes           |  10   |   1   |  2  | Absorbe las habilidades del último enemigo muerto                                   |
 | ⚔️ Melee  | Sediento                       |   9   |   1   |  2  | Gana +1 dado permanente por cada 10 muertes (máx. +3)                               |
 | ⚔️ Melee  | Espada del Contrato            |  10   |   1   |  2  | Vinculada con pacto de sangre: si el portador muere, mata al asesino                |
-| 🔨 Melee  | Yunque del Olvido              |  10   |   1   |  1  | Los golpes borran 1 doctrina del objetivo                                           |
+| 🔨 Melee  | Yunque del Olvido              |  10   |   1   |  1  | Los golpes borran 1 habilidad del objetivo                                           |
 | 🔨 Melee  | Mazo de los Titanes            |  10   |   1   |  1  | Destruye estructuras con facilidad; enemigos golpeados atraviesan muros             |
 | 🔨 Melee  | Hacha Caníbal                  |   9   |   1   |  1  | Consume armas enemigas destruidas para +1 dado temporal                             |
-| ✨ Mágica | Cetro de Hueso de Archidemonio |  10   |   4   |  2  | Exige sacrificio: cada doctrina cuesta 1 herida extra pero ignora defensa mágica    |
-| ✨ Mágica | Orbe del Ojo Ciego             |  10   |   5   |  2  | Ve a través de paredes y oscuridad; doctrinas ignoran cobertura                     |
-| ✨ Mágica | Bastón de las Mil Voces        |   9   |   4   |  2  | Canaliza espíritus: cada doctrina tiene voz distinta con efecto adicional aleatorio |
-| 📘 Mágica | Grimorio de Icor               |  10   |   5   |  1  | Las doctrinas marcan al objetivo: +2 dados permanentes vs. ese enemigo              |
+| ✨ Mágica | Cetro de Hueso de Archidemonio |  10   |   4   |  2  | Exige sacrificio: cada habilidad cuesta 1 herida extra pero ignora defensa mágica    |
+| ✨ Mágica | Orbe del Ojo Ciego             |  10   |   5   |  2  | Ve a través de paredes y oscuridad; habilidades ignoran cobertura                     |
+| ✨ Mágica | Bastón de las Mil Voces        |   9   |   4   |  2  | Canaliza espíritus: cada habilidad tiene voz distinta con efecto adicional aleatorio |
+| 📘 Mágica | Grimorio de Icor               |  10   |   5   |  1  | Las habilidades marcan al objetivo: +2 dados permanentes vs. ese enemigo              |
 | 📘 Mágica | Crónicas del Abismo            |  10   |   6   |  1  | Leer en voz alta invoca tentáculos que inmovilizan a todos en rango 2               |
 
 **Armaduras Tier 8:**
@@ -596,8 +596,8 @@ Las armas de Tier 8 exigen sacrificio. Cada una porta una entidad menor que dema
 | 🛡️ Física | Exoesqueleto Infernal          |      9      |      5      | Armadura templada en Icor del Vacío. Regeneración completa entre combates; drena 1 herida por combate largo |
 | 🛡️ Física | Armadura de Almas Encadenadas  |      9      |      6      | Almas atrapadas gritan: enemigos en rango 2 sufren -2 dados por terror                                      |
 | 🛡️ Física | Coraza del Leviatán            |     10      |      4      | Escamas de bestia marina primordial: inmune a ataques de agua/hielo                                         |
-| 🌟 Mágica | Cota Angelical                 |      5      |      9      | Todas las doctrinas son imbuidas en el atributo luz                                                         |
-| 🌟 Mágica | Caparazón de Quitina Entrópica |      6      |      9      | Exoesqueleto de insecto abismal que devora la magia, doctrinas enemigas que te afectan tienen 50% de fallar |
+| 🌟 Mágica | Cota Angelical                 |      5      |      9      | Todas las habilidades son imbuidas en el atributo luz                                                         |
+| 🌟 Mágica | Caparazón de Quitina Entrópica |      6      |      9      | Exoesqueleto de insecto abismal que devora la magia, habilidades enemigas que te afectan tienen 50% de fallar |
 
 **Tecnología disponible:**
 
@@ -623,10 +623,10 @@ El armamento de Tier 9 desafía la física fundamental. Estas armas manipulan el
 | ⚔️ Melee  | Paradoja                        |  10   |   1   |  3  | Si fallas el ataque, ocurre de todas formas en una línea temporal alternativa                |
 | 🔨 Melee  | Trituradora Celestial           |  12   |   ∞   |  1  | Martillo hecho con neutrones, lo aplasta todo                                                |
 | 🔨 Melee  | Martillo de la Causalidad       |  11   |   1   |  1  | El golpe ocurre antes de que el enemigo actúe: siempre golpeas primero                       |
-| ✨ Mágica | Segunda Ley de la Termodinámica |  11   |   ∞   |  2  | Las doctrinas ignoran el espacio: afectan a cualquier objetivo visible                       |
+| ✨ Mágica | Segunda Ley de la Termodinámica |  11   |   ∞   |  2  | Las habilidades ignoran el espacio: afectan a cualquier objetivo visible                       |
 | ✨ Mágica | Vara de la Incertidumbre        |  10   |   ∞   |  2  | El objetivo no puede ser observado ni atacado hasta tu siguiente turno                       |
 | ✨ Mágica | Cetro del Multiverso            |  11   |   3   |  2  | Invoca versiones alternativas de ti mismo para atacar (+3 ataques fantasma)                  |
-| 📘 Mágica | La Teoría del Todo              |  12   |   ∞   |  1  | Lanza la misma doctrina en pasado y presente simultáneamente                                 |
+| 📘 Mágica | La Teoría del Todo              |  12   |   ∞   |  1  | Lanza la misma habilidad en pasado y presente simultáneamente                                 |
 | 📘 Mágica | Ecuaciones de Campo             |  11   |   ∞   |  1  | Reescribe las leyes físicas locales: elige gravedad, tiempo o espacio alterados              |
 
 **Armaduras Tier 9:**
@@ -663,7 +663,7 @@ Las armas de Tier 10 son fragmentos de los cielos. Cada una fue portada por un a
 | ⚔️ Melee  | Espada del Edén         |  13   |   1   |  2  | Flamígera, expulsa del combate a cualquier enemigo impuro (destierro instantáneo)             |
 | 🔨 Melee  | Martillo del Arcángel   |  14   |   1   |  1  | Cada golpe crea un terremoto: todos en rango 3 reciben 5 dados de daño                        |
 | 🔨 Melee  | El Sello                |  13   |   1   |  1  | Sella entidades: el objetivo queda petrificado eternamente con crítico                        |
-| ✨ Mágica | Cetro Seráfico          |  13   |   ∞   |  2  | Manifestación de voluntad divina, las doctrinas son conceptos puros                           |
+| ✨ Mágica | Cetro Seráfico          |  13   |   ∞   |  2  | Manifestación de voluntad divina, las habilidades son conceptos puros                           |
 | ✨ Mágica | Vara del Primer Día     |  14   |   ∞   |  2  | Crea luz donde no la hay: revela todo lo oculto, disipa toda ilusión y sombra                 |
 | ✨ Mágica | Báculo del Alfa y Omega |  13   |   ∞   |  2  | Controla principios y finales: decide cuándo empieza y termina un combate                     |
 | 📘 Mágica | El Libro de la Vida     |  15   |   ∞   |  1  | Escribe el destino: la próxima acción del objetivo la decide el portador                      |
