@@ -6,6 +6,31 @@
 
 ## Critical Priority
 
+- [ ] Rotate all production secrets before flipping repo public `[blocker]`
+  - History rewrite is done; secrets were never committed but must still be rotated since the repo widens its threat surface on public flip. Any prior collaborator, contractor, or backup snapshot may retain the value.
+  - **Rotate:** `SENTRY_AUTH_TOKEN` (Sentry → Settings → Auth Tokens), `BREVO_API_KEY` (Brevo → SMTP & API), `UPSTASH_REDIS_REST_TOKEN` (Upstash console), `JWT_SECRET` (`openssl rand -base64 64` — **all active sessions invalidated**), `GOOGLE_CLIENT_SECRET` (Google Cloud Console), `DATABASE_URL` / `DIRECT_URL` (Railway → Postgres password).
+  - If any local dev DB was seeded from a prod dump: rotate dev DB password + re-seed from sanitized fixture.
+  - After rotation, redistribute via 1Password/Bitwarden — not Slack/Discord.
+
+- [ ] GitHub repository settings (manual, post-rotation) `[blocker]`
+  - **Audit closed PRs/issues first.** Going public exposes every PR thread, issue comment, review on github.com. Edit/delete anything sensitive (infra IDs, env names, internal URLs, prod screenshots/logs, personal refs in reviews).
+  - **Flip repository public** in GitHub Settings → General → Danger Zone.
+  - **Enable security features:** Dependabot alerts, Secret scanning, (optional) Code scanning.
+  - **Repo metadata:** Description "Gamified productivity platform with RPG-style progression"; Topics `nextjs trpc prisma postgresql gamification productivity rpg`; Website `https://covenantrpg.com`.
+  - **Branch protection on `main`:** require PR reviews, require `validate` status check (`.github/workflows/pr.yml`), require up-to-date branch before merge.
+  - **Repo secrets:** `SENTRY_AUTH_TOKEN` only. No `RAILWAY_TOKEN` — Railway uses its GitHub app, no Actions deploy workflow today.
+
+- [ ] Set up `privacy@covenantrpg.com` email forwarder before going public `[blocker]`
+  - Privacy + ToS MDX now reference this address. Without forwarder, GDPR-required data-subject requests bounce.
+  - Configure on covenantrpg.com DNS provider (Cloudflare Email Routing, ImprovMX, Fastmail catch-all, etc.) → forward to your gmail.
+
+- [ ] Notify Denis of identity rewrite before flipping public `[blocker]`
+  - Draft email (per earlier plan): repo going public under AGPL-3.0 on `<date>`, his `syrewolfdigital@gmail.com` rewritten to `58982694+SyreWolf@users.noreply.github.com` in history, name preserved as commit author. Give him a response window to object.
+  - Documents consent, converts "might sue" risk into "documented opportunity to object".
+
+- [ ] Retire `pre-oss-rewrite` recovery anchor after public state verified `[debt]`
+  - Tag at `a728362d` on local repo points to pre-rewrite SHA. Delete (`git tag -d pre-oss-rewrite`) and any private archive once Phase 4 (GitHub settings) is complete and public state is confirmed correct.
+
 - [ ]
 
 ## High Priority
