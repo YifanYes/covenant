@@ -61,11 +61,10 @@ Use **git-filter-repo** to permanently strip deleted directories and files that 
 | `docs/guides/railway_deployment.md` (historical versions)  | Old guide references `arq-game.com`, `api.arq-game.com`, Railway subdomains          | Strip file (will be recreated fresh)                                |
 | `docs/guides/email_brevo_setup.md` (historical versions)   | Contains `xkeysib-...` placeholder that looks like a real API key format             | Strip file (will be recreated fresh)                                |
 | `docs/guides/sentry_setup.md` (historical versions)        | References `covenant-06` org slug                                                    | Strip file (will be recreated fresh)                                |
-| Commit author `syrewolfdigital@gmail.com`                  | Personal email in history                                                            | Rewrite to `denis@noreply.covenantrpg.com`                          |
-| Commit author `58982694+SyreWolf@users.noreply.github.com` | GitHub-numeric-ID identity attributable to Denis (web edits)                         | Rewrite to `denis@noreply.covenantrpg.com`                          |
-| Commit author `yifanyemontpe@gmail.com`                    | Personal email in history                                                            | Rewrite to `yifan@noreply.covenantrpg.com`                          |
-| Commit author `yifan.ye@signe.es`                          | Employer email in history                                                            | Rewrite to `yifan@noreply.covenantrpg.com`                          |
-| Commit author `t3code@users.noreply.github.com`            | Tooling-bot identity attributable to Yifan                                           | Rewrite to `yifan@noreply.covenantrpg.com`                          |
+| Commit author `syrewolfdigital@gmail.com`                  | Personal email in history                                                            | Rewrite to `58982694+SyreWolf@users.noreply.github.com` (GitHub noreply — preserves clickable contributor graph) |
+| Commit author `yifanyemontpe@gmail.com`                    | Personal email in history                                                            | Rewrite to `30553455+YifanYes@users.noreply.github.com` (GitHub noreply — preserves clickable contributor graph) |
+| Commit author `yifan.ye@signe.es`                          | Employer email in history                                                            | Rewrite to `30553455+YifanYes@users.noreply.github.com`             |
+| Commit author `t3code@users.noreply.github.com`            | Tooling-bot identity attributable to Yifan                                           | Rewrite to `30553455+YifanYes@users.noreply.github.com`             |
 | Commit committer `GitHub <noreply@github.com>`             | Web-UI commits / merge commits authored via github.com                               | **Allowed as-is** — generic GitHub identity, no PII; do not rewrite |
 
 ### Verify all author/committer identities are covered
@@ -105,12 +104,13 @@ git filter-repo \
 Where `/tmp/mailmap.txt` contains:
 
 ```
-Denis Gudiña Nuñez <denis@noreply.covenantrpg.com> Denis Gudiña Nuñez <syrewolfdigital@gmail.com>
-Denis Gudiña Nuñez <denis@noreply.covenantrpg.com> Denis Gudiña Nuñez <58982694+SyreWolf@users.noreply.github.com>
-Yifan Ye <yifan@noreply.covenantrpg.com> Yifan <yifanyemontpe@gmail.com>
-Yifan Ye <yifan@noreply.covenantrpg.com> yifan <yifan.ye@signe.es>
-Yifan Ye <yifan@noreply.covenantrpg.com> T3 Code <t3code@users.noreply.github.com>
+Denis Gudiña Nuñez <58982694+SyreWolf@users.noreply.github.com> Denis Gudiña Nuñez <syrewolfdigital@gmail.com>
+Yifan Ye <30553455+YifanYes@users.noreply.github.com> Yifan <yifanyemontpe@gmail.com>
+Yifan Ye <30553455+YifanYes@users.noreply.github.com> yifan <yifan.ye@signe.es>
+Yifan Ye <30553455+YifanYes@users.noreply.github.com> T3 Code <t3code@users.noreply.github.com>
 ```
+
+Both maintainers retain GitHub-noreply identities (`<numeric-id>+<username>@users.noreply.github.com`) — clickable on github.com, no real email exposed, contributor graph intact.
 
 Note: `GitHub <noreply@github.com>` is intentionally absent from the mailmap — it is the generic GitHub web-UI committer and is allowed to remain unchanged.
 
