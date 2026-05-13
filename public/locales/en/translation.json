@@ -1090,7 +1090,9 @@
       "monthly": "Monthly",
       "weekly": "Weekly"
     },
-    "title": "Habits"
+    "title": "Habits",
+    "last_completed": "Last: {{relative}}",
+    "never_completed": "Never completed"
   },
   "guilds": {
     "title": "Guilds",

@@ -20,7 +20,12 @@ export class HabitService {
 
   async getAll(userId: string) {
     const habits = await this.habitRepository.findAll(userId)
-    return { habits }
+    const withLastCompleted = habits.map((habit) => {
+      const completions = (habit as typeof habit & { completions?: { completedAt: Date }[] }).completions ?? []
+      const lastCompletedAt = completions[0]?.completedAt ?? null
+      return { ...habit, lastCompletedAt }
+    })
+    return { habits: withLastCompleted }
   }
 
   async getById(userId: string, id: string) {

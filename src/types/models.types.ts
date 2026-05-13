@@ -59,4 +59,5 @@ export type Habit = {
   completions?: HabitCompletion[]
   objectives?: Objective[]
   areas?: Area[]
+  lastCompletedAt?: string | null
 }

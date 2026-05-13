@@ -6,19 +6,23 @@
 
 ## Critical Priority
 
-- [ ] Rotate all production secrets before flipping repo public `[blocker]`
-  - History rewrite is done; secrets were never committed but must still be rotated since the repo widens its threat surface on public flip. Any prior collaborator, contractor, or backup snapshot may retain the value.
-  - **Rotate:** `SENTRY_AUTH_TOKEN` (Sentry → Settings → Auth Tokens), `BREVO_API_KEY` (Brevo → SMTP & API), `UPSTASH_REDIS_REST_TOKEN` (Upstash console), `JWT_SECRET` (`openssl rand -base64 64` — **all active sessions invalidated**), `GOOGLE_CLIENT_SECRET` (Google Cloud Console), `DATABASE_URL` / `DIRECT_URL` (Railway → Postgres password).
-  - If any local dev DB was seeded from a prod dump: rotate dev DB password + re-seed from sanitized fixture.
-  - After rotation, redistribute via 1Password/Bitwarden — not Slack/Discord.
-
-- [ ] GitHub repository settings (manual, post-rotation) `[blocker]`
-  - **Audit closed PRs/issues first.** Going public exposes every PR thread, issue comment, review on github.com. Edit/delete anything sensitive (infra IDs, env names, internal URLs, prod screenshots/logs, personal refs in reviews).
-  - **Flip repository public** in GitHub Settings → General → Danger Zone.
-  - **Enable security features:** Dependabot alerts, Secret scanning, (optional) Code scanning.
-  - **Repo metadata:** Description "Gamified productivity platform with RPG-style progression"; Topics `nextjs trpc prisma postgresql gamification productivity rpg`; Website `https://covenantrpg.com`.
-  - **Branch protection on `main`:** require PR reviews, require `validate` status check (`.github/workflows/pr.yml`), require up-to-date branch before merge.
-  - **Repo secrets:** `SENTRY_AUTH_TOKEN` only. No `RAILWAY_TOKEN` — Railway uses its GitHub app, no Actions deploy workflow today.
+- [ ] GitHub repository settings (manual) `[blocker]`
+  - **Pre-flip (hard gates):**
+    1. **Audit closed PRs/issues.** Going public exposes every PR thread, issue comment, review on github.com. Edit/delete anything sensitive (infra IDs, env names, internal URLs, prod screenshots/logs, personal refs in reviews).
+    2. **`privacy@covenantrpg.com` forwarder live** (tracked separately below).
+    3. **Denis notice sent** with response window elapsed (tracked separately below).
+  - **Flip repository public** in Settings → General → Danger Zone. Rulesets / branch protection cannot be enforced on free-plan private repos, so flipping is the prerequisite for protection.
+  - **Post-flip configuration:**
+    - **Branch protection ruleset on `main`** (Settings → Rules → Rulesets → New ruleset):
+      - Target: include default branch
+      - Restrict deletions
+      - Require a pull request before merging — required approvals `0` (solo dev cannot self-approve)
+      - Require status checks to pass — add `validate` (job in `.github/workflows/pr.yml`); require branches up to date before merge
+      - Block force pushes
+      - Note: the `validate` check name only appears in the dropdown after the workflow has run once on `main` — open + close a no-op PR if the list is empty
+    - **Security features** (Settings → Code security): Dependabot alerts, Secret scanning, optional Code scanning
+    - **Repo metadata** (Settings → General): Description "Gamified productivity platform with RPG-style progression"; Topics `nextjs trpc prisma postgresql gamification productivity rpg`; Website `https://covenantrpg.com`
+    - **Repo secrets** (Settings → Secrets and variables → Actions): `SENTRY_AUTH_TOKEN` only. No `RAILWAY_TOKEN` — Railway uses its GitHub app, no Actions deploy workflow today.
 
 - [ ] Set up `privacy@covenantrpg.com` email forwarder before going public `[blocker]`
   - Privacy + ToS MDX now reference this address. Without forwarder, GDPR-required data-subject requests bounce.

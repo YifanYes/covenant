@@ -9,7 +9,7 @@ import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Check, Braces as Code, Loader } from 'pixelarticons/react'
 import { HabitTimespan } from '@shared/schemas/habits.schemas'
 import { useMutation } from '@tanstack/react-query'
-import type { OpUnitType } from 'dayjs'
+import type { ManipulateType, OpUnitType } from 'dayjs'
 import dayjs from 'dayjs'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -23,10 +23,24 @@ const timespanUnits: Record<HabitTimespan, OpUnitType> = {
 
 // forwarding ref and event handlers so the trigger can attach to root div
 const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttributes<HTMLDivElement>>(
-  ({ habit: { completions = [], recurrence = 1, id, name, description, timespan }, ...props }, ref) => {
+  (
+    { habit: { completions = [], recurrence = 1, id, name, description, timespan, lastCompletedAt }, ...props },
+    ref
+  ) => {
     const { t } = useTranslation()
     const { formatDate } = useDateFormat()
     const timespanUnit = timespanUnits[timespan as HabitTimespan]
+
+    const { lastCompletedLabel, isNeglected } = useMemo(() => {
+      if (!lastCompletedAt) {
+        return { lastCompletedLabel: t('habits.never_completed'), isNeglected: true }
+      }
+      const last = dayjs(lastCompletedAt)
+      return {
+        lastCompletedLabel: t('habits.last_completed', { relative: last.fromNow() }),
+        isNeglected: last.isBefore(dayjs().subtract(1, timespanUnit as ManipulateType))
+      }
+    }, [lastCompletedAt, timespanUnit, t])
 
     const createCompletion = useMutation(
       trpcOptions.habits.createCompletion.mutationOptions({
@@ -80,7 +94,11 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
     }
 
     return (
-      <div ref={ref} {...props} className="flex cursor-pointer flex-col rounded-lg border p-3">
+      <div
+        ref={ref}
+        {...props}
+        className={`flex cursor-pointer flex-col rounded-lg border p-3 ${isNeglected ? 'border-amber-500/50' : ''}`}
+      >
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 flex-1 items-center gap-2">
             <div className="bg-primary/10 text-primary rounded-md p-1.5">
@@ -121,6 +139,10 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
             )}
           </Button>
         </div>
+
+        <p className={`mt-1 text-xs ${isNeglected ? 'text-amber-500' : 'text-muted-foreground'}`}>
+          {lastCompletedLabel}
+        </p>
 
         <div className="mt-4 flex flex-1 flex-col">
           <div className="grid flex-1 grid-cols-[repeat(9,1fr)] grid-rows-[repeat(4,1fr)] gap-1">
