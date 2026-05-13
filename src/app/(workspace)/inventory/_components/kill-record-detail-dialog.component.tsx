@@ -1,5 +1,6 @@
 'use client'
 import CombatLog from '@/components/combat/combat-log.component'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import Dialog, { DialogContent, DialogHeader, DialogTitle } from '@/ui/dialog.component'
 import { EnemyType, getEnemy } from '@shared/constants/enemies'
@@ -92,19 +93,19 @@ export default function KillRecordDetailDialog({ enemy, open, onOpenChange }: Ki
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="border-border bg-muted/30 flex flex-col items-center rounded-lg border p-2">
+          <div className={cn(panelChrome, 'flex flex-col items-center p-2')}>
             <span className="text-lg font-bold">{enemy.maxHealth}</span>
             <span className="text-muted-foreground text-[10px]">{t('inventory.kill_record.max_health')}</span>
           </div>
-          <div className="border-border bg-muted/30 flex flex-col items-center rounded-lg border p-2">
+          <div className={cn(panelChrome, 'flex flex-col items-center p-2')}>
             <span className="text-lg font-bold">{enemy.turnsElapsed}</span>
             <span className="text-muted-foreground text-[10px]">{t('inventory.kill_record.turns')}</span>
           </div>
-          <div className="border-border bg-muted/30 flex flex-col items-center rounded-lg border p-2">
+          <div className={cn(panelChrome, 'flex flex-col items-center p-2')}>
             <span className="text-lg font-bold text-emerald-500">{enemy.damageDealt}</span>
             <span className="text-muted-foreground text-[10px]">{t('inventory.kill_record.damage_dealt_short')}</span>
           </div>
-          <div className="border-border bg-muted/30 flex flex-col items-center rounded-lg border p-2">
+          <div className={cn(panelChrome, 'flex flex-col items-center p-2')}>
             <span className="text-lg font-bold text-red-500">{enemy.damageTaken}</span>
             <span className="text-muted-foreground text-[10px]">
               {t('inventory.kill_record.damage_received_short')}

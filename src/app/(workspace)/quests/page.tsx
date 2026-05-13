@@ -1,5 +1,6 @@
 'use client'
 import LoaderButton from '@/common/loader-button.component'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Badge } from '@/ui/badge.component'
@@ -70,7 +71,8 @@ export default function QuestsPage() {
               type="button"
               onClick={() => setSelectedQuest(quest)}
               className={cn(
-                'group cursor-pointer overflow-hidden rounded-lg border bg-card text-left transition-all hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                panelChrome,
+                'group cursor-pointer overflow-hidden text-left transition-all hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                 quest.isActive && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
               )}
             >
@@ -150,7 +152,7 @@ export default function QuestsPage() {
               </DialogHeader>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-md border p-3">
+                <div className={cn(panelChrome, 'p-3')}>
                   <p className="text-muted-foreground mb-1.5 text-xs font-medium uppercase tracking-wider">
                     {t('quests.objective')}
                   </p>
@@ -159,7 +161,7 @@ export default function QuestsPage() {
                     {t('quests.kill_enemies', { count: selectedQuest.objective.target })}
                   </p>
                 </div>
-                <div className="rounded-md border p-3">
+                <div className={cn(panelChrome, 'p-3')}>
                   <p className="text-muted-foreground mb-1.5 text-xs font-medium uppercase tracking-wider">
                     {t('quests.reward')}
                   </p>

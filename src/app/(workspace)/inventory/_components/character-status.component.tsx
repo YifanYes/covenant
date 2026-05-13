@@ -1,6 +1,8 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import Separator from '@/ui/separator.component'
+import { cn } from '@/lib/cn.lib'
 import { Battery, Heart, Money, FileText as ScriptText, Shield, Zap } from 'pixelarticons/react'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
@@ -22,7 +24,7 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
   const isDead = currentClass.health <= 0
 
   return (
-    <Card className="relative flex min-h-0 w-full flex-1 flex-col gap-0">
+    <Card className={cn(panelChrome, 'relative flex min-h-0 w-full flex-1 flex-col gap-0')}>
       <CardHeader className="flex shrink-0 flex-row items-center justify-between pb-2">
         <CardTitle className="flex items-center gap-2 text-sm font-medium">
           <ScriptText className="h-4 w-4" />

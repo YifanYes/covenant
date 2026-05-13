@@ -1,4 +1,6 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
+import { cn } from '@/lib/cn.lib'
 import { Cancel as Close, Money } from 'pixelarticons/react'
 import type { ItemDefinition } from '@shared/constants/items'
 import Image from 'next/image'
@@ -19,7 +21,7 @@ export default function CartItem({ item, quantity, onRemove }: CartItemProps) {
 
   return (
     <StoreItemTooltip item={item}>
-      <div className="relative flex cursor-default items-center gap-2 rounded-md border-2 border-border p-2">
+      <div className={cn(panelChrome, 'relative flex cursor-default items-center gap-2 p-2')}>
         <button
           onClick={onRemove}
           className="bg-card border-destructive absolute -top-2 -right-2 z-20 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full border"

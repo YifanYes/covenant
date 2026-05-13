@@ -1,5 +1,6 @@
 'use client'
 import LoaderButton from '@/common/loader-button.component'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import Button from '@/ui/button.component'
 import { cn } from '@/lib/cn.lib'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
@@ -79,7 +80,7 @@ export default function InviteLinkCard({ guildId }: InviteLinkCardProps) {
     : null
 
   return (
-    <div className="rounded-xl border bg-card/40 p-5 space-y-4">
+    <div className={cn(panelChrome, 'p-5 space-y-4')}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-title text-base">{t('guilds.invite.title')}</h3>

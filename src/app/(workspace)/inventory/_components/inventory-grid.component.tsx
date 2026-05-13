@@ -1,4 +1,6 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
+import { cn } from '@/lib/cn.lib'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { Users as Group } from 'pixelarticons/react'
 import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
@@ -95,7 +97,7 @@ export default function InventoryGrid({
   }, [character?.inventory, character?.loadout, tierFilter, typeFilter])
 
   return (
-    <Card className="flex h-fit w-full flex-1 flex-col gap-0">
+    <Card className={cn(panelChrome, 'flex h-fit w-full flex-1 flex-col gap-0')}>
       <CardHeader className="flex shrink-0 flex-row items-center justify-between pb-2">
         <CardTitle className="flex items-center gap-2 text-sm font-medium">
           <Group className="h-4 w-4" />

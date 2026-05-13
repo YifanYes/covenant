@@ -1,4 +1,6 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
+import { cn } from '@/lib/cn.lib'
 import Card, { CardContent } from '@/ui/card.component'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
 import Image from 'next/image'
@@ -13,7 +15,7 @@ export default function CharacterPreview({ character }: CharacterPreviewProps) {
   const { t } = useTranslation()
 
   return (
-    <Card className="flex min-h-0 w-full flex-1 flex-col gap-0">
+    <Card className={cn(panelChrome, 'flex min-h-0 w-full flex-1 flex-col gap-0')}>
       <CardContent className="flex h-full flex-col items-center justify-center p-6">
         <div className="relative flex h-56 w-56 items-center justify-center">
           <Image

@@ -1,7 +1,7 @@
 'use client'
 import HealthBar from '@/components/combat/health-bar.component'
 import ManaBar from '@/components/combat/mana-bar.component'
-import { panelChrome } from '@/components/combat/combat-styles'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import { EnemyType, getEnemy } from '@shared/constants/enemies'
 import type { EnemyState } from '@shared/types/gamification.types'

@@ -1,4 +1,5 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import { Progress } from '@/components/ui/progress.component'
 import { cn } from '@/lib/cn.lib'
 import { trpcOptions } from '@/utils/trpc.utils'
@@ -12,7 +13,7 @@ export default function TierProgressCard() {
 
   if (isLoading) {
     return (
-      <div className="border-border bg-muted/30 animate-pulse rounded-lg border p-4">
+      <div className={cn(panelChrome, 'animate-pulse p-4')}>
         <div className="bg-muted h-6 w-32 rounded" />
         <div className="bg-muted mt-4 h-4 w-full rounded-full" />
       </div>
@@ -25,7 +26,7 @@ export default function TierProgressCard() {
   const isMaxTier = !progress
 
   return (
-    <div className="border-border bg-muted/30 rounded-lg border p-4">
+    <div className={cn(panelChrome, 'p-4')}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Trophy className="h-5 w-5 text-yellow-500" />

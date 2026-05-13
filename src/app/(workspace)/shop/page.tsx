@@ -1,5 +1,7 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import OnboardingRedirect from '@/components/shared/onboarding-redirect'
+import { cn } from '@/lib/cn.lib'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import type { ItemDefinition } from '@shared/constants/items'
@@ -125,7 +127,7 @@ function StoreContent() {
   return (
     <div className="flex h-[calc(100dvh-3rem)] w-full gap-6 overflow-hidden pr-4">
       {/* Left Panel - Store Items */}
-      <Card className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden py-4">
+      <Card className={cn(panelChrome, 'flex min-h-0 flex-1 flex-col gap-4 overflow-hidden py-4')}>
         <CardHeader className="shrink-0">
           <CardTitle>
             <StoreFilters

@@ -2,7 +2,7 @@
 import TierBadge from '@/common/tier-badge.component'
 import HealthBar from '@/components/combat/health-bar.component'
 import ManaBar from '@/components/combat/mana-bar.component'
-import { panelChrome } from '@/components/combat/combat-styles'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import { Battery, Heart } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'

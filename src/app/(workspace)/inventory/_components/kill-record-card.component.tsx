@@ -1,4 +1,5 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import { EnemyType, getEnemy } from '@shared/constants/enemies'
 import dayjs from 'dayjs'
@@ -59,7 +60,8 @@ export default function KillRecordCard({ enemy, onClick }: KillRecordCardProps) 
     <button
       onClick={onClick}
       className={cn(
-        'border-border flex w-full cursor-pointer gap-3 overflow-hidden rounded-lg border p-3 text-left transition-all',
+        panelChrome,
+        'flex w-full cursor-pointer gap-3 overflow-hidden p-3 text-left transition-all',
         'hover:bg-muted/50 focus:ring-1 focus:ring-emerald-500/30 focus:outline-none'
       )}
     >

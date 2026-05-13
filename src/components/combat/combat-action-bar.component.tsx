@@ -1,5 +1,5 @@
 'use client'
-import { panelChrome } from '@/components/combat/combat-styles'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import Button from '@/ui/button.component'
 import { BASIC_STRIKE_ID, ABILITIES } from '@shared/constants/abilities'

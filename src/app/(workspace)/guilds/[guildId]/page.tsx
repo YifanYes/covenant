@@ -1,5 +1,7 @@
 'use client'
 import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
+import { panelChrome } from '@/components/rpg/rpg-styles'
+import { cn } from '@/lib/cn.lib'
 import { Badge } from '@/ui/badge.component'
 import Button from '@/ui/button.component'
 import DropdownMenu, {
@@ -57,7 +59,7 @@ export default function GuildDetailPage() {
   if (guildQuery.isLoading) {
     return (
       <div className="min-h-screen w-full p-6 max-w-5xl mx-auto space-y-6">
-        <div className="rounded-xl border bg-card p-6 animate-pulse">
+        <div className={cn(panelChrome, 'p-6 animate-pulse')}>
           <div className="flex items-start gap-5">
             <div className="h-16 w-16 rounded-xl bg-muted/30" />
             <div className="flex-1 space-y-2">
@@ -94,7 +96,7 @@ export default function GuildDetailPage() {
   return (
     <div className="min-h-screen w-full p-4 max-w-5xl mx-auto space-y-3">
       <Tabs defaultValue="forum">
-        <header className="rounded-xl border bg-card px-4 py-3">
+        <header className={cn(panelChrome, 'px-4 py-3')}>
           <div className="flex items-center gap-3">
             <div
               aria-hidden

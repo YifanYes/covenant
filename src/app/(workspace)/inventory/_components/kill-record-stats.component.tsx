@@ -1,4 +1,5 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import { Target as Bullseye, Heart, Shield, Trophy } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
@@ -49,7 +50,7 @@ export default function KillRecordStats({ stats }: KillRecordStatsProps) {
         return (
           <div
             key={stat.label}
-            className="border-border bg-muted/30 flex flex-col items-center gap-2 rounded-lg border p-3"
+            className={cn(panelChrome, 'flex flex-col items-center gap-2 p-3')}
           >
             <Icon className={cn('h-6 w-6', stat.color)} />
             <span className="text-xl font-bold">{stat.value.toLocaleString()}</span>

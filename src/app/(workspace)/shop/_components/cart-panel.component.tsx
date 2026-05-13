@@ -1,5 +1,7 @@
 'use client'
 import LoaderButton from '@/common/loader-button.component'
+import { panelChrome } from '@/components/rpg/rpg-styles'
+import { cn } from '@/lib/cn.lib'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import ScrollArea from '@/ui/scroll-area.component'
 import Separator from '@/ui/separator.component'
@@ -33,7 +35,7 @@ export default function CartPanel({
   const canBuy = !isEmpty && total <= maxGold
 
   return (
-    <Card className="flex w-80 shrink-0 flex-col gap-2 overflow-hidden">
+    <Card className={cn(panelChrome, 'flex w-80 shrink-0 flex-col gap-2 overflow-hidden')}>
       <CardHeader className="shrink-0">
         <CardTitle className="flex items-center gap-2">
           <Cart className="h-5 w-5" />

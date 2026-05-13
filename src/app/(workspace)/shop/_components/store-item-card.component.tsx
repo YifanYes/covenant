@@ -1,4 +1,5 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import Button from '@/ui/button.component'
 import { ShoppingCart as Cart, Minus, Money, Plus } from 'pixelarticons/react'
@@ -54,15 +55,15 @@ export default function StoreItemCard({
     <StoreItemTooltip item={item} isTierRestricted={isTierRestricted} characterTier={characterTier}>
       <div
         className={cn(
-          'relative flex items-center gap-3 rounded-md border-2 p-3 text-left transition-all',
-          'border-border',
+          panelChrome,
+          'relative flex items-center gap-3 p-3 text-left transition-all',
           isSelected && 'border-primary',
           isDisabled && 'cursor-not-allowed opacity-40',
           !isDisabled && !isSelected && 'hover:bg-primary/20 hover:border-primary/20'
         )}
       >
         {isSelected && !isConsumable && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-black/50">
             <Cart className="text-primary h-10 w-10" />
           </div>
         )}

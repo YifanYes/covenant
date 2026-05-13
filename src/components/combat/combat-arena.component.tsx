@@ -1,6 +1,6 @@
 'use client'
 import CombatActionBar from '@/components/combat/combat-action-bar.component'
-import { panelChrome } from '@/components/combat/combat-styles'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import EnemyInfo from '@/components/combat/enemy-info.component'
 import EnemySprite from '@/components/combat/enemy-sprite.component'
 import PlayerInfo from '@/components/combat/player-info.component'

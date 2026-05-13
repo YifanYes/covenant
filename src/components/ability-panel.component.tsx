@@ -1,4 +1,5 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import Button from '@/components/ui/button.component'
 import { cn } from '@/lib/cn.lib'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
@@ -139,7 +140,8 @@ export default function AbilityPanel({
       <div
         key={ability.id}
         className={cn(
-          'flex min-w-0 items-start gap-3 rounded-lg border p-3 transition-all',
+          panelChrome,
+          'flex min-w-0 items-start gap-3 p-3 transition-all',
           ability.isUltimate && 'border-amber-500/50'
         )}
       >
@@ -230,7 +232,7 @@ export default function AbilityPanel({
     }
 
     return (
-      <div className={cn('rounded-lg border p-4', className)}>
+      <div className={cn(panelChrome, 'p-4', className)}>
         <div className="mb-2 text-sm font-medium tracking-wider text-purple-500/80 uppercase">
           {t('abilities.title')}
         </div>
@@ -247,7 +249,7 @@ export default function AbilityPanel({
   return (
     <div className={cn('space-y-4', className)}>
       {/* Equipped Abilities */}
-      <div className="rounded-lg border p-4">
+      <div className={cn(panelChrome, 'p-4')}>
         <div className="mb-3 flex items-center justify-between">
           <h3 className="font-semibold">{t('abilities.equipped')}</h3>
           <span className="text-muted-foreground text-sm">{equippedAbilities.length}/2</span>
@@ -260,7 +262,7 @@ export default function AbilityPanel({
       </div>
 
       {/* Available Abilities */}
-      <div className="rounded-lg border p-4">
+      <div className={cn(panelChrome, 'p-4')}>
         <h3 className="mb-3 font-semibold">{t('abilities.available')}</h3>
         {availableAbilities.length === 0 ? (
           <p className="text-muted-foreground text-sm">{t('abilities.no_abilities')}</p>

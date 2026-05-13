@@ -1,5 +1,6 @@
 'use client'
 import LoaderButton from '@/common/loader-button.component'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import Textarea from '@/ui/textarea.component'
 import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/tooltip.component'
 import { cn } from '@/lib/cn.lib'
@@ -125,7 +126,7 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
 
   return (
     <div className="flex flex-col gap-2 h-[calc(100vh-160px)] min-h-[480px]">
-      <div className="flex-1 overflow-y-auto rounded-xl border bg-card/40 p-4">
+      <div className={cn(panelChrome, 'flex-1 overflow-y-auto p-4')}>
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
             <MessageText className="h-10 w-10 text-muted-foreground/50" />
@@ -208,7 +209,7 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-xl border bg-card/40 p-2 focus-within:border-accent/50 transition"
+        className={cn(panelChrome, 'p-2 focus-within:border-accent/50 transition')}
       >
         <Textarea
           value={content}

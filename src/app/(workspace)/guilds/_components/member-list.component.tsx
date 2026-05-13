@@ -1,4 +1,5 @@
 'use client'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import { Badge } from '@/ui/badge.component'
 import Button from '@/ui/button.component'
 import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
@@ -103,7 +104,7 @@ export default function MemberList({ guildId, members, myUserId, myRole }: Membe
   }
 
   return (
-    <ul className="divide-y rounded-xl border bg-card/40 overflow-hidden">
+    <ul className={cn(panelChrome, 'divide-y overflow-hidden')}>
       {sorted.map((member) => {
         const isMe = member.userId === myUserId
         const isOwner = member.role === GuildRole.OWNER

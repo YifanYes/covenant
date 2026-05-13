@@ -100,6 +100,24 @@
 
 Deferred until the core loop has been validated with real beta users. Specs for some of these already exist (Journaling at `docs/specs/journaling.md`); the rest are real ideas, just wrong-time.
 
+- [ ] Combat redesign Phase 3 — "doesn't feel gamy" polish pass `[loop]`. Tester feedback that combat "doesn't feel gamy" is not a mechanics problem (dice were swapped out in 2A) but a vibes problem. Bundle of:
+  - Combat animation polish — sprite movement, hit reactions, attack/cast windups, screen shake on crit.
+  - Sound design — music loops per tier, ability cast SFX, hit/crit/defeat stingers, UI clicks. None exist today.
+  - Lore/world touchpoints — flavor text on quest scene transitions, enemy bestiary entries, ambient story beats outside combat.
+  - Character progression visibility outside combat — tier-up moments, stat-change reveals, equipment-on-character render (overlaps with "Render character with equipped items" loop item).
+  - Retro/16-bit aesthetic consistency — push past `panelChrome` Tailwind shim toward real NES.css `nes-container`/`nes-btn`, or pick a different consistent pixel-art system. Requires replacing shadcn `Card`/`Dialog`/`Button` primitives on RPG views.
+  - Herald-flavored heal Ability — deferred from beta combat catalog; revisit if users request a healing class option.
+
+- [ ] Combat redesign — post-beta cleanup `[debt]`. Deferred items surfaced during Phase 2 implementation, not load-bearing for beta:
+  - Tier 4 abilities for Inquisitor + Demon Hunter classes (both classes out of beta scope; no T4 abilities defined for any class).
+  - Empirical balance data — current tuning backed only by fight-count tests, not playtest data. Run 10× T1/T2/T3 parity fights and log average duration; flag stat axes outside 3–5 turn band.
+  - `ManaService.scrubManaPotions` auto-invocation — runtime scrub exists but is uncalled. Wire into `CharacterService.getCurrentClass` or one-off deploy script before any real user has `mana_potion` rows.
+  - Non-catalog ability i18n + ES item flavor — `blinding_faith` / `disruption_storm` / `fireball` / `fragility_curse` / `lightning_burst` / `righteous_charge` / `templar_burst` / `temporal_prison` / `igneous_cut` / `shield_bash` still contain "dice" copy; ES item flavor at `es/translation.json:1383/1399/1427/1467` still mentions "dado". No live consumer, but stale.
+  - AI selection unit test — Phase 2B asserts outcomes (mana drains, fallback fires) not ordering (cost-tier sort, HP-low filter). Add focused test for `executeEnemyMove` selection algorithm.
+  - `CombatLogType` enum prune — legacy variants (`PLAYER_HITS` / `ENEMY_DEFENDS` / `PLAYER_DEFENDS` / `MANA_REGEN` / `PHASE_COMPLETE` / `STATUS_EXPIRED`) no longer have emitters but UI consumers reference them. Prune when combat-log UI gets its own pass.
+  - `AbilityEffectType` enum semantics rename — Phase 2A reuses old enum members with new meanings (`POWER_MODIFIER` now `+N% ATK`, `THRESHOLD_MODIFIER` now `+N% DEF`, `NEGATE_HITS` now Protect/thorns, etc.). Rename to match Pokémon-formula vocabulary when test churn is cheap.
+  - `EnemyTemplate.manaRegen` field removal — hardcoded `0` on every enemy after Phase 2A locked "no regen". Still consumed by `inventory/character-status.component.tsx`. Drop field + UI reference together.
+
 - [ ] Conversation-type quests — dialog with branching choices and outcomes
 - [ ] Post-its board / Kanban card view in productivity section
 - [ ] AI report of the month — monthly AI-generated summary of productivity, streaks, objective progress
