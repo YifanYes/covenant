@@ -1,5 +1,4 @@
 **/node_modules/
-**/bruno/ARQ/environments
 .DS_Store
 
 # Next.js
@@ -21,3 +20,7 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Local AI tooling overrides
+.claude/settings.local.json
+

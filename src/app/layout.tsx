@@ -1,4 +1,5 @@
 import { SentryProvider } from '@/components/common/sentry-provider.component'
+import SourceLink from '@/components/common/source-link.component'
 import ThemeProvider, { Theme } from '@/components/common/theme-provider.component'
 import Toaster from '@/components/ui/toaster.component'
 import { Faction } from '@shared/constants/factions'
@@ -71,6 +72,7 @@ export default async function RootLayout({
               <ThemeProvider initialTheme={theme as Theme} initialFaction={faction as Faction}>
                 <Toaster />
                 {children}
+                <SourceLink />
               </ThemeProvider>
             </TRPCProvider>
           </SentryProvider>

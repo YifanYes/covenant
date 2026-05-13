@@ -2010,29 +2010,6 @@
     },
     "tiles": "tiles"
   },
-  "card": {
-    "denis": {
-      "name": "Denis Gudina",
-      "quote": "Deuteronomy 20, 1-4"
-    },
-    "links": {
-      "app": "Covenant - Gamified Productivity",
-      "email": "Email",
-      "x": "X",
-      "github": "GitHub",
-      "linkedin": "LinkedIn"
-    },
-    "actions": {
-      "show_qr": "Show QR Code",
-      "share": "Share Card",
-      "copied": "Link copied to clipboard"
-    },
-    "project": "Covenant",
-    "yifan": {
-      "name": "Yifan Ye",
-      "quote": "Ephesians 6, 10-17"
-    }
-  },
   "quests": {
     "title": "Quests",
     "subtitle": "Choose your mission. Every victory shapes the war.",

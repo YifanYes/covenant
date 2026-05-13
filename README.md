@@ -60,7 +60,6 @@ covenant/
 │   │   ├── (auth)/             # Onboarding, login, sign-up
 │   │   ├── (workspace)/        # Main app pages (dashboard, tasks, habits, etc.)
 │   │   ├── (landing)/          # Marketing pages (story, mechanics, roadmap, news)
-│   │   ├── (card)/             # Character card pages
 │   │   ├── api/                # API routes (tRPC, Better Auth, health, logs)
 │   │   ├── _layouts/           # Layout components (RPGLayout, ProductivityLayout)
 │   │   └── providers/          # Context providers
@@ -92,7 +91,6 @@ covenant/
 │   ├── lore/                   # Game lore, worldbuilding, mechanics
 │   └── product/                # Product and infrastructure docs
 ├── mission.md                  # Project mission and pillars
-├── roadmap.md                  # Project timeline and phases
 ├── DESIGN.md                   # Visual identity, faction palettes, UI principles
 ├── CLAUDE.md                   # Detailed architecture and conventions
 └── AGENTS.md                   # Compact instructions for AI agents
@@ -308,7 +306,6 @@ Key variables (see `.env.example` for full list):
 | `CLAUDE.md`     | Points to AGENTS.md                              |
 | `DESIGN.md`     | Visual identity, faction palettes, UI principles |
 | `mission.md`    | Project mission and pillars                      |
-| `roadmap.md`    | Project timeline and phases                      |
 | `docs/specs/`   | Technical specifications (SDD)                   |
 | `docs/lore/`    | Game lore, worldbuilding, mechanics              |
 | `docs/product/` | Product and infrastructure docs                  |

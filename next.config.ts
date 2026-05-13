@@ -19,6 +19,11 @@ const securityHeaders = [
   }
 ]
 
+// Surface the deployed commit SHA to the client bundle so the AGPL §13 source
+// link can point at the exact running revision. Railway exposes
+// `RAILWAY_GIT_COMMIT_SHA`; other hosts can set `NEXT_PUBLIC_COMMIT_SHA` directly.
+process.env.NEXT_PUBLIC_COMMIT_SHA ??= process.env.RAILWAY_GIT_COMMIT_SHA ?? ''
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ['pg', 'pino', 'pino-pretty', 'node-cron'],
@@ -41,7 +46,13 @@ export default withSentryConfig(withMDX(nextConfig), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
-  org: process.env.SENTRY_ORG || 'covenant-06',
+  org:
+    process.env.SENTRY_ORG ??
+    (process.env.NODE_ENV === 'production'
+      ? (() => {
+          throw new Error('SENTRY_ORG required in production')
+        })()
+      : undefined),
 
   project: process.env.SENTRY_PROJECT || 'javascript-nextjs',
 

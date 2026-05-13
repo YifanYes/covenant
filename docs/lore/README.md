@@ -16,8 +16,7 @@ lore/
 │   ├── Inversiones.md         # Inversiones colectivas de jugadores
 │   ├── Mecanicas.md           # Mecánicas generales del juego de mesa
 │   ├── Tecnologia.md          # Sistema tecnológico
-│   ├── Titulos.md             # Sistema de títulos y rangos
-│   └── Yifan.md               # Personaje de prueba
+│   └── Titulos.md             # Sistema de títulos y rangos
 │
 ├── Personajes/
 │   ├── Angeles.md             # Arcángeles y jerarquías celestiales

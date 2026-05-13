@@ -2010,29 +2010,6 @@
     },
     "tiles": "casillas"
   },
-  "card": {
-    "denis": {
-      "name": "Denis Gudiña",
-      "quote": "Deuteronomio 20, 1-4"
-    },
-    "links": {
-      "app": "Covenant - Productividad Gamificada",
-      "email": "Email",
-      "x": "X",
-      "github": "GitHub",
-      "linkedin": "LinkedIn"
-    },
-    "actions": {
-      "show_qr": "Mostrar Codigo QR",
-      "share": "Compartir Tarjeta",
-      "copied": "Enlace copiado al portapapeles"
-    },
-    "project": "Covenant",
-    "yifan": {
-      "name": "Yifan Ye",
-      "quote": "Efesios 6, 10-17"
-    }
-  },
   "quests": {
     "title": "Misiones",
     "subtitle": "Elige tu misión. Cada victoria da forma a la guerra.",
