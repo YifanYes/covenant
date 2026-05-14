@@ -45,6 +45,12 @@
 
 - [ ] Guild system Phase 3 — exclusive rewards + progression bonuses `[retention]`. Guild-only items (`Item.guildExclusive` flag), guild-tier progression with member XP/gold modifiers. Touches store + character services. Defer until Phase 1+2 retention signal validated with beta cohort.
 
+- [ ] Guild system Phase 4 — community lore + roleplay surfaces `[retention]`. Player-authored creative layer on top of guild infra. Habit-tracker-with-RPG-skin product benefits especially: lore reframes chores as quests and is stickier than leaderboards (lore decay slow, leaderboards reset weekly). Stage to keep moderation surface bounded.
+  - **Identity layer (ship-first)** — guild lore field (rich text, ~5000 char), officer-set `GuildMember.title` ("Quartermaster", "Scout"), guild emblem/banner from preset list. Pair with custom campaign names from parametric-campaigns proposal. Officer-gated, length-capped, soft-delete on report. Schema: extend `Guild` (`lore Text?`, `emblem String?`) + add `GuildMember.title`. No economy exposure, reversible by clearing field. ~2–3 days.
+  - **Interactive RP layer (defer further)** — player-authored quests/encounters/NPC dialogue, free-form avatar uploads, RP-mode chat channel separate from forum. Blocked on moderation pipeline (no infra today for NSFW/harassment review) and on identity-layer retention signal.
+  - Risks: T&S burden on solo maintainer, localization (user text doesn't translate — accept per-guild), empty-shell problem if guild critical mass missing — solve discovery/capacity first.
+  - **Defer until** Phase 3 ships and beta cohort shows lore-field engagement signal.
+
 - [ ] PostHog integration — absorbs feature flags + analytics `[loop]`
   - Single tool for product analytics + session replay + feature flags. Replaces three previously-separate items: standalone "feature flag" infra, roadmap _"Analytics implemented (GA + Mixpanel)"_, roadmap _"UTM parameters definidos por canal"_.
   - **Fix:** Add `posthog-js` (client) + `posthog-node` (server). Capture pageviews and key events (task completion, combat start/end, quest claim). Wire feature flags via `posthog.isFeatureEnabled()`. Capture UTM on landing.
@@ -105,6 +111,10 @@
 
 - [ ] Empty states for remaining views `[loop]`
   - Already shipped for habits/tasks/objectives. Still missing: shop filtered results (no matches), inventory Armory + Abilities tabs.
+
+- [ ] User-defined task statuses `[retention]`
+  - Tasks currently use fixed statuses (TODO/IN_PROGRESS/DONE or equivalent). Allow users to create, rename, reorder, and delete custom statuses per workspace or globally. Enables personal workflows (e.g. "Waiting", "Blocked", "In Review") without forcing the default three-state model.
+  - Schema: new `TaskStatus` entity (id, userId, label, color, position, isDefault); migrate existing `Task.status` enum column to FK. Guard: at least one status must remain; deletion re-assigns tasks to a chosen fallback.
 
 - [ ] Accessibility in combat `[loop]`
   - Combat grid sprites are styled `div`s with no `role="img"`, `aria-label`, or alt text. No keyboard navigation for tactical grid. ~30 aria attributes across 78 components (~38% coverage).

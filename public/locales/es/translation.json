@@ -1133,19 +1133,23 @@
       "templates": {
         "KILL_RAMPAGE": {
           "name": "Furia de los Fieles",
-          "description": "Aniquilad enemigos juntos. El acero afila al acero."
+          "description": "Aniquilad enemigos juntos. El acero afila al acero.",
+          "objective": "Derrotad {{count}} enemigos entre todos los miembros del gremio."
         },
         "HABIT_CRUSADE": {
           "name": "Cruzada Diaria",
-          "description": "Acumulad hábitos completados. La disciplina contagia."
+          "description": "Acumulad hábitos completados. La disciplina contagia.",
+          "objective": "Completad {{count}} hábitos entre todos los miembros del gremio."
         },
         "TASK_SWEEP": {
           "name": "Barrida de Tareas",
-          "description": "Cerrad tareas como gremio. La lista es el enemigo."
+          "description": "Cerrad tareas como gremio. La lista es el enemigo.",
+          "objective": "Cerrad {{count}} tareas entre todos los miembros del gremio."
         },
         "GOLD_RUSH": {
           "name": "Fiebre del Oro",
-          "description": "Saquead más oro de los caídos. La fortuna favorece a los valientes."
+          "description": "Saquead más oro de los caídos. La fortuna favorece a los valientes.",
+          "objective": "Saquead {{count}} de oro entre todos los miembros del gremio."
         }
       },
       "target": "Objetivo: {{count}}",

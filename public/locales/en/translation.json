@@ -1133,19 +1133,23 @@
       "templates": {
         "KILL_RAMPAGE": {
           "name": "Rampage of the Faithful",
-          "description": "Slay enemies together. Steel sharpens steel."
+          "description": "Slay enemies together. Steel sharpens steel.",
+          "objective": "Defeat {{count}} enemies across all guild members."
         },
         "HABIT_CRUSADE": {
           "name": "Daily Crusade",
-          "description": "Stack habit completions. Discipline is contagious."
+          "description": "Stack habit completions. Discipline is contagious.",
+          "objective": "Complete {{count}} habits across all guild members."
         },
         "TASK_SWEEP": {
           "name": "Task Sweep",
-          "description": "Close out tasks as a guild. The list is the enemy."
+          "description": "Close out tasks as a guild. The list is the enemy.",
+          "objective": "Close {{count}} tasks across all guild members."
         },
         "GOLD_RUSH": {
           "name": "Gold Rush",
-          "description": "Loot more gold from foes. Riches favor the bold."
+          "description": "Loot more gold from foes. Riches favor the bold.",
+          "objective": "Loot {{count}} gold across all guild members."
         }
       },
       "target": "Target: {{count}}",

@@ -18,6 +18,7 @@ export interface CampaignTemplate {
   id: string
   nameKey: string
   descriptionKey: string
+  objectiveKey: string
   eventType: CampaignEventType
   defaultTarget: number
   durationDays: number
@@ -29,6 +30,7 @@ export const CAMPAIGN_TEMPLATES: readonly CampaignTemplate[] = [
     id: 'KILL_RAMPAGE',
     nameKey: 'guilds.campaigns.templates.KILL_RAMPAGE.name',
     descriptionKey: 'guilds.campaigns.templates.KILL_RAMPAGE.description',
+    objectiveKey: 'guilds.campaigns.templates.KILL_RAMPAGE.objective',
     eventType: CAMPAIGN_EVENT_TYPE.ENEMY_KILL,
     defaultTarget: 100,
     durationDays: 7,
@@ -38,6 +40,7 @@ export const CAMPAIGN_TEMPLATES: readonly CampaignTemplate[] = [
     id: 'HABIT_CRUSADE',
     nameKey: 'guilds.campaigns.templates.HABIT_CRUSADE.name',
     descriptionKey: 'guilds.campaigns.templates.HABIT_CRUSADE.description',
+    objectiveKey: 'guilds.campaigns.templates.HABIT_CRUSADE.objective',
     eventType: CAMPAIGN_EVENT_TYPE.HABIT_COMPLETION,
     defaultTarget: 50,
     durationDays: 7,
@@ -47,6 +50,7 @@ export const CAMPAIGN_TEMPLATES: readonly CampaignTemplate[] = [
     id: 'TASK_SWEEP',
     nameKey: 'guilds.campaigns.templates.TASK_SWEEP.name',
     descriptionKey: 'guilds.campaigns.templates.TASK_SWEEP.description',
+    objectiveKey: 'guilds.campaigns.templates.TASK_SWEEP.objective',
     eventType: CAMPAIGN_EVENT_TYPE.TASK_COMPLETION,
     defaultTarget: 75,
     durationDays: 7,
@@ -56,6 +60,7 @@ export const CAMPAIGN_TEMPLATES: readonly CampaignTemplate[] = [
     id: 'GOLD_RUSH',
     nameKey: 'guilds.campaigns.templates.GOLD_RUSH.name',
     descriptionKey: 'guilds.campaigns.templates.GOLD_RUSH.description',
+    objectiveKey: 'guilds.campaigns.templates.GOLD_RUSH.objective',
     eventType: CAMPAIGN_EVENT_TYPE.GOLD_EARNED,
     defaultTarget: 2000,
     durationDays: 7,

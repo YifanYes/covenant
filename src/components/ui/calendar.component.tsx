@@ -128,6 +128,7 @@ function CalendarDayButton({ className, day, modifiers, ...props }: React.Compon
   }, [modifiers.focused])
 
   const isSelected = modifiers.selected && !modifiers.range_start && !modifiers.range_end && !modifiers.range_middle
+  const isToday = modifiers.today
 
   return (
     <button
@@ -138,6 +139,7 @@ function CalendarDayButton({ className, day, modifiers, ...props }: React.Compon
         isSelected
           ? 'bg-primary/10 text-primary ring-primary/20 ring-2 ring-inset hover:bg-transparent hover:ring-0'
           : 'text-foreground hover:bg-primary/10 hover:text-primary',
+        isToday && !isSelected && 'rounded-full! text-primary ring-primary/40 ring-1 ring-inset font-semibold',
         className
       )}
       {...props}

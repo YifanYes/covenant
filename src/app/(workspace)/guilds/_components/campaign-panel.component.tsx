@@ -1,4 +1,5 @@
 'use client'
+
 import LoaderButton from '@/common/loader-button.component'
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
@@ -39,18 +40,22 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
     refetchInterval: 7000,
     refetchIntervalInBackground: false
   })
+
   const historyQuery = useQuery(trpcOptions.guilds.getCampaignHistory.queryOptions({ guildId }))
 
   const claimMutation = useMutation(
     trpcOptions.guilds.claimCampaignReward.mutationOptions({
       onSuccess: async (result) => {
         toast.success(t('guilds.campaigns.success.claim', { gold: result.goldClaimed }))
+
         await queryClient.invalidateQueries({
           queryKey: trpcOptions.guilds.getCurrentCampaign.queryKey({ guildId })
         })
+
         await queryClient.invalidateQueries({
           queryKey: trpcOptions.guilds.getCampaignHistory.queryKey({ guildId })
         })
+
         await queryClient.invalidateQueries({ queryKey: trpcOptions.character.get.queryKey() })
       },
       onError: (error) => toast.error(t('guilds.campaigns.error.claim'), { description: error.message })
@@ -78,10 +83,8 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
           <div className="flex items-start gap-3">
             <Flag className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-title text-base">{t('guilds.campaigns.empty.title')}</h3>
-              <p className="text-muted-foreground text-xs mt-0.5 max-w-md">
-                {t('guilds.campaigns.empty.description')}
-              </p>
+              <h3 className="font-title text-lg">{t('guilds.campaigns.empty.title')}</h3>
+              <p className="text-muted-foreground text-sm mt-1 max-w-md">{t('guilds.campaigns.empty.description')}</p>
             </div>
           </div>
           {canManage && <StartCampaignDialog guildId={guildId} />}
@@ -96,11 +99,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
   const isCompleted = campaign.completedAt != null
   const isExpired = campaign.isExpired && !isCompleted
   const myContribution = campaign.myContribution
-  const canClaim =
-    isCompleted &&
-    myContribution > 0 &&
-    !campaign.myClaimedAt &&
-    campaign.myShare > 0
+  const canClaim = isCompleted && myContribution > 0 && !campaign.myClaimedAt && campaign.myShare > 0
 
   return (
     <div className={cn(panelChrome, 'p-5 space-y-4')}>
@@ -109,9 +108,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
           <Flag className={cn('h-5 w-5 shrink-0 mt-0.5', isCompleted ? 'text-emerald-400' : 'text-accent')} />
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-title text-base truncate">
-                {template ? t(template.nameKey) : campaign.templateId}
-              </h3>
+              <h3 className="font-title text-lg truncate">{template ? t(template.nameKey) : campaign.templateId}</h3>
               {isCompleted && (
                 <Badge variant="default" className="gap-1">
                   <Trophy className="h-3 w-3" />
@@ -124,10 +121,10 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
                 </Badge>
               )}
             </div>
-            <p className="text-muted-foreground text-xs mt-0.5">
-              {template ? t(template.descriptionKey) : null}
-            </p>
-            <p className="text-muted-foreground text-[11px] mt-1">
+            {template && (
+              <p className="text-lg text-foreground mt-1">{t(template.objectiveKey, { count: campaign.target })}</p>
+            )}
+            <p className="text-muted-foreground text-base">
               {isCompleted
                 ? t('guilds.campaigns.contributors', { count: campaign.contributorCount ?? 0 })
                 : formatRemaining(new Date(campaign.expiresAt), t)}
@@ -151,13 +148,11 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
       </div>
 
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span className="tabular-nums">
             {campaign.progress} / {campaign.target}
           </span>
-          <span className="tabular-nums">
-            {t('guilds.campaigns.reward_gold', { gold: campaign.rewardPool.gold })}
-          </span>
+          <span className="tabular-nums">{t('guilds.campaigns.reward_gold', { gold: campaign.rewardPool.gold })}</span>
         </div>
         <Progress value={pct} className="h-2" />
       </div>
@@ -176,7 +171,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
                 <li
                   key={entry.userId}
                   className={cn(
-                    'flex items-center justify-between gap-3 px-2 py-1 rounded text-xs',
+                    'flex items-center justify-between gap-3 px-2 py-1 rounded text-sm',
                     isMe && 'bg-accent/10'
                   )}
                 >
@@ -196,7 +191,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
       )}
 
       {!isCompleted && myContribution === 0 && (
-        <p className="text-[11px] text-muted-foreground">{t('guilds.campaigns.no_contribution')}</p>
+        <p className="text-xs text-muted-foreground">{t('guilds.campaigns.no_contribution')}</p>
       )}
 
       {isCompleted && canManage && (
@@ -218,13 +213,7 @@ interface CampaignHistoryItem {
   completedAt: Date | string | null
 }
 
-function HistoryList({
-  history,
-  t
-}: {
-  history: CampaignHistoryItem[]
-  t: ReturnType<typeof useTranslation>['t']
-}) {
+function HistoryList({ history, t }: { history: CampaignHistoryItem[]; t: ReturnType<typeof useTranslation>['t'] }) {
   return (
     <div className="border-t pt-3 space-y-1.5">
       <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">

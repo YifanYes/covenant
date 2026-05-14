@@ -10,23 +10,23 @@ This document covers both the frontend and backend architecture for Covenant.
 
 ## Stack
 
-| Layer | Tech | Version |
-|---|---|---|
-| **Framework** | Next.js App Router | 16.2.6 |
-| **Language** | TypeScript (strict) | 5.9.3 |
-| **UI Library** | React | 19.2.3 |
-| **Styling** | Tailwind CSS v4 | 4.x |
-| **UI Primitives** | Radix UI | 13 packages |
-| **Server State** | React Query | 5.90.20 |
-| **Client State** | Zustand | 5.0.10 |
-| **Forms** | react-hook-form + Zod | 7.71.1 / 4.3.6 |
-| **Routing** | Next.js App Router | built-in |
-| **API Client** | tRPC | 11.8.1 |
-| **i18n** | i18next | 25.8.0 |
-| **Animations** | Framer Motion | 12.34.3 |
-| **Charts** | Recharts | 3.7.0 |
-| **Date** | dayjs | 1.11.19 |
-| **Error Tracking** | Sentry | 10.52.0 |
+| Layer              | Tech                  | Version        |
+| ------------------ | --------------------- | -------------- |
+| **Framework**      | Next.js App Router    | 16.2.6         |
+| **Language**       | TypeScript (strict)   | 5.9.3          |
+| **UI Library**     | React                 | 19.2.3         |
+| **Styling**        | Tailwind CSS v4       | 4.x            |
+| **UI Primitives**  | Radix UI              | 13 packages    |
+| **Server State**   | React Query           | 5.90.20        |
+| **Client State**   | Zustand               | 5.0.10         |
+| **Forms**          | react-hook-form + Zod | 7.71.1 / 4.3.6 |
+| **Routing**        | Next.js App Router    | built-in       |
+| **API Client**     | tRPC                  | 11.8.1         |
+| **i18n**           | i18next               | 25.8.0         |
+| **Animations**     | Framer Motion         | 12.34.3        |
+| **Charts**         | Recharts              | 3.7.0          |
+| **Date**           | dayjs                 | 1.11.19        |
+| **Error Tracking** | Sentry                | 10.52.0        |
 
 ## Route Structure (App Router)
 
@@ -88,13 +88,13 @@ Page-local components live in `src/app/(workspace)/<page>/_components/`.
 
 ### Naming Conventions
 
-| Thing | Pattern | Example |
-|---|---|---|
-| File | `domain-name.component.tsx` | `enemy-card.component.tsx` |
-| Hook | `use-name.hook.ts` | `use-combat.hook.ts` |
-| Store | `name.store.ts` | `tutorial.store.ts` |
-| Schema | `name.schemas.ts` | `character.schemas.ts` |
-| Util | `name.utils.ts` | `query-invalidation.utils.ts` |
+| Thing  | Pattern                     | Example                       |
+| ------ | --------------------------- | ----------------------------- |
+| File   | `domain-name.component.tsx` | `enemy-card.component.tsx`    |
+| Hook   | `use-name.hook.ts`          | `use-combat.hook.ts`          |
+| Store  | `name.store.ts`             | `tutorial.store.ts`           |
+| Schema | `name.schemas.ts`           | `character.schemas.ts`        |
+| Util   | `name.utils.ts`             | `query-invalidation.utils.ts` |
 
 Exports: named exports (`export function ComponentName()`).
 
@@ -102,13 +102,13 @@ Exports: named exports (`export function ComponentName()`).
 
 5 stores in `src/stores/`:
 
-| Store | Persisted | Purpose |
-|---|---|---|
-| `auth.store.ts` | Yes (`covenant-store`) | email, userId, signOut |
-| `user-preferences.store.ts` | Yes | theme, locale |
-| `calendar.store.ts` | No | selected month/date |
-| `tasks.store.ts` | No | view filters/sorts |
-| `tutorial.store.ts` | No | tutorial step/state |
+| Store                       | Persisted              | Purpose                |
+| --------------------------- | ---------------------- | ---------------------- |
+| `auth.store.ts`             | Yes (`covenant-store`) | email, userId, signOut |
+| `user-preferences.store.ts` | Yes                    | theme, locale          |
+| `calendar.store.ts`         | No                     | selected month/date    |
+| `tasks.store.ts`            | No                     | view filters/sorts     |
+| `tutorial.store.ts`         | No                     | tutorial step/state    |
 
 ## API Integration
 
@@ -160,6 +160,7 @@ shared/
 ## SSR / SEO
 
 Next.js App Router gives per-route rendering control:
+
 - `(landing)/` — SSG, fully crawlable
 - `(workspace)/` — mostly CSR (game state), auth-gated
 - `(card)/[slug]` — SSR, public info pages
