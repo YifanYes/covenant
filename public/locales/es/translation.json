@@ -643,6 +643,16 @@
       "name": "Tormenta de Ruptura"
     },
     "empty_equipped": "No tienes habilidades equipadas",
+    "empty_state": {
+      "equipped": {
+        "title": "No tienes habilidades equipadas",
+        "description": "Equipa hasta 2 habilidades desde abajo para llevarlas a la batalla."
+      },
+      "available": {
+        "title": "No hay habilidades disponibles",
+        "description": "Desbloquea nuevas habilidades alcanzando tiers superiores."
+      }
+    },
     "entropic_acceleration": {
       "description": "Aplica Quemadura al objetivo durante 2 turnos.",
       "flavor": "El tiempo se acelera donde reina la entropía.",
@@ -1331,6 +1341,16 @@
       "“La luz de los cielos es cegadora, pero te guiará a través de la oscuridad...”"
     ],
     "empty": "No hay objetos en el inventario",
+    "empty_state": {
+      "empty": {
+        "title": "No hay objetos en el inventario",
+        "description": "Visita la Tienda para comprar armas, armaduras y consumibles."
+      },
+      "no_matches": {
+        "title": "Ningún objeto coincide con tus filtros",
+        "description": "Prueba con un tier o tipo distinto, o limpia todos los filtros."
+      }
+    },
     "equipment_slot": {
       "ACCESSORY": "Accesorio",
       "ARMOR": "Armadura",
@@ -1902,6 +1922,7 @@
     "filter": {
       "all_tiers": "Todos los Tiers",
       "all_types": "Todos los Tipos",
+      "clear": "Limpiar filtros",
       "tier": "Tier",
       "type": "Tipo"
     },
@@ -1914,6 +1935,16 @@
     },
     "items_purchased": "objetos comprados",
     "no_items": "No hay objetos disponibles",
+    "empty_state": {
+      "no_items": {
+        "title": "No hay objetos disponibles",
+        "description": "El puesto del mercader está vacío. Vuelve más tarde para nuevas mercancías."
+      },
+      "no_matches": {
+        "title": "Ningún objeto coincide con tus filtros",
+        "description": "Prueba con un tier o tipo distinto, o limpia todos los filtros."
+      }
+    },
     "random_rarity": "Rareza aleatoria",
     "success": {
       "buy": "¡Compra exitosa!"

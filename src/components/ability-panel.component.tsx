@@ -1,4 +1,5 @@
 'use client'
+import EmptyState from '@/components/empty-state.component'
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import Button from '@/components/ui/button.component'
 import { cn } from '@/lib/cn.lib'
@@ -246,6 +247,8 @@ export default function AbilityPanel({
   }
 
   // For inventory: show all available abilities with equip controls
+  const unequippedAvailable = availableAbilities.filter((d) => !isEquipped(d.id))
+
   return (
     <div className={cn('space-y-4', className)}>
       {/* Equipped Abilities */}
@@ -255,7 +258,12 @@ export default function AbilityPanel({
           <span className="text-muted-foreground text-sm">{equippedAbilities.length}/2</span>
         </div>
         {equippedAbilities.length === 0 ? (
-          <p className="text-muted-foreground text-sm">{t('abilities.empty_equipped')}</p>
+          <EmptyState
+            size="compact"
+            icon={<Zap className="h-5 w-5" />}
+            title={t('abilities.empty_state.equipped.title')}
+            description={t('abilities.empty_state.equipped.description')}
+          />
         ) : (
           <div className="space-y-2">{equippedAbilities.map((ability) => renderAbilityCard(ability, true))}</div>
         )}
@@ -264,12 +272,15 @@ export default function AbilityPanel({
       {/* Available Abilities */}
       <div className={cn(panelChrome, 'p-4')}>
         <h3 className="mb-3 font-semibold">{t('abilities.available')}</h3>
-        {availableAbilities.length === 0 ? (
-          <p className="text-muted-foreground text-sm">{t('abilities.no_abilities')}</p>
+        {unequippedAvailable.length === 0 ? (
+          <EmptyState
+            size="compact"
+            icon={<Trophy className="h-5 w-5" />}
+            title={t('abilities.empty_state.available.title')}
+            description={t('abilities.empty_state.available.description')}
+          />
         ) : (
-          <div className="space-y-2">
-            {availableAbilities.filter((d) => !isEquipped(d.id)).map((ability) => renderAbilityCard(ability, false))}
-          </div>
+          <div className="space-y-2">{unequippedAvailable.map((ability) => renderAbilityCard(ability, false))}</div>
         )}
       </div>
     </div>

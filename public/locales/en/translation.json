@@ -643,6 +643,16 @@
       "name": "Disruption Storm"
     },
     "empty_equipped": "No abilities equipped",
+    "empty_state": {
+      "equipped": {
+        "title": "No abilities equipped",
+        "description": "Equip up to 2 abilities from below to bring into battle."
+      },
+      "available": {
+        "title": "No abilities available",
+        "description": "Unlock new abilities by reaching higher tiers."
+      }
+    },
     "entropic_acceleration": {
       "description": "Apply Burning for 2 turns to target.",
       "flavor": "Time accelerates where entropy reigns.",
@@ -1331,6 +1341,16 @@
       "“The light of the heavens is blinding, but it shall guide you through the dark...”"
     ],
     "empty": "No items in inventory",
+    "empty_state": {
+      "empty": {
+        "title": "No items in inventory",
+        "description": "Visit the Store to buy weapons, armor, and consumables."
+      },
+      "no_matches": {
+        "title": "No items match your filters",
+        "description": "Try a different tier or type, or clear all filters."
+      }
+    },
     "equipment_slot": {
       "ACCESSORY": "Accessory",
       "ARMOR": "Armor",
@@ -1902,6 +1922,7 @@
     "filter": {
       "all_tiers": "All Tiers",
       "all_types": "All Types",
+      "clear": "Clear filters",
       "tier": "Tier",
       "type": "Type"
     },
@@ -1914,6 +1935,16 @@
     },
     "items_purchased": "items purchased",
     "no_items": "No items available",
+    "empty_state": {
+      "no_items": {
+        "title": "No items available",
+        "description": "The merchant's stall is bare. Check back later for new wares."
+      },
+      "no_matches": {
+        "title": "No items match your filters",
+        "description": "Try a different tier or type, or clear all filters."
+      }
+    },
     "random_rarity": "Random rarity",
     "success": {
       "buy": "Purchase successful!"

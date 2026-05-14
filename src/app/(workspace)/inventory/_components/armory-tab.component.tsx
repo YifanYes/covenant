@@ -83,6 +83,8 @@ export default function ArmoryTab({ character, onEquipItem, onUnequipItem }: Arm
           onItemClick={onEquipItem}
           tierFilter={tierFilter}
           typeFilter={typeFilter === 'all' ? null : typeFilter}
+          hasActiveFilters={hasActiveFilters}
+          onClearFilters={clearFilters}
         />
       </div>
     </div>

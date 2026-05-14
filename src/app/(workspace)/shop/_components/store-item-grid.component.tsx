@@ -1,5 +1,8 @@
 'use client'
+import EmptyState from '@/components/empty-state.component'
+import Button from '@/ui/button.component'
 import ScrollArea from '@/ui/scroll-area.component'
+import { Cancel as Close, Search, Store } from 'pixelarticons/react'
 import type { ItemDefinition } from '@shared/constants/items'
 import { ItemType } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
@@ -11,8 +14,10 @@ interface StoreItemGridProps {
   availableGold: number
   characterTier: number
   consumableQuantities: Record<string, number>
+  hasActiveFilters: boolean
   onToggle: (itemId: string) => void
   onQuantityChange: (itemId: string, quantity: number) => void
+  onClearFilters: () => void
 }
 
 export default function StoreItemGrid({
@@ -21,8 +26,10 @@ export default function StoreItemGrid({
   availableGold,
   characterTier,
   consumableQuantities,
+  hasActiveFilters,
   onToggle,
-  onQuantityChange
+  onQuantityChange,
+  onClearFilters
 }: StoreItemGridProps) {
   const { t } = useTranslation()
   const sortedTiers = Object.entries(itemsByTier).sort(([a], [b]) => parseInt(a) - parseInt(b))
@@ -59,9 +66,26 @@ export default function StoreItemGrid({
             </div>
           </div>
         ))}
-        {isEmpty && (
-          <div className="text-muted-foreground flex h-40 items-center justify-center">{t('store.no_items')}</div>
-        )}
+        {isEmpty &&
+          (hasActiveFilters ? (
+            <EmptyState
+              icon={<Search className="h-8 w-8" />}
+              title={t('store.empty_state.no_matches.title')}
+              description={t('store.empty_state.no_matches.description')}
+              action={
+                <Button variant="outline" size="sm" onClick={onClearFilters}>
+                  <Close className="mr-2 h-4 w-4" />
+                  {t('store.filter.clear')}
+                </Button>
+              }
+            />
+          ) : (
+            <EmptyState
+              icon={<Store className="h-8 w-8" />}
+              title={t('store.empty_state.no_items.title')}
+              description={t('store.empty_state.no_items.description')}
+            />
+          ))}
       </div>
     </ScrollArea>
   )

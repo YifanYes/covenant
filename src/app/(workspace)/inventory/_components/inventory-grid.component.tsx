@@ -1,8 +1,10 @@
 'use client'
+import EmptyState from '@/components/empty-state.component'
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
+import Button from '@/ui/button.component'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
-import { Users as Group } from 'pixelarticons/react'
+import { Cancel as Close, Users as Group, Search, Suitcase } from 'pixelarticons/react'
 import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
 import {
   EquipmentTypeFilter,
@@ -20,6 +22,8 @@ interface InventoryGridProps {
   onItemClick?: (item: InventoryItem) => void
   tierFilter?: number | null
   typeFilter?: EquipmentTypeFilter | null
+  hasActiveFilters?: boolean
+  onClearFilters?: () => void
 }
 
 function matchesTypeFilter(itemType: ItemType, filter: EquipmentTypeFilter | null): boolean {
@@ -44,7 +48,9 @@ export default function InventoryGrid({
   selectedItemId,
   onItemClick,
   tierFilter,
-  typeFilter
+  typeFilter,
+  hasActiveFilters = false,
+  onClearFilters
 }: InventoryGridProps) {
   const { t } = useTranslation()
 
@@ -106,9 +112,27 @@ export default function InventoryGrid({
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto">
         {groupedItems.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center gap-2">
-            <span className="text-muted-foreground text-sm">{t('inventory.empty')}</span>
-          </div>
+          hasActiveFilters ? (
+            <EmptyState
+              icon={<Search className="h-8 w-8" />}
+              title={t('inventory.empty_state.no_matches.title')}
+              description={t('inventory.empty_state.no_matches.description')}
+              action={
+                onClearFilters && (
+                  <Button variant="outline" size="sm" onClick={onClearFilters}>
+                    <Close className="mr-2 h-4 w-4" />
+                    {t('inventory.filter.clear')}
+                  </Button>
+                )
+              }
+            />
+          ) : (
+            <EmptyState
+              icon={<Suitcase className="h-8 w-8" />}
+              title={t('inventory.empty_state.empty.title')}
+              description={t('inventory.empty_state.empty.description')}
+            />
+          )
         ) : (
           <div className="flex flex-wrap gap-2 py-1">
             {groupedItems.map(({ item, quantity }) => (

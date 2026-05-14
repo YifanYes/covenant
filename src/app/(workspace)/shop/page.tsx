@@ -107,6 +107,13 @@ function StoreContent() {
     })
   }
 
+  const hasActiveFilters = tierFilter !== 'all' || typeFilter !== 'all'
+
+  const clearFilters = () => {
+    setTierFilter('all')
+    setTypeFilter('all')
+  }
+
   const handleBuy = () => {
     if (selectedIds.size === 0) return
 
@@ -146,8 +153,10 @@ function StoreContent() {
             availableGold={availableGold}
             characterTier={store.characterTier}
             consumableQuantities={consumableQuantities}
+            hasActiveFilters={hasActiveFilters}
             onToggle={toggleItem}
             onQuantityChange={handleQuantityChange}
+            onClearFilters={clearFilters}
           />
         </CardContent>
       </Card>
