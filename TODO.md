@@ -35,11 +35,25 @@
 - [ ] Retire `pre-oss-rewrite` recovery anchor after public state verified `[debt]`
   - Tag at `a728362d` on local repo points to pre-rewrite SHA. Delete (`git tag -d pre-oss-rewrite`) and any private archive once Phase 4 (GitHub settings) is complete and public state is confirmed correct.
 
-- [ ]
+- [ ] Combat: race condition — enemy turn guard `[blocker]`
+  - `use-tactical-enemy-turn.hook.ts:29-31`. Bug in shipping code on the core loop.
+  - **Fix:** Use state flag + ref together; debounce effect.
+
+- [ ] Combat: race condition — async state access `[blocker]`
+  - `use-tactical-enemy-turn.hook.ts:34`. Bug in shipping code on the core loop.
+  - **Fix:** Refresh state after each await in critical paths.
+
+- [ ] Per-route error boundaries `[loop]`
+  - Only root `error.tsx` exists. Add `error.tsx` to `(workspace)/quests/`, `(workspace)/tasks/`, `(workspace)/habits/`, `(workspace)/objectives/`, `(workspace)/shop/`, `(workspace)/inventory/`.
+
+- [ ] i18n: translate hardcoded strings in error pages `[blocker]`
+  - `src/app/error.tsx`, `src/app/not-found.tsx` have raw English ("Something went wrong!", "404 - Page Not Found", "Go to Dashboard"). Add to `en` + `es` locales.
+
+- [ ] Empty states for remaining views `[loop]`. Already shipped for habits/tasks/objectives. Still missing: shop filtered results (no matches), inventory Armory + Abilities tabs.
+
+- [ ] Logout button in sidebar `[loop]`. Currently buried in `/settings`. Add to a new user dropdown menu in the sidebar.
 
 ## High Priority
-
-- [ ] Guild system Phase 3 — exclusive rewards + progression bonuses `[retention]`. Guild-only items (`Item.guildExclusive` flag), guild-tier progression with member XP/gold modifiers. Touches store + character services. Defer until Phase 1+2 retention signal validated with beta cohort.
 
 - [ ] Guild system Phase 4 — community lore + roleplay surfaces `[retention]`. Player-authored creative layer on top of guild infra. Habit-tracker-with-RPG-skin product benefits especially: lore reframes chores as quests and is stickier than leaderboards (lore decay slow, leaderboards reset weekly). Stage to keep moderation surface bounded.
   - **Identity layer (ship-first)** — guild lore field (rich text, ~5000 char), officer-set `GuildMember.title` ("Quartermaster", "Scout"), guild emblem/banner from preset list. Pair with custom campaign names from parametric-campaigns proposal. Officer-gated, length-capped, soft-delete on report. Schema: extend `Guild` (`lore Text?`, `emblem String?`) + add `GuildMember.title`. No economy exposure, reversible by clearing field. ~2–3 days.
@@ -70,12 +84,6 @@
 
 - [ ] Define story decisions `[loop]`. Story branches are the tier-progression payoff in the core loop.
 
-- [ ] Per-route error boundaries `[loop]`
-  - Only root `error.tsx` exists. Add `error.tsx` to `(workspace)/quests/`, `(workspace)/tasks/`, `(workspace)/habits/`, `(workspace)/objectives/`, `(workspace)/shop/`, `(workspace)/inventory/`.
-
-- [ ] i18n: translate hardcoded strings in error pages `[blocker]`
-  - `src/app/error.tsx`, `src/app/not-found.tsx` have raw English ("Something went wrong!", "404 - Page Not Found", "Go to Dashboard"). Add to `en` + `es` locales.
-
 - [ ] SEO basics + press kit + 2-line pitch `[loop]`
   - No `sitemap.ts`, no `robots.txt`, no per-page OG tags (only root `metadataBase`). Roadmap Phase 3 also calls for press kit (screenshots, descripción, logo) and a tested 2-line pitch.
 
@@ -85,28 +93,15 @@
 - [ ] Test coverage gaps for core gamification services `[debt]`
   - Missing tests: `habit.service.ts` (streaks + dice rewards), `objective.service.ts`, `area.service.ts`, `auth.service.ts`, `kill-record.service.ts`. CLAUDE.md flags habits + tier progression as critical paths.
 
-  - [ ] Use [NES.css](https://nostalgic-css.github.io/NES.css/) or [RPGUI](https://ronenness.github.io/RPGUI/) for the RPG views.
-
 ## Medium Priority
 
 - [ ] Security: error messages leak resource existence `[blocker]`
   - Multiple service files distinguish "not found" from "forbidden" in their error messages, leaking existence of records the caller doesn't own.
   - **Fix:** Use generic "Resource not found or access denied" messages.
 
-- [ ] Combat: race condition — enemy turn guard `[blocker]`
-  - `use-tactical-enemy-turn.hook.ts:29-31`. Bug in shipping code on the core loop.
-  - **Fix:** Use state flag + ref together; debounce effect.
-
-- [ ] Combat: race condition — async state access `[blocker]`
-  - `use-tactical-enemy-turn.hook.ts:34`. Bug in shipping code on the core loop.
-  - **Fix:** Refresh state after each await in critical paths.
-
 - [ ] Combat: ability cast clobbers stale `currentClass.health` `[debt]`
   - `combat.service.ts` `playerCastAbility` / `playerCastSelfBuffAbility` snapshot `currentClass.health` and `currentClass.mana` BEFORE the ability executes, then write the snapshot back paired with `newMana`. Any ability that mutates DB health (self-damage, lifesteal) gets overwritten with the stale value. Latent today because no current ability touches DB health, but the foot-gun lives on the core combat path.
   - **Fix:** Either re-fetch the class after `executeTacticalAbility` / `useSelfBuffAbility`, or split `characterRepository.updateHealth` into a dedicated `updateMana(classId, mana)` and only write the column we changed.
-
-- [ ] Empty states for remaining views `[loop]`
-  - Already shipped for habits/tasks/objectives. Still missing: shop filtered results (no matches), inventory Armory + Abilities tabs.
 
 - [ ] User-defined task statuses `[retention]`
   - Tasks currently use fixed statuses (TODO/IN_PROGRESS/DONE or equivalent). Allow users to create, rename, reorder, and delete custom statuses per workspace or globally. Enables personal workflows (e.g. "Waiting", "Blocked", "In Review") without forcing the default three-state model.
@@ -117,9 +112,6 @@
 
 - [ ] 404 / invalid ID handling `[loop]`
   - Invalid quest/task IDs hit generic error boundary; no redirect to listing or "this doesn't exist" empty state.
-
-- [ ] Logout button in sidebar `[loop]`
-  - Currently buried in `/settings`. Add to user dropdown in sidebar.
 
 - [ ] Re-enable strict TLS verification on prod database `[debt]`
   - `src/server/lib/prisma.ts` currently runs production with `ssl: { rejectUnauthorized: false }` (channel still encrypted, chain not validated). See `docs/specs/database_ssl.md`.

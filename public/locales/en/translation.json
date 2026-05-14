@@ -1192,6 +1192,8 @@
       "officer": "Officer",
       "member": "Member"
     },
+    "role_label": "Role",
+    "actions": "Actions",
     "member": {
       "you": "(you)",
       "joined": "Joined",
@@ -1813,7 +1815,12 @@
     "replay_tutorial": "Replay tutorial",
     "replay_tutorial_error": "Failed to reset tutorial. Please try again.",
     "saved_success": "Settings saved",
-    "save_error": "Failed to save settings"
+    "save_error": "Failed to save settings",
+    "source": {
+      "label": "Source",
+      "label_with_sha": "Source ({{sha}})",
+      "aria": "View source code on GitHub (AGPL-3.0)"
+    }
   },
   "nav": {
     "quests": "Quests"

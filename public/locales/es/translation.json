@@ -1192,6 +1192,8 @@
       "officer": "Oficial",
       "member": "Miembro"
     },
+    "role_label": "Rol",
+    "actions": "Acciones",
     "member": {
       "you": "(tú)",
       "joined": "Se unió",
@@ -1813,7 +1815,12 @@
     "replay_tutorial": "Repetir tutorial",
     "replay_tutorial_error": "No se pudo reiniciar el tutorial. Inténtalo de nuevo.",
     "saved_success": "Configuración guardada",
-    "save_error": "Error al guardar la configuración"
+    "save_error": "Error al guardar la configuración",
+    "source": {
+      "label": "Código",
+      "label_with_sha": "Código ({{sha}})",
+      "aria": "Ver código fuente en GitHub (AGPL-3.0)"
+    }
   },
   "nav": {
     "quests": "Misiones"

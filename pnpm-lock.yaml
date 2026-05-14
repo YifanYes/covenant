@@ -149,9 +149,6 @@ importers:
       isomorphic-dompurify:
         specifier: ^3.12.0
         version: 3.12.0(@noble/hashes@2.2.0)
-      nes.css:
-        specifier: ^2.3.0
-        version: 2.3.0
       next:
         specifier: 16.2.6
         version: 16.2.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -167,9 +164,6 @@ importers:
       pixelarticons:
         specifier: ^2.1.0
         version: 2.1.0(react@19.2.3)
-      postcss-prefix-selector:
-        specifier: ^2.1.1
-        version: 2.1.1(postcss@8.5.14)
       prisma:
         specifier: ^7.3.0
         version: 7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(magicast@0.5.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
@@ -4638,10 +4632,6 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  nes.css@2.3.0:
-    resolution: {integrity: sha512-lCFZs9vj3f5RVdbvTL/kSxiYsOARwSeAdJaMNo+bCgmWOO9x8ay7QpT4yQVKHy3r5Dttzd0uqVdpt3fvvx6EpQ==}
-    engines: {node: 10.x}
-
   next@16.2.6:
     resolution: {integrity: sha512-qOVgKJg1+At15NpeUP+eJgCHvTCgXsogweq87Ri/Ix7PkqQHg4sdaXmSFqKlgaIXE4kW0g25LE68W87UANlHtw==}
     engines: {node: '>=20.9.0'}
@@ -4855,11 +4845,6 @@ packages:
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
-
-  postcss-prefix-selector@2.1.1:
-    resolution: {integrity: sha512-ZBgf427Et6+XnrnJ9VXtJEKCjJwTvn2wn/qMg+wvvlRhIeFIAxdbrlZZ0CSsWYMJfcyPLBh8ogj5O1kb/Mcx3g==}
-    peerDependencies:
-      postcss: ^8.0.0
 
   postcss@8.4.31:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
@@ -10560,8 +10545,6 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  nes.css@2.3.0: {}
-
   next@16.2.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       '@next/env': 16.2.6
@@ -10807,10 +10790,6 @@ snapshots:
       pathe: 2.0.3
 
   possible-typed-array-names@1.1.0: {}
-
-  postcss-prefix-selector@2.1.1(postcss@8.5.14):
-    dependencies:
-      postcss: 8.5.14
 
   postcss@8.4.31:
     dependencies:

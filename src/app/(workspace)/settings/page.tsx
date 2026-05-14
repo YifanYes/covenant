@@ -339,7 +339,30 @@ export default function Settings() {
         <div className="pt-4">
           <ConfirmDeleteAccountDialog />
         </div>
+        <SourceFooter />
       </div>
     </Suspense>
+  )
+}
+
+const REPO_URL = 'https://github.com/YifanYes/covenant'
+
+function SourceFooter() {
+  const { t } = useTranslation()
+  const sha = process.env.NEXT_PUBLIC_COMMIT_SHA
+  const href = sha ? `${REPO_URL}/tree/${sha}` : REPO_URL
+  const label = sha ? t('settings.source.label_with_sha', { sha: sha.slice(0, 7) }) : t('settings.source.label')
+  return (
+    <div className="pt-6">
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t('settings.source.aria')}
+        className="text-muted-foreground hover:text-foreground font-mono text-[10px]"
+      >
+        {label} · AGPL-3.0
+      </a>
+    </div>
   )
 }
