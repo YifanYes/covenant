@@ -1,6 +1,7 @@
 'use client'
 
 import CovenantLogo from '@/components/common/covenant-logo.component'
+import UserMenu from '@/components/common/user-menu.component'
 import Separator from '@/ui/separator.component'
 import Sidebar, {
   SidebarContent,
@@ -177,6 +178,7 @@ export default function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <UserMenu />
           <SidebarTrigger />
         </SidebarMenu>
       </SidebarFooter>

@@ -1,9 +1,5 @@
 # TODOs
 
-> Tags: `[blocker]` legal/security/abuse · `[loop]` core validation hypothesis · `[retention]` keeps validated users · `[debt]` engineering hygiene
->
-> Items in **Backlog (post-validation)** are not deleted — they're deferred until the core loop has been validated with real beta users. Re-evaluate based on retention/feedback signals.
-
 ## Critical Priority
 
 - [ ] GitHub repository settings (manual) `[blocker]`
@@ -31,9 +27,7 @@
 - [ ] Retire `pre-oss-rewrite` recovery anchor after public state verified `[debt]`
   - Tag at `a728362d` on local repo points to pre-rewrite SHA. Delete (`git tag -d pre-oss-rewrite`) and any private archive once Phase 4 (GitHub settings) is complete and public state is confirmed correct.
 
-- [x] Empty states for remaining views. Still missing: shop filtered results (no matches), inventory Armory + Abilities tabs.
-
-- [ ] Logout button in sidebar `[loop]`. Currently buried in `/settings`. Add to a new user dropdown menu in the sidebar.
+- [ ] Logout button in sidebar. Currently buried in `/settings`. Add to a new user dropdown menu in the sidebar.
 
 ## High Priority
 

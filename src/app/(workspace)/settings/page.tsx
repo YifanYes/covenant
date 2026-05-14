@@ -5,28 +5,21 @@ import FactionColorSelector from '@/forms/faction-color-selector.component'
 import SingleSelect from '@/forms/single-select.component'
 import useFactionTheme, { STORAGE_KEY as FACTION_STORAGE_KEY, FACTION_TO_CLASS } from '@/hooks/use-faction-theme'
 import useTheme from '@/hooks/use-theme'
-import { useAuthStore } from '@/stores/auth.store'
-import { useTutorialStore } from '@/stores/tutorial.store'
 import { useUserPreferencesStore, type DateFormat } from '@/stores/user-preferences.store'
-import Button from '@/ui/button.component'
-import Input from '@/ui/input.component'
 import Label from '@/ui/label.component'
 import Switch from '@/ui/switch.component'
-import { queryClient, trpcOptions } from '@/utils/trpc.utils'
+import { trpcOptions } from '@/utils/trpc.utils'
 import { Faction } from '@shared/constants/factions'
 import { DATE_FORMATS } from '@shared/schemas/auth.schemas'
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useRouter } from 'next/navigation'
 import { Moon, CloudSun as Sun } from 'pixelarticons/react'
-import { Suspense, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { ConfirmDeleteAccountDialog } from './_components/confirm-delete-account-dialog.component'
 
 type SettingsFormValues = {
-  characterName: string
   language: string
   defaultTasksView: string
   dateFormat: DateFormat
@@ -69,27 +62,19 @@ function persistLocaleCookie(value: string) {
 
 export default function Settings() {
   const { t, i18n } = useTranslation()
-  const router = useRouter()
-  const { email, signOut } = useAuthStore()
   const { language, defaultTasksView, dateFormat, setLanguage, setDefaultTasksView, setDateFormat } =
     useUserPreferencesStore()
   const { theme, toggleTheme } = useTheme()
   const { faction } = useFactionTheme()
-  const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
-  const reopen = useTutorialStore((s) => s.reopen)
-
-  const characterName = characterData?.name ?? ''
 
   const {
-    register,
     control,
     handleSubmit,
     reset,
-    formState: { isDirty, errors }
+    formState: { isDirty }
   } = useForm<SettingsFormValues>({
     mode: 'onChange',
     defaultValues: {
-      characterName,
       language,
       defaultTasksView,
       dateFormat,
@@ -101,7 +86,6 @@ export default function Settings() {
   useEffect(() => {
     if (!isDirty) {
       reset({
-        characterName,
         language,
         defaultTasksView,
         dateFormat,
@@ -109,7 +93,7 @@ export default function Settings() {
         faction
       })
     }
-  }, [characterName, language, defaultTasksView, dateFormat, theme, faction, isDirty, reset])
+  }, [language, defaultTasksView, dateFormat, theme, faction, isDirty, reset])
 
   const watchedTheme = useWatch({ control, name: 'theme' })
   const watchedFaction = useWatch({ control, name: 'faction' })
@@ -147,22 +131,8 @@ export default function Settings() {
 
   const updateProfileMutation = useMutation(trpcOptions.auth.updateProfile.mutationOptions())
 
-  const resetTutorialMutation = useMutation(
-    trpcOptions.character.resetTutorial.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
-        reopen()
-      },
-      onError: () => {
-        toast.error(t('settings.replay_tutorial_error'))
-      }
-    })
-  )
-
   const onSubmit = async (values: SettingsFormValues) => {
     try {
-      const trimmedName = values.characterName.trim()
-      const nameChanged = !!characterData?.name && !!trimmedName && trimmedName !== characterData.name
       const factionChanged = values.faction !== faction
       const languageChanged = values.language !== language
       const defaultTasksViewChanged = values.defaultTasksView !== defaultTasksView
@@ -170,7 +140,6 @@ export default function Settings() {
       const themeChanged = values.theme !== theme
 
       const payload: Parameters<typeof updateProfileMutation.mutateAsync>[0] = {}
-      if (nameChanged) payload.characterName = trimmedName
       if (factionChanged) payload.theme = values.faction
       if (languageChanged) payload.locale = values.language as 'en' | 'es'
       if (defaultTasksViewChanged) payload.defaultTasksView = values.defaultTasksView as 'list' | 'table' | 'matrix'
@@ -185,19 +154,12 @@ export default function Settings() {
       if (themeChanged) persistColorModeCookie(values.theme)
       if (languageChanged) persistLocaleCookie(values.language)
 
-      if (factionChanged || nameChanged) {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: trpcOptions.auth.getProfile.queryKey() }),
-          queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
-        ])
-      }
-
       if (languageChanged) setLanguage(values.language)
       if (defaultTasksViewChanged) setDefaultTasksView(values.defaultTasksView)
       if (dateFormatChanged) setDateFormat(values.dateFormat)
       if (themeChanged) toggleTheme()
 
-      reset({ ...values, characterName: trimmedName })
+      reset(values)
       toast.success(t('settings.saved_success'))
     } catch {
       toast.error(t('settings.save_error'))
@@ -205,10 +167,10 @@ export default function Settings() {
   }
 
   const isSubmitting = updateProfileMutation.isPending
-  const isSaveDisabled = !isDirty || isSubmitting || !!errors.characterName
+  const isSaveDisabled = !isDirty || isSubmitting
 
   return (
-    <Suspense>
+    <>
       <div className="flex max-w-md items-center justify-between">
         <h1 className="text-2xl font-semibold">{t('settings.title')}</h1>
         <LoaderButton
@@ -221,23 +183,6 @@ export default function Settings() {
         />
       </div>
       <div className="flex max-w-md flex-col gap-6 py-6">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="email">{t('settings.email_label')}</Label>
-          <Input id="email" type="email" value={email} disabled />
-        </div>
-        {characterData?.name && (
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="character-name">{t('settings.character_name_label')}</Label>
-            <Input
-              id="character-name"
-              maxLength={255}
-              disabled={isSubmitting}
-              {...register('characterName', {
-                validate: (v) => v.trim().length > 0
-              })}
-            />
-          </div>
-        )}
         <Controller
           name="language"
           control={control}
@@ -313,35 +258,9 @@ export default function Settings() {
           control={control}
           render={({ field }) => <FactionColorSelector value={field.value} onChange={field.onChange} />}
         />
-        <div className="pt-4">
-          <Button
-            type="button"
-            onClick={() =>
-              signOut()
-                .then(() => router.push('/login'))
-                .catch(() => toast.error(t('settings.logout_error')))
-            }
-            className="w-fit text-muted-foreground border-muted-foreground hover:text-background hover:bg-muted-foreground cursor-pointer border bg-transparent"
-          >
-            {t('settings.logout_button')}
-          </Button>
-        </div>
-        <div className="flex flex-col gap-4">
-          <LoaderButton
-            type="button"
-            onClick={() => resetTutorialMutation.mutate()}
-            isLoading={resetTutorialMutation.isPending}
-            className="w-fit cursor-pointer"
-            variant="outline"
-            label={t('settings.replay_tutorial')}
-          />
-        </div>
-        <div className="pt-4">
-          <ConfirmDeleteAccountDialog />
-        </div>
         <SourceFooter />
       </div>
-    </Suspense>
+    </>
   )
 }
 

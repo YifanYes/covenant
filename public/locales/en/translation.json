@@ -1854,6 +1854,10 @@
   "nav": {
     "quests": "Quests"
   },
+  "user_menu": {
+    "aria": "User menu",
+    "edit_name": "Edit character name"
+  },
   "sidebar": {
     "calendar": "Calendar",
     "close": "Collapse menu",

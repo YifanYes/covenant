@@ -1854,6 +1854,10 @@
   "nav": {
     "quests": "Misiones"
   },
+  "user_menu": {
+    "aria": "Menú de usuario",
+    "edit_name": "Editar nombre del personaje"
+  },
   "sidebar": {
     "calendar": "Calendario",
     "close": "Colapsar menú",
