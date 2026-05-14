@@ -28,20 +28,8 @@
   - Privacy + ToS MDX now reference this address. Without forwarder, GDPR-required data-subject requests bounce.
   - Configure on covenantrpg.com DNS provider (Cloudflare Email Routing, ImprovMX, Fastmail catch-all, etc.) → forward to your gmail.
 
-- [ ] Notify Denis of identity rewrite before flipping public `[blocker]`
-  - Draft email (per earlier plan): repo going public under AGPL-3.0 on `<date>`, his `syrewolfdigital@gmail.com` rewritten to `58982694+SyreWolf@users.noreply.github.com` in history, name preserved as commit author. Give him a response window to object.
-  - Documents consent, converts "might sue" risk into "documented opportunity to object".
-
 - [ ] Retire `pre-oss-rewrite` recovery anchor after public state verified `[debt]`
   - Tag at `a728362d` on local repo points to pre-rewrite SHA. Delete (`git tag -d pre-oss-rewrite`) and any private archive once Phase 4 (GitHub settings) is complete and public state is confirmed correct.
-
-- [ ] Combat: race condition — enemy turn guard `[blocker]`
-  - `use-tactical-enemy-turn.hook.ts:29-31`. Bug in shipping code on the core loop.
-  - **Fix:** Use state flag + ref together; debounce effect.
-
-- [ ] Combat: race condition — async state access `[blocker]`
-  - `use-tactical-enemy-turn.hook.ts:34`. Bug in shipping code on the core loop.
-  - **Fix:** Refresh state after each await in critical paths.
 
 - [ ] Per-route error boundaries `[loop]`
   - Only root `error.tsx` exists. Add `error.tsx` to `(workspace)/quests/`, `(workspace)/tasks/`, `(workspace)/habits/`, `(workspace)/objectives/`, `(workspace)/shop/`, `(workspace)/inventory/`.

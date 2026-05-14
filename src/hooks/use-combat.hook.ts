@@ -21,6 +21,8 @@ export function useCombat(
   const { t } = useTranslation()
   const animations = useCombatAnimations()
   const executingEnemyTurnRef = useRef(false)
+  const localEnemiesRef = useRef<EnemyState[]>(initialEnemies)
+  const playerDeadRef = useRef(false)
 
   const currentClass = character.classes.find((c) => c.className === character.currentClass)!
 
@@ -265,27 +267,40 @@ export function useCombat(
   )
 
   useEffect(() => {
+    localEnemiesRef.current = localEnemies
+  }, [localEnemies])
+
+  useEffect(() => {
+    playerDeadRef.current = playerDead
+  }, [playerDead])
+
+  useEffect(() => {
     if (!isEnemyTurn || executingEnemyTurnRef.current || animations.isAnimating) return
 
-    const executeEnemyTurns = async () => {
+    // Debounce: clears if isEnemyTurn/isAnimating flips before fire; ref guards re-entry once running.
+    const timeoutId = setTimeout(async () => {
       executingEnemyTurnRef.current = true
-      await new Promise((r) => setTimeout(r, 300))
 
-      for (const enemy of localEnemies) {
-        if (enemy.currentHealth <= 0) continue
-        const template = getEnemy(enemy.templateId)
+      // Snapshot iteration order; re-read each enemy's live state via ref before mutation.
+      const enemyIds = localEnemiesRef.current.map((e) => e.id)
+      for (const enemyId of enemyIds) {
+        if (playerDeadRef.current) break
+        const current = localEnemiesRef.current.find((e) => e.id === enemyId)
+        if (!current || current.currentHealth <= 0) continue
+        const template = getEnemy(current.templateId)
         if (!template) continue
         try {
-          await enemyTurnMutation.mutateAsync({ questId, enemyId: enemy.id })
+          await enemyTurnMutation.mutateAsync({ questId, enemyId: current.id })
         } catch {
           break
         }
         await new Promise((r) => setTimeout(r, 200))
       }
       executingEnemyTurnRef.current = false
-    }
-    executeEnemyTurns()
-  }, [isEnemyTurn]) // eslint-disable-line react-hooks/exhaustive-deps
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [isEnemyTurn, animations.isAnimating]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isLoading = moveMutation.isPending || enemyTurnMutation.isPending || potionMutation.isPending
 
