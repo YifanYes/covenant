@@ -31,9 +31,6 @@
 - [ ] Retire `pre-oss-rewrite` recovery anchor after public state verified `[debt]`
   - Tag at `a728362d` on local repo points to pre-rewrite SHA. Delete (`git tag -d pre-oss-rewrite`) and any private archive once Phase 4 (GitHub settings) is complete and public state is confirmed correct.
 
-- [ ] Per-route error boundaries `[loop]`
-  - Only root `error.tsx` exists. Add `error.tsx` to `(workspace)/quests/`, `(workspace)/tasks/`, `(workspace)/habits/`, `(workspace)/objectives/`, `(workspace)/shop/`, `(workspace)/inventory/`.
-
 - [ ] i18n: translate hardcoded strings in error pages `[blocker]`
   - `src/app/error.tsx`, `src/app/not-found.tsx` have raw English ("Something went wrong!", "404 - Page Not Found", "Go to Dashboard"). Add to `en` + `es` locales.
 
