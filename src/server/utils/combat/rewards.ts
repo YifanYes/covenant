@@ -1,3 +1,4 @@
+import { CAMPAIGN_EVENT_TYPE } from '@shared/constants/guild-campaigns'
 import { getQuestById, selectEnemyWithFallback } from '@shared/constants/quests'
 import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
 import { applyStatScaling, calculateGoldReward, getEnemy } from '@shared/constants/enemies'
@@ -7,6 +8,7 @@ import type { TacticalStateData, TacticalUnitState } from '@shared/types/tactica
 import type { CharacterQuestRepository } from '../../repositories/character-quest.repository'
 import type { CharacterRepository } from '../../repositories/character.repository'
 import type { CombatEnemyRepository } from '../../repositories/combat-enemy.repository'
+import type { GuildService } from '../../services/guild.service'
 import type { KillRecordService } from '../../services/kill-record.service'
 import type { ManaService } from '../../services/mana.service'
 
@@ -21,6 +23,7 @@ export interface CombatStateRepos {
 export interface CombatRewardDeps extends CombatStateRepos {
   killRecordService?: KillRecordService
   manaService?: ManaService
+  guildService?: GuildService
 }
 
 /** @deprecated Use CombatStateRepos or CombatRewardDeps instead. */
@@ -48,7 +51,8 @@ export async function processEnemyDefeat(
   questId: string,
   updatedState: TacticalStateData,
   killedEnemyIds: string[],
-  repos: CombatRewardDeps
+  repos: CombatRewardDeps,
+  userId?: string
 ): Promise<EnemyDefeatResult> {
   const result: EnemyDefeatResult = {
     goldReward: 0
@@ -96,6 +100,23 @@ export async function processEnemyDefeat(
     const tierResult = await repos.killRecordService.checkAndApplyTierProgressionByCharacterId(quest.characterId)
     if (tierResult.tierChanged) {
       result.tierProgression = { oldTier: tierResult.oldTier, newTier: tierResult.newTier }
+    }
+  }
+
+  // Record guild campaign contributions. Non-fatal — wrapped to guarantee user's
+  // kill/gold reward path is unaffected even if recordEvent throws.
+  if (repos.guildService && userId) {
+    try {
+      await repos.guildService.recordCampaignEvent(userId, CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)
+      if (result.goldReward > 0) {
+        await repos.guildService.recordCampaignEvent(
+          userId,
+          CAMPAIGN_EVENT_TYPE.GOLD_EARNED,
+          result.goldReward
+        )
+      }
+    } catch {
+      // swallow — campaign tracking must never break the combat reward path
     }
   }
 

@@ -73,7 +73,9 @@ describe('GuildService', () => {
       findById: vi.fn().mockResolvedValue({ id: 'u1', theme: 'HOLY_KNIGHTS' })
     }
 
-    service = new GuildService(prisma, guildRepo, memberRepo, messageRepo, inviteRepo, userRepo)
+    const characterRepo = { findByUserId: vi.fn() }
+
+    service = new GuildService(prisma, guildRepo, memberRepo, messageRepo, inviteRepo, userRepo, characterRepo as any)
   })
 
   describe('createGuild', () => {

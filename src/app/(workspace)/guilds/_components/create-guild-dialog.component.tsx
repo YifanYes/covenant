@@ -1,5 +1,6 @@
 'use client'
 import BaseFormDialog from '@/common/base-form-dialog.component'
+import { rpgDialogContent } from '@/components/rpg/rpg-styles'
 import TextInput from '@/forms/text-input.component'
 import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
@@ -68,6 +69,7 @@ export default function CreateGuildDialog({ trigger, open: controlledOpen, onOpe
       submitLabel="guilds.create.submit"
       isLoading={mutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
+      className={rpgDialogContent}
       trigger={
         trigger || (
           <Button>

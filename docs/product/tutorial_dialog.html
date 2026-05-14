@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial Dialog — Covenant Docs</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+<div class="doc-container">
+
+  <nav class="breadcrumb">
+    <a href="index.html">Covenant Docs</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>Tutorial Dialog</span>
+  </nav>
+
+  <header class="doc-header">
+    <h1>Tutorial Dialog</h1>
+    <div class="doc-meta">
+      <span><span class="badge badge-green">Implemented</span></span>
+      <span><span class="badge badge-blue">4-slide modal</span></span>
+    </div>
+    <p style="margin-top:0.75rem;color:var(--text-secondary);">One-time modal walkthrough teaching new users the core gameplay loop: <strong>dice → combat → tier → gear</strong>. Triggered automatically when <code>tutorialCompletedAt</code> is null. Skippable but non-dismissible (ESC/overlay blocked).</p>
+  </header>
+
+  <!-- ═══════════ VALIDATION ═══════════ -->
+  <h2>Validation Hypothesis</h2>
+  <div class="three-col">
+    <div class="stat-card">
+      <div class="stat-label">Completion Target</div>
+      <div class="stat-value">80%</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;">of users shown the tutorial click through to last slide</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">First Combat</div>
+      <div class="stat-value">↑</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;">7-day post-signup combat rate lifts vs. pre-tutorial baseline</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">First Equip</div>
+      <div class="stat-value">↑</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;">7-day post-signup equip rate lifts vs. baseline</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SLIDES ═══════════ -->
+  <h2>Slide Content</h2>
+
+  <div class="diagram">
+    <svg viewBox="0 0 660 160" width="660" height="160" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;">
+      <defs>
+        <marker id="arrowT" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+          <path d="M1,1 L7,4 L1,7 Z" fill="#656d76"/>
+        </marker>
+      </defs>
+
+      <!-- Slide 1: Dice -->
+      <rect x="10" y="20" width="135" height="120" rx="6" fill="#1c2128" stroke="#f0c040" stroke-width="2"/>
+      <text x="77" y="46" fill="#f0c040" font-size="22" text-anchor="middle">🎲</text>
+      <text x="77" y="70" fill="#f0c040" font-size="11" font-weight="700" text-anchor="middle">1 · Earn Dice</text>
+      <text x="77" y="88" fill="#8b949e" font-size="8.5" text-anchor="middle">Complete habits, tasks,</text>
+      <text x="77" y="100" fill="#8b949e" font-size="8.5" text-anchor="middle">and objectives to fill</text>
+      <text x="77" y="112" fill="#8b949e" font-size="8.5" text-anchor="middle">your dice bank.</text>
+      <circle cx="77" cy="132" r="3" fill="#f0c040"/>
+
+      <line x1="145" y1="80" x2="165" y2="80" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowT)"/>
+
+      <!-- Slide 2: Combat -->
+      <rect x="167" y="20" width="135" height="120" rx="6" fill="#1c2128" stroke="#e05263" stroke-width="1.5"/>
+      <text x="234" y="46" fill="#e05263" font-size="22" text-anchor="middle">⚔️</text>
+      <text x="234" y="70" fill="#e05263" font-size="11" font-weight="700" text-anchor="middle">2 · Roll in Combat</text>
+      <text x="234" y="88" fill="#8b949e" font-size="8.5" text-anchor="middle">Spend dice in quest</text>
+      <text x="234" y="100" fill="#8b949e" font-size="8.5" text-anchor="middle">battles to attack,</text>
+      <text x="234" y="112" fill="#8b949e" font-size="8.5" text-anchor="middle">defend, cast abilities.</text>
+      <circle cx="234" cy="132" r="3" fill="#e05263"/>
+
+      <line x1="302" y1="80" x2="322" y2="80" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowT)"/>
+
+      <!-- Slide 3: Tier Up -->
+      <rect x="324" y="20" width="135" height="120" rx="6" fill="#1c2128" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="391" y="46" fill="#3fb950" font-size="22" text-anchor="middle">🏆</text>
+      <text x="391" y="70" fill="#3fb950" font-size="11" font-weight="700" text-anchor="middle">3 · Tier Up</text>
+      <text x="391" y="88" fill="#8b949e" font-size="8.5" text-anchor="middle">Defeat enemies to</text>
+      <text x="391" y="100" fill="#8b949e" font-size="8.5" text-anchor="middle">climb class tier.</text>
+      <text x="391" y="112" fill="#8b949e" font-size="8.5" text-anchor="middle">Unlock gear + abilities.</text>
+      <circle cx="391" cy="132" r="3" fill="#3fb950"/>
+
+      <line x1="459" y1="80" x2="479" y2="80" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowT)"/>
+
+      <!-- Slide 4: Equip Gear -->
+      <rect x="481" y="20" width="168" height="120" rx="6" fill="#1c2128" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="565" y="46" fill="#58a6ff" font-size="22" text-anchor="middle">🛡️</text>
+      <text x="565" y="70" fill="#58a6ff" font-size="11" font-weight="700" text-anchor="middle">4 · Equip Gear</text>
+      <text x="565" y="88" fill="#8b949e" font-size="8.5" text-anchor="middle">Buy gear in the Shop</text>
+      <text x="565" y="100" fill="#8b949e" font-size="8.5" text-anchor="middle">and equip it from your</text>
+      <text x="565" y="112" fill="#8b949e" font-size="8.5" text-anchor="middle">Inventory.</text>
+      <text x="565" y="132" fill="#58a6ff" font-size="9" font-weight="600" text-anchor="middle">✓ Got it</text>
+    </svg>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Icon</th><th>Headline (EN)</th><th>Body (EN)</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><code>Dice</code></td><td>Earn Dice</td><td>Complete habits, tasks, and objectives to fill your dice bank.</td></tr>
+        <tr><td>2</td><td><code>Sword</code></td><td>Roll in Combat</td><td>Spend dice in quest battles to attack, defend, and cast abilities.</td></tr>
+        <tr><td>3</td><td><code>Trophy</code></td><td>Tier Up</td><td>Defeat enemies to climb your class tier. Higher tiers unlock new gear and abilities.</td></tr>
+        <tr><td>4</td><td><code>Shield</code></td><td>Equip Gear</td><td>Buy gear in the Shop and equip it from your Inventory. Stronger gear, tougher quests.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ TRIGGER LOGIC ═══════════ -->
+  <h2>Trigger &amp; Persistence</h2>
+
+  <div class="diagram">
+    <svg viewBox="0 0 620 200" width="620" height="200" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;">
+      <defs>
+        <marker id="arrowTR" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+          <path d="M1,1 L7,4 L1,7 Z" fill="#656d76"/>
+        </marker>
+      </defs>
+
+      <!-- Workspace layout mounts -->
+      <rect x="10" y="70" width="145" height="50" rx="6" fill="#1c2128" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="82" y="92" fill="#58a6ff" font-size="10.5" font-weight="700" text-anchor="middle">workspace/layout.tsx</text>
+      <text x="82" y="108" fill="#8b949e" font-size="9" text-anchor="middle">mounts</text>
+
+      <line x1="155" y1="95" x2="180" y2="95" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowTR)"/>
+
+      <!-- character.getCurrentClass -->
+      <rect x="182" y="60" width="155" height="70" rx="6" fill="#1c2128" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="259" y="82" fill="#f0c040" font-size="10" font-weight="700" text-anchor="middle">character.getCurrentClass</text>
+      <text x="259" y="97" fill="#8b949e" font-size="9" text-anchor="middle">query (enabled: !!session)</text>
+      <text x="259" y="112" fill="#8b949e" font-size="9" text-anchor="middle">returns tutorialCompletedAt</text>
+
+      <!-- Derive open state -->
+      <rect x="182" y="150" width="155" height="38" rx="6" fill="#1c2128" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="259" y="167" fill="#3fb950" font-size="9.5" font-weight="700" text-anchor="middle">Derive: open = </text>
+      <text x="259" y="181" fill="#8b949e" font-size="8" text-anchor="middle">completedAt === null &amp;&amp; !manuallyClosed</text>
+      <line x1="259" y1="130" x2="259" y2="150" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowTR)"/>
+
+      <line x1="337" y1="95" x2="362" y2="95" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowTR)"/>
+
+      <!-- Modal -->
+      <rect x="364" y="60" width="115" height="70" rx="6" fill="#1c2128" stroke="#a371f7" stroke-width="1.5"/>
+      <text x="421" y="84" fill="#a371f7" font-size="11" font-weight="700" text-anchor="middle">TutorialModal</text>
+      <text x="421" y="100" fill="#8b949e" font-size="9" text-anchor="middle">open={open}</text>
+      <text x="421" y="114" fill="#8b949e" font-size="9" text-anchor="middle">onComplete → mutate</text>
+
+      <!-- onComplete -->
+      <line x1="479" y1="95" x2="504" y2="95" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowTR)"/>
+
+      <!-- completeTutorial -->
+      <rect x="506" y="60" width="104" height="70" rx="6" fill="#1c2128" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="558" y="84" fill="#3fb950" font-size="10" font-weight="700" text-anchor="middle">completeTutorial</text>
+      <text x="558" y="100" fill="#8b949e" font-size="9" text-anchor="middle">mutation</text>
+      <text x="558" y="114" fill="#8b949e" font-size="9" text-anchor="middle">optimistic update</text>
+    </svg>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-title">Dismiss Semantics</div>
+    Skip = complete. Both <strong>Skip</strong> and <strong>Got it</strong> call <code>onComplete</code>. ESC and overlay click are blocked (<code>onEscapeKeyDown</code> + <code>onPointerDownOutside</code> → <code>preventDefault</code>). No path closes the modal without persisting <code>tutorialCompletedAt</code>.
+  </div>
+
+  <!-- ═══════════ DATABASE ═══════════ -->
+  <h2>Database</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">prisma</span><span>prisma/schema.prisma</span></div>
+    <pre><code class="language-typescript">model Character {
+  // ... existing fields
+  tutorialCompletedAt DateTime? @db.Timestamp(6)
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">sql</span><span>Backfill — skip modal for users who already understand the loop</span></div>
+    <pre><code class="language-sql">UPDATE characters c
+SET tutorial_completed_at = NOW()
+WHERE EXISTS (
+  SELECT 1 FROM character_classes cc WHERE cc.character_id = c.id AND cc.tier > 1
+)
+   OR jsonb_array_length(COALESCE(c.loadout, '[]'::jsonb)) > 0
+   OR EXISTS (
+  SELECT 1 FROM character_quests cq WHERE cq.character_id = c.id AND cq.completed_at IS NOT NULL
+);</code></pre>
+  </div>
+
+  <!-- ═══════════ BACKEND ═══════════ -->
+  <h2>Backend</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">typescript</span><span>character.service.ts</span></div>
+    <pre><code class="language-typescript">async completeTutorial(userId: string) {
+  return this.characterRepository.setTutorialCompletedAt(userId, new Date())
+}
+async resetTutorial(userId: string) {
+  return this.characterRepository.setTutorialCompletedAt(userId, null)
+}</code></pre>
+  </div>
+
+  <!-- ═══════════ ZUSTAND STORE ═══════════ -->
+  <h2>Zustand Store</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">typescript</span><span>src/stores/tutorial.store.ts</span></div>
+    <pre><code class="language-typescript">type TutorialState = {
+  manuallyClosed: boolean
+  setClosed: () => void
+  reopen: () => void
+}
+
+export const useTutorialStore = create&lt;TutorialState&gt;((set) => ({
+  manuallyClosed: false,
+  setClosed: () => set({ manuallyClosed: true }),
+  reopen: () => set({ manuallyClosed: false })
+}))</code></pre>
+  </div>
+
+  <!-- ═══════════ FILES ═══════════ -->
+  <h2>Files Touched</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Path</th><th>Change</th></tr></thead>
+      <tbody>
+        <tr><td><code>prisma/schema.prisma</code></td><td>Add <code>tutorialCompletedAt DateTime?</code> to Character</td></tr>
+        <tr><td><code>src/server/repositories/character.repository.ts</code></td><td>Add <code>setTutorialCompletedAt(userId, value)</code></td></tr>
+        <tr><td><code>src/server/services/character.service.ts</code></td><td>Add <code>completeTutorial</code>, <code>resetTutorial</code>; expose field in <code>getCurrentClass</code></td></tr>
+        <tr><td><code>src/server/routers/character.router.ts</code></td><td>Add <code>completeTutorial</code>, <code>resetTutorial</code> mutations</td></tr>
+        <tr><td><code>src/stores/tutorial.store.ts</code></td><td><span class="badge badge-green">New</span> Zustand slice for <code>manuallyClosed</code></td></tr>
+        <tr><td><code>src/components/tutorial/tutorial-dialog.component.tsx</code></td><td><span class="badge badge-green">New</span> Non-dismissible dialog component</td></tr>
+        <tr><td><code>src/app/(workspace)/layout.tsx</code></td><td>Derive <code>open</code> from query + store; render modal</td></tr>
+        <tr><td><code>src/app/(workspace)/settings/page.tsx</code></td><td>Add "Replay tutorial" button</td></tr>
+        <tr><td><code>public/locales/en/translation.json</code></td><td>Merge <code>tutorial.*</code> keys + <code>settings.replay_tutorial</code></td></tr>
+        <tr><td><code>public/locales/es/translation.json</code></td><td>Same in Spanish</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <details>
+    <summary>Deferred Features</summary>
+    <div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Feature</th><th>Deferred Until</th></tr></thead>
+          <tbody>
+            <tr><td>Guided in-app tour (popovers anchored to real UI)</td><td>Modal completion is high but combat/equip rates don't lift</td></tr>
+            <tr><td>Sidebar checklist ("Complete first habit", "Win first combat")</td><td>Beta data shows users complete modal but stall before first action</td></tr>
+            <tr><td>Per-route contextual tooltips</td><td>Users ask "where do I go now" after the modal</td></tr>
+            <tr><td>Video / animated slides</td><td>Static icons underperform</td></tr>
+            <tr><td>Lore-heavy intro</td><td>Never — roadmap: "evitar lore pesado"</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </details>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+</body>
+</html>

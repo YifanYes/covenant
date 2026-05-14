@@ -146,8 +146,9 @@ export async function executeMove(args: {
   targetIds: string[]
   casterMana: number
   repos: CombatRewardDeps
+  userId?: string
 }): Promise<TacticalMoveResult> {
-  const { participationId, casterId, moveId, targetIds, casterMana, repos } = args
+  const { participationId, casterId, moveId, targetIds, casterMana, repos, userId } = args
 
   const participation = await repos.characterQuestRepository.findByIdWithTacticalState(participationId)
   if (!participation) {
@@ -440,7 +441,7 @@ export async function executeMove(args: {
       })
       await repos.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
     }
-    const defeat = await processEnemyDefeat(participationId, state, killedIds, repos)
+    const defeat = await processEnemyDefeat(participationId, state, killedIds, repos, userId)
     goldReward = defeat.goldReward
     nextEnemy = defeat.nextEnemy
     tierProgression = defeat.tierProgression
@@ -485,8 +486,9 @@ export async function executeEnemyMove(args: {
   participationId: string
   enemyId: string
   repos: CombatRewardDeps
+  userId?: string
 }): Promise<TacticalMoveResult> {
-  const { participationId, enemyId, repos } = args
+  const { participationId, enemyId, repos, userId } = args
   const participation = await repos.characterQuestRepository.findByIdWithTacticalState(participationId)
   if (!participation) {
     throw new TRPCError({ code: 'NOT_FOUND', message: 'Participation not found' })
@@ -573,7 +575,7 @@ export async function executeEnemyMove(args: {
         if (activeEnemy) {
           await repos.combatEnemyRepository.appendToCombatLog(activeEnemy.id, dotLogEntries)
         }
-        const defeat = await processEnemyDefeat(participationId, state, [enemyId], repos)
+        const defeat = await processEnemyDefeat(participationId, state, [enemyId], repos, userId)
         goldReward = defeat.goldReward
         nextEnemy = defeat.nextEnemy
         tierProgression = defeat.tierProgression
@@ -647,6 +649,7 @@ export async function executeEnemyMove(args: {
     moveId: chosen.id,
     targetIds: [player.id],
     casterMana: currentEnemy.currentMana,
-    repos
+    repos,
+    userId
   })
 }

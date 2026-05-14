@@ -180,23 +180,63 @@ Two browsers (one + incognito), `pnpm dev`. Walk this in order:
 
 ---
 
-## Phase 2 — Guild Campaigns (deferred)
+## Phase 2 — Guild Campaigns
 
-**Goal**: shared progress goals across guild members. Validates "group accountability" beyond passive chat.
+Shared progress goals across guild members. Validates "group accountability" beyond passive chat.
 
-**Schema**:
+### Decisions Locked (Phase 2)
 
-- `GuildCampaign` — `id`, `guildId`, `templateId`, `target`, `progress`, `rewardPool` (JSON), `startedAt`, `completedAt`, `expiresAt`
-- `GuildCampaignProgress` — per-member contribution tally (`campaignId`, `userId`, `contribution`)
+| Decision | Choice | Why |
+| --- | --- | --- |
+| Concurrency | **One active campaign per guild** | Simpler UI, clearer focus. Service-layer enforced (no partial-unique constraint). |
+| Reward model | **Equal split, per-entry snapshot at completion** | When the campaign target is reached, `share = floor(rewardPool.gold / contributorCount)` is stamped onto each `GuildCampaignProgress.goldClaimed` field. Claim is deterministic — late contributors created after completion keep `goldClaimed = 0` and are excluded by the claim's `updateMany` predicate. The completion `updateMany` itself is conditional on `completedAt: null`, so concurrent target-crossers race for the snapshot once. |
+| Permissions | **Owner + Officer can start** | Matches invite-create permissions. |
+| Expiry semantics | **`expiresAt` blocks new contributions only** | Claims remain open after expiry if the campaign completed before expiry. |
+| Hook isolation | **`recordEvent` errors swallowed + logged** | User actions (kill, habit, task) never fail because of campaign tracking. |
+| Templates | **Hardcoded constants** (`src/shared/constants/guild-campaigns.ts`) | 4 templates: `KILL_RAMPAGE`, `HABIT_CRUSADE`, `TASK_SWEEP`, `GOLD_RUSH`. |
+
+### What Shipped
+
+**Schema** (`prisma/schema.prisma`):
+
+- `GuildCampaign` — `id`, `guildId`, `templateId`, `eventType`, `target`, `progress`, `rewardPool` (Json), `startedBy`, `startedAt`, `expiresAt`, `completedAt`, `contributorCount` (snapshotted on completion)
+- `GuildCampaignProgress` — per-member contribution tally + claim state. Unique on `(campaignId, userId)`. Tracks `contribution`, `claimedAt`, `goldClaimed` (snapshotted share, stamped at completion).
+
+**Constants** (`src/shared/constants/guild-campaigns.ts`):
+
+- `CAMPAIGN_EVENT_TYPE` enum: `ENEMY_KILL`, `HABIT_COMPLETION`, `TASK_COMPLETION`, `GOLD_EARNED`
+- `CAMPAIGN_TEMPLATES`: 4 templates listed above, each with `defaultTarget`, `durationDays`, `rewardPool: { gold }`.
+
+**Backend** (campaign code lives alongside Phase 1 in the same `guild` module):
+
+- **Repository**: campaign methods (`findActiveCampaignByGuild`, `findCurrentCampaignByGuildWithEntries`, `findCampaignById`, `listCampaignsByGuild`, `createCampaign`) added to `guild.repository.ts`.
+- **Service** (`guild.service.ts`): `startCampaign`, `getCurrentCampaign` (returns the most-recent campaign regardless of completion state so completed campaigns remain claimable in the UI), `listCampaignHistory`, `recordCampaignEvent` (atomic upsert + race-safe completion snapshot — wins via conditional `updateMany` on `completedAt: null`, then stamps `goldClaimed` per entry), `claimCampaignReward` (atomic claim via `updateMany` predicate-narrowed to `goldClaimed > 0 AND claimedAt IS NULL`, then credits `character.gold`).
+- **Factory**: `GuildService` gains `characterRepository` dep; the single `guild` service is injected into `HabitService`, `TaskService`, `CombatService` (and `processEnemyDefeat` via `CombatRewardDeps.guildService`).
+- **Router**: campaign procedures (`getCurrentCampaign`, `getCampaignHistory`, `startCampaign`, `claimCampaignReward`) added to `guilds.router.ts`. Single router avoids fan-out; tRPC inference depth held in check by shaping `startCampaign`'s return type (no raw `Prisma.JsonValue` for `rewardPool`).
 
 **Hooks**:
 
-- `kill-record.service.ts` increments active campaign progress on enemy defeat
-- `habit.service.ts` / `task.service.ts` increments on completion (if campaign template scopes to those events)
+- `HabitService.createCompletion` → `HABIT_COMPLETION`
+- `TaskService.update` (on transition to completing status) → `TASK_COMPLETION`
+- `processEnemyDefeat` (combat reward path) → `ENEMY_KILL` (+1) and `GOLD_EARNED` (+goldReward)
+- All hooks `recordEvent` failures swallowed in-service.
 
-**UI**: campaign banner on guild overview, contribution leaderboard, claim-reward dialog on completion.
+**Frontend**:
 
-**Spec lives at**: `docs/specs/guild_campaigns.md` (write when starting Phase 2).
+- `_components/campaign-panel.component.tsx` — active campaign card with progress bar, leaderboard (top 25 contributors), claim button when completed, recent history when no active campaign
+- `_components/start-campaign-dialog.component.tsx` — template picker for officer+
+- Guild detail page (`[guildId]/page.tsx`) gains a **Campaigns** tab (between Forum and Members)
+
+**i18n**: `guilds.campaigns.*` namespace in both `en` and `es`.
+
+**Tests** (`guild-campaign.service.test.ts` — 19 vitest cases): start permission matrix, unknown template, active-campaign conflict; `recordEvent` no-op paths (no guild, no active, wrong event type, expired, amount ≤ 0); target-crossing stamps `goldClaimed` per contributor entry; race-safe completion (losing tx skips snapshot); error swallowing; claim rejects non-member / not-completed / non-contributor / late-contributor (`goldClaimed = 0`) / double-claim; claim awards the snapshotted share.
+
+### Known Caveats (Phase 2)
+
+- **One-active enforcement is service-layer only** — concurrent `startCampaign` calls could create two active campaigns. Phase 1-acceptable, same family of races as the existing capacity phantom-read caveat.
+- **Leftover gold from non-claimers is lost** — by design. Snapshot makes claim deterministic; unclaimed shares stay in the pool indefinitely.
+- **Late contributions after completion still record contribution but earn no reward** — their entry has `goldClaimed = 0`. Acceptable: contributions across the target boundary are rare and the UX cost (showing them on the leaderboard with no claim) is minor.
+- **No campaign-end push notification** — completion is observed via the 7s poll on `getCurrentCampaign`. Push notifications deferred.
 
 ## Phase 3 — Exclusive Rewards + Progression Bonuses (deferred)
 

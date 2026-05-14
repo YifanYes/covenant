@@ -1,6 +1,6 @@
 'use client'
 import LoaderButton from '@/common/loader-button.component'
-import { panelChrome } from '@/components/rpg/rpg-styles'
+import { panelChrome, rpgDialogContent } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Badge } from '@/ui/badge.component'
@@ -118,7 +118,7 @@ export default function QuestsPage() {
       {/* Quest Detail Modal */}
       <Dialog open={!!selectedQuest} onOpenChange={(open) => !open && setSelectedQuest(null)}>
         {selectedQuest && (
-          <DialogContent className="overflow-hidden p-0" showCloseButton={false}>
+          <DialogContent className={cn(rpgDialogContent, 'overflow-hidden p-0')} showCloseButton={false}>
             {/* Full-bleed image header */}
             <div className="relative flex h-44 items-center justify-center bg-muted">
               <Flag className="h-20 w-20 text-muted-foreground/20" />

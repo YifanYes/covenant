@@ -24,6 +24,7 @@ interface BaseConfirmDialogProps {
   trigger?: ReactNode
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  contentClassName?: string
 }
 
 export default function BaseConfirmDialog({
@@ -37,14 +38,15 @@ export default function BaseConfirmDialog({
   confirmClassName,
   trigger,
   open,
-  onOpenChange
+  onOpenChange,
+  contentClassName
 }: BaseConfirmDialogProps) {
   const { t } = useTranslation()
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       {trigger && <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>}
-      <AlertDialogContent>
+      <AlertDialogContent className={contentClassName}>
         <AlertDialogHeader>
           <AlertDialogTitle>{t(title)}</AlertDialogTitle>
           <AlertDialogDescription>{description ? t(description) : null}</AlertDialogDescription>

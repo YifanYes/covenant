@@ -1,6 +1,6 @@
 'use client'
 import CombatLog from '@/components/combat/combat-log.component'
-import { panelChrome } from '@/components/rpg/rpg-styles'
+import { panelChrome, rpgDialogContent } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import Dialog, { DialogContent, DialogHeader, DialogTitle } from '@/ui/dialog.component'
 import { EnemyType, getEnemy } from '@shared/constants/enemies'
@@ -66,7 +66,7 @@ export default function KillRecordDetailDialog({ enemy, open, onOpenChange }: Ki
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[90vh] flex-col overflow-hidden sm:max-w-3xl">
+      <DialogContent className={cn(rpgDialogContent, 'flex h-[90vh] flex-col overflow-hidden sm:max-w-3xl')}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <Image

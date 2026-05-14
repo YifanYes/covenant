@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth — Covenant Docs</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+<div class="doc-container">
+
+  <nav class="breadcrumb">
+    <a href="index.html">Covenant Docs</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>Authentication</span>
+  </nav>
+
+  <header class="doc-header">
+    <h1>Authentication</h1>
+    <div class="doc-meta">
+      <span><span class="badge badge-green">Implemented</span></span>
+      <span><span class="badge badge-blue">Better Auth v1.6.9</span></span>
+    </div>
+    <p style="margin-top:0.75rem;color:var(--text-secondary);">Email/password + Google OAuth. Magic-link removed. Email verification enforced. Session tokens SHA-256 hashed at the DB layer.</p>
+  </header>
+
+  <!-- ═══════════ AUTH FLOW ═══════════ -->
+  <h2>Sign-Up Flow</h2>
+
+  <div class="diagram">
+    <svg viewBox="0 0 680 200" width="680" height="200" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;">
+      <defs>
+        <marker id="arrowA" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+          <path d="M1,1 L7,4 L1,7 Z" fill="#656d76"/>
+        </marker>
+      </defs>
+
+      <!-- Steps -->
+      <rect x="10"  y="60" width="110" height="44" rx="6" fill="#1c2128" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="65"  y="80" fill="#58a6ff" font-size="10.5" font-weight="700" text-anchor="middle">/sign-up</text>
+      <text x="65"  y="95" fill="#8b949e" font-size="9"    text-anchor="middle">name + email + pw</text>
+
+      <line x1="120" y1="82" x2="145" y2="82" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowA)"/>
+
+      <rect x="147" y="60" width="120" height="44" rx="6" fill="#1c2128" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="207" y="80" fill="#f0c040" font-size="10.5" font-weight="700" text-anchor="middle">Better Auth</text>
+      <text x="207" y="95" fill="#8b949e" font-size="9"    text-anchor="middle">signUpEmail()</text>
+
+      <line x1="267" y1="82" x2="292" y2="82" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowA)"/>
+
+      <rect x="294" y="60" width="120" height="44" rx="6" fill="#1c2128" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="354" y="80" fill="#3fb950" font-size="10.5" font-weight="700" text-anchor="middle">Brevo Email</text>
+      <text x="354" y="95" fill="#8b949e" font-size="9"    text-anchor="middle">verification link</text>
+
+      <line x1="414" y1="82" x2="439" y2="82" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowA)"/>
+
+      <rect x="441" y="60" width="120" height="44" rx="6" fill="#1c2128" stroke="#a371f7" stroke-width="1.5"/>
+      <text x="501" y="80" fill="#a371f7" font-size="10.5" font-weight="700" text-anchor="middle">Click Link</text>
+      <text x="501" y="95" fill="#8b949e" font-size="9"    text-anchor="middle">session issued</text>
+
+      <line x1="561" y1="82" x2="586" y2="82" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowA)"/>
+
+      <rect x="588" y="60" width="80" height="44" rx="6" fill="#1c2128" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="628" y="80" fill="#f0c040" font-size="10.5" font-weight="700" text-anchor="middle">/onboarding</text>
+      <text x="628" y="95" fill="#8b949e" font-size="9"    text-anchor="middle">→ /dashboard</text>
+
+      <!-- Login unverified -->
+      <rect x="147" y="135" width="310" height="40" rx="6" fill="#1c2128" stroke="#e05263" stroke-width="1.5"/>
+      <text x="302" y="152" fill="#e05263" font-size="10.5" font-weight="700" text-anchor="middle">/login before verification</text>
+      <text x="302" y="166" fill="#8b949e" font-size="9"    text-anchor="middle">toast: "Verify your email before logging in."</text>
+      <line x1="207" y1="104" x2="207" y2="135" stroke="#e05263" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrowA)"/>
+    </svg>
+  </div>
+
+  <!-- ═══════════ SECURITY FEATURES ═══════════ -->
+  <h2>Security Features</h2>
+
+  <div class="card-grid">
+    <div class="card card-red">
+      <div class="card-title">Account Lockout</div>
+      <div class="card-body">3 failures / 10s → locked. Redis-backed via <code>account-lockout.ts</code>. Distributed rate limiting via Upstash when configured.</div>
+    </div>
+    <div class="card card-blue">
+      <div class="card-title">Session Token Hashing</div>
+      <div class="card-body">SHA-256 at DB layer (Prisma extension in <code>prisma.ts</code>). Raw token in cookie, hashed token stored in DB.</div>
+    </div>
+    <div class="card card-gold">
+      <div class="card-title">Email Verification</div>
+      <div class="card-body"><code>requireEmailVerification: true</code>. <code>autoSignInAfterVerification: true</code> — session issued on link click.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Account Linking</div>
+      <div class="card-body"><code>trustedProviders: ['google']</code>, <code>allowDifferentEmails: false</code>. Prevents takeover via pre-registered unverified account.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Password Reset</div>
+      <div class="card-body">Token sent via email. <code>revokeSessionsOnPasswordReset: true</code> — all sessions dropped on use.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Security Headers</div>
+      <div class="card-body">HSTS, <code>X-Frame-Options: DENY</code>, <code>X-Content-Type-Options</code>, Referrer-Policy, Permissions-Policy in <code>next.config.ts</code>.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ RATE LIMITS ═══════════ -->
+  <h2>Rate Limiting (Distributed)</h2>
+  <p>Both Better Auth's built-in limiter and the tRPC limiter use Upstash Redis when configured. Fallback to in-memory in dev/test.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Config</th><th>Limit</th><th>Window</th><th>Used For</th></tr></thead>
+      <tbody>
+        <tr><td><code>auth</code></td><td>5 requests</td><td>60s</td><td>sign-in, sign-up</td></tr>
+        <tr><td><code>write</code></td><td>30 requests</td><td>60s</td><td>CRUD mutations</td></tr>
+        <tr><td><code>strict</code></td><td>10 requests</td><td>60s</td><td>sensitive operations</td></tr>
+        <tr><td><code>combat</code></td><td>60 requests</td><td>60s</td><td>combat actions</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ SESSION STORAGE ═══════════ -->
+  <h2>Session Storage</h2>
+  <div class="two-col">
+    <div class="card card-blue">
+      <div class="card-title">Primary — PostgreSQL</div>
+      <div class="card-body"><code>Session</code> table, managed by Better Auth. Token SHA-256 hashed via Prisma extension.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Secondary — Upstash Redis</div>
+      <div class="card-body">Optional. Survives restarts, shared across replicas. Wired to Better Auth <code>secondaryStorage</code>.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SESSION TOKEN HASHING ═══════════ -->
+  <div class="section-divider"><span class="section-divider-text">Session Token Hashing</span></div>
+
+  <h2>Why SHA-256, Not bcrypt</h2>
+  <div class="callout callout-tip">
+    <div class="callout-title">Design Decision</div>
+    bcrypt is non-deterministic — <code>bcrypt.hash("token")</code> produces a different output each call (random salt embedded). You cannot do <code>WHERE token = bcrypt.hash(cookieToken)</code> — the hashes never match.<br><br>
+    SHA-256 is deterministic, one-way, and uses Node.js built-in <code>node:crypto</code>. Session tokens already have ~192 bits of entropy (32-char random strings) — no salt needed.
+  </div>
+
+  <h2>How the Extension Works</h2>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 260" width="700" height="260" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;">
+      <defs>
+        <marker id="arrowH" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+          <path d="M1,1 L7,4 L1,7 Z" fill="#656d76"/>
+        </marker>
+      </defs>
+
+      <!-- Better Auth (caller) -->
+      <rect x="20" y="90" width="120" height="40" rx="6" fill="#1c2128" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="80" y="114" fill="#58a6ff" font-size="11" font-weight="700" text-anchor="middle">Better Auth</text>
+
+      <line x1="140" y1="110" x2="165" y2="110" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowH)"/>
+      <text x="152" y="105" fill="#8b949e" font-size="9" text-anchor="middle">raw token</text>
+
+      <!-- Extension -->
+      <rect x="167" y="60" width="170" height="100" rx="6" fill="#1c2128" stroke="#f0c040" stroke-width="2"/>
+      <text x="252" y="82" fill="#f0c040" font-size="10.5" font-weight="700" text-anchor="middle">Prisma Extension</text>
+      <text x="252" y="97" fill="#8b949e" font-size="9" text-anchor="middle">session-token-hash</text>
+      <line x1="252" y1="105" x2="252" y2="115" stroke="#656d76" stroke-width="1"/>
+      <text x="252" y="125" fill="#3fb950" font-size="9.5" text-anchor="middle">hash(token) → write</text>
+      <text x="252" y="140" fill="#a371f7" font-size="9.5" text-anchor="middle">restore raw → return</text>
+
+      <line x1="337" y1="110" x2="362" y2="110" stroke="#656d76" stroke-width="1.5" marker-end="url(#arrowH)"/>
+      <text x="350" y="105" fill="#8b949e" font-size="9" text-anchor="middle">hashed</text>
+
+      <!-- DB -->
+      <rect x="364" y="90" width="120" height="40" rx="6" fill="#1c2128" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="424" y="114" fill="#3fb950" font-size="11" font-weight="700" text-anchor="middle">PostgreSQL</text>
+
+      <!-- Return path -->
+      <path d="M424,130 L424,180 L252,180 L252,160" fill="none" stroke="#a371f7" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowH)"/>
+      <text x="340" y="198" fill="#a371f7" font-size="9" text-anchor="middle">row with hashed token</text>
+
+      <!-- Back to caller -->
+      <path d="M167,140 L167,200 L80,200 L80,130" fill="none" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowH)"/>
+      <text x="90" y="215" fill="#58a6ff" font-size="9" text-anchor="middle">raw token restored</text>
+      <text x="90" y="228" fill="#8b949e" font-size="8.5" text-anchor="middle">written to session cookie</text>
+    </svg>
+  </div>
+
+  <h3>Operations Intercepted</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Operation</th><th>Hashes Input On</th><th>Restores Raw Token</th></tr></thead>
+      <tbody>
+        <tr><td><code>create</code></td><td><code>data.token</code></td><td>Returned row</td></tr>
+        <tr><td><code>findFirst</code></td><td><code>where.token</code></td><td>Returned row</td></tr>
+        <tr><td><code>findMany</code></td><td><code>where.token</code> (string or <code>in</code>)</td><td>Each row via <code>hash→raw</code> map</td></tr>
+        <tr><td><code>update</code></td><td><code>where.token</code></td><td>Returned row (used by session roll)</td></tr>
+        <tr><td><code>delete</code></td><td><code>where.token</code></td><td>Returned row</td></tr>
+        <tr><td><code>deleteMany</code></td><td><code>where.token</code></td><td>n/a — returns count</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-danger">
+    <div class="callout-title">Migration Warning</div>
+    Existing sessions are invalidated on deploy — DB stores plaintext tokens; after deploy, lookups hash the cookie token but no existing row matches. Users are signed out once and must re-authenticate.<br><br>
+    <strong>Rollback Warning:</strong> If code is reverted after deploy, DB contains hashed tokens but reverted code does raw-token lookups — no one can authenticate until the sessions table is cleared.
+  </div>
+
+  <h2>Implementation</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">typescript</span><span>src/server/lib/session-token.ts</span></div>
+    <pre><code class="language-typescript">import { createHash } from 'node:crypto'
+
+export function hashSessionToken(token: string): string {
+  return createHash('sha256').update(token, 'utf8').digest('hex')
+}</code></pre>
+  </div>
+
+  <h2>Hardening Summary</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Severity</th><th>Item</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-red">Critical</span></td><td>Email verification enforced</td><td><span class="badge badge-green">Delivered</span></td></tr>
+        <tr><td><span class="badge badge-red">Critical</span></td><td>Account-linking takeover closed</td><td><span class="badge badge-green">Delivered</span></td></tr>
+        <tr><td><span class="badge badge-red">Critical</span></td><td>Password reset flow + session revocation</td><td><span class="badge badge-green">Delivered</span></td></tr>
+        <tr><td><span class="badge badge-red">Critical</span></td><td>Distributed rate limiting (Upstash)</td><td><span class="badge badge-green">Delivered</span></td></tr>
+        <tr><td><span class="badge badge-orange">Medium</span></td><td>Email infrastructure (Brevo, templates)</td><td><span class="badge badge-green">Delivered</span></td></tr>
+        <tr><td><span class="badge badge-orange">Medium</span></td><td>Security headers (HSTS, X-Frame, etc.)</td><td><span class="badge badge-green">Delivered</span></td></tr>
+        <tr><td><span class="badge badge-gray">Low</span></td><td>2FA / TOTP</td><td><span class="badge badge-gray">Deferred</span></td></tr>
+        <tr><td><span class="badge badge-gray">Low</span></td><td>CAPTCHA on sign-up</td><td><span class="badge badge-gray">Deferred</span></td></tr>
+        <tr><td><span class="badge badge-gray">Low</span></td><td>CSP</td><td><span class="badge badge-orange">In Progress</span></td></tr>
+        <tr><td><span class="badge badge-gray">Low</span></td><td>HIBP breach check</td><td><span class="badge badge-gray">Deferred</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Environment Variables</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>BREVO_API_KEY</code></td><td><span class="badge badge-orange">Production</span></td><td>Brevo HTTP API key for transactional email</td></tr>
+        <tr><td><code>FROM_EMAIL</code></td><td><span class="badge badge-orange">Production</span></td><td>Verified sender address on a Brevo-authenticated domain</td></tr>
+        <tr><td><code>UPSTASH_REDIS_REST_URL</code></td><td><span class="badge badge-orange">Production</span></td><td>Upstash Redis REST endpoint</td></tr>
+        <tr><td><code>UPSTASH_REDIS_REST_TOKEN</code></td><td><span class="badge badge-orange">Production</span></td><td>Upstash Redis REST token</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>All four degrade gracefully in dev/test (email skipped with a warning; rate limiter falls back to per-instance memory).</p>
+
+  <details>
+    <summary>Verification Steps</summary>
+    <div>
+      <ol>
+        <li><code>pnpm tsc --noEmit</code> — clean</li>
+        <li><code>pnpm lint</code> — clean</li>
+        <li><code>pnpm test:run</code> — all suites pass (rate-limiter tests hit in-memory implementation by design)</li>
+        <li><code>pnpm build</code> — clean; <code>/forgot-password</code> and <code>/reset-password</code> emitted</li>
+        <li>With Brevo + Upstash configured in <code>.env.local</code>:
+          <ul>
+            <li><code>/sign-up</code> → submits → "Check your email" shown; verification email arrives</li>
+            <li>Click verification link → lands on <code>/dashboard</code> with session</li>
+            <li><code>/login</code> before verification → toast: "Verify your email before logging in."</li>
+            <li><code>/forgot-password</code> → same "check your email" state regardless of email existence (prevents enumeration)</li>
+            <li>Click reset link → <code>/reset-password?token=...</code> → submit → redirected to <code>/login</code> with success toast</li>
+          </ul>
+        </li>
+        <li>Query DB after sign-in: <code>SELECT token FROM sessions LIMIT 1;</code> — should be 64-char lowercase hex</li>
+      </ol>
+    </div>
+  </details>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+</body>
+</html>

@@ -1115,8 +1115,61 @@
     },
     "tabs": {
       "forum": "Foro",
+      "campaigns": "Campañas",
       "members": "Miembros",
       "settings": "Ajustes"
+    },
+    "campaigns": {
+      "empty": {
+        "title": "Sin campaña activa",
+        "description": "Reúne al gremio en torno a un objetivo común. Quien aporta, comparte el botín."
+      },
+      "start": {
+        "cta": "Iniciar campaña",
+        "title": "Iniciar una campaña de gremio",
+        "description": "Elige una meta. Los miembros contribuyen jugando. La recompensa se reparte entre quienes aportan al alcanzar el objetivo.",
+        "submit": "Iniciar campaña"
+      },
+      "templates": {
+        "KILL_RAMPAGE": {
+          "name": "Furia de los Fieles",
+          "description": "Aniquilad enemigos juntos. El acero afila al acero."
+        },
+        "HABIT_CRUSADE": {
+          "name": "Cruzada Diaria",
+          "description": "Acumulad hábitos completados. La disciplina contagia."
+        },
+        "TASK_SWEEP": {
+          "name": "Barrida de Tareas",
+          "description": "Cerrad tareas como gremio. La lista es el enemigo."
+        },
+        "GOLD_RUSH": {
+          "name": "Fiebre del Oro",
+          "description": "Saquead más oro de los caídos. La fortuna favorece a los valientes."
+        }
+      },
+      "target": "Objetivo: {{count}}",
+      "duration": "{{count}}d de duración",
+      "reward_gold": "Bote: {{gold}}o",
+      "remaining_days": "Quedan {{count}}d",
+      "remaining_hours": "Quedan {{count}}h",
+      "remaining_minutes": "Quedan {{count}}m",
+      "expired": "Expirada",
+      "completed": "Completada",
+      "contributors": "{{count}} contribuyentes",
+      "claim_cta": "Reclamar {{gold}}o",
+      "claimed": "Recompensa reclamada",
+      "no_contribution": "Aún no has contribuido. Toma acción para sumar.",
+      "leaderboard": "Mayores contribuyentes",
+      "history": "Campañas recientes",
+      "success": {
+        "start": "Campaña iniciada. ¡Adelante, fieles!",
+        "claim": "Recogiste {{gold}} oro."
+      },
+      "error": {
+        "start": "No se pudo iniciar la campaña",
+        "claim": "No se pudo reclamar la recompensa"
+      }
     },
     "role": {
       "owner": "Líder",

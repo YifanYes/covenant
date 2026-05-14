@@ -144,7 +144,8 @@ export class ServiceFactory {
       this.combatEnemyRepository,
       this.killRecord,
       undefined,
-      this.prisma
+      this.prisma,
+      this.guild
     ))
   }
 
@@ -155,12 +156,13 @@ export class ServiceFactory {
       this.guildMemberRepository,
       this.guildMessageRepository,
       this.guildInviteRepository,
-      this.userRepository
+      this.userRepository,
+      this.characterRepository
     ))
   }
 
   get habit(): HabitService {
-    return (this._habitService ??= new HabitService(this.habitRepository, this.mana))
+    return (this._habitService ??= new HabitService(this.habitRepository, this.mana, this.guild))
   }
 
   get journal(): JournalService {
@@ -172,7 +174,7 @@ export class ServiceFactory {
   }
 
   get task(): TaskService {
-    return (this._taskService ??= new TaskService(this.taskRepository, this.mana))
+    return (this._taskService ??= new TaskService(this.taskRepository, this.mana, this.guild))
   }
 
   // Layer 3: Repository + Layer 2 service dependencies

@@ -1,4 +1,5 @@
 import {
+  campaignIdSchema,
   createGuildSchema,
   createInviteSchema,
   deleteMessageSchema,
@@ -8,6 +9,7 @@ import {
   kickMemberSchema,
   revokeInviteSchema,
   sendMessageSchema,
+  startCampaignSchema,
   transferOwnershipSchema,
   updateGuildSchema,
   updateRoleSchema
@@ -113,5 +115,27 @@ export const guildsRouter = t.router({
     .input(deleteMessageSchema)
     .mutation(async ({ ctx, input }) => {
       return ctx.services.guild.deleteMessage(input.messageId, ctx.user.id)
+    }),
+
+  getCurrentCampaign: protectedProcedure.input(guildIdSchema).query(async ({ ctx, input }) => {
+    return ctx.services.guild.getCurrentCampaign(input.guildId, ctx.user.id)
+  }),
+
+  getCampaignHistory: protectedProcedure.input(guildIdSchema).query(async ({ ctx, input }) => {
+    return ctx.services.guild.listCampaignHistory(input.guildId, ctx.user.id)
+  }),
+
+  startCampaign: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.strict))
+    .input(startCampaignSchema)
+    .mutation(async ({ ctx, input }) => {
+      return ctx.services.guild.startCampaign(input, ctx.user.id)
+    }),
+
+  claimCampaignReward: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
+    .input(campaignIdSchema)
+    .mutation(async ({ ctx, input }) => {
+      return ctx.services.guild.claimCampaignReward(input.campaignId, ctx.user.id)
     })
 })

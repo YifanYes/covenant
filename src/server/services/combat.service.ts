@@ -15,6 +15,7 @@ import type { CombatEnemyRepository } from '../repositories/combat-enemy.reposit
 import { executeEnemyMove, executeMove } from '../utils/combat/move-resolution'
 import { type CombatRewardDeps } from '../utils/combat/rewards'
 import type { CharacterService } from './character.service'
+import type { GuildService } from './guild.service'
 import type { KillRecordService } from './kill-record.service'
 import type { ManaService } from './mana.service'
 
@@ -47,7 +48,8 @@ export class CombatService {
     private combatEnemyRepository?: CombatEnemyRepository,
     private killRecordService?: KillRecordService,
     private manaService?: ManaService,
-    private prisma?: PrismaClient
+    private prisma?: PrismaClient,
+    private guildService?: GuildService
   ) {}
 
   private async assertQuestOwnership(questId: string, userId: string): Promise<void> {
@@ -83,7 +85,8 @@ export class CombatService {
       characterQuestRepository: this.characterQuestRepository,
       combatEnemyRepository: this.combatEnemyRepository,
       killRecordService: this.killRecordService,
-      manaService: this.manaService
+      manaService: this.manaService,
+      guildService: this.guildService
     }
   }
 
@@ -198,7 +201,8 @@ export class CombatService {
           const enemyResult = await executeEnemyMove({
             participationId: questId,
             enemyId: pendingUnit.id,
-            repos: this.repos
+            repos: this.repos,
+            userId
           })
           const playerAfter = enemyResult.updatedState.units.find((u) => u.id.startsWith('player-'))
           if (!playerAfter || playerAfter.currentHealth <= 0) {
@@ -226,7 +230,8 @@ export class CombatService {
         moveId,
         targetIds,
         casterMana: currentClass.mana,
-        repos: this.repos
+        repos: this.repos,
+        userId
       })
 
       return precedingEnemy ? mergeMoveResults(precedingEnemy, playerResult) : playerResult
@@ -253,7 +258,7 @@ export class CombatService {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot execute AI turn for player units' })
     }
     return this.withQuestLock(questId, () =>
-      executeEnemyMove({ participationId: questId, enemyId, repos: this.repos })
+      executeEnemyMove({ participationId: questId, enemyId, repos: this.repos, userId })
     )
   }
 

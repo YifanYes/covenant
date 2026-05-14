@@ -1,6 +1,6 @@
 'use client'
 import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
-import { panelChrome } from '@/components/rpg/rpg-styles'
+import { panelChrome, rpgDialogContent } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import { Badge } from '@/ui/badge.component'
 import Button from '@/ui/button.component'
@@ -16,10 +16,11 @@ import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { GuildRole } from '@shared/schemas/guilds.schemas'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useParams, useRouter } from 'next/navigation'
-import { Crown, Delete, Logout, MessageText, MoreVertical, Settings2, Users } from 'pixelarticons/react'
+import { Crown, Delete, Flag, Logout, MessageText, MoreVertical, Settings2, Users } from 'pixelarticons/react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import CampaignPanel from '../_components/campaign-panel.component'
 import GuildForum from '../_components/guild-forum.component'
 import InviteLinkCard from '../_components/invite-link-card.component'
 import MemberList from '../_components/member-list.component'
@@ -125,6 +126,10 @@ export default function GuildDetailPage() {
                 <MessageText className="h-4 w-4" />
                 <span className="hidden sm:inline">{t('guilds.tabs.forum')}</span>
               </TabsTrigger>
+              <TabsTrigger value="campaigns" className="gap-1.5">
+                <Flag className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('guilds.tabs.campaigns')}</span>
+              </TabsTrigger>
               <TabsTrigger value="members" className="gap-1.5">
                 <Users className="h-4 w-4" />
                 <span className="hidden sm:inline">{t('guilds.tabs.members')}</span>
@@ -164,6 +169,10 @@ export default function GuildDetailPage() {
           <GuildForum guildId={guild.id} myUserId={myUserId} myRole={myRole} />
         </TabsContent>
 
+        <TabsContent value="campaigns" className="mt-3">
+          <CampaignPanel guildId={guild.id} myUserId={myUserId} myRole={myRole} members={guild.members} />
+        </TabsContent>
+
         <TabsContent value="members" className="mt-3">
           <MemberList guildId={guild.id} members={guild.members} myUserId={myUserId} myRole={myRole} />
         </TabsContent>
@@ -182,6 +191,7 @@ export default function GuildDetailPage() {
         description="guilds.leave_confirm.description"
         onConfirm={() => leaveMutation.mutate()}
         isLoading={leaveMutation.isPending}
+        contentClassName={rpgDialogContent}
       />
 
       <BaseConfirmDialog
@@ -191,6 +201,7 @@ export default function GuildDetailPage() {
         description="guilds.dissolve_confirm.description"
         onConfirm={() => dissolveMutation.mutate({ guildId: guild.id })}
         isLoading={dissolveMutation.isPending}
+        contentClassName={rpgDialogContent}
       />
     </div>
   )

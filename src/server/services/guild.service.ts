@@ -1,10 +1,17 @@
 import { randomBytes } from 'node:crypto'
+import {
+  CAMPAIGN_EVENT_TYPE,
+  type CampaignEventType,
+  getCampaignTemplate
+} from '@shared/constants/guild-campaigns'
 import type {
   CreateGuildType,
   CreateInviteType,
   GetMessagesType,
   KickMemberType,
+  RewardPoolType,
   SendMessageType,
+  StartCampaignType,
   TransferOwnershipType,
   UpdateGuildType,
   UpdateRoleType
@@ -14,6 +21,7 @@ import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '@/generated/prisma'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
+import type { CharacterRepository } from '../repositories/character.repository'
 import type { GuildInviteRepository } from '../repositories/guild-invite.repository'
 import type { GuildMemberRepository } from '../repositories/guild-member.repository'
 import type { GuildMessageRepository } from '../repositories/guild-message.repository'
@@ -37,6 +45,15 @@ const PRISMA_UNIQUE_CONSTRAINT = 'P2002'
 const notFound = () =>
   new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
 
+function isRewardPool(value: unknown): value is RewardPoolType {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'gold' in value &&
+    typeof (value as { gold: unknown }).gold === 'number'
+  )
+}
+
 export class GuildService {
   constructor(
     private prisma: PrismaClient,
@@ -44,7 +61,8 @@ export class GuildService {
     private guildMemberRepository: GuildMemberRepository,
     private guildMessageRepository: GuildMessageRepository,
     private guildInviteRepository: GuildInviteRepository,
-    private userRepository: UserRepository
+    private userRepository: UserRepository,
+    private characterRepository: CharacterRepository
   ) {}
 
   async createGuild(input: CreateGuildType, userId: string) {
@@ -378,7 +396,269 @@ export class GuildService {
     }
     return member
   }
+
+  // ========== Campaigns ==========
+
+  async startCampaign(input: StartCampaignType, userId: string) {
+    await this.requireRole(input.guildId, userId, [GuildRole.OWNER, GuildRole.OFFICER])
+
+    const template = getCampaignTemplate(input.templateId)
+    if (!template) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Unknown campaign template' })
+    }
+
+    const active = await this.guildRepository.findActiveCampaignByGuild(input.guildId)
+    if (active) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'A campaign is already active. Finish it before starting another.'
+      })
+    }
+
+    const expiresAt = new Date(Date.now() + template.durationDays * 24 * 60 * 60 * 1000)
+
+    const created = await this.guildRepository.createCampaign({
+      guildId: input.guildId,
+      templateId: template.id,
+      eventType: template.eventType,
+      target: template.defaultTarget,
+      rewardPool: template.rewardPool,
+      startedBy: userId,
+      expiresAt
+    })
+
+    return {
+      id: created.id,
+      guildId: created.guildId,
+      templateId: created.templateId,
+      eventType: created.eventType,
+      target: created.target,
+      progress: created.progress,
+      rewardPool: template.rewardPool,
+      startedAt: created.startedAt,
+      expiresAt: created.expiresAt,
+      completedAt: created.completedAt
+    }
+  }
+
+  async getCurrentCampaign(guildId: string, userId: string) {
+    await this.requireMembership(guildId, userId)
+    const campaign = await this.guildRepository.findCurrentCampaignByGuildWithEntries(guildId)
+    if (!campaign) return null
+    return this.shapeCampaign(campaign, userId)
+  }
+
+  async listCampaignHistory(guildId: string, userId: string) {
+    await this.requireMembership(guildId, userId)
+    const campaigns = await this.guildRepository.listCampaignsByGuild(guildId, 20)
+    return campaigns.map((c) => ({
+      id: c.id,
+      templateId: c.templateId,
+      eventType: c.eventType,
+      target: c.target,
+      progress: c.progress,
+      startedAt: c.startedAt,
+      expiresAt: c.expiresAt,
+      completedAt: c.completedAt,
+      rewardPool: isRewardPool(c.rewardPool) ? c.rewardPool : { gold: 0 }
+    }))
+  }
+
+  /**
+   * Record a contribution event. Non-fatal: any error here is logged and swallowed
+   * so user-facing actions (habit completion, kill, etc.) never fail due to campaign tracking.
+   */
+  async recordCampaignEvent(userId: string, eventType: CampaignEventType, amount: number): Promise<void> {
+    if (amount <= 0) return
+    try {
+      const membership = await this.guildMemberRepository.findByUserId(userId)
+      if (!membership) return
+
+      const campaign = await this.guildRepository.findActiveCampaignByGuild(membership.guildId)
+      if (!campaign) return
+      if (campaign.eventType !== eventType) return
+      if (campaign.expiresAt.getTime() <= Date.now()) return
+
+      await this.applyContribution(campaign.id, userId, amount, campaign.target)
+    } catch (error) {
+      log.warn({ err: error, userId, eventType, amount }, 'Failed to record campaign event')
+    }
+  }
+
+  async claimCampaignReward(campaignId: string, userId: string) {
+    const campaign = await this.guildRepository.findCampaignById(campaignId)
+    if (!campaign) throw notFound()
+
+    const member = await this.guildMemberRepository.findByUserAndGuild(userId, campaign.guildId)
+    if (!member) throw notFound()
+
+    if (!campaign.completedAt) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Campaign has not been completed yet' })
+    }
+
+    const character = await this.characterRepository.findByUserId(userId)
+    if (!character) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      // Atomic claim: only entries with a snapshotted goldClaimed > 0 (stamped at completion)
+      // and not yet claimed succeed. Late contributors created after completion have
+      // goldClaimed = 0 and are excluded.
+      const claim = await tx.guildCampaignProgress.updateMany({
+        where: {
+          campaignId,
+          userId,
+          claimedAt: null,
+          goldClaimed: { gt: 0 }
+        },
+        data: { claimedAt: new Date() }
+      })
+
+      if (claim.count === 0) {
+        const existing = await tx.guildCampaignProgress.findUnique({
+          where: { campaignId_userId: { campaignId, userId } }
+        })
+        if (!existing) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'You did not contribute to this campaign'
+          })
+        }
+        if (existing.goldClaimed <= 0) {
+          if (existing.contribution > 0) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message: 'Contributed after the target was reached — no share available'
+            })
+          }
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'You did not contribute to this campaign'
+          })
+        }
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Reward already claimed' })
+      }
+
+      const entry = await tx.guildCampaignProgress.findUnique({
+        where: { campaignId_userId: { campaignId, userId } }
+      })
+      const share = entry?.goldClaimed ?? 0
+
+      if (share > 0) {
+        await tx.character.update({
+          where: { id: character.id },
+          data: { gold: { increment: share } }
+        })
+      }
+
+      return { goldClaimed: share }
+    })
+  }
+
+  private shapeCampaign(
+    campaign: Awaited<ReturnType<GuildRepository['findCurrentCampaignByGuildWithEntries']>>,
+    userId: string
+  ) {
+    if (!campaign) return null
+
+    const pool = isRewardPool(campaign.rewardPool) ? campaign.rewardPool : { gold: 0 }
+    const myEntry = campaign.progressEntries.find((e) => e.userId === userId) ?? null
+    const leaderboard = [...campaign.progressEntries]
+      .filter((e) => e.contribution > 0)
+      .sort((a, b) => b.contribution - a.contribution)
+      .slice(0, 25)
+      .map((e) => ({
+        userId: e.userId,
+        contribution: e.contribution,
+        claimedAt: e.claimedAt
+      }))
+
+    return {
+      id: campaign.id,
+      guildId: campaign.guildId,
+      templateId: campaign.templateId,
+      eventType: campaign.eventType,
+      target: campaign.target,
+      progress: campaign.progress,
+      rewardPool: pool,
+      startedAt: campaign.startedAt,
+      expiresAt: campaign.expiresAt,
+      completedAt: campaign.completedAt,
+      contributorCount: campaign.contributorCount,
+      leaderboard,
+      myContribution: myEntry?.contribution ?? 0,
+      myClaimedAt: myEntry?.claimedAt ?? null,
+      myShare: myEntry?.goldClaimed ?? 0,
+      isExpired: !campaign.completedAt && campaign.expiresAt.getTime() <= Date.now()
+    }
+  }
+
+  private async applyContribution(
+    campaignId: string,
+    userId: string,
+    amount: number,
+    target: number
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      const guardCampaign = await tx.guildCampaign.findUnique({
+        where: { id: campaignId },
+        select: { completedAt: true, expiresAt: true, progress: true, target: true, rewardPool: true }
+      })
+      if (!guardCampaign) return
+      if (guardCampaign.completedAt) return
+      if (guardCampaign.expiresAt.getTime() <= Date.now()) return
+
+      await tx.guildCampaignProgress.upsert({
+        where: { campaignId_userId: { campaignId, userId } },
+        create: { campaignId, userId, contribution: amount },
+        update: { contribution: { increment: amount } }
+      })
+
+      const updated = await tx.guildCampaign.update({
+        where: { id: campaignId },
+        data: { progress: { increment: amount } },
+        select: { id: true, progress: true, completedAt: true }
+      })
+
+      if (!updated.completedAt && updated.progress >= target) {
+        // Race-safe completion: conditional updateMany on completedAt: null elects one
+        // winner. Winner enumerates contributors and stamps goldClaimed onto each entry.
+        // Late contributions whose tx began before this completion still see completedAt
+        // == null in their guard read; their upsert may insert/update a row, but it will
+        // have goldClaimed = 0 (default) and be excluded from claims.
+        const claimed = await tx.guildCampaign.updateMany({
+          where: { id: campaignId, completedAt: null },
+          data: { completedAt: new Date() }
+        })
+
+        if (claimed.count > 0) {
+          const pool = isRewardPool(guardCampaign.rewardPool) ? guardCampaign.rewardPool : { gold: 0 }
+          const contributorEntries = await tx.guildCampaignProgress.findMany({
+            where: { campaignId, contribution: { gt: 0 } },
+            select: { id: true }
+          })
+          const count = contributorEntries.length
+          const share = count > 0 ? Math.floor(pool.gold / count) : 0
+
+          if (count > 0) {
+            await tx.guildCampaignProgress.updateMany({
+              where: { campaignId, contribution: { gt: 0 } },
+              data: { goldClaimed: share }
+            })
+          }
+
+          await tx.guildCampaign.update({
+            where: { id: campaignId },
+            data: { contributorCount: count }
+          })
+        }
+      }
+    })
+  }
 }
+
+export { CAMPAIGN_EVENT_TYPE }
 
 function isUniqueConstraintError(error: unknown): boolean {
   return (

@@ -81,3 +81,19 @@ export const updateRoleSchema = z.object({
   role: z.enum([GuildRole.OFFICER, GuildRole.MEMBER])
 })
 export type UpdateRoleType = z.infer<typeof updateRoleSchema>
+
+export const rewardPoolSchema = z.object({
+  gold: z.number().int().nonnegative()
+})
+export type RewardPoolType = z.infer<typeof rewardPoolSchema>
+
+export const startCampaignSchema = z.object({
+  guildId: z.string().uuid(),
+  templateId: z.string().min(1).max(64)
+})
+export type StartCampaignType = z.infer<typeof startCampaignSchema>
+
+export const campaignIdSchema = z.object({
+  campaignId: z.string().uuid()
+})
+export type CampaignIdType = z.infer<typeof campaignIdSchema>

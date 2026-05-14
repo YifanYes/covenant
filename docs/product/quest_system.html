@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quest System — Covenant Docs</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+<div class="doc-container">
+
+  <nav class="breadcrumb">
+    <a href="index.html">Covenant Docs</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>Quest System</span>
+  </nav>
+
+  <header class="doc-header">
+    <h1>Quest System</h1>
+    <div class="doc-meta">
+      <span><span class="badge badge-green">Implemented</span></span>
+      <span><span class="badge badge-blue">Replaces MapActivity</span></span>
+    </div>
+    <p style="margin-top:0.75rem;color:var(--text-secondary);">Replaces the <code>MapActivity</code>/<code>ActivityParticipation</code> shared-event system with individual character quests. Each character can have one active quest at a time. Quest templates live in code constants; instances persist in the <code>character_quests</code> table.</p>
+  </header>
+
+  <!-- ═══════════ DATA MODEL ═══════════ -->
+  <h2>Data Model</h2>
+
+  <h3>CharacterQuest</h3>
+  <p>Replaces <code>ActivityParticipation</code> + <code>MapActivity</code>. <code>CombatEnemy.participationId</code> renamed to <code>characterQuestId</code>.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td><span class="badge badge-gray">UUID</span></td><td>Primary key</td></tr>
+        <tr><td><code>characterId</code></td><td><span class="badge badge-gray">UUID</span></td><td>FK → Character</td></tr>
+        <tr><td><code>questId</code></td><td><span class="badge badge-gray">VARCHAR</span></td><td>Template ID from QUESTS constants</td></tr>
+        <tr><td><code>status</code></td><td><span class="badge badge-gray">VARCHAR</span></td><td><code>ACTIVE</code> / <code>COMPLETED</code> / <code>ABANDONED</code></td></tr>
+        <tr><td><code>progress</code></td><td><span class="badge badge-gray">Int</span></td><td>Enemies killed so far</td></tr>
+        <tr><td><code>target</code></td><td><span class="badge badge-gray">Int</span></td><td>Enemies needed to complete</td></tr>
+        <tr><td><code>goldEarned</code></td><td><span class="badge badge-gray">Int</span></td><td>Gold accumulated</td></tr>
+        <tr><td><code>startedAt</code></td><td><span class="badge badge-gray">DateTime</span></td><td></td></tr>
+        <tr><td><code>completedAt</code></td><td><span class="badge badge-gray">DateTime?</span></td><td>Nullable</td></tr>
+        <tr><td><code>activeAbilities</code></td><td><span class="badge badge-blue">Json</span></td><td>Player ability state (buffs, cooldowns)</td></tr>
+        <tr><td><code>enemyActiveAbilities</code></td><td><span class="badge badge-blue">Json</span></td><td>Enemy ability state</td></tr>
+        <tr><td><code>combatStats</code></td><td><span class="badge badge-blue">Json</span></td><td>Encounter pattern state</td></tr>
+        <tr><td><code>tacticalState</code></td><td><span class="badge badge-blue">Json</span></td><td>Full tactical combat snapshot</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ QUEST TEMPLATES ═══════════ -->
+  <h2>Quest Templates</h2>
+  <p>Defined in <code>src/shared/constants/quests.ts</code>. Current objective type is <code>KILL_ENEMIES</code>. Interface designed for future types:</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Current</div>
+      <div class="stat-value" style="font-size:0.9rem;">KILL_ENEMIES</div>
+    </div>
+    <div class="stat-card" style="opacity:0.5;">
+      <div class="stat-label">Planned</div>
+      <div class="stat-value" style="font-size:0.8rem;">FIND_ITEM</div>
+    </div>
+    <div class="stat-card" style="opacity:0.5;">
+      <div class="stat-label">Planned</div>
+      <div class="stat-value" style="font-size:0.8rem;">PROTECT_NPC</div>
+    </div>
+    <div class="stat-card" style="opacity:0.5;">
+      <div class="stat-label">Planned</div>
+      <div class="stat-value" style="font-size:0.8rem;">DEFEND</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ FRONTEND ═══════════ -->
+  <h2>Frontend Routes</h2>
+  <div class="card-grid">
+    <div class="card card-blue">
+      <div class="card-title"><code>/quests</code></div>
+      <div class="card-body">List available quest templates + character's active quest status.</div>
+    </div>
+    <div class="card card-gold">
+      <div class="card-title"><code>/quests/[questId]</code></div>
+      <div class="card-body">Combat arena for the active quest. Replaces <code>/map/activity/[id]</code>.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ DELETED ═══════════ -->
+  <h2>Deleted in This Migration</h2>
+  <div class="callout callout-danger">
+    <div class="callout-title">Breaking Changes</div>
+    The following were completely removed as part of this replacement:
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Artifact</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td><code>MapActivity</code></td><td><span class="badge badge-red">DB Model</span></td></tr>
+        <tr><td><code>ActivityParticipation</code></td><td><span class="badge badge-red">DB Model</span></td></tr>
+        <tr><td><code>ActivityRepository</code></td><td><span class="badge badge-gray">Repository</span></td></tr>
+        <tr><td><code>ActivityParticipationRepository</code></td><td><span class="badge badge-gray">Repository</span></td></tr>
+        <tr><td><code>ActivityService</code></td><td><span class="badge badge-gray">Service</span></td></tr>
+        <tr><td><code>DeadlineService</code></td><td><span class="badge badge-gray">Service</span></td></tr>
+        <tr><td><code>activity.router.ts</code></td><td><span class="badge badge-gray">Router</span></td></tr>
+        <tr><td><code>deadline.router.ts</code></td><td><span class="badge badge-gray">Router</span></td></tr>
+        <tr><td><code>src/shared/constants/activities.ts</code></td><td><span class="badge badge-gray">Constants</span></td></tr>
+        <tr><td><code>/map/activity/[id]/page.tsx</code></td><td><span class="badge badge-gray">Page</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ RELATED DOCS ═══════════ -->
+  <h2>Related Documentation</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title"><a href="combat.html">Combat System</a></div>
+      <div class="card-body">Turn structure, damage formula, abilities, enemy AI.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><a href="architecture.html">Architecture</a></div>
+      <div class="card-body">Server layers, CharacterQuest model in full schema table.</div>
+    </div>
+  </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+</body>
+</html>

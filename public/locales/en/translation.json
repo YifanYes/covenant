@@ -1115,8 +1115,61 @@
     },
     "tabs": {
       "forum": "Forum",
+      "campaigns": "Campaigns",
       "members": "Members",
       "settings": "Settings"
+    },
+    "campaigns": {
+      "empty": {
+        "title": "No campaign in progress",
+        "description": "Rally your guild around a shared goal. Whoever shows up shares the loot."
+      },
+      "start": {
+        "cta": "Start campaign",
+        "title": "Start a guild campaign",
+        "description": "Pick a goal. Members contribute by playing the game. Pool splits among contributors when the target is reached.",
+        "submit": "Start campaign"
+      },
+      "templates": {
+        "KILL_RAMPAGE": {
+          "name": "Rampage of the Faithful",
+          "description": "Slay enemies together. Steel sharpens steel."
+        },
+        "HABIT_CRUSADE": {
+          "name": "Daily Crusade",
+          "description": "Stack habit completions. Discipline is contagious."
+        },
+        "TASK_SWEEP": {
+          "name": "Task Sweep",
+          "description": "Close out tasks as a guild. The list is the enemy."
+        },
+        "GOLD_RUSH": {
+          "name": "Gold Rush",
+          "description": "Loot more gold from foes. Riches favor the bold."
+        }
+      },
+      "target": "Target: {{count}}",
+      "duration": "{{count}}d duration",
+      "reward_gold": "Pool: {{gold}}g",
+      "remaining_days": "{{count}}d left",
+      "remaining_hours": "{{count}}h left",
+      "remaining_minutes": "{{count}}m left",
+      "expired": "Expired",
+      "completed": "Completed",
+      "contributors": "{{count}} contributors",
+      "claim_cta": "Claim {{gold}}g",
+      "claimed": "Reward claimed",
+      "no_contribution": "You have not contributed yet. Take action to count.",
+      "leaderboard": "Top contributors",
+      "history": "Recent campaigns",
+      "success": {
+        "start": "Campaign begun. Forward, faithful.",
+        "claim": "You collected {{gold}} gold."
+      },
+      "error": {
+        "start": "Could not start campaign",
+        "claim": "Could not claim reward"
+      }
     },
     "role": {
       "owner": "Owner",

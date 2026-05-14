@@ -1,8 +1,10 @@
+import { CAMPAIGN_EVENT_TYPE } from '@shared/constants/guild-campaigns'
 import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import type { HabitRepository } from '../repositories/habit.repository'
 import { logger } from '../lib/logger'
+import type { GuildService } from './guild.service'
 import type { ManaService } from './mana.service'
 
 const log = logger.child({ service: 'habit' })
@@ -10,7 +12,8 @@ const log = logger.child({ service: 'habit' })
 export class HabitService {
   constructor(
     private habitRepository: HabitRepository,
-    private manaService: ManaService
+    private manaService: ManaService,
+    private guildService?: GuildService
   ) {}
 
   async create(userId: string, input: CreateHabitType) {
@@ -74,6 +77,8 @@ export class HabitService {
     const streak = this.manaService.calculateHabitStreak(completions)
 
     const result = await this.manaService.addManaFromCompletion(userId, 'habit')
+
+    await this.guildService?.recordCampaignEvent(userId, CAMPAIGN_EVENT_TYPE.HABIT_COMPLETION, 1)
 
     return {
       completion,

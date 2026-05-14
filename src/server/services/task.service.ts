@@ -1,3 +1,4 @@
+import { CAMPAIGN_EVENT_TYPE } from '@shared/constants/guild-campaigns'
 import type {
   BulkUpdateTaskItem,
   CreateTaskType,
@@ -5,12 +6,14 @@ import type {
   UpdateTaskType
 } from '@shared/schemas/tasks.schemas'
 import type { TaskRepository } from '../repositories/task.repository'
+import type { GuildService } from './guild.service'
 import type { ManaService } from './mana.service'
 
 export class TaskService {
   constructor(
     private taskRepository: TaskRepository,
-    private manaService: ManaService
+    private manaService: ManaService,
+    private guildService?: GuildService
   ) {}
 
   async create(userId: string, input: CreateTaskType) {
@@ -81,6 +84,7 @@ export class TaskService {
       const result = await this.manaService.addManaFromCompletion(userId, 'task', { impact: task.impact })
       manaEarned = result.manaApplied
       reserveGained = result.reserveGained
+      await this.guildService?.recordCampaignEvent(userId, CAMPAIGN_EVENT_TYPE.TASK_COMPLETION, 1)
     }
 
     return { task, manaEarned, reserveGained }

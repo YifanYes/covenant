@@ -4,7 +4,7 @@ import ThemeProvider, { Theme } from '@/components/common/theme-provider.compone
 import Toaster from '@/components/ui/toaster.component'
 import { Faction } from '@shared/constants/factions'
 import type { Metadata } from 'next'
-import { Cinzel, EB_Garamond, Geist, Geist_Mono } from 'next/font/google'
+import { Cinzel, EB_Garamond, Geist, Geist_Mono, Pixelify_Sans, Press_Start_2P } from 'next/font/google'
 import { cookies, headers } from 'next/headers'
 import './globals.css'
 import { I18nProvider } from './providers/i18n-provider'
@@ -30,6 +30,20 @@ const cinzel = Cinzel({
   variable: '--font-cinzel',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800', '900']
+})
+
+const pixelifySans = Pixelify_Sans({
+  subsets: ['latin'],
+  weight: ['400', '600'],
+  variable: '--font-rpg-body',
+  display: 'swap'
+})
+
+const pressStart2P = Press_Start_2P({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-rpg-display',
+  display: 'swap'
 })
 
 // Helper to get preferred language from headers
@@ -63,7 +77,7 @@ export default async function RootLayout({
   return (
     <html lang={lang} className={`${theme} ${factionClass}`} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${ebGaramond.variable} ${cinzel.variable} ${factionClass} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${ebGaramond.variable} ${cinzel.variable} ${pixelifySans.variable} ${pressStart2P.variable} ${factionClass} antialiased`}
         suppressHydrationWarning
       >
         <I18nProvider initialLang={lang}>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database SSL — Covenant Docs</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+<div class="doc-container">
+
+  <nav class="breadcrumb">
+    <a href="index.html">Covenant Docs</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>Database SSL</span>
+  </nav>
+
+  <header class="doc-header">
+    <h1>Database SSL Configuration</h1>
+    <div class="doc-meta">
+      <span><span class="badge badge-orange">Tech Debt</span></span>
+      <span><span class="badge badge-green">Encrypted in Transit</span></span>
+    </div>
+    <p style="margin-top:0.75rem;color:var(--text-secondary);">TLS is enabled in production, but certificate chain verification is disabled — a deliberate trade-off pending Prisma and Railway fixes.</p>
+  </header>
+
+  <!-- ═══════════ CURRENT CONFIG ═══════════ -->
+  <h2>Current Configuration</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">typescript</span><span>src/server/lib/prisma.ts — pool SSL</span></div>
+    <pre><code class="language-typescript">ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,</code></pre>
+  </div>
+
+  <div class="callout callout-warning">
+    <div class="callout-title">What This Means</div>
+    The production connection is <strong>TLS-encrypted</strong> — wire traffic is protected. However, the certificate chain is <strong>not verified</strong>. A MITM attacker on the network path could in theory present any certificate.
+  </div>
+
+  <!-- ═══════════ WHY ═══════════ -->
+  <h2>Why rejectUnauthorized Is False</h2>
+
+  <div class="card-grid">
+    <div class="card card-red">
+      <div class="card-title">Issue 1 — No Railway CA Bundle</div>
+      <div class="card-body">Railway doesn't publish a CA bundle for managed Postgres. Their TCP proxy presents a certificate chain not in Node.js's default trust store. No <code>ssl.ca</code> PEM to pin. Railway staff confirm: skip strict verification for project-private connectivity.</div>
+    </div>
+    <div class="card card-red">
+      <div class="card-title">Issue 2 — Prisma 7 Regression</div>
+      <div class="card-body"><code>@prisma/adapter-pg</code> in 7.x stops trusting Railway-style chains that worked in Prisma 6.x, even with explicit pool options or <code>sslmode=verify-full</code>.</div>
+    </div>
+  </div>
+
+  <h3>Tracking Issues</h3>
+  <ul>
+    <li><a href="https://github.com/prisma/prisma/issues/29060">prisma/prisma#29060</a> — "Error opening a TLS connection: self-signed certificate in certificate chain"</li>
+    <li><a href="https://github.com/prisma/prisma/issues/27611">prisma/prisma#27611</a> — root duplicate, adapter-pg SSL handling</li>
+    <li><a href="https://github.com/prisma/prisma/issues/29252">prisma/prisma#29252</a> — <code>PrismaPg</code> connectionString fails on SSL-required DBs</li>
+  </ul>
+
+  <!-- ═══════════ FUTURE HARDENING ═══════════ -->
+  <h2>Future Hardening</h2>
+  <p>Flip back to strict verification once <strong>either</strong> condition holds:</p>
+
+  <div class="two-col">
+    <div class="card card-gold">
+      <div class="card-title">Condition A — Prisma Fix</div>
+      <div class="card-body">Prisma ships a fix for #29060 / #27611 in the 7.x line that restores 6.x behavior — and we upgrade to that version.</div>
+    </div>
+    <div class="card card-gold">
+      <div class="card-title">Condition B — Railway CA Bundle</div>
+      <div class="card-body">Railway exposes a CA bundle for managed Postgres. Then add <code>DATABASE_SSL_CA</code> to <code>src/server/config.ts</code>.</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">typescript</span><span>hardened config (when a CA is available)</span></div>
+    <pre><code class="language-typescript">ssl: env.NODE_ENV === 'production'
+  ? { rejectUnauthorized: true, ca: env.DATABASE_SSL_CA }
+  : false,</code></pre>
+  </div>
+
+  <!-- ═══════════ FAILURE SCENARIOS ═══════════ -->
+  <h2>Common Failure Scenarios</h2>
+
+  <div class="callout callout-danger">
+    <div class="callout-title">UNABLE_TO_VERIFY_LEAF_SIGNATURE / SELF_SIGNED_CERT_IN_CHAIN</div>
+    <strong>Cause:</strong> DB certificate signed by a private CA not in Node.js's default trust store. With <code>rejectUnauthorized: false</code> this no longer fails the handshake — it would resurface if strict verification is re-enabled prematurely.<br><br>
+    <strong>Fix when a CA is available:</strong><br>
+    <code>ssl: { rejectUnauthorized: true, ca: env.DATABASE_SSL_CA }</code>
+  </div>
+
+  <div class="callout callout-warning">
+    <div class="callout-title">CERT_HAS_EXPIRED</div>
+    <strong>Cause:</strong> DB SSL certificate has passed its expiry date.<br>
+    <strong>Fix:</strong> Renew certificate on the database server. On Railway this is handled automatically.
+  </div>
+
+  <div class="callout callout-warning">
+    <div class="callout-title">ERR_TLS_CERT_ALTNAME_INVALID / Hostname Mismatch</div>
+    <strong>Cause:</strong> Hostname in <code>DATABASE_URL</code> does not match the CN or SAN in the certificate. Common when using an IP address instead of a hostname.<br>
+    <strong>Fix:</strong> Use the hostname (e.g., <code>postgres.railway.internal</code>) rather than a raw IP in <code>DATABASE_URL</code>.
+  </div>
+
+  <div class="callout callout-danger">
+    <div class="callout-title">Connection Refused / ECONNREFUSED with SSL Enabled</div>
+    <strong>Cause:</strong> Database server not configured to accept SSL connections at all.<br>
+    <strong>Fix:</strong> Enable SSL on the Postgres server (<code>ssl = on</code> in <code>postgresql.conf</code>). Railway Postgres has SSL enabled by default.
+  </div>
+
+  <!-- ═══════════ VERIFY ENCRYPTION ═══════════ -->
+  <h2>Verifying the Connection Is Encrypted</h2>
+  <p>Even with <code>rejectUnauthorized: false</code>, the channel is still TLS-encrypted. Confirm with:</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">sql</span></div>
+    <pre><code class="language-sql">SELECT ssl, version FROM pg_stat_ssl WHERE pid = pg_backend_pid();</code></pre>
+  </div>
+  <p>If <code>ssl</code> is <code>t</code>, the connection is encrypted. The lost guarantee is <em>whose certificate</em> terminated the TLS, not whether TLS is present.</p>
+
+  <!-- ═══════════ LOCAL DEV ═══════════ -->
+  <h2>Local Development</h2>
+  <div class="callout callout-success">
+    <div class="callout-title">No Action Needed</div>
+    SSL remains disabled in <code>development</code> and <code>test</code> environments (<code>ssl: false</code>). Local Postgres instances typically don't have SSL certificates configured.
+  </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+</body>
+</html>
