@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { createTacticalStateWithNewEnemy } from '../../../utils/combat/rewards'
+import { describe, expect, it, vi } from 'vitest'
+import { createTacticalStateWithNewEnemy, processEnemyDefeat } from '../../../utils/combat/rewards'
 import { createTestTacticalState, createTestUnit } from '../../fixtures/tactical-state.fixtures'
 
 const newEnemyArgs = (
@@ -71,6 +71,119 @@ describe('rewards utilities', () => {
       )
       expect(result.units.find((u) => u.id === 'old-enemy')).toBeUndefined()
       expect(result.units.find((u) => u.id === 'new-enemy')).toBeDefined()
+    })
+  })
+
+  describe('processEnemyDefeat — guild gold multiplier (Phase 3)', () => {
+    function makeRepos(multipliedGold: number) {
+      const characterRepo = {
+        addGold: vi.fn().mockResolvedValue(undefined),
+        findByIdWithClasses: vi.fn().mockResolvedValue(null)
+      }
+      const characterQuestRepo = {
+        updateProgress: vi.fn().mockResolvedValue(undefined),
+        findById: vi
+          .fn()
+          .mockResolvedValueOnce({ id: 'q-1', characterId: 'char-1', questId: 'unknown', progress: 1, target: 1000 })
+          .mockResolvedValueOnce({ id: 'q-1', characterId: 'char-1', questId: 'unknown', progress: 1, target: 1000 }),
+        getCombatStats: vi.fn().mockResolvedValue(null),
+        updateCombatStats: vi.fn().mockResolvedValue(undefined),
+        updateTacticalState: vi.fn().mockResolvedValue(undefined),
+        complete: vi.fn().mockResolvedValue(undefined)
+      }
+      const combatEnemyRepo = {
+        getActiveEnemy: vi
+          .fn()
+          .mockResolvedValue({ id: 'enemy-1', templateId: 'skeleton', currentHealth: 0 }),
+        defeatEnemy: vi.fn().mockResolvedValue(undefined),
+        findById: vi.fn(),
+        createEnemy: vi.fn().mockResolvedValue({ id: 'enemy-2' })
+      }
+      const guildService = {
+        applyCombatRewards: vi.fn().mockResolvedValue(multipliedGold)
+      }
+      return { characterRepo, characterQuestRepo, combatEnemyRepo, guildService }
+    }
+
+    it('returns the post-multiplier gold from applyCombatRewards', async () => {
+      // Deterministic base gold: stub random to mid-range. skeleton range 8-12 → base=8.
+      const randSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+      const { characterRepo, characterQuestRepo, combatEnemyRepo, guildService } = makeRepos(9)
+
+      const state = createTestTacticalState({
+        units: [createTestUnit({ id: 'player-1' }), createTestUnit({ id: 'enemy-1' })]
+      })
+
+      const result = await processEnemyDefeat(
+        'q-1',
+        state,
+        ['enemy-1'],
+        {
+          characterRepository: characterRepo as any,
+          characterQuestRepository: characterQuestRepo as any,
+          combatEnemyRepository: combatEnemyRepo as any,
+          guildService: guildService as any
+        },
+        'user-1'
+      )
+
+      expect(guildService.applyCombatRewards).toHaveBeenCalledWith('user-1', 8)
+      expect(result.goldReward).toBe(9)
+      expect(characterRepo.addGold).toHaveBeenCalledWith('char-1', 9)
+
+      randSpy.mockRestore()
+    })
+
+    it('uses base gold when no guildService is injected', async () => {
+      const randSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+      const { characterRepo, characterQuestRepo, combatEnemyRepo } = makeRepos(8)
+
+      const state = createTestTacticalState({
+        units: [createTestUnit({ id: 'player-1' }), createTestUnit({ id: 'enemy-1' })]
+      })
+
+      const result = await processEnemyDefeat(
+        'q-1',
+        state,
+        ['enemy-1'],
+        {
+          characterRepository: characterRepo as any,
+          characterQuestRepository: characterQuestRepo as any,
+          combatEnemyRepository: combatEnemyRepo as any
+        },
+        'user-1'
+      )
+
+      expect(result.goldReward).toBe(8)
+      randSpy.mockRestore()
+    })
+
+    it('falls back to base gold if applyCombatRewards throws', async () => {
+      const randSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+      const { characterRepo, characterQuestRepo, combatEnemyRepo, guildService } = makeRepos(0)
+      guildService.applyCombatRewards.mockRejectedValue(new Error('db down'))
+
+      const state = createTestTacticalState({
+        units: [createTestUnit({ id: 'player-1' }), createTestUnit({ id: 'enemy-1' })]
+      })
+
+      const result = await processEnemyDefeat(
+        'q-1',
+        state,
+        ['enemy-1'],
+        {
+          characterRepository: characterRepo as any,
+          characterQuestRepository: characterQuestRepo as any,
+          combatEnemyRepository: combatEnemyRepo as any,
+          guildService: guildService as any
+        },
+        'user-1'
+      )
+
+      expect(result.goldReward).toBe(8)
+      // Character should still credited from the base gold despite the buff path failing.
+      expect(characterRepo.addGold).toHaveBeenCalledWith('char-1', 8)
+      randSpy.mockRestore()
     })
   })
 })

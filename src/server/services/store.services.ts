@@ -4,11 +4,17 @@ import type { PurchaseResult, StoreListResult } from '@shared/types/store.types'
 import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CharacterService } from './character.service'
+import type { GuildService } from './guild.service'
+
+// Precomputed at module load: only pay for the guild lookup in `listAvailableItems`
+// when the item catalog actually contains a guild-exclusive entry.
+const CATALOG_HAS_GUILD_EXCLUSIVES = Object.values(ALL_ITEMS).some((item) => item.guildExclusive === true)
 
 export class StoreService {
   constructor(
     private characterRepository: CharacterRepository,
-    private characterService: CharacterService
+    private characterService: CharacterService,
+    private guildService?: GuildService
   ) {}
 
   async listAvailableItems(userId: string): Promise<StoreListResult> {
@@ -26,8 +32,18 @@ export class StoreService {
       ...loadout.map((item) => item.definitionId)
     ])
 
-    // Filter equipment items: must have price > 0 and not already owned
-    const availableEquipment = Object.values(ALL_ITEMS).filter((item) => item.price > 0 && !ownedItemIds.has(item.id))
+    const guildProgression =
+      CATALOG_HAS_GUILD_EXCLUSIVES && this.guildService ? await this.guildService.getMyProgression(userId) : null
+    const guildTier = guildProgression?.tier ?? 0
+
+    // Filter equipment items: must have price > 0 and not already owned.
+    // Guild-exclusive items only surface when user is in a guild whose tier >= item.tier.
+    const availableEquipment = Object.values(ALL_ITEMS).filter((item) => {
+      if (item.price <= 0) return false
+      if (ownedItemIds.has(item.id)) return false
+      if (item.guildExclusive && guildTier < item.tier) return false
+      return true
+    })
 
     // Include all consumables (they are stackable, so always available)
     const availableConsumables = Object.values(CONSUMABLES)
@@ -48,6 +64,12 @@ export class StoreService {
 
     const { tier: characterTier } = this.characterService.getCharacterProgress(character)
 
+    // Resolve guild tier once for the whole batch (guild-exclusive item gating).
+    const hasGuildExclusiveInBatch = itemIds.some((id) => ALL_ITEMS[id]?.guildExclusive === true)
+    const guildProgression =
+      hasGuildExclusiveInBatch && this.guildService ? await this.guildService.getMyProgression(userId) : null
+    const guildTier = guildProgression?.tier ?? 0
+
     // Get item definitions and calculate total cost
     const itemsToBuy = itemIds.map((id) => {
       const consumable = getConsumableById(id)
@@ -64,6 +86,12 @@ export class StoreService {
       }
       if (item.tier > characterTier) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: `Item ${item.id} requires Tier ${item.tier}` })
+      }
+      if (item.guildExclusive && guildTier < item.tier) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Item ${item.id} requires a Guild of Tier ${item.tier}`
+        })
       }
       return item
     })

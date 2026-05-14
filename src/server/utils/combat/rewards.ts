@@ -1,4 +1,3 @@
-import { CAMPAIGN_EVENT_TYPE } from '@shared/constants/guild-campaigns'
 import { getQuestById, selectEnemyWithFallback } from '@shared/constants/quests'
 import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
 import { applyStatScaling, calculateGoldReward, getEnemy } from '@shared/constants/enemies'
@@ -80,7 +79,23 @@ export async function processEnemyDefeat(
   // Get enemy template for gold calculation
   const enemyTemplate = getEnemy(activeEnemy.templateId)
   if (enemyTemplate) {
-    result.goldReward = calculateGoldReward(enemyTemplate)
+    const baseGold = calculateGoldReward(enemyTemplate)
+    // Apply guild-tier gold multiplier + record kill/gold contribution events
+    // in a single membership lookup. `applyCombatRewards` is fail-safe — it
+    // returns baseGold and logs internally on lookup failure. Capped at +20%
+    // (tier 5); the post-multiplier amount feeds GOLD_EARNED tracking — small
+    // feedback loop bounded by the multiplier cap.
+    if (repos.guildService && userId) {
+      try {
+        result.goldReward = await repos.guildService.applyCombatRewards(userId, baseGold)
+      } catch {
+        // belt-and-suspenders: applyCombatRewards handles its own errors, but
+        // never let the buff path break the reward flow.
+        result.goldReward = baseGold
+      }
+    } else {
+      result.goldReward = baseGold
+    }
   }
 
   // Update quest progress (kills + gold)
@@ -103,22 +118,9 @@ export async function processEnemyDefeat(
     }
   }
 
-  // Record guild campaign contributions. Non-fatal — wrapped to guarantee user's
-  // kill/gold reward path is unaffected even if recordEvent throws.
-  if (repos.guildService && userId) {
-    try {
-      await repos.guildService.recordCampaignEvent(userId, CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)
-      if (result.goldReward > 0) {
-        await repos.guildService.recordCampaignEvent(
-          userId,
-          CAMPAIGN_EVENT_TYPE.GOLD_EARNED,
-          result.goldReward
-        )
-      }
-    } catch {
-      // swallow — campaign tracking must never break the combat reward path
-    }
-  }
+  // Guild campaign + contribution events (ENEMY_KILL, GOLD_EARNED) are now recorded
+  // inside `applyCombatRewards` above, sharing the same membership lookup as the
+  // gold multiplier — saves two round-trips per defeat in the combat hot path.
 
   // Reload updated quest to get the latest progress
   const updatedQuest = await repos.characterQuestRepository.findById(questId)

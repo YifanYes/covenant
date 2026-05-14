@@ -4,6 +4,13 @@ import {
   type CampaignEventType,
   getCampaignTemplate
 } from '@shared/constants/guild-campaigns'
+import {
+  computeContributionPoints,
+  getGuildGoldMultiplier,
+  getGuildTier,
+  getNextTierThreshold,
+  MAX_GUILD_TIER
+} from '@shared/constants/guild-progression'
 import type {
   CreateGuildType,
   CreateInviteType,
@@ -467,21 +474,153 @@ export class GuildService {
   /**
    * Record a contribution event. Non-fatal: any error here is logged and swallowed
    * so user-facing actions (habit completion, kill, etc.) never fail due to campaign tracking.
+   *
+   * Two effects per event:
+   * 1. Always-on guild progression — bumps `Guild.totalContribution` and advances `Guild.tier`
+   *    when a new threshold is crossed. Independent of whether a campaign is active.
+   * 2. Active-campaign progress — only when an active campaign matches the eventType.
    */
   async recordCampaignEvent(userId: string, eventType: CampaignEventType, amount: number): Promise<void> {
     if (amount <= 0) return
+    let membership: { guildId: string } | null = null
     try {
-      const membership = await this.guildMemberRepository.findByUserId(userId)
-      if (!membership) return
+      membership = await this.guildMemberRepository.findByUserId(userId)
+    } catch (error) {
+      log.warn({ err: error, userId, eventType, amount }, 'Failed to look up guild membership')
+      return
+    }
+    if (!membership) return
+    await this.recordEventForGuild(membership.guildId, userId, eventType, amount)
+  }
 
-      const campaign = await this.guildRepository.findActiveCampaignByGuild(membership.guildId)
+  /**
+   * Combat hot-path: a single membership+guild lookup that both multiplies gold by
+   * the guild-tier multiplier and records ENEMY_KILL + GOLD_EARNED contribution and
+   * campaign progress. Folds what used to be three independent member lookups
+   * (`getGoldMultiplier` + two `recordCampaignEvent` calls) into one round-trip pair.
+   *
+   * Non-fatal: a failure in the membership lookup falls back to the base gold and
+   * skips event recording entirely. Per-event errors are still logged independently
+   * inside `recordEventForGuild`.
+   */
+  async applyCombatRewards(userId: string, baseGold: number): Promise<number> {
+    let membership: { guildId: string; tier: number } | null = null
+    try {
+      const member = await this.guildMemberRepository.findByUserId(userId)
+      if (!member) return baseGold
+      const guild = await this.guildRepository.findById(member.guildId)
+      if (!guild) {
+        log.warn({ userId, guildId: member.guildId }, 'Guild member references missing guild')
+        return baseGold
+      }
+      membership = { guildId: guild.id, tier: guild.tier }
+    } catch (error) {
+      log.warn({ err: error, userId }, 'Failed to load guild membership for combat rewards')
+      return baseGold
+    }
+
+    const multipliedGold = Math.floor(baseGold * getGuildGoldMultiplier(membership.tier))
+
+    await this.recordEventForGuild(membership.guildId, userId, CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)
+    if (multipliedGold > 0) {
+      // Contribution bump uses post-multiplier gold (bounded +20% feedback loop,
+      // accepted per Phase 3 spec). Campaign progress uses pre-multiplier baseGold
+      // so a GOLD_EARNED campaign target is not affected by guild tier — preserves
+      // the Phase 2 contract.
+      await this.recordEventForGuild(
+        membership.guildId,
+        userId,
+        CAMPAIGN_EVENT_TYPE.GOLD_EARNED,
+        multipliedGold,
+        baseGold
+      )
+    }
+
+    return multipliedGold
+  }
+
+  /**
+   * Two-stage event recording on a known guild: always-on contribution bump, then
+   * active-campaign progress when the event type matches. Each stage has its own
+   * try/catch so a failure in one path doesn't block the other.
+   *
+   * `contributionAmount` feeds `Guild.totalContribution`; `campaignAmount` feeds
+   * the active campaign target. They diverge only for GOLD_EARNED from combat,
+   * where the gold multiplier should bump contribution but not skew Phase 2
+   * campaign progress.
+   */
+  private async recordEventForGuild(
+    guildId: string,
+    userId: string,
+    eventType: CampaignEventType,
+    contributionAmount: number,
+    campaignAmount: number = contributionAmount
+  ): Promise<void> {
+    try {
+      const points = computeContributionPoints(eventType, contributionAmount)
+      if (points > 0) {
+        await this.addGuildContribution(guildId, points)
+      }
+    } catch (error) {
+      log.warn(
+        { err: error, userId, guildId, eventType, amount: contributionAmount },
+        'Failed to bump guild contribution'
+      )
+    }
+
+    try {
+      const campaign = await this.guildRepository.findActiveCampaignByGuild(guildId)
       if (!campaign) return
       if (campaign.eventType !== eventType) return
       if (campaign.expiresAt.getTime() <= Date.now()) return
 
-      await this.applyContribution(campaign.id, userId, amount, campaign.target)
+      await this.applyContribution(campaign.id, userId, campaignAmount, campaign.target)
     } catch (error) {
-      log.warn({ err: error, userId, eventType, amount }, 'Failed to record campaign event')
+      log.warn(
+        { err: error, userId, guildId, eventType, amount: campaignAmount },
+        'Failed to record campaign event'
+      )
+    }
+  }
+
+  /**
+   * Atomic contribution increment + tier compare-and-swap. Tier is recomputed from
+   * the post-increment total via the pure `getGuildTier()` (handles multi-threshold
+   * jumps). The conditional `updateMany` on `tier < computed` elects one winner
+   * across concurrent crossings, matching the joinByToken CAS pattern. The two
+   * statements are non-transactional; if the CAS fails after the increment lands,
+   * tier self-heals on the next event.
+   */
+  private async addGuildContribution(guildId: string, points: number): Promise<void> {
+    const updated = await this.prisma.guild.update({
+      where: { id: guildId },
+      data: { totalContribution: { increment: points } },
+      select: { tier: true, totalContribution: true }
+    })
+    const newTier = getGuildTier(updated.totalContribution)
+    if (newTier > updated.tier) {
+      await this.prisma.guild.updateMany({
+        where: { id: guildId, tier: { lt: newTier } },
+        data: { tier: newTier }
+      })
+    }
+  }
+
+  /** Tier + progression summary for the user's guild, or null if guildless. */
+  async getMyProgression(userId: string) {
+    const membership = await this.guildMemberRepository.findByUserId(userId)
+    if (!membership) return null
+    const guild = await this.guildRepository.findById(membership.guildId)
+    if (!guild) return null
+    const tier = guild.tier
+    const nextThreshold = getNextTierThreshold(tier)
+    return {
+      guildId: guild.id,
+      tier,
+      maxTier: MAX_GUILD_TIER,
+      totalContribution: guild.totalContribution,
+      nextThreshold,
+      goldMultiplier: getGuildGoldMultiplier(tier)
     }
   }
 

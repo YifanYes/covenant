@@ -34,6 +34,7 @@ export default function GuildDetailPage() {
   const [dissolveOpen, setDissolveOpen] = useState(false)
 
   const guildQuery = useQuery(trpcOptions.guilds.getMyGuild.queryOptions())
+  const progressionQuery = useQuery(trpcOptions.guilds.getMyProgression.queryOptions())
 
   const leaveMutation = useMutation(
     trpcOptions.guilds.leave.mutationOptions({
@@ -120,6 +121,31 @@ export default function GuildDetailPage() {
                   {guild.members.length} / {guild.capacity}
                 </span>
               </div>
+              {progressionQuery.data && (
+                <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground tabular-nums">
+                  <Badge variant="outline" className="gap-1 px-1.5 py-0">
+                    {t('guilds.progression.tier_badge', {
+                      tier: progressionQuery.data.tier,
+                      max: progressionQuery.data.maxTier
+                    })}
+                  </Badge>
+                  <span>
+                    {progressionQuery.data.nextThreshold !== null
+                      ? t('guilds.progression.next', {
+                          current: progressionQuery.data.totalContribution,
+                          next: progressionQuery.data.nextThreshold
+                        })
+                      : t('guilds.progression.maxed', { current: progressionQuery.data.totalContribution })}
+                  </span>
+                  <span>
+                    {progressionQuery.data.goldMultiplier > 1
+                      ? t('guilds.progression.buff', {
+                          pct: Math.round((progressionQuery.data.goldMultiplier - 1) * 100)
+                        })
+                      : t('guilds.progression.buff_locked')}
+                  </span>
+                </div>
+              )}
             </div>
             <TabsList className="shrink-0">
               <TabsTrigger value="forum" className="gap-1.5">

@@ -29,6 +29,11 @@ export interface ItemDefinition {
   tier: number
   stats: ItemStats
   price: number
+  /**
+   * Guild-exclusive items only appear in the store for users in a guild whose
+   * `Guild.tier >= ItemDefinition.tier`. Bought with regular character gold.
+   */
+  guildExclusive?: boolean
 }
 
 export interface ConsumableEffect {
@@ -153,6 +158,16 @@ export const TIER_2_WEAPONS: Record<string, ItemDefinition> = {
     tier: 2,
     stats: { magicAtkBonus: 4, speed: 1, damageType: WeaponDamageType.MAGIC },
     price: 50
+  },
+  guild_vanguard_blade: {
+    id: 'guild_vanguard_blade',
+    nameKey: 'items.guild_vanguard_blade.name',
+    descriptionKey: 'items.guild_vanguard_blade.description',
+    type: ItemType.WEAPON_MELEE,
+    tier: 2,
+    stats: { strengthAtkBonus: 4, speed: 2, damageType: WeaponDamageType.PHYSICAL },
+    price: 75,
+    guildExclusive: true
   }
 }
 
@@ -211,6 +226,16 @@ export const TIER_3_WEAPONS: Record<string, ItemDefinition> = {
     tier: 3,
     stats: { magicAtkBonus: 5, speed: 1, damageType: WeaponDamageType.MAGIC },
     price: 150
+  },
+  guild_oathkeeper_staff: {
+    id: 'guild_oathkeeper_staff',
+    nameKey: 'items.guild_oathkeeper_staff.name',
+    descriptionKey: 'items.guild_oathkeeper_staff.description',
+    type: ItemType.WEAPON_MAGIC,
+    tier: 3,
+    stats: { magicAtkBonus: 6, speed: 1, damageType: WeaponDamageType.MAGIC },
+    price: 200,
+    guildExclusive: true
   }
 }
 
@@ -277,6 +302,16 @@ export const TIER_3_ARMOR: Record<string, ItemDefinition> = {
     tier: 3,
     stats: { strengthDefBonus: 2, magicDefBonus: 4 },
     price: 150
+  },
+  guild_aegis_plate: {
+    id: 'guild_aegis_plate',
+    nameKey: 'items.guild_aegis_plate.name',
+    descriptionKey: 'items.guild_aegis_plate.description',
+    type: ItemType.ARMOR,
+    tier: 3,
+    stats: { strengthDefBonus: 5, magicDefBonus: 4 },
+    price: 200,
+    guildExclusive: true
   }
 }
 

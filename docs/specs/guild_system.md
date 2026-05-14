@@ -238,16 +238,67 @@ Shared progress goals across guild members. Validates "group accountability" bey
 - **Late contributions after completion still record contribution but earn no reward** — their entry has `goldClaimed = 0`. Acceptable: contributions across the target boundary are rare and the UX cost (showing them on the leaderboard with no claim) is minor.
 - **No campaign-end push notification** — completion is observed via the 7s poll on `getCurrentCampaign`. Push notifications deferred.
 
-## Phase 3 — Exclusive Rewards + Progression Bonuses (deferred)
+## Phase 3 — Exclusive Rewards + Progression Bonuses
 
-**Goal**: make guild membership a tangible mechanical advantage, not just social.
+Make guild membership a tangible mechanical advantage, not only social.
 
-**Schema additions**:
+### Decisions Locked (Phase 3)
 
-- `Item.guildExclusive: Boolean` — purchasable only via guild reward pool
-- `Guild.tier: Int` + `Guild.totalContribution: Int` — guild-wide progression accrued from member activity
-- Guild-tier modifiers: small XP / gold buffs (e.g. +5% per guild tier) applied at `dice.service.ts` reward calc
+| Decision | Choice | Why |
+| --- | --- | --- |
+| Tier curve | **5 tiers, exponential** thresholds (cumulative `totalContribution`): 0, 1000, 5000, 15000, 40000 | Long-tail signal; sustained activity rewarded over weekly grind. |
+| Gold buff | **+5% gold per tier above 1** (cap +20% at T5). Applied at `processEnemyDefeat` after `calculateGoldReward`. | Bounded feedback loop on GOLD_EARNED tracking. No XP system in code, so XP buff omitted. |
+| Item gate | **Guild member + `guild.tier >= item.tier`** | Spec called out "purchasable only via guild reward pool"; no shared pool exists (rewards are stamped per-member at completion). Tier gate is the simplest equivalent. Bought with regular character gold. |
+| Exclusive items | **3 new** items (`guild_vanguard_blade` T2, `guild_oathkeeper_staff` T3 magic, `guild_aegis_plate` T3 armor) | Net-new; existing solo balance untouched. |
+| Contribution accrual | **Always-on**; bumped from `recordCampaignEvent` *before* campaign-match guards | Spec said "accrued from member activity" — not "only during a campaign". Independent failure paths so contribution and campaign progress don't block each other. |
+| Event weights | `ENEMY_KILL=5`, `HABIT_COMPLETION=3`, `TASK_COMPLETION=4`, `GOLD_EARNED=floor(amount/5)·1` | Normalises kills/habits vs gold drops (raw GOLD_EARNED amounts dwarf 1-per-event kills). |
+| Tier advance | **Pure derivation + CAS** | `getGuildTier(totalContribution)` returns post-bump tier (handles multi-threshold jumps). Conditional `updateMany` on `tier < computed` elects one winner across concurrent crossings (same family as `joinByToken` claim). |
 
-**Service touch points**: `store.services.ts`, `character.service.ts`, `dice.service.ts`.
+### What Shipped
 
-**Defer until**: Phase 1 + 2 retention signal validated with beta cohort (cohort retention ≥ X% week-over-week vs solo control).
+**Schema** (`prisma/schema.prisma`):
+
+- `Guild.tier Int @default(1)`, `Guild.totalContribution Int @default(0)`
+
+**Constants**:
+
+- `src/shared/constants/guild-progression.ts` — `GUILD_TIER_THRESHOLDS`, `MAX_GUILD_TIER`, `CONTRIBUTION_WEIGHTS`, `computeContributionPoints`, `getGuildTier`, `getNextTierThreshold`, `getGuildGoldMultiplier`
+- `src/shared/constants/items.ts` — `ItemDefinition.guildExclusive?: boolean`; three new exclusives (`guild_vanguard_blade`, `guild_oathkeeper_staff`, `guild_aegis_plate`)
+
+**Backend**:
+
+- `GuildService.recordCampaignEvent` restructured: always-on contribution bump in its own try/catch, campaign-match tracking in a second try/catch — independent failure paths
+- `GuildService.addGuildContribution(guildId, points)` (private) — atomic `prisma.guild.update` increment, then conditional `updateMany` CAS to advance tier
+- `GuildService.getGoldMultiplier(userId)` → `number` (1.0 when guildless)
+- `GuildService.getMyProgression(userId)` → `{ guildId, tier, maxTier, totalContribution, nextThreshold, goldMultiplier } | null`
+- `processEnemyDefeat` (`src/server/utils/combat/rewards.ts`) multiplies `calculateGoldReward` by the user's guild multiplier (`Math.floor`). Multiplier lookup wrapped to never break the reward path. The post-multiplier amount is what credits the character and feeds GOLD_EARNED tracking.
+- `StoreService` constructor gains optional `guildService`; `listAvailableItems` filters out `guildExclusive` items when the user has no guild or `guild.tier < item.tier`; `purchaseItems` rejects with "requires a Guild of Tier {N}"
+- `service.factory.ts` wires `guild` into `store`
+- `guilds.router.ts` adds `getMyProgression` query
+
+**Note on `dice.service.ts` / `character.service.ts` touch points from the original spec:** the project has no `dice.service.ts` — reward calc lives in `src/server/utils/combat/rewards.ts`, which is where the multiplier was applied. The `character.service.ts` touch point was skipped intentionally: adding a `GuildService` dependency would flip `CharacterService` from L1 to L2 in the factory and grow the dependency fan-out. Frontend reads `guilds.getMyProgression` separately for the buff badge.
+
+**Frontend**:
+
+- Guild detail header (`src/app/(workspace)/guilds/[guildId]/page.tsx`) shows a Tier badge, contribution progress toward the next threshold, and the current gold-drop buff percentage
+- Store automatically filters guild-exclusive items the user can't access (no banner — items just don't appear, matching existing tier-restriction behavior)
+
+**i18n**: `guilds.progression.*` and three new `items.guild_*` keys in both `en` and `es`.
+
+**Tests** (`guild-progression.service.test.ts` — 17 cases):
+
+- Pure helpers: tier thresholds (boundary + multi-threshold jump), `getNextTierThreshold`, gold multiplier per tier, `computeContributionPoints` weights
+- `recordCampaignEvent` always-on bump: bumps when no campaign, bumps when event-type mismatch, advances tier on threshold crossing, no advance below threshold, no bump when guildless, errors swallowed
+- `getGoldMultiplier`: 1.0 when guildless, +5% per tier above 1
+- `getMyProgression`: null when guildless, shape at mid-tier, `nextThreshold: null` at max
+
+`store.service.test.ts` — 5 new cases: exclusive item hidden without guild / with under-tier guild, surfaced when tier matches; purchase rejected under-tier; purchase allowed at-tier.
+
+Full suite green: 336 tests pass. `pnpm lint` ✓ · `npx tsc --noEmit` ✓.
+
+### Known Caveats (Phase 3)
+
+- **GOLD_EARNED tracks post-multiplier gold.** Small bounded feedback loop (cap +20%). Acceptable; documented at the call site.
+- **`recordCampaignEvent` is fire-and-forget.** A failed `addGuildContribution` is logged + dropped; the user never sees an error from missed contribution. Same family as Phase 2 campaign tracking.
+- **One-active enforcement on `Guild.tier` advance is service-layer only.** A guild whose `tier` row is hand-edited backwards won't be re-advanced until the next event. Phase-acceptable.
+- **No "guild-exclusive" badge in the store UI.** Inaccessible items are simply hidden. Add a badge in Phase 3.5 if users ask "where are the guild items?"

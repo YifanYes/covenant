@@ -214,6 +214,6 @@ export class ServiceFactory {
   }
 
   get store(): StoreService {
-    return (this._storeService ??= new StoreService(this.characterRepository, this.character))
+    return (this._storeService ??= new StoreService(this.characterRepository, this.character, this.guild))
   }
 }

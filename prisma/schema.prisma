@@ -272,14 +272,16 @@ model JournalEntry {
 }
 
 model Guild {
-  id          String          @id @default(uuid()) @db.Uuid
-  name        String          @db.VarChar(80)
-  description String?         @db.VarChar(500)
-  ownerId     String
-  factionName String          @default("HOLY_KNIGHTS")
-  capacity    Int             @default(50)
-  createdAt   DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime        @updatedAt @db.Timestamp(6)
+  id                 String          @id @default(uuid()) @db.Uuid
+  name               String          @db.VarChar(80)
+  description        String?         @db.VarChar(500)
+  ownerId            String
+  factionName        String          @default("HOLY_KNIGHTS")
+  capacity           Int             @default(50)
+  tier               Int             @default(1)
+  totalContribution  Int             @default(0)
+  createdAt          DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime        @updatedAt @db.Timestamp(6)
   members     GuildMember[]
   messages    GuildMessage[]
   invites     GuildInvite[]

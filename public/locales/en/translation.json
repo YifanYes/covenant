@@ -468,6 +468,18 @@
     "gold_plate_armor": {
       "name": "Gold Plate Armor",
       "description": "Craft ornate armor infused with magical gold."
+    },
+    "guild_vanguard_blade": {
+      "name": "Vanguard's Oath",
+      "description": "A swift sabre etched with the sigils of bound allies. Available only to the banner-bound."
+    },
+    "guild_oathkeeper_staff": {
+      "name": "Oathkeeper Staff",
+      "description": "Carved from heartwood pledged at the founding rite. Sings when its guild is near."
+    },
+    "guild_aegis_plate": {
+      "name": "Aegis of the Banner",
+      "description": "Plate forged in shared purpose. Strangers cannot lift it; allies cannot put it down."
     }
   },
   "confirm": "Confirm",
@@ -1265,6 +1277,13 @@
     },
     "errors": {
       "not_member": "This guild does not exist or you are not a member."
+    },
+    "progression": {
+      "tier_badge": "Guild Tier {{tier}} / {{max}}",
+      "next": "{{current}} → {{next}} contribution",
+      "maxed": "{{current}} contribution · max tier",
+      "buff": "+{{pct}}% gold drops",
+      "buff_locked": "Reach Tier 2 to unlock gold drops"
     }
   },
   "icons": {
@@ -1481,6 +1500,18 @@
     "gothic_armor": {
       "description": "Refracts the force of blows. If you block all attacks, the enemy is pushed back.",
       "name": "Gothic Armor"
+    },
+    "guild_aegis_plate": {
+      "description": "Plate forged in shared purpose. Strangers cannot lift it; allies cannot put it down.",
+      "name": "Aegis of the Banner"
+    },
+    "guild_oathkeeper_staff": {
+      "description": "Carved from heartwood pledged at the founding rite. Sings when its guild is near.",
+      "name": "Oathkeeper Staff"
+    },
+    "guild_vanguard_blade": {
+      "description": "A swift sabre etched with the sigils of bound allies. Available only to the banner-bound.",
+      "name": "Vanguard's Oath"
     },
     "great_war_axe": {
       "description": "Brutal weapon. Critical successes (natural 6) ignore 1 enemy defense die.",

@@ -39,10 +39,6 @@
 
 ## High Priority
 
-- [x] Guild system Phase 1 — guilds + members + invite-link + flat forum `[retention]`. Single-guild membership, role matrix (OWNER/OFFICER/MEMBER), shareable invite links, polled (7s) chat. Habitica's removal of guilds is a documented churn driver — Phase 1 ships the social retention surface.
-
-- [x] Guild system Phase 2 — guild campaigns `[retention]`. Shared progress goals (e.g. "guild collectively defeats N enemies"). New `GuildCampaign` + `GuildCampaignProgress` entities; hook into `kill-record.service.ts`. Spec to live at `docs/specs/guild_campaigns.md`.
-
 - [ ] Guild system Phase 3 — exclusive rewards + progression bonuses `[retention]`. Guild-only items (`Item.guildExclusive` flag), guild-tier progression with member XP/gold modifiers. Touches store + character services. Defer until Phase 1+2 retention signal validated with beta cohort.
 
 - [ ] Guild system Phase 4 — community lore + roleplay surfaces `[retention]`. Player-authored creative layer on top of guild infra. Habit-tracker-with-RPG-skin product benefits especially: lore reframes chores as quests and is stickier than leaderboards (lore decay slow, leaderboards reset weekly). Stage to keep moderation surface bounded.

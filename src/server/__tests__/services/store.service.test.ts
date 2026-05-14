@@ -121,4 +121,107 @@ describe('StoreService', () => {
       expect(listedIds).not.toContain(itemId)
     })
   })
+
+  describe('guild-exclusive gating (Phase 3)', () => {
+    const exclusiveId = Object.keys(ALL_ITEMS).find((id) => ALL_ITEMS[id].guildExclusive) ?? 'guild_vanguard_blade'
+
+    it('hides guild-exclusive items when user has no guild', async () => {
+      const character = mockCharacter({ gold: 10000 })
+      mockCharacterRepo.findWithClasses.mockResolvedValue(character)
+      mockCharacterService.getCharacterProgress.mockReturnValue({ tier: 5 })
+
+      const guildService = { getMyProgression: vi.fn().mockResolvedValue(null) }
+      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as any)
+
+      const result = await gated.listAvailableItems('user-123')
+      expect(result.items.map((i) => i.id)).not.toContain(exclusiveId)
+    })
+
+    it('hides guild-exclusive items when guild tier is below item tier', async () => {
+      const character = mockCharacter({ gold: 10000 })
+      mockCharacterRepo.findWithClasses.mockResolvedValue(character)
+      mockCharacterService.getCharacterProgress.mockReturnValue({ tier: 5 })
+      const itemTier = ALL_ITEMS[exclusiveId].tier
+
+      const guildService = {
+        getMyProgression: vi.fn().mockResolvedValue({
+          guildId: 'g-1',
+          tier: itemTier - 1,
+          maxTier: 5,
+          totalContribution: 0,
+          nextThreshold: 1000,
+          goldMultiplier: 1
+        })
+      }
+      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as any)
+
+      const result = await gated.listAvailableItems('user-123')
+      expect(result.items.map((i) => i.id)).not.toContain(exclusiveId)
+    })
+
+    it('lists guild-exclusive items when guild tier >= item tier', async () => {
+      const character = mockCharacter({ gold: 10000 })
+      mockCharacterRepo.findWithClasses.mockResolvedValue(character)
+      mockCharacterService.getCharacterProgress.mockReturnValue({ tier: 5 })
+      const itemTier = ALL_ITEMS[exclusiveId].tier
+
+      const guildService = {
+        getMyProgression: vi.fn().mockResolvedValue({
+          guildId: 'g-1',
+          tier: itemTier,
+          maxTier: 5,
+          totalContribution: 1000,
+          nextThreshold: 5000,
+          goldMultiplier: 1.05
+        })
+      }
+      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as any)
+
+      const result = await gated.listAvailableItems('user-123')
+      expect(result.items.map((i) => i.id)).toContain(exclusiveId)
+    })
+
+    it('purchaseItems rejects guild-exclusive when guild tier too low', async () => {
+      const character = mockCharacter({ gold: 10000 })
+      mockCharacterRepo.findWithClasses.mockResolvedValue(character)
+      mockCharacterService.getCharacterProgress.mockReturnValue({ tier: 5 })
+      const itemTier = ALL_ITEMS[exclusiveId].tier
+
+      const guildService = {
+        getMyProgression: vi.fn().mockResolvedValue({
+          guildId: 'g-1',
+          tier: itemTier - 1,
+          maxTier: 5,
+          totalContribution: 0,
+          nextThreshold: 1000,
+          goldMultiplier: 1
+        })
+      }
+      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as any)
+
+      await expect(gated.purchaseItems('user-123', [exclusiveId])).rejects.toThrow(/requires a Guild of Tier/)
+    })
+
+    it('purchaseItems allows guild-exclusive when guild tier matches', async () => {
+      const character = mockCharacter({ gold: 10000 })
+      mockCharacterRepo.findWithClasses.mockResolvedValue(character)
+      mockCharacterService.getCharacterProgress.mockReturnValue({ tier: 5 })
+      const itemTier = ALL_ITEMS[exclusiveId].tier
+
+      const guildService = {
+        getMyProgression: vi.fn().mockResolvedValue({
+          guildId: 'g-1',
+          tier: itemTier,
+          maxTier: 5,
+          totalContribution: 1000,
+          nextThreshold: 5000,
+          goldMultiplier: 1.05
+        })
+      }
+      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as any)
+
+      const result = await gated.purchaseItems('user-123', [exclusiveId])
+      expect(result.success).toBe(true)
+    })
+  })
 })

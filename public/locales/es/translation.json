@@ -468,6 +468,18 @@
     "gold_plate_armor": {
       "name": "Armadura de Placas de Oro",
       "description": "Fabrica una armadura ornamentada infundida con oro mágico."
+    },
+    "guild_vanguard_blade": {
+      "name": "Juramento de Vanguardia",
+      "description": "Sable veloz grabado con los sellos de aliados jurados. Solo para los portadores del estandarte."
+    },
+    "guild_oathkeeper_staff": {
+      "name": "Báculo del Guardajuramentos",
+      "description": "Tallado en madera prometida en el rito fundacional. Canta cuando su gremio está cerca."
+    },
+    "guild_aegis_plate": {
+      "name": "Égida del Estandarte",
+      "description": "Placa forjada en propósito compartido. Los extraños no pueden alzarla; los aliados no pueden soltarla."
     }
   },
   "confirm": "Confirmar",
@@ -1265,6 +1277,13 @@
     },
     "errors": {
       "not_member": "Este gremio no existe o no eres miembro."
+    },
+    "progression": {
+      "tier_badge": "Gremio Nivel {{tier}} / {{max}}",
+      "next": "{{current}} → {{next}} contribución",
+      "maxed": "{{current}} contribución · nivel máximo",
+      "buff": "+{{pct}}% de oro",
+      "buff_locked": "Alcanza Nivel 2 para desbloquear el bono de oro"
     }
   },
   "icons": {
@@ -1481,6 +1500,18 @@
     "gothic_armor": {
       "description": "Refractan la fuerza de los golpes. Si bloqueas todos los ataques, el enemigo es empujado.",
       "name": "Armadura Gótica"
+    },
+    "guild_aegis_plate": {
+      "description": "Placa forjada en propósito compartido. Los extraños no pueden alzarla; los aliados no pueden soltarla.",
+      "name": "Égida del Estandarte"
+    },
+    "guild_oathkeeper_staff": {
+      "description": "Tallado en madera prometida en el rito fundacional. Canta cuando su gremio está cerca.",
+      "name": "Báculo del Guardajuramentos"
+    },
+    "guild_vanguard_blade": {
+      "description": "Sable veloz grabado con los sellos de aliados jurados. Solo para los portadores del estandarte.",
+      "name": "Juramento de Vanguardia"
     },
     "great_war_axe": {
       "description": "Arma brutal. Los éxitos críticos (6 natural) ignoran 1 dado de defensa del enemigo.",

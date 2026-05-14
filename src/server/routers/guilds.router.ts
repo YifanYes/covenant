@@ -21,6 +21,10 @@ export const guildsRouter = t.router({
     return ctx.services.guild.getMyGuild(ctx.user.id)
   }),
 
+  getMyProgression: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.services.guild.getMyProgression(ctx.user.id)
+  }),
+
   create: protectedProcedure
     .use(rateLimit(RATE_LIMITS.strict))
     .input(createGuildSchema)
