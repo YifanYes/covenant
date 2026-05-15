@@ -534,6 +534,8 @@
     },
     "name_placeholder": "Título",
     "select_areas_placeholder": "Seleccionar áreas",
+    "select_habits_placeholder": "Seleccionar hábitos",
+    "select_tasks_placeholder": "Seleccionar tareas",
     "success": "Objetivo creado exitosamente",
     "title": "Crear nuevo objetivo"
   },
@@ -1737,6 +1739,12 @@
       "description": "Los objetivos son tus grandes metas. Crea el primero para comenzar tu viaje.",
       "action": "Crea tu primer objetivo"
     },
+    "filter": {
+      "all": "Todas",
+      "empty_for_area": "Aún no hay objetivos en esta área"
+    },
+    "all_done": "Todas las tareas completadas",
+    "progress": "{{done}}/{{total}}",
     "habits_count_one": "{{count}} hábito",
     "habits_count_other": "{{count}} hábitos",
     "no_date": "Sin fecha",

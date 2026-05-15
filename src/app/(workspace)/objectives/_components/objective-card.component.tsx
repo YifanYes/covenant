@@ -4,7 +4,7 @@ import DatePicker from '@/forms/date-picker.component'
 import MultiSelect from '@/forms/multi-select.component'
 import TextInput from '@/forms/text-input.component'
 import { useDateFormat } from '@/hooks/use-date-format'
-import { areaSimpleStyles } from '@/types/colors.types'
+import { areaBorderStyles, areaProgressBarStyles, areaSimpleStyles } from '@/types/colors.types'
 import { allIcons } from '@/types/icons.types'
 import type { Objective } from '@/types/models.types'
 import Button from '@/ui/button.component'
@@ -20,10 +20,12 @@ import Textarea from '@/ui/textarea.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
+import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { Calendar, Check, Repeat } from 'pixelarticons/react'
 import { toast } from 'sonner'
 import ConfirmCompleteObjectiveDialog from './confirm-complete-objective-dialog.component'
 import ConfirmDeleteObjectiveDialog from './confirm-delete-objective-dialog.component'
@@ -35,12 +37,16 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
   const [open, setOpen] = useState(false)
 
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
+  const { data: tasksData } = useSuspenseQuery(trpcOptions.tasks.getAll.queryOptions())
+  const { data: habitsData } = useSuspenseQuery(trpcOptions.habits.getAll.queryOptions())
 
   const updateMutation = useMutation(
     trpcOptions.objectives.update.mutationOptions({
       onSuccess: () => {
         toast.success(t('objectives.update.success'))
         queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })
         setOpen(false)
       },
       onError: (error) => toast.error(t('objectives.update.error'), { description: error.message })
@@ -60,11 +66,13 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
       name: objective.name,
       description: objective.description || '',
       dueDate: objective.dueDate ? new Date(objective.dueDate) : undefined,
-      areas: objective.areas?.map((area) => area.id) || []
+      areas: objective.areas?.map((area) => area.id) || [],
+      tasks: objective.tasks?.map((task) => task.id) || [],
+      habits: objective.habits?.map((habit) => habit.id) || []
     }
   })
 
-  // Reset form with area data when area changes or dialog opens
+  // Reset form when dialog opens
   useEffect(() => {
     if (open) {
       reset({
@@ -72,7 +80,9 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
         name: objective.name,
         description: objective.description || '',
         dueDate: objective.dueDate ? new Date(objective.dueDate) : undefined,
-        areas: objective.areas?.map((area) => area.id) || []
+        areas: objective.areas?.map((area) => area.id) || [],
+        tasks: objective.tasks?.map((task) => task.id) || [],
+        habits: objective.habits?.map((habit) => habit.id) || []
       })
     }
   }, [open, objective, reset])
@@ -82,6 +92,52 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
   const handleDeleteSuccess = () => setOpen(false)
   const handleCompleteSuccess = () => setOpen(false)
 
+  const primaryArea = objective.areas?.[0]
+  const borderStyle = primaryArea
+    ? areaBorderStyles.find((s) => s.color === primaryArea.color)?.styles
+    : undefined
+  const progressColor = primaryArea
+    ? areaProgressBarStyles.find((s) => s.color === primaryArea.color)?.styles
+    : undefined
+
+  const taskItems = useMemo(() => {
+    const grouped = (tasksData?.tasks ?? {}) as Record<string, { id: string; title: string }[]>
+    const incomplete = [
+      ...(grouped[TaskStatus.TODO] ?? []),
+      ...(grouped[TaskStatus.DOING] ?? [])
+    ]
+    const linked = objective.tasks ?? []
+    const linkedDone = linked.filter((task) => task.status === TaskStatus.DONE)
+    const merged = [...incomplete, ...linkedDone]
+    const seen = new Set<string>()
+    return merged
+      .filter((task) => {
+        if (seen.has(task.id)) return false
+        seen.add(task.id)
+        return true
+      })
+      .map((task) => ({ id: task.id, label: task.title }))
+  }, [tasksData, objective.tasks])
+
+  const habitItems = useMemo(() => {
+    return (habitsData?.habits ?? []).map((habit) => ({ id: habit.id, label: habit.name }))
+  }, [habitsData])
+
+  const { totalTasks, doneTasks, pendingTasks, totalHabits } = useMemo(() => {
+    const tasks = objective.tasks ?? []
+    const done = tasks.filter((t) => t.status === TaskStatus.DONE).length
+    return {
+      totalTasks: tasks.length,
+      doneTasks: done,
+      pendingTasks: tasks.length - done,
+      totalHabits: objective.habits?.length ?? 0
+    }
+  }, [objective.tasks, objective.habits])
+
+  const hasAnyLinks = totalTasks > 0 || totalHabits > 0
+  const hasActiveLinks = pendingTasks > 0 || totalHabits > 0
+  const taskProgressPct = totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0
+
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
     reset()
@@ -90,12 +146,17 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <div className="group border-foreground/20 bg-background hover:border-primary hover:bg-accent/30 flex h-full w-full cursor-pointer flex-col rounded-lg border-2 p-4 transition-all duration-200 hover:scale-[1.02]">
+        <div
+          className={`group border-foreground/20 bg-background hover:border-primary hover:bg-accent/30 flex h-full w-full cursor-pointer flex-col rounded-lg border-2 p-4 transition-all duration-200 hover:scale-[1.02] ${
+            borderStyle ? `border-l-8 ${borderStyle}` : ''
+          }`}
+        >
           <div className="flex items-start justify-between gap-6">
             <div className="flex flex-1 flex-col gap-1">
               <h4 className="text-sm leading-tight font-semibold">{objective.name}</h4>
-              <div className="text-muted-foreground text-xs">
-                {objective.dueDate ? formatDate(objective.dueDate) : t('objectives.no_date')}
+              <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                <Calendar className="size-3" />
+                <span>{objective.dueDate ? formatDate(objective.dueDate) : t('objectives.no_date')}</span>
               </div>
             </div>
             {objective.areas && objective.areas.length > 0 && (
@@ -114,19 +175,47 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
             )}
           </div>
           {objective.description && (
-            <p className="text-muted-foreground mt-4 line-clamp-2 text-sm leading-relaxed">{objective.description}</p>
+            <p className="text-muted-foreground mt-3 line-clamp-2 text-sm leading-relaxed">{objective.description}</p>
           )}
-          {(objective.tasks && objective.tasks.length > 0) || (objective.habits && objective.habits.length > 0) ? (
-            <div className="mt-4 border-t pt-4">
+          {hasAnyLinks && (
+            <div className="mt-3 flex items-center gap-3 text-[11px]">
+              {totalTasks > 0 && (
+                <div className="flex flex-1 items-center gap-2">
+                  <span className="text-muted-foreground tabular-nums">
+                    {t('objectives.progress', { done: doneTasks, total: totalTasks })}
+                  </span>
+                  <div className="bg-foreground/10 h-1 flex-1 overflow-hidden rounded-full">
+                    <div
+                      className={`h-full rounded-full transition-all ${progressColor ?? 'bg-primary'}`}
+                      style={{ width: `${taskProgressPct}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              {totalHabits > 0 && (
+                <span className="text-muted-foreground inline-flex items-center gap-1 tabular-nums">
+                  <Repeat className="size-3" />
+                  {totalHabits}
+                </span>
+              )}
+            </div>
+          )}
+          {hasActiveLinks ? (
+            <div className="border-foreground/10 mt-3 border-t pt-3">
               <ObjectiveSummaryList
                 title={objective.name}
                 tasks={objective.tasks || []}
                 habits={objective.habits || []}
               />
             </div>
+          ) : hasAnyLinks ? (
+            <div className="border-foreground/10 mt-3 flex items-center justify-center gap-2 border-t pt-3">
+              <Check className="size-3.5 text-emerald-500" />
+              <p className="text-muted-foreground text-xs">{t('objectives.all_done')}</p>
+            </div>
           ) : (
-            <div className="mt-4 flex flex-1 items-center justify-center border-t pt-6 pb-4">
-              <p className="text-muted-foreground text-center text-xs italic">{t('objectives.no_tasks_or_habits')}</p>
+            <div className="border-foreground/10 mt-3 border-t pt-3">
+              <p className="text-muted-foreground text-xs">{t('objectives.no_tasks_or_habits')}</p>
             </div>
           )}
         </div>
@@ -180,6 +269,18 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
             control={control}
             items={areasData?.areas.map((a) => ({ id: a.id, label: t(a.name) })) || []}
             placeholder={t('create_objective_dialog.select_areas_placeholder')}
+          />
+          <MultiSelect
+            name="tasks"
+            control={control}
+            items={taskItems}
+            placeholder={t('create_objective_dialog.select_tasks_placeholder')}
+          />
+          <MultiSelect
+            name="habits"
+            control={control}
+            items={habitItems}
+            placeholder={t('create_objective_dialog.select_habits_placeholder')}
           />
         </div>
 

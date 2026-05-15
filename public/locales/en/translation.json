@@ -534,6 +534,8 @@
     },
     "name_placeholder": "Title",
     "select_areas_placeholder": "Select areas",
+    "select_habits_placeholder": "Select habits",
+    "select_tasks_placeholder": "Select tasks",
     "success": "Objective created successfully",
     "title": "Create new objective"
   },
@@ -1737,6 +1739,12 @@
       "description": "Objectives are your big goals. Create your first one to start your journey.",
       "action": "Create your first objective"
     },
+    "filter": {
+      "all": "All",
+      "empty_for_area": "No objectives in this area yet"
+    },
+    "all_done": "All tasks complete",
+    "progress": "{{done}}/{{total}}",
     "habits_count_one": "{{count}} habit",
     "habits_count_other": "{{count}} habits",
     "no_date": "No date",

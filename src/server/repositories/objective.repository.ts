@@ -63,7 +63,13 @@ export class ObjectiveRepository {
         ...(input.dueDate && { dueDate: input.dueDate }),
         areas: {
           set: input.areas?.map((areaId) => ({ id: areaId })) || []
-        }
+        },
+        ...(input.tasks !== undefined && {
+          tasks: { set: input.tasks.map((taskId) => ({ id: taskId })) }
+        }),
+        ...(input.habits !== undefined && {
+          habits: { set: input.habits.map((habitId) => ({ id: habitId })) }
+        })
       },
       include: OBJECTIVE_INCLUDE
     })

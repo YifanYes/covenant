@@ -154,6 +154,50 @@ export const areaStyles = [
   }
 ]
 
+export const areaBorderStyles = [
+  { color: 'green', styles: 'border-l-green-500 dark:border-l-green-400' },
+  { color: 'purple', styles: 'border-l-purple-500 dark:border-l-purple-400' },
+  { color: 'orange', styles: 'border-l-orange-500 dark:border-l-orange-400' },
+  { color: 'red', styles: 'border-l-red-500 dark:border-l-red-400' },
+  { color: 'blue', styles: 'border-l-blue-500 dark:border-l-blue-400' },
+  { color: 'yellow', styles: 'border-l-yellow-500 dark:border-l-yellow-400' },
+  { color: 'teal', styles: 'border-l-teal-500 dark:border-l-teal-400' },
+  { color: 'pink', styles: 'border-l-pink-500 dark:border-l-pink-400' },
+  { color: 'cyan', styles: 'border-l-cyan-500 dark:border-l-cyan-400' },
+  { color: 'indigo', styles: 'border-l-indigo-500 dark:border-l-indigo-400' },
+  { color: 'violet', styles: 'border-l-violet-500 dark:border-l-violet-400' },
+  { color: 'gray', styles: 'border-l-gray-500 dark:border-l-gray-400' },
+  { color: 'black', styles: 'border-l-black dark:border-l-white' },
+  { color: 'white', styles: 'border-l-white dark:border-l-white' },
+  { color: 'lime', styles: 'border-l-lime-500 dark:border-l-lime-400' },
+  { color: 'rose', styles: 'border-l-rose-500 dark:border-l-rose-400' },
+  { color: 'amber', styles: 'border-l-amber-500 dark:border-l-amber-400' },
+  { color: 'sky', styles: 'border-l-sky-500 dark:border-l-sky-400' },
+  { color: 'slate', styles: 'border-l-slate-500 dark:border-l-slate-400' }
+]
+
+export const areaProgressBarStyles = [
+  { color: 'green', styles: 'bg-green-500 dark:bg-green-400' },
+  { color: 'purple', styles: 'bg-purple-500 dark:bg-purple-400' },
+  { color: 'orange', styles: 'bg-orange-500 dark:bg-orange-400' },
+  { color: 'red', styles: 'bg-red-500 dark:bg-red-400' },
+  { color: 'blue', styles: 'bg-blue-500 dark:bg-blue-400' },
+  { color: 'yellow', styles: 'bg-yellow-500 dark:bg-yellow-400' },
+  { color: 'teal', styles: 'bg-teal-500 dark:bg-teal-400' },
+  { color: 'pink', styles: 'bg-pink-500 dark:bg-pink-400' },
+  { color: 'cyan', styles: 'bg-cyan-500 dark:bg-cyan-400' },
+  { color: 'indigo', styles: 'bg-indigo-500 dark:bg-indigo-400' },
+  { color: 'violet', styles: 'bg-violet-500 dark:bg-violet-400' },
+  { color: 'gray', styles: 'bg-gray-500 dark:bg-gray-400' },
+  { color: 'black', styles: 'bg-black dark:bg-white' },
+  { color: 'white', styles: 'bg-white dark:bg-white' },
+  { color: 'lime', styles: 'bg-lime-500 dark:bg-lime-400' },
+  { color: 'rose', styles: 'bg-rose-500 dark:bg-rose-400' },
+  { color: 'amber', styles: 'bg-amber-500 dark:bg-amber-400' },
+  { color: 'sky', styles: 'bg-sky-500 dark:bg-sky-400' },
+  { color: 'slate', styles: 'bg-slate-500 dark:bg-slate-400' }
+]
+
 export const areaSimpleStyles = [
   {
     color: 'green',

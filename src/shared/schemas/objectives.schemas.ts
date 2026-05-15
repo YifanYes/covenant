@@ -9,6 +9,8 @@ export const objectiveSchema = z.object({
     .nullish()
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
   areas: z.array(z.uuid()).optional(),
+  tasks: z.array(z.uuid()).optional(),
+  habits: z.array(z.uuid()).optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
   completedAt: z.date().nullish()

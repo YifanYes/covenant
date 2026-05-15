@@ -16,7 +16,12 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import ConfirmDeleteAreaDialog from './confirm-delete-area-dialog.component'
 
-export default function UpdateAreaDialog({ area }: { area: Area }) {
+interface UpdateAreaDialogProps {
+  area: Area
+  trigger?: React.ReactNode
+}
+
+export default function UpdateAreaDialog({ area, trigger: triggerOverride }: UpdateAreaDialogProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
@@ -84,11 +89,13 @@ export default function UpdateAreaDialog({ area }: { area: Area }) {
     </div>
   ) : null
 
-  if (!Badge) {
+  const effectiveTrigger = triggerOverride ?? Badge
+
+  if (!effectiveTrigger) {
     return null
   }
 
-  if (isDefaultArea) {
+  if (!triggerOverride && isDefaultArea) {
     return Badge
   }
 
@@ -103,7 +110,7 @@ export default function UpdateAreaDialog({ area }: { area: Area }) {
       isLoading={updateMutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
       extraFooterActions={<ConfirmDeleteAreaDialog area={area} onDeleteSuccess={handleDeleteSuccess} />}
-      trigger={Badge}
+      trigger={effectiveTrigger}
     >
       <div className="grid gap-4">
         <div className="grid gap-3">
