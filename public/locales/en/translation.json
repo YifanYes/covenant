@@ -191,7 +191,8 @@
     "no_tasks_for_day_description": "Even heroes need rest. Enjoy the calm before the next battle.",
     "no_habits_for_day": "No habits completed this day",
     "no_habits_for_day_description": "The forge is cold. Tomorrow is another chance to train.",
-    "no_journal_for_day_description": "No chronicle written. The scribe's quill waits for your deeds."
+    "no_journal_for_day_description": "No chronicle written. The scribe's quill waits for your deeds.",
+    "day_details_description": "Tasks, habits, and journal entries for the selected day."
   },
   "cancel": "Cancel",
   "character_class": {

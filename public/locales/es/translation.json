@@ -191,7 +191,8 @@
     "no_tasks_for_day_description": "Hasta los héroes necesitan descansar. Disfruta la calma antes de la próxima batalla.",
     "no_habits_for_day": "No hay hábitos completados este día",
     "no_habits_for_day_description": "La forja está fría. Mañana es otra oportunidad para entrenar.",
-    "no_journal_for_day_description": "Ninguna crónica escrita. La pluma del escriba espera tus hazañas."
+    "no_journal_for_day_description": "Ninguna crónica escrita. La pluma del escriba espera tus hazañas.",
+    "day_details_description": "Tareas, hábitos y entradas del diario para el día seleccionado."
   },
   "cancel": "Cancelar",
   "character_class": {

@@ -1,21 +1,21 @@
 'use client'
 
-import { MOOD_COLOR_MAP } from '@shared/constants/journal.constants'
 import JournalContent from '@/app/(workspace)/journaling/_components/journal-content.component'
 import EmptyState from '@/components/empty-state.component'
-import Dialog, { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog.component'
 import Task from '@/components/tasks/task.component'
+import Sheet, { SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet.component'
 import { useDateFormat } from '@/hooks/use-date-format'
 import { useTasksStore } from '@/stores/tasks.store'
 import { type Habit, type Task as TaskType } from '@/types/models.types'
 import { trpcOptions } from '@/utils/trpc.utils'
+import { MOOD_COLOR_MAP } from '@shared/constants/journal.constants'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { BookOpen, Check, Flag, Repeat } from 'pixelarticons/react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-interface DayDetailsDialogProps {
+interface DayDetailsSheetProps {
   date: string | null
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -23,17 +23,14 @@ interface DayDetailsDialogProps {
   habits: Habit[]
 }
 
-export default function DayDetailsDialog({ date, open, onOpenChange, tasks, habits }: DayDetailsDialogProps) {
+export default function DayDetailsSheet({ date, open, onOpenChange, tasks, habits }: DayDetailsSheetProps) {
   const { t } = useTranslation()
   const { formatDate } = useDateFormat()
   const { setSelectedTask } = useTasksStore()
   const timezoneOffset = new Date().getTimezoneOffset()
 
   const { data: entries } = useQuery(
-    trpcOptions.journaling.getByDate.queryOptions(
-      { date: date || '', timezoneOffset },
-      { enabled: !!date }
-    )
+    trpcOptions.journaling.getByDate.queryOptions({ date: date || '', timezoneOffset }, { enabled: !!date })
   )
 
   const dayTasks = useMemo(() => {
@@ -54,13 +51,13 @@ export default function DayDetailsDialog({ date, open, onOpenChange, tasks, habi
   }, [date, formatDate])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl max-h-[85vh] flex flex-col gap-0 p-0">
-        <DialogHeader className="p-6 pb-4">
-          <DialogTitle className="text-xl capitalize">{formattedDate}</DialogTitle>
-        </DialogHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="w-full gap-0 p-0 sm:max-w-lg">
+        <SheetHeader className="p-6 pb-4">
+          <SheetTitle className="text-xl capitalize">{formattedDate}</SheetTitle>
+          <SheetDescription className="sr-only">{t('calendar.day_details_description')}</SheetDescription>
+        </SheetHeader>
         <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6">
-          {/* Tasks Section */}
           <section>
             <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
               {t('tasks.title')}
@@ -81,7 +78,6 @@ export default function DayDetailsDialog({ date, open, onOpenChange, tasks, habi
             )}
           </section>
 
-          {/* Habits Section */}
           <section>
             <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
               {t('habits.title')}
@@ -105,7 +101,6 @@ export default function DayDetailsDialog({ date, open, onOpenChange, tasks, habi
             )}
           </section>
 
-          {/* Journal Section */}
           <section>
             <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
               {t('journaling.title')}
@@ -137,7 +132,7 @@ export default function DayDetailsDialog({ date, open, onOpenChange, tasks, habi
             )}
           </section>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   )
 }

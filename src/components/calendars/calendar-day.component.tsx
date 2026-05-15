@@ -30,13 +30,15 @@ export default function CalendarDay({ day, weekIndex, tasks, mood, isSelected, o
     >
       <header className="flex flex-col items-center">
         {weekIndex === 0 && <p className="mt-1 text-sm">{day.format('ddd').toUpperCase()}</p>}
-        <p className={cn('my-1 p-1 text-center text-sm', getCurrentDayClass())}>{day.format('D')}</p>
-        {mood && (
-          <span
-            className="mb-1 h-2 w-2 rounded-full"
-            style={{ backgroundColor: MOOD_COLOR_MAP.get(mood) || undefined }}
-          />
-        )}
+        <div className="my-1 flex items-center gap-1.5">
+          <p className={cn('p-1 text-center text-sm', getCurrentDayClass())}>{day.format('D')}</p>
+          {mood && (
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: MOOD_COLOR_MAP.get(mood) || undefined }}
+            />
+          )}
+        </div>
       </header>
       <div className="flex flex-col gap-1 p-1">
         {dayTasks.slice(0, 2).map((task) => {

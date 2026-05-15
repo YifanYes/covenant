@@ -8,12 +8,12 @@ import { trpcOptions } from '@/utils/trpc.utils'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
-import DayDetailsDialog from './day-details-dialog.component'
+import DayDetailsSheet from './day-details-sheet.component'
 
 export default function IntegratedCalendar() {
   const { monthIndex } = useCalendarStore()
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
   const timezoneOffset = new Date().getTimezoneOffset()
 
   const currentMonth = useMemo(() => getMonth(monthIndex), [monthIndex])
@@ -48,11 +48,11 @@ export default function IntegratedCalendar() {
 
   const handleSelectDate = (date: string) => {
     setSelectedDate(date)
-    setDialogOpen(true)
+    setSheetOpen(true)
   }
 
-  const handleDialogOpenChange = (open: boolean) => {
-    setDialogOpen(open)
+  const handleSheetOpenChange = (open: boolean) => {
+    setSheetOpen(open)
     if (!open) {
       setSelectedDate(null)
     }
@@ -70,10 +70,10 @@ export default function IntegratedCalendar() {
           onSelectDate={handleSelectDate}
         />
       </div>
-      <DayDetailsDialog
+      <DayDetailsSheet
         date={selectedDate}
-        open={dialogOpen}
-        onOpenChange={handleDialogOpenChange}
+        open={sheetOpen}
+        onOpenChange={handleSheetOpenChange}
         tasks={tasksData?.tasks || []}
         habits={habitsData?.habits || []}
       />
