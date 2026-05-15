@@ -24,11 +24,6 @@
   - Privacy + ToS MDX now reference this address. Without forwarder, GDPR-required data-subject requests bounce.
   - Configure on covenantrpg.com DNS provider (Cloudflare Email Routing, ImprovMX, Fastmail catch-all, etc.) → forward to your gmail.
 
-- [ ] Retire `pre-oss-rewrite` recovery anchor after public state verified `[debt]`
-  - Tag at `a728362d` on local repo points to pre-rewrite SHA. Delete (`git tag -d pre-oss-rewrite`) and any private archive once Phase 4 (GitHub settings) is complete and public state is confirmed correct.
-
-- [ ] Logout button in sidebar. Currently buried in `/settings`. Add to a new user dropdown menu in the sidebar.
-
 ## High Priority
 
 - [ ] Guild system Phase 4 — community lore + roleplay surfaces `[retention]`. Player-authored creative layer on top of guild infra. Habit-tracker-with-RPG-skin product benefits especially: lore reframes chores as quests and is stickier than leaderboards (lore decay slow, leaderboards reset weekly). Stage to keep moderation surface bounded.
@@ -41,8 +36,7 @@
   - Single tool for product analytics + session replay + feature flags. Replaces three previously-separate items: standalone "feature flag" infra, roadmap _"Analytics implemented (GA + Mixpanel)"_, roadmap _"UTM parameters definidos por canal"_.
   - **Fix:** Add `posthog-js` (client) + `posthog-node` (server). Capture pageviews and key events (task completion, combat start/end, quest claim). Wire feature flags via `posthog.isFeatureEnabled()`. Capture UTM on landing.
 
-- [ ] Beta wipe tools `[loop]`
-  - Roadmap Phase 3: _"Herramientas para resetear el progreso de usuarios beta"_ + _"Capacidad de rollback o wipe controlado ante fallos graves"_. Required for controlled beta iteration.
+- [ ] Beta wipe tools. Required for controlled beta iteration.
 
 - [ ] Welcome email + email retry/throttle `[blocker]`
   - `EmailService` is single-attempt with 5s timeout. Verification + password-reset endpoints are rate-limited via Better Auth (3 req / 10s per IP on sign-up, 3 req / 60s on `/forget-password`), but there is no per-recipient cap and no welcome email. Abuse vector + Brevo cost risk if a single email is targeted from many IPs.
@@ -65,9 +59,6 @@
 
 - [ ] Discord setup — server, roles, welcome bot, weekly update template `[loop]`
   - Roadmap Phase 3 infrastructure block (Discord servidor, roles configurados, bot de bienvenida, template para weekly update). Beta tester comms channel.
-
-- [ ] Test coverage gaps for core gamification services `[debt]`
-  - Missing tests: `habit.service.ts` (streaks + dice rewards), `objective.service.ts`, `area.service.ts`, `auth.service.ts`, `kill-record.service.ts`. CLAUDE.md flags habits + tier progression as critical paths.
 
 ## Medium Priority
 

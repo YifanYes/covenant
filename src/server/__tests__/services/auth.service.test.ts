@@ -1,0 +1,109 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { AuthService } from '../../services/auth.service'
+
+describe('AuthService', () => {
+  let authService: AuthService
+  let mockPrisma: any
+  let mockUserRepo: any
+  let tx: any
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    tx = {
+      character: { update: vi.fn() },
+      user: { update: vi.fn() }
+    }
+
+    mockPrisma = {
+      $transaction: vi.fn(async (cb: any) => cb(tx))
+    }
+
+    mockUserRepo = {
+      update: vi.fn(),
+      findById: vi.fn(),
+      delete: vi.fn()
+    }
+
+    authService = new AuthService(mockPrisma, mockUserRepo)
+  })
+
+  describe('deleteAccount', () => {
+    it('delegates to userRepository.delete (schema cascade handles child rows)', async () => {
+      const result = await authService.deleteAccount('user-1')
+
+      expect(mockUserRepo.delete).toHaveBeenCalledWith('user-1')
+      expect(result.message).toBe('Account deleted successfully')
+    })
+
+    it('propagates userRepository.delete rejection so caller sees the failure', async () => {
+      const dbError = new Error('FK violation')
+      mockUserRepo.delete.mockRejectedValue(dbError)
+
+      await expect(authService.deleteAccount('user-1')).rejects.toThrow(dbError)
+    })
+  })
+
+  describe('updateTheme', () => {
+    it('updates user theme via userRepo', async () => {
+      const result = await authService.updateTheme('user-1', { theme: 'dark' } as any)
+      expect(mockUserRepo.update).toHaveBeenCalledWith('user-1', { theme: 'dark' })
+      expect(result.message).toBe('Theme updated successfully')
+    })
+  })
+
+  describe('updateProfile', () => {
+    it('updates user fields only when no characterName', async () => {
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', name: 'New' })
+
+      const result = await authService.updateProfile('user-1', { name: 'New' } as any)
+
+      expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { name: 'New' } })
+      expect(tx.character.update).not.toHaveBeenCalled()
+      expect(result).toEqual({ id: 'user-1', name: 'New' })
+    })
+
+    it('updates character name only when no user fields', async () => {
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
+
+      await authService.updateProfile('user-1', { characterName: 'Hero' } as any)
+
+      expect(tx.user.update).not.toHaveBeenCalled()
+      expect(tx.character.update).toHaveBeenCalledWith({ where: { userId: 'user-1' }, data: { name: 'Hero' } })
+    })
+
+    it('updates both user fields and character name', async () => {
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
+
+      await authService.updateProfile('user-1', { name: 'New', characterName: 'Hero' } as any)
+
+      expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { name: 'New' } })
+      expect(tx.character.update).toHaveBeenCalledWith({ where: { userId: 'user-1' }, data: { name: 'Hero' } })
+    })
+
+    it('skips both updates when input only has characterName: undefined', async () => {
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
+
+      await authService.updateProfile('user-1', { characterName: undefined } as any)
+
+      expect(tx.user.update).not.toHaveBeenCalled()
+      expect(tx.character.update).not.toHaveBeenCalled()
+    })
+
+    it('returns userRepo.findById result after transaction', async () => {
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', name: 'Resolved' })
+      const result = await authService.updateProfile('user-1', { name: 'X' } as any)
+      expect(mockUserRepo.findById).toHaveBeenCalledWith('user-1')
+      expect(result).toEqual({ id: 'user-1', name: 'Resolved' })
+    })
+  })
+
+  describe('getProfile', () => {
+    it('delegates to userRepo.findById', async () => {
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
+      const result = await authService.getProfile('user-1')
+      expect(mockUserRepo.findById).toHaveBeenCalledWith('user-1')
+      expect(result).toEqual({ id: 'user-1' })
+    })
+  })
+})
