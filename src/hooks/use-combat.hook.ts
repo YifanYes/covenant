@@ -238,8 +238,14 @@ export function useCombat(
       // Damage moves and ENEMY-targeted moves need targeting; pure self-effects fire immediately.
       const needsEnemyTarget = isDamageMove(def) || def.effects.some((e) => e.target === 'ENEMY')
       if (needsEnemyTarget) {
+        const targeting = def.targeting ?? 'single'
+        const livingEnemies = localEnemiesRef.current.filter((e) => e.currentHealth > 0)
+        if (targeting === 'single' && livingEnemies.length === 1) {
+          executeMove(moveId, [livingEnemies[0].id])
+          return
+        }
         setSelectedMoveId(moveId)
-        setTargetingMode(def.targeting ?? 'single')
+        setTargetingMode(targeting)
       } else {
         executeMove(moveId, [])
       }
