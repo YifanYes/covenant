@@ -430,14 +430,25 @@ export async function executeMove(args: {
   let nextEnemy: TacticalMoveResult['nextEnemy']
   let tierProgression: { oldTier: number; newTier: number } | undefined
 
+  const dealtToEnemies = effects
+    .filter((e) => !e.unitId.startsWith('player-'))
+    .reduce((s, e) => s + (e.damageDealt ?? 0), 0)
+  const dealtToPlayer = effects
+    .filter((e) => e.unitId.startsWith('player-'))
+    .reduce((s, e) => s + (e.damageDealt ?? 0), 0)
+  const playerCrits = effects.filter((e) => e.isCritical && !e.unitId.startsWith('player-')).length
+  const turnTick = isCasterPlayer ? 1 : 0
+
   const killedIds = effects.filter((e) => e.killed && !e.unitId.startsWith('player-')).map((e) => e.unitId)
   if (killedIds.length > 0 && repos.combatEnemyRepository) {
     const activeEnemy = await repos.combatEnemyRepository.getActiveEnemy(participationId)
     if (activeEnemy) {
       await repos.combatEnemyRepository.updateEnemy(activeEnemy.id, {
         currentHealth: 0,
-        damageDealt: effects.reduce((s, e) => s + (e.damageDealt ?? 0), 0),
-        criticalHits: effects.filter((e) => e.isCritical).length
+        damageDealt: dealtToEnemies,
+        damageTaken: dealtToPlayer,
+        criticalHits: playerCrits,
+        turnsElapsed: turnTick
       })
       await repos.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
     }
@@ -450,11 +461,12 @@ export async function executeMove(args: {
     const activeEnemy = await repos.combatEnemyRepository.getActiveEnemy(participationId)
     if (activeEnemy) {
       await repos.combatEnemyRepository.appendToCombatLog(activeEnemy.id, logEntries)
-      const totalDmg = effects.reduce((s, e) => s + (e.damageDealt ?? 0), 0)
-      if (totalDmg > 0) {
+      if (dealtToEnemies > 0 || dealtToPlayer > 0 || turnTick > 0) {
         await repos.combatEnemyRepository.updateEnemy(activeEnemy.id, {
-          damageDealt: totalDmg,
-          criticalHits: effects.filter((e) => e.isCritical).length
+          damageDealt: dealtToEnemies,
+          damageTaken: dealtToPlayer,
+          criticalHits: playerCrits,
+          turnsElapsed: turnTick
         })
       }
     }
