@@ -1,11 +1,11 @@
 'use client'
 import CombatActionBar from '@/components/combat/combat-action-bar.component'
+import CombatLog from '@/components/combat/combat-log.component'
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import EnemyInfo from '@/components/combat/enemy-info.component'
 import EnemySprite from '@/components/combat/enemy-sprite.component'
 import PlayerInfo from '@/components/combat/player-info.component'
 import PlayerSprite from '@/components/combat/player-sprite.component'
-import { translateEnemyName } from '@/components/combat/translate-enemy-name.utils'
 import { useCombat } from '@/hooks/use-combat.hook'
 import { cn } from '@/lib/cn.lib'
 import AlertDialog, {
@@ -17,7 +17,6 @@ import AlertDialog, {
   AlertDialogTitle
 } from '@/ui/alert-dialog.component'
 import {
-  CombatLogType,
   type CombatLogEntry,
   type EnemyState,
   type InventoryCharacter
@@ -26,21 +25,6 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
-const LOG_TYPE_TO_KEY: Partial<Record<CombatLogType, string>> = {
-  [CombatLogType.PLAYER_ATTACK]: 'combat.log.player_attack',
-  [CombatLogType.PLAYER_HITS]: 'combat.log.player_hits',
-  [CombatLogType.ENEMY_DEFENDS]: 'combat.log.enemy_defends',
-  [CombatLogType.ENEMY_ATTACKS]: 'combat.log.enemy_attacks',
-  [CombatLogType.PLAYER_DEFENDS]: 'combat.log.player_defends',
-  [CombatLogType.DAMAGE_TO_ENEMY]: 'combat.log.damage_to_enemy',
-  [CombatLogType.DAMAGE_TO_PLAYER]: 'combat.log.damage_to_player',
-  [CombatLogType.MANA_REGEN]: 'combat.log.mana_regen',
-  [CombatLogType.ENEMY_DEFEATED]: 'combat.log.enemy_defeated',
-  [CombatLogType.STATUS_EFFECT]: 'combat.log.status_effect',
-  [CombatLogType.ABILITY_EFFECT]: 'combat.log.ability_effect',
-  [CombatLogType.STATUS_EXPIRED]: 'combat.log.status_expired'
-}
 
 interface MessageBoxProps {
   phase: string
@@ -55,9 +39,6 @@ function MessageBox({ phase, targetingMode, combatLog, manaReserve, className }:
 
   if (phase === 'victory' || phase === 'defeat') return null
 
-  const latestLog = combatLog[combatLog.length - 1]
-  const logKey = latestLog ? LOG_TYPE_TO_KEY[latestLog.type] : undefined
-
   const primaryText = targetingMode
     ? targetingMode === 'all'
       ? t('combat.targeting.all')
@@ -69,21 +50,14 @@ function MessageBox({ phase, targetingMode, combatLog, manaReserve, className }:
         : '...'
 
   return (
-    <div className={cn(panelChrome, 'flex flex-col gap-1 p-3', className)}>
-      <p className="text-sm font-medium">{primaryText}</p>
-      {logKey && (
-        <p className="text-muted-foreground line-clamp-2 text-xs">
-          {t(logKey, {
-            ...(latestLog.data as Record<string, unknown>),
-            ...(typeof latestLog.data?.enemy === 'string' && {
-              enemy: translateEnemyName(t, latestLog.data.enemy)
-            })
-          })}
+    <div className={cn(panelChrome, 'flex min-h-0 flex-col gap-2 p-3', className)}>
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-sm font-medium">{primaryText}</p>
+        <p className="text-primary text-[10px] font-bold tracking-widest">
+          {t('combat.mana_reserve')}: {manaReserve}
         </p>
-      )}
-      <p className="text-primary mt-auto text-[10px] font-bold tracking-widest">
-        {t('combat.mana_reserve')}: {manaReserve}
-      </p>
+      </div>
+      <CombatLog entries={combatLog} className="min-h-0 flex-1 border-0 bg-transparent p-0" />
     </div>
   )
 }
@@ -132,7 +106,7 @@ export default function CombatArena({
 
   return (
     <div className={cn('flex flex-col gap-3 overflow-hidden', className)}>
-      <div className="relative h-72 w-full overflow-hidden rounded-lg">
+      <div className="relative min-h-72 w-full flex-1 overflow-hidden rounded-lg">
         <div className="absolute inset-0 bg-gradient-to-b from-card via-background to-muted" />
 
         {!imageError && sceneId && (
@@ -196,7 +170,7 @@ export default function CombatArena({
         </div>
       </div>
 
-      <div className="flex min-h-28 shrink-0 items-stretch gap-3">
+      <div className="flex h-44 shrink-0 items-stretch gap-3">
         <MessageBox
           phase={combat.phase}
           targetingMode={combat.targetingMode}
