@@ -62,6 +62,13 @@
 
 ## Medium Priority
 
+- [ ] Security: `/api/logs` endpoint has no auth, no rate limit, no payload size cap `[debt]`
+  - Any client (authenticated or not) can POST arbitrary log payloads. Abuse vector: log-flood inflates Sentry/hosting bill and drowns signal in noise.
+  - **Fix:** Add IP-based `checkRateLimit` call + zod `.max()` bounds on `message` and `context` fields in `clientLogSchema`.
+
+- [ ] Security: Sentry `sendDefaultPii: true` ships user IP/email/headers to Sentry `[debt]`
+  - Configured in `sentry.shared.config.ts:18`. Fine operationally (Sentry is SOC 2), but must be disclosed in privacy policy. Consider `beforeSend` scrubber to strip email, keeping only `userId`.
+
 - [ ] Security: error messages leak resource existence `[blocker]`
   - Multiple service files distinguish "not found" from "forbidden" in their error messages, leaking existence of records the caller doesn't own.
   - **Fix:** Use generic "Resource not found or access denied" messages.
@@ -86,6 +93,15 @@
   - **Fix when unblocked:** flip `rejectUnauthorized` back to `true` (and add `ca: env.DATABASE_SSL_CA` if pinning); update `docs/specs/database_ssl.md`.
 
 ## Low Priority
+
+- [ ] Security: journal HTML stored raw in DB, sanitized at render only `[debt]`
+  - All 3 current render sites go through `<JournalContent>` + DOMPurify — safe today. Future surfaces (data export, email digest, mobile API) would expose raw stored HTML. Defense-in-depth: sanitize on write in `journal.service.ts:create` + `update` with same DOMPurify allowlist.
+
+- [ ] Security: rate limiter falls back to in-memory when Redis absent `[debt]`
+  - In multi-replica production without Upstash, rate limits are per-instance and trivially bypassable. Consider hard-fail in `src/server/lib/rate-limiter.ts` when `NODE_ENV=production && !UPSTASH_REDIS_REST_URL`. Document Redis as prod-required in deploy guide.
+
+- [ ] Security: pnpm audit — 2 moderate transitive vulns `[debt]`
+  - `@hono/node-server <1.19.13` (via `@prisma/dev`), `postcss <8.5.10` (via `next`). Not directly exploitable in app code paths. Pin via `pnpm.overrides` or wait for upstream dependency bumps.
 
 - [ ] Security: type safety — replace `as any` usages `[debt]`
   - Including the `inventory` / `loadout` JSON-field casts in `character.repository.ts:107-108` (replace with Zod-inferred types from `src/shared/schemas/`).
