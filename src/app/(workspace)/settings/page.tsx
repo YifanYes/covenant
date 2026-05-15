@@ -8,7 +8,7 @@ import useTheme from '@/hooks/use-theme'
 import { useUserPreferencesStore, type DateFormat } from '@/stores/user-preferences.store'
 import Label from '@/ui/label.component'
 import Switch from '@/ui/switch.component'
-import { trpcOptions } from '@/utils/trpc.utils'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { Faction } from '@shared/constants/factions'
 import { DATE_FORMATS } from '@shared/schemas/auth.schemas'
 import { useMutation } from '@tanstack/react-query'
@@ -148,6 +148,7 @@ export default function Settings() {
 
       if (Object.keys(payload).length > 0) {
         await updateProfileMutation.mutateAsync(payload)
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.auth.getProfile.queryKey() })
       }
 
       if (factionChanged) persistFactionStorage(values.faction)
