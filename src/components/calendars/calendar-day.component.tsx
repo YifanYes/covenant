@@ -25,7 +25,7 @@ export default function CalendarDay({ day, weekIndex, tasks, mood, isSelected, o
 
   return (
     <div
-      className={cn('flex flex-col border-2', isSelected && 'ring-foreground ring-2')}
+      className={cn('flex flex-col border-2 cursor-pointer', isSelected && 'ring-foreground ring-2')}
       onClick={onSelect}
     >
       <header className="flex flex-col items-center">
@@ -41,8 +41,8 @@ export default function CalendarDay({ day, weekIndex, tasks, mood, isSelected, o
       <div className="flex flex-col gap-1 p-1">
         {dayTasks.slice(0, 2).map((task) => {
           const colorClasses = getColorClasses(task.color, {
-            bg: 'bg-muted',
-            text: 'text-card-foreground'
+            bg: 'bg-muted hover:bg-accent',
+            text: 'text-card-foreground hover:text-accent-foreground'
           })
           return (
             <button
