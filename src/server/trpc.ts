@@ -55,7 +55,8 @@ export const RATE_LIMITS = {
   auth: { windowMs: 60_000, maxRequests: 5 },
   write: { windowMs: 60_000, maxRequests: 30 },
   strict: { windowMs: 60_000, maxRequests: 10 },
-  combat: { windowMs: 60_000, maxRequests: 60 }
+  combat: { windowMs: 60_000, maxRequests: 60 },
+  chat: { windowMs: 30_000, maxRequests: 5 }
 } as const
 
 export const createCallerFactory = t.createCallerFactory

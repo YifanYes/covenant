@@ -20,7 +20,7 @@ import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { Battery, BookOpen, Bulletlist, Calendar, Castle, Grid3x3, PenSquare, Settings2, Shield, Store, Suitcase, Trophy } from 'pixelarticons/react'
+import { Battery, BookOpen, Bulletlist, Calendar, Castle, Coffee, Grid3x3, PenSquare, Settings2, Shield, Store, Suitcase, Trophy } from 'pixelarticons/react'
 import { useSyncExternalStore, type ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -152,6 +152,11 @@ export default function AppSidebar() {
         title: t('sidebar.guilds'),
         url: '/guilds',
         icon: Shield
+      },
+      {
+        title: t('sidebar.tavern'),
+        url: '/tavern',
+        icon: Coffee
       }
     ],
     settings: [

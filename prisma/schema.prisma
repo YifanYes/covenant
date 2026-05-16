@@ -29,6 +29,8 @@ model User {
   guildMembership      GuildMember?
   ownedGuilds          Guild[]         @relation("GuildOwner")
   guildMessages        GuildMessage[]
+  tavernMessages       TavernMessage[]
+  tavernReports        TavernMessageReport[]
 
   @@map("users")
 }
@@ -372,3 +374,32 @@ model GuildCampaignProgress {
   @@map("guild_campaign_progress")
 }
 
+model TavernMessage {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String
+  characterId String    @db.Uuid
+  content     String    @db.VarChar(500)
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt   DateTime? @db.Timestamp(6)
+  reportCount Int       @default(0)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reports     TavernMessageReport[]
+
+  @@index([createdAt, id])
+  @@index([userId, createdAt])
+  @@map("tavern_messages")
+}
+
+model TavernMessageReport {
+  id         String        @id @default(uuid()) @db.Uuid
+  messageId  String        @db.Uuid
+  reporterId String
+  reason     String?       @db.VarChar(255)
+  createdAt  DateTime      @default(now()) @db.Timestamp(6)
+  message    TavernMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  reporter   User          @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, reporterId])
+  @@index([messageId])
+  @@map("tavern_message_reports")
+}

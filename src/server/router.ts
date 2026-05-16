@@ -10,6 +10,7 @@ import { objectivesRouter } from './routers/objectives.router'
 import { questRouter } from './routers/quest.router'
 import { storeRouter } from './routers/store.router'
 import { tasksRouter } from './routers/tasks.router'
+import { tavernRouter } from './routers/tavern.router'
 import { publicProcedure, t } from './trpc'
 
 export const appRouter = t.router({
@@ -29,7 +30,8 @@ export const appRouter = t.router({
   quest: questRouter,
   killRecord: killRecordRouter,
   store: storeRouter,
-  guilds: guildsRouter
+  guilds: guildsRouter,
+  tavern: tavernRouter
 })
 
 export type AppRouter = typeof appRouter

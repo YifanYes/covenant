@@ -11,6 +11,7 @@ import { HabitRepository } from '../repositories/habit.repository'
 import { JournalRepository } from '../repositories/journal.repository'
 import { ObjectiveRepository } from '../repositories/objective.repository'
 import { TaskRepository } from '../repositories/task.repository'
+import { TavernMessageRepository } from '../repositories/tavern-message.repository'
 import { UserRepository } from '../repositories/user.repository'
 import { AreaService } from './area.service'
 import { AuthService } from './auth.service'
@@ -26,6 +27,7 @@ import { ObjectiveService } from './objective.service'
 import { QuestService } from './quest.service'
 import { StoreService } from './store.services'
 import { TaskService } from './task.service'
+import { TavernService } from './tavern.service'
 
 /**
  * ServiceFactory creates lazily-initialized service instances with proper dependency injection.
@@ -46,6 +48,7 @@ export class ServiceFactory {
   private _journalRepository?: JournalRepository
   private _objectiveRepository?: ObjectiveRepository
   private _taskRepository?: TaskRepository
+  private _tavernMessageRepository?: TavernMessageRepository
   private _userRepository?: UserRepository
 
   // Services (private, lazy-initialized)
@@ -63,6 +66,7 @@ export class ServiceFactory {
   private _questService?: QuestService
   private _storeService?: StoreService
   private _taskService?: TaskService
+  private _tavernService?: TavernService
 
   constructor(private prisma: PrismaClient) {}
 
@@ -114,6 +118,10 @@ export class ServiceFactory {
 
   private get taskRepository(): TaskRepository {
     return (this._taskRepository ??= new TaskRepository(this.prisma))
+  }
+
+  private get tavernMessageRepository(): TavernMessageRepository {
+    return (this._tavernMessageRepository ??= new TavernMessageRepository(this.prisma))
   }
 
   private get userRepository(): UserRepository {
@@ -175,6 +183,14 @@ export class ServiceFactory {
 
   get task(): TaskService {
     return (this._taskService ??= new TaskService(this.taskRepository, this.mana, this.guild))
+  }
+
+  get tavern(): TavernService {
+    return (this._tavernService ??= new TavernService(
+      this.prisma,
+      this.tavernMessageRepository,
+      this.characterRepository
+    ))
   }
 
   // Layer 3: Repository + Layer 2 service dependencies
