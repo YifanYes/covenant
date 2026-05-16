@@ -30,7 +30,7 @@ Uncapped overflow bank stored on `Character.manaReserve`. Real-life completions 
 
 ### RPG-views set (post-redesign)
 
-Routes that adopt the NES.css visual system, Pixelify Sans body, and Press Start 2P display font: `/quests`, `/quests/[id]` (combat arena), `/inventory`, `/shop`, `/guilds`. All wrapped in a `.rpg-ui` scope class via a `(rpg)` route group layout. Scope leak prevented by PostCSS prefix-selector at build time (rewrites NES.css selectors to `.rpg-ui ...`).
+Routes that adopt the NES.css visual system, Pixelify Sans body, and Press Start 2P display font: `/quests`, `/quests/[id]` (combat arena), `/inventory`, `/shop`, `/guilds`, `/tavern`. All wrapped in a `.rpg-ui` scope class via a `(rpg)` route group layout. Scope leak prevented by PostCSS prefix-selector at build time (rewrites NES.css selectors to `.rpg-ui ...`).
 
 **`/map` is deprecated and deleted in this rewrite** — references in the spec (`map/_components/enemy-card`, `map/_components/health-bar`) are obsolete. `health-bar.component.tsx` must be relocated before `/map` deletion since combat imports it.
 
