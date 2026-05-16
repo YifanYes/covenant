@@ -2,6 +2,7 @@
 
 import CovenantLogo from '@/components/common/covenant-logo.component'
 import UserMenu from '@/components/common/user-menu.component'
+import { useManaReserveTooltip } from '@/hooks/use-mana-reserve-tooltip.hook'
 import Separator from '@/ui/separator.component'
 import Sidebar, {
   SidebarContent,
@@ -15,6 +16,7 @@ import Sidebar, {
   SidebarMenuItem,
   SidebarTrigger
 } from '@/ui/sidebar.component'
+import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
@@ -51,23 +53,31 @@ function SidebarSection({ title, items }: { title?: string; items: SidebarItem[]
 }
 
 function ManaIndicator() {
-  const { t } = useTranslation()
   const { data: character } = useQuery({ ...trpcOptions.character.getCurrentClass.queryOptions() })
+  const manaReserve = character?.manaReserve ?? 0
+  const tooltip = useManaReserveTooltip(manaReserve)
   if (!character) return null
   const currentClass = character.classes.find((c) => c.className === character.currentClass)
   if (!currentClass) return null
   return (
-    <div className="flex items-center gap-2 px-2 py-1 group-data-[collapsible=icon]:hidden" title={t('combat.mana_reserve_tooltip', { reserve: character.manaReserve ?? 0 })}>
-      <Battery className="h-3 w-3 text-blue-400" />
-      <span className="text-xs font-medium">
-        {currentClass.mana}/{currentClass.maxMana}
-      </span>
-      {(character.manaReserve ?? 0) > 0 && (
-        <span className="rounded bg-blue-500/20 px-1 text-[10px] font-bold text-blue-300">
-          +{character.manaReserve}
-        </span>
-      )}
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="flex cursor-pointer items-center gap-2 px-2 py-1 group-data-[collapsible=icon]:hidden">
+          <Battery className="h-3 w-3 text-blue-400" />
+          <span className="text-xs font-medium">
+            {currentClass.mana}/{currentClass.maxMana}
+          </span>
+          {manaReserve > 0 && (
+            <span className="rounded bg-blue-500/20 px-1 text-[10px] font-bold text-blue-300">
+              +{manaReserve}
+            </span>
+          )}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="right" align="center" className="max-w-xs whitespace-pre-line text-left">
+        {tooltip}
+      </TooltipContent>
+    </Tooltip>
   )
 }
 

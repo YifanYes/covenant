@@ -9,7 +9,7 @@ import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { UserRepository } from '../repositories/user.repository'
 import { getCharacterProgress } from '../utils/character.utils'
-import type { ManaService } from './mana.service'
+import type { ManaService, ReserveBreakdown } from './mana.service'
 
 export class CharacterService {
   constructor(
@@ -80,6 +80,18 @@ export class CharacterService {
         equippedAbilities: (c as { equippedAbilities?: string[] }).equippedAbilities || []
       }))
     }
+  }
+
+  async getTodayReserveBreakdown(userId: string, timezoneOffset = 0): Promise<ReserveBreakdown> {
+    return (
+      this.manaService?.getTodayReserveBreakdown(userId, timezoneOffset) ?? {
+        habits: { count: 0, mana: 0 },
+        tasks: { count: 0, mana: 0 },
+        objectives: { count: 0, mana: 0 },
+        journals: { count: 0, mana: 0 },
+        total: 0
+      }
+    )
   }
 
   async updateName(userId: string, name: string) {

@@ -302,7 +302,16 @@
     },
     "mana_reserve": "Reserva",
     "mana_reserve_badge": "+{{reserve}}",
-    "mana_reserve_tooltip": "Reserva: {{reserve}} maná guardado para futuros combates",
+    "mana_reserve_tooltip": "Reserva: {{reserve}} maná",
+    "mana_reserve_today_empty": "Hoy: {{total}} maná",
+    "mana_reserve_today_with_sources": "Hoy: {{total}} maná ({{sources}})",
+    "mana_reserve_source_separator": ", ",
+    "mana_reserve_sources": {
+      "habits": "Hábitos +{{mana}}",
+      "tasks": "Tareas +{{mana}}",
+      "objectives": "Objetivos +{{mana}}",
+      "journals": "Diario +{{mana}}"
+    },
     "targeting": {
       "single": "Selecciona un objetivo",
       "all": "Atacando a todos los enemigos",

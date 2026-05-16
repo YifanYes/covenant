@@ -16,7 +16,8 @@ export const invalidators = {
       queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() }),
       queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getFiltered.queryKey() }),
       // Phase 2A: completing a task grants mana; sidebar/dashboard indicators must refresh.
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() }),
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getTodayReserveBreakdown.queryKey() })
     ]
     if (monthIndex) {
       promises.push(
@@ -36,7 +37,8 @@ export const invalidators = {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() }),
       // Phase 2A: habit completion grants mana; surface live in sidebar.
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() }),
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getTodayReserveBreakdown.queryKey() })
     ])
   },
 
@@ -48,7 +50,8 @@ export const invalidators = {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: trpcOptions.objectives.getAll.queryKey() }),
       // Phase 2A: completing an objective grants mana.
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() }),
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getTodayReserveBreakdown.queryKey() })
     ])
   },
 
@@ -67,7 +70,8 @@ export const invalidators = {
   character: async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() }),
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.get.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.get.queryKey() }),
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getTodayReserveBreakdown.queryKey() })
     ])
   },
 
@@ -89,7 +93,8 @@ export const invalidators = {
   combat: async (questId?: string) => {
     const promises = [
       queryClient.invalidateQueries({ queryKey: trpcOptions.quest.list.queryKey() }),
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() }),
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getTodayReserveBreakdown.queryKey() })
     ]
     if (questId) {
       promises.push(
@@ -108,7 +113,8 @@ export const invalidators = {
   store: async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: trpcOptions.store.list.queryKey() }),
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() }),
+      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getTodayReserveBreakdown.queryKey() })
     ])
   }
 }

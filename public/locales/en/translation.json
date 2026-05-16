@@ -302,7 +302,16 @@
     },
     "mana_reserve": "Reserve",
     "mana_reserve_badge": "+{{reserve}}",
-    "mana_reserve_tooltip": "Reserve: {{reserve}} mana saved for future fights",
+    "mana_reserve_tooltip": "Reserve: {{reserve}} mana",
+    "mana_reserve_today_empty": "Today: {{total}} mana",
+    "mana_reserve_today_with_sources": "Today: {{total}} mana ({{sources}})",
+    "mana_reserve_source_separator": ", ",
+    "mana_reserve_sources": {
+      "habits": "Habits +{{mana}}",
+      "tasks": "Tasks +{{mana}}",
+      "objectives": "Objectives +{{mana}}",
+      "journals": "Journals +{{mana}}"
+    },
     "targeting": {
       "single": "Select a target",
       "all": "Targeting all enemies",

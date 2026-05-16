@@ -10,6 +10,7 @@ import Select, {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select.component'
+import { invalidators } from '@/utils/query-invalidation.utils'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -45,7 +46,7 @@ export default function JournalEditor() {
         await queryClient.invalidateQueries({ queryKey: trpcOptions.journaling.getAll.queryKey() })
         await queryClient.invalidateQueries({ queryKey: trpcOptions.journaling.getMoodCalendar.queryKey() })
         // Phase 2A: creating a journal entry grants mana; refresh sidebar indicator.
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+        await invalidators.character()
       },
       onError: (error) => toast.error(t('journaling.error.internal.create'), { description: error.message })
     })
