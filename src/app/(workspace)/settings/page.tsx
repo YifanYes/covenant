@@ -10,7 +10,7 @@ import { useUserPreferencesStore, type DateFormat } from '@/stores/user-preferen
 import Label from '@/ui/label.component'
 import Switch from '@/ui/switch.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import { DATE_FORMATS } from '@shared/schemas/auth.schemas'
+import { DATE_FORMATS, TASKS_VIEWS, type TasksView } from '@shared/schemas/auth.schemas'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Moon, CloudSun as Sun } from 'pixelarticons/react'
@@ -142,7 +142,7 @@ export default function Settings() {
       const payload: Parameters<typeof updateProfileMutation.mutateAsync>[0] = {}
       if (factionChanged) payload.theme = values.faction
       if (languageChanged) payload.locale = values.language as 'en' | 'es'
-      if (defaultTasksViewChanged) payload.defaultTasksView = values.defaultTasksView as 'list' | 'table' | 'matrix'
+      if (defaultTasksViewChanged) payload.defaultTasksView = values.defaultTasksView as TasksView
       if (dateFormatChanged) payload.dateFormat = values.dateFormat
       if (themeChanged) payload.colorMode = values.theme
 
@@ -206,7 +206,7 @@ export default function Settings() {
               placeholder={t('settings.default_tasks_view_placeholder')}
               value={field.value}
               onChange={(v) => v && field.onChange(v)}
-              options={['list', 'table', 'matrix'].map((value) => ({
+              options={TASKS_VIEWS.map((value) => ({
                 value,
                 label: t(`tasks.tabs.${value}`)
               }))}

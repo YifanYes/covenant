@@ -2140,6 +2140,7 @@
     },
     "tabs": {
       "calendar": "Calendario",
+      "kanban": "Kanban",
       "list": "Lista",
       "matrix": "Matriz",
       "table": "Tabla"

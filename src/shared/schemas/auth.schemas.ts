@@ -26,7 +26,8 @@ export const updateThemeSchema = z.object({
 export type UpdateThemeType = z.infer<typeof updateThemeSchema>
 
 export const DATE_FORMATS = ['L', 'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', 'DD MMM YYYY'] as const
-export const TASKS_VIEWS = ['list', 'table', 'matrix'] as const
+export const TASKS_VIEWS = ['list', 'kanban', 'table', 'matrix'] as const
+export type TasksView = (typeof TASKS_VIEWS)[number]
 export const LOCALES = ['en', 'es'] as const
 export const COLOR_MODES = ['light', 'dark'] as const
 

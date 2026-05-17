@@ -65,7 +65,7 @@ export default function DayDetailsSheet({ date, open, onOpenChange, tasks, habit
             {dayTasks.length > 0 ? (
               <ul className="rounded-md border divide-y">
                 {dayTasks.map((task) => (
-                  <Task key={task.id} task={task} setSelectedTask={setSelectedTask} hideHandle hideHover />
+                  <Task key={task.id} task={task} setSelectedTask={setSelectedTask} hideHover />
                 ))}
               </ul>
             ) : (

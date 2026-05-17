@@ -163,21 +163,46 @@ export class TaskRepository {
     })
   }
 
-  async bulkUpdate(userId: string, tasks: BulkUpdateTaskItem[]): Promise<void> {
+  async findManyByIds(
+    ids: string[],
+    userId: string
+  ): Promise<Array<Pick<Task, 'id' | 'status' | 'impact'>>> {
+    if (ids.length === 0) return []
+    return this.prisma.task.findMany({
+      where: { id: { in: ids }, userId },
+      select: { id: true, status: true, impact: true }
+    })
+  }
+
+  async bulkUpdate(
+    userId: string,
+    tasks: BulkUpdateTaskItem[],
+    completingIds: string[] = [],
+    completedAt: Date = new Date()
+  ): Promise<void> {
     if (tasks.length === 0) return
 
-    const values = tasks.map((t) => Prisma.sql`(${t.id}::uuid, ${t.status}::varchar, ${t.order}::integer)`)
+    await this.prisma.$transaction(async (tx) => {
+      let updated = 0
+      for (const t of tasks) {
+        const result = await tx.task.updateMany({
+          where: { id: t.id, userId },
+          data: { status: t.status, order: t.order }
+        })
+        updated += result.count
+      }
 
-    const count = await this.prisma.$executeRaw`
-      UPDATE "tasks" as t
-      SET "status" = c.status, "order" = c."order"
-      FROM (VALUES ${Prisma.join(values)}) as c(id, status, "order")
-      WHERE c.id = t.id AND "userId" = ${userId}
-    `
+      if (updated !== tasks.length) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Some tasks not found or access denied' })
+      }
 
-    if (count !== tasks.length) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Some tasks not found or access denied' })
-    }
+      if (completingIds.length > 0) {
+        await tx.task.updateMany({
+          where: { id: { in: completingIds }, userId },
+          data: { completedAt }
+        })
+      }
+    })
   }
 
   async delete(id: string): Promise<Task> {

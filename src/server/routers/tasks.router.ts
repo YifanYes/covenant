@@ -34,7 +34,7 @@ export const tasksRouter = t.router({
   }),
 
   bulkUpdate: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(bulkUpdateTasksSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.task.bulkUpdate(ctx.user.id, input.tasks)
+    return ctx.services.task.bulkUpdate(ctx.user.id, input.tasks, TaskStatus.DONE)
   }),
 
   delete: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).input(taskIdSchema).mutation(async ({ ctx, input }) => {
