@@ -1,3 +1,4 @@
+import { sanitizeRichText } from '@shared/lib/sanitize-rich-text.lib'
 import type { CreateJournalEntryType, UpdateJournalEntryType } from '@shared/schemas/journal.schemas'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '@/generated/prisma'
@@ -17,10 +18,11 @@ export class JournalService {
     let reserveGained = 0
     let createdNew = false
     let entry: Awaited<ReturnType<typeof this.journalRepository.create>>
+    const sanitizedContent = sanitizeRichText(input.content)
 
     try {
       entry = await this.prisma.$transaction(async (tx) => {
-        return this.journalRepository.create(userId, input.content, input.mood, input.color, tx)
+        return this.journalRepository.create(userId, sanitizedContent, input.mood, input.color, tx)
       })
       createdNew = true
     } catch (error) {
@@ -47,7 +49,8 @@ export class JournalService {
   }
 
   async update(userId: string, input: UpdateJournalEntryType) {
-    const entry = await this.journalRepository.update(input.id, userId, input.content, input.mood, input.color)
+    const sanitizedContent = input.content !== undefined ? sanitizeRichText(input.content) : undefined
+    const entry = await this.journalRepository.update(input.id, userId, sanitizedContent, input.mood, input.color)
     return entry
   }
 

@@ -83,7 +83,7 @@
 
 ## Low Priority
 
-- [ ] Security: journal HTML stored raw in DB, sanitized at render only. All 3 current render sites go through `<JournalContent>` + DOMPurify — safe today. Future surfaces (data export, email digest, mobile API) would expose raw stored HTML. Defense-in-depth: sanitize on write in `journal.service.ts:create` + `update` with same DOMPurify allowlist.
+- [ ] Security: journal HTML stored raw in DB, sanitized at render only. All 3 current render sites go through `<JournalContent>` + DOMPurify — safe today. Future surfaces (data export, email digest, mobile API) would expose raw stored HTML. Sanitize on write in `journal.service.ts:create` + `update` with same DOMPurify allowlist.
 
 - [ ] Security: rate limiter falls back to in-memory when Redis absent. In multi-replica production without Upstash, rate limits are per-instance and trivially bypassable. Consider hard-fail in `src/server/lib/rate-limiter.ts` when `NODE_ENV=production && !UPSTASH_REDIS_REST_URL`. Document Redis as prod-required in deploy guide.
 

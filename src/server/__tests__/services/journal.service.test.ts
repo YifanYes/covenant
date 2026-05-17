@@ -86,6 +86,24 @@ describe('JournalService', () => {
       expect(mockManaService.addManaFromCompletion).toHaveBeenCalledWith('user-1', 'journal')
     })
 
+    it('should sanitize HTML content before writing', async () => {
+      mockJournalRepo.create.mockResolvedValue({ id: 'entry-1', content: '<p>safe</p>' })
+      mockJournalRepo.findEntryDates.mockResolvedValue([new Date()])
+
+      await journalService.create('user-1', {
+        content: '<p>safe</p><script>alert(1)</script><img src=x onerror=alert(1)>',
+        mood: undefined,
+        color: undefined,
+        timezoneOffset: 0
+      })
+
+      const writtenContent = mockJournalRepo.create.mock.calls[0][1]
+      expect(writtenContent).not.toContain('<script')
+      expect(writtenContent).not.toContain('onerror')
+      expect(writtenContent).not.toContain('<img')
+      expect(writtenContent).toContain('<p>safe</p>')
+    })
+
     it('should handle race condition when duplicate entry is created concurrently', async () => {
       const existingEntry = { id: 'entry-existing', content: 'Existing', mood: 'calm', color: '#5F9EA0' }
       mockJournalRepo.create.mockRejectedValue(Object.assign(new Error('Unique constraint'), { code: 'P2002' }))
@@ -115,6 +133,21 @@ describe('JournalService', () => {
       expect(result.mood).toBe('calm')
       expect(result.color).toBe('#5F9EA0')
       expect(mockJournalRepo.findByIdOrThrow).not.toHaveBeenCalled()
+    })
+
+    it('should sanitize HTML content before writing', async () => {
+      mockJournalRepo.update.mockResolvedValue({ id: 'entry-1', content: '<p>safe</p>' })
+
+      await journalService.update('user-1', {
+        id: 'entry-1',
+        content: '<p>safe</p><script>alert(1)</script>',
+        mood: undefined,
+        color: undefined
+      })
+
+      const writtenContent = mockJournalRepo.update.mock.calls[0][2]
+      expect(writtenContent).not.toContain('<script')
+      expect(writtenContent).toContain('<p>safe</p>')
     })
   })
 
