@@ -2,7 +2,8 @@
 import { useUserPreferencesStore } from '@/stores/user-preferences.store'
 import Tabs, { TabsContent, TabsList, TabsTrigger } from '@/ui/tabs.component'
 import { TASKS_VIEWS, type TasksView } from '@shared/schemas/auth.schemas'
-import { useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CreateTaskDialog from './_components/create-task-dialog.component'
 import TaskKanban from './_components/task-kanban.component'
@@ -11,18 +12,34 @@ import TaskTable from './_components/task-table.component'
 import TasksListBoard from './_components/tasks-list-board.component'
 import UpdateTaskDialog from './_components/update-task-dialog.component'
 
+const isTasksView = (v: string | null): v is TasksView =>
+  v !== null && (TASKS_VIEWS as readonly string[]).includes(v)
+
 export default function Tasks() {
   const { t } = useTranslation()
   const { defaultTasksView } = useUserPreferencesStore()
   const [createOpen, setCreateOpen] = useState(false)
+  const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const activeView: TasksView = (TASKS_VIEWS as readonly string[]).includes(defaultTasksView)
-    ? (defaultTasksView as TasksView)
-    : 'list'
+  const viewParam = searchParams.get('view')
+  const fallback: TasksView = isTasksView(defaultTasksView) ? defaultTasksView : 'list'
+  const activeView: TasksView = isTasksView(viewParam) ? viewParam : fallback
+
+  const handleViewChange = useCallback(
+    (value: string) => {
+      if (!isTasksView(value)) return
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('view', value)
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    },
+    [pathname, router, searchParams]
+  )
 
   return (
     <div className="h-[calc(100dvh-3rem)] w-full p-6">
-      <Tabs defaultValue={activeView} className="flex h-full w-full flex-col">
+      <Tabs value={activeView} onValueChange={handleViewChange} className="flex h-full w-full flex-col">
         <div className="flex flex-row items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold">{t('tasks.title')}</h1>
           <div className="flex items-center gap-4">
