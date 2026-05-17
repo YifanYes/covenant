@@ -1,9 +1,11 @@
 'use client'
 import { useUserPreferencesStore } from '@/stores/user-preferences.store'
 import Tabs, { TabsContent, TabsList, TabsTrigger } from '@/ui/tabs.component'
+import { TASKS_VIEWS, type TasksView } from '@shared/schemas/auth.schemas'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CreateTaskDialog from './_components/create-task-dialog.component'
+import TaskKanban from './_components/task-kanban.component'
 import TaskMatrix from './_components/task-matrix.component'
 import TaskTable from './_components/task-table.component'
 import TasksListBoard from './_components/tasks-list-board.component'
@@ -14,8 +16,9 @@ export default function Tasks() {
   const { defaultTasksView } = useUserPreferencesStore()
   const [createOpen, setCreateOpen] = useState(false)
 
-  const validViews = ['list', 'table', 'matrix']
-  const activeView = validViews.includes(defaultTasksView) ? defaultTasksView : 'list'
+  const activeView: TasksView = (TASKS_VIEWS as readonly string[]).includes(defaultTasksView)
+    ? (defaultTasksView as TasksView)
+    : 'list'
 
   return (
     <div className="h-[calc(100dvh-3rem)] w-full p-6">
@@ -25,6 +28,7 @@ export default function Tasks() {
           <div className="flex items-center gap-4">
             <TabsList>
               <TabsTrigger value="list">{t('tasks.tabs.list')}</TabsTrigger>
+              <TabsTrigger value="kanban">{t('tasks.tabs.kanban')}</TabsTrigger>
               <TabsTrigger value="table">{t('tasks.tabs.table')}</TabsTrigger>
               <TabsTrigger value="matrix">{t('tasks.tabs.matrix')}</TabsTrigger>
             </TabsList>
@@ -34,6 +38,10 @@ export default function Tasks() {
 
         <TabsContent value="list" className="mt-1">
           <TasksListBoard />
+        </TabsContent>
+
+        <TabsContent value="kanban" className="mt-4 flex-1 overflow-hidden">
+          <TaskKanban />
         </TabsContent>
 
         <TabsContent value="table" className="mt-4 flex flex-1 flex-col overflow-hidden">

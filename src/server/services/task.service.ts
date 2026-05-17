@@ -1,9 +1,10 @@
 import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
-import type {
-  BulkUpdateTaskItem,
-  CreateTaskType,
-  GetTasksFilteredInput,
-  UpdateTaskType
+import {
+  TaskStatus,
+  type BulkUpdateTaskItem,
+  type CreateTaskType,
+  type GetTasksFilteredInput,
+  type UpdateTaskType
 } from '@shared/schemas/tasks.schemas'
 import type { TaskRepository } from '../repositories/task.repository'
 import type { GuildService } from './guild.service'
@@ -71,7 +72,7 @@ export class TaskService {
     return { tasks }
   }
 
-  async update(userId: string, input: UpdateTaskType, completingStatus: string) {
+  async update(userId: string, input: UpdateTaskType, completingStatus: TaskStatus) {
     const existingTask = await this.taskRepository.findByIdOrThrow(input.id, userId)
 
     const isCompleting = input.status === completingStatus && existingTask.status !== completingStatus
@@ -90,9 +91,48 @@ export class TaskService {
     return { task, manaEarned, reserveGained }
   }
 
-  async bulkUpdate(userId: string, tasks: BulkUpdateTaskItem[]) {
-    await this.taskRepository.bulkUpdate(userId, tasks)
-    return { message: 'Tasks updated successfully' }
+  async bulkUpdate(userId: string, tasks: BulkUpdateTaskItem[], completingStatus: TaskStatus) {
+    if (tasks.length === 0) {
+      return { message: 'Tasks updated successfully', manaEarned: 0, reserveGained: 0 }
+    }
+
+    const existing = await this.taskRepository.findManyByIds(
+      tasks.map((t) => t.id),
+      userId
+    )
+    const existingById = new Map(existing.map((t) => [t.id, t]))
+
+    const completing = tasks.flatMap((t) => {
+      const prev = existingById.get(t.id)
+      if (!prev) return []
+      if (t.status !== completingStatus || prev.status === completingStatus) return []
+      return [{ id: t.id, impact: prev.impact }]
+    })
+
+    await this.taskRepository.bulkUpdate(
+      userId,
+      tasks,
+      completing.map((c) => c.id),
+      new Date()
+    )
+
+    if (completing.length === 0) {
+      return { message: 'Tasks updated successfully', manaEarned: 0, reserveGained: 0 }
+    }
+
+    const manaResult = await this.manaService.addManaFromCompletions(
+      userId,
+      'task',
+      completing.map((c) => ({ impact: c.impact }))
+    )
+
+    await this.guildService?.recordCampaignEvent(userId, CAMPAIGN_EVENT_TYPE.TASK_COMPLETION, completing.length)
+
+    return {
+      message: 'Tasks updated successfully',
+      manaEarned: manaResult.manaApplied,
+      reserveGained: manaResult.reserveGained
+    }
   }
 
   async delete(userId: string, id: string) {

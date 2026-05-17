@@ -67,6 +67,47 @@ export class ManaService {
   }
 
   /**
+   * Batched variant: aggregates total mana from multiple completions in a single character read/write.
+   * Used by bulk operations (e.g. dragging multiple tasks to DONE at once).
+   */
+  async addManaFromCompletions(
+    userId: string,
+    source: ManaSource,
+    contexts: ManaGrantContext[]
+  ): Promise<ManaGrantResult> {
+    if (contexts.length === 0) {
+      return { success: true, amount: 0, manaApplied: 0, reserveGained: 0, newMana: 0, newReserve: 0 }
+    }
+
+    const character = await this.characterRepository.findWithClasses(userId)
+    if (!character) {
+      return { success: false, amount: 0, manaApplied: 0, reserveGained: 0, newMana: 0, newReserve: 0 }
+    }
+
+    const amount = contexts.reduce((sum, ctx) => sum + this.amountFor(source, ctx), 0)
+    const currentClass = character.classes.find((c) => c.className === character.currentClass)
+    if (!currentClass) {
+      return { success: false, amount, manaApplied: 0, reserveGained: 0, newMana: 0, newReserve: 0 }
+    }
+
+    const room = Math.max(0, currentClass.maxMana - currentClass.mana)
+    const manaApplied = Math.min(amount, room)
+    const reserveGained = amount - manaApplied
+    const newMana = currentClass.mana + manaApplied
+    const currentReserve = character.manaReserve ?? 0
+    const newReserve = currentReserve + reserveGained
+
+    if (manaApplied > 0) {
+      await this.characterRepository.updateHealth(currentClass.id, currentClass.health, newMana)
+    }
+    if (reserveGained > 0) {
+      await this.characterRepository.updateManaReserve(character.id, newReserve)
+    }
+
+    return { success: true, amount, manaApplied, reserveGained, newMana, newReserve }
+  }
+
+  /**
    * Drain Reserve into active mana until full or Reserve is empty.
    * Called by quest.service at the start of every Encounter (initial spawn + each spawn after a defeat).
    */

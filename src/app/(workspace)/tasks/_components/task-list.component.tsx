@@ -1,4 +1,7 @@
 'use client'
+import EmptyState from '@/components/empty-state.component'
+import type { ReorderTasksMutation } from '@/hooks/use-reorder-tasks-mutation'
+import { cn } from '@/lib/cn.lib'
 import { useTasksStore } from '@/stores/tasks.store'
 import Task from '@/tasks/task.component'
 import { type Task as TaskType } from '@/types/models.types'
@@ -8,10 +11,18 @@ import { clone, filter, flatten, values as getValues, map } from 'es-toolkit/com
 import { Flag } from 'pixelarticons/react'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import EmptyState from '@/components/empty-state.component'
-import { cn } from '@/lib/cn.lib'
 
-export default function TaskList({ id, group, mutation }: { id: string; group: string; mutation: any }) {
+export default function TaskList({
+  id,
+  group,
+  mutation,
+  variant = 'list'
+}: {
+  id: string
+  group: string
+  mutation: ReorderTasksMutation
+  variant?: 'list' | 'kanban'
+}) {
   const { t } = useTranslation()
   const { tasks, setSelectedTask, setTasks } = useTasksStore()
   const [parent, values, setValues] = useDragAndDrop<HTMLUListElement, TaskType>(tasks?.[id] ?? [], {
@@ -64,23 +75,40 @@ export default function TaskList({ id, group, mutation }: { id: string; group: s
     setValues(tasks?.[id] ?? [])
   }, [tasks, id, setValues])
 
+  const lowerId = id.toLowerCase()
+  const isKanban = variant === 'kanban'
+
   return (
-    <section className="w-full py-4">
+    <section className={cn('w-full', isKanban ? 'flex h-full min-h-0 flex-col py-2' : 'py-4')}>
       <header className="mb-2 flex items-center justify-between">
         <h2 className="text-md font-medium">{t(`task_status.${id}`).toUpperCase()}</h2>
       </header>
-      <div className={cn('relative isolate rounded-md border-2', values.length === 0 ? 'min-h-52' : 'min-h-20')}>
+      <div
+        className={cn(
+          'relative isolate rounded-md border-2',
+          isKanban ? 'flex min-h-0 flex-1 flex-col' : values.length === 0 ? 'min-h-52' : 'min-h-20'
+        )}
+      >
         {values.length === 0 && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
             <EmptyState
               size="compact"
               icon={<Flag className="h-5 w-5" />}
-              title={t(`tasks.empty_state.${id}.title` as any, { defaultValue: t('tasks.empty_state.todo.title') })}
-              description={t(`tasks.empty_state.${id}.description` as any, { defaultValue: t('tasks.empty_state.todo.description') })}
+              title={t(`tasks.empty_state.${lowerId}.title` as any, { defaultValue: t('tasks.empty_state.todo.title') })}
+              description={t(`tasks.empty_state.${lowerId}.description` as any, {
+                defaultValue: t('tasks.empty_state.todo.description')
+              })}
             />
           </div>
         )}
-        <ul ref={parent} className="flex h-full min-h-20 flex-col gap-1 rounded-md p-3" data-list-id={id}>
+        <ul
+          ref={parent}
+          className={cn(
+            'flex flex-col gap-1 rounded-md p-3',
+            isKanban ? 'min-h-0 flex-1 overflow-y-auto' : 'h-full min-h-20'
+          )}
+          data-list-id={id}
+        >
           {map(values, (task: TaskType) => (
             <Task key={task.id} task={task} setSelectedTask={setSelectedTask} />
           ))}

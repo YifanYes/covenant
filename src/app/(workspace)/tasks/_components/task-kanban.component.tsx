@@ -8,7 +8,7 @@ import { isUndefined } from 'es-toolkit/compat'
 import { useEffect } from 'react'
 import TaskList from './task-list.component'
 
-export default function TasksListBoard() {
+export default function TaskKanban() {
   const { data } = useSuspenseQuery(trpcOptions.tasks.getAll.queryOptions())
   const { setTasks } = useTasksStore()
   const reorderMutation = useReorderTasksMutation()
@@ -20,12 +20,10 @@ export default function TasksListBoard() {
   }, [data, setTasks])
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-4">
-        {[TaskStatus.DOING, TaskStatus.TODO].map((status) => (
-          <TaskList key={status} id={status} group="tasks" mutation={reorderMutation} />
-        ))}
-      </div>
+    <div className="grid h-full min-h-0 grid-cols-1 gap-4 md:grid-cols-3">
+      {[TaskStatus.TODO, TaskStatus.DOING, TaskStatus.DONE].map((status) => (
+        <TaskList key={status} id={status} group="tasks" mutation={reorderMutation} variant="kanban" />
+      ))}
     </div>
   )
 }

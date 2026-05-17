@@ -1,5 +1,6 @@
 'use client'
 import Button from '@/ui/button.component'
+import { TASKS_VIEWS } from '@shared/schemas/auth.schemas'
 import { Plus } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import TaskSkeleton from '../skeletons/task-skeleton.component'
@@ -13,7 +14,7 @@ export default function TasksSuspenseFallback() {
           <h1 className="text-2xl font-semibold">{t('tasks.title')}</h1>
           <div className="flex items-center gap-4">
             <div className="bg-muted flex h-9 w-fit items-center justify-center gap-4 rounded-lg px-2">
-              {['list', 'table', 'matrix'].map((tab) => (
+              {TASKS_VIEWS.map((tab) => (
                 <div key={tab} className="bg-muted-foreground/30 h-4 w-12 animate-pulse rounded" />
               ))}
             </div>
