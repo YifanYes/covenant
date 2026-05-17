@@ -1,10 +1,12 @@
 'use client'
 import BaseFormDialog from '@/common/base-form-dialog.component'
-import Input from '@/ui/input.component'
-import Label from '@/ui/label.component'
+import TextInput from '@/forms/text-input.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { updateProfileSchema, type UpdateProfileType } from '@shared/schemas/auth.schemas'
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -16,13 +18,6 @@ interface EditProfileDialogProps {
 
 export default function EditProfileDialog({ open, onOpenChange, initialName }: EditProfileDialogProps) {
   const { t } = useTranslation()
-  const [name, setName] = useState(initialName)
-  const [wasOpen, setWasOpen] = useState(open)
-
-  if (open !== wasOpen) {
-    setWasOpen(open)
-    if (open) setName(initialName)
-  }
 
   const updateProfileMutation = useMutation(
     trpcOptions.auth.updateProfile.mutationOptions({
@@ -38,31 +33,44 @@ export default function EditProfileDialog({ open, onOpenChange, initialName }: E
     })
   )
 
-  const trimmed = name.trim()
-  const isUnchanged = trimmed === initialName
-  const isEmpty = trimmed.length === 0
-  const isSubmitDisabled = isUnchanged || isEmpty || updateProfileMutation.isPending
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid, isDirty }
+  } = useForm<UpdateProfileType>({
+    resolver: standardSchemaResolver(updateProfileSchema),
+    mode: 'onSubmit',
+    defaultValues: { characterName: initialName }
+  })
+
+  useEffect(() => {
+    if (open) reset({ characterName: initialName })
+  }, [open, initialName, reset])
+
+  const onSubmit = (data: UpdateProfileType) =>
+    updateProfileMutation.mutate({ characterName: data.characterName?.trim() })
 
   return (
     <BaseFormDialog
       open={open}
       onOpenChange={onOpenChange}
       title="user_menu.edit_name"
-      onSubmit={() => updateProfileMutation.mutate({ characterName: trimmed })}
+      onSubmit={handleSubmit(onSubmit)}
       submitLabel="save_changes"
       isLoading={updateProfileMutation.isPending}
-      isSubmitDisabled={isSubmitDisabled}
+      isSubmitDisabled={!isValid || !isDirty}
     >
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="edit-character-name">{t('settings.character_name_label')}</Label>
-        <Input
-          id="edit-character-name"
-          maxLength={255}
-          value={name}
-          disabled={updateProfileMutation.isPending}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
+      <TextInput
+        type="text"
+        label={t('settings.character_name_label')}
+        maxLength={255}
+        disabled={updateProfileMutation.isPending}
+        {...register('characterName')}
+        {...(errors.characterName?.message && {
+          errorMessage: t(errors.characterName.message.toString())
+        })}
+      />
     </BaseFormDialog>
   )
 }

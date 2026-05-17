@@ -4,10 +4,12 @@ import LoaderButton from '@/common/loader-button.component'
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import { TAVERN_MESSAGE_MAX_LENGTH } from '@/shared/constants/tavern.constants'
-import { sendTavernMessageSchema } from '@/shared/schemas/tavern.schemas'
+import { sendTavernMessageSchema, type SendTavernMessageType } from '@/shared/schemas/tavern.schemas'
 import Textarea from '@/ui/textarea.component'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Send } from 'pixelarticons/react'
-import { useState } from 'react'
+import { type KeyboardEvent } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 interface TavernComposerProps {
@@ -17,24 +19,29 @@ interface TavernComposerProps {
 
 export default function TavernComposer({ onSubmit, isPending }: TavernComposerProps) {
   const { t } = useTranslation()
-  const [content, setContent] = useState('')
 
-  const parsed = sendTavernMessageSchema.safeParse({ content })
-  const isValid = parsed.success
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { isValid }
+  } = useForm<SendTavernMessageType>({
+    resolver: standardSchemaResolver(sendTavernMessageSchema),
+    mode: 'onChange',
+    defaultValues: { content: '' }
+  })
+
+  const content = useWatch({ control, name: 'content' }) ?? ''
   const remaining = TAVERN_MESSAGE_MAX_LENGTH - content.length
 
-  const submit = () => {
-    if (!parsed.success || isPending) return
-    onSubmit(parsed.data.content)
-    setContent('')
-  }
+  const submit = handleSubmit((data) => {
+    if (isPending) return
+    onSubmit(data.content)
+    reset({ content: '' })
+  })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    submit()
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       submit()
@@ -42,10 +49,9 @@ export default function TavernComposer({ onSubmit, isPending }: TavernComposerPr
   }
 
   return (
-    <form onSubmit={handleSubmit} className={cn(panelChrome, 'p-2 focus-within:border-accent/50 transition')}>
+    <form onSubmit={submit} className={cn(panelChrome, 'p-2 focus-within:border-accent/50 transition')}>
       <Textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
+        {...register('content')}
         onKeyDown={handleKeyDown}
         placeholder={t('tavern.composer.placeholder')}
         className="resize-none min-h-12 border-0 bg-transparent shadow-none focus-visible:ring-0 px-2"

@@ -3,11 +3,6 @@
 ## Critical Priority
 
 - [ ] GitHub repository settings (manual)
-  - **Pre-flip (hard gates):**
-    1. **Audit closed PRs/issues.** Going public exposes every PR thread, issue comment, review on github.com. Edit/delete anything sensitive (infra IDs, env names, internal URLs, prod screenshots/logs, personal refs in reviews).
-    2. **`privacy@covenantrpg.com` forwarder live** (tracked separately below).
-    3. **Denis notice sent** with response window elapsed (tracked separately below).
-  - **Flip repository public** in Settings → General → Danger Zone. Rulesets / branch protection cannot be enforced on free-plan private repos, so flipping is the prerequisite for protection.
   - **Post-flip configuration:**
     - **Branch protection ruleset on `main`** (Settings → Rules → Rulesets → New ruleset):
       - Target: include default branch

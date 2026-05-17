@@ -6,11 +6,13 @@ import type { GuildMessage } from '@/types/trpc.types'
 import Textarea from '@/ui/textarea.component'
 import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/tooltip.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import type { GuildRoleType } from '@shared/schemas/guilds.schemas'
-import { GuildRole } from '@shared/schemas/guilds.schemas'
+import { GuildRole, sendMessageSchema, type SendMessageType } from '@shared/schemas/guilds.schemas'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Delete, Loader, MessageText, Send } from 'pixelarticons/react'
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useEffect, useRef, type KeyboardEvent } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import UserAvatar from './user-avatar.component'
@@ -43,8 +45,19 @@ interface GroupedMessage extends GuildMessage {
 
 export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProps) {
   const { t } = useTranslation()
-  const [content, setContent] = useState('')
   const scrollAnchorRef = useRef<HTMLDivElement>(null)
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { isValid }
+  } = useForm<SendMessageType>({
+    resolver: standardSchemaResolver(sendMessageSchema),
+    mode: 'onChange',
+    defaultValues: { guildId, content: '' }
+  })
 
   const messagesQuery = useQuery({
     ...trpcOptions.guilds.getMessages.queryOptions({ guildId }),
@@ -70,7 +83,7 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
   const sendMutation = useMutation(
     trpcOptions.guilds.sendMessage.mutationOptions({
       onSuccess: async () => {
-        setContent('')
+        reset({ guildId, content: '' })
         await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.getMessages.queryKey({ guildId }) })
       },
       onError: (error) => toast.error(t('guilds.forum.error.send'), { description: error.message })
@@ -92,18 +105,13 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
     scrollAnchorRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [lastMessageId])
 
-  const trimmed = content.trim()
+  const content = useWatch({ control, name: 'content' }) ?? ''
   const remaining = MAX_LENGTH - content.length
 
-  const submit = () => {
-    if (!trimmed || sendMutation.isPending) return
-    sendMutation.mutate({ guildId, content: trimmed })
-  }
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    submit()
-  }
+  const submit = handleSubmit((data) => {
+    if (sendMutation.isPending) return
+    sendMutation.mutate(data)
+  })
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
@@ -209,10 +217,9 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
         <div ref={scrollAnchorRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className={cn(panelChrome, 'p-2 focus-within:border-accent/50 transition')}>
+      <form onSubmit={submit} className={cn(panelChrome, 'p-2 focus-within:border-accent/50 transition')}>
         <Textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
+          {...register('content')}
           onKeyDown={handleKeyDown}
           placeholder={t('guilds.forum.placeholder')}
           className="resize-none min-h-12 border-0 bg-transparent shadow-none focus-visible:ring-0 px-2"
@@ -231,7 +238,7 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
             type="submit"
             size="sm"
             isLoading={sendMutation.isPending}
-            disabled={!trimmed}
+            disabled={!isValid}
             className="gap-1.5"
             icon={<Send className="h-4 w-4" />}
             label={t('guilds.forum.send')}
