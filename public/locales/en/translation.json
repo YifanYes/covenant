@@ -1983,7 +1983,8 @@
   },
   "tavern": {
     "title": "The Tavern",
-    "subtitle": "Where rumors travel further than blades.",
+    "subtitle": "A live, worldwide chatroom where every player can share news, ask questions, and trade rumors.",
+    "character_count": "{{count}} / {{max}}",
     "empty": "The fire is lit. The ale is flowing. The room is waiting for its first rumor.",
     "send": "Send",
     "refresh": "Refresh",
@@ -2004,7 +2005,7 @@
     "new_messages_one": "{{count}} new message",
     "new_messages_other": "{{count}} new messages",
     "composer": {
-      "placeholder": "Speak, traveler. (Cmd/Ctrl+Enter to send)"
+      "placeholder": "Send a message to the tavern"
     },
     "last_updated": {
       "label": "Last updated {{relative}}",

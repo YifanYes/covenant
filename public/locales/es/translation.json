@@ -1983,7 +1983,8 @@
   },
   "tavern": {
     "title": "La Taberna",
-    "subtitle": "Donde los rumores viajan más lejos que las espadas.",
+    "subtitle": "Una sala de chat global en vivo donde todos los jugadores comparten noticias, preguntan y intercambian rumores.",
+    "character_count": "{{count}} / {{max}}",
     "empty": "El fuego está encendido. La cerveza fluye. La sala espera su primer rumor.",
     "send": "Enviar",
     "refresh": "Actualizar",
@@ -2004,7 +2005,7 @@
     "new_messages_one": "{{count}} mensaje nuevo",
     "new_messages_other": "{{count}} mensajes nuevos",
     "composer": {
-      "placeholder": "Habla, viajero. (Cmd/Ctrl+Enter para enviar)"
+      "placeholder": "Envía un mensaje a la taverna"
     },
     "last_updated": {
       "label": "Actualizado {{relative}}",

@@ -3,7 +3,7 @@ import {
   getTierProgress,
   MAX_BETA_TIER,
   TIER_REQUIREMENTS
-} from '@shared/constants/tier-progression'
+} from '@/shared/constants/tier-progression.constants'
 import { describe, expect, it } from 'vitest'
 
 describe('TIER_REQUIREMENTS', () => {

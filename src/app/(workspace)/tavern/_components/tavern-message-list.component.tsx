@@ -56,7 +56,7 @@ export default function TavernMessageList({
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
         <Coffee className="h-10 w-10 text-muted-foreground/50" />
-        <p className="text-muted-foreground text-sm max-w-sm">{t('tavern.empty')}</p>
+        <p className="text-muted-foreground text-xl max-w-lg">{t('tavern.empty')}</p>
       </div>
     )
   }
@@ -131,7 +131,7 @@ export default function TavernMessageList({
                     <TooltipTrigger asChild>
                       <div
                         className={cn(
-                          'rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap break-words',
+                          'rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap wrap-break-word',
                           isMine
                             ? 'bg-accent/20 text-foreground rounded-br-md'
                             : 'bg-muted/50 text-foreground rounded-bl-md'

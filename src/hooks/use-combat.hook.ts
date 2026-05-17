@@ -1,10 +1,15 @@
 'use client'
-import { useCombatAnimations } from '@/hooks/use-combat-animations.hook'
 import { translateEnemyName } from '@/components/combat/translate-enemy-name.utils'
+import { useCombatAnimations } from '@/hooks/use-combat-animations.hook'
+import { ABILITIES, BASIC_STRIKE_ID, isDamageMove } from '@/shared/constants/abilities.constants'
+import { getEnemy } from '@/shared/constants/enemies.constants'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import { BASIC_STRIKE_ID, ABILITIES, isDamageMove } from '@shared/constants/abilities'
-import { getEnemy } from '@shared/constants/enemies'
-import { CombatLogType, type CombatLogEntry, type EnemyState, type InventoryCharacter } from '@shared/types/gamification.types'
+import {
+  CombatLogType,
+  type CombatLogEntry,
+  type EnemyState,
+  type InventoryCharacter
+} from '@shared/types/gamification.types'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'

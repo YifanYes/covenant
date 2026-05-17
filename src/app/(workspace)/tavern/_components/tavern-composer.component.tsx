@@ -3,12 +3,12 @@
 import LoaderButton from '@/common/loader-button.component'
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
+import { TAVERN_MESSAGE_MAX_LENGTH } from '@/shared/constants/tavern.constants'
+import { sendTavernMessageSchema } from '@/shared/schemas/tavern.schemas'
 import Textarea from '@/ui/textarea.component'
 import { Send } from 'pixelarticons/react'
-import { useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
-const MAX_LENGTH = 500
 
 interface TavernComposerProps {
   onSubmit: (content: string) => void
@@ -19,21 +19,22 @@ export default function TavernComposer({ onSubmit, isPending }: TavernComposerPr
   const { t } = useTranslation()
   const [content, setContent] = useState('')
 
-  const trimmed = content.trim()
-  const remaining = MAX_LENGTH - content.length
+  const parsed = sendTavernMessageSchema.safeParse({ content })
+  const isValid = parsed.success
+  const remaining = TAVERN_MESSAGE_MAX_LENGTH - content.length
 
   const submit = () => {
-    if (!trimmed || isPending) return
-    onSubmit(trimmed)
+    if (!parsed.success || isPending) return
+    onSubmit(parsed.data.content)
     setContent('')
   }
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     submit()
   }
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       submit()
@@ -48,7 +49,7 @@ export default function TavernComposer({ onSubmit, isPending }: TavernComposerPr
         onKeyDown={handleKeyDown}
         placeholder={t('tavern.composer.placeholder')}
         className="resize-none min-h-12 border-0 bg-transparent shadow-none focus-visible:ring-0 px-2"
-        maxLength={MAX_LENGTH}
+        maxLength={TAVERN_MESSAGE_MAX_LENGTH}
       />
       <div className="flex items-center justify-between pl-2 pr-1 pt-1">
         <span
@@ -57,13 +58,13 @@ export default function TavernComposer({ onSubmit, isPending }: TavernComposerPr
             remaining < 50 ? 'text-destructive' : remaining < 100 ? 'text-amber-400' : 'text-muted-foreground/60'
           )}
         >
-          {remaining < 100 ? remaining : ''}
+          {t('tavern.character_count', { count: content.length, max: TAVERN_MESSAGE_MAX_LENGTH })}
         </span>
         <LoaderButton
           type="submit"
           size="sm"
           isLoading={isPending}
-          disabled={!trimmed}
+          disabled={!isValid}
           className="gap-1.5"
           icon={<Send className="h-4 w-4" />}
           label={t('tavern.send')}

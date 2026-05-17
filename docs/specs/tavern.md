@@ -174,19 +174,19 @@ Deferred:
 
 ## Service / router map
 
-| Surface          | File                                                                            |
-| ---------------- | ------------------------------------------------------------------------------- |
-| Schema           | `prisma/schema.prisma`                                                          |
-| Zod schemas      | `src/shared/schemas/tavern.schemas.ts`                                          |
-| Repository       | `src/server/repositories/tavern-message.repository.ts`                          |
-| Service          | `src/server/services/tavern.service.ts`                                         |
-| Service factory  | `src/server/services/service.factory.ts`                                        |
-| Router           | `src/server/routers/tavern.router.ts`                                           |
-| Page             | `src/app/(workspace)/tavern/page.tsx`                                           |
-| Components       | `src/app/(workspace)/tavern/_components/{message-list,composer}.component.tsx`  |
-| i18n             | `public/locales/{en,es}/translation.json` under `tavern.*`                      |
-| Rate-limit tier  | `src/server/trpc.ts` — add `RATE_LIMITS.chat = { windowMs: 30_000, maxRequests: 5 }` |
-| Tests            | `src/server/__tests__/services/tavern.service.test.ts`                          |
+| Surface         | File                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------ |
+| Schema          | `prisma/schema.prisma`                                                               |
+| Zod schemas     | `src/shared/schemas/tavern.schemas.ts`                                               |
+| Repository      | `src/server/repositories/tavern-message.repository.ts`                               |
+| Service         | `src/server/services/tavern.service.ts`                                              |
+| Service factory | `src/server/services/service.factory.ts`                                             |
+| Router          | `src/server/routers/tavern.router.ts`                                                |
+| Page            | `src/app/(workspace)/tavern/page.tsx`                                                |
+| Components      | `src/app/(workspace)/tavern/_components/{message-list,composer}.component.tsx`       |
+| i18n            | `public/locales/{en,es}/translation.json` under `tavern.*`                           |
+| Rate-limit tier | `src/server/trpc.ts` — add `RATE_LIMITS.chat = { windowMs: 30_000, maxRequests: 5 }` |
+| Tests           | `src/server/__tests__/services/tavern.service.test.ts`                               |
 
 Router shape:
 
@@ -207,22 +207,22 @@ tavern.reportMessage({ messageId: string })        // one per (messageId, report
 
 ## Items deliberately deferred
 
-| Item                          | Why deferred                                                  |
-| ----------------------------- | ------------------------------------------------------------- |
-| DMs                           | Large safety/abuse surface.                                   |
-| Attachments / images          | Requires upload moderation.                                   |
-| Rich embeds / link unfurls    | Phishing and moderation risk.                                 |
-| Multiple channels             | Premature before volume exists.                               |
-| User-created channels         | Moderation and discoverability cost.                          |
-| SYSTEM messages               | No v1 producer; reintroduces with Warfronts.                  |
-| Admin / moderator role        | No role model in DB; report + auto-hide is enough for beta.   |
-| Blocked-terms list            | False-positive heavy; add only after a real incident.         |
-| Global slow mode              | Kill-switch env var is enough for incidents.                  |
-| URL detection / stripping     | Plain-text rendering already removes XSS/click risk.          |
-| Presence / online count       | Approximations are misleading at low concurrent counts.       |
-| Right rail                    | Empty in v1 (Warfronts split out).                            |
-| Tavern Inn / rest mode        | Not native to Covenant mechanics.                             |
-| Direct task/habit boss damage | Bypasses Covenant's mana/combat loop.                         |
+| Item                          | Why deferred                                                |
+| ----------------------------- | ----------------------------------------------------------- |
+| DMs                           | Large safety/abuse surface.                                 |
+| Attachments / images          | Requires upload moderation.                                 |
+| Rich embeds / link unfurls    | Phishing and moderation risk.                               |
+| Multiple channels             | Premature before volume exists.                             |
+| User-created channels         | Moderation and discoverability cost.                        |
+| SYSTEM messages               | No v1 producer; reintroduces with Warfronts.                |
+| Admin / moderator role        | No role model in DB; report + auto-hide is enough for beta. |
+| Blocked-terms list            | False-positive heavy; add only after a real incident.       |
+| Global slow mode              | Kill-switch env var is enough for incidents.                |
+| URL detection / stripping     | Plain-text rendering already removes XSS/click risk.        |
+| Presence / online count       | Approximations are misleading at low concurrent counts.     |
+| Right rail                    | Empty in v1 (Warfronts split out).                          |
+| Tavern Inn / rest mode        | Not native to Covenant mechanics.                           |
+| Direct task/habit boss damage | Bypasses Covenant's mana/combat loop.                       |
 
 ## Risks
 

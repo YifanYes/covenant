@@ -1,0 +1,1 @@
+export const TAVERN_MESSAGE_MAX_LENGTH = 500

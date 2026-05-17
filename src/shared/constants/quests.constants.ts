@@ -1,4 +1,4 @@
-import { ENEMIES, type EnemyTemplate, type EnemyType } from './enemies'
+import { ENEMIES, type EnemyTemplate, type EnemyType } from '@shared/constants/enemies.constants'
 
 export type QuestObjectiveType = 'KILL_ENEMIES'
 // Designed for extension: | 'FIND_ITEM' | 'PROTECT_NPC' | 'DEFEND_POSITION' | 'ATTACK_POSITION'

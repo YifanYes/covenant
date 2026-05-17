@@ -1,4 +1,4 @@
-import { CAMPAIGN_EVENT_TYPE } from '@shared/constants/guild-campaigns'
+import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import type {
   BulkUpdateTaskItem,
   CreateTaskType,

@@ -1,7 +1,7 @@
 import { SentryProvider } from '@/components/common/sentry-provider.component'
 import ThemeProvider, { Theme } from '@/components/common/theme-provider.component'
 import Toaster from '@/components/ui/toaster.component'
-import { Faction } from '@shared/constants/factions'
+import { Faction } from '@/shared/constants/factions.constants'
 import type { Metadata } from 'next'
 import { Cinzel, EB_Garamond, Geist, Geist_Mono, Pixelify_Sans, Press_Start_2P } from 'next/font/google'
 import { cookies, headers } from 'next/headers'

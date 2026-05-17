@@ -15,7 +15,8 @@ describe('TavernService', () => {
     delete process.env.TAVERN_DISABLED
 
     txTavernMessage = {
-      update: vi.fn().mockResolvedValue({})
+      findFirst: vi.fn(),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 })
     }
     txTavernReport = {
       create: vi.fn().mockResolvedValue({ id: 'rep-1' })
@@ -29,7 +30,6 @@ describe('TavernService', () => {
 
     messageRepo = {
       findRecent: vi.fn().mockResolvedValue([]),
-      findById: vi.fn(),
       create: vi.fn(),
       softDeleteByAuthor: vi.fn().mockResolvedValue(1)
     }
@@ -113,30 +113,40 @@ describe('TavernService', () => {
 
   describe('reportMessage', () => {
     it('inserts a report and increments reportCount in one transaction', async () => {
-      messageRepo.findById.mockResolvedValue({ id: 'm1', userId: 'author', deletedAt: null })
+      txTavernMessage.findFirst.mockResolvedValue({ userId: 'author' })
       await service.reportMessage('m1', 'reporter')
+      expect(txTavernMessage.findFirst).toHaveBeenCalledWith({
+        where: { id: 'm1', deletedAt: null },
+        select: { userId: true }
+      })
       expect(txTavernReport.create).toHaveBeenCalledWith({
         data: { messageId: 'm1', reporterId: 'reporter' }
       })
-      expect(txTavernMessage.update).toHaveBeenCalledWith({
-        where: { id: 'm1' },
+      expect(txTavernMessage.updateMany).toHaveBeenCalledWith({
+        where: { id: 'm1', deletedAt: null },
         data: { reportCount: { increment: 1 } }
       })
     })
 
     it('refuses self-reports', async () => {
-      messageRepo.findById.mockResolvedValue({ id: 'm1', userId: 'u1', deletedAt: null })
+      txTavernMessage.findFirst.mockResolvedValue({ userId: 'u1' })
       await expect(service.reportMessage('m1', 'u1')).rejects.toMatchObject({ code: 'BAD_REQUEST' })
       expect(txTavernReport.create).not.toHaveBeenCalled()
     })
 
-    it('throws when the message is deleted', async () => {
-      messageRepo.findById.mockResolvedValue({ id: 'm1', userId: 'author', deletedAt: new Date() })
+    it('throws NOT_FOUND when message is missing or soft-deleted', async () => {
+      txTavernMessage.findFirst.mockResolvedValue(null)
+      await expect(service.reportMessage('m1', 'reporter')).rejects.toMatchObject({ code: 'NOT_FOUND' })
+      expect(txTavernReport.create).not.toHaveBeenCalled()
+    })
+
+    it('throws NOT_FOUND when the message is deleted between insert and increment', async () => {
+      txTavernMessage.findFirst.mockResolvedValue({ userId: 'author' })
+      txTavernMessage.updateMany.mockResolvedValue({ count: 0 })
       await expect(service.reportMessage('m1', 'reporter')).rejects.toMatchObject({ code: 'NOT_FOUND' })
     })
 
     it('throws BAD_REQUEST on duplicate report (unique constraint)', async () => {
-      messageRepo.findById.mockResolvedValue({ id: 'm1', userId: 'author', deletedAt: null })
       prisma.$transaction.mockImplementation(async () => {
         const err = new Error('Unique constraint') as Error & { code: string }
         err.code = 'P2002'

@@ -1,4 +1,4 @@
-import { Faction } from '@shared/constants/factions'
+import { Faction } from '@/shared/constants/factions.constants'
 import { z } from 'zod'
 
 export const loginSchema = z.object({

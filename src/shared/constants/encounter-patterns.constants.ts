@@ -1,4 +1,4 @@
-import type { EnemyType } from './enemies'
+import type { EnemyType } from '@shared/constants/enemies.constants'
 
 export interface EncounterSlot {
   type: EnemyType

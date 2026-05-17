@@ -1,7 +1,7 @@
+import { ABILITIES } from '@/shared/constants/abilities.constants'
 import type { AbilityDefinition, MoveDamageType } from '@shared/types/ability.types'
 import { AbilityEffectType, AbilityTarget } from '@shared/types/ability.types'
 import type { TacticalUnitState } from '@shared/types/tactical-combat.types'
-import { ABILITIES } from '@shared/constants/abilities'
 
 export const CRIT_RATE = 1 / 16 // Pokémon Gen-1 base critical chance (6.25%)
 export const VARIANCE_MIN = 0.85
@@ -30,7 +30,7 @@ export interface FormulaInputs {
  */
 export function computeDamage(inputs: FormulaInputs): number {
   const def = Math.max(1, inputs.def)
-  const base = Math.floor(((((2 * inputs.level) / 5 + 2) * inputs.power * inputs.atk) / def / 50) + 2)
+  const base = Math.floor((((2 * inputs.level) / 5 + 2) * inputs.power * inputs.atk) / def / 50 + 2)
   const dmg = base * inputs.variance * (inputs.isCrit ? 2 : 1)
   return Math.max(0, Math.floor(dmg))
 }

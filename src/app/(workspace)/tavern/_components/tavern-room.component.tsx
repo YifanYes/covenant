@@ -2,21 +2,25 @@
 
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
-import Button from '@/ui/button.component'
 import type { TavernMessage } from '@/types/trpc.types'
+import Button from '@/ui/button.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { ArrowDown, Loader, Reload } from 'pixelarticons/react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import TavernComposer from './tavern-composer.component'
 import TavernMessageList from './tavern-message-list.component'
 
-const POLL_INTERVAL_MS = 15_000
-const PAGE_SIZE = 50
+interface TavernRoomProps {
+  myUserId: string
+}
 
 type TFn = ReturnType<typeof useTranslation>['t']
+
+const POLL_INTERVAL_MS = 15_000
+const PAGE_SIZE = 50
 
 function formatLastUpdated(timestamp: number, now: number, t: TFn) {
   const diff = now - timestamp
@@ -29,11 +33,14 @@ function formatLastUpdated(timestamp: number, now: number, t: TFn) {
 function LastUpdatedLabel({ timestamp }: { timestamp: number | undefined }) {
   const { t } = useTranslation()
   const [now, setNow] = useState(() => Date.now())
+
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 15_000)
     return () => clearInterval(interval)
   }, [])
+
   if (!timestamp) return <span className="tabular-nums">{t('tavern.last_updated.never')}</span>
+
   return (
     <span className="tabular-nums">
       {t('tavern.last_updated.label', { relative: formatLastUpdated(timestamp, now, t) })}
@@ -41,18 +48,16 @@ function LastUpdatedLabel({ timestamp }: { timestamp: number | undefined }) {
   )
 }
 
-interface TavernRoomProps {
-  myUserId: string
-}
-
 export default function TavernRoom({ myUserId }: TavernRoomProps) {
   const { t } = useTranslation()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const anchorRef = useRef<HTMLDivElement>(null)
-  const [olderMessages, setOlderMessages] = useState<TavernMessage[]>([])
+  const knownMessagesRef = useRef<Map<string, TavernMessage>>(new Map())
+  const lastSeenIdRef = useRef<string | null>(null)
   const [hasMoreOlder, setHasMoreOlder] = useState(true)
   const [isLoadingOlder, setIsLoadingOlder] = useState(false)
   const [pendingNewCount, setPendingNewCount] = useState(0)
+  const [mergeTick, setMergeTick] = useState(0)
 
   const messagesQuery = useQuery({
     ...trpcOptions.tavern.getMessages.queryOptions({ limit: PAGE_SIZE }),
@@ -63,39 +68,51 @@ export default function TavernRoom({ myUserId }: TavernRoomProps) {
   const liveMessages = useMemo(() => messagesQuery.data ?? [], [messagesQuery.data])
 
   const messages = useMemo<TavernMessage[]>(() => {
-    const liveIds = new Set(liveMessages.map((m) => m.id))
-    const older = olderMessages.filter((m) => !liveIds.has(m.id))
-    return [...older, ...liveMessages]
-  }, [olderMessages, liveMessages])
+    const map = knownMessagesRef.current
+    if (liveMessages.length > 0) {
+      const liveIds = new Set(liveMessages.map((m) => m.id))
+      const oldestLiveTime = new Date(liveMessages[0].createdAt).getTime()
+      for (const [id, msg] of map) {
+        if (new Date(msg.createdAt).getTime() >= oldestLiveTime && !liveIds.has(id)) {
+          map.delete(id)
+        }
+      }
+      for (const msg of liveMessages) map.set(msg.id, msg)
+    }
+    const all = Array.from(map.values())
+    all.sort((a, b) => {
+      const diff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      return diff !== 0 ? diff : a.id.localeCompare(b.id)
+    })
+    return all
+  }, [liveMessages, mergeTick])
 
   const lastLiveId = liveMessages[liveMessages.length - 1]?.id
-  const previousLastLiveIdRef = useRef<string | undefined>(undefined)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (!lastLiveId) return
+    if (lastSeenIdRef.current === lastLiveId) return
+
     const container = scrollContainerRef.current
-    if (!container) return
-    if (previousLastLiveIdRef.current === lastLiveId) return
+    if (!container) {
+      lastSeenIdRef.current = lastLiveId
+      return
+    }
 
-    const distanceFromBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight
-
-    const isFirstLoad = previousLastLiveIdRef.current === undefined
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight
+    const isFirstLoad = lastSeenIdRef.current === null
     const isNearBottom = distanceFromBottom < 80
 
     if (isFirstLoad || isNearBottom) {
       anchorRef.current?.scrollIntoView({ behavior: isFirstLoad ? 'auto' : 'smooth' })
       setPendingNewCount(0)
-    } else if (lastLiveId) {
-      setPendingNewCount((prev) => {
-        const lastSeenIndex = liveMessages.findIndex(
-          (m) => m.id === previousLastLiveIdRef.current
-        )
-        const newlyArrived = lastSeenIndex >= 0 ? liveMessages.length - 1 - lastSeenIndex : 1
-        return prev + Math.max(1, newlyArrived)
-      })
+    } else {
+      const lastSeenIndex = liveMessages.findIndex((m) => m.id === lastSeenIdRef.current)
+      const newlyArrived = lastSeenIndex >= 0 ? liveMessages.length - 1 - lastSeenIndex : 1
+      setPendingNewCount((prev) => prev + Math.max(1, newlyArrived))
     }
 
-    previousLastLiveIdRef.current = lastLiveId
+    lastSeenIdRef.current = lastLiveId
   }, [lastLiveId, liveMessages])
 
   const [scrollRequest, setScrollRequest] = useState(0)
@@ -173,11 +190,9 @@ export default function TavernRoom({ myUserId }: TavernRoomProps) {
       )
       if (result.length < PAGE_SIZE) setHasMoreOlder(false)
       if (result.length > 0) {
-        setOlderMessages((prev) => {
-          const ids = new Set(prev.map((m) => m.id))
-          const merged = [...result.filter((m) => !ids.has(m.id)), ...prev]
-          return merged
-        })
+        const map = knownMessagesRef.current
+        for (const msg of result) map.set(msg.id, msg)
+        setMergeTick((n) => n + 1)
         requestAnimationFrame(() => {
           if (!container) return
           const newScrollHeight = container.scrollHeight
@@ -201,13 +216,13 @@ export default function TavernRoom({ myUserId }: TavernRoomProps) {
   const lastUpdatedAt = messagesQuery.dataUpdatedAt || undefined
 
   return (
-    <div className="flex flex-col gap-2 h-[calc(100vh-160px)] min-h-[480px]">
+    <div className="flex flex-col gap-2 h-[calc(100vh-160px)] min-h-120">
       <div className="flex items-center justify-between gap-2 px-1 text-xs text-muted-foreground">
         <LastUpdatedLabel timestamp={lastUpdatedAt} />
         <Button
           type="button"
           size="sm"
-          variant="ghost"
+          variant="outline"
           onClick={handleRefresh}
           disabled={messagesQuery.isFetching}
           className="gap-1.5"

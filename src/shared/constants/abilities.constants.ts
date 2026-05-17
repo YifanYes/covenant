@@ -1,11 +1,11 @@
+import { CharacterClassName, MagicNature } from '@shared/constants/classes.constants'
 import {
   AbilityAttributeType,
   AbilityEffectType,
   AbilityTarget,
   StatusEffect,
   type AbilityDefinition
-} from '../types/ability.types'
-import { CharacterClassName, MagicNature } from './classes'
+} from '@shared/types/ability.types'
 
 export const MAX_EQUIPPED_ABILITIES = 2
 

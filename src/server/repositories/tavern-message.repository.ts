@@ -51,10 +51,6 @@ export class TavernMessageRepository {
     })
   }
 
-  async findById(id: string): Promise<TavernMessage | null> {
-    return this.prisma.tavernMessage.findUnique({ where: { id } })
-  }
-
   async create(data: {
     userId: string
     characterId: string

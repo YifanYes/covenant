@@ -1,9 +1,9 @@
 'use client'
 
 import { cn } from '@/lib/cn.lib'
+import { Faction } from '@/shared/constants/factions.constants'
 import Label from '@/ui/label.component'
 import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
-import { Faction } from '@shared/constants/factions'
 import { useTranslation } from 'react-i18next'
 
 const FACTION_COLORS: Record<Faction, string> = {

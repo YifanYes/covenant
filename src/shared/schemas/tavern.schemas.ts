@@ -1,8 +1,9 @@
+import { TAVERN_MESSAGE_MAX_LENGTH } from '@shared/constants/tavern.constants'
 import { z } from 'zod'
 
 export const tavernMessageCursorSchema = z.object({
-  createdAt: z.string().datetime(),
-  id: z.string().uuid()
+  createdAt: z.iso.datetime(),
+  id: z.uuid()
 })
 export type TavernMessageCursorType = z.infer<typeof tavernMessageCursorSchema>
 
@@ -13,16 +14,16 @@ export const getTavernMessagesSchema = z.object({
 export type GetTavernMessagesType = z.infer<typeof getTavernMessagesSchema>
 
 export const sendTavernMessageSchema = z.object({
-  content: z.string().trim().min(1).max(500)
+  content: z.string().trim().min(1).max(TAVERN_MESSAGE_MAX_LENGTH)
 })
 export type SendTavernMessageType = z.infer<typeof sendTavernMessageSchema>
 
 export const tavernMessageIdSchema = z.object({
-  messageId: z.string().uuid()
+  messageId: z.uuid()
 })
 export type TavernMessageIdType = z.infer<typeof tavernMessageIdSchema>
 
 export const deleteTavernMessageSchema = z.object({
-  id: z.string().uuid()
+  id: z.uuid()
 })
 export type DeleteTavernMessageType = z.infer<typeof deleteTavernMessageSchema>

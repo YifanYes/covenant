@@ -1,4 +1,4 @@
-import type { ResolvedEncounterSlot } from '@shared/constants/encounter-patterns'
+import type { ResolvedEncounterSlot } from '@/shared/constants/encounter-patterns.constants'
 
 export interface EncounterState {
   encounterPattern: ResolvedEncounterSlot[]

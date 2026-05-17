@@ -1,16 +1,16 @@
-import { randomBytes } from 'node:crypto'
+import type { PrismaClient } from '@/generated/prisma'
 import {
   CAMPAIGN_EVENT_TYPE,
   type CampaignEventType,
   getCampaignTemplate
-} from '@shared/constants/guild-campaigns'
+} from '@/shared/constants/guild-campaigns.constants'
 import {
   computeContributionPoints,
   getGuildGoldMultiplier,
   getGuildTier,
   getNextTierThreshold,
   MAX_GUILD_TIER
-} from '@shared/constants/guild-progression'
+} from '@/shared/constants/guild-progression.constants'
 import type {
   CreateGuildType,
   CreateInviteType,
@@ -25,7 +25,7 @@ import type {
 } from '@shared/schemas/guilds.schemas'
 import { GuildRole, type GuildRoleType } from '@shared/schemas/guilds.schemas'
 import { TRPCError } from '@trpc/server'
-import type { PrismaClient } from '@/generated/prisma'
+import { randomBytes } from 'node:crypto'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
@@ -42,15 +42,13 @@ export const INVITE_INVALID_REASON = {
   REVOKED: 'revoked',
   EXHAUSTED: 'exhausted'
 } as const
-export type InviteInvalidReasonType =
-  (typeof INVITE_INVALID_REASON)[keyof typeof INVITE_INVALID_REASON]
+export type InviteInvalidReasonType = (typeof INVITE_INVALID_REASON)[keyof typeof INVITE_INVALID_REASON]
 
 const DEFAULT_FACTION = 'HOLY_KNIGHTS'
 const MAX_ACTIVE_INVITES_PER_GUILD = 5
 const PRISMA_UNIQUE_CONSTRAINT = 'P2002'
 
-const notFound = () =>
-  new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+const notFound = () => new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
 
 function isRewardPool(value: unknown): value is RewardPoolType {
   return (
@@ -306,10 +304,7 @@ export class GuildService {
     const guild = await this.guildRepository.findById(invite.guildId)
     if (!guild) throw notFound()
 
-    const inviteUsedCondition =
-      invite.maxUses == null
-        ? {}
-        : { usedCount: { lt: invite.maxUses } }
+    const inviteUsedCondition = invite.maxUses == null ? {} : { usedCount: { lt: invite.maxUses } }
 
     try {
       return await this.prisma.$transaction(async (tx) => {
@@ -576,10 +571,7 @@ export class GuildService {
 
       await this.applyContribution(campaign.id, userId, campaignAmount, campaign.target)
     } catch (error) {
-      log.warn(
-        { err: error, userId, guildId, eventType, amount: campaignAmount },
-        'Failed to record campaign event'
-      )
+      log.warn({ err: error, userId, guildId, eventType, amount: campaignAmount }, 'Failed to record campaign event')
     }
   }
 
@@ -733,12 +725,7 @@ export class GuildService {
     }
   }
 
-  private async applyContribution(
-    campaignId: string,
-    userId: string,
-    amount: number,
-    target: number
-  ): Promise<void> {
+  private async applyContribution(campaignId: string, userId: string, amount: number, target: number): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       const guardCampaign = await tx.guildCampaign.findUnique({
         where: { id: campaignId },

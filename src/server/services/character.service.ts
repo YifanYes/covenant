@@ -1,9 +1,9 @@
-import type { CharacterClassName, MagicNature } from '@shared/constants/classes'
-import { getAvailableAbilities, getAbilityById, MAX_EQUIPPED_ABILITIES } from '@shared/constants/abilities'
-import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
+import { getAbilityById, getAvailableAbilities, MAX_EQUIPPED_ABILITIES } from '@/shared/constants/abilities.constants'
+import type { CharacterClassName, MagicNature } from '@/shared/constants/classes.constants'
+import { createInventoryItem, TIER_1_ITEMS } from '@/shared/constants/items.constants'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
-import type { CharacterWithClasses } from '@shared/types/character.types'
 import type { AbilityDefinition } from '@shared/types/ability.types'
+import type { CharacterWithClasses } from '@shared/types/character.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
@@ -314,10 +314,7 @@ export class CharacterService {
     return { success: true, equippedAbilities: newEquippedAbilities }
   }
 
-  async unequipAbility(
-    userId: string,
-    abilityId: string
-  ): Promise<{ success: boolean; equippedAbilities: string[] }> {
+  async unequipAbility(userId: string, abilityId: string): Promise<{ success: boolean; equippedAbilities: string[] }> {
     const character = await this.characterRepository.getCharacterWithClasses(userId)
     if (!character) {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })

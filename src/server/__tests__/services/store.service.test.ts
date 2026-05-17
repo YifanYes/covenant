@@ -1,4 +1,4 @@
-import { ALL_ITEMS, CONSUMABLES } from '@shared/constants/items'
+import { ALL_ITEMS, CONSUMABLES } from '@/shared/constants/items.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { StoreService } from '../../services/store.services'
 import { mockCharacter, mockInventoryItem } from '../fixtures/character.fixtures'

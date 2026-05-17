@@ -7,10 +7,7 @@ import type { PrismaClient } from '@/generated/prisma'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
-import {
-  AUTO_HIDE_THRESHOLD,
-  type TavernMessageRepository
-} from '../repositories/tavern-message.repository'
+import type { TavernMessageRepository } from '../repositories/tavern-message.repository'
 
 const log = logger.child({ service: 'tavern' })
 
@@ -41,7 +38,7 @@ export class TavernService {
       cursor: input.cursor,
       limit: input.limit
     })
-    return rows.reverse()
+    return rows.slice().reverse()
   }
 
   async sendMessage(input: SendTavernMessageType, userId: string) {
@@ -82,25 +79,31 @@ export class TavernService {
   }
 
   async reportMessage(messageId: string, reporterId: string) {
-    const message = await this.tavernMessageRepository.findById(messageId)
-    if (!message || message.deletedAt) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
-    }
-    if (message.userId === reporterId) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'You cannot report your own message' })
-    }
-
     try {
       await this.prisma.$transaction(async (tx) => {
+        const message = await tx.tavernMessage.findFirst({
+          where: { id: messageId, deletedAt: null },
+          select: { userId: true }
+        })
+        if (!message) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+        }
+        if (message.userId === reporterId) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'You cannot report your own message' })
+        }
         await tx.tavernMessageReport.create({
           data: { messageId, reporterId }
         })
-        await tx.tavernMessage.update({
-          where: { id: messageId },
+        const updated = await tx.tavernMessage.updateMany({
+          where: { id: messageId, deletedAt: null },
           data: { reportCount: { increment: 1 } }
         })
+        if (updated.count === 0) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+        }
       })
     } catch (error) {
+      if (error instanceof TRPCError) throw error
       if (isUniqueConstraintError(error)) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'You have already reported this message' })
       }
@@ -110,5 +113,3 @@ export class TavernService {
     return { message: 'Report received' }
   }
 }
-
-export { AUTO_HIDE_THRESHOLD }

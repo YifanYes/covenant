@@ -4,3 +4,4 @@ args = [
     "caveman-shrink",
 ]
 command = "npx"
+

@@ -1,4 +1,4 @@
-import { EnemyType } from './enemies'
+import { EnemyType } from '@shared/constants/enemies.constants'
 
 // Translation key prefixes for procedural enemy names by type
 const NAME_PREFIXES: Record<EnemyType, string[]> = {

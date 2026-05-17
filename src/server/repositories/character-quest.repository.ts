@@ -1,6 +1,6 @@
 import type { PrismaClient } from '@/generated/prisma'
+import type { QuestStatus } from '@/shared/constants/quests.constants'
 import type { ActiveStatusEffect } from '@shared/types/ability.types'
-import type { QuestStatus } from '@shared/constants/quests'
 import { parseTacticalState, type TacticalStateData } from '@shared/types/tactical-combat.types'
 
 export class CharacterQuestRepository {

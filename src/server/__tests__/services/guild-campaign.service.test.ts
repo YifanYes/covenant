@@ -1,4 +1,4 @@
-import { CAMPAIGN_EVENT_TYPE } from '@shared/constants/guild-campaigns'
+import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import { GuildRole } from '@shared/schemas/guilds.schemas'
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -101,24 +101,24 @@ describe('GuildService — campaigns', () => {
   describe('startCampaign', () => {
     it('rejects non-officer/owner', async () => {
       memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER })
-      await expect(
-        service.startCampaign({ guildId: 'g-1', templateId: 'KILL_RAMPAGE' }, 'u1')
-      ).rejects.toBeInstanceOf(TRPCError)
+      await expect(service.startCampaign({ guildId: 'g-1', templateId: 'KILL_RAMPAGE' }, 'u1')).rejects.toBeInstanceOf(
+        TRPCError
+      )
     })
 
     it('rejects unknown template id', async () => {
       memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.OWNER })
-      await expect(
-        service.startCampaign({ guildId: 'g-1', templateId: 'NOPE' }, 'u1')
-      ).rejects.toThrow('Unknown campaign template')
+      await expect(service.startCampaign({ guildId: 'g-1', templateId: 'NOPE' }, 'u1')).rejects.toThrow(
+        'Unknown campaign template'
+      )
     })
 
     it('rejects when active campaign exists', async () => {
       memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.OWNER })
       guildRepo.findActiveCampaignByGuild.mockResolvedValue({ id: 'c-existing' })
-      await expect(
-        service.startCampaign({ guildId: 'g-1', templateId: 'KILL_RAMPAGE' }, 'u1')
-      ).rejects.toThrow('already active')
+      await expect(service.startCampaign({ guildId: 'g-1', templateId: 'KILL_RAMPAGE' }, 'u1')).rejects.toThrow(
+        'already active'
+      )
     })
 
     it('creates a campaign when officer + no active', async () => {
@@ -222,11 +222,7 @@ describe('GuildService — campaigns', () => {
       tx.guildCampaign.update.mockResolvedValue({ id: 'c-1', progress: 100, completedAt: null })
       // Race-safe completion: first updateMany sets completedAt with count=1 (this tx wins)
       tx.guildCampaign.updateMany.mockResolvedValueOnce({ count: 1 })
-      tx.guildCampaignProgress.findMany.mockResolvedValue([
-        { id: 'p-1' },
-        { id: 'p-2' },
-        { id: 'p-3' }
-      ])
+      tx.guildCampaignProgress.findMany.mockResolvedValue([{ id: 'p-1' }, { id: 'p-2' }, { id: 'p-3' }])
       await service.recordCampaignEvent('u1', CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)
       // Stamp goldClaimed = floor(600 / 3) = 200 on contributor entries
       expect(tx.guildCampaignProgress.updateMany).toHaveBeenCalledWith(
@@ -268,9 +264,7 @@ describe('GuildService — campaigns', () => {
 
     it('swallows errors silently', async () => {
       memberRepo.findByUserId.mockRejectedValue(new Error('boom'))
-      await expect(
-        service.recordCampaignEvent('u1', CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)
-      ).resolves.toBeUndefined()
+      await expect(service.recordCampaignEvent('u1', CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)).resolves.toBeUndefined()
     })
 
     it('ignores amount <= 0', async () => {

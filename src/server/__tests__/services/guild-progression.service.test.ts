@@ -1,11 +1,11 @@
-import { CAMPAIGN_EVENT_TYPE } from '@shared/constants/guild-campaigns'
+import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import {
   computeContributionPoints,
   getGuildGoldMultiplier,
   getGuildTier,
   getNextTierThreshold,
   MAX_GUILD_TIER
-} from '@shared/constants/guild-progression'
+} from '@/shared/constants/guild-progression.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { GuildService } from '../../services/guild.service'
 
@@ -159,9 +159,7 @@ describe('Guild progression (Phase 3)', () => {
       memberRepo.findByUserId.mockResolvedValue({ guildId: 'g-1' })
       prisma.guild.update.mockRejectedValue(new Error('db down'))
       guildRepo.findActiveCampaignByGuild.mockResolvedValue(null)
-      await expect(
-        service.recordCampaignEvent('u1', CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)
-      ).resolves.toBeUndefined()
+      await expect(service.recordCampaignEvent('u1', CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)).resolves.toBeUndefined()
       // Documented independence: campaign lookup must still run after the contribution
       // path throws — otherwise a single bad guild row would also break campaign progress.
       expect(guildRepo.findActiveCampaignByGuild).toHaveBeenCalledWith('g-1')

@@ -1,4 +1,4 @@
-import { ABILITIES, isDamageMove } from '@shared/constants/abilities'
+import { ABILITIES, isDamageMove } from '@/shared/constants/abilities.constants'
 import {
   AbilityEffectType,
   AbilityTarget,
@@ -394,9 +394,7 @@ export async function executeMove(args: {
   if (aliveTurnOrder.length > 0) {
     const casterPos = aliveTurnOrder.indexOf(casterId)
     nextTurnIndex =
-      casterPos < 0
-        ? state.currentTurnIndex % aliveTurnOrder.length
-        : (casterPos + 1) % aliveTurnOrder.length
+      casterPos < 0 ? state.currentTurnIndex % aliveTurnOrder.length : (casterPos + 1) % aliveTurnOrder.length
   }
   state = { ...state, units: aliveUnits, turnOrder: aliveTurnOrder, currentTurnIndex: nextTurnIndex }
 
@@ -418,9 +416,7 @@ export async function executeMove(args: {
       const cls = findCurrentClass(character)
       const playerUnit = state.units.find((u) => u.id.startsWith('player-'))
       const newHp = playerUnit?.currentHealth ?? cls.health
-      const newMana = isCasterPlayer
-        ? Math.max(0, casterMana - (stunned ? 0 : move.manaCost))
-        : cls.mana
+      const newMana = isCasterPlayer ? Math.max(0, casterMana - (stunned ? 0 : move.manaCost)) : cls.mana
       await repos.characterRepository.updateHealth(cls.id, newHp, newMana)
     }
   }
@@ -547,9 +543,7 @@ export async function executeEnemyMove(args: {
     state = {
       ...state,
       units: state.units.map((u, i) =>
-        i === enemyIdx
-          ? { ...u, currentHealth: newHp, activeEffects: decremented.activeEffects }
-          : u
+        i === enemyIdx ? { ...u, currentHealth: newHp, activeEffects: decremented.activeEffects } : u
       )
     }
     if (newHp <= 0) {
@@ -557,9 +551,7 @@ export async function executeEnemyMove(args: {
       // attack passes the turn check, persist, then run defeat handling so the
       // next enemy spawns and gold/tier rewards fire (same as a player kill).
       const aliveUnits = state.units.filter((u) => u.id.startsWith('player-') || u.currentHealth > 0)
-      const aliveTurnOrder = state.turnOrder.filter((id) =>
-        aliveUnits.find((u) => u.id === id && u.currentHealth > 0)
-      )
+      const aliveTurnOrder = state.turnOrder.filter((id) => aliveUnits.find((u) => u.id === id && u.currentHealth > 0))
       const playerIdx = aliveTurnOrder.findIndex((id) => id.startsWith('player-'))
       state = {
         ...state,
@@ -613,8 +605,7 @@ export async function executeEnemyMove(args: {
 
   // Immobilized / stunned: pass turn.
   const stillStunned = (state.units.find((u) => u.id === enemyId)?.activeEffects ?? []).some(
-    (eff) =>
-      (eff.effect === StatusEffect.STUNNED || eff.effect === StatusEffect.IMMOBILIZED) && eff.remainingTurns > 0
+    (eff) => (eff.effect === StatusEffect.STUNNED || eff.effect === StatusEffect.IMMOBILIZED) && eff.remainingTurns > 0
   )
   if (stillStunned) {
     return {
