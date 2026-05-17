@@ -8,6 +8,7 @@ import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { ArrowDown, Loader, Reload } from 'pixelarticons/react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import TavernComposer from './tavern-composer.component'
@@ -52,12 +53,11 @@ export default function TavernRoom({ myUserId }: TavernRoomProps) {
   const { t } = useTranslation()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const anchorRef = useRef<HTMLDivElement>(null)
-  const knownMessagesRef = useRef<Map<string, TavernMessage>>(new Map())
   const lastSeenIdRef = useRef<string | null>(null)
   const [hasMoreOlder, setHasMoreOlder] = useState(true)
   const [isLoadingOlder, setIsLoadingOlder] = useState(false)
   const [pendingNewCount, setPendingNewCount] = useState(0)
-  const [mergeTick, setMergeTick] = useState(0)
+  const [olderMessages, setOlderMessages] = useState<TavernMessage[]>([])
 
   const messagesQuery = useQuery({
     ...trpcOptions.tavern.getMessages.queryOptions({ limit: PAGE_SIZE }),
@@ -68,24 +68,27 @@ export default function TavernRoom({ myUserId }: TavernRoomProps) {
   const liveMessages = useMemo(() => messagesQuery.data ?? [], [messagesQuery.data])
 
   const messages = useMemo<TavernMessage[]>(() => {
-    const map = knownMessagesRef.current
-    if (liveMessages.length > 0) {
-      const liveIds = new Set(liveMessages.map((m) => m.id))
-      const oldestLiveTime = new Date(liveMessages[0].createdAt).getTime()
-      for (const [id, msg] of map) {
-        if (new Date(msg.createdAt).getTime() >= oldestLiveTime && !liveIds.has(id)) {
-          map.delete(id)
-        }
-      }
-      for (const msg of liveMessages) map.set(msg.id, msg)
+    if (liveMessages.length === 0) {
+      const all = [...olderMessages]
+      all.sort((a, b) => {
+        const diff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        return diff !== 0 ? diff : a.id.localeCompare(b.id)
+      })
+      return all
     }
-    const all = Array.from(map.values())
+    const liveIds = new Set(liveMessages.map((m) => m.id))
+    const oldestLiveTime = new Date(liveMessages[0].createdAt).getTime()
+    const filteredOlder = olderMessages.filter((m) => {
+      if (liveIds.has(m.id)) return false
+      return new Date(m.createdAt).getTime() < oldestLiveTime
+    })
+    const all = [...filteredOlder, ...liveMessages]
     all.sort((a, b) => {
       const diff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       return diff !== 0 ? diff : a.id.localeCompare(b.id)
     })
     return all
-  }, [liveMessages, mergeTick])
+  }, [liveMessages, olderMessages])
 
   const lastLiveId = liveMessages[liveMessages.length - 1]?.id
 
@@ -190,14 +193,18 @@ export default function TavernRoom({ myUserId }: TavernRoomProps) {
       )
       if (result.length < PAGE_SIZE) setHasMoreOlder(false)
       if (result.length > 0) {
-        const map = knownMessagesRef.current
-        for (const msg of result) map.set(msg.id, msg)
-        setMergeTick((n) => n + 1)
-        requestAnimationFrame(() => {
-          if (!container) return
+        flushSync(() => {
+          setOlderMessages((prev) => {
+            const existing = new Set(prev.map((m) => m.id))
+            const additions = result.filter((m) => !existing.has(m.id))
+            if (additions.length === 0) return prev
+            return [...prev, ...additions]
+          })
+        })
+        if (container) {
           const newScrollHeight = container.scrollHeight
           container.scrollTop = newScrollHeight - previousScrollHeight
-        })
+        }
       }
     } catch (error) {
       toast.error(t('tavern.error.load_older'), {
@@ -260,6 +267,7 @@ export default function TavernRoom({ myUserId }: TavernRoomProps) {
           onReport={handleReport}
           isDeletePending={deleteMutation.isPending}
           isReportPending={reportMutation.isPending}
+          isLoading={messagesQuery.isPending}
         />
 
         <div ref={anchorRef} />

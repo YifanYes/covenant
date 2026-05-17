@@ -5,7 +5,7 @@ import { rpgDialogContent } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import type { TavernMessage } from '@/types/trpc.types'
 import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/tooltip.component'
-import { Coffee, Delete, Flag } from 'pixelarticons/react'
+import { Coffee, Delete, Flag, Loader } from 'pixelarticons/react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import UserAvatar from '../../guilds/_components/user-avatar.component'
@@ -35,6 +35,7 @@ interface TavernMessageListProps {
   onReport: (messageId: string) => void
   isDeletePending: boolean
   isReportPending: boolean
+  isLoading: boolean
 }
 
 export default function TavernMessageList({
@@ -43,7 +44,8 @@ export default function TavernMessageList({
   onDelete,
   onReport,
   isDeletePending,
-  isReportPending
+  isReportPending,
+  isLoading
 }: TavernMessageListProps) {
   const { t } = useTranslation()
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
@@ -53,6 +55,14 @@ export default function TavernMessageList({
   const closeReport = () => setReportTarget(null)
 
   if (messages.length === 0) {
+    if (isLoading) {
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+          <Loader className="h-8 w-8 text-muted-foreground/50 animate-spin" />
+        </div>
+      )
+    }
+
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
         <Coffee className="h-10 w-10 text-muted-foreground/50" />
