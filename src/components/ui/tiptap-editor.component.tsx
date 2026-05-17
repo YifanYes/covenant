@@ -129,7 +129,7 @@ export default function TiptapEditor({ content, onChange, placeholder, className
           &ldquo;
         </ToolbarBtn>
       </div>
-      <EditorContent editor={editor} className="flex-1 px-4 py-3" />
+      <EditorContent editor={editor} className="flex-1 overflow-y-auto px-4 py-3" />
     </div>
   )
 }

@@ -1,9 +1,8 @@
 'use client'
 
-import LoaderButton from '@/common/loader-button.component'
 import BaseConfirmDialog from '@/components/common/base-confirm-dialog.component'
+import BaseFormDialog from '@/components/common/base-form-dialog.component'
 import Button from '@/components/ui/button.component'
-import Dialog, { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog.component'
 import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.component'
 import TiptapEditor from '@/components/ui/tiptap-editor.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
@@ -101,26 +100,41 @@ export default function EditEntryDialog({ entry, open, onOpenChange }: EditEntry
   const isLoading = updateMutation.isPending
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>{t('journaling.edit_entry')}</DialogTitle>
-        </DialogHeader>
+    <>
+      <BaseFormDialog
+        open={open}
+        onOpenChange={onOpenChange}
+        title="journaling.edit_entry"
+        onSubmit={handleSubmit(onSubmit)}
+        submitLabel="journaling.update"
+        isLoading={isLoading}
+        isSubmitDisabled={!plainContent}
+        className="sm:max-w-4xl"
+        extraFooterActions={
+          <Button
+            variant="outline"
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={deleteMutation.isPending || isLoading}
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/40 mr-auto"
+          >
+            {t('journaling.delete.button')}
+          </Button>
+        }
+      >
         <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-3">
-            <Controller
-              name="content"
-              control={control}
-              render={({ field }) => (
-                <TiptapEditor
-                  content={field.value ?? ''}
-                  onChange={field.onChange}
-                  placeholder={t('journaling.placeholder')}
-                  disabled={isLoading}
-                />
-              )}
-            />
-          </div>
+          <Controller
+            name="content"
+            control={control}
+            render={({ field }) => (
+              <TiptapEditor
+                content={field.value ?? ''}
+                onChange={field.onChange}
+                placeholder={t('journaling.placeholder')}
+                disabled={isLoading}
+                className="max-h-[50vh] min-h-70"
+              />
+            )}
+          />
 
           <div className="flex flex-col gap-2">
             <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
@@ -152,24 +166,8 @@ export default function EditEntryDialog({ entry, open, onOpenChange }: EditEntry
               </SelectContent>
             </Select>
           </div>
-
-          <div className="flex items-center justify-between gap-3">
-            <Button
-              variant="destructive"
-              onClick={() => setShowDeleteConfirm(true)}
-              disabled={deleteMutation.isPending || isLoading}
-            >
-              {t('journaling.delete.button')}
-            </Button>
-            <LoaderButton
-              onClick={handleSubmit(onSubmit)}
-              isLoading={isLoading}
-              disabled={!plainContent}
-              label={t('journaling.update')}
-            />
-          </div>
         </div>
-      </DialogContent>
+      </BaseFormDialog>
 
       <BaseConfirmDialog
         open={showDeleteConfirm}
@@ -180,6 +178,6 @@ export default function EditEntryDialog({ entry, open, onOpenChange }: EditEntry
         onConfirm={() => deleteMutation.mutate({ id: entry.id })}
         isLoading={deleteMutation.isPending}
       />
-    </Dialog>
+    </>
   )
 }

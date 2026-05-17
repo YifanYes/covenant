@@ -1,24 +1,24 @@
 # Design System: Covenant
 
-Covenant is a high-performance productivity infrastructure embedded in a dark fantasy setting. The system balances technical utility with a narrative of global conflict where each user's individual actions affect their faction's balance of power.
+Covenant = high-performance productivity infra embedded in dark fantasy setting. Balances technical utility with narrative of global conflict where each user's actions affect faction's balance of power.
 
 ---
 
 ## 1. Style & Atmosphere
 
-| Aspect         | Description                                                                      |
-| -------------- | -------------------------------------------------------------------------------- |
-| **Genre**      | Dark Fantasy                                                                     |
-| **Atmosphere** | A divided world in constant conflict. The tone is solemn, mystical, and warlike. |
+| Aspect         | Description                                                              |
+| -------------- | ------------------------------------------------------------------------ |
+| **Genre**      | Dark Fantasy                                                             |
+| **Atmosphere** | Divided world in constant conflict. Tone solemn, mystical, warlike.      |
 
 ### Interface Duality
 
-- **Productivity Area:** Utilitarian, clean, and efficient style. Prioritizes data management with a minimalist aesthetic integrated into the faction's color palette.
+- **Productivity Area:** Utilitarian, clean, efficient. Prioritizes data management with minimalist aesthetic integrated into faction's color palette.
 - **Game Area:** "Hi-Bit" art (16-bit pixel art) with modern lighting effects.
 
 ### Impact Metric
 
-The user acts as a unit within a faction; their consistency contributes to global objectives on a shared war map.
+User acts as unit within faction; consistency contributes to global objectives on shared war map.
 
 ---
 
@@ -26,17 +26,17 @@ The user acts as a unit within a faction; their consistency contributes to globa
 
 ### 2.1 The Logo
 
-The central symbol is the **Ark of the Covenant** in detailed pixel art. It represents the mystical artifact that serves as the turning point in the world's history. Displayed as a high-resolution static image with no dynamic effects.
+Central symbol: **Ark of the Covenant** in detailed pixel art. Represents mystical artifact serving as turning point in world's history. Displayed as high-resolution static image, no dynamic effects.
 
 ### 2.2 Theming System
 
-The system implements a **Light / Dark Mode** selector. In dark mode, faction color saturation is reduced by 20% to prevent halation and visual fatigue, ensuring a contrast ratio of **4.5:1** (WCAG 2.1).
+System implements **Light / Dark Mode** selector. In dark mode, faction color saturation reduced by 20% to prevent halation and visual fatigue, ensuring contrast ratio **4.5:1** (WCAG 2.1).
 
 ---
 
 ## 3. Technical Color Palette by Faction
 
-The chromatic strategy is based on **Eigengrau** (intrinsic grey), **Chiaroscuro** (light and shadow), and organic decomposing tones — using deep shadows and dramatic highlights to generate visual volume.
+Chromatic strategy based on **Eigengrau** (intrinsic grey), **Chiaroscuro** (light/shadow), and organic decomposing tones — deep shadows and dramatic highlights generate visual volume.
 
 ### 3.1 Global Semantic Colors
 
@@ -95,7 +95,7 @@ The chromatic strategy is based on **Eigengrau** (intrinsic grey), **Chiaroscuro
 
 ## 4. CSS Implementation
 
-To maintain the retro-modern aesthetic without compromising usability, the following overrides apply on top of NES.css and Tailwind CSS:
+Retro-modern aesthetic without compromising usability. Overrides apply on top of NES.css and Tailwind CSS:
 
 ```css
 :root {
@@ -148,12 +148,12 @@ li {
 
 ## 5. Typography & Visual Hierarchy
 
-| Element               | Font           | Description                                                              |
-| --------------------- | -------------- | ------------------------------------------------------------------------ |
-| **Headings (H1–H6)**  | Cinzel         | Classic serif for solemn titles and section names. 90% opacity.          |
-| **Body & Task Lists** | EB Garamond    | High-legibility font with technical and academic aesthetic. 80% opacity. |
-| **UI Labels**         | Press Start 2P | 8-bit style for RPG-specific elements (where applicable).                |
-| **Disabled Elements** | —              | 40% opacity.                                                             |
+| Element               | Font           | Description                                                       |
+| --------------------- | -------------- | ----------------------------------------------------------------- |
+| **Headings (H1–H6)**  | Cinzel         | Classic serif for solemn titles and section names. 90% opacity.   |
+| **Body & Task Lists** | EB Garamond    | High-legibility font, technical/academic aesthetic. 80% opacity.  |
+| **UI Labels**         | Press Start 2P | 8-bit style for RPG-specific elements (where applicable).         |
+| **Disabled Elements** | —              | 40% opacity.                                                      |
 
 ---
 
@@ -161,29 +161,29 @@ li {
 
 ### 6.1 Base Elements
 
-| Aspect            | Implementation                                                                            |
-| ----------------- | ----------------------------------------------------------------------------------------- |
-| **Rendering**     | `image-rendering: pixelated;` applied globally in CSS to prevent blur on scaling.         |
-| **Layout**        | Tailwind CSS for the responsive grid system.                                              |
-| **Components**    | Customized NES.css base using `:root` variables to inject the selected faction's palette. |
-| **Accessibility** | `prefers-reduced-motion` support that disables shake/vibration animations.                |
+| Aspect            | Implementation                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| **Rendering**     | `image-rendering: pixelated;` applied globally in CSS to prevent blur on scaling.    |
+| **Layout**        | Tailwind CSS for responsive grid system.                                             |
+| **Components**    | Customized NES.css base using `:root` variables to inject selected faction's palette.|
+| **Accessibility** | `prefers-reduced-motion` support disables shake/vibration animations.                |
 
 ### 6.2 Ornamental Elements
 
-| Element      | Description                                                                                                  |
-| ------------ | ------------------------------------------------------------------------------------------------------------ |
-| **Dividers** | Instead of plain `<hr>` lines, use repeatable SVGs or sprites: rusted chains, thorny roots, or stone cracks. |
-| **Loaders**  | A spinning religious symbol or a chalice filling with blood.                                                 |
+| Element      | Description                                                                                              |
+| ------------ | -------------------------------------------------------------------------------------------------------- |
+| **Dividers** | Instead of plain `<hr>` lines, use repeatable SVGs or sprites: rusted chains, thorny roots, stone cracks.|
+| **Loaders**  | Spinning religious symbol or chalice filling with blood.                                                 |
 
 ---
 
 ## 7. Productivity UI Principles
 
-Optimizes operational efficiency through human-oriented design that maintains thematic cohesion without visual distraction.
+Optimizes operational efficiency via human-oriented design maintaining thematic cohesion without visual distraction.
 
-| Principle                    | Description                                                                                                                                     |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Minimalism & Integration** | Lists and calendars with generous negative space; surfaces use the faction's Surface/Card tone.                                                 |
-| **Data Hierarchy**           | Critical elements are highlighted with the accent color; secondary information uses reduced opacity (60%) over the Bone White tone (`#c2b29a`). |
-| **Pixel-Perfect Precision**  | Margins, padding, and component sizes must align to an 8px grid.                                                                                |
-| **Technical Interactivity**  | Immediate feedback on task completion via clear state changes; DotGothic16 bitmap typography for maximum sharpness at small sizes.              |
+| Principle                    | Description                                                                                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Minimalism & Integration** | Lists and calendars with generous negative space; surfaces use faction's Surface/Card tone.                                              |
+| **Data Hierarchy**           | Critical elements highlighted with accent color; secondary info uses reduced opacity (60%) over Bone White tone (`#c2b29a`).             |
+| **Pixel-Perfect Precision**  | Margins, padding, component sizes must align to 8px grid.                                                                                |
+| **Technical Interactivity**  | Immediate feedback on task completion via clear state changes; DotGothic16 bitmap typography for max sharpness at small sizes.           |

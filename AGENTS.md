@@ -8,7 +8,7 @@ Design system: `@DESIGN.md`.
 
 ## Quickstart
 
-- Node `>=22.12.0`, pnpm `10.4.1` (enforced via `packageManager`)
+- Node `>=24.0.0`, pnpm `11.1.2` (enforced via `packageManager`)
 - Install: `pnpm install` (auto-runs `prisma generate`)
 - Dev: `pnpm dev` (backend = API routes, no separate process)
 - Env: copy `.env.example` → `.env.local` (Prisma reads via `prisma.config.ts`)
@@ -23,7 +23,7 @@ npx tsc --noEmit   # required after type/interface changes
 pnpm test:run      # vitest, must pass
 ```
 
-Pre-push: Husky runs full build+test via `.husky/pre-push`, mirrors Railway `buildCommand` exactly: `pnpm install --frozen-lockfile && pnpm prisma generate && pnpm lint && npx tsc --noEmit && pnpm build && pnpm test:run`. Bypass: `git push --no-verify`.
+Pre-push: Husky runs full build+test via `.husky/pre-push`, mirrors Railway `buildCommand` exact: `pnpm install --frozen-lockfile && pnpm prisma generate && pnpm lint && npx tsc --noEmit && pnpm build && pnpm test:run`. Bypass: `git push --no-verify`.
 
 ## Deployment / Railway
 
@@ -116,6 +116,13 @@ const data = await trpc.dashboard.getData()
 - Imports: path aliases (`@/*`, `@shared/*`, `@ui/*`). No relative imports.
 - i18n: NEVER hardcode user-facing strings. Use `useTranslation()`. Add keys to BOTH `public/locales/en/translation.json` and `public/locales/es/translation.json`.
 
+## Forms & Dialogs
+
+- Forms: `react-hook-form` + `standardSchemaResolver` from `@hookform/resolvers/standard-schema`, validated by Zod schemas in `src/shared/schemas/`. Use `Controller` for non-native inputs (Tiptap, Select, etc.).
+- Form modals: `src/components/common/base-form-dialog.component.tsx`. Pass i18n keys (not translated strings) for `title` / `submitLabel` / `cancelLabel` — component calls `t()` internally. Wire `onSubmit={handleSubmit(onSubmit)}`, `isSubmitDisabled`, `isLoading`. Use `extraFooterActions` for left-aligned secondary actions (e.g. delete).
+- Destructive confirmations: `src/components/common/base-confirm-dialog.component.tsx`. Default `variant="destructive"`. Pass i18n keys for `title` / `description` / `confirmLabel`.
+- Do NOT hand-roll `<Dialog><DialogContent>...<LoaderButton/>` in feature code when base dialog fits.
+
 ## Copy Tone
 
 Empty states + microcopy: friendly, funny, energetic, RPG-themed. Treat user as hero on epic quest. No dry corporate. Canonical example: tasks empty states.
@@ -130,7 +137,7 @@ Conventional: `<type>: <description>` (`fix:`, `feat:`, `docs:`, `test:`, `build
 
 ## Debugging & Bug Fixes
 
-Trace EVERY caller/reference of affected logic. Fix all paths in one pass. Never fix only 1–2 of 3+.
+Trace EVERY caller/reference of affected logic. Fix all paths one pass. Never fix only 1–2 of 3+.
 
 - Minimal targeted fixes. No adjacent refactor unless asked.
 - No strict validation rejecting existing/legacy state.
@@ -139,16 +146,16 @@ Trace EVERY caller/reference of affected logic. Fix all paths in one pass. Never
 ## Gotchas
 
 - `next.config.ts`: `serverExternalPackages: ['pg', 'pino', 'pino-pretty', 'node-cron']`, MDX via `@next/mdx`
-- Prisma client at `@/generated/prisma`. Do NOT import `@prisma/client` directly.
-- Tests inject repos directly into service constructors. No DI container.
+- Prisma client at `@/generated/prisma`. Do NOT import `@prisma/client` direct.
+- Tests inject repos direct into service constructors. No DI container.
 - Avoid `Omit<>` — breaks implicit tRPC type resolution.
-- NEVER call `setState` synchronously inside `useEffect`. Triggers cascading renders, fails `react-hooks/set-state-in-effect` lint. Use lazy init: `useState(() => !safeGet())`.
+- NEVER call `setState` sync inside `useEffect`. Triggers cascading renders, fails `react-hooks/set-state-in-effect` lint. Use lazy init: `useState(() => !safeGet())`.
 - Better Auth user IDs are `text`, NOT `uuid` (e.g. `f4FRrCSJBqVEU5WCOTBTaZSHY9NrxnkW`). In raw SQL, never cast `userId::uuid` — throws `invalid input syntax for type uuid`, 500. Compare as text. Entity `id` cols (tasks, habits, etc.) ARE uuid and can cast.
 
 ## References
 
 - `CLAUDE.md` — detailed architecture and conventions
-- `README.md` — outdated (describes split front/server setup that no longer exists). Trust `package.json` + this file.
+- `README.md` — outdated (describes split front/server setup no longer exists). Trust `package.json` + this file.
 - `.cursorrules` — points to `CLAUDE.md` / `CONVENTIONS.md`
 
 ## Agent skills
