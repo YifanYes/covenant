@@ -69,7 +69,7 @@ export default function ObjectiveSummaryList({ title, tasks, habits, setSelected
                   <div className="flex flex-col gap-2">
                     {pendingTasks.map((task) => (
                       <div key={task.id} className="rounded-lg border p-2">
-                        <Task task={task} setSelectedTask={setSelectedTask} hideHandle hideHover />
+                        <Task task={task} setSelectedTask={setSelectedTask} hideHover />
                       </div>
                     ))}
                   </div>

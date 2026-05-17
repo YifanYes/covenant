@@ -6,11 +6,12 @@ import { useTasksStore } from '@/stores/tasks.store'
 import Task from '@/tasks/task.component'
 import { type Task as TaskType } from '@/types/models.types'
 import { useDragAndDrop } from '@formkit/drag-and-drop/react'
-import { TaskStatus } from '@shared/schemas/tasks.schemas'
-import { clone, filter, flatten, values as getValues, map } from 'es-toolkit/compat'
+import { flatten, values as getValues, map } from 'es-toolkit/compat'
 import { Flag } from 'pixelarticons/react'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+
+const reIndex = (arr: TaskType[]) => arr.map((t, i) => ({ ...t, order: i }))
 
 export default function TaskList({
   id,
@@ -25,51 +26,40 @@ export default function TaskList({
 }) {
   const { t } = useTranslation()
   const { tasks, setSelectedTask, setTasks } = useTasksStore()
+
+  const commit = (next: Record<string, TaskType[]>) => {
+    setTasks(next)
+    mutation.debouncedMutate({ tasks: flatten(getValues(next)) })
+  }
+
   const [parent, values, setValues] = useDragAndDrop<HTMLUListElement, TaskType>(tasks?.[id] ?? [], {
     group,
-    dragHandle: '.drag-handle',
-    handleNodeDrop: (event, state) =>
-      mutation.debouncedMutate({
-        tasks: handleDrop({
-          tasks,
-          currentParentId: state.currentParent.el.dataset.listId as TaskStatus,
-          formerParentId: state.initialParent.el.dataset.listId as TaskStatus,
-          task: event.targetData.node.data.value,
-          currentIndex: state.targetIndex,
-          setTasks
-        })
+    onSort: ({ parent, values: newValues }) => {
+      const listId = parent.el.dataset.listId
+      if (!listId) return
+      const allTasks = useTasksStore.getState().tasks
+      commit({ ...allTasks, [listId]: reIndex(newValues as TaskType[]) })
+    },
+    onTransfer: ({ sourceParent, targetParent, draggedNodes }) => {
+      const sourceId = sourceParent.el.dataset.listId
+      const targetId = targetParent.el.dataset.listId
+      if (!sourceId || !targetId) return
+      if (id !== sourceId) return
+
+      const sourceVals = sourceParent.data.getValues(sourceParent.el) as TaskType[]
+      const targetVals = targetParent.data.getValues(targetParent.el) as TaskType[]
+      const draggedIds = new Set(draggedNodes.map((n) => (n.data.value as TaskType).id))
+      const targetWithStatus = targetVals.map((t) =>
+        draggedIds.has(t.id) ? { ...t, status: targetId } : t
+      )
+      const allTasks = useTasksStore.getState().tasks
+      commit({
+        ...allTasks,
+        [sourceId]: reIndex(sourceVals),
+        [targetId]: reIndex(targetWithStatus)
       })
+    }
   })
-
-  const handleDrop = ({
-    tasks,
-    currentParentId = TaskStatus.TODO,
-    formerParentId = TaskStatus.TODO,
-    task,
-    currentIndex,
-    setTasks
-  }: {
-    tasks: Record<string, TaskType[]>
-    currentParentId: string
-    formerParentId: string
-    task: TaskType
-    currentIndex: number
-    setTasks: (tasks: Record<string, TaskType[]>) => void
-  }) => {
-    const reIndex = (tasks: TaskType[]) => map(tasks, (t, i) => ({ ...t, order: i }))
-
-    const from = filter(clone(tasks[formerParentId]), (item) => item.id !== task.id)
-    const to = currentParentId === formerParentId ? from : clone(tasks[currentParentId] ?? [])
-    to.splice(currentIndex, 0, {
-      ...task,
-      order: currentIndex,
-      ...(currentParentId !== formerParentId && { status: currentParentId })
-    })
-    const result = { ...tasks, [formerParentId]: reIndex(from), [currentParentId]: reIndex(to) }
-
-    setTasks(result)
-    return flatten(getValues(result))
-  }
 
   useEffect(() => {
     setValues(tasks?.[id] ?? [])
@@ -104,13 +94,18 @@ export default function TaskList({
         <ul
           ref={parent}
           className={cn(
-            'flex flex-col gap-1 rounded-md p-3',
-            isKanban ? 'min-h-0 flex-1 overflow-y-auto' : 'h-full min-h-20'
+            'flex flex-col rounded-md',
+            isKanban ? 'min-h-0 flex-1 gap-2 overflow-y-auto p-3' : 'h-full min-h-20 gap-1 p-3'
           )}
           data-list-id={id}
         >
           {map(values, (task: TaskType) => (
-            <Task key={task.id} task={task} setSelectedTask={setSelectedTask} />
+            <Task
+              key={task.id}
+              task={task}
+              setSelectedTask={setSelectedTask}
+              variant={isKanban ? 'card' : 'row'}
+            />
           ))}
         </ul>
       </div>

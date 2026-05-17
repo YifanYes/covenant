@@ -182,17 +182,17 @@ export class TaskRepository {
   ): Promise<void> {
     if (tasks.length === 0) return
 
-    const values = tasks.map((t) => Prisma.sql`(${t.id}::uuid, ${t.status}::varchar, ${t.order}::integer)`)
-
     await this.prisma.$transaction(async (tx) => {
-      const count = await tx.$executeRaw`
-        UPDATE "tasks" as t
-        SET "status" = c.status, "order" = c."order"
-        FROM (VALUES ${Prisma.join(values)}) as c(id, status, "order")
-        WHERE c.id = t.id AND "userId" = ${userId}
-      `
+      let updated = 0
+      for (const t of tasks) {
+        const result = await tx.task.updateMany({
+          where: { id: t.id, userId },
+          data: { status: t.status, order: t.order }
+        })
+        updated += result.count
+      }
 
-      if (count !== tasks.length) {
+      if (updated !== tasks.length) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Some tasks not found or access denied' })
       }
 
