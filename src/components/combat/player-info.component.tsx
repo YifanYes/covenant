@@ -3,7 +3,9 @@ import TierBadge from '@/common/tier-badge.component'
 import HealthBar from '@/components/combat/health-bar.component'
 import ManaBar from '@/components/combat/mana-bar.component'
 import { panelChrome } from '@/components/rpg/rpg-styles'
+import { useManaReserveTooltip } from '@/hooks/use-mana-reserve-tooltip.hook'
 import { cn } from '@/lib/cn.lib'
+import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import { Battery, Heart } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 
@@ -31,6 +33,7 @@ export default function PlayerInfo({
   className
 }: PlayerInfoProps) {
   const { t } = useTranslation()
+  const reserveTooltip = useManaReserveTooltip(manaReserve)
 
   return (
     <div className={cn(panelChrome, 'flex flex-col gap-1.5 p-3', className)}>
@@ -51,12 +54,16 @@ export default function PlayerInfo({
         <span className="text-[10px] font-bold tracking-widest text-primary">MP</span>
         <ManaBar current={mana} max={maxMana} className="flex-1" />
         {manaReserve > 0 && (
-          <span
-            className="rounded bg-blue-500/20 px-1 text-[10px] font-bold text-blue-300"
-            title={t('combat.mana_reserve_tooltip', { reserve: manaReserve })}
-          >
-            +{manaReserve}
-          </span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="cursor-pointer rounded bg-blue-500/20 px-1 text-[10px] font-bold text-blue-300">
+                +{manaReserve}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="right" align="center" className="max-w-xs whitespace-pre-line text-left">
+              {reserveTooltip}
+            </TooltipContent>
+          </Tooltip>
         )}
       </div>
     </div>

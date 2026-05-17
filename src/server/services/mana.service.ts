@@ -1,5 +1,5 @@
-import { getTaskMana, MANA_REWARDS, type ManaSource, type TaskImpact } from '@shared/constants/rewards'
 import type { PrismaClient } from '@/generated/prisma'
+import { getTaskMana, MANA_REWARDS, type ManaSource, type TaskImpact } from '@/shared/constants/rewards.constants'
 import type { CharacterRepository } from '../repositories/character.repository'
 
 export interface ManaGrantContext {
@@ -97,7 +97,9 @@ export class ManaService {
   async getTodayReserveBreakdown(userId: string, timezoneOffset = 0): Promise<ReserveBreakdown> {
     const now = new Date()
     const localNow = new Date(now.getTime() - timezoneOffset * 60 * 1000)
-    const startLocal = new Date(Date.UTC(localNow.getUTCFullYear(), localNow.getUTCMonth(), localNow.getUTCDate(), 0, 0, 0, 0))
+    const startLocal = new Date(
+      Date.UTC(localNow.getUTCFullYear(), localNow.getUTCMonth(), localNow.getUTCDate(), 0, 0, 0, 0)
+    )
     const startUtc = new Date(startLocal.getTime() + timezoneOffset * 60 * 1000)
     const endUtc = new Date(startUtc.getTime() + 24 * 60 * 60 * 1000)
 

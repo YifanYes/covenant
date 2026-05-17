@@ -1,9 +1,9 @@
 'use client'
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
-import { Cancel as Close, Money } from 'pixelarticons/react'
-import type { ItemDefinition } from '@shared/constants/items'
+import type { ItemDefinition } from '@/shared/constants/items.constants'
 import Image from 'next/image'
+import { Cancel as Close, Money } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import StoreItemTooltip from './store-item-tooltip.component'
 

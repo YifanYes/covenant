@@ -1,4 +1,4 @@
-import { CAMPAIGN_EVENT_TYPE, type CampaignEventType } from './guild-campaigns'
+import { CAMPAIGN_EVENT_TYPE, type CampaignEventType } from '@shared/constants/guild-campaigns.constants'
 
 /**
  * Guild tier thresholds (cumulative totalContribution required to reach that tier).

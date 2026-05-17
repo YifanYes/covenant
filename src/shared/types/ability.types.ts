@@ -1,4 +1,4 @@
-import type { CharacterClassName, MagicNature } from '../constants/classes'
+import type { CharacterClassName, MagicNature } from '../constants/classes.constants'
 
 export const AbilityEffectType = {
   POWER_MODIFIER: 'POWER_MODIFIER',

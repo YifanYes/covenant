@@ -1,7 +1,8 @@
 'use client'
+
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
-import { EnemyType, getEnemy } from '@shared/constants/enemies'
+import { EnemyType, getEnemy } from '@/shared/constants/enemies.constants'
 import dayjs from 'dayjs'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'

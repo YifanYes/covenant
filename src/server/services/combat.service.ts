@@ -1,11 +1,8 @@
 import type { PrismaClient } from '@/generated/prisma'
-import { getConsumableById } from '@shared/constants/items'
+import { getConsumableById } from '@/shared/constants/items.constants'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
-import type {
-  TacticalMoveResult,
-  TacticalStateData
-} from '@shared/types/tactical-combat.types'
+import type { TacticalMoveResult, TacticalStateData } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
 
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
@@ -24,10 +21,7 @@ import type { ManaService } from './mana.service'
 // the player's. updatedState is taken from the player result (chronologically
 // last). Reward / nextEnemy / tierProgression collapse to whichever side produced
 // them — in practice only one side can, since the encounter ends after the kill.
-function mergeMoveResults(
-  enemy: TacticalMoveResult,
-  player: TacticalMoveResult
-): TacticalMoveResult {
+function mergeMoveResults(enemy: TacticalMoveResult, player: TacticalMoveResult): TacticalMoveResult {
   const base = {
     ...player,
     affectedUnitIds: [...enemy.affectedUnitIds, ...player.affectedUnitIds],

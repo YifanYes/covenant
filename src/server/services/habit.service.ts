@@ -1,9 +1,9 @@
-import { CAMPAIGN_EVENT_TYPE } from '@shared/constants/guild-campaigns'
+import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
-import type { HabitRepository } from '../repositories/habit.repository'
 import { logger } from '../lib/logger'
+import type { HabitRepository } from '../repositories/habit.repository'
 import type { GuildService } from './guild.service'
 import type { ManaService } from './mana.service'
 

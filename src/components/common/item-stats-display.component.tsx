@@ -1,5 +1,5 @@
 'use client'
-import type { ItemStats } from '@shared/constants/items'
+import type { ItemStats } from '@/shared/constants/items.constants'
 import { useTranslation } from 'react-i18next'
 
 interface ItemStatsDisplayProps {
@@ -26,9 +26,7 @@ export default function ItemStatsDisplay({ stats }: ItemStatsDisplayProps) {
       {stats.damageType && (
         <div className="flex gap-1">
           <span className="text-zinc-400">{t('inventory.stats.damage_type')}</span>
-          <span className="font-medium text-zinc-200">
-            {t(`inventory.damage_type.${stats.damageType}`)}
-          </span>
+          <span className="font-medium text-zinc-200">{t(`inventory.damage_type.${stats.damageType}`)}</span>
         </div>
       )}
       {stats.strengthDefBonus !== undefined && stats.strengthDefBonus !== 0 && (

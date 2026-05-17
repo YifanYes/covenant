@@ -1,6 +1,6 @@
+import { CharacterClassName, MagicNature } from '@shared/constants/classes.constants'
+import { slotTypeValues } from '@shared/types/gamification.types'
 import { z } from 'zod'
-import { CharacterClassName, MagicNature } from '../constants/classes'
-import { slotTypeValues } from '../types/gamification.types'
 
 export const createCharacterSchema = z.object({
   name: z.string().min(1).max(255),

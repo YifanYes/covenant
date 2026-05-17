@@ -1,8 +1,8 @@
 'use client'
 
 import { useSession } from '@/lib/auth.lib'
+import { Faction } from '@/shared/constants/factions.constants'
 import { trpcOptions } from '@/utils/trpc.utils'
-import { Faction } from '@shared/constants/factions'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 

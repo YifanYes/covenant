@@ -1,5 +1,5 @@
-import { CharacterClassName } from '@shared/constants/classes'
-import { ALL_ITEMS, CONSUMABLES } from '@shared/constants/items'
+import { CharacterClassName } from '@/shared/constants/classes.constants'
+import { ALL_ITEMS, CONSUMABLES } from '@/shared/constants/items.constants'
 import { ItemRarity, ItemType } from '@shared/types/gamification.types'
 
 export const mockCharacter = (overrides = {}) => ({

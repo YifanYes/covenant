@@ -8,6 +8,7 @@ import {
   updateCharacterNameSchema,
   useConsumableSchema
 } from '@shared/schemas/character.schemas'
+import { z } from 'zod'
 import { protectedProcedure, rateLimit, RATE_LIMITS, t } from '../trpc'
 
 export const characterRouter = t.router({
@@ -22,6 +23,12 @@ export const characterRouter = t.router({
   getCurrentClass: protectedProcedure.query(async ({ ctx }) => {
     return ctx.services.character.getCurrentClass(ctx.user.id)
   }),
+
+  getTodayReserveBreakdown: protectedProcedure
+    .input(z.object({ timezoneOffset: z.number().int().optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      return ctx.services.character.getTodayReserveBreakdown(ctx.user.id, input?.timezoneOffset)
+    }),
 
   switchClass: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(switchClassSchema).mutation(async ({ ctx, input }) => {
     return ctx.services.character.switchClass(ctx.user.id, input.className)

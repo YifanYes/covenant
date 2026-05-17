@@ -1,7 +1,7 @@
 'use client'
 import ItemStatsDisplay from '@/components/common/item-stats-display.component'
+import type { ItemDefinition } from '@/shared/constants/items.constants'
 import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
-import type { ItemDefinition } from '@shared/constants/items'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 

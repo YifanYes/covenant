@@ -1,6 +1,6 @@
 import { type Character, type PrismaClient } from '@/generated/prisma'
-import { Faction } from '@shared/constants/factions'
-import { CharacterClassName, CLASS_INITIAL_STATS } from '@shared/constants/classes'
+import { CharacterClassName, CLASS_INITIAL_STATS } from '@/shared/constants/classes.constants'
+import { Faction } from '@/shared/constants/factions.constants'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
@@ -220,5 +220,4 @@ export class CharacterRepository {
       data: { factionName: faction }
     })
   }
-
 }

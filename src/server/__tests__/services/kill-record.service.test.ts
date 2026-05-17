@@ -1,4 +1,4 @@
-import { CharacterClassName, calculateMaxStats } from '@shared/constants/classes'
+import { CharacterClassName, calculateMaxStats } from '@/shared/constants/classes.constants'
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { KillRecordService } from '../../services/kill-record.service'
@@ -128,12 +128,7 @@ describe('KillRecordService', () => {
       const result = await killRecordService.checkAndApplyTierProgression('user-1')
 
       const expected = calculateMaxStats(CharacterClassName.TEMPLAR, 2)
-      expect(mockCharacterRepo.updateProgress).toHaveBeenCalledWith(
-        'class-1',
-        2,
-        expected.maxHealth,
-        expected.maxMana
-      )
+      expect(mockCharacterRepo.updateProgress).toHaveBeenCalledWith('class-1', 2, expected.maxHealth, expected.maxMana)
       expect(result).toEqual({ tierChanged: true, oldTier: 1, newTier: 2 })
     })
 

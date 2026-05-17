@@ -302,7 +302,16 @@
     },
     "mana_reserve": "Reserva",
     "mana_reserve_badge": "+{{reserve}}",
-    "mana_reserve_tooltip": "Reserva: {{reserve}} maná guardado para futuros combates",
+    "mana_reserve_tooltip": "Reserva: {{reserve}} maná",
+    "mana_reserve_today_empty": "Hoy: {{total}} maná",
+    "mana_reserve_today_with_sources": "Hoy: {{total}} maná ({{sources}})",
+    "mana_reserve_source_separator": ", ",
+    "mana_reserve_sources": {
+      "habits": "Hábitos +{{mana}}",
+      "tasks": "Tareas +{{mana}}",
+      "objectives": "Objetivos +{{mana}}",
+      "journals": "Diario +{{mana}}"
+    },
     "targeting": {
       "single": "Selecciona un objetivo",
       "all": "Atacando a todos los enemigos",
@@ -1884,7 +1893,8 @@
     "settings": "Configuración",
     "shop": "Tienda",
     "tasks": "Tareas",
-    "guilds": "Gremios"
+    "guilds": "Gremios",
+    "tavern": "Taberna"
   },
   "sign_up": {
     "already_have_account": "¿Ya tienes cuenta?",
@@ -1970,6 +1980,61 @@
     "DOING": "En progreso",
     "DONE": "Completado",
     "TODO": "Por hacer"
+  },
+  "tavern": {
+    "title": "La Taberna",
+    "subtitle": "Una sala de chat global en vivo donde todos los jugadores comparten noticias, preguntan y intercambian rumores.",
+    "character_count": "{{count}} / {{max}}",
+    "empty": "El fuego está encendido. La cerveza fluye. La sala espera su primer rumor.",
+    "send": "Enviar",
+    "refresh": "Actualizar",
+    "load_older": "Cargar anteriores",
+    "delete_message": "Eliminar este mensaje",
+    "report_message": "Reportar este mensaje",
+    "unknown_user": "Forastero",
+    "delete_confirm": {
+      "title": "¿Eliminar tu mensaje?",
+      "description": "El mensaje se borrará de la Taberna y no se puede recuperar.",
+      "cta": "Eliminar"
+    },
+    "report_confirm": {
+      "title": "¿Reportar este mensaje?",
+      "description": "Los reportes son anónimos. Los mensajes con suficientes reportes se ocultan de la Taberna.",
+      "cta": "Reportar"
+    },
+    "new_messages_one": "{{count}} mensaje nuevo",
+    "new_messages_other": "{{count}} mensajes nuevos",
+    "composer": {
+      "placeholder": "Envía un mensaje a la taverna"
+    },
+    "last_updated": {
+      "label": "Actualizado {{relative}}",
+      "never": "Actualizando…",
+      "just_now": "justo ahora",
+      "seconds_one": "hace {{count}}s",
+      "seconds_other": "hace {{count}}s",
+      "minutes_one": "hace {{count}}m",
+      "minutes_other": "hace {{count}}m"
+    },
+    "relative": {
+      "just_now": "justo ahora",
+      "minutes_one": "hace {{count}}m",
+      "minutes_other": "hace {{count}}m",
+      "hours_one": "hace {{count}}h",
+      "hours_other": "hace {{count}}h",
+      "days_one": "hace {{count}}d",
+      "days_other": "hace {{count}}d"
+    },
+    "success": {
+      "delete": "Mensaje eliminado.",
+      "report": "Reporte recibido. Gracias por cuidar la taberna."
+    },
+    "error": {
+      "send": "No se pudo enviar tu mensaje",
+      "delete": "No se pudo eliminar el mensaje",
+      "report": "No se pudo enviar el reporte",
+      "load_older": "No se pudieron cargar los mensajes anteriores"
+    }
   },
   "tasks": {
     "add": "Crear tarea",

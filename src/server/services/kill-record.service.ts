@@ -1,5 +1,9 @@
-import { CharacterClassName, calculateMaxStats } from '@shared/constants/classes'
-import { calculateTierFromKills, getTierProgress, type TierProgressInfo } from '@shared/constants/tier-progression'
+import { CharacterClassName, calculateMaxStats } from '@/shared/constants/classes.constants'
+import {
+  calculateTierFromKills,
+  getTierProgress,
+  type TierProgressInfo
+} from '@/shared/constants/tier-progression.constants'
 import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'

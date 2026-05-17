@@ -1,13 +1,13 @@
-import { getQuestById, QUESTS, selectEnemyWithFallback } from '@shared/constants/quests'
-import { applyStatScaling } from '@shared/constants/enemies'
-import { generateEncounterSequence, getNextEncounterSlot } from '@shared/constants/encounter-patterns'
-import { generateEnemyNameKeys } from '@shared/constants/enemy-names'
-import type { EncounterState } from '@shared/types/combat.types'
-import type { TacticalStateData } from '@shared/types/tactical-combat.types'
+import { generateEncounterSequence, getNextEncounterSlot } from '@/shared/constants/encounter-patterns.constants'
+import { applyStatScaling } from '@/shared/constants/enemies.constants'
+import { generateEnemyNameKeys } from '@/shared/constants/enemy-names.constants'
+import { aggregateLoadoutStats } from '@/shared/constants/items.constants'
+import { getQuestById, QUESTS, selectEnemyWithFallback } from '@/shared/constants/quests.constants'
 import type { CharacterClassType } from '@shared/types/character.types'
-import { TRPCError } from '@trpc/server'
-import { aggregateLoadoutStats } from '@shared/constants/items'
+import type { EncounterState } from '@shared/types/combat.types'
 import type { InventoryItem } from '@shared/types/gamification.types'
+import type { TacticalStateData } from '@shared/types/tactical-combat.types'
+import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
@@ -165,9 +165,7 @@ export class QuestService {
         (c) => c.className === refreshed.currentClass
       )
 
-      const initialHealth = refreshedClass
-        ? Math.min(refreshedClass.health, refreshedClass.maxHealth)
-        : 10
+      const initialHealth = refreshedClass ? Math.min(refreshedClass.health, refreshedClass.maxHealth) : 10
       const maxHealth = refreshedClass?.maxHealth ?? initialHealth
 
       const enemyName = `${nameKeys.prefix}|${nameKeys.suffix}`

@@ -1,15 +1,15 @@
-import type { CharacterClassName, MagicNature } from '@shared/constants/classes'
-import { getAvailableAbilities, getAbilityById, MAX_EQUIPPED_ABILITIES } from '@shared/constants/abilities'
-import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
+import { getAbilityById, getAvailableAbilities, MAX_EQUIPPED_ABILITIES } from '@/shared/constants/abilities.constants'
+import type { CharacterClassName, MagicNature } from '@/shared/constants/classes.constants'
+import { createInventoryItem, TIER_1_ITEMS } from '@/shared/constants/items.constants'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
-import type { CharacterWithClasses } from '@shared/types/character.types'
 import type { AbilityDefinition } from '@shared/types/ability.types'
+import type { CharacterWithClasses } from '@shared/types/character.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { UserRepository } from '../repositories/user.repository'
 import { getCharacterProgress } from '../utils/character.utils'
-import type { ManaService } from './mana.service'
+import type { ManaService, ReserveBreakdown } from './mana.service'
 
 export class CharacterService {
   constructor(
@@ -80,6 +80,18 @@ export class CharacterService {
         equippedAbilities: (c as { equippedAbilities?: string[] }).equippedAbilities || []
       }))
     }
+  }
+
+  async getTodayReserveBreakdown(userId: string, timezoneOffset = 0): Promise<ReserveBreakdown> {
+    return (
+      this.manaService?.getTodayReserveBreakdown(userId, timezoneOffset) ?? {
+        habits: { count: 0, mana: 0 },
+        tasks: { count: 0, mana: 0 },
+        objectives: { count: 0, mana: 0 },
+        journals: { count: 0, mana: 0 },
+        total: 0
+      }
+    )
   }
 
   async updateName(userId: string, name: string) {
@@ -302,10 +314,7 @@ export class CharacterService {
     return { success: true, equippedAbilities: newEquippedAbilities }
   }
 
-  async unequipAbility(
-    userId: string,
-    abilityId: string
-  ): Promise<{ success: boolean; equippedAbilities: string[] }> {
+  async unequipAbility(userId: string, abilityId: string): Promise<{ success: boolean; equippedAbilities: string[] }> {
     const character = await this.characterRepository.getCharacterWithClasses(userId)
     if (!character) {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })

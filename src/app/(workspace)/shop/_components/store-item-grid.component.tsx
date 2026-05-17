@@ -1,10 +1,10 @@
 'use client'
 import EmptyState from '@/components/empty-state.component'
+import type { ItemDefinition } from '@/shared/constants/items.constants'
 import Button from '@/ui/button.component'
 import ScrollArea from '@/ui/scroll-area.component'
-import { Cancel as Close, Search, Store } from 'pixelarticons/react'
-import type { ItemDefinition } from '@shared/constants/items'
 import { ItemType } from '@shared/types/gamification.types'
+import { Cancel as Close, Search, Store } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import StoreItemCard from './store-item-card.component'
 

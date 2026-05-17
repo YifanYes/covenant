@@ -1,4 +1,10 @@
-import { ALL_ITEMS, CONSUMABLES, createInventoryItem, getConsumableById, getItemById } from '@shared/constants/items'
+import {
+  ALL_ITEMS,
+  CONSUMABLES,
+  createInventoryItem,
+  getConsumableById,
+  getItemById
+} from '@/shared/constants/items.constants'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import type { PurchaseResult, StoreListResult } from '@shared/types/store.types'
 import { TRPCError } from '@trpc/server'

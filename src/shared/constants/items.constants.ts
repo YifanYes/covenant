@@ -1,4 +1,4 @@
-import { ItemRarity, ItemType, type InventoryItem } from '../types/gamification.types'
+import { ItemRarity, ItemType, type InventoryItem } from '@shared/types/gamification.types'
 
 export const WeaponDamageType = {
   PHYSICAL: 'PHYSICAL',

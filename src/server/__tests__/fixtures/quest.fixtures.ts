@@ -1,4 +1,4 @@
-import type { QuestStatus } from '@shared/constants/quests'
+import type { QuestStatus } from '@/shared/constants/quests.constants'
 
 export const mockCharacterQuest = (overrides: Record<string, unknown> = {}) => ({
   id: 'quest-instance-1',

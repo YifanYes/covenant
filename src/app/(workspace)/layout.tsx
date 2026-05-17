@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next'
 import ProductivityLayout from './productivity-layout'
 import RPGLayout from './rpg-layout'
 
-const RPG_ROUTES = ['/quests', '/inventory', '/shop', '/guilds']
+const RPG_ROUTES = ['/quests', '/inventory', '/shop', '/guilds', '/tavern']
 
 export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()

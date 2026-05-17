@@ -25,7 +25,7 @@ export default function GuildsLandingPage() {
   }
 
   return (
-    <div className="min-h-screen w-full p-6">
+    <div className="min-h-screen w-full p-4">
       <div className="flex flex-row justify-between gap-4 mb-6">
         <h1 className="text-2xl font-semibold">{t('guilds.title')}</h1>
       </div>

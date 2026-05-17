@@ -2,7 +2,7 @@
 import LoaderButton from '@/common/loader-button.component'
 import { panelChrome, rpgDialogContent } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
-import { queryClient, trpcOptions } from '@/utils/trpc.utils'
+import type { QuestTemplate } from '@/shared/constants/quests.constants'
 import { Badge } from '@/ui/badge.component'
 import Dialog, {
   DialogClose,
@@ -12,13 +12,13 @@ import Dialog, {
   DialogHeader,
   DialogTitle
 } from '@/ui/dialog.component'
+import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { Cancel as Close, Flag, Money } from 'pixelarticons/react'
 import { useRouter } from 'next/navigation'
+import { Cancel as Close, Flag, Money } from 'pixelarticons/react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import type { QuestTemplate } from '@shared/constants/quests'
 
 type QuestWithStatus = QuestTemplate & { isActive: boolean; activeCharacterQuestId: string | null }
 
@@ -124,9 +124,7 @@ export default function QuestsPage() {
               <Flag className="h-20 w-20 text-muted-foreground/20" />
               {selectedQuest.isActive && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                  <Badge className="border-primary/40 bg-primary/15 text-primary">
-                    {t('quests.status.active')}
-                  </Badge>
+                  <Badge className="border-primary/40 bg-primary/15 text-primary">{t('quests.status.active')}</Badge>
                 </div>
               )}
               <span
@@ -146,9 +144,7 @@ export default function QuestsPage() {
             <div className="space-y-4 p-6">
               <DialogHeader>
                 <DialogTitle className="text-xl">{t(selectedQuest.name)}</DialogTitle>
-                <DialogDescription className="leading-relaxed">
-                  {t(selectedQuest.description)}
-                </DialogDescription>
+                <DialogDescription className="leading-relaxed">{t(selectedQuest.description)}</DialogDescription>
               </DialogHeader>
 
               <div className="grid grid-cols-2 gap-3">

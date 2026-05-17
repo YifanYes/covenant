@@ -1,5 +1,5 @@
 'use client'
-import { MagicNature } from '@shared/constants/classes'
+import { MagicNature } from '@/shared/constants/classes.constants'
 import { useTranslation } from 'react-i18next'
 
 interface MagicNatureBadgeProps {

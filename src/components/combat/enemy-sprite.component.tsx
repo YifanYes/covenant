@@ -4,7 +4,7 @@ import { DamageNumberContainer } from '@/components/combat/damage-number.compone
 import SpritePlatform from '@/components/combat/sprite-platform.component'
 import type { CombatAnimationState } from '@/hooks/use-combat-animations.hook'
 import { cn } from '@/lib/cn.lib'
-import { getEnemy } from '@shared/constants/enemies'
+import { getEnemy } from '@/shared/constants/enemies.constants'
 import type { EnemyState } from '@shared/types/gamification.types'
 import { useTranslation } from 'react-i18next'
 

@@ -2,16 +2,16 @@
 import EmptyState from '@/components/empty-state.component'
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
+import { createInventoryItem, TIER_1_ITEMS } from '@/shared/constants/items.constants'
 import Button from '@/ui/button.component'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
-import { Cancel as Close, Users as Group, Search, Suitcase } from 'pixelarticons/react'
-import { createInventoryItem, TIER_1_ITEMS } from '@shared/constants/items'
 import {
   EquipmentTypeFilter,
   ItemType,
   type InventoryCharacter,
   type InventoryItem
 } from '@shared/types/gamification.types'
+import { Cancel as Close, Users as Group, Search, Suitcase } from 'pixelarticons/react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import ItemCard from './item-card.component'

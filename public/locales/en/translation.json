@@ -302,7 +302,16 @@
     },
     "mana_reserve": "Reserve",
     "mana_reserve_badge": "+{{reserve}}",
-    "mana_reserve_tooltip": "Reserve: {{reserve}} mana saved for future fights",
+    "mana_reserve_tooltip": "Reserve: {{reserve}} mana",
+    "mana_reserve_today_empty": "Today: {{total}} mana",
+    "mana_reserve_today_with_sources": "Today: {{total}} mana ({{sources}})",
+    "mana_reserve_source_separator": ", ",
+    "mana_reserve_sources": {
+      "habits": "Habits +{{mana}}",
+      "tasks": "Tasks +{{mana}}",
+      "objectives": "Objectives +{{mana}}",
+      "journals": "Journals +{{mana}}"
+    },
     "targeting": {
       "single": "Select a target",
       "all": "Targeting all enemies",
@@ -1884,7 +1893,8 @@
     "settings": "Settings",
     "shop": "Shop",
     "tasks": "Tasks",
-    "guilds": "Guilds"
+    "guilds": "Guilds",
+    "tavern": "Tavern"
   },
   "sign_up": {
     "already_have_account": "Already have an account?",
@@ -1970,6 +1980,61 @@
     "DOING": "In Progress",
     "DONE": "Done",
     "TODO": "To Do"
+  },
+  "tavern": {
+    "title": "The Tavern",
+    "subtitle": "A live, worldwide chatroom where every player can share news, ask questions, and trade rumors.",
+    "character_count": "{{count}} / {{max}}",
+    "empty": "The fire is lit. The ale is flowing. The room is waiting for its first rumor.",
+    "send": "Send",
+    "refresh": "Refresh",
+    "load_older": "Load older",
+    "delete_message": "Delete this message",
+    "report_message": "Report this message",
+    "unknown_user": "Stranger",
+    "delete_confirm": {
+      "title": "Delete your message?",
+      "description": "This message will be removed from the Tavern. You cannot restore it.",
+      "cta": "Delete"
+    },
+    "report_confirm": {
+      "title": "Report this message?",
+      "description": "Reports are anonymous. Messages with enough reports are hidden from the Tavern.",
+      "cta": "Report"
+    },
+    "new_messages_one": "{{count}} new message",
+    "new_messages_other": "{{count}} new messages",
+    "composer": {
+      "placeholder": "Send a message to the tavern"
+    },
+    "last_updated": {
+      "label": "Last updated {{relative}}",
+      "never": "Updating…",
+      "just_now": "just now",
+      "seconds_one": "{{count}}s ago",
+      "seconds_other": "{{count}}s ago",
+      "minutes_one": "{{count}}m ago",
+      "minutes_other": "{{count}}m ago"
+    },
+    "relative": {
+      "just_now": "just now",
+      "minutes_one": "{{count}}m ago",
+      "minutes_other": "{{count}}m ago",
+      "hours_one": "{{count}}h ago",
+      "hours_other": "{{count}}h ago",
+      "days_one": "{{count}}d ago",
+      "days_other": "{{count}}d ago"
+    },
+    "success": {
+      "delete": "Message deleted.",
+      "report": "Report received. Thanks for keeping the tavern clean."
+    },
+    "error": {
+      "send": "Could not send your message",
+      "delete": "Could not delete the message",
+      "report": "Could not file the report",
+      "load_older": "Could not load older messages"
+    }
   },
   "tasks": {
     "add": "Add Task",

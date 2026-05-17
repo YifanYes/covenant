@@ -1,5 +1,5 @@
-import { CAMPAIGN_EVENT_TYPE } from '@shared/constants/guild-campaigns'
-import { MANA_REWARDS } from '@shared/constants/rewards'
+import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
+import { MANA_REWARDS } from '@/shared/constants/rewards.constants'
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { HabitService } from '../../services/habit.service'

@@ -2,18 +2,18 @@
 import CombatArena from '@/components/combat/combat-arena.component'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/cn.lib'
+import { getEnemy } from '@/shared/constants/enemies.constants'
+import { getQuestById } from '@/shared/constants/quests.constants'
 import { Badge } from '@/ui/badge.component'
 import Button from '@/ui/button.component'
 import { Progress } from '@/ui/progress.component'
 import { useSidebar } from '@/ui/sidebar.component'
 import { trpcOptions } from '@/utils/trpc.utils'
-import { ChevronLeft } from 'pixelarticons/react'
-import { getEnemy } from '@shared/constants/enemies'
-import { getQuestById } from '@shared/constants/quests'
 import { type CombatLogEntry, type EnemyState, type InventoryCharacter } from '@shared/types/gamification.types'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { ChevronLeft } from 'pixelarticons/react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -81,9 +81,7 @@ export default function QuestDetailPage() {
           </Button>
           <div className="flex flex-1 items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold">
-                {questTemplate ? t(questTemplate.name) : t('quests.unknown')}
-              </h1>
+              <h1 className="text-xl font-bold">{questTemplate ? t(questTemplate.name) : t('quests.unknown')}</h1>
               <Badge className="border-emerald-600 bg-emerald-600/15 text-emerald-400">
                 {t('quests.status.active')}
               </Badge>

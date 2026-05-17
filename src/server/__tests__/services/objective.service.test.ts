@@ -1,4 +1,4 @@
-import { MANA_REWARDS } from '@shared/constants/rewards'
+import { MANA_REWARDS } from '@/shared/constants/rewards.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ObjectiveService } from '../../services/objective.service'
 

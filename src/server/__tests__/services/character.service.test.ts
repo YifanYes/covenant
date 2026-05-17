@@ -1,5 +1,5 @@
-import { CharacterClassName } from '@shared/constants/classes'
-import { ALL_ITEMS } from '@shared/constants/items'
+import { CharacterClassName } from '@/shared/constants/classes.constants'
+import { ALL_ITEMS } from '@/shared/constants/items.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CharacterService } from '../../services/character.service'
 import { mockCharacter, mockInventoryItem } from '../fixtures/character.fixtures'

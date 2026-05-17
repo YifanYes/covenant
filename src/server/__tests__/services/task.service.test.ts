@@ -1,4 +1,4 @@
-import { MANA_REWARDS } from '@shared/constants/rewards'
+import { MANA_REWARDS } from '@/shared/constants/rewards.constants'
 import { TaskEffort, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { TaskService } from '../../services/task.service'
