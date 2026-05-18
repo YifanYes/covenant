@@ -1,5 +1,5 @@
-import { TRPCError } from '@trpc/server'
 import { GuildRole } from '@shared/schemas/guilds.schemas'
+import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CharacterRepository } from '../../repositories/character.repository'
 import { GuildService, INVITE_INVALID_REASON } from '../../services/guild.service'
@@ -113,9 +113,7 @@ describe('GuildService', () => {
   describe('updateGuild', () => {
     it('rejects non-owner', async () => {
       memberRepo.findByUserAndGuild.mockResolvedValue({ id: 'm-1', role: GuildRole.OFFICER, guildId: 'g-1' })
-      await expect(
-        service.updateGuild({ guildId: 'g-1', name: 'X' }, 'u1')
-      ).rejects.toBeInstanceOf(TRPCError)
+      await expect(service.updateGuild({ guildId: 'g-1', name: 'X' }, 'u1')).rejects.toBeInstanceOf(TRPCError)
     })
 
     it('updates when owner', async () => {
@@ -266,7 +264,7 @@ describe('GuildService', () => {
     it('OFFICER cannot kick OFFICER', async () => {
       arrange(GuildRole.OFFICER, GuildRole.OFFICER)
       await expect(service.kickMember({ guildId, targetUserId: 'target' }, 'actor')).rejects.toThrow(
-        'Officers cannot kick'
+        'Officers cannot kick other officers'
       )
     })
 
@@ -278,9 +276,7 @@ describe('GuildService', () => {
 
     it('MEMBER cannot kick anyone', async () => {
       arrange(GuildRole.MEMBER, GuildRole.MEMBER)
-      await expect(service.kickMember({ guildId, targetUserId: 'target' }, 'actor')).rejects.toBeInstanceOf(
-        TRPCError
-      )
+      await expect(service.kickMember({ guildId, targetUserId: 'target' }, 'actor')).rejects.toBeInstanceOf(TRPCError)
     })
 
     it('nobody can kick OWNER', async () => {
@@ -380,9 +376,9 @@ describe('GuildService', () => {
     })
 
     it('rejects transfer to self', async () => {
-      await expect(
-        service.transferOwnership({ guildId: 'g-1', newOwnerUserId: 'owner' }, 'owner')
-      ).rejects.toThrow('already own')
+      await expect(service.transferOwnership({ guildId: 'g-1', newOwnerUserId: 'owner' }, 'owner')).rejects.toThrow(
+        'already own'
+      )
     })
 
     it('rejects when target is not in guild', async () => {
@@ -391,9 +387,9 @@ describe('GuildService', () => {
         return null
       })
 
-      await expect(
-        service.transferOwnership({ guildId: 'g-1', newOwnerUserId: 'ghost' }, 'owner')
-      ).rejects.toThrow('not in this guild')
+      await expect(service.transferOwnership({ guildId: 'g-1', newOwnerUserId: 'ghost' }, 'owner')).rejects.toThrow(
+        'not in this guild'
+      )
     })
   })
 
@@ -404,9 +400,9 @@ describe('GuildService', () => {
 
     it('rejects when active invite cap reached', async () => {
       inviteRepo.countActiveByGuild.mockResolvedValue(5)
-      await expect(
-        service.createInvite({ guildId: 'g-1', expiresInHours: 168 }, 'u1')
-      ).rejects.toThrow('Active invite limit reached')
+      await expect(service.createInvite({ guildId: 'g-1', expiresInHours: 168 }, 'u1')).rejects.toThrow(
+        'Active invite limit reached'
+      )
     })
 
     it('creates invite below cap', async () => {

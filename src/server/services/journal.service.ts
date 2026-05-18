@@ -2,9 +2,12 @@ import { sanitizeRichText } from '@shared/lib/sanitize-rich-text.lib'
 import type { CreateJournalEntryType, UpdateJournalEntryType } from '@shared/schemas/journal.schemas'
 import { TRPCError } from '@trpc/server'
 import { Prisma, type PrismaClient } from '@/generated/prisma'
-import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
+import { resourceNotFound } from '../lib/errors'
+import { logger } from '../lib/logger'
 import type { JournalRepository } from '../repositories/journal.repository'
 import type { ManaService } from './mana.service'
+
+const log = logger.child({ service: 'journal' })
 
 export class JournalService {
   constructor(
@@ -62,7 +65,8 @@ export class JournalService {
   async getById(userId: string, id: string) {
     const entry = await this.journalRepository.findById(id, userId)
     if (!entry) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+      log.warn({ entryId: id, userId }, 'getById: journal entry not found or not owned by user')
+      throw resourceNotFound()
     }
     return entry
   }

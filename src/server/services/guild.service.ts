@@ -26,7 +26,7 @@ import type {
 import { GuildRole, type GuildRoleType } from '@shared/schemas/guilds.schemas'
 import { TRPCError } from '@trpc/server'
 import { randomBytes } from 'node:crypto'
-import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
+import { resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { GuildInviteRepository } from '../repositories/guild-invite.repository'
@@ -48,7 +48,7 @@ const DEFAULT_FACTION = 'HOLY_KNIGHTS'
 const MAX_ACTIVE_INVITES_PER_GUILD = 5
 const PRISMA_UNIQUE_CONSTRAINT = 'P2002'
 
-const notFound = () => new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+const notFound = resourceNotFound
 
 function isRewardPool(value: unknown): value is RewardPoolType {
   return (
@@ -184,9 +184,17 @@ export class GuildService {
     if (!target) throw notFound()
 
     if (target.role === GuildRole.OWNER) {
+      log.warn(
+        { guildId: input.guildId, actorId: userId, targetId: input.targetUserId },
+        'Attempt to kick guild owner'
+      )
       throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot kick the guild owner' })
     }
     if (actor.role === GuildRole.OFFICER && target.role === GuildRole.OFFICER) {
+      log.warn(
+        { guildId: input.guildId, actorId: userId, targetId: input.targetUserId },
+        'Officer attempted to kick another officer'
+      )
       throw new TRPCError({ code: 'FORBIDDEN', message: 'Officers cannot kick other officers' })
     }
 
@@ -203,6 +211,10 @@ export class GuildService {
     const target = await this.guildMemberRepository.findByUserAndGuild(input.targetUserId, input.guildId)
     if (!target) throw notFound()
     if (target.role === GuildRole.OWNER) {
+      log.warn(
+        { guildId: input.guildId, actorId: userId, targetId: input.targetUserId },
+        'Attempt to change owner role via updateRole'
+      )
       throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot change the owner role here' })
     }
 
@@ -629,7 +641,8 @@ export class GuildService {
 
     const character = await this.characterRepository.findByUserId(userId)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      log.warn({ userId, campaignId }, 'claimCampaignReward: character not found')
+      throw notFound()
     }
 
     return this.prisma.$transaction(async (tx) => {

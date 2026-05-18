@@ -4,7 +4,7 @@ import type {
 } from '@shared/schemas/tavern.schemas'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '@/generated/prisma'
-import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
+import { resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { TavernMessageRepository } from '../repositories/tavern-message.repository'
@@ -72,8 +72,8 @@ export class TavernService {
   async deleteMessage(id: string, userId: string) {
     const deleted = await this.tavernMessageRepository.softDeleteByAuthor(id, userId)
     if (deleted === 0) {
-      log.warn({ messageId: id, userId }, 'Unauthorized or missing tavern message delete')
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+      log.warn({ messageId: id, userId }, 'deleteMessage: unauthorized or missing tavern message')
+      throw resourceNotFound()
     }
     return { message: 'Message deleted' }
   }
@@ -86,7 +86,8 @@ export class TavernService {
           select: { userId: true }
         })
         if (!message) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+          log.warn({ messageId, reporterId }, 'reportMessage: tavern message not found')
+          throw resourceNotFound()
         }
         if (message.userId === reporterId) {
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'You cannot report your own message' })
@@ -99,7 +100,8 @@ export class TavernService {
           data: { reportCount: { increment: 1 } }
         })
         if (updated.count === 0) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+          log.warn({ messageId, reporterId }, 'reportMessage: tavern message gone after report insert')
+          throw resourceNotFound()
         }
       })
     } catch (error) {

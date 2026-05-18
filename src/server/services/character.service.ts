@@ -7,10 +7,14 @@ import type { AbilityDefinition } from '@shared/types/ability.types'
 import type { CharacterWithClasses } from '@shared/types/character.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
+import { resourceNotFound } from '../lib/errors'
+import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { UserRepository } from '../repositories/user.repository'
 import { getCharacterProgress } from '../utils/character.utils'
 import type { ManaService, ReserveBreakdown } from './mana.service'
+
+const log = logger.child({ service: 'character' })
 
 export class CharacterService {
   constructor(
@@ -143,7 +147,8 @@ export class CharacterService {
     }
 
     if (!itemToEquip) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Item ${itemId} not found` })
+      log.warn({ userId, itemId }, 'equipItem: item not found')
+      throw resourceNotFound()
     }
 
     const slotType = this.getSlotType(itemToEquip.type)
@@ -183,7 +188,8 @@ export class CharacterService {
 
     const itemIndex = loadout.findIndex((item) => this.getSlotType(item.type) === slotType)
     if (itemIndex === -1) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'No item equipped in that slot' })
+      log.warn({ userId, slotType }, 'unequipItem: no item equipped in that slot')
+      throw resourceNotFound()
     }
 
     const itemToUnequip = loadout[itemIndex]
@@ -209,7 +215,8 @@ export class CharacterService {
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
 
     if (!currentClass) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
+      log.error({ userId, currentClass: character.currentClass }, 'revive: current class not found (data integrity)')
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Current class not found' })
     }
 
     await this.characterRepository.updateHealth(currentClass.id, currentClass.maxHealth, currentClass.maxMana)
@@ -238,12 +245,14 @@ export class CharacterService {
   async getAvailableAbilitiesForCharacter(userId: string): Promise<AbilityDefinition[]> {
     const character = await this.characterRepository.getCharacterWithClasses(userId)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      log.warn({ userId }, 'getAvailableAbilitiesForCharacter: character not found')
+      throw resourceNotFound()
     }
 
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     if (!currentClass) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
+      log.error({ userId, currentClass: character.currentClass }, 'getAvailableAbilitiesForCharacter: current class not found (data integrity)')
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Current class not found' })
     }
 
     return getAvailableAbilities(
@@ -256,12 +265,14 @@ export class CharacterService {
   async getEquippedAbilities(userId: string): Promise<AbilityDefinition[]> {
     const character = await this.characterRepository.getCharacterWithClasses(userId)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      log.warn({ userId }, 'getEquippedAbilities: character not found')
+      throw resourceNotFound()
     }
 
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     if (!currentClass) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
+      log.error({ userId, currentClass: character.currentClass }, 'getEquippedAbilities: current class not found (data integrity)')
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Current class not found' })
     }
 
     const equippedIds = (currentClass as unknown as { equippedAbilities: string[] }).equippedAbilities || []
@@ -271,27 +282,35 @@ export class CharacterService {
   async equipAbility(userId: string, abilityId: string): Promise<{ success: boolean; equippedAbilities: string[] }> {
     const character = await this.characterRepository.getCharacterWithClasses(userId)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      log.warn({ userId }, 'equipAbility: character not found')
+      throw resourceNotFound()
     }
 
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     if (!currentClass) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
+      log.error({ userId, currentClass: character.currentClass }, 'equipAbility: current class not found (data integrity)')
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Current class not found' })
     }
 
-    // Validate ability exists
     const ability = getAbilityById(abilityId)
     if (!ability) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Ability not found' })
+      log.warn({ userId, abilityId }, 'equipAbility: ability id not found')
+      throw resourceNotFound()
     }
 
-    // Validate ability is for this class
     if (ability.className !== currentClass.className) {
+      log.warn(
+        { userId, abilityId, abilityClass: ability.className, currentClass: currentClass.className },
+        'equipAbility: ability class mismatch'
+      )
       throw new TRPCError({ code: 'FORBIDDEN', message: 'Ability not available for this class' })
     }
 
-    // Validate tier requirement
     if (ability.tier > currentClass.tier) {
+      log.warn(
+        { userId, abilityId, abilityTier: ability.tier, currentTier: currentClass.tier },
+        'equipAbility: tier requirement not met'
+      )
       throw new TRPCError({ code: 'FORBIDDEN', message: 'Tier requirement not met' })
     }
 
@@ -318,12 +337,14 @@ export class CharacterService {
   async unequipAbility(userId: string, abilityId: string): Promise<{ success: boolean; equippedAbilities: string[] }> {
     const character = await this.characterRepository.getCharacterWithClasses(userId)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      log.warn({ userId }, 'unequipAbility: character not found')
+      throw resourceNotFound()
     }
 
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     if (!currentClass) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Current class not found' })
+      log.error({ userId, currentClass: character.currentClass }, 'unequipAbility: current class not found (data integrity)')
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Current class not found' })
     }
 
     const equippedAbilities = (currentClass as unknown as { equippedAbilities: string[] }).equippedAbilities || []

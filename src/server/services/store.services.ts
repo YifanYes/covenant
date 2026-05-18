@@ -8,9 +8,13 @@ import {
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import type { PurchaseResult, StoreListResult } from '@shared/types/store.types'
 import { TRPCError } from '@trpc/server'
+import { resourceNotFound } from '../lib/errors'
+import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CharacterService } from './character.service'
 import type { GuildService } from './guild.service'
+
+const log = logger.child({ service: 'store' })
 
 // Precomputed at module load: only pay for the guild lookup in `listAvailableItems`
 // when the item catalog actually contains a guild-exclusive entry.
@@ -27,7 +31,8 @@ export class StoreService {
     const character = await this.characterRepository.findWithClasses(userId)
 
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      log.warn({ userId }, 'listAvailableItems: character not found')
+      throw resourceNotFound()
     }
 
     const { tier } = this.characterService.getCharacterProgress(character)
@@ -65,7 +70,8 @@ export class StoreService {
     const character = await this.characterRepository.findWithClasses(userId)
 
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      log.warn({ userId }, 'purchaseItems: character not found')
+      throw resourceNotFound()
     }
 
     const { tier: characterTier } = this.characterService.getCharacterProgress(character)
@@ -85,7 +91,8 @@ export class StoreService {
 
       const item = getItemById(id)
       if (!item) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: `Item ${id} not found` })
+        log.warn({ userId, itemId: id }, 'purchaseItems: item definition not found')
+        throw resourceNotFound()
       }
       if (item.price <= 0) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: `Item ${id} is not purchasable` })

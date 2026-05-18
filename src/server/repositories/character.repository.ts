@@ -6,7 +6,7 @@ import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import type { CharacterDataType, InventoryItemType } from '@shared/schemas/inventory.schemas'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
-import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN, resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 
 const log = logger.child({ component: 'character-repository' })
@@ -23,7 +23,8 @@ export class CharacterRepository {
   async findByUserIdOrThrow(userId: string): Promise<Character> {
     const character = await this.findByUserId(userId)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      log.warn({ userId }, 'findByUserIdOrThrow: character not found')
+      throw resourceNotFound()
     }
     return character
   }
@@ -40,7 +41,8 @@ export class CharacterRepository {
   async findWithClassesOrThrow(userId: string): Promise<CharacterWithClasses> {
     const character = await this.findWithClasses(userId)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      log.warn({ userId }, 'findWithClassesOrThrow: character not found')
+      throw resourceNotFound()
     }
     return character
   }

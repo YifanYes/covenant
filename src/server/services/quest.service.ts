@@ -8,11 +8,14 @@ import type { EncounterState } from '@shared/types/combat.types'
 import type { InventoryItem } from '@shared/types/gamification.types'
 import type { TacticalStateData } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
-import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
+import { resourceNotFound } from '../lib/errors'
+import { logger } from '../lib/logger'
 import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { CharacterService } from './character.service'
 import type { ManaService } from './mana.service'
+
+const log = logger.child({ service: 'quest' })
 
 export class QuestService {
   constructor(
@@ -25,14 +28,16 @@ export class QuestService {
   private async assertCharacterOwnership(characterId: string, userId: string): Promise<void> {
     const isOwner = await this.characterService.verifyCharacterOwnership(characterId, userId)
     if (!isOwner) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+      log.warn({ userId, characterId }, 'assertCharacterOwnership: ownership check failed')
+      throw resourceNotFound()
     }
   }
 
   private async assertQuestOwnership(questId: string, userId: string): Promise<void> {
     const isOwner = await this.characterQuestRepository.verifyOwnership(questId, userId)
     if (!isOwner) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+      log.warn({ userId, questId }, 'assertQuestOwnership: ownership check failed')
+      throw resourceNotFound()
     }
   }
 
@@ -113,7 +118,8 @@ export class QuestService {
 
     const template = getQuestById(questId)
     if (!template) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Quest ${questId} not found` })
+      log.warn({ userId, characterId, questId }, 'startQuest: quest template not found')
+      throw resourceNotFound()
     }
 
     const existing = await this.characterQuestRepository.findActiveByCharacterId(characterId)
@@ -141,7 +147,11 @@ export class QuestService {
       const currentSlot = getNextEncounterSlot(encounterPattern, 0)
       const selected = selectEnemyWithFallback(template.enemySpawnWeights, characterTier, currentSlot?.type)
       if (!selected) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'No suitable enemy found for spawn' })
+        log.error(
+          { userId, characterId, questId, characterTier, slot: currentSlot?.type },
+          'startQuest: no suitable enemy found for spawn (catalog gap)'
+        )
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'No suitable enemy found for spawn' })
       }
 
       const scaledTemplate = applyStatScaling(selected.template, characterTier)

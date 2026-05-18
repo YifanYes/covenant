@@ -4,8 +4,8 @@ import type { CharacterClassType, CharacterWithClasses } from '@shared/types/cha
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import type { TacticalMoveResult, TacticalStateData } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
-
-import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
+import { resourceNotFound } from '../lib/errors'
+import { logger } from '../lib/logger'
 import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
@@ -15,6 +15,8 @@ import type { CharacterService } from './character.service'
 import type { GuildService } from './guild.service'
 import type { KillRecordService } from './kill-record.service'
 import type { ManaService } from './mana.service'
+
+const log = logger.child({ service: 'combat' })
 
 // Combine an auto-run enemy turn (when recovery fired) with the player's move so
 // the FE receives both halves of the round: enemy logs/effects render first, then
@@ -49,18 +51,21 @@ export class CombatService {
   private async assertQuestOwnership(questId: string, userId: string): Promise<void> {
     const isOwner = await this.characterQuestRepository.verifyOwnership(questId, userId)
     if (!isOwner) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+      log.warn({ userId, questId }, 'assertQuestOwnership: ownership check failed')
+      throw resourceNotFound()
     }
   }
 
   private async getCurrentClassForUser(userId: string): Promise<CharacterClassType> {
     const character = await this.characterService.getCurrentClass(userId)
     if (!character) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character not found' })
+      log.warn({ userId }, 'getCurrentClassForUser: character not found')
+      throw resourceNotFound()
     }
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     if (!currentClass) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Character class not found' })
+      log.error({ userId, currentClass: character.currentClass }, 'getCurrentClassForUser: character class not found (data integrity)')
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Character class not found' })
     }
     return currentClass as unknown as CharacterClassType
   }
@@ -68,7 +73,8 @@ export class CombatService {
   private getCurrentClassFromCharacter(character: CharacterWithClasses): CharacterClassType {
     const c = character.classes.find((cl) => cl.className === character.currentClass)
     if (!c) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Character class ${character.currentClass} not found` })
+      log.error({ characterId: character.id, currentClass: character.currentClass }, 'getCurrentClassFromCharacter: character class not found (data integrity)')
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Character class not found' })
     }
     return c
   }
@@ -91,7 +97,8 @@ export class CombatService {
   ): Promise<{ success: boolean; healthRestored?: number; manaRestored?: number }> {
     const consumable = getConsumableById(consumableId)
     if (!consumable) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Consumable ${consumableId} not found` })
+      log.warn({ userId, consumableId }, 'useConsumable: consumable definition not found')
+      throw resourceNotFound()
     }
 
     const character = await this.characterRepository.findWithClassesOrThrow(userId)
@@ -101,7 +108,8 @@ export class CombatService {
       (item) => item.type === ItemType.CONSUMABLE && item.definitionId === consumableId
     )
     if (itemIndex === -1) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: `Consumable ${consumableId} not in inventory` })
+      log.warn({ userId, consumableId }, 'useConsumable: consumable not in inventory')
+      throw resourceNotFound()
     }
 
     const currentClass = this.getCurrentClassFromCharacter(character)
@@ -175,6 +183,7 @@ export class CombatService {
   ): Promise<TacticalMoveResult> {
     await this.assertQuestOwnership(questId, userId)
     if (!casterId.startsWith('player-')) {
+      log.warn({ userId, questId, casterId, moveId }, 'playerExecuteMove: caster is not a player unit')
       throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot execute move for enemy units' })
     }
 
@@ -249,8 +258,10 @@ export class CombatService {
   async playerEnemyTurn(userId: string, questId: string, enemyId: string): Promise<TacticalMoveResult> {
     await this.assertQuestOwnership(questId, userId)
     if (enemyId.startsWith('player-')) {
+      log.warn({ userId, questId, enemyId }, 'playerEnemyTurn: enemyId is a player unit')
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot execute AI turn for player units' })
     }
+
     return this.withQuestLock(questId, () =>
       executeEnemyMove({ participationId: questId, enemyId, repos: this.repos, userId })
     )

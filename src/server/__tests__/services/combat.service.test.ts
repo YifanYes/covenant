@@ -1,6 +1,8 @@
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '@/server/lib/errors'
 import { ItemType } from '@shared/types/gamification.types'
 import type { TacticalMoveResult, TacticalStateData } from '@shared/types/tactical-combat.types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { CombatService } from '../../services/combat.service'
 
 const executeMoveMock = vi.fn()
 const executeEnemyMoveMock = vi.fn()
@@ -8,8 +10,6 @@ vi.mock('../../utils/combat/move-resolution', () => ({
   executeMove: (args: unknown) => executeMoveMock(args),
   executeEnemyMove: (args: unknown) => executeEnemyMoveMock(args)
 }))
-
-import { CombatService } from '../../services/combat.service'
 
 const createMockCharacter = (
   health: number,
@@ -129,11 +129,15 @@ describe('CombatService (Phase 2A)', () => {
 
     it('throws if consumable not in inventory', async () => {
       mockCharacterRepo.findWithClassesOrThrow.mockResolvedValue(createMockCharacter(20, 50, 5, 10, []))
-      await expect(combatService.useConsumable('user-1', 'health_potion')).rejects.toThrow('not in inventory')
+      await expect(combatService.useConsumable('user-1', 'health_potion')).rejects.toThrow(
+        RESOURCE_NOT_FOUND_OR_FORBIDDEN
+      )
     })
 
     it('throws if consumable definition does not exist', async () => {
-      await expect(combatService.useConsumable('user-1', 'invalid_potion')).rejects.toThrow('not found')
+      await expect(combatService.useConsumable('user-1', 'invalid_potion')).rejects.toThrow(
+        RESOURCE_NOT_FOUND_OR_FORBIDDEN
+      )
     })
 
     it('blocks a second potion in the same turn when markPotionTurn is set', async () => {
@@ -253,13 +257,9 @@ describe('CombatService (Phase 2A)', () => {
       executeEnemyMoveMock.mockResolvedValue(mkEnemyResult())
       executeMoveMock.mockResolvedValue(mkPlayerResult())
 
-      const result = await combatService.playerExecuteMove(
-        'user-1',
-        'quest-1',
-        'player-1',
-        'basic_strike',
-        ['enemy-spawn-1']
-      )
+      const result = await combatService.playerExecuteMove('user-1', 'quest-1', 'player-1', 'basic_strike', [
+        'enemy-spawn-1'
+      ])
 
       expect(executeEnemyMoveMock).toHaveBeenCalledTimes(1)
       expect(executeEnemyMoveMock.mock.calls[0][0]).toMatchObject({
@@ -284,13 +284,9 @@ describe('CombatService (Phase 2A)', () => {
       })
       executeEnemyMoveMock.mockResolvedValue(lethal)
 
-      const result = await combatService.playerExecuteMove(
-        'user-1',
-        'quest-1',
-        'player-1',
-        'basic_strike',
-        ['enemy-spawn-1']
-      )
+      const result = await combatService.playerExecuteMove('user-1', 'quest-1', 'player-1', 'basic_strike', [
+        'enemy-spawn-1'
+      ])
 
       expect(executeEnemyMoveMock).toHaveBeenCalledTimes(1)
       expect(executeMoveMock).not.toHaveBeenCalled()
@@ -317,9 +313,7 @@ describe('CombatService (Phase 2A)', () => {
         characterId: 'char-1',
         tacticalState: {
           ...stuckState,
-          units: stuckState.units.map((u) =>
-            u.id === 'enemy-spawn-1' ? { ...u, currentHealth: 0 } : u
-          )
+          units: stuckState.units.map((u) => (u.id === 'enemy-spawn-1' ? { ...u, currentHealth: 0 } : u))
         }
       })
       executeMoveMock.mockResolvedValue(mkPlayerResult())
@@ -336,7 +330,7 @@ describe('CombatService (Phase 2A)', () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
       await expect(
         combatService.playerExecuteMove('user-1', 'quest-1', 'player-1', 'basic_strike', ['enemy-1'])
-      ).rejects.toThrow('Resource not found or access denied')
+      ).rejects.toThrow(RESOURCE_NOT_FOUND_OR_FORBIDDEN)
     })
 
     it('playerExecuteMove throws FORBIDDEN if casterId is not a player unit', async () => {
@@ -349,7 +343,7 @@ describe('CombatService (Phase 2A)', () => {
     it('playerEnemyTurn throws NOT_FOUND if user does not own the quest', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
       await expect(combatService.playerEnemyTurn('user-1', 'quest-1', 'enemy-1')).rejects.toThrow(
-        'Resource not found or access denied'
+        RESOURCE_NOT_FOUND_OR_FORBIDDEN
       )
     })
 
@@ -363,7 +357,7 @@ describe('CombatService (Phase 2A)', () => {
     it('playerUsePotion throws NOT_FOUND if user does not own the quest', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
       await expect(combatService.playerUsePotion('user-1', 'quest-1', 'health_potion')).rejects.toThrow(
-        'Resource not found or access denied'
+        RESOURCE_NOT_FOUND_OR_FORBIDDEN
       )
     })
   })

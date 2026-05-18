@@ -19,11 +19,6 @@
     - **Repo metadata** (Settings → General): Description "Gamified productivity platform with RPG-style progression"; Topics `nextjs trpc prisma postgresql gamification productivity rpg`; Website `https://covenantrpg.com`
     - **Repo secrets** (Settings → Secrets and variables → Actions): `SENTRY_AUTH_TOKEN` only. No `RAILWAY_TOKEN` — Railway uses its GitHub app, no Actions deploy workflow today.
 
-- [ ] Security: type safety — replace `as any` usages. Including the `inventory` / `loadout` JSON-field casts in `character.repository.ts:107-108` (replace with Zod-inferred types from `src/shared/schemas/`).
-
-- [ ] Security: error messages leak resource existence. Multiple service files distinguish "not found" from "forbidden" in their error messages, leaking existence of records the caller doesn't own.
-  - **Fix:** Use generic "Resource not found or access denied" messages.
-
 - [ ] Security: Sentry `sendDefaultPii: true` ships user IP/email/headers to Sentry. Configured in `sentry.shared.config.ts:18`. Fine operationally (Sentry is SOC 2), but must be disclosed in privacy policy. Consider `beforeSend` scrubber to strip email, keeping only `userId`.
 
 - [ ] Combat: ability cast clobbers stale `currentClass.health`.

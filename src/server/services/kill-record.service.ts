@@ -5,8 +5,12 @@ import {
   type TierProgressInfo
 } from '@/shared/constants/tier-progression.constants'
 import { TRPCError } from '@trpc/server'
+import { resourceNotFound } from '../lib/errors'
+import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
+
+const log = logger.child({ service: 'kill-record' })
 
 export interface TierProgressionResult {
   tierChanged: boolean
@@ -64,10 +68,8 @@ export class KillRecordService {
   async checkAndApplyTierProgression(userId: string): Promise<TierProgressionResult> {
     const character = await this.characterRepository.findWithClasses(userId)
     if (!character) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Character not found'
-      })
+      log.warn({ userId }, 'checkAndApplyTierProgression: character not found')
+      throw resourceNotFound()
     }
 
     return this.applyTierProgressionForCharacter(character)
@@ -80,10 +82,8 @@ export class KillRecordService {
   async checkAndApplyTierProgressionByCharacterId(characterId: string): Promise<TierProgressionResult> {
     const character = await this.characterRepository.findByIdWithClasses(characterId)
     if (!character) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Character not found'
-      })
+      log.warn({ characterId }, 'checkAndApplyTierProgressionByCharacterId: character not found')
+      throw resourceNotFound()
     }
 
     return this.applyTierProgressionForCharacter(character)
@@ -94,9 +94,13 @@ export class KillRecordService {
   ): Promise<TierProgressionResult> {
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     if (!currentClass) {
+      log.error(
+        { characterId: character.id, currentClass: character.currentClass },
+        'applyTierProgressionForCharacter: current class not found (data integrity)'
+      )
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: `Current class ${character.currentClass} not found for character ${character.id}`
+        message: 'Current class not found'
       })
     }
 

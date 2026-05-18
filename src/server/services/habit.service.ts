@@ -1,7 +1,6 @@
 import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
-import { TRPCError } from '@trpc/server'
-import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
+import { resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { HabitRepository } from '../repositories/habit.repository'
 import type { GuildService } from './guild.service'
@@ -35,11 +34,12 @@ export class HabitService {
     const habit = await this.habitRepository.findByIdWithDetails(id)
 
     if (!habit) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+      log.warn({ habitId: id, userId }, 'getById: habit not found')
+      throw resourceNotFound()
     }
     if (habit.userId !== userId) {
-      log.warn({ resourceId: id, requestingUserId: userId }, 'Unauthorized habit access attempt')
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+      log.warn({ habitId: id, requestingUserId: userId, ownerId: habit.userId }, 'getById: ownership check failed')
+      throw resourceNotFound()
     }
 
     return { habit }
@@ -92,11 +92,15 @@ export class HabitService {
     const completion = await this.habitRepository.findCompletionById(completionId)
 
     if (!completion) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+      log.warn({ completionId, userId }, 'deleteCompletion: completion not found')
+      throw resourceNotFound()
     }
     if (completion.userId !== userId) {
-      log.warn({ resourceId: completionId, requestingUserId: userId }, 'Unauthorized habit completion access attempt')
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+      log.warn(
+        { completionId, requestingUserId: userId, ownerId: completion.userId },
+        'deleteCompletion: ownership check failed'
+      )
+      throw resourceNotFound()
     }
 
     await this.habitRepository.deleteCompletion(completionId)
