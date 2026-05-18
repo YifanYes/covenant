@@ -18,7 +18,7 @@ echo "🔍 Running lint..."
 pnpm lint
 
 echo "📝 Running TypeScript check..."
-npx tsc --noEmit
+pnpm typecheck
 
 echo "🏗️  Running production build..."
 pnpm build

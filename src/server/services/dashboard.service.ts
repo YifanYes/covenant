@@ -250,10 +250,10 @@ export class DashboardService {
       ? this.characterService.getCharacterProgress(character)
       : { currentClass: undefined, manaReserve: 0 }
 
-    const { completedToday, totalDaily, meanHabitRate } = this.getHabitMetrics(habits as any, now)
-    const { mostCommonType, mostFocusedArea, mostFocusedObjective } = this.getEfficiencyMetrics(metricsTasks as any)
+    const { completedToday, totalDaily, meanHabitRate } = this.getHabitMetrics(habits, now)
+    const { mostCommonType, mostFocusedArea, mostFocusedObjective } = this.getEfficiencyMetrics(metricsTasks)
     const parsedUpcomingTasks = this.parseUpcomingTasks(upcomingTasks)
-    const { areas, objectives } = this.getActiveAreasAndObjectives(allAreas as any, habitsWithAreas as any, now)
+    const { areas, objectives } = this.getActiveAreasAndObjectives(allAreas, habitsWithAreas, now)
 
     return {
       characterName: character?.name || null,

@@ -17,44 +17,44 @@ export const createGuildSchema = z.object({
 export type CreateGuildType = z.infer<typeof createGuildSchema>
 
 export const updateGuildSchema = z.object({
-  guildId: z.string().uuid(),
+  guildId: z.uuid(),
   name: z.string().trim().min(3).max(80).optional(),
   description: z.string().trim().max(500).optional()
 })
 export type UpdateGuildType = z.infer<typeof updateGuildSchema>
 
 export const guildIdSchema = z.object({
-  guildId: z.string().uuid()
+  guildId: z.uuid()
 })
 export type GuildIdType = z.infer<typeof guildIdSchema>
 
 export const sendMessageSchema = z.object({
-  guildId: z.string().uuid(),
+  guildId: z.uuid(),
   content: z.string().trim().min(1).max(2000)
 })
 export type SendMessageType = z.infer<typeof sendMessageSchema>
 
 export const getMessagesSchema = z.object({
-  guildId: z.string().uuid(),
+  guildId: z.uuid(),
   limit: z.number().int().min(1).max(100).optional(),
-  before: z.string().datetime().optional()
+  before: z.iso.datetime().optional()
 })
 export type GetMessagesType = z.infer<typeof getMessagesSchema>
 
 export const deleteMessageSchema = z.object({
-  messageId: z.string().uuid()
+  messageId: z.uuid()
 })
 export type DeleteMessageType = z.infer<typeof deleteMessageSchema>
 
 export const createInviteSchema = z.object({
-  guildId: z.string().uuid(),
+  guildId: z.uuid(),
   expiresInHours: z.number().int().min(1).max(168).default(168),
   maxUses: z.number().int().positive().max(1000).optional()
 })
 export type CreateInviteType = z.infer<typeof createInviteSchema>
 
 export const revokeInviteSchema = z.object({
-  inviteId: z.string().uuid()
+  inviteId: z.uuid()
 })
 export type RevokeInviteType = z.infer<typeof revokeInviteSchema>
 
@@ -64,19 +64,19 @@ export const inviteTokenSchema = z.object({
 export type InviteTokenType = z.infer<typeof inviteTokenSchema>
 
 export const kickMemberSchema = z.object({
-  guildId: z.string().uuid(),
+  guildId: z.uuid(),
   targetUserId: z.string().min(1)
 })
 export type KickMemberType = z.infer<typeof kickMemberSchema>
 
 export const transferOwnershipSchema = z.object({
-  guildId: z.string().uuid(),
+  guildId: z.uuid(),
   newOwnerUserId: z.string().min(1)
 })
 export type TransferOwnershipType = z.infer<typeof transferOwnershipSchema>
 
 export const updateRoleSchema = z.object({
-  guildId: z.string().uuid(),
+  guildId: z.uuid(),
   targetUserId: z.string().min(1),
   role: z.enum([GuildRole.OFFICER, GuildRole.MEMBER])
 })
@@ -88,12 +88,12 @@ export const rewardPoolSchema = z.object({
 export type RewardPoolType = z.infer<typeof rewardPoolSchema>
 
 export const startCampaignSchema = z.object({
-  guildId: z.string().uuid(),
+  guildId: z.uuid(),
   templateId: z.string().min(1).max(64)
 })
 export type StartCampaignType = z.infer<typeof startCampaignSchema>
 
 export const campaignIdSchema = z.object({
-  campaignId: z.string().uuid()
+  campaignId: z.uuid()
 })
 export type CampaignIdType = z.infer<typeof campaignIdSchema>

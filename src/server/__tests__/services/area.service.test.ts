@@ -19,7 +19,7 @@ describe('AreaService', () => {
   })
 
   it('create passes userId and input to repo', async () => {
-    const input = { name: 'Health', color: '#FF0000', icon: 'heart' } as any
+    const input = { name: 'Health', color: '#FF0000', icon: 'heart' }
     mockAreaRepo.create.mockResolvedValue({ id: 'a-1', ...input })
 
     const result = await areaService.create('user-1', input)
@@ -36,7 +36,7 @@ describe('AreaService', () => {
   })
 
   it('update passes id, userId, input to repo', async () => {
-    const input = { id: 'a-1', name: 'Renamed' } as any
+    const input = { id: 'a-1', name: 'Renamed' }
     mockAreaRepo.update.mockResolvedValue({ id: 'a-1', name: 'Renamed' })
 
     const result = await areaService.update('user-1', input)

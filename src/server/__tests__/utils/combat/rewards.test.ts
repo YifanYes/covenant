@@ -1,4 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
+import type { CharacterQuestRepository } from '../../../repositories/character-quest.repository'
+import type { CharacterRepository } from '../../../repositories/character.repository'
+import type { CombatEnemyRepository } from '../../../repositories/combat-enemy.repository'
+import type { GuildService } from '../../../services/guild.service'
 import { createTacticalStateWithNewEnemy, processEnemyDefeat } from '../../../utils/combat/rewards'
 import { createTestTacticalState, createTestUnit } from '../../fixtures/tactical-state.fixtures'
 
@@ -119,10 +123,10 @@ describe('rewards utilities', () => {
         state,
         ['enemy-1'],
         {
-          characterRepository: characterRepo as any,
-          characterQuestRepository: characterQuestRepo as any,
-          combatEnemyRepository: combatEnemyRepo as any,
-          guildService: guildService as any
+          characterRepository: characterRepo as unknown as CharacterRepository,
+          characterQuestRepository: characterQuestRepo as unknown as CharacterQuestRepository,
+          combatEnemyRepository: combatEnemyRepo as unknown as CombatEnemyRepository,
+          guildService: guildService as unknown as GuildService
         },
         'user-1'
       )
@@ -147,9 +151,9 @@ describe('rewards utilities', () => {
         state,
         ['enemy-1'],
         {
-          characterRepository: characterRepo as any,
-          characterQuestRepository: characterQuestRepo as any,
-          combatEnemyRepository: combatEnemyRepo as any
+          characterRepository: characterRepo as unknown as CharacterRepository,
+          characterQuestRepository: characterQuestRepo as unknown as CharacterQuestRepository,
+          combatEnemyRepository: combatEnemyRepo as unknown as CombatEnemyRepository
         },
         'user-1'
       )
@@ -172,10 +176,10 @@ describe('rewards utilities', () => {
         state,
         ['enemy-1'],
         {
-          characterRepository: characterRepo as any,
-          characterQuestRepository: characterQuestRepo as any,
-          combatEnemyRepository: combatEnemyRepo as any,
-          guildService: guildService as any
+          characterRepository: characterRepo as unknown as CharacterRepository,
+          characterQuestRepository: characterQuestRepo as unknown as CharacterQuestRepository,
+          combatEnemyRepository: combatEnemyRepo as unknown as CombatEnemyRepository,
+          guildService: guildService as unknown as GuildService
         },
         'user-1'
       )

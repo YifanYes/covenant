@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server'
 import { GuildRole } from '@shared/schemas/guilds.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { CharacterRepository } from '../../repositories/character.repository'
 import { GuildService, INVITE_INVALID_REASON } from '../../services/guild.service'
 
 describe('GuildService', () => {
@@ -75,7 +76,15 @@ describe('GuildService', () => {
 
     const characterRepo = { findByUserId: vi.fn() }
 
-    service = new GuildService(prisma, guildRepo, memberRepo, messageRepo, inviteRepo, userRepo, characterRepo as any)
+    service = new GuildService(
+      prisma,
+      guildRepo,
+      memberRepo,
+      messageRepo,
+      inviteRepo,
+      userRepo,
+      characterRepo as unknown as CharacterRepository
+    )
   })
 
   describe('createGuild', () => {

@@ -1,3 +1,4 @@
+import { Prisma } from '@/generated/prisma'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { JournalService } from '../../services/journal.service'
 
@@ -106,7 +107,12 @@ describe('JournalService', () => {
 
     it('should handle race condition when duplicate entry is created concurrently', async () => {
       const existingEntry = { id: 'entry-existing', content: 'Existing', mood: 'calm', color: '#5F9EA0' }
-      mockJournalRepo.create.mockRejectedValue(Object.assign(new Error('Unique constraint'), { code: 'P2002' }))
+      mockJournalRepo.create.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError('Unique constraint', {
+          code: 'P2002',
+          clientVersion: 'test'
+        })
+      )
       mockJournalRepo.findByDate.mockResolvedValue([existingEntry])
       mockJournalRepo.findEntryDates.mockResolvedValue([new Date()])
 

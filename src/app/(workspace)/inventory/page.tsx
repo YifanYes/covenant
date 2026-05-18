@@ -45,7 +45,7 @@ export default function Inventory() {
     )
   }
 
-  const character = characterData as InventoryCharacter
+  const character = characterData as unknown as InventoryCharacter
 
   const handleEquipItem = (item: InventoryItem) => {
     equipMutation.mutate({ itemId: item.id })

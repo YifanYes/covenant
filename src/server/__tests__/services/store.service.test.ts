@@ -1,5 +1,6 @@
 import { ALL_ITEMS, CONSUMABLES } from '@/shared/constants/items.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { GuildService } from '../../services/guild.service'
 import { StoreService } from '../../services/store.services'
 import { mockCharacter, mockInventoryItem } from '../fixtures/character.fixtures'
 
@@ -131,7 +132,7 @@ describe('StoreService', () => {
       mockCharacterService.getCharacterProgress.mockReturnValue({ tier: 5 })
 
       const guildService = { getMyProgression: vi.fn().mockResolvedValue(null) }
-      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as any)
+      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as unknown as GuildService)
 
       const result = await gated.listAvailableItems('user-123')
       expect(result.items.map((i) => i.id)).not.toContain(exclusiveId)
@@ -153,7 +154,7 @@ describe('StoreService', () => {
           goldMultiplier: 1
         })
       }
-      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as any)
+      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as unknown as GuildService)
 
       const result = await gated.listAvailableItems('user-123')
       expect(result.items.map((i) => i.id)).not.toContain(exclusiveId)
@@ -175,7 +176,7 @@ describe('StoreService', () => {
           goldMultiplier: 1.05
         })
       }
-      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as any)
+      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as unknown as GuildService)
 
       const result = await gated.listAvailableItems('user-123')
       expect(result.items.map((i) => i.id)).toContain(exclusiveId)
@@ -197,7 +198,7 @@ describe('StoreService', () => {
           goldMultiplier: 1
         })
       }
-      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as any)
+      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as unknown as GuildService)
 
       await expect(gated.purchaseItems('user-123', [exclusiveId])).rejects.toThrow(/requires a Guild of Tier/)
     })
@@ -218,7 +219,7 @@ describe('StoreService', () => {
           goldMultiplier: 1.05
         })
       }
-      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as any)
+      const gated = new StoreService(mockCharacterRepo, mockCharacterService, guildService as unknown as GuildService)
 
       const result = await gated.purchaseItems('user-123', [exclusiveId])
       expect(result.success).toBe(true)

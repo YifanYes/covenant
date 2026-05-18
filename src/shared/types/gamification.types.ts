@@ -1,3 +1,7 @@
+import type { InventoryItemType } from '@shared/schemas/inventory.schemas'
+
+export type InventoryItem = InventoryItemType
+
 export const ItemType = {
   WEAPON_MELEE: 'WEAPON_MELEE',
   WEAPON_RANGED: 'WEAPON_RANGED',
@@ -32,18 +36,6 @@ export const EquipmentTypeFilter = {
   CONSUMABLE: 'consumable'
 } as const
 export type EquipmentTypeFilter = (typeof EquipmentTypeFilter)[keyof typeof EquipmentTypeFilter]
-
-export interface InventoryItem {
-  id: string
-  definitionId?: string // Link to base item definition not unique id
-  nameKey: string
-  descriptionKey?: string
-  type: ItemType
-  tier: number
-  rarity: ItemRarity
-  stats: Record<string, number | undefined>
-  obtainedAt: Date
-}
 
 // Enemy types (for display)
 export type EnemyType = 'MINION' | 'ELITE' | 'BOSS'

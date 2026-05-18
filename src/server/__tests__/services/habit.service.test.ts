@@ -1,5 +1,6 @@
 import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import { MANA_REWARDS } from '@/shared/constants/rewards.constants'
+import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { HabitService } from '../../services/habit.service'
@@ -49,7 +50,7 @@ describe('HabitService', () => {
 
   describe('create', () => {
     it('creates habit', async () => {
-      const input = { name: 'Read', recurrence: 'DAILY', timespan: 'MORNING' } as any
+      const input = { name: 'Read', recurrence: 'DAILY', timespan: 'MORNING' } as unknown as CreateHabitType
       mockHabitRepo.create.mockResolvedValue({ id: 'h-1', ...input })
 
       const result = await habitService.create('user-1', input)
@@ -99,7 +100,7 @@ describe('HabitService', () => {
       mockHabitRepo.findByIdOrThrow.mockResolvedValue({ id: 'h-1', userId: 'user-1' })
       mockHabitRepo.update.mockResolvedValue({ id: 'h-1', name: 'New' })
 
-      const result = await habitService.update('user-1', { id: 'h-1', name: 'New' } as any)
+      const result = await habitService.update('user-1', { id: 'h-1', name: 'New' } as unknown as UpdateHabitType)
 
       expect(mockHabitRepo.findByIdOrThrow).toHaveBeenCalledWith('h-1', 'user-1')
       expect(result.habit).toEqual({ id: 'h-1', name: 'New' })

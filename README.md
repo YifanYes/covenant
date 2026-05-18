@@ -204,9 +204,11 @@ After making changes, run in this order:
 
 ```bash
 pnpm lint
-npx tsc --noEmit   # Required after type/interface changes
+pnpm typecheck     # Required after type/interface changes — runs `next typegen && tsc --noEmit`
 pnpm test          # Must pass before considering task complete
 ```
+
+> The `next typegen` step regenerates `.next/types/**` (typed routes, validator). Bare `tsc --noEmit` without it produces ~190 spurious `() => never` errors because the Next.js TypeScript plugin in `tsconfig.json` only runs in the IDE language service, not the CLI compiler.
 
 ## Code Conventions
 

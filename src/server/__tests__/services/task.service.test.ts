@@ -1,6 +1,12 @@
 import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import { MANA_REWARDS } from '@/shared/constants/rewards.constants'
-import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
+import {
+  TaskEffort,
+  TaskImpact,
+  TaskStatus,
+  type CreateTaskType,
+  type UpdateTaskType
+} from '@shared/schemas/tasks.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { TaskService } from '../../services/task.service'
 
@@ -52,7 +58,7 @@ describe('TaskService', () => {
 
   describe('create', () => {
     it('should create a task', async () => {
-      const input = { title: 'New Task' } as any
+      const input = { title: 'New Task' } as unknown as CreateTaskType
       const createdTask = { id: 'task-1', ...input }
       mockTaskRepo.create.mockResolvedValue(createdTask)
 
@@ -84,7 +90,7 @@ describe('TaskService', () => {
         newReserve: 0
       })
 
-      const result = await taskService.update(userId, updateInput as any, TaskStatus.DONE)
+      const result = await taskService.update(userId, updateInput as unknown as UpdateTaskType, TaskStatus.DONE)
 
       expect(result.manaEarned).toBe(MANA_REWARDS.TASK_HIGH_IMPACT)
       expect(mockManaService.addManaFromCompletion).toHaveBeenCalledWith(userId, 'task', { impact: TaskEffort.HIGH })
@@ -99,7 +105,7 @@ describe('TaskService', () => {
       const updateInput = { id: taskId, status: TaskStatus.TODO, title: 'New Title' }
       mockTaskRepo.update.mockResolvedValue(updateInput)
 
-      const result = await taskService.update(userId, updateInput as any, TaskStatus.TODO)
+      const result = await taskService.update(userId, updateInput as unknown as UpdateTaskType, TaskStatus.TODO)
 
       expect(result.manaEarned).toBe(0)
       expect(mockManaService.addManaFromCompletion).not.toHaveBeenCalled()

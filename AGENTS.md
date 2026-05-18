@@ -19,11 +19,11 @@ After changes:
 
 ```bash
 pnpm lint
-npx tsc --noEmit   # required after type/interface changes
+pnpm typecheck
 pnpm test:run      # vitest, must pass
 ```
 
-Pre-push: Husky runs full build+test via `.husky/pre-push`, mirrors Railway `buildCommand` exact: `pnpm install --frozen-lockfile && pnpm prisma generate && pnpm lint && npx tsc --noEmit && pnpm build && pnpm test:run`. Bypass: `git push --no-verify`.
+Pre-push: Husky runs full build+test via `.husky/pre-push`, mirrors Railway `buildCommand` exact: `pnpm install --frozen-lockfile && pnpm prisma generate && pnpm lint && pnpm typecheck && pnpm build && pnpm test:run`. Bypass: `git push --no-verify`.
 
 ## Deployment / Railway
 

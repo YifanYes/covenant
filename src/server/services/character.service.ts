@@ -2,6 +2,7 @@ import { getAbilityById, getAvailableAbilities, MAX_EQUIPPED_ABILITIES } from '@
 import type { CharacterClassName, MagicNature } from '@/shared/constants/classes.constants'
 import { createInventoryItem, TIER_1_ITEMS } from '@/shared/constants/items.constants'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
+import type { CharacterDataType } from '@shared/schemas/inventory.schemas'
 import type { AbilityDefinition } from '@shared/types/ability.types'
 import type { CharacterWithClasses } from '@shared/types/character.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
@@ -42,7 +43,7 @@ export class CharacterService {
     if (!character) return null
 
     // One-time backfill for pre-Phase-2A characters. Flag check first so the hot path is a no-op.
-    if (this.manaService && (character.data as { scrubbedManaPotions?: boolean })?.scrubbedManaPotions !== true) {
+    if (this.manaService && (character.data as CharacterDataType | null)?.scrubbedManaPotions !== true) {
       await this.manaService.scrubManaPotions(userId)
       character = (await this.characterRepository.findWithClasses(userId)) ?? character
     }
@@ -56,12 +57,12 @@ export class CharacterService {
       factionName: character.factionName,
       magicNature: character.magicNature,
       currentClass: character.currentClass,
-      data: character.data as any,
+      data: (character.data as CharacterDataType | null) ?? null,
       gold: character.gold,
       manaReserve: character.manaReserve ?? 0,
       tier,
-      inventory: character.inventory as unknown,
-      loadout: character.loadout as unknown,
+      inventory: character.inventory as unknown as InventoryItem[],
+      loadout: character.loadout as unknown as InventoryItem[],
       tutorialCompletedAt: character.user?.tutorialCompletedAt ?? null,
       classes: character.classes.map((c) => ({
         id: c.id,
@@ -224,7 +225,7 @@ export class CharacterService {
     await this.characterRepository.updateProgress(classId, tier, maxHealth, maxMana)
   }
 
-  async updateData(characterId: string, data: any): Promise<void> {
+  async updateData(characterId: string, data: CharacterDataType): Promise<void> {
     await this.characterRepository.updateCharacterData(characterId, data)
   }
 

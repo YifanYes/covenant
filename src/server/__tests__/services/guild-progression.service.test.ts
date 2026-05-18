@@ -1,3 +1,4 @@
+import type { PrismaClient } from '@/generated/prisma'
 import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import {
   computeContributionPoints,
@@ -7,6 +8,7 @@ import {
   MAX_GUILD_TIER
 } from '@/shared/constants/guild-progression.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { CharacterRepository } from '../../repositories/character.repository'
 import { GuildService } from '../../services/guild.service'
 
 describe('Guild progression (Phase 3)', () => {
@@ -101,7 +103,15 @@ describe('Guild progression (Phase 3)', () => {
       }
       const userRepo: any = { findById: vi.fn() }
       const characterRepo = { findByUserId: vi.fn() }
-      service = new GuildService(prisma, guildRepo, memberRepo, messageRepo, inviteRepo, userRepo, characterRepo as any)
+      service = new GuildService(
+        prisma,
+        guildRepo,
+        memberRepo,
+        messageRepo,
+        inviteRepo,
+        userRepo,
+        characterRepo as unknown as CharacterRepository
+      )
     })
 
     it('bumps contribution even when no campaign is active', async () => {
@@ -213,13 +223,13 @@ describe('Guild progression (Phase 3)', () => {
       const userRepo: any = { findById: vi.fn() }
       const characterRepo = { findByUserId: vi.fn() }
       service = new GuildService(
-        prisma as any,
+        prisma as unknown as PrismaClient,
         guildRepo,
         memberRepo,
         messageRepo,
         inviteRepo,
         userRepo,
-        characterRepo as any
+        characterRepo as unknown as CharacterRepository
       )
     })
 

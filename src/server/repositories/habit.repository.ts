@@ -148,7 +148,10 @@ export class HabitRepository {
     })
   }
 
-  async findCompletionsByDate(userId: string, after: Date): Promise<Habit[]> {
+  async findCompletionsByDate(
+    userId: string,
+    after: Date
+  ): Promise<Array<Habit & { completions: HabitCompletion[] }>> {
     return this.prisma.habit.findMany({
       where: { userId, deletedAt: null },
       include: {
@@ -159,7 +162,17 @@ export class HabitRepository {
     })
   }
 
-  async findCompletionsWithAreas(userId: string, after: Date): Promise<Habit[]> {
+  async findCompletionsWithAreas(
+    userId: string,
+    after: Date
+  ): Promise<
+    Array<
+      Habit & {
+        objectives: Array<{ areas: Array<{ id: string }> }>
+        completions: HabitCompletion[]
+      }
+    >
+  > {
     return this.prisma.habit.findMany({
       where: { userId, deletedAt: null },
       include: {

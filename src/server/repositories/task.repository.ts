@@ -115,7 +115,10 @@ export class TaskRepository {
     })
   }
 
-  async findByIdOrThrow(id: string, userId: string): Promise<Task & { objectives: { id: string }[] }> {
+  async findByIdOrThrow(
+    id: string,
+    userId: string
+  ): Promise<Task & { objectives: { id: string }[]; areas: { id: string }[] }> {
     const task = await this.prisma.task.findUnique({
       where: { id },
       include: TASK_INCLUDE
@@ -258,7 +261,10 @@ export class TaskRepository {
     })
   }
 
-  async findRecentWithObjectives(userId: string, after: Date): Promise<Task[]> {
+  async findRecentWithObjectives(
+    userId: string,
+    after: Date
+  ): Promise<Array<Task & { objectives: Array<{ name: string; areas: Array<{ name: string }> }> }>> {
     return this.prisma.task.findMany({
       where: { userId, updatedAt: { gte: after } },
       include: { objectives: { include: { areas: true } } }

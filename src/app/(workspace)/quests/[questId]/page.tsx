@@ -1,4 +1,5 @@
 'use client'
+
 import CombatArena from '@/components/combat/combat-arena.component'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/cn.lib'
@@ -24,7 +25,7 @@ export default function QuestDetailPage() {
   const isMobile = useIsMobile()
 
   const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
-  const character = characterData as InventoryCharacter
+  const character = characterData as unknown as InventoryCharacter
 
   const { data: activeQuest } = useSuspenseQuery(
     trpcOptions.quest.getActive.queryOptions({ characterId: character.id })

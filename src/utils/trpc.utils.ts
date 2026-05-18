@@ -35,9 +35,8 @@ export const trpcClient = trpcReact.createClient({
 // Export trpcReact for Provider usage
 export const trpcReactClient = trpcReact
 
-// Options proxy - provides .queryOptions() and .mutationOptions()
 const trpcOptions = createTRPCOptionsProxy<AppRouter>({
-  client: vanillaClient as any,
+  client: vanillaClient,
   queryClient
 })
 

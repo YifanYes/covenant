@@ -1,3 +1,4 @@
+import type { UpdateProfileType, UpdateThemeType } from '@shared/schemas/auth.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthService } from '../../services/auth.service'
 
@@ -46,7 +47,7 @@ describe('AuthService', () => {
 
   describe('updateTheme', () => {
     it('updates user theme via userRepo', async () => {
-      const result = await authService.updateTheme('user-1', { theme: 'dark' } as any)
+      const result = await authService.updateTheme('user-1', { theme: 'dark' } as unknown as UpdateThemeType)
       expect(mockUserRepo.update).toHaveBeenCalledWith('user-1', { theme: 'dark' })
       expect(result.message).toBe('Theme updated successfully')
     })
@@ -56,7 +57,7 @@ describe('AuthService', () => {
     it('updates user fields only when no characterName', async () => {
       mockUserRepo.findById.mockResolvedValue({ id: 'user-1', name: 'New' })
 
-      const result = await authService.updateProfile('user-1', { name: 'New' } as any)
+      const result = await authService.updateProfile('user-1', { name: 'New' } as unknown as UpdateProfileType)
 
       expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { name: 'New' } })
       expect(tx.character.update).not.toHaveBeenCalled()
@@ -66,7 +67,7 @@ describe('AuthService', () => {
     it('updates character name only when no user fields', async () => {
       mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
 
-      await authService.updateProfile('user-1', { characterName: 'Hero' } as any)
+      await authService.updateProfile('user-1', { characterName: 'Hero' } as unknown as UpdateProfileType)
 
       expect(tx.user.update).not.toHaveBeenCalled()
       expect(tx.character.update).toHaveBeenCalledWith({ where: { userId: 'user-1' }, data: { name: 'Hero' } })
@@ -75,7 +76,10 @@ describe('AuthService', () => {
     it('updates both user fields and character name', async () => {
       mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
 
-      await authService.updateProfile('user-1', { name: 'New', characterName: 'Hero' } as any)
+      await authService.updateProfile('user-1', {
+        name: 'New',
+        characterName: 'Hero'
+      } as unknown as UpdateProfileType)
 
       expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { name: 'New' } })
       expect(tx.character.update).toHaveBeenCalledWith({ where: { userId: 'user-1' }, data: { name: 'Hero' } })
@@ -84,7 +88,9 @@ describe('AuthService', () => {
     it('skips both updates when input only has characterName: undefined', async () => {
       mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
 
-      await authService.updateProfile('user-1', { characterName: undefined } as any)
+      await authService.updateProfile('user-1', {
+        characterName: undefined
+      } as unknown as UpdateProfileType)
 
       expect(tx.user.update).not.toHaveBeenCalled()
       expect(tx.character.update).not.toHaveBeenCalled()
@@ -92,7 +98,7 @@ describe('AuthService', () => {
 
     it('returns userRepo.findById result after transaction', async () => {
       mockUserRepo.findById.mockResolvedValue({ id: 'user-1', name: 'Resolved' })
-      const result = await authService.updateProfile('user-1', { name: 'X' } as any)
+      const result = await authService.updateProfile('user-1', { name: 'X' } as unknown as UpdateProfileType)
       expect(mockUserRepo.findById).toHaveBeenCalledWith('user-1')
       expect(result).toEqual({ id: 'user-1', name: 'Resolved' })
     })

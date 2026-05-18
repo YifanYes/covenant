@@ -1,4 +1,5 @@
 'use client'
+
 import EmptyState from '@/components/empty-state.component'
 import type { ReorderTasksMutation } from '@/hooks/use-reorder-tasks-mutation'
 import { cn } from '@/lib/cn.lib'
@@ -49,9 +50,7 @@ export default function TaskList({
       const sourceVals = sourceParent.data.getValues(sourceParent.el) as TaskType[]
       const targetVals = targetParent.data.getValues(targetParent.el) as TaskType[]
       const draggedIds = new Set(draggedNodes.map((n) => (n.data.value as TaskType).id))
-      const targetWithStatus = targetVals.map((t) =>
-        draggedIds.has(t.id) ? { ...t, status: targetId } : t
-      )
+      const targetWithStatus = targetVals.map((t) => (draggedIds.has(t.id) ? { ...t, status: targetId } : t))
       const allTasks = useTasksStore.getState().tasks
       commit({
         ...allTasks,
@@ -84,8 +83,10 @@ export default function TaskList({
             <EmptyState
               size="compact"
               icon={<Flag className="h-5 w-5" />}
-              title={t(`tasks.empty_state.${lowerId}.title` as any, { defaultValue: t('tasks.empty_state.todo.title') })}
-              description={t(`tasks.empty_state.${lowerId}.description` as any, {
+              title={t(`tasks.empty_state.${lowerId}.title` as Parameters<typeof t>[0], {
+                defaultValue: t('tasks.empty_state.todo.title')
+              })}
+              description={t(`tasks.empty_state.${lowerId}.description` as Parameters<typeof t>[0], {
                 defaultValue: t('tasks.empty_state.todo.description')
               })}
             />
@@ -100,12 +101,7 @@ export default function TaskList({
           data-list-id={id}
         >
           {map(values, (task: TaskType) => (
-            <Task
-              key={task.id}
-              task={task}
-              setSelectedTask={setSelectedTask}
-              variant={isKanban ? 'card' : 'row'}
-            />
+            <Task key={task.id} task={task} setSelectedTask={setSelectedTask} variant={isKanban ? 'card' : 'row'} />
           ))}
         </ul>
       </div>

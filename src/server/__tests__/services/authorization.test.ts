@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { UserRepository } from '../../repositories/user.repository'
 import { AreaService } from '../../services/area.service'
 import { CharacterService } from '../../services/character.service'
 import { ObjectiveService } from '../../services/objective.service'
@@ -152,7 +153,10 @@ describe('Authorization - Service Layer', () => {
         verifyOwnership: vi.fn()
       }
 
-      characterService = new CharacterService(mockCharacterRepo, { setTutorialCompletedAt: vi.fn() } as any)
+      characterService = new CharacterService(
+        mockCharacterRepo,
+        { setTutorialCompletedAt: vi.fn() } as unknown as UserRepository
+      )
     })
 
     describe('getCharacterById', () => {

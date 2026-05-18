@@ -21,7 +21,8 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:run": "vitest run",
-    "dry-run": "pnpm install --frozen-lockfile && pnpm prisma generate && pnpm lint && npx tsc --noEmit && pnpm build && pnpm test:run"
+    "typecheck": "next typegen && tsc --noEmit",
+    "dry-run": "pnpm install --frozen-lockfile && pnpm prisma generate && pnpm lint && pnpm typecheck && pnpm build && pnpm test:run"
   },
   "dependencies": {
     "@formkit/drag-and-drop": "^0.5.3",

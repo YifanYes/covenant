@@ -1,7 +1,7 @@
 import { sanitizeRichText } from '@shared/lib/sanitize-rich-text.lib'
 import type { CreateJournalEntryType, UpdateJournalEntryType } from '@shared/schemas/journal.schemas'
 import { TRPCError } from '@trpc/server'
-import type { PrismaClient } from '@/generated/prisma'
+import { Prisma, type PrismaClient } from '@/generated/prisma'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import type { JournalRepository } from '../repositories/journal.repository'
 import type { ManaService } from './mana.service'
@@ -26,7 +26,7 @@ export class JournalService {
       })
       createdNew = true
     } catch (error) {
-      if (error instanceof Error && (error as any).code === 'P2002') {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         const entries = await this.journalRepository.findByDate(userId, new Date(), input.timezoneOffset)
         entry = entries[0]
       } else {

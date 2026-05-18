@@ -1,4 +1,5 @@
 import { MANA_REWARDS } from '@/shared/constants/rewards.constants'
+import type { CreateObjectiveBodyType, UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ObjectiveService } from '../../services/objective.service'
 
@@ -34,7 +35,7 @@ describe('ObjectiveService', () => {
 
   describe('create', () => {
     it('creates objective via repo', async () => {
-      const input = { name: 'Ship feature' } as any
+      const input = { name: 'Ship feature' } as unknown as CreateObjectiveBodyType
       mockObjectiveRepo.create.mockResolvedValue({ id: 'o-1', ...input })
 
       const result = await objectiveService.create('user-1', input)
@@ -54,7 +55,7 @@ describe('ObjectiveService', () => {
 
   describe('update', () => {
     it('passes id, userId, input to repo', async () => {
-      const input = { id: 'o-1', name: 'Renamed' } as any
+      const input = { id: 'o-1', name: 'Renamed' } as unknown as UpdateObjectiveBodyType
       mockObjectiveRepo.update.mockResolvedValue({ id: 'o-1', name: 'Renamed' })
 
       const result = await objectiveService.update('user-1', input)

@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../../lib/errors'
+import type { ManaService } from '../../services/mana.service'
 import { QuestService } from '../../services/quest.service'
 import { mockCharacter } from '../fixtures/character.fixtures'
 import { mockCharacterQuest } from '../fixtures/quest.fixtures'
@@ -47,7 +48,12 @@ describe('QuestService', () => {
       topUpFromReserve: vi.fn().mockResolvedValue({ added: 0, newMana: 0, newReserve: 0 })
     }
 
-    questService = new QuestService(mockCharacterQuestRepo, mockCombatEnemyRepo, mockCharacterService, mockManaService as any)
+    questService = new QuestService(
+      mockCharacterQuestRepo,
+      mockCombatEnemyRepo,
+      mockCharacterService,
+      mockManaService as unknown as ManaService
+    )
   })
 
   describe('startQuest', () => {

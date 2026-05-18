@@ -1,5 +1,7 @@
 import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import {
+  TaskEffort,
+  TaskImpact,
   TaskStatus,
   type BulkUpdateTaskItem,
   type CreateTaskType,
@@ -151,11 +153,11 @@ export class TaskService {
       status: original.status,
       order: original.order,
       color: original.color || undefined,
-      effort: original.effort as any,
-      impact: original.impact as any,
+      effort: (original.effort ?? undefined) as TaskEffort | undefined,
+      impact: (original.impact ?? undefined) as TaskImpact | undefined,
       dueDate: original.dueDate || undefined,
-      objectives: original.objectives.map((o: any) => o.id),
-      areas: (original as any).areas?.map((a: any) => a.id) || []
+      objectives: original.objectives.map((o) => o.id),
+      areas: original.areas.map((a) => a.id)
     }
 
     const task = await this.taskRepository.create(userId, newTaskInput)

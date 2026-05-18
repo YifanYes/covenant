@@ -1,3 +1,4 @@
+import type { GenericEndpointContext } from 'better-auth'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   DEFAULT_LOCALE,
@@ -122,7 +123,7 @@ describe('resolveEmailLocale', () => {
     mockPrismaUserFindUnique.mockResolvedValue(null)
     const ctx = {
       query: { callbackURL: 'https://example.com/login?locale=en' }
-    } as any
+    } as unknown as GenericEndpointContext
     const result = await resolveEmailLocale(email, ctx)
     expect(result).toBe('en')
   })
@@ -132,7 +133,7 @@ describe('resolveEmailLocale', () => {
     const ctx = {
       query: {},
       getCookie: vi.fn().mockReturnValue('en')
-    } as any
+    } as unknown as GenericEndpointContext
     const result = await resolveEmailLocale(email, ctx)
     expect(result).toBe('en')
   })
@@ -142,7 +143,7 @@ describe('resolveEmailLocale', () => {
     const ctx = {
       query: {},
       getCookie: vi.fn().mockReturnValue(null)
-    } as any
+    } as unknown as GenericEndpointContext
     const result = await resolveEmailLocale(email, ctx)
     expect(result).toBe(DEFAULT_LOCALE)
   })
@@ -152,7 +153,7 @@ describe('resolveEmailLocale', () => {
     const ctx = {
       query: {},
       getCookie: vi.fn().mockReturnValue('zh')
-    } as any
+    } as unknown as GenericEndpointContext
     const result = await resolveEmailLocale(email, ctx)
     expect(result).toBe(DEFAULT_LOCALE)
   })
@@ -162,7 +163,7 @@ describe('resolveEmailLocale', () => {
     const ctx = {
       query: { callbackURL: 'https://example.com/login?locale=es' },
       getCookie: vi.fn().mockReturnValue('es')
-    } as any
+    } as unknown as GenericEndpointContext
     const result = await resolveEmailLocale(email, ctx)
     expect(result).toBe('en')
   })
@@ -182,7 +183,7 @@ describe('resolveCreateUserLocale', () => {
   it('returns locale from callbackURL', async () => {
     const ctx = {
       query: { callbackURL: 'https://example.com/onboarding?locale=en' }
-    } as any
+    } as unknown as GenericEndpointContext
     const result = await resolveCreateUserLocale(ctx)
     expect(result).toBe('en')
   })
@@ -191,7 +192,7 @@ describe('resolveCreateUserLocale', () => {
     const ctx = {
       query: {},
       getCookie: vi.fn().mockReturnValue('en')
-    } as any
+    } as unknown as GenericEndpointContext
     const result = await resolveCreateUserLocale(ctx)
     expect(result).toBe('en')
   })
@@ -200,7 +201,7 @@ describe('resolveCreateUserLocale', () => {
     const ctx = {
       query: {},
       getCookie: vi.fn().mockReturnValue('ja')
-    } as any
+    } as unknown as GenericEndpointContext
     const result = await resolveCreateUserLocale(ctx)
     expect(result).toBe(DEFAULT_LOCALE)
   })
@@ -209,7 +210,7 @@ describe('resolveCreateUserLocale', () => {
     const ctx = {
       query: {},
       getCookie: vi.fn().mockReturnValue(null)
-    } as any
+    } as unknown as GenericEndpointContext
     const result = await resolveCreateUserLocale(ctx)
     expect(result).toBe(DEFAULT_LOCALE)
   })

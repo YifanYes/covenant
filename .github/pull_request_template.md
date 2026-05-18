@@ -9,7 +9,7 @@
 ## Test Plan
 
 - [ ] `pnpm lint` passes
-- [ ] `npx tsc --noEmit` passes
+- [ ] `pnpm typecheck` passes
 - [ ] `pnpm test:run` passes
 - [ ] `pnpm build` succeeds
 - [ ] Manually exercised the changed flow in `pnpm dev`

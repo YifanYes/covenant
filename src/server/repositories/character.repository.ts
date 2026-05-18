@@ -1,8 +1,9 @@
-import { type Character, type PrismaClient } from '@/generated/prisma'
+import { Prisma, type Character, type PrismaClient } from '@/generated/prisma'
 import { CharacterClassName, CLASS_INITIAL_STATS } from '@/shared/constants/classes.constants'
 import { Faction } from '@/shared/constants/factions.constants'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
+import type { CharacterDataType, InventoryItemType } from '@shared/schemas/inventory.schemas'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
@@ -101,12 +102,16 @@ export class CharacterRepository {
     })
   }
 
-  async updateInventoryAndLoadout(characterId: string, inventory: unknown[], loadout: unknown[]): Promise<void> {
+  async updateInventoryAndLoadout(
+    characterId: string,
+    inventory: InventoryItemType[],
+    loadout: InventoryItemType[]
+  ): Promise<void> {
     await this.prisma.character.update({
       where: { id: characterId },
       data: {
-        inventory: inventory as any,
-        loadout: loadout as any
+        inventory: inventory as unknown as Prisma.InputJsonValue,
+        loadout: loadout as unknown as Prisma.InputJsonValue
       }
     })
   }
@@ -164,17 +169,21 @@ export class CharacterRepository {
     })
   }
 
-  async updateCharacterData(characterId: string, data: any): Promise<Character> {
+  async updateCharacterData(characterId: string, data: CharacterDataType): Promise<Character> {
     return this.prisma.character.update({
       where: { id: characterId },
-      data: { data }
+      data: { data: data as unknown as Prisma.InputJsonValue }
     })
   }
 
-  async updateInventoryAndGold(characterId: string, inventory: any, gold: number): Promise<Character> {
+  async updateInventoryAndGold(
+    characterId: string,
+    inventory: InventoryItemType[],
+    gold: number
+  ): Promise<Character> {
     return this.prisma.character.update({
       where: { id: characterId },
-      data: { inventory, gold }
+      data: { inventory: inventory as unknown as Prisma.InputJsonValue, gold }
     })
   }
 
