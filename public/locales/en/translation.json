@@ -44,7 +44,41 @@
     },
     "meta": {
       "title": "Covenant - Gamified Productivity",
-      "description": "A gamified productivity app where every task, every habit, and every goal you complete forges your character. No shortcuts. No excuses. Only results you can see, measure, and equip."
+      "description": "A gamified productivity app where every task, every habit, and every goal you complete forges your character. No shortcuts. No excuses. Only results you can see, measure, and equip.",
+      "pages": {
+        "magic_nature": {
+          "title": "Magic Nature - Covenant",
+          "description": "The nature of magic in the Covenant world — schools, factions, and how power is earned."
+        },
+        "mechanics": {
+          "title": "Mechanics - Covenant",
+          "description": "How Covenant turns tasks, habits, and goals into XP, gear, and tactical combat. Game mechanics overview."
+        },
+        "roadmap": {
+          "title": "Roadmap - Covenant",
+          "description": "What we are building next in Covenant. Public roadmap with shipped milestones and upcoming features."
+        },
+        "story": {
+          "title": "Story - Covenant",
+          "description": "Lore and episodic story of the Covenant world."
+        },
+        "sabotaje_nocturno": {
+          "title": "Night Sabotage - Covenant",
+          "description": "Episode 1 of the Covenant story: Night Sabotage."
+        },
+        "news": {
+          "title": "News - Covenant",
+          "description": "Release notes, security updates, and weekly progress reports from the Covenant team."
+        },
+        "privacy": {
+          "title": "Privacy Policy - Covenant",
+          "description": "How Covenant collects, uses, and protects your personal data."
+        },
+        "tos": {
+          "title": "Terms of Service - Covenant",
+          "description": "The terms governing your use of Covenant."
+        }
+      }
     },
     "hero": {
       "title": "Complete tasks. Kill demons.",

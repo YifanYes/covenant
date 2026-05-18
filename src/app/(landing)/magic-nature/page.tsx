@@ -1,8 +1,7 @@
 import { cookies } from 'next/headers'
+import { buildPageMetadata } from '../_lib/page-metadata'
 
-export const metadata = {
-  title: 'Magic Nature - Covenant'
-}
+export const generateMetadata = () => buildPageMetadata({ pageKey: 'magic_nature', path: '/magic-nature' })
 
 const SUPPORTED_LOCALES = ['en', 'es'] as const
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]

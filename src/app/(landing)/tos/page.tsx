@@ -1,11 +1,8 @@
-import type { Metadata } from 'next'
 import LegalPageLayout from '../_components/legal-page-layout.component'
 import { getLandingLocale } from '../_lib/locale'
+import { buildPageMetadata } from '../_lib/page-metadata'
 
-export const metadata: Metadata = {
-  title: 'Terms of Service - Covenant',
-  description: 'The terms governing your use of Covenant.'
-}
+export const generateMetadata = () => buildPageMetadata({ pageKey: 'tos', path: '/tos' })
 
 export default async function TermsOfServicePage() {
   const lang = await getLandingLocale()

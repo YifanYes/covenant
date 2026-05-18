@@ -2,6 +2,7 @@ import { SentryProvider } from '@/components/common/sentry-provider.component'
 import ThemeProvider, { Theme } from '@/components/common/theme-provider.component'
 import Toaster from '@/components/ui/toaster.component'
 import { Faction } from '@/shared/constants/factions.constants'
+import { SITE_URL } from '@/shared/constants/site.constants'
 import type { Metadata } from 'next'
 import { Cinzel, EB_Garamond, Geist, Geist_Mono, Pixelify_Sans, Press_Start_2P } from 'next/font/google'
 import { cookies, headers } from 'next/headers'
@@ -53,7 +54,7 @@ function getParsedHeadersLang(acceptLang: string | null) {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://covenantrpg.com'),
+  metadataBase: new URL(SITE_URL),
   title: 'Covenant - Gamified Productivity',
   description: 'Level up your productivity with Covenant',
   icons: { icon: '/covenant-logo.svg' }

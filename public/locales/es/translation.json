@@ -44,7 +44,41 @@
     },
     "meta": {
       "title": "Covenant - Productividad Gamificada",
-      "description": "Una app de productividad gamificada donde cada tarea, cada hábito y cada objetivo que completas forja a tu personaje. Sin atajos. Sin excusas. Solo resultados que puedes ver, medir y equipar."
+      "description": "Una app de productividad gamificada donde cada tarea, cada hábito y cada objetivo que completas forja a tu personaje. Sin atajos. Sin excusas. Solo resultados que puedes ver, medir y equipar.",
+      "pages": {
+        "magic_nature": {
+          "title": "Naturaleza Mágica - Covenant",
+          "description": "La naturaleza de la magia en el mundo de Covenant: escuelas, facciones y cómo se gana el poder."
+        },
+        "mechanics": {
+          "title": "Mecánicas - Covenant",
+          "description": "Cómo Covenant convierte tareas, hábitos y objetivos en XP, equipo y combate táctico. Visión general de las mecánicas del juego."
+        },
+        "roadmap": {
+          "title": "Hoja de Ruta - Covenant",
+          "description": "Lo que vamos a construir a continuación en Covenant. Hoja de ruta pública con hitos enviados y próximas funciones."
+        },
+        "story": {
+          "title": "Historia - Covenant",
+          "description": "Lore e historia episódica del mundo de Covenant."
+        },
+        "sabotaje_nocturno": {
+          "title": "Sabotaje Nocturno - Covenant",
+          "description": "Episodio 1 de la historia de Covenant: Sabotaje Nocturno."
+        },
+        "news": {
+          "title": "Noticias - Covenant",
+          "description": "Notas de versión, actualizaciones de seguridad e informes semanales de progreso del equipo de Covenant."
+        },
+        "privacy": {
+          "title": "Política de Privacidad - Covenant",
+          "description": "Cómo Covenant recopila, utiliza y protege tus datos personales."
+        },
+        "tos": {
+          "title": "Términos del Servicio - Covenant",
+          "description": "Los términos que rigen tu uso de Covenant."
+        }
+      }
     },
     "hero": {
       "title": "Completa tareas. Mata demonios.",

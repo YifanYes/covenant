@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers'
+import { buildPageMetadata } from '../../_lib/page-metadata'
 
-export const metadata = {
-  title: 'Sabotaje Nocturno - Covenant'
-}
+export const generateMetadata = () =>
+  buildPageMetadata({ pageKey: 'sabotaje_nocturno', path: '/story/sabotaje-nocturno', ogType: 'article' })
 
 const SUPPORTED_LOCALES = ['en', 'es'] as const
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]

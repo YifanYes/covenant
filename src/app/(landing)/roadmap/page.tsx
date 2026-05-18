@@ -1,8 +1,7 @@
 import { cookies } from 'next/headers'
+import { buildPageMetadata } from '../_lib/page-metadata'
 
-export const metadata = {
-  title: 'Roadmap - Covenant',
-}
+export const generateMetadata = () => buildPageMetadata({ pageKey: 'roadmap', path: '/roadmap' })
 
 const SUPPORTED_LOCALES = ['en', 'es'] as const
 type SupportedLocale = typeof SUPPORTED_LOCALES[number]

@@ -16,10 +16,16 @@ export const metadata: Metadata = {
     'goal setting',
     'personal development'
   ],
+  alternates: {
+    canonical: '/',
+    languages: { en: '/', es: '/' }
+  },
   openGraph: {
     title: 'Covenant - Transform Your Productivity Into Real Power',
     description:
       'A gamified productivity app where every task, every habit, and every goal you complete forges your character.',
+    url: '/',
+    siteName: 'Covenant',
     type: 'website',
     locale: 'en_US',
     alternateLocale: 'es_ES'

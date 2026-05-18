@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getLandingLocale } from '../../_lib/locale'
 import { POSTS, POST_IMPORTS } from '../posts'
@@ -10,12 +11,36 @@ export async function generateStaticParams() {
   return POSTS.map((post) => ({ slug: post.slug }))
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = POSTS.find((p) => p.slug === slug)
   if (!post) return {}
   const lang = await getLandingLocale()
-  return { title: `${post.title[lang]} - Covenant` }
+  const title = `${post.title[lang]} - Covenant`
+  const description = post.excerpt[lang]
+  const url = `/news/${post.slug}`
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: { en: url, es: url }
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'article',
+      publishedTime: post.date,
+      authors: [post.author],
+      tags: post.tags
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description
+    }
+  }
 }
 
 export default async function ArticlePage({ params }: Props) {

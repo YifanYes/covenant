@@ -1,6 +1,10 @@
 # TODOs
 
-## Critical Priority
+## Quick Wins
+
+- [ ] Set up `privacy@covenantrpg.com` email forwarder before going public
+  - Privacy + ToS MDX now reference this address. Without forwarder, GDPR-required data-subject requests bounce.
+  - Configure on covenantrpg.com DNS provider (Cloudflare Email Routing, ImprovMX, Fastmail catch-all, etc.) → forward to your gmail.
 
 - [ ] GitHub repository settings (manual)
   - **Post-flip configuration:**
@@ -15,9 +19,16 @@
     - **Repo metadata** (Settings → General): Description "Gamified productivity platform with RPG-style progression"; Topics `nextjs trpc prisma postgresql gamification productivity rpg`; Website `https://covenantrpg.com`
     - **Repo secrets** (Settings → Secrets and variables → Actions): `SENTRY_AUTH_TOKEN` only. No `RAILWAY_TOKEN` — Railway uses its GitHub app, no Actions deploy workflow today.
 
-- [ ] Set up `privacy@covenantrpg.com` email forwarder before going public
-  - Privacy + ToS MDX now reference this address. Without forwarder, GDPR-required data-subject requests bounce.
-  - Configure on covenantrpg.com DNS provider (Cloudflare Email Routing, ImprovMX, Fastmail catch-all, etc.) → forward to your gmail.
+- [ ] Security: type safety — replace `as any` usages. Including the `inventory` / `loadout` JSON-field casts in `character.repository.ts:107-108` (replace with Zod-inferred types from `src/shared/schemas/`).
+
+- [ ] Security: error messages leak resource existence. Multiple service files distinguish "not found" from "forbidden" in their error messages, leaking existence of records the caller doesn't own.
+  - **Fix:** Use generic "Resource not found or access denied" messages.
+
+- [ ] Security: Sentry `sendDefaultPii: true` ships user IP/email/headers to Sentry. Configured in `sentry.shared.config.ts:18`. Fine operationally (Sentry is SOC 2), but must be disclosed in privacy policy. Consider `beforeSend` scrubber to strip email, keeping only `userId`.
+
+- [ ] Combat: ability cast clobbers stale `currentClass.health`.
+  - `combat.service.ts` `playerCastAbility` / `playerCastSelfBuffAbility` snapshot `currentClass.health` and `currentClass.mana` BEFORE the ability executes, then write the snapshot back paired with `newMana`. Any ability that mutates DB health (self-damage, lifesteal) gets overwritten with the stale value. Latent today because no current ability touches DB health, but the foot-gun lives on the core combat path.
+  - **Fix:** Either re-fetch the class after `executeTacticalAbility` / `useSelfBuffAbility`, or split `characterRepository.updateHealth` into a dedicated `updateMana(classId, mana)` and only write the column we changed.
 
 ## High Priority
 
@@ -49,20 +60,11 @@
 
 - [ ] Define story decisions. Story branches are the tier-progression payoff in the core loop.
 
-- [ ] SEO basics + press kit + 2-line pitch. No `sitemap.ts`, no `robots.txt`, no per-page OG tags (only root `metadataBase`). Roadmap Phase 3 also calls for press kit (screenshots, descripción, logo) and a tested 2-line pitch.
+- [ ] Press kit: Screenshots, description, logo, and a tested 2-line pitch.
 
 - [ ] Discord setup — server, roles, welcome bot, weekly update template. Roadmap Phase 3 infrastructure block (Discord servidor, roles configurados, bot de bienvenida, template para weekly update). Beta tester comms channel.
 
 ## Medium Priority
-
-- [ ] Security: Sentry `sendDefaultPii: true` ships user IP/email/headers to Sentry. Configured in `sentry.shared.config.ts:18`. Fine operationally (Sentry is SOC 2), but must be disclosed in privacy policy. Consider `beforeSend` scrubber to strip email, keeping only `userId`.
-
-- [ ] Security: error messages leak resource existence. Multiple service files distinguish "not found" from "forbidden" in their error messages, leaking existence of records the caller doesn't own.
-  - **Fix:** Use generic "Resource not found or access denied" messages.
-
-- [ ] Combat: ability cast clobbers stale `currentClass.health`.
-  - `combat.service.ts` `playerCastAbility` / `playerCastSelfBuffAbility` snapshot `currentClass.health` and `currentClass.mana` BEFORE the ability executes, then write the snapshot back paired with `newMana`. Any ability that mutates DB health (self-damage, lifesteal) gets overwritten with the stale value. Latent today because no current ability touches DB health, but the foot-gun lives on the core combat path.
-  - **Fix:** Either re-fetch the class after `executeTacticalAbility` / `useSelfBuffAbility`, or split `characterRepository.updateHealth` into a dedicated `updateMana(classId, mana)` and only write the column we changed.
 
 - [ ] User-defined task statuses.
   - Tasks currently use fixed statuses (TODO/IN_PROGRESS/DONE or equivalent). Allow users to create, rename, reorder, and delete custom statuses per workspace or globally. Enables personal workflows (e.g. "Waiting", "Blocked", "In Review") without forcing the default three-state model.
@@ -89,8 +91,6 @@
 - [ ] Security: rate limiter falls back to in-memory when Redis absent. In multi-replica production without Upstash, rate limits are per-instance and trivially bypassable. Consider hard-fail in `src/server/lib/rate-limiter.ts` when `NODE_ENV=production && !UPSTASH_REDIS_REST_URL`. Document Redis as prod-required in deploy guide.
 
 - [ ] Security: pnpm audit — 2 moderate transitive vulns. @hono/node-server <1.19.13`(via`@prisma/dev`), `postcss <8.5.10`(via`next`). Not directly exploitable in app code paths. Pin via `pnpm.overrides` or wait for upstream dependency bumps.
-
-- [ ] Security: type safety — replace `as any` usages. Including the `inventory` / `loadout` JSON-field casts in `character.repository.ts:107-108` (replace with Zod-inferred types from `src/shared/schemas/`).
 
 ## Backlog (post-validation)
 

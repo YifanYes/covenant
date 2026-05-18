@@ -2,11 +2,10 @@ import Link from 'next/link'
 import { ArrowRight } from 'pixelarticons/react'
 import { createServerI18n } from '@/server/lib/i18n-server'
 import { getLandingLocale } from '../_lib/locale'
+import { buildPageMetadata } from '../_lib/page-metadata'
 import { POSTS } from './posts'
 
-export const metadata = {
-  title: 'News - Covenant'
-}
+export const generateMetadata = () => buildPageMetadata({ pageKey: 'news', path: '/news' })
 
 const TAG_COLORS: Record<string, string> = {
   'release-notes': 'bg-primary/10 text-primary border-primary/20',
