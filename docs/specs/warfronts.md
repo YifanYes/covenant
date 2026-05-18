@@ -1,6 +1,6 @@
 # Warfronts
 
-> **Version**: 0.1 (draft, extracted from `tavern.md` v0.2)
+> **Version**: 0.1 (draft, extracted from `docs/product/tavern.md` v0.2)
 > **Status**: Proposed
 > **Last Updated**: 2026-05-16
 > **Source**: revival of the deleted `MapActivity` / `ActivityParticipation` system documented in `docs/product/quest_system.md`, framed for Covenant's mana/quest loop.
@@ -9,7 +9,7 @@
 
 **Warfronts** are shared, time-bounded world objectives. Contribution comes from satisfying quest/combat events powered by mana, not from raw productivity completions. Outcomes change lore and reward pools.
 
-Warfronts are adjacent to — and announced by — the [Tavern](./tavern.md), but do not depend on it.
+Warfronts are adjacent to — and announced by — the [Tavern](../product/tavern.md), but do not depend on it.
 
 ## Product thesis
 
@@ -127,7 +127,7 @@ model WarfrontContribution {
 
 ## Tavern integration
 
-Warfront state surfaces in the Tavern as system messages (reintroduces the `TavernMessage.kind` column deferred in `tavern.md` v1). Tavern does not own Warfront mechanics; it only renders the announcements.
+Warfront state surfaces in the Tavern as system messages (reintroduces the `TavernMessage.kind` column deferred in `docs/product/tavern.md` v1). Tavern does not own Warfront mechanics; it only renders the announcements.
 
 - pinned system banner: active Warfront, deadline, progress
 - system message when a Warfront starts, hits milestones, succeeds, or fails
@@ -184,14 +184,14 @@ Example Warfront titles:
 
 - **Route**: `/warfronts/[id]` or `/quests/warfronts/[id]`?
 - **Lore consequences**: only flavor text, or also temporary shop inventory / enemy pools / faction bonuses?
-- **Scheduling**: who creates a Warfront in v1 — manual SQL seeding, cron from a template table, or a small admin endpoint? Depends on the admin-role question deferred in `tavern.md`.
+- **Scheduling**: who creates a Warfront in v1 — manual SQL seeding, cron from a template table, or a small admin endpoint? Depends on the admin-role question deferred in `docs/product/tavern.md`.
 - **Resolution**: cron job that flips `resolvedAt` + computes `outcome` from `progress >= target` at `deadlineAt`. Needs `node-cron` registration alongside existing scheduled jobs.
 - **Reward distribution**: lazy ("claim on visit") or eager (push at resolution)? Lazy is simpler.
 - **Contribution weighting**: minion vs elite vs boss should not all count as `1`. Use a weight table (`kind -> amount`) or scale by enemy HP.
 
 ## Cross-references
 
-- [Tavern](./tavern.md) — announcement surface for Warfront events.
+- [Tavern](../product/tavern.md) — announcement surface for Warfront events.
 - `docs/product/quest_system.md` — quests + deleted `MapActivity` lineage.
 - `docs/product/guild_system.md` — guild-scoped contribution rollup.
 - `CONTEXT.md` — Quest, Encounter, Mana, Reserve definitions.

@@ -1,7 +1,8 @@
 'use client'
+
 import LoaderButton from '@/common/loader-button.component'
-import { clientLogger } from '@/lib/logger.client'
 import { signIn } from '@/lib/auth.lib'
+import * as Sentry from '@sentry/nextjs'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -18,7 +19,7 @@ export default function GoogleLoginButton() {
         callbackURL: `${window.location.origin}/login`
       })
     } catch (error) {
-      clientLogger.error('Google login failed', error)
+      Sentry.captureException(error, { tags: { flow: 'google-login' } })
       toast.error(t('login.error.title'), { description: t('login.error.google_unavailable') })
       setIsLoading(false)
     }

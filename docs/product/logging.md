@@ -1,12 +1,19 @@
 # Structured Logging System
 
-> **Version**: 2.0
+> **Version**: 3.0
 > **Status**: Implemented
-> **Last Updated**: 2026-05-08
+> **Last Updated**: 2026-05-18
 
 ## Summary
 
-All server-side logging uses [Pino](https://github.com/pinojs/pino) for structured JSON output. A thin client-side wrapper forwards browser logs to the same Pino stream via `/api/logs`. This replaces every ad-hoc `console.log/error/warn` call and provides a single, filterable, aggregator-friendly log pipeline.
+Production logging splits along two distinct rails:
+
+- **Operational / structured logs** (server stdout, Railway) — [Pino](https://github.com/pinojs/pino) JSON, request-scoped with `userId`.
+- **Production errors** (client + server) — [Sentry](https://sentry.io) SDK, posted directly from the browser/server to Sentry ingest (or the `/monitoring` tunnel route configured by `withSentryConfig`).
+
+Client errors do **not** round-trip through our API. The legacy `/api/logs` endpoint was retired once Sentry was wired up — see `docs/guides/error_monitoring.md`.
+
+Future product analytics (button clicks, funnel events) will live in PostHog, not in either of the rails above — see `docs/specs/posthog_integration.md`.
 
 ## Goals
 
@@ -14,7 +21,7 @@ All server-side logging uses [Pino](https://github.com/pinojs/pino) for structur
 2. Pretty-printed colored output in development
 3. Request-scoped logging with user context (`userId`) in authenticated tRPC requests
 4. Configurable log levels via `LOG_LEVEL` environment variable
-5. Client logs unified into the same stream as server logs
+5. Production errors centralized in Sentry without a custom forwarding endpoint
 
 ---
 
@@ -89,76 +96,45 @@ Default levels:
 
 ---
 
-## Client-Side Logging
+## Client-Side Error Reporting
 
-**Location:** `src/lib/logger.client.ts`
+There is **no** custom client logger. Client errors are reported directly to Sentry:
 
-A lightweight wrapper that:
-
-- In **development**: calls `console[level]` for immediate browser devtools feedback
-- In **all environments**: ships a fire-and-forget POST to `/api/logs` (never throws, never blocks)
+- **Unhandled errors** (render crashes, uncaught promises) — captured automatically by Sentry's global handlers configured in `instrumentation-client.ts` and the React `ErrorBoundary` mounted in `src/components/common/sentry-provider.component.tsx`.
+- **Caught errors** (try/catch, mutation `onError`) — call `Sentry.captureException` explicitly so the error stays visible after you swallow it.
 
 ### Usage
 
 ```ts
-import { clientLogger } from '@/lib/logger.client'
+import * as Sentry from '@sentry/nextjs'
 
-// Plain message
-clientLogger.info('Sidebar opened')
-
-// With context (Error objects, extra data)
-clientLogger.error('Failed to create objective', error)
-clientLogger.warn('Stale cache detected', { cacheAge })
-```
-
-### Payload shape
-
-```ts
-{
-  level: 'error' | 'warn' | 'info'
-  message: string          // max 1000 chars
-  context?: unknown        // serialised as-is
-  timestamp: string        // ISO 8601
-  source: 'client'
+try {
+  await mutate()
+} catch (error) {
+  Sentry.captureException(error, { tags: { flow: 'create-objective' } })
+  toast.error('Something went wrong')
 }
 ```
 
-The schema is defined in `src/shared/schemas/logs.schemas.ts` and validated by both the client logger (TypeScript types) and the API endpoint (Zod at runtime).
+Use the `tags` field for a stable identifier of the user-facing flow (`google-login`, `create-objective`, …) so issues can be grouped in Sentry without scraping stack traces.
 
----
+### Why not pino for client?
 
-## `/api/logs` Endpoint
+Pino is a Node-first JSON logger; in the browser it relies on a polyfill, cannot capture Edge runtime, and the original `/api/logs` round-trip was an unauthenticated abuse vector with no rate-limit or body-size cap. Sentry already does grouping, deduplication, sampling, source-map resolution, and replay — using two parallel pipelines added cost without value.
 
-**Location:** `src/app/api/logs/route.ts`
-
-| Method | Path        | Auth | Purpose                             |
-| ------ | ----------- | ---- | ----------------------------------- |
-| POST   | `/api/logs` | None | Receive client log, forward to Pino |
-
-The endpoint validates the payload with `clientLogSchema`, then calls:
-
-```ts
-logger[level]({ source: 'client', timestamp, context }, message)
-```
-
-This means client logs appear in the same Pino stream as server logs, tagged with `"source":"client"`, and can be filtered or routed separately in any log aggregator.
-
-**Error responses:**
-
-- `400 { error: 'Invalid payload' }` — Zod validation failed
-- `400 { error: 'Bad request' }` — malformed JSON body
+For structured client product telemetry (button clicks, funnel events), use PostHog (see `docs/specs/posthog_integration.md`). Errors are not telemetry.
 
 ---
 
 ## Adding Logs
 
-| Location        | Import                                               | API                                |
-| --------------- | ---------------------------------------------------- | ---------------------------------- |
-| Server (tRPC)   | Use `ctx.log` from tRPC context                      | `ctx.log.info({ ... }, 'message')` |
-| Server (script) | `import { logger } from '@/server/lib/logger'`       | `logger.error({ ... }, 'message')` |
-| Client          | `import { clientLogger } from '@/lib/logger.client'` | `clientLogger.error('msg', ctx)`   |
+| Location               | Import                                         | API                                                  |
+| ---------------------- | ---------------------------------------------- | ---------------------------------------------------- |
+| Server (tRPC)          | Use `ctx.log` from tRPC context                | `ctx.log.info({ ... }, 'message')`                   |
+| Server (script / cron) | `import { logger } from '@/server/lib/logger'` | `logger.error({ ... }, 'message')`                   |
+| Client (errors only)   | `import * as Sentry from '@sentry/nextjs'`     | `Sentry.captureException(err, { tags: { flow } })`   |
 
-Never use `console.*` directly — use the appropriate logger so all output is structured, filterable, and routed consistently.
+Never use `console.*` directly — server code uses pino, client error code uses Sentry.
 
 ---
 
@@ -192,17 +168,48 @@ Never use `console.*` directly — use the appropriate logger so all output is s
 
 ---
 
+## Sentry Pricing & Quotas
+
+Sentry is the single sink for production errors, so its quota dictates how much error volume is "free". Numbers below are sourced from <https://sentry.io/pricing/> and <https://docs.sentry.io/pricing/quotas/> as of 2026-05-18.
+
+| Plan             | Cost          | Errors / mo | Spans (tracing) / mo | Replays / mo | Logs / mo | Attachments / mo | Cron monitors          | Uptime monitors        |
+| ---------------- | ------------- | ----------- | -------------------- | ------------ | --------- | ---------------- | ---------------------- | ---------------------- |
+| Developer (free) | $0            | 5k          | 5M                   | 50           | 5 GB      | 1 GB             | 1                      | 1                      |
+| Team             | $26/mo annual | 50k         | 5M                   | 50           | 5 GB      | 1 GB             | 1 (+$0.78/extra)       | 1 (+$1.00/extra)       |
+| Business         | $80/mo annual | 50k         | 5M                   | 50           | 5 GB      | 1 GB             | 1 (+$0.78/extra)       | 1 (+$1.00/extra)       |
+
+**When does it start costing money?**
+
+- **Developer plan:** never — events past quota are **silently dropped** until the next billing cycle. Good for early-stage usage, bad for incident response (an outage that spikes errors past 5k will hide subsequent errors until the month rolls over).
+- **Team / Business:** above the included quota Sentry bills per-event (errors ≈ $0.000290 each, plus per-unit rates for replays/spans/logs). Set a spend cap in **Settings → Subscription → On-demand spend** to make the cost ceiling explicit.
+
+**Cost-control levers already configured** (see `sentry.shared.config.ts`, `instrumentation-client.ts`, `src/app/api/trpc/[...trpc]/route.ts`):
+
+- `tracesSampleRate: 0.1` in prod — drops 90% of performance spans before ingest.
+- `replaysSessionSampleRate: 0` — no idle session replays.
+- `replaysOnErrorSampleRate: 0.1` — only 10% of error sessions record a replay.
+- tRPC `onError` filters out `BAD_REQUEST` / `UNAUTHORIZED` / `TOO_MANY_REQUESTS` — protocol-level noise never reaches Sentry.
+
+**Levers to pull if we ever exceed the free 5k errors/mo:**
+
+- Lower `tracesSampleRate` to `0.05`.
+- Drop `replaysOnErrorSampleRate` to `0`.
+- Add a `beforeSend` filter to drop known-noisy errors (third-party scripts, network aborts).
+- Upgrade to the Team plan ($26/mo) for 10× the error quota.
+
+---
+
 ## Files Modified
 
-| File                                  | Change                                             |
-| ------------------------------------- | -------------------------------------------------- |
-| `src/server/lib/logger.ts`            | Standalone Pino instance                           |
-| `src/server/context.ts`               | Adds request-scoped `log` to tRPC context          |
-| `src/lib/logger.client.ts`            | Client logger wrapper                              |
-| `src/app/api/logs/route.ts`           | Receives client logs and forwards to Pino          |
-| `src/shared/schemas/logs.schemas.ts`  | Zod schema for client log payloads                 |
-| `package.json`                        | `pino` (prod), `pino-pretty` (dev)                 |
-| `.env.example`                        | `LOG_LEVEL=debug`                                  |
+| File                                                   | Change                                                  |
+| ------------------------------------------------------ | ------------------------------------------------------- |
+| `src/server/lib/logger.ts`                             | Standalone Pino instance                                |
+| `src/server/context.ts`                                | Adds request-scoped `log` to tRPC context               |
+| `instrumentation-client.ts`                            | Sentry browser SDK init (replaces `logger.client`)      |
+| `sentry.shared.config.ts` / `sentry.server.config.ts`  | Sentry Node/Edge SDK init                               |
+| `src/app/api/trpc/[...trpc]/route.ts`                  | tRPC `onError` forwards `INTERNAL_SERVER_ERROR` to Sentry |
+| `package.json`                                         | `pino` (prod), `pino-pretty` (dev), `@sentry/nextjs`    |
+| `.env.example`                                         | `LOG_LEVEL=debug`                                       |
 
 ---
 
@@ -221,6 +228,7 @@ Never use `console.*` directly — use the appropriate logger so all output is s
 
 ### Phase 4: External integrations
 
-- Log aggregation (Datadog, Grafana Cloud)
-- Error tracking (Sentry — see `docs/guides/sentry_setup.md`)
-- Alerting on error rate thresholds
+- Log aggregation (Datadog, Grafana Cloud) — server pino stream is the source
+- Error tracking (Sentry — implemented, see `docs/guides/error_monitoring.md`)
+- Alerting on error rate thresholds (Sentry alert rules)
+- Optional: `Sentry.pinoIntegration()` to forward server pino warn/error logs into Sentry — deferred until we have a concrete need (5 GB/mo log quota burns fast on the free plan)

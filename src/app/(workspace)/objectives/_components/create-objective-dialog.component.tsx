@@ -3,11 +3,11 @@ import BaseFormDialog from '@/common/base-form-dialog.component'
 import DatePicker from '@/forms/date-picker.component'
 import MultiSelect from '@/forms/multi-select.component'
 import TextInput from '@/forms/text-input.component'
-import { clientLogger } from '@/lib/logger.client'
 import Button from '@/ui/button.component'
 import Textarea from '@/ui/textarea.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import * as Sentry from '@sentry/nextjs'
 import { Plus } from 'pixelarticons/react'
 import { createObjectiveSchema, type CreateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -35,7 +35,7 @@ export default function CreateObjectiveDialog({ trigger }: CreateObjectiveDialog
         setOpen(false)
       },
       onError: (error) => {
-        clientLogger.error('Failed to create objective', error)
+        Sentry.captureException(error, { tags: { flow: 'create-objective' } })
         toast.error(t('create_objective_dialog.error.internal'))
       }
     })

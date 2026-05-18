@@ -55,9 +55,6 @@
 
 ## Medium Priority
 
-- [ ] Security: `/api/logs` endpoint has no auth, no rate limit, no payload size cap. Any client (authenticated or not) can POST arbitrary log payloads. Abuse vector: log-flood inflates Sentry/hosting bill and drowns signal in noise.
-  - **Fix:** Add IP-based `checkRateLimit` call + zod `.max()` bounds on `message` and `context` fields in `clientLogSchema`.
-
 - [ ] Security: Sentry `sendDefaultPii: true` ships user IP/email/headers to Sentry. Configured in `sentry.shared.config.ts:18`. Fine operationally (Sentry is SOC 2), but must be disclosed in privacy policy. Consider `beforeSend` scrubber to strip email, keeping only `userId`.
 
 - [ ] Security: error messages leak resource existence. Multiple service files distinguish "not found" from "forbidden" in their error messages, leaking existence of records the caller doesn't own.
@@ -81,9 +78,13 @@
   - Blocked on either: a Prisma 7 fix for the `@prisma/adapter-pg` regression (prisma/prisma#29060, #27611) — strict verification rejects Railway's cert chain even with `sslmode=verify-full` — or Railway publishing a CA bundle for managed Postgres so we can pin via `ssl.ca`.
   - **Fix when unblocked:** flip `rejectUnauthorized` back to `true` (and add `ca: env.DATABASE_SSL_CA` if pinning); update `docs/specs/database_ssl.md`.
 
-## Low Priority
+- [ ] Flexible habit recurrence patterns `[loop]`. Schema today supports only `recurrence Int` + `timespan` enum (DAILY/WEEKLY/MONTHLY) — cannot express "Mon/Wed/Fri", "1st and 15th", or "every other day". Top recurring Habitica request. See `docs/specs/habitica_inspired_features.md` §1. Touches `prisma/schema.prisma:233-234`, `src/shared/schemas/habits.schemas.ts:3-13`.
 
-- [ ] Security: journal HTML stored raw in DB, sanitized at render only. All 3 current render sites go through `<JournalContent>` + DOMPurify — safe today. Future surfaces (data export, email digest, mobile API) would expose raw stored HTML. Sanitize on write in `journal.service.ts:create` + `update` with same DOMPurify allowlist.
+- [ ] Consistency heatmap (year view) `[retention]`. GitHub-style year heatmap on `/dashboard` (or `/calendar`) — cells colored by total completions/day across habits + tasks, hover tooltip lists what was done. Dashboard locked to 8-day rolling window today (`src/server/services/dashboard.service.ts:28-79`). See `docs/specs/habitica_inspired_features.md` §2.
+
+- [ ] Per-habit difficulty levels `[loop]`. Add `difficulty` enum on `Habit` (`TRIVIAL | EASY | MEDIUM | HARD`, default `EASY`); scale base dice reward (1/2/3/5) + streak bonus multiplier. Current uniform 2 dice + streak bonus (`src/server/services/habit.service.ts:74-79`) scales poorly across effort tiers. Ship reward-scaling alone; penalty modulation out of scope. Mitigate "mark everything HARD" with per-day soft cap on habit dice. See `docs/specs/habitica_inspired_features.md` §3.
+
+## Low Priority
 
 - [ ] Security: rate limiter falls back to in-memory when Redis absent. In multi-replica production without Upstash, rate limits are per-instance and trivially bypassable. Consider hard-fail in `src/server/lib/rate-limiter.ts` when `NODE_ENV=production && !UPSTASH_REDIS_REST_URL`. Document Redis as prod-required in deploy guide.
 
