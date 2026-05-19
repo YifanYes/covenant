@@ -10,7 +10,7 @@ export function proxy(request: NextRequest) {
   const hasSession = Boolean(sessionToken)
 
   // Public routes
-  const authRoutes = ['/login', '/sign-up', '/auth/callback']
+  const authRoutes = ['/login', '/sign-up', '/auth/callback', '/forgot-password', '/reset-password']
   const landingRoutes = ['/', '/news', '/mechanics', '/magic-nature', '/roadmap']
   const landingPrefixRoutes = ['/story', '/card']
   const isPublicRoute =

@@ -25,7 +25,7 @@ export default function ResetPassword() {
   } = useForm<ResetPasswordType>({
     defaultValues: { password: '', confirmPassword: '' },
     resolver: standardSchemaResolver(resetPasswordSchema),
-    mode: 'onSubmit'
+    mode: 'onTouched'
   })
 
   const onSubmit = useCallback(

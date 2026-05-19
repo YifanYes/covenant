@@ -22,7 +22,7 @@ export default function ForgotPassword() {
   } = useForm<ForgotPasswordType>({
     defaultValues: { email: '' },
     resolver: standardSchemaResolver(forgotPasswordSchema),
-    mode: 'onSubmit'
+    mode: 'onTouched'
   })
 
   const onSubmit = useCallback(
