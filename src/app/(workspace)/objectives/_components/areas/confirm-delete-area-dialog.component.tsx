@@ -36,10 +36,10 @@ export default function ConfirmDeleteAreaDialog({ area, onDeleteSuccess }: Props
     <BaseConfirmDialog
       open={open}
       onOpenChange={setOpen}
-      title="confirm_delete_area_dialog.title"
-      description="confirm_delete_area_dialog.description"
+      titleKey="confirm_delete_area_dialog.title"
+      descriptionKey="confirm_delete_area_dialog.description"
       onConfirm={handleDelete}
-      confirmLabel="delete"
+      confirmLabelKey="delete"
       isLoading={deleteMutation.isPending}
       trigger={
         <Button

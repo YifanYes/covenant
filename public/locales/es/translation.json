@@ -364,7 +364,31 @@
     "failed": "Fallida",
     "loading": "Cargando...",
     "back": "Volver",
-    "none": "Ninguno"
+    "none": "Ninguno",
+    "refresh": "Actualizar",
+    "last_updated": {
+      "label": "Actualizado {{relative}}",
+      "never": "Actualizando…",
+      "just_now": "justo ahora",
+      "seconds_one": "hace {{count}}s",
+      "seconds_other": "hace {{count}}s",
+      "minutes_one": "hace {{count}}m",
+      "minutes_other": "hace {{count}}m"
+    },
+    "chat": {
+      "load_older": "Cargar anteriores",
+      "new_messages_one": "{{count}} mensaje nuevo",
+      "new_messages_other": "{{count}} mensajes nuevos",
+      "relative": {
+        "just_now": "justo ahora",
+        "minutes_one": "hace {{count}}m",
+        "minutes_other": "hace {{count}}m",
+        "hours_one": "hace {{count}}h",
+        "hours_other": "hace {{count}}h",
+        "days_one": "hace {{count}}d",
+        "days_other": "hace {{count}}d"
+      }
+    }
   },
   "crafting": {
     "title": "Forja",
@@ -1269,17 +1293,29 @@
       "empty": "Aún no hay mensajes. Sé el primero en romper el silencio.",
       "placeholder": "Envía una misiva al gremio…",
       "send": "Enviar",
+      "character_count": "{{count}} / {{max}}",
       "delete_message": "Eliminar mensaje",
+      "report_message": "Reportar este mensaje",
       "unknown_user": "Aventurero desconocido",
-      "relative": {
-        "just_now": "justo ahora",
-        "minutes": "{{count}} min",
-        "hours": "{{count}} h",
-        "days": "{{count}} d"
+      "delete_confirm": {
+        "title": "¿Eliminar este mensaje?",
+        "description": "El mensaje se borrará del foro del gremio y no se puede recuperar.",
+        "cta": "Eliminar"
+      },
+      "report_confirm": {
+        "title": "¿Reportar este mensaje?",
+        "description": "Los reportes son anónimos. Los mensajes con suficientes reportes se ocultan del foro.",
+        "cta": "Reportar"
+      },
+      "success": {
+        "delete": "Mensaje eliminado.",
+        "report": "Reporte recibido. Gracias por cuidar el gremio."
       },
       "error": {
         "send": "No se pudo enviar el mensaje",
-        "delete": "No se pudo eliminar el mensaje"
+        "delete": "No se pudo eliminar el mensaje",
+        "report": "No se pudo enviar el reporte",
+        "load_older": "No se pudieron cargar los mensajes anteriores"
       }
     },
     "invite": {
@@ -2021,8 +2057,6 @@
     "character_count": "{{count}} / {{max}}",
     "empty": "El fuego está encendido. La cerveza fluye. La sala espera su primer rumor.",
     "send": "Enviar",
-    "refresh": "Actualizar",
-    "load_older": "Cargar anteriores",
     "delete_message": "Eliminar este mensaje",
     "report_message": "Reportar este mensaje",
     "unknown_user": "Forastero",
@@ -2036,28 +2070,8 @@
       "description": "Los reportes son anónimos. Los mensajes con suficientes reportes se ocultan de la Taberna.",
       "cta": "Reportar"
     },
-    "new_messages_one": "{{count}} mensaje nuevo",
-    "new_messages_other": "{{count}} mensajes nuevos",
     "composer": {
       "placeholder": "Envía un mensaje a la taverna"
-    },
-    "last_updated": {
-      "label": "Actualizado {{relative}}",
-      "never": "Actualizando…",
-      "just_now": "justo ahora",
-      "seconds_one": "hace {{count}}s",
-      "seconds_other": "hace {{count}}s",
-      "minutes_one": "hace {{count}}m",
-      "minutes_other": "hace {{count}}m"
-    },
-    "relative": {
-      "just_now": "justo ahora",
-      "minutes_one": "hace {{count}}m",
-      "minutes_other": "hace {{count}}m",
-      "hours_one": "hace {{count}}h",
-      "hours_other": "hace {{count}}h",
-      "days_one": "hace {{count}}d",
-      "days_other": "hace {{count}}d"
     },
     "success": {
       "delete": "Mensaje eliminado.",

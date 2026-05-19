@@ -11,7 +11,7 @@ import { useMutation } from '@tanstack/react-query'
 import { Crown, Shield, UserMinus, UserPlus, UserX } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import UserAvatar from './user-avatar.component'
+import UserAvatar from '@/common/user-avatar.component'
 
 interface MemberListProps {
   guildId: string

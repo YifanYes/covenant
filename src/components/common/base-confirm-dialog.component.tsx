@@ -1,4 +1,5 @@
 'use client'
+
 import AlertDialog, {
   AlertDialogCancel,
   AlertDialogContent,
@@ -13,11 +14,11 @@ import { useTranslation } from 'react-i18next'
 import LoaderButton from './loader-button.component'
 
 interface BaseConfirmDialogProps {
-  title: string
-  description?: string
+  titleKey: string
+  descriptionKey?: string
   onConfirm: () => void
-  confirmLabel?: string
-  cancelLabel?: string
+  confirmLabelKey?: string
+  cancelLabelKey?: string
   isLoading?: boolean
   variant?: 'default' | 'destructive'
   confirmClassName?: string
@@ -28,11 +29,11 @@ interface BaseConfirmDialogProps {
 }
 
 export default function BaseConfirmDialog({
-  title,
-  description,
+  titleKey,
+  descriptionKey,
   onConfirm,
-  confirmLabel,
-  cancelLabel,
+  confirmLabelKey,
+  cancelLabelKey,
   isLoading,
   variant = 'destructive',
   confirmClassName,
@@ -48,12 +49,12 @@ export default function BaseConfirmDialog({
       {trigger && <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>}
       <AlertDialogContent className={contentClassName}>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t(title)}</AlertDialogTitle>
-          <AlertDialogDescription>{description ? t(description) : null}</AlertDialogDescription>
+          <AlertDialogTitle>{t(titleKey)}</AlertDialogTitle>
+          <AlertDialogDescription>{descriptionKey ? t(descriptionKey) : null}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="hover:bg-foreground/10 cursor-pointer">
-            {cancelLabel ? t(cancelLabel) : t('cancel')}
+            {cancelLabelKey ? t(cancelLabelKey) : t('cancel')}
           </AlertDialogCancel>
           <LoaderButton
             className={
@@ -65,7 +66,7 @@ export default function BaseConfirmDialog({
             onClick={onConfirm}
             disabled={isLoading}
             isLoading={!!isLoading}
-            label={confirmLabel ? t(confirmLabel) : t('confirm')}
+            label={confirmLabelKey ? t(confirmLabelKey) : t('confirm')}
           />
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -1,0 +1,1 @@
+export const GUILD_MESSAGE_MAX_LENGTH = 2000

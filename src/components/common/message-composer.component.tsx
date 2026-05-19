@@ -3,42 +3,61 @@
 import LoaderButton from '@/common/loader-button.component'
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
-import { TAVERN_MESSAGE_MAX_LENGTH } from '@/shared/constants/tavern.constants'
-import { sendTavernMessageSchema, type SendTavernMessageType } from '@/shared/schemas/tavern.schemas'
 import Textarea from '@/ui/textarea.component'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Send } from 'pixelarticons/react'
 import { type KeyboardEvent } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { z } from 'zod'
 
-interface TavernComposerProps {
-  onSubmit: (content: string) => void
+interface MessageComposerProps {
+  placeholder: string
+  sendLabel: string
+  maxLength: number
+  warnRemaining: number
+  dangerRemaining: number
+  onSubmit: (content: string) => Promise<unknown> | void
   isPending: boolean
+  formatCount: (length: number, max: number) => string
 }
 
-export default function TavernComposer({ onSubmit, isPending }: TavernComposerProps) {
-  const { t } = useTranslation()
+interface ContentForm {
+  content: string
+}
 
+export default function MessageComposer({
+  placeholder,
+  sendLabel,
+  maxLength,
+  warnRemaining,
+  dangerRemaining,
+  onSubmit,
+  isPending,
+  formatCount
+}: MessageComposerProps) {
   const {
     register,
     handleSubmit,
     reset,
     control,
     formState: { isValid }
-  } = useForm<SendTavernMessageType>({
-    resolver: standardSchemaResolver(sendTavernMessageSchema),
+  } = useForm<ContentForm>({
+    resolver: standardSchemaResolver(z.object({ content: z.string().trim().min(1).max(maxLength) })),
     mode: 'onChange',
     defaultValues: { content: '' }
   })
 
   const content = useWatch({ control, name: 'content' }) ?? ''
-  const remaining = TAVERN_MESSAGE_MAX_LENGTH - content.length
+  const remaining = maxLength - content.length
 
-  const submit = handleSubmit((data) => {
+  const submit = handleSubmit(async (data) => {
     if (isPending) return
-    onSubmit(data.content)
-    reset({ content: '' })
+    try {
+      await onSubmit(data.content)
+      reset({ content: '' })
+    } catch {
+      // preserve content on failure; parent handles error surfacing
+    }
   })
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -48,23 +67,25 @@ export default function TavernComposer({ onSubmit, isPending }: TavernComposerPr
     }
   }
 
+  const tone =
+    remaining < dangerRemaining
+      ? 'text-destructive'
+      : remaining < warnRemaining
+        ? 'text-amber-400'
+        : 'text-muted-foreground/60'
+
   return (
     <form onSubmit={submit} className={cn(panelChrome, 'p-2 focus-within:border-accent/50 transition')}>
       <Textarea
         {...register('content')}
         onKeyDown={handleKeyDown}
-        placeholder={t('tavern.composer.placeholder')}
+        placeholder={placeholder}
         className="resize-none min-h-12 border-0 bg-transparent shadow-none focus-visible:ring-0 px-2"
-        maxLength={TAVERN_MESSAGE_MAX_LENGTH}
+        maxLength={maxLength}
       />
       <div className="flex items-center justify-between pl-2 pr-1 pt-1">
-        <span
-          className={cn(
-            'text-[11px] tabular-nums',
-            remaining < 50 ? 'text-destructive' : remaining < 100 ? 'text-amber-400' : 'text-muted-foreground/60'
-          )}
-        >
-          {t('tavern.character_count', { count: content.length, max: TAVERN_MESSAGE_MAX_LENGTH })}
+        <span className={cn('text-[11px] tabular-nums', tone)}>
+          {formatCount(content.length, maxLength)}
         </span>
         <LoaderButton
           type="submit"
@@ -73,7 +94,7 @@ export default function TavernComposer({ onSubmit, isPending }: TavernComposerPr
           disabled={!isValid}
           className="gap-1.5"
           icon={<Send className="h-4 w-4" />}
-          label={t('tavern.send')}
+          label={sendLabel}
         />
       </div>
     </form>

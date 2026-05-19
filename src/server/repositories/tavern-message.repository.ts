@@ -1,7 +1,6 @@
 import type { Prisma, PrismaClient, TavernMessage } from '@/generated/prisma'
+import { AUTO_HIDE_THRESHOLD } from '@shared/constants/chat-room.constants'
 import type { TavernMessageCursorType } from '@shared/schemas/tavern.schemas'
-
-const AUTO_HIDE_THRESHOLD = 3
 
 export type TavernMessageWithAuthor = TavernMessage & {
   user: {
@@ -67,5 +66,3 @@ export class TavernMessageRepository {
     return result.count
   }
 }
-
-export { AUTO_HIDE_THRESHOLD }

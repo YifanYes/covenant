@@ -36,10 +36,10 @@ export default function ConfirmDeleteObjectiveDialog({ objective, onDeleteSucces
     <BaseConfirmDialog
       open={open}
       onOpenChange={setOpen}
-      title="objectives.delete.title"
-      description="objectives.delete.description"
+      titleKey="objectives.delete.title"
+      descriptionKey="objectives.delete.description"
       onConfirm={handleDelete}
-      confirmLabel="delete"
+      confirmLabelKey="delete"
       isLoading={deleteMutation.isPending}
       trigger={
         <Button

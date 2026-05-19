@@ -265,8 +265,8 @@ export default function GuildLayout({ children }: { children: ReactNode }) {
         <BaseConfirmDialog
           open={leaveOpen}
           onOpenChange={setLeaveOpen}
-          title="guilds.leave_confirm.title"
-          description="guilds.leave_confirm.description"
+          titleKey="guilds.leave_confirm.title"
+          descriptionKey="guilds.leave_confirm.description"
           onConfirm={() => leaveMutation.mutate()}
           isLoading={leaveMutation.isPending}
           contentClassName={rpgDialogContent}
@@ -275,8 +275,8 @@ export default function GuildLayout({ children }: { children: ReactNode }) {
         <BaseConfirmDialog
           open={dissolveOpen}
           onOpenChange={setDissolveOpen}
-          title="guilds.dissolve_confirm.title"
-          description="guilds.dissolve_confirm.description"
+          titleKey="guilds.dissolve_confirm.title"
+          descriptionKey="guilds.dissolve_confirm.description"
           onConfirm={() => dissolveMutation.mutate({ guildId: guild.id })}
           isLoading={dissolveMutation.isPending}
           contentClassName={rpgDialogContent}

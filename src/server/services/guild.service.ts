@@ -354,12 +354,11 @@ export class GuildService {
 
   async getMessages(input: GetMessagesType, userId: string) {
     await this.requireMembership(input.guildId, userId)
-    const before = input.before ? new Date(input.before) : undefined
     const messages = await this.guildMessageRepository.findByGuild(input.guildId, {
       limit: input.limit,
-      before
+      cursor: input.cursor
     })
-    return messages.reverse()
+    return messages.slice().reverse()
   }
 
   async sendMessage(input: SendMessageType, userId: string) {
@@ -391,6 +390,40 @@ export class GuildService {
 
     await this.guildMessageRepository.softDelete(messageId)
     return { message: 'Message deleted' }
+  }
+
+  async reportMessage(messageId: string, reporterId: string) {
+    const message = await this.guildMessageRepository.findById(messageId)
+    if (!message || message.deletedAt) {
+      log.warn({ messageId, reporterId }, 'reportMessage: guild message not found')
+      throw notFound()
+    }
+    if (message.userId === reporterId) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'You cannot report your own message' })
+    }
+
+    const membership = await this.guildMemberRepository.findByUserAndGuild(reporterId, message.guildId)
+    if (!membership) {
+      log.warn({ messageId, reporterId }, 'reportMessage: non-member attempted to report')
+      throw notFound()
+    }
+
+    try {
+      await this.guildMessageRepository.recordReport(messageId, reporterId)
+    } catch (error) {
+      if (error instanceof TRPCError) {
+        if (error.code === 'NOT_FOUND') {
+          log.warn({ messageId, reporterId }, 'reportMessage: guild message gone during report tx')
+        }
+        throw error
+      }
+      if (isUniqueConstraintError(error)) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'You have already reported this message' })
+      }
+      throw error
+    }
+
+    return { message: 'Report received' }
   }
 
   private async requireMembership(guildId: string, userId: string) {

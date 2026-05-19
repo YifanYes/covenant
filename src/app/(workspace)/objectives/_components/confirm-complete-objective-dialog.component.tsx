@@ -39,10 +39,10 @@ export default function ConfirmCompleteObjectiveDialog({ objective, onCompleteSu
     <BaseConfirmDialog
       open={open}
       onOpenChange={setOpen}
-      title="objectives.complete.title"
-      description="objectives.complete.description"
+      titleKey="objectives.complete.title"
+      descriptionKey="objectives.complete.description"
       onConfirm={handleComplete}
-      confirmLabel="objectives.complete.button"
+      confirmLabelKey="objectives.complete.button"
       confirmClassName="hover:bg-foreground/10 bg-transparent text-green-400 hover:text-green-400 cursor-pointer"
       isLoading={completeMutation.isPending}
       trigger={

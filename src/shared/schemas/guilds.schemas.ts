@@ -1,3 +1,4 @@
+import { GUILD_MESSAGE_MAX_LENGTH } from '@shared/constants/guild.constants'
 import { z } from 'zod'
 
 export const GuildRole = {
@@ -30,14 +31,20 @@ export type GuildIdType = z.infer<typeof guildIdSchema>
 
 export const sendMessageSchema = z.object({
   guildId: z.uuid(),
-  content: z.string().trim().min(1).max(2000)
+  content: z.string().trim().min(1).max(GUILD_MESSAGE_MAX_LENGTH)
 })
 export type SendMessageType = z.infer<typeof sendMessageSchema>
+
+export const guildMessageCursorSchema = z.object({
+  createdAt: z.iso.datetime(),
+  id: z.uuid()
+})
+export type GuildMessageCursorType = z.infer<typeof guildMessageCursorSchema>
 
 export const getMessagesSchema = z.object({
   guildId: z.uuid(),
   limit: z.number().int().min(1).max(100).optional(),
-  before: z.iso.datetime().optional()
+  cursor: guildMessageCursorSchema.optional()
 })
 export type GetMessagesType = z.infer<typeof getMessagesSchema>
 
@@ -45,6 +52,11 @@ export const deleteMessageSchema = z.object({
   messageId: z.uuid()
 })
 export type DeleteMessageType = z.infer<typeof deleteMessageSchema>
+
+export const reportMessageSchema = z.object({
+  messageId: z.uuid()
+})
+export type ReportMessageType = z.infer<typeof reportMessageSchema>
 
 export const createInviteSchema = z.object({
   guildId: z.uuid(),

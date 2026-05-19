@@ -7,6 +7,7 @@ import {
   guildIdSchema,
   inviteTokenSchema,
   kickMemberSchema,
+  reportMessageSchema,
   revokeInviteSchema,
   sendMessageSchema,
   startCampaignSchema,
@@ -119,6 +120,13 @@ export const guildsRouter = t.router({
     .input(deleteMessageSchema)
     .mutation(async ({ ctx, input }) => {
       return ctx.services.guild.deleteMessage(input.messageId, ctx.user.id)
+    }),
+
+  reportMessage: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
+    .input(reportMessageSchema)
+    .mutation(async ({ ctx, input }) => {
+      return ctx.services.guild.reportMessage(input.messageId, ctx.user.id)
     }),
 
   getCurrentCampaign: protectedProcedure.input(guildIdSchema).query(async ({ ctx, input }) => {

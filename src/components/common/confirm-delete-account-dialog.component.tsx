@@ -33,10 +33,10 @@ export const ConfirmDeleteAccountDialog = ({ open, onOpenChange }: ConfirmDelete
     <BaseConfirmDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="confirm_delete_account_dialog.title"
-      description="confirm_delete_account_dialog.description"
+      titleKey="confirm_delete_account_dialog.title"
+      descriptionKey="confirm_delete_account_dialog.description"
       onConfirm={() => deleteAccountMutation.mutate()}
-      confirmLabel="delete"
+      confirmLabelKey="delete"
       isLoading={deleteAccountMutation.isPending}
     />
   )

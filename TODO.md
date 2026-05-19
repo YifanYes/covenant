@@ -21,10 +21,6 @@
 
 - [ ] Security: Sentry `sendDefaultPii: true` ships user IP/email/headers to Sentry. Configured in `sentry.shared.config.ts:18`. Fine operationally (Sentry is SOC 2), but must be disclosed in privacy policy. Consider `beforeSend` scrubber to strip email, keeping only `userId`.
 
-- [ ] Combat: ability cast clobbers stale `currentClass.health`.
-  - `combat.service.ts` `playerCastAbility` / `playerCastSelfBuffAbility` snapshot `currentClass.health` and `currentClass.mana` BEFORE the ability executes, then write the snapshot back paired with `newMana`. Any ability that mutates DB health (self-damage, lifesteal) gets overwritten with the stale value. Latent today because no current ability touches DB health, but the foot-gun lives on the core combat path.
-  - **Fix:** Either re-fetch the class after `executeTacticalAbility` / `useSelfBuffAbility`, or split `characterRepository.updateHealth` into a dedicated `updateMana(classId, mana)` and only write the column we changed.
-
 ## High Priority
 
 - [ ] Guild system Phase 4 — community lore + roleplay surfaces. Player-authored creative layer on top of guild infra. Habit-tracker-with-RPG-skin product benefits especially: lore reframes chores as quests and is stickier than leaderboards (lore decay slow, leaderboards reset weekly). Stage to keep moderation surface bounded.

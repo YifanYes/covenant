@@ -172,9 +172,9 @@ export default function EditEntryDialog({ entry, open, onOpenChange }: EditEntry
       <BaseConfirmDialog
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
-        title={t('journaling.delete.title')}
-        description={t('journaling.delete.description')}
-        confirmLabel={t('journaling.delete.button')}
+        titleKey="journaling.delete.title"
+        descriptionKey="journaling.delete.description"
+        confirmLabelKey="journaling.delete.button"
         onConfirm={() => deleteMutation.mutate({ id: entry.id })}
         isLoading={deleteMutation.isPending}
       />

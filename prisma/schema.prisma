@@ -29,6 +29,7 @@ model User {
   guildMembership      GuildMember?
   ownedGuilds          Guild[]         @relation("GuildOwner")
   guildMessages        GuildMessage[]
+  guildReports         GuildMessageReport[]
   tavernMessages       TavernMessage[]
   tavernReports        TavernMessageReport[]
 
@@ -309,17 +310,33 @@ model GuildMember {
 }
 
 model GuildMessage {
-  id        String    @id @default(uuid()) @db.Uuid
-  guildId   String    @db.Uuid
-  userId    String
-  content   String    @db.VarChar(2000)
-  createdAt DateTime  @default(now()) @db.Timestamp(6)
-  deletedAt DateTime? @db.Timestamp(6)
-  guild     Guild     @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String                @id @default(uuid()) @db.Uuid
+  guildId     String                @db.Uuid
+  userId      String
+  content     String                @db.VarChar(2000)
+  createdAt   DateTime              @default(now()) @db.Timestamp(6)
+  deletedAt   DateTime?             @db.Timestamp(6)
+  reportCount Int                   @default(0)
+  guild       Guild                 @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reports     GuildMessageReport[]
 
-  @@index([guildId, createdAt])
+  @@index([guildId, createdAt, id])
   @@map("guild_messages")
+}
+
+model GuildMessageReport {
+  id         String       @id @default(uuid()) @db.Uuid
+  messageId  String       @db.Uuid
+  reporterId String
+  reason     String?      @db.VarChar(255)
+  createdAt  DateTime     @default(now()) @db.Timestamp(6)
+  message    GuildMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  reporter   User         @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, reporterId])
+  @@index([messageId])
+  @@map("guild_message_reports")
 }
 
 model GuildInvite {
