@@ -97,7 +97,7 @@ export default function Login() {
   } = useForm<LoginType>({
     defaultValues: { email: '', password: '' },
     resolver: standardSchemaResolver(loginSchema),
-    mode: 'onSubmit'
+    mode: 'onTouched'
   })
 
   const [verifyingMessage, setVerifyingMessage] = useState(() => t('login.verifying_title'))

@@ -1124,7 +1124,7 @@
     "try_again": "Intentar de nuevo"
   },
   "errors": {
-    "invalid_email": "Correo electrónico no valido",
+    "invalid_email": "Correo electrónico no válido",
     "invalid_password_length": "La contraseña debe tener al menos 8 caracteres",
     "password_mismatch": "Las contraseñas no coinciden",
     "required_field": "Campo requerido"

@@ -23,7 +23,7 @@ export default function SignUp() {
   } = useForm<SignUpType>({
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
     resolver: standardSchemaResolver(signUpSchema),
-    mode: 'onSubmit'
+    mode: 'onTouched'
   })
 
   const onSubmit = useCallback(
