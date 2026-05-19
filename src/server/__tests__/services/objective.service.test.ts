@@ -1,34 +1,29 @@
 import { MANA_REWARDS } from '@/shared/constants/rewards.constants'
 import type { CreateObjectiveBodyType, UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { ObjectiveRepository } from '../../repositories/objective.repository'
+import type { ManaService } from '../../services/mana.service'
 import { ObjectiveService } from '../../services/objective.service'
+import { createRepoMock } from '../helpers/mock-repo'
 
 describe('ObjectiveService', () => {
   let objectiveService: ObjectiveService
-  let mockObjectiveRepo: any
-  let mockManaService: any
+  let mockObjectiveRepo: ReturnType<typeof createRepoMock<ObjectiveRepository>>
+  let mockManaService: ReturnType<typeof createRepoMock<ManaService>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockObjectiveRepo = {
-      create: vi.fn(),
-      findAll: vi.fn(),
-      update: vi.fn(),
-      complete: vi.fn(),
-      delete: vi.fn()
-    }
-
-    mockManaService = {
-      addManaFromCompletion: vi.fn().mockResolvedValue({
-        success: true,
-        amount: MANA_REWARDS.OBJECTIVE,
-        manaApplied: MANA_REWARDS.OBJECTIVE,
-        reserveGained: 0,
-        newMana: MANA_REWARDS.OBJECTIVE,
-        newReserve: 0
-      })
-    }
+    mockObjectiveRepo = createRepoMock<ObjectiveRepository>()
+    mockManaService = createRepoMock<ManaService>()
+    mockManaService.addManaFromCompletion.mockResolvedValue({
+      success: true,
+      amount: MANA_REWARDS.OBJECTIVE,
+      manaApplied: MANA_REWARDS.OBJECTIVE,
+      reserveGained: 0,
+      newMana: MANA_REWARDS.OBJECTIVE,
+      newReserve: 0
+    })
 
     objectiveService = new ObjectiveService(mockObjectiveRepo, mockManaService)
   })

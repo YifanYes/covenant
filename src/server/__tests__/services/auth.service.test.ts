@@ -1,30 +1,28 @@
 import type { UpdateProfileType, UpdateThemeType } from '@shared/schemas/auth.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { UserRepository } from '../../repositories/user.repository'
 import { AuthService } from '../../services/auth.service'
+import { createPrismaMock, createRepoMock } from '../helpers/mock-repo'
 
 describe('AuthService', () => {
+  type TxRepo = ReturnType<typeof createRepoMock<any>>
+
   let authService: AuthService
-  let mockPrisma: any
-  let mockUserRepo: any
-  let tx: any
+  let mockPrisma: ReturnType<typeof createPrismaMock>
+  let mockUserRepo: ReturnType<typeof createRepoMock<UserRepository>>
+  let tx: { character: TxRepo; user: TxRepo }
 
   beforeEach(() => {
     vi.clearAllMocks()
 
     tx = {
-      character: { update: vi.fn() },
-      user: { update: vi.fn() }
+      character: createRepoMock<any>(),
+      user: createRepoMock<any>()
     }
 
-    mockPrisma = {
-      $transaction: vi.fn(async (cb: any) => cb(tx))
-    }
+    mockPrisma = createPrismaMock(tx)
 
-    mockUserRepo = {
-      update: vi.fn(),
-      findById: vi.fn(),
-      delete: vi.fn()
-    }
+    mockUserRepo = createRepoMock<UserRepository>()
 
     authService = new AuthService(mockPrisma, mockUserRepo)
   })

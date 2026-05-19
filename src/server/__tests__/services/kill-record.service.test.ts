@@ -1,12 +1,15 @@
 import { CharacterClassName, calculateMaxStats } from '@/shared/constants/classes.constants'
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { CharacterRepository } from '../../repositories/character.repository'
+import type { CombatEnemyRepository } from '../../repositories/combat-enemy.repository'
 import { KillRecordService } from '../../services/kill-record.service'
+import { createRepoMock } from '../helpers/mock-repo'
 
 describe('KillRecordService', () => {
   let killRecordService: KillRecordService
-  let mockCharacterRepo: any
-  let mockCombatEnemyRepo: any
+  let mockCharacterRepo: ReturnType<typeof createRepoMock<CharacterRepository>>
+  let mockCombatEnemyRepo: ReturnType<typeof createRepoMock<CombatEnemyRepository>>
 
   const mockCharWithClasses = (overrides: Record<string, unknown> = {}) => ({
     id: 'char-1',
@@ -25,17 +28,8 @@ describe('KillRecordService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockCharacterRepo = {
-      findByUserId: vi.fn(),
-      findWithClasses: vi.fn(),
-      findByIdWithClasses: vi.fn(),
-      updateProgress: vi.fn()
-    }
-
-    mockCombatEnemyRepo = {
-      getDefeatedEnemiesByCharacter: vi.fn(),
-      getKillStats: vi.fn()
-    }
+    mockCharacterRepo = createRepoMock<CharacterRepository>()
+    mockCombatEnemyRepo = createRepoMock<CombatEnemyRepository>()
 
     killRecordService = new KillRecordService(mockCharacterRepo, mockCombatEnemyRepo)
   })

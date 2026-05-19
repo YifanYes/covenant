@@ -3,47 +3,36 @@ import { MANA_REWARDS } from '@/shared/constants/rewards.constants'
 import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { HabitRepository } from '../../repositories/habit.repository'
+import type { GuildService } from '../../services/guild.service'
 import { HabitService } from '../../services/habit.service'
+import type { ManaService } from '../../services/mana.service'
+import { createRepoMock } from '../helpers/mock-repo'
 
 describe('HabitService', () => {
   let habitService: HabitService
-  let mockHabitRepo: any
-  let mockManaService: any
-  let mockGuildService: any
+  let mockHabitRepo: ReturnType<typeof createRepoMock<HabitRepository>>
+  let mockManaService: ReturnType<typeof createRepoMock<ManaService>>
+  let mockGuildService: ReturnType<typeof createRepoMock<GuildService>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockHabitRepo = {
-      create: vi.fn(),
-      findAll: vi.fn(),
-      findByIdOrThrow: vi.fn(),
-      findByIdWithDetails: vi.fn(),
-      update: vi.fn(),
-      softDelete: vi.fn(),
-      restore: vi.fn(),
-      findDeleted: vi.fn(),
-      createCompletion: vi.fn(),
-      findCompletions: vi.fn(),
-      findCompletionById: vi.fn(),
-      deleteCompletion: vi.fn()
-    }
+    mockHabitRepo = createRepoMock<HabitRepository>()
 
-    mockManaService = {
-      addManaFromCompletion: vi.fn().mockResolvedValue({
-        success: true,
-        amount: MANA_REWARDS.HABIT,
-        manaApplied: MANA_REWARDS.HABIT,
-        reserveGained: 0,
-        newMana: MANA_REWARDS.HABIT,
-        newReserve: 0
-      }),
-      calculateHabitStreak: vi.fn().mockReturnValue(5)
-    }
+    mockManaService = createRepoMock<ManaService>()
+    mockManaService.addManaFromCompletion.mockResolvedValue({
+      success: true,
+      amount: MANA_REWARDS.HABIT,
+      manaApplied: MANA_REWARDS.HABIT,
+      reserveGained: 0,
+      newMana: MANA_REWARDS.HABIT,
+      newReserve: 0
+    })
+    mockManaService.calculateHabitStreak.mockReturnValue(5)
 
-    mockGuildService = {
-      recordCampaignEvent: vi.fn().mockResolvedValue(undefined)
-    }
+    mockGuildService = createRepoMock<GuildService>()
+    mockGuildService.recordCampaignEvent.mockResolvedValue(undefined)
 
     habitService = new HabitService(mockHabitRepo, mockManaService, mockGuildService)
   })

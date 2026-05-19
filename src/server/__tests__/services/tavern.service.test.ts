@@ -1,42 +1,35 @@
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { CharacterRepository } from '../../repositories/character.repository'
+import type { TavernMessageRepository } from '../../repositories/tavern-message.repository'
 import { TavernService } from '../../services/tavern.service'
+import { createPrismaMock, createRepoMock } from '../helpers/mock-repo'
 
 describe('TavernService', () => {
   let service: TavernService
-  let prisma: any
-  let messageRepo: any
-  let characterRepo: any
-  let txTavernMessage: any
-  let txTavernReport: any
+  let prisma: ReturnType<typeof createPrismaMock>
+  let messageRepo: ReturnType<typeof createRepoMock<TavernMessageRepository>>
+  let characterRepo: ReturnType<typeof createRepoMock<CharacterRepository>>
+  let txTavernMessage: ReturnType<typeof createRepoMock<any>>
+  let txTavernReport: ReturnType<typeof createRepoMock<any>>
 
   beforeEach(() => {
     vi.clearAllMocks()
     delete process.env.TAVERN_DISABLED
 
-    txTavernMessage = {
-      findFirst: vi.fn(),
-      updateMany: vi.fn().mockResolvedValue({ count: 1 })
-    }
-    txTavernReport = {
-      create: vi.fn().mockResolvedValue({ id: 'rep-1' })
-    }
+    txTavernMessage = createRepoMock<any>()
+    txTavernMessage.updateMany.mockResolvedValue({ count: 1 })
+    txTavernReport = createRepoMock<any>()
+    txTavernReport.create.mockResolvedValue({ id: 'rep-1' })
 
-    prisma = {
-      $transaction: vi.fn(async (fn: any) =>
-        fn({ tavernMessage: txTavernMessage, tavernMessageReport: txTavernReport })
-      )
-    }
+    prisma = createPrismaMock({ tavernMessage: txTavernMessage, tavernMessageReport: txTavernReport })
 
-    messageRepo = {
-      findRecent: vi.fn().mockResolvedValue([]),
-      create: vi.fn(),
-      softDeleteByAuthor: vi.fn().mockResolvedValue(1)
-    }
+    messageRepo = createRepoMock<TavernMessageRepository>()
+    messageRepo.findRecent.mockResolvedValue([])
+    messageRepo.softDeleteByAuthor.mockResolvedValue(1)
 
-    characterRepo = {
-      findByUserId: vi.fn().mockResolvedValue({ id: 'char-1', userId: 'u1' })
-    }
+    characterRepo = createRepoMock<CharacterRepository>()
+    characterRepo.findByUserId.mockResolvedValue({ id: 'char-1', userId: 'u1' } as never)
 
     service = new TavernService(prisma, messageRepo, characterRepo)
   })
@@ -50,7 +43,7 @@ describe('TavernService', () => {
       ]
       messageRepo.findRecent.mockResolvedValue(desc)
       const result = await service.getMessages({})
-      expect(result.map((m: any) => m.id)).toEqual(['m1', 'm2', 'm3'])
+      expect(result.map((m: { id: string }) => m.id)).toEqual(['m1', 'm2', 'm3'])
     })
 
     it('passes cursor and limit to the repository', async () => {

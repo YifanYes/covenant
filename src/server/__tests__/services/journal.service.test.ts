@@ -1,48 +1,33 @@
 import { Prisma } from '@/generated/prisma'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { JournalRepository } from '../../repositories/journal.repository'
 import { JournalService } from '../../services/journal.service'
+import type { ManaService } from '../../services/mana.service'
+import { createPrismaMock, createRepoMock } from '../helpers/mock-repo'
 
 describe('JournalService', () => {
   let journalService: JournalService
-  let mockPrisma: any
-  let mockJournalRepo: any
-  let mockManaService: any
+  let mockPrisma: ReturnType<typeof createPrismaMock>
+  let mockJournalRepo: ReturnType<typeof createRepoMock<JournalRepository>>
+  let mockManaService: ReturnType<typeof createRepoMock<ManaService>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockPrisma = {
-      $transaction: vi.fn(async (callback: any) => {
-        const tx = {}
-        return callback(tx)
-      })
-    }
+    mockPrisma = createPrismaMock({})
 
-    mockJournalRepo = {
-      create: vi.fn(),
-      update: vi.fn(),
-      softDelete: vi.fn(),
-      findById: vi.fn(),
-      findByIdOrThrow: vi.fn(),
-      findByDate: vi.fn(),
-      findAll: vi.fn(),
-      findMoodCalendar: vi.fn(),
-      findEntryDates: vi.fn(),
-      hasEntryToday: vi.fn(),
-      deleteManyByUserId: vi.fn()
-    }
+    mockJournalRepo = createRepoMock<JournalRepository>()
 
-    mockManaService = {
-      addManaFromCompletion: vi.fn().mockResolvedValue({
-        success: true,
-        amount: 1,
-        manaApplied: 1,
-        reserveGained: 0,
-        newMana: 1,
-        newReserve: 0
-      }),
-      calculateStreakFromDates: vi.fn().mockReturnValue(3)
-    }
+    mockManaService = createRepoMock<ManaService>()
+    mockManaService.addManaFromCompletion.mockResolvedValue({
+      success: true,
+      amount: 1,
+      manaApplied: 1,
+      reserveGained: 0,
+      newMana: 1,
+      newReserve: 0
+    })
+    mockManaService.calculateStreakFromDates.mockReturnValue(3)
 
     journalService = new JournalService(mockPrisma, mockJournalRepo, mockManaService)
   })

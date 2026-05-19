@@ -2,89 +2,51 @@ import { GuildRole } from '@shared/schemas/guilds.schemas'
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CharacterRepository } from '../../repositories/character.repository'
+import type { GuildInviteRepository } from '../../repositories/guild-invite.repository'
+import type { GuildMemberRepository } from '../../repositories/guild-member.repository'
+import type { GuildMessageRepository } from '../../repositories/guild-message.repository'
+import type { GuildRepository } from '../../repositories/guild.repository'
+import type { UserRepository } from '../../repositories/user.repository'
 import { GuildService, INVITE_INVALID_REASON } from '../../services/guild.service'
+import { createPrismaMock, createRepoMock } from '../helpers/mock-repo'
 
 describe('GuildService', () => {
   let service: GuildService
-  let prisma: any
-  let txGuildInvite: any
-  let txGuildMember: any
-  let guildRepo: any
-  let memberRepo: any
-  let messageRepo: any
-  let inviteRepo: any
-  let userRepo: any
+  let prisma: ReturnType<typeof createPrismaMock>
+  let txGuildInvite: ReturnType<typeof createRepoMock<any>>
+  let txGuildMember: ReturnType<typeof createRepoMock<any>>
+  let txGuild: ReturnType<typeof createRepoMock<any>>
+  let guildRepo: ReturnType<typeof createRepoMock<GuildRepository>>
+  let memberRepo: ReturnType<typeof createRepoMock<GuildMemberRepository>>
+  let messageRepo: ReturnType<typeof createRepoMock<GuildMessageRepository>>
+  let inviteRepo: ReturnType<typeof createRepoMock<GuildInviteRepository>>
+  let userRepo: ReturnType<typeof createRepoMock<UserRepository>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    txGuildInvite = {
-      update: vi.fn(),
-      updateMany: vi.fn().mockResolvedValue({ count: 1 })
-    }
-    txGuildMember = {
-      create: vi.fn().mockResolvedValue({ id: 'gm-1' }),
-      update: vi.fn(),
-      count: vi.fn().mockResolvedValue(1)
-    }
+    txGuild = createRepoMock<any>()
+    txGuildMember = createRepoMock<any>()
+    txGuildInvite = createRepoMock<any>()
+    txGuild.create.mockResolvedValue({ id: 'guild-1', name: 'New', ownerId: 'u1' })
+    txGuildMember.create.mockResolvedValue({ id: 'gm-1' })
+    txGuildMember.count.mockResolvedValue(1)
+    txGuildInvite.updateMany.mockResolvedValue({ count: 1 })
 
-    prisma = {
-      $transaction: vi.fn(async (fn: any) => {
-        return fn({
-          guild: {
-            create: vi.fn().mockResolvedValue({ id: 'guild-1', name: 'New', ownerId: 'u1' }),
-            update: vi.fn()
-          },
-          guildMember: txGuildMember,
-          guildInvite: txGuildInvite
-        })
-      })
-    }
+    prisma = createPrismaMock({ guild: txGuild, guildMember: txGuildMember, guildInvite: txGuildInvite })
 
-    guildRepo = {
-      findById: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn()
-    }
-    memberRepo = {
-      findByUserId: vi.fn(),
-      findByUserIdWithGuildAndMembers: vi.fn(),
-      findByUserAndGuild: vi.fn(),
-      create: vi.fn(),
-      updateRole: vi.fn(),
-      delete: vi.fn(),
-      countByGuild: vi.fn()
-    }
-    messageRepo = {
-      findByGuild: vi.fn(),
-      findById: vi.fn(),
-      create: vi.fn(),
-      softDelete: vi.fn()
-    }
-    inviteRepo = {
-      findByToken: vi.fn(),
-      findById: vi.fn(),
-      findByGuild: vi.fn(),
-      countActiveByGuild: vi.fn().mockResolvedValue(0),
-      create: vi.fn().mockResolvedValue({ id: 'inv-new' }),
-      revoke: vi.fn()
-    }
-    userRepo = {
-      findById: vi.fn().mockResolvedValue({ id: 'u1', theme: 'HOLY_KNIGHTS' })
-    }
+    guildRepo = createRepoMock<GuildRepository>()
+    memberRepo = createRepoMock<GuildMemberRepository>()
+    messageRepo = createRepoMock<GuildMessageRepository>()
+    inviteRepo = createRepoMock<GuildInviteRepository>()
+    userRepo = createRepoMock<UserRepository>()
+    inviteRepo.countActiveByGuild.mockResolvedValue(0)
+    inviteRepo.create.mockResolvedValue({ id: 'inv-new' } as never)
+    userRepo.findById.mockResolvedValue({ id: 'u1', theme: 'HOLY_KNIGHTS' } as never)
 
-    const characterRepo = { findByUserId: vi.fn() }
+    const characterRepo = createRepoMock<CharacterRepository>()
 
-    service = new GuildService(
-      prisma,
-      guildRepo,
-      memberRepo,
-      messageRepo,
-      inviteRepo,
-      userRepo,
-      characterRepo as unknown as CharacterRepository
-    )
+    service = new GuildService(prisma, guildRepo, memberRepo, messageRepo, inviteRepo, userRepo, characterRepo)
   })
 
   describe('createGuild', () => {

@@ -2,7 +2,11 @@ import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '@/server/lib/errors'
 import { ItemType } from '@shared/types/gamification.types'
 import type { TacticalMoveResult, TacticalStateData } from '@shared/types/tactical-combat.types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { CharacterQuestRepository } from '../../repositories/character-quest.repository'
+import type { CharacterRepository } from '../../repositories/character.repository'
+import type { CharacterService } from '../../services/character.service'
 import { CombatService } from '../../services/combat.service'
+import { createRepoMock } from '../helpers/mock-repo'
 
 const executeMoveMock = vi.fn()
 const executeEnemyMoveMock = vi.fn()
@@ -67,34 +71,17 @@ const createTacticalStateForConsumable = (playerHealth: number, maxHealth: numbe
 
 describe('CombatService (Phase 2A)', () => {
   let combatService: CombatService
-  let mockCharacterRepo: any
-  let mockCharacterQuestRepo: any
-  let mockCharacterService: any
+  let mockCharacterRepo: ReturnType<typeof createRepoMock<CharacterRepository>>
+  let mockCharacterQuestRepo: ReturnType<typeof createRepoMock<CharacterQuestRepository>>
+  let mockCharacterService: ReturnType<typeof createRepoMock<CharacterService>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockCharacterRepo = {
-      findWithClasses: vi.fn(),
-      findWithClassesOrThrow: vi.fn(),
-      findByIdWithClasses: vi.fn(),
-      updateHealth: vi.fn(),
-      updateInventoryAndLoadout: vi.fn(),
-      updateManaReserve: vi.fn()
-    }
-
-    mockCharacterQuestRepo = {
-      findActiveByCharacterId: vi.fn(),
-      findByIdWithTacticalState: vi.fn(),
-      verifyOwnership: vi.fn().mockResolvedValue(true),
-      updateTacticalState: vi.fn()
-    }
-
-    mockCharacterService = {
-      getCurrentClass: vi.fn(),
-      updateHealth: vi.fn(),
-      getCharacterById: vi.fn()
-    }
+    mockCharacterRepo = createRepoMock<CharacterRepository>()
+    mockCharacterQuestRepo = createRepoMock<CharacterQuestRepository>()
+    mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+    mockCharacterService = createRepoMock<CharacterService>()
 
     combatService = new CombatService(mockCharacterRepo, mockCharacterQuestRepo, mockCharacterService)
   })
@@ -224,7 +211,7 @@ describe('CombatService (Phase 2A)', () => {
     beforeEach(() => {
       executeMoveMock.mockReset()
       executeEnemyMoveMock.mockReset()
-      mockCharacterQuestRepo.findByIdWithTacticalState = vi.fn().mockResolvedValue({
+      mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
         id: 'quest-1',
         characterId: 'char-1',
         tacticalState: stuckState

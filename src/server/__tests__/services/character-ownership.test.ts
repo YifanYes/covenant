@@ -1,5 +1,7 @@
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { CharacterService } from '../../services/character.service'
+import { createRepoMock } from '../helpers/mock-repo'
 
 /**
  * These tests verify that character ownership validation is properly
@@ -11,14 +13,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
  */
 
 describe('Character Ownership Validation', () => {
-  let mockCharacterService: any
+  let mockCharacterService: ReturnType<typeof createRepoMock<CharacterService>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockCharacterService = {
-      verifyCharacterOwnership: vi.fn()
-    }
+    mockCharacterService = createRepoMock<CharacterService>()
   })
 
   describe('verifyCharacterOwnership integration', () => {

@@ -1,29 +1,24 @@
 import { ALL_ITEMS, CONSUMABLES } from '@/shared/constants/items.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { CharacterRepository } from '../../repositories/character.repository'
+import type { CharacterService } from '../../services/character.service'
 import type { GuildService } from '../../services/guild.service'
 import { StoreService } from '../../services/store.services'
 import { mockCharacter, mockInventoryItem } from '../fixtures/character.fixtures'
+import { createRepoMock } from '../helpers/mock-repo'
 
 describe('StoreService', () => {
   let storeService: StoreService
-  let mockCharacterRepo: any
-  let mockCharacterService: any
+  let mockCharacterRepo: ReturnType<typeof createRepoMock<CharacterRepository>>
+  let mockCharacterService: ReturnType<typeof createRepoMock<CharacterService>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    // Create mock repository with mocked methods
-    mockCharacterRepo = {
-      findWithClasses: vi.fn(),
-      updateInventoryAndGold: vi.fn()
-    }
+    mockCharacterRepo = createRepoMock<CharacterRepository>()
+    mockCharacterService = createRepoMock<CharacterService>()
+    mockCharacterService.getCharacterProgress.mockReturnValue({ tier: 1 })
 
-    // Create mock character service
-    mockCharacterService = {
-      getCharacterProgress: vi.fn().mockReturnValue({ tier: 1 })
-    }
-
-    // Inject the mock dependencies directly
     storeService = new StoreService(mockCharacterRepo, mockCharacterService)
   })
 

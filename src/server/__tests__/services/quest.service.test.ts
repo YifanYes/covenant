@@ -1,59 +1,36 @@
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../../lib/errors'
+import type { CharacterQuestRepository } from '../../repositories/character-quest.repository'
+import type { CombatEnemyRepository } from '../../repositories/combat-enemy.repository'
+import type { CharacterService } from '../../services/character.service'
 import type { ManaService } from '../../services/mana.service'
 import { QuestService } from '../../services/quest.service'
 import { mockCharacter } from '../fixtures/character.fixtures'
 import { mockCharacterQuest } from '../fixtures/quest.fixtures'
+import { createRepoMock } from '../helpers/mock-repo'
 
 describe('QuestService', () => {
   let questService: QuestService
-  let mockCharacterQuestRepo: any
-  let mockCombatEnemyRepo: any
-  let mockCharacterService: any
+  let mockCharacterQuestRepo: ReturnType<typeof createRepoMock<CharacterQuestRepository>>
+  let mockCombatEnemyRepo: ReturnType<typeof createRepoMock<CombatEnemyRepository>>
+  let mockCharacterService: ReturnType<typeof createRepoMock<CharacterService>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockCharacterQuestRepo = {
-      findById: vi.fn(),
-      findActiveByCharacterId: vi.fn(),
-      findByIdWithTacticalState: vi.fn(),
-      findByIdWithAbilities: vi.fn(),
-      create: vi.fn(),
-      updateProgress: vi.fn(),
-      complete: vi.fn(),
-      abandon: vi.fn(),
-      updateTacticalState: vi.fn(),
-      updateAbilities: vi.fn(),
-      updateActiveAbilities: vi.fn(),
-      updateCombatStats: vi.fn(),
-      getCombatStats: vi.fn(),
-      verifyOwnership: vi.fn().mockResolvedValue(true)
-    }
+    mockCharacterQuestRepo = createRepoMock<CharacterQuestRepository>()
+    mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
 
-    mockCombatEnemyRepo = {
-      getActiveEnemy: vi.fn(),
-      createEnemy: vi.fn(),
-      defeatEnemy: vi.fn()
-    }
+    mockCombatEnemyRepo = createRepoMock<CombatEnemyRepository>()
 
-    mockCharacterService = {
-      getCharacterById: vi.fn(),
-      getCurrentClass: vi.fn(),
-      verifyCharacterOwnership: vi.fn().mockResolvedValue(true)
-    }
+    mockCharacterService = createRepoMock<CharacterService>()
+    mockCharacterService.verifyCharacterOwnership.mockResolvedValue(true)
 
-    const mockManaService = {
-      topUpFromReserve: vi.fn().mockResolvedValue({ added: 0, newMana: 0, newReserve: 0 })
-    }
+    const mockManaService = createRepoMock<ManaService>()
+    mockManaService.topUpFromReserve.mockResolvedValue({ added: 0, newMana: 0, newReserve: 0 })
 
-    questService = new QuestService(
-      mockCharacterQuestRepo,
-      mockCombatEnemyRepo,
-      mockCharacterService,
-      mockManaService as unknown as ManaService
-    )
+    questService = new QuestService(mockCharacterQuestRepo, mockCombatEnemyRepo, mockCharacterService, mockManaService)
   })
 
   describe('startQuest', () => {

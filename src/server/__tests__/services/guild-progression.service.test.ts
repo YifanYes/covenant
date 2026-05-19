@@ -1,4 +1,3 @@
-import type { PrismaClient } from '@/generated/prisma'
 import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import {
   computeContributionPoints,
@@ -9,7 +8,13 @@ import {
 } from '@/shared/constants/guild-progression.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CharacterRepository } from '../../repositories/character.repository'
+import type { GuildInviteRepository } from '../../repositories/guild-invite.repository'
+import type { GuildMemberRepository } from '../../repositories/guild-member.repository'
+import type { GuildMessageRepository } from '../../repositories/guild-message.repository'
+import type { GuildRepository } from '../../repositories/guild.repository'
+import type { UserRepository } from '../../repositories/user.repository'
 import { GuildService } from '../../services/guild.service'
+import { createPrismaMock, createRepoMock } from '../helpers/mock-repo'
 
 describe('Guild progression (Phase 3)', () => {
   describe('pure helpers', () => {
@@ -59,59 +64,24 @@ describe('Guild progression (Phase 3)', () => {
 
   describe('GuildService.recordCampaignEvent — always-on contribution', () => {
     let service: GuildService
-    let prisma: any
-    let memberRepo: any
-    let guildRepo: any
+    let prisma: ReturnType<typeof createPrismaMock> & { guild: ReturnType<typeof createRepoMock<any>> }
+    let memberRepo: ReturnType<typeof createRepoMock<GuildMemberRepository>>
+    let guildRepo: ReturnType<typeof createRepoMock<GuildRepository>>
 
     beforeEach(() => {
       vi.clearAllMocks()
-      prisma = {
-        $transaction: vi.fn(async (fn: any) => fn({})),
-        guild: {
-          update: vi.fn().mockResolvedValue({ tier: 1, totalContribution: 5 }),
-          updateMany: vi.fn().mockResolvedValue({ count: 1 })
-        }
-      }
-      memberRepo = {
-        findByUserId: vi.fn(),
-        findByUserAndGuild: vi.fn(),
-        findByUserIdWithGuildAndMembers: vi.fn(),
-        create: vi.fn(),
-        updateRole: vi.fn(),
-        delete: vi.fn(),
-        countByGuild: vi.fn()
-      }
-      guildRepo = {
-        findById: vi.fn(),
-        create: vi.fn(),
-        update: vi.fn(),
-        delete: vi.fn(),
-        findActiveCampaignByGuild: vi.fn().mockResolvedValue(null),
-        findCurrentCampaignByGuildWithEntries: vi.fn(),
-        findCampaignById: vi.fn(),
-        listCampaignsByGuild: vi.fn(),
-        createCampaign: vi.fn()
-      }
-      const messageRepo: any = { findByGuild: vi.fn(), findById: vi.fn(), create: vi.fn(), softDelete: vi.fn() }
-      const inviteRepo: any = {
-        findByToken: vi.fn(),
-        findById: vi.fn(),
-        findByGuild: vi.fn(),
-        countActiveByGuild: vi.fn(),
-        create: vi.fn(),
-        revoke: vi.fn()
-      }
-      const userRepo: any = { findById: vi.fn() }
-      const characterRepo = { findByUserId: vi.fn() }
-      service = new GuildService(
-        prisma,
-        guildRepo,
-        memberRepo,
-        messageRepo,
-        inviteRepo,
-        userRepo,
-        characterRepo as unknown as CharacterRepository
-      )
+      const guild = createRepoMock<any>()
+      guild.update.mockResolvedValue({ tier: 1, totalContribution: 5 })
+      guild.updateMany.mockResolvedValue({ count: 1 })
+      prisma = Object.assign(createPrismaMock({}), { guild })
+      memberRepo = createRepoMock<GuildMemberRepository>()
+      guildRepo = createRepoMock<GuildRepository>()
+      guildRepo.findActiveCampaignByGuild.mockResolvedValue(null)
+      const messageRepo = createRepoMock<GuildMessageRepository>()
+      const inviteRepo = createRepoMock<GuildInviteRepository>()
+      const userRepo = createRepoMock<UserRepository>()
+      const characterRepo = createRepoMock<CharacterRepository>()
+      service = new GuildService(prisma, guildRepo, memberRepo, messageRepo, inviteRepo, userRepo, characterRepo)
     })
 
     it('bumps contribution even when no campaign is active', async () => {
@@ -178,59 +148,24 @@ describe('Guild progression (Phase 3)', () => {
 
   describe('GuildService.applyCombatRewards / getMyProgression', () => {
     let service: GuildService
-    let prisma: any
-    let memberRepo: any
-    let guildRepo: any
+    let prisma: ReturnType<typeof createPrismaMock> & { guild: ReturnType<typeof createRepoMock<any>> }
+    let memberRepo: ReturnType<typeof createRepoMock<GuildMemberRepository>>
+    let guildRepo: ReturnType<typeof createRepoMock<GuildRepository>>
 
     beforeEach(() => {
       vi.clearAllMocks()
-      prisma = {
-        $transaction: vi.fn(),
-        guild: {
-          update: vi.fn().mockResolvedValue({ tier: 1, totalContribution: 5 }),
-          updateMany: vi.fn().mockResolvedValue({ count: 1 })
-        }
-      }
-      memberRepo = {
-        findByUserId: vi.fn(),
-        findByUserAndGuild: vi.fn(),
-        findByUserIdWithGuildAndMembers: vi.fn(),
-        create: vi.fn(),
-        updateRole: vi.fn(),
-        delete: vi.fn(),
-        countByGuild: vi.fn()
-      }
-      guildRepo = {
-        findById: vi.fn(),
-        create: vi.fn(),
-        update: vi.fn(),
-        delete: vi.fn(),
-        findActiveCampaignByGuild: vi.fn().mockResolvedValue(null),
-        findCurrentCampaignByGuildWithEntries: vi.fn(),
-        findCampaignById: vi.fn(),
-        listCampaignsByGuild: vi.fn(),
-        createCampaign: vi.fn()
-      }
-      const messageRepo: any = { findByGuild: vi.fn(), findById: vi.fn(), create: vi.fn(), softDelete: vi.fn() }
-      const inviteRepo: any = {
-        findByToken: vi.fn(),
-        findById: vi.fn(),
-        findByGuild: vi.fn(),
-        countActiveByGuild: vi.fn(),
-        create: vi.fn(),
-        revoke: vi.fn()
-      }
-      const userRepo: any = { findById: vi.fn() }
-      const characterRepo = { findByUserId: vi.fn() }
-      service = new GuildService(
-        prisma as unknown as PrismaClient,
-        guildRepo,
-        memberRepo,
-        messageRepo,
-        inviteRepo,
-        userRepo,
-        characterRepo as unknown as CharacterRepository
-      )
+      const guild = createRepoMock<any>()
+      guild.update.mockResolvedValue({ tier: 1, totalContribution: 5 })
+      guild.updateMany.mockResolvedValue({ count: 1 })
+      prisma = Object.assign(createPrismaMock({}), { guild })
+      memberRepo = createRepoMock<GuildMemberRepository>()
+      guildRepo = createRepoMock<GuildRepository>()
+      guildRepo.findActiveCampaignByGuild.mockResolvedValue(null)
+      const messageRepo = createRepoMock<GuildMessageRepository>()
+      const inviteRepo = createRepoMock<GuildInviteRepository>()
+      const userRepo = createRepoMock<UserRepository>()
+      const characterRepo = createRepoMock<CharacterRepository>()
+      service = new GuildService(prisma, guildRepo, memberRepo, messageRepo, inviteRepo, userRepo, characterRepo)
     })
 
     it('applyCombatRewards returns baseGold and skips recording when guildless', async () => {

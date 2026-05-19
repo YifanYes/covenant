@@ -1,33 +1,22 @@
 import { CharacterClassName } from '@/shared/constants/classes.constants'
 import { ALL_ITEMS } from '@/shared/constants/items.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { CharacterRepository } from '../../repositories/character.repository'
+import type { UserRepository } from '../../repositories/user.repository'
 import { CharacterService } from '../../services/character.service'
 import { mockCharacter, mockInventoryItem } from '../fixtures/character.fixtures'
+import { createRepoMock } from '../helpers/mock-repo'
 
 describe('CharacterService', () => {
   let characterService: CharacterService
-  let mockCharacterRepo: any
-  let mockUserRepo: any
+  let mockCharacterRepo: ReturnType<typeof createRepoMock<CharacterRepository>>
+  let mockUserRepo: ReturnType<typeof createRepoMock<UserRepository>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockCharacterRepo = {
-      findWithClasses: vi.fn(),
-      findByUserIdOrThrow: vi.fn(),
-      findByIdWithClassesOrThrow: vi.fn(),
-      getCharacterWithClasses: vi.fn(),
-      updateCharacterClass: vi.fn(),
-      updateInventoryAndLoadout: vi.fn(),
-      updateHealth: vi.fn(),
-      equipItem: vi.fn(),
-      unequipItem: vi.fn(),
-      updateAbilities: vi.fn()
-    }
-
-    mockUserRepo = {
-      setTutorialCompletedAt: vi.fn()
-    }
+    mockCharacterRepo = createRepoMock<CharacterRepository>()
+    mockUserRepo = createRepoMock<UserRepository>()
 
     characterService = new CharacterService(mockCharacterRepo, mockUserRepo)
   })

@@ -1,19 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { AreaRepository } from '../../repositories/area.repository'
 import { AreaService } from '../../services/area.service'
+import { createRepoMock } from '../helpers/mock-repo'
 
 describe('AreaService', () => {
   let areaService: AreaService
-  let mockAreaRepo: any
+  let mockAreaRepo: ReturnType<typeof createRepoMock<AreaRepository>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockAreaRepo = {
-      create: vi.fn(),
-      findAll: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn()
-    }
+    mockAreaRepo = createRepoMock<AreaRepository>()
 
     areaService = new AreaService(mockAreaRepo)
   })

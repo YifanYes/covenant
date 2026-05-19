@@ -8,50 +8,44 @@ import {
   type UpdateTaskType
 } from '@shared/schemas/tasks.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { TaskRepository } from '../../repositories/task.repository'
+import type { GuildService } from '../../services/guild.service'
+import type { ManaService } from '../../services/mana.service'
 import { TaskService } from '../../services/task.service'
+import { createRepoMock } from '../helpers/mock-repo'
 
 describe('TaskService', () => {
   let taskService: TaskService
-  let mockTaskRepo: any
-  let mockManaService: any
-  let mockGuildService: any
+  let mockTaskRepo: ReturnType<typeof createRepoMock<TaskRepository>>
+  let mockManaService: ReturnType<typeof createRepoMock<ManaService>>
+  let mockGuildService: ReturnType<typeof createRepoMock<GuildService>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockTaskRepo = {
-      create: vi.fn(),
-      findAll: vi.fn(),
-      findByIdOrThrow: vi.fn(),
-      findManyByIds: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      findFiltered: vi.fn(),
-      bulkUpdate: vi.fn().mockResolvedValue(undefined)
-    }
+    mockTaskRepo = createRepoMock<TaskRepository>()
+    mockTaskRepo.bulkUpdate.mockResolvedValue(undefined)
 
-    mockManaService = {
-      addManaFromCompletion: vi.fn().mockResolvedValue({
-        success: true,
-        amount: 0,
-        manaApplied: 0,
-        reserveGained: 0,
-        newMana: 0,
-        newReserve: 0
-      }),
-      addManaFromCompletions: vi.fn().mockResolvedValue({
-        success: true,
-        amount: 0,
-        manaApplied: 0,
-        reserveGained: 0,
-        newMana: 0,
-        newReserve: 0
-      })
-    }
+    mockManaService = createRepoMock<ManaService>()
+    mockManaService.addManaFromCompletion.mockResolvedValue({
+      success: true,
+      amount: 0,
+      manaApplied: 0,
+      reserveGained: 0,
+      newMana: 0,
+      newReserve: 0
+    })
+    mockManaService.addManaFromCompletions.mockResolvedValue({
+      success: true,
+      amount: 0,
+      manaApplied: 0,
+      reserveGained: 0,
+      newMana: 0,
+      newReserve: 0
+    })
 
-    mockGuildService = {
-      recordCampaignEvent: vi.fn().mockResolvedValue(undefined)
-    }
+    mockGuildService = createRepoMock<GuildService>()
+    mockGuildService.recordCampaignEvent.mockResolvedValue(undefined)
 
     taskService = new TaskService(mockTaskRepo, mockManaService, mockGuildService)
   })
