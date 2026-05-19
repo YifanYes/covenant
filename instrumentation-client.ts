@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+import { scrubPii } from './sentry.shared.config'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -17,9 +18,9 @@ if (isProd) {
 
     enableLogs: true,
 
-    integrations: [
-      Sentry.replayIntegration()
-    ],
+    beforeSend: scrubPii,
+
+    integrations: [Sentry.replayIntegration()]
   })
 }
 

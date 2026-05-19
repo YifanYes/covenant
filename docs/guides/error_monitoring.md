@@ -4,15 +4,15 @@ Covenant captures production errors via [Sentry](https://sentry.io) for both ser
 
 ## Required environment variables
 
-| Variable | Runtime | Required in prod? | Description |
-| --- | --- | --- | --- |
-| `SENTRY_DSN` | Server / Edge | Yes | Server-side and edge error ingestion DSN |
-| `NEXT_PUBLIC_SENTRY_DSN` | Client | Yes | Browser error ingestion DSN |
-| `SENTRY_ORG` | Build | Yes (prod) | Sentry organization slug, used for source-map upload |
-| `SENTRY_PROJECT` | Build | Yes (prod) | Sentry project slug, used for source-map upload |
-| `SENTRY_AUTH_TOKEN` | Build | Yes (prod) | Build-time auth token (do not commit) |
-| `NODE_ENV` | All | No | Defaults Sentry environment to `development` / `production` |
-| `ENVIRONMENT` / `NEXT_PUBLIC_ENVIRONMENT` | Server / Client | No | Override `NODE_ENV` in Sentry tags (e.g. `staging`, `preview`) |
+| Variable                                  | Runtime         | Required in prod? | Description                                                    |
+| ----------------------------------------- | --------------- | ----------------- | -------------------------------------------------------------- |
+| `SENTRY_DSN`                              | Server / Edge   | Yes               | Server-side and edge error ingestion DSN                       |
+| `NEXT_PUBLIC_SENTRY_DSN`                  | Client          | Yes               | Browser error ingestion DSN                                    |
+| `SENTRY_ORG`                              | Build           | Yes (prod)        | Sentry organization slug, used for source-map upload           |
+| `SENTRY_PROJECT`                          | Build           | Yes (prod)        | Sentry project slug, used for source-map upload                |
+| `SENTRY_AUTH_TOKEN`                       | Build           | Yes (prod)        | Build-time auth token (do not commit)                          |
+| `NODE_ENV`                                | All             | No                | Defaults Sentry environment to `development` / `production`    |
+| `ENVIRONMENT` / `NEXT_PUBLIC_ENVIRONMENT` | Server / Client | No                | Override `NODE_ENV` in Sentry tags (e.g. `staging`, `preview`) |
 
 In `next.config.ts`, the build throws if `SENTRY_ORG` is missing in production — there is no fallback slug, so each deployment must set its own.
 
@@ -28,16 +28,16 @@ In dev, `SENTRY_ORG` is optional; without it the Sentry plugin skips source-map 
 
 ## Files involved
 
-| File | Purpose |
-| --- | --- |
-| `instrumentation-client.ts` | Browser SDK init |
-| `sentry.server.config.ts` | Node.js SDK init |
-| `sentry.edge.config.ts` | Edge runtime SDK init |
-| `sentry.shared.config.ts` | Shared config for server + edge |
-| `instrumentation.ts` | Loads correct config based on `NEXT_RUNTIME` |
-| `next.config.ts` | Wraps export with `withSentryConfig` |
-| `src/app/api/trpc/[...trpc]/route.ts` | tRPC `onError` handler — sends `INTERNAL_SERVER_ERROR` to Sentry |
-| `src/components/common/sentry-provider.component.tsx` | React `ErrorBoundary` for unhandled client errors |
+| File                                                  | Purpose                                                          |
+| ----------------------------------------------------- | ---------------------------------------------------------------- |
+| `instrumentation-client.ts`                           | Browser SDK init                                                 |
+| `sentry.server.config.ts`                             | Node.js SDK init                                                 |
+| `sentry.edge.config.ts`                               | Edge runtime SDK init                                            |
+| `sentry.shared.config.ts`                             | Shared config for server + edge                                  |
+| `instrumentation.ts`                                  | Loads correct config based on `NEXT_RUNTIME`                     |
+| `next.config.ts`                                      | Wraps export with `withSentryConfig`                             |
+| `src/app/api/trpc/[...trpc]/route.ts`                 | tRPC `onError` handler — sends `INTERNAL_SERVER_ERROR` to Sentry |
+| `src/components/common/sentry-provider.component.tsx` | React `ErrorBoundary` for unhandled client errors                |
 
 ## How it works
 
@@ -58,7 +58,16 @@ The tRPC fetch handler's `onError` callback captures unwrapped `INTERNAL_SERVER_
 
 ### beforeSend filter
 
-Events are dropped when no DSN is configured **and** `NODE_ENV` is not `production` — so local dev never spams Sentry.
+Events are dropped entirely in non-production environments by skipping `Sentry.init` when `NODE_ENV !== 'production'`, so local dev never spams Sentry.
+
+In production, `sendDefaultPii: true` is enabled (required for source-map symbolication and useful context like user-scoped issues), but the `scrubPii` `beforeSend` hook in `sentry.shared.config.ts` runs on every event to strip identifiers before transport:
+
+- **`event.user`** — reduced to `{ id }` only. Email, username, and `ip_address` are removed.
+- **`event.request.cookies`** — cleared.
+- **`event.request.headers`** — `cookie`, `set-cookie`, `authorization`, `proxy-authorization`, `x-forwarded-for`, `x-real-ip`, and `forwarded` headers are removed (case-insensitive).
+- **`event.request.data`** — replaced with `'[Filtered]'` to avoid leaking request bodies.
+
+The same `scrubPii` function is imported by `instrumentation-client.ts` so server, edge, and browser events all go through the same filter. When adjusting the scrubber, update both call sites by editing the shared helper.
 
 ## Verification
 
@@ -77,13 +86,13 @@ If you don't set any Sentry variables:
 
 ## Troubleshooting
 
-| Symptom | Fix |
-| --- | --- |
-| `SENTRY_ORG required in production` at build | Set `SENTRY_ORG` (and the rest) in your host's environment |
-| Source-maps not uploaded | Confirm `SENTRY_ORG`, `SENTRY_PROJECT`, and `SENTRY_AUTH_TOKEN` are set at build time |
-| tRPC errors not appearing | Only `INTERNAL_SERVER_ERROR` with a `.cause` is captured; check the error code |
-| Client boundary not catching | `<SentryProvider>` must be mounted **outside** any component that might crash |
-| Too much noise | Lower `tracesSampleRate` and `replaysOnErrorSampleRate` in the shared config |
+| Symptom                                      | Fix                                                                                   |
+| -------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `SENTRY_ORG required in production` at build | Set `SENTRY_ORG` (and the rest) in your host's environment                            |
+| Source-maps not uploaded                     | Confirm `SENTRY_ORG`, `SENTRY_PROJECT`, and `SENTRY_AUTH_TOKEN` are set at build time |
+| tRPC errors not appearing                    | Only `INTERNAL_SERVER_ERROR` with a `.cause` is captured; check the error code        |
+| Client boundary not catching                 | `<SentryProvider>` must be mounted **outside** any component that might crash         |
+| Too much noise                               | Lower `tracesSampleRate` and `replaysOnErrorSampleRate` in the shared config          |
 
 ## Related docs
 
