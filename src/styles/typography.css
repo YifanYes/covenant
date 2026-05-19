@@ -1,43 +1,45 @@
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-title);
-  opacity: 0.9;
-  color: var(--primary) !important;
-}
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-title);
+    opacity: 0.9;
+    color: var(--primary) !important;
+  }
 
-p,
-li,
-span {
-  font-family: var(--font-body);
-}
+  p,
+  li,
+  span {
+    font-family: var(--font-body);
+  }
 
-.text-body {
-  opacity: 0.8;
-}
+  .text-body {
+    opacity: 0.8;
+  }
 
-.text-disabled {
-  opacity: 0.4;
-}
+  .text-disabled {
+    opacity: 0.4;
+  }
 
-.rpg-typography h1,
-.rpg-typography h2,
-.rpg-typography .rpg-title {
-  font-family: var(--font-title);
-}
+  .rpg-typography h1,
+  .rpg-typography h2,
+  .rpg-typography .rpg-title {
+    font-family: var(--font-title);
+  }
 
-.rpg-typography p,
-.rpg-typography span {
-  font-family: var(--font-body);
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
+  .rpg-typography p,
+  .rpg-typography span {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
 
-.rpg-btn,
-.rpg-label {
-  font-family: var(--font-title);
-  font-weight: bold;
+  .rpg-btn,
+  .rpg-label {
+    font-family: var(--font-title);
+    font-weight: bold;
+  }
 }

@@ -81,9 +81,7 @@ export default function StoreItemCard({
             <div className="truncate pr-6 text-sm font-medium">{displayName}</div>
             <div className="text-muted-foreground line-clamp-1 text-xs">{displayDescription}</div>
           </button>
-          <div className="mt-1 flex items-center justify-between">
-            <span className="text-muted-foreground text-xs italic">{t('store.random_rarity')}</span>
-
+          <div className="mt-1 flex items-center justify-end">
             {isConsumable && isSelected ? (
               <div className="flex items-center gap-1">
                 <Button

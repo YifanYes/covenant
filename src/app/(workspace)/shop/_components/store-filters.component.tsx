@@ -23,10 +23,10 @@ export default function StoreFilters({ gold, tierFilter, typeFilter, onTierChang
       </div>
       <div className="flex gap-2">
         <Select value={tierFilter} onValueChange={onTierChange}>
-          <SelectTrigger className="w-40 cursor-pointer">
+          <SelectTrigger className="w-40 cursor-pointer [font-family:var(--font-rpg-body)] **:[font-family:var(--font-rpg-body)] text-sm font-normal">
             <SelectValue placeholder={t('store.filter.tier')} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="[font-family:var(--font-rpg-body)] **:[font-family:var(--font-rpg-body)] text-sm font-normal">
             <SelectItem value="all">{t('store.filter.all_tiers')}</SelectItem>
             <SelectItem value="1">{t('store.filter.tier')} 1</SelectItem>
             <SelectItem value="2">{t('store.filter.tier')} 2</SelectItem>
@@ -34,10 +34,10 @@ export default function StoreFilters({ gold, tierFilter, typeFilter, onTierChang
           </SelectContent>
         </Select>
         <Select value={typeFilter} onValueChange={onTypeChange}>
-          <SelectTrigger className="w-40 cursor-pointer">
+          <SelectTrigger className="w-40 cursor-pointer [font-family:var(--font-rpg-body)] **:[font-family:var(--font-rpg-body)] text-sm font-normal">
             <SelectValue placeholder={t('store.filter.type')} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="[font-family:var(--font-rpg-body)] **:[font-family:var(--font-rpg-body)] text-sm font-normal">
             <SelectItem value="all">{t('store.filter.all_types')}</SelectItem>
             <SelectItem value="WEAPON">{t('item_categories.type.weapon')}</SelectItem>
             <SelectItem value="ARMOR">{t('item_categories.type.armor')}</SelectItem>

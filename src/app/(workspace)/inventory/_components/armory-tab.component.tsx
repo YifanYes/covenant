@@ -1,13 +1,13 @@
 'use client'
 import Button from '@/ui/button.component'
 import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select.component'
-import { Cancel as Close } from 'pixelarticons/react'
 import {
   EquipmentTypeFilter,
   type InventoryCharacter,
   type InventoryItem,
   type SlotType
 } from '@shared/types/gamification.types'
+import { Cancel as Close } from 'pixelarticons/react'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import InventoryGrid from './inventory-grid.component'
@@ -42,10 +42,10 @@ export default function ArmoryTab({ character, onEquipItem, onUnequipItem }: Arm
           value={tierFilter?.toString() ?? 'all'}
           onValueChange={(value: string) => setTierFilter(value === 'all' ? null : Number(value))}
         >
-          <SelectTrigger className="w-35">
+          <SelectTrigger className="w-35 [font-family:var(--font-rpg-body)] **:[font-family:var(--font-rpg-body)] text-sm font-normal">
             <SelectValue placeholder={t('inventory.filter.all_tiers')} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="[font-family:var(--font-rpg-body)] **:[font-family:var(--font-rpg-body)] text-sm font-normal">
             <SelectItem value="all">{t('inventory.filter.all_tiers')}</SelectItem>
             {availableTiers.map((tier) => (
               <SelectItem key={tier} value={tier.toString()}>
@@ -56,10 +56,10 @@ export default function ArmoryTab({ character, onEquipItem, onUnequipItem }: Arm
         </Select>
 
         <Select value={typeFilter} onValueChange={(value: string) => setTypeFilter(value as EquipmentTypeFilter)}>
-          <SelectTrigger className="w-35">
+          <SelectTrigger className="w-35 [font-family:var(--font-rpg-body)] **:[font-family:var(--font-rpg-body)] text-sm font-normal">
             <SelectValue placeholder={t('inventory.filter.all_types')} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="[font-family:var(--font-rpg-body)] **:[font-family:var(--font-rpg-body)] text-sm font-normal">
             <SelectItem value="all">{t('inventory.filter.all_types')}</SelectItem>
             <SelectItem value="weapon">{t('inventory.filter.weapon')}</SelectItem>
             <SelectItem value="armor">{t('inventory.filter.armor')}</SelectItem>

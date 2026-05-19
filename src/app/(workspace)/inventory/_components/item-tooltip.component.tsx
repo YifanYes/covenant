@@ -21,7 +21,7 @@ export default function ItemTooltip({ item, quantity = 1, children }: ItemToolti
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent className="max-w-xs border-zinc-700 bg-zinc-800 p-3">
+      <TooltipContent className="max-w-xs border-zinc-700 bg-zinc-800 p-3 [font-family:var(--font-rpg-body)] **:[font-family:var(--font-rpg-body)]">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Image src={itemImagePath} alt={itemName} width={32} height={32} className="h-8 w-8 object-contain" />
