@@ -29,7 +29,9 @@
     },
     "news": {
       "title": "Noticias",
-      "subtitle": "Actualizaciones de desarrollo, lanzamientos de funciones y notas internas de la construcción de Covenant."
+      "subtitle": "Actualizaciones de desarrollo, lanzamientos de funciones y notas internas de la construcción de Covenant.",
+      "back": "Volver a Noticias",
+      "other_posts": "Otras entradas"
     },
     "footer": {
       "copyright": "© {{year}} Covenant. Todos los derechos reservados.",

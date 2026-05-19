@@ -142,14 +142,13 @@ export default function ChatRoom<T extends ChatRoomMessage>({
   const { t } = useTranslation()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const anchorRef = useRef<HTMLDivElement>(null)
-  const lastSeenIdRef = useRef<string | null>(null)
   const expectingOlderRef = useRef<number | null>(null)
   const previousMessagesLengthRef = useRef(0)
 
   const [olderMessages, setOlderMessages] = useState<T[]>([])
   const [hasMoreOlder, setHasMoreOlder] = useState(Boolean(pagination))
   const [isLoadingOlder, setIsLoadingOlder] = useState(false)
-  const [pendingNewCount, setPendingNewCount] = useState(0)
+  const [lastSeenId, setLastSeenId] = useState<string | null>(null)
   const [scrollRequest, setScrollRequest] = useState(0)
   const [deleteTarget, setDeleteTarget] = useState<T | null>(null)
   const [reportTarget, setReportTarget] = useState<T | null>(null)
@@ -190,29 +189,29 @@ export default function ChatRoom<T extends ChatRoomMessage>({
   useLayoutEffect(() => {
     if (!lastMessageId) return
     if (expectingOlderRef.current != null) return
-    if (lastSeenIdRef.current === lastMessageId) return
+    if (lastSeenId === lastMessageId) return
 
     const container = scrollContainerRef.current
     if (!container) {
-      lastSeenIdRef.current = lastMessageId
+      setLastSeenId(lastMessageId)
       return
     }
 
     const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight
-    const isFirstLoad = lastSeenIdRef.current === null
+    const isFirstLoad = lastSeenId === null
     const isNearBottom = distanceFromBottom < 80
 
     if (isFirstLoad || isNearBottom) {
       anchorRef.current?.scrollIntoView({ behavior: isFirstLoad ? 'auto' : 'smooth' })
-      setPendingNewCount(0)
-    } else {
-      const lastSeenIndex = messages.findIndex((m) => m.id === lastSeenIdRef.current)
-      const newlyArrived = lastSeenIndex >= 0 ? messages.length - 1 - lastSeenIndex : 1
-      setPendingNewCount((prev) => prev + Math.max(1, newlyArrived))
+      setLastSeenId(lastMessageId)
     }
+  }, [lastMessageId, lastSeenId])
 
-    lastSeenIdRef.current = lastMessageId
-  }, [lastMessageId, messages])
+  const pendingNewCount = useMemo(() => {
+    if (!lastSeenId || !lastMessageId || lastSeenId === lastMessageId) return 0
+    const idx = messages.findIndex((m) => m.id === lastSeenId)
+    return idx < 0 ? 0 : messages.length - 1 - idx
+  }, [messages, lastSeenId, lastMessageId])
 
   useEffect(() => {
     if (scrollRequest === 0) return
@@ -222,7 +221,7 @@ export default function ChatRoom<T extends ChatRoomMessage>({
   const handleRefresh = () => query.onRefresh()
   const requestJumpToBottom = () => {
     setScrollRequest((n) => n + 1)
-    setPendingNewCount(0)
+    if (lastMessageId) setLastSeenId(lastMessageId)
   }
 
   const handleLoadOlder = async () => {
@@ -268,7 +267,7 @@ export default function ChatRoom<T extends ChatRoomMessage>({
   const handleComposerSubmit = async (content: string) => {
     const result = composer.onSubmit(content)
     if (result instanceof Promise) await result
-    setPendingNewCount(0)
+    if (lastMessageId) setLastSeenId(lastMessageId)
     setScrollRequest((n) => n + 1)
   }
 

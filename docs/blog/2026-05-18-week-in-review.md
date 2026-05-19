@@ -1,0 +1,65 @@
+---
+title: 'A Week in Covenant: Combat Reborn and Guilds Complete'
+date: 2026-05-18
+author: Yifan
+tags: [release-notes, features]
+---
+
+# A Week in Covenant: Combat Reborn and Guilds Complete
+
+There were three big shifts this week, plus a stack of smaller ones.
+
+## Combat got rebuilt
+
+The old fight system is gone. No more dice rolls.
+
+The new one is cleaner, faster, and simpler.
+
+The core mechanic shift: you regenerate mana by doing real productivity work outside combat. The two halves of Covenant — fulfilling your objectives and killing demons — finally talk to each other.
+
+A few other changes:
+
+- "Doctrines" are now called **abilities**. It's more obvious. Players don't have to learn more jargon
+- Damage and HP got rebalanced so numbers feel right
+
+## Guilds are complete
+
+Two big additions.
+
+- **Shared campaigns.** A campaign is a time-limited group objective: complete X tasks together, defeat Y monsters, earn Z gold. Every guild member contributes through normal play. When the goal hits, every member gets the reward. New campaigns rotate in. I would like players to create their own campaigns in the future.
+
+- **Tier progression.** Your guild now levels up as members play. Each tier unlocks a passive buff — XP multipliers, mana regen bonuses, drop-rate bumps — and a small catalog of tier-exclusive items in the shop. The buffs are modest on purpose. Being in a guild should feel nice and rewarding, but not mandatory.
+
+## Covenant is open source
+
+After watching some videos of Theo (follow him on https://www.youtube.com/@t3dotgg), I truly believe the future is open-source. Users deserve to read the code they run and customize it however they want.
+
+This is my small contribution.
+
+The code is now public on GitHub under AGPL-3.0. Steal it, fork it, mock it, fix my typos. The license keeps the project from being locked away behind a paid clone.
+
+## The Tavern: a place to hang out
+
+There's a global chat now, called the Tavern. One room, every player, low-key. A reminder that you're playing alongside other real people.
+
+## Tasks as a kanban board
+
+The task list has a new toggle: view your tasks as a kanban board (To-do / In-progress / Done) instead of a list. Drag cards between columns. Moving a task into "Done" still triggers the same mana reward as ticking it off.
+
+## Objectives feel more connected
+
+- Filter the objectives page by area (Work, Health, Family, etc.)
+- Open an objective and see every task and habit linked to it
+- The calendar's day-details now opens as a side panel, so the calendar stays in view
+
+## Polish that adds up
+
+- A proper user dropdown in the sidebar — profile, settings, sign-out
+- "Last completed N days ago" on every habit card
+- Error pages and 404s now translate properly
+- Settings changes appear in the sidebar instantly
+- Empty states across shop filters and inventory tabs
+
+## Quest scene backdrops
+
+The quest reader now has pixel-art backgrounds for scenes. A small thing that does a lot to make a quest feel like a place instead of a card.

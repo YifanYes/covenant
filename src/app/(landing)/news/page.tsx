@@ -1,6 +1,6 @@
+import { createServerI18n } from '@/server/lib/i18n-server'
 import Link from 'next/link'
 import { ArrowRight } from 'pixelarticons/react'
-import { createServerI18n } from '@/server/lib/i18n-server'
 import { getLandingLocale } from '../_lib/locale'
 import { buildPageMetadata } from '../_lib/page-metadata'
 import { POSTS } from './posts'
@@ -23,7 +23,7 @@ export default async function NewsPage() {
     <main className="bg-background min-h-screen pt-16">
       <div className="mx-auto max-w-4xl px-4 py-12">
         <div className="mb-12">
-          <h1 className="font-[family:var(--font-title)] mb-3 text-5xl font-bold">{t('landing.news.title')}</h1>
+          <h1 className="font-bold mb-3 text-5xl">{t('landing.news.title')}</h1>
           <p className="text-muted-foreground max-w-xl text-lg leading-relaxed">{t('landing.news.subtitle')}</p>
         </div>
 
@@ -36,9 +36,7 @@ export default async function NewsPage() {
                     <div className="text-muted-foreground mb-2 text-xs">
                       {post.date} · {post.author}
                     </div>
-                    <h2 className="font-[family:var(--font-title)] mb-2 text-lg font-semibold leading-snug">
-                      {post.title[lang]}
-                    </h2>
+                    <h2 className="mb-2 text-lg font-semibold leading-snug">{post.title[lang]}</h2>
                     <p className="text-muted-foreground mb-3 text-sm leading-relaxed">{post.excerpt[lang]}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {post.tags.map((tag) => (

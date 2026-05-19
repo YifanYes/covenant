@@ -29,7 +29,9 @@
     },
     "news": {
       "title": "News",
-      "subtitle": "Development updates, feature releases, and behind-the-scenes notes from building Covenant."
+      "subtitle": "Development updates, feature releases, and behind-the-scenes notes from building Covenant.",
+      "back": "Back to News",
+      "other_posts": "Other posts"
     },
     "footer": {
       "copyright": "© {{year}} Covenant. All rights reserved.",
