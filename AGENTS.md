@@ -129,7 +129,7 @@ Empty states + microcopy: friendly, funny, energetic, RPG-themed. Treat user as 
 
 ## Adding a Feature
 
-`roadmap.md` → spec in `docs/specs/` → Zod schema in `src/shared/schemas/` → Repository → Service → register in ServiceFactory → Router → Component → Hook → View → i18n keys (both locales).
+`TODO.md` → spec in `docs/specs/` → Zod schema in `src/shared/schemas/` → Repository → Service → register in ServiceFactory → Router → Component → Hook → View → i18n keys (both locales).
 
 ## Git Commits
 

@@ -3,6 +3,8 @@
 import CovenantLogo from '@/components/common/covenant-logo.component'
 import UserMenu from '@/components/common/user-menu.component'
 import { useManaReserveTooltip } from '@/hooks/use-mana-reserve-tooltip.hook'
+import { useSidebarUIStore } from '@/stores/sidebar-ui.store'
+import Collapsible, { CollapsibleContent, CollapsibleTrigger } from '@/ui/collapsible.component'
 import Separator from '@/ui/separator.component'
 import Sidebar, {
   SidebarContent,
@@ -20,7 +22,7 @@ import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { Battery, BookOpen, Bulletlist, Calendar, Castle, Coffee, Grid3x3, PenSquare, Settings2, Shield, Store, Suitcase, Trophy } from 'pixelarticons/react'
+import { Battery, BookOpen, Bulletlist, Calendar, Castle, ChevronDown, Coffee, Grid3x3, PenSquare, Settings2, Shield, Store, Suitcase, Trophy } from 'pixelarticons/react'
 import { useSyncExternalStore, type ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -30,25 +32,54 @@ interface SidebarItem {
   icon: ElementType
 }
 
-function SidebarSection({ title, items }: { title?: string; items: SidebarItem[] }) {
+function SidebarSectionMenu({ items }: { items: SidebarItem[] }) {
   return (
-    <SidebarGroup>
-      {title && <SidebarGroupLabel className="font-title text-sidebar-foreground">{title}</SidebarGroupLabel>}
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <Link href={item.url}>
-                  <item.icon />
-                  <span className="font-title">{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
+    <SidebarMenu>
+      {items.map((item) => (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton asChild tooltip={item.title}>
+            <Link href={item.url}>
+              <item.icon />
+              <span className="font-title">{item.title}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  )
+}
+
+function SidebarSection({ title, items, collapsibleId }: { title?: string; items: SidebarItem[]; collapsibleId?: string }) {
+  const open = useSidebarUIStore((s) => (collapsibleId ? (s.sectionsOpen[collapsibleId] ?? true) : true))
+  const setSectionOpen = useSidebarUIStore((s) => s.setSectionOpen)
+
+  if (!collapsibleId) {
+    return (
+      <SidebarGroup>
+        {title && <SidebarGroupLabel className="font-title text-sidebar-foreground">{title}</SidebarGroupLabel>}
+        <SidebarGroupContent>
+          <SidebarSectionMenu items={items} />
+        </SidebarGroupContent>
+      </SidebarGroup>
+    )
+  }
+
+  return (
+    <Collapsible open={open} onOpenChange={(v) => setSectionOpen(collapsibleId, v)} className="group/collapsible">
+      <SidebarGroup>
+        <SidebarGroupLabel asChild className="font-title text-sidebar-foreground">
+          <CollapsibleTrigger className="flex w-full items-center">
+            {title}
+            <ChevronDown className="ml-auto h-3 w-3 transition-transform group-data-[state=closed]/collapsible:-rotate-90" />
+          </CollapsibleTrigger>
+        </SidebarGroupLabel>
+        <CollapsibleContent>
+          <SidebarGroupContent>
+            <SidebarSectionMenu items={items} />
+          </SidebarGroupContent>
+        </CollapsibleContent>
+      </SidebarGroup>
+    </Collapsible>
   )
 }
 
@@ -185,8 +216,8 @@ export default function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarSection title={t('sidebar.productivity')} items={sidebarItems.productivity} />
-        <SidebarSection title={t('sidebar.rpg')} items={sidebarItems.rpg} />
+        <SidebarSection collapsibleId="productivity" title={t('sidebar.productivity')} items={sidebarItems.productivity} />
+        <SidebarSection collapsibleId="rpg" title={t('sidebar.rpg')} items={sidebarItems.rpg} />
         <ManaIndicator />
         <Separator />
         <SidebarSection items={sidebarItems.settings} />
