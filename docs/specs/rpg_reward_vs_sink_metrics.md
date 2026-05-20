@@ -106,33 +106,31 @@ Compare:
 
 ## Event Instrumentation
 
-Minimum events:
+Event taxonomy lives in [`posthog_integration.md`](./posthog_integration.md#event-taxonomy). The v1 set is deliberately Pareto-strict — only events that load-bear on the core reward-vs-sink question ship.
 
-- `productivity_completed`
-  - `source`: task, habit, objective, journal
-  - `mana_earned`
-  - `mana_applied`
-  - `reserve_gained`
-- `rpg_viewed`
-  - `view`: quests, combat, inventory, shop, guilds
-- `combat_started`
-  - `quest_id`
-  - `reserve_at_start`
-  - `mana_at_start`
-- `combat_finished`
-  - `quest_id`
-  - `outcome`: victory, defeat, abandoned
-  - `gold_earned`
-  - `kills`
-  - `tier_changed`
-- `rpg_reward_spent`
-  - `reward_type`: mana, reserve, gold
-  - `amount`
-  - `target`: ability, encounter_refill, item
-- `returned_to_productivity`
-  - `source_view`
-  - `next_productivity_view`
-  - `minutes_since_rpg_action`
+How the metrics in this doc map onto the v1 event set:
+
+- **Completion Lift** — per-source events (`task_completed`, `habit_completed`, `objective_completed`, `journal_entry_created`) carry `mana_earned` / `reserve_gained`. Segment by RPG engagement via `$pageview` URL filters (RPG-views cohort defined in posthog spec).
+- **Reward Return Loop** — `combat_started` → productivity-completion events sequence in PostHog Funnels. `combat_started.reserve_at_start` / `mana_at_start` snapshot pre-fight resource state.
+- **RPG Time Ratio** — `$pageview` + `$pageleave` with the productivity-views and RPG-views URL cohorts.
+- **Combat outcome** — `combat_finished` with `outcome` (`'victory'` \| `'defeat'` \| `'abandoned'`) and `gold_earned` (nullable on defeat/abandoned).
+
+Events deliberately cut from v1 and tracked in [Out of Scope](./posthog_integration.md#out-of-scope):
+
+- `rpg_viewed` — redundant with `$pageview` + URL filters
+- `returned_to_productivity` — derivable from `$pageview` sequencing in Funnels
+- `rpg_reward_spent` — gold-spend rides on `item_purchased` (deferred to Phase 4); reserve-to-mana refill derivable from `combat_started` deltas
+- `productivity_completed` umbrella — split into per-source events for stronger typing at callsites
+
+### Sink Warning instrumentation (Phase 4)
+
+The Reward Saturation, Management Drag, and Friction signals in this doc require additional instrumentation deferred to Phase 4 of the posthog rollout:
+
+- Person properties `mana_reserve`, `gold_balance`, `tier` — `$set` on existing captures
+- `character_leveled_up` event for tier-progression cohorts
+- `item_purchased` / `item_equipped` for gear-loop analysis
+
+See [`posthog_integration.md` § Phase 4](./posthog_integration.md#phase-4-sink-saturation-instrumentation).
 
 ## Decision Thresholds
 

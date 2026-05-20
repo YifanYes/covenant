@@ -47,26 +47,26 @@ Cloudflare is the missing shield. Upstash remains the app-level fairness/abuse l
 
 ### Already in place
 
-| Layer | Current protection | Notes |
-| --- | --- | --- |
-| Network / host | Railway baseline L4-and-below mitigation | Railway does not provide application-layer WAF protection. |
-| Auth API | Better Auth rate limit in `src/server/lib/auth.ts` | Auth routes have stricter custom rules. |
-| Account brute force | `src/server/lib/account-lockout.ts` | Production Upstash is configured, so lockout survives restarts and replicas. |
-| tRPC writes | `rateLimit(RATE_LIMITS.*)` in routers | Mutations are mostly guarded. |
-| Rate-limit store | Upstash Redis via `src/server/lib/rate-limiter.ts` | Confirmed configured correctly in production. |
-| Security headers | `next.config.ts` | Good baseline, not DDoS-specific. |
-| Health check | `/api/health` | Simple and cheap, but public. |
+| Layer               | Current protection                                 | Notes                                                                        |
+| ------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Network / host      | Railway baseline L4-and-below mitigation           | Railway does not provide application-layer WAF protection.                   |
+| Auth API            | Better Auth rate limit in `src/server/lib/auth.ts` | Auth routes have stricter custom rules.                                      |
+| Account brute force | `src/server/lib/account-lockout.ts`                | Production Upstash is configured, so lockout survives restarts and replicas. |
+| tRPC writes         | `rateLimit(RATE_LIMITS.*)` in routers              | Mutations are mostly guarded.                                                |
+| Rate-limit store    | Upstash Redis via `src/server/lib/rate-limiter.ts` | Confirmed configured correctly in production.                                |
+| Security headers    | `next.config.ts`                                   | Good baseline, not DDoS-specific.                                            |
+| Health check        | `/api/health`                                      | Simple and cheap, but public.                                                |
 
 ### Gaps
 
-| Gap | Risk |
-| --- | --- |
-| No Cloudflare proxy/WAF in front of production | HTTP floods reach Railway and Next.js directly. |
-| tRPC read queries are mostly not rate-limited | Authenticated attackers can repeatedly hit expensive read paths. |
-| `/api/logs` is public and not rate-limited | Easy noisy write path into server logs. |
-| Railway origin may remain directly reachable | Attackers can bypass Cloudflare if they know the Railway hostname. |
-| No edge cache policy documented | Public static/landing traffic may consume origin capacity during bursts. |
-| No attack runbook | Slower response when traffic spikes. |
+| Gap                                            | Risk                                                                     |
+| ---------------------------------------------- | ------------------------------------------------------------------------ |
+| No Cloudflare proxy/WAF in front of production | HTTP floods reach Railway and Next.js directly.                          |
+| tRPC read queries are mostly not rate-limited  | Authenticated attackers can repeatedly hit expensive read paths.         |
+| `/api/logs` is public and not rate-limited     | Easy noisy write path into server logs.                                  |
+| Railway origin may remain directly reachable   | Attackers can bypass Cloudflare if they know the Railway hostname.       |
+| No edge cache policy documented                | Public static/landing traffic may consume origin capacity during bursts. |
+| No attack runbook                              | Slower response when traffic spikes.                                     |
 
 ## Phase 1 - Cloudflare Front Door
 
@@ -118,13 +118,13 @@ Rulesets:
 
 Custom WAF rules:
 
-| Rule | Action | Reason |
-| --- | --- | --- |
-| Block non-GET/HEAD/POST methods globally | Block | Covenant does not need PUT/PATCH/DELETE at raw HTTP level for public routes. tRPC mutations use POST. |
-| Block obvious scanner paths | Block | `/wp-admin`, `/xmlrpc.php`, `/.env`, `/.git`, common PHP paths. |
-| Challenge suspicious countries/ASNs only during attack | Managed Challenge | Keep normal beta access open; use during incidents. |
-| Challenge requests with missing/empty User-Agent to API paths | Managed Challenge or block | Most real browsers and clients send a UA. |
-| Block oversized request bodies where possible | Block | Protect JSON endpoints from cheap bandwidth/CPU abuse. |
+| Rule                                                          | Action                     | Reason                                                                                                |
+| ------------------------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Block non-GET/HEAD/POST methods globally                      | Block                      | Covenant does not need PUT/PATCH/DELETE at raw HTTP level for public routes. tRPC mutations use POST. |
+| Block obvious scanner paths                                   | Block                      | `/wp-admin`, `/xmlrpc.php`, `/.env`, `/.git`, common PHP paths.                                       |
+| Challenge suspicious countries/ASNs only during attack        | Managed Challenge          | Keep normal beta access open; use during incidents.                                                   |
+| Challenge requests with missing/empty User-Agent to API paths | Managed Challenge or block | Most real browsers and clients send a UA.                                                             |
+| Block oversized request bodies where possible                 | Block                      | Protect JSON endpoints from cheap bandwidth/CPU abuse.                                                |
 
 Acceptance:
 
@@ -140,16 +140,16 @@ Cloudflare rate limits should protect origin capacity. Upstash limits should sti
 
 Initial Cloudflare route rules:
 
-| Route | Suggested limit | Action | Notes |
-| --- | ---: | --- | --- |
-| `/api/auth/*` | 20 requests / 10 seconds / IP | Managed Challenge, then block | Better Auth has stricter internal limits; edge limit absorbs floods. |
-| `/api/auth/sign-in/*` | 5 requests / 60 seconds / IP | Managed Challenge | Avoid breaking legitimate retries too aggressively. |
-| `/api/auth/request-password-reset*` | 3 requests / 10 minutes / IP | Managed Challenge or block | Protect email provider and account discovery surface. |
-| `/api/trpc/*` | 120 requests / 60 seconds / IP | Managed Challenge | Broad safety valve for API floods. |
-| `/api/trpc/*` with 401/403/429 responses | 30 responses / 60 seconds / IP | Block for 10 minutes | Punish repeated bad/limited API traffic. |
-| `/api/logs` | 10 requests / 60 seconds / IP | Block | Public write endpoint; should be low-volume. |
-| `/api/health` | 60 requests / 60 seconds / IP | Block | Railway probes should not come through the public domain often. |
-| `/_next/static/*` | no challenge | Allow/cache | Static assets should stay cheap and cacheable. |
+| Route                                    |                Suggested limit | Action                        | Notes                                                                |
+| ---------------------------------------- | -----------------------------: | ----------------------------- | -------------------------------------------------------------------- |
+| `/api/auth/*`                            |  20 requests / 10 seconds / IP | Managed Challenge, then block | Better Auth has stricter internal limits; edge limit absorbs floods. |
+| `/api/auth/sign-in/*`                    |   5 requests / 60 seconds / IP | Managed Challenge             | Avoid breaking legitimate retries too aggressively.                  |
+| `/api/auth/request-password-reset*`      |   3 requests / 10 minutes / IP | Managed Challenge or block    | Protect email provider and account discovery surface.                |
+| `/api/trpc/*`                            | 120 requests / 60 seconds / IP | Managed Challenge             | Broad safety valve for API floods.                                   |
+| `/api/trpc/*` with 401/403/429 responses | 30 responses / 60 seconds / IP | Block for 10 minutes          | Punish repeated bad/limited API traffic.                             |
+| `/api/logs`                              |  10 requests / 60 seconds / IP | Block                         | Public write endpoint; should be low-volume.                         |
+| `/api/health`                            |  60 requests / 60 seconds / IP | Block                         | Railway probes should not come through the public domain often.      |
+| `/_next/static/*`                        |                   no challenge | Allow/cache                   | Static assets should stay cheap and cacheable.                       |
 
 During beta, start with logging/challenge actions rather than hard blocks for broad API rules. Tighten after one week of production traffic.
 
@@ -225,14 +225,14 @@ Cache only safe public assets and public marketing/document pages. Never cache a
 
 Cloudflare cache rules:
 
-| Path | Policy |
-| --- | --- |
-| `/_next/static/*` | Cache everything, long TTL, respect immutable assets. |
-| `/images/*`, `/favicon.ico`, static public assets | Cache everything, long TTL. |
-| Landing/news/mechanics/roadmap/static MDX routes | Cache eligible GET/HEAD if response is public and has no auth cookies. |
-| `/api/*` | Bypass cache. |
-| `/dashboard`, `/tasks`, `/habits`, `/objectives`, `/journal`, `/inventory`, `/quests`, `/guilds`, `/settings` | Bypass cache. |
-| Sentry tunnel `/monitoring` | Bypass cache. |
+| Path                                                                                                          | Policy                                                                 |
+| ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `/_next/static/*`                                                                                             | Cache everything, long TTL, respect immutable assets.                  |
+| `/images/*`, `/favicon.ico`, static public assets                                                             | Cache everything, long TTL.                                            |
+| Landing/news/mechanics/roadmap/static MDX routes                                                              | Cache eligible GET/HEAD if response is public and has no auth cookies. |
+| `/api/*`                                                                                                      | Bypass cache.                                                          |
+| `/dashboard`, `/tasks`, `/habits`, `/objectives`, `/journal`, `/inventory`, `/quests`, `/guilds`, `/settings` | Bypass cache.                                                          |
+| Sentry tunnel `/monitoring`                                                                                   | Bypass cache.                                                          |
 
 Acceptance:
 

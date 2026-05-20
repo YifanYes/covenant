@@ -34,7 +34,7 @@ Routes adopt NES.css visual system, Pixelify Sans body, Press Start 2P display f
 
 **`/map` deprecated and deleted in this rewrite** — references in spec (`map/_components/enemy-card`, `map/_components/health-bar`) obsolete. `health-bar.component.tsx` must relocate before `/map` deletion since combat imports it.
 
-Productivity-views set: `/tasks`, `/habits`, `/dashboard`, `/settings`, `/journaling`, `/objectives`, `/calendar`. Keep current Tailwind style and font stack.
+Productivity-views set (visual scope): `/tasks`, `/habits`, `/dashboard`, `/journaling`, `/objectives`, `/calendar`. Keep current Tailwind style and font stack.
 
 ### Beta scope (combat redesign)
 
@@ -45,10 +45,10 @@ Productivity-views set: `/tasks`, `/habits`, `/dashboard`, `/settings`, `/journa
 
 Weapons add flat bonuses to attacker stats; armor adds to defender stats. Dice fields (`attackDice`, `physicalDefDice`, `magicDefDice`) removed in Phase 2c — replaced by:
 
-| Weapon `damageType` | Bonus field |
-|---|---|
+| Weapon `damageType`                                            | Bonus field        |
+| -------------------------------------------------------------- | ------------------ |
 | `PHYSICAL` (formerly PHYSICAL or RANGED — RANGED collapsed in) | `strengthAtkBonus` |
-| `MAGIC` | `magicAtkBonus` |
+| `MAGIC`                                                        | `magicAtkBonus`    |
 
 Armor: `strengthDefBonus`, `magicDefBonus`. Scaling factor for dice→flat: **×1** (old `attackDice: 5` → new `strengthAtkBonus: 5`). Balanced against HP×5 rescale (path i from combat formula decision); full T3 weapon roughly doubles class ATK, ~Pokémon Choice Band magnitude.
 

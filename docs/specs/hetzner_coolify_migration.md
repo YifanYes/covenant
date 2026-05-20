@@ -1,9 +1,12 @@
 # Hetzner + Coolify Migration
 
-> **Version**: 0.1 (draft)
+> **Version**: 0.2 (draft)
 > **Status**: Proposed
-> **Last Updated**: 2026-05-19
-> **Source**: local code audit (`railway.toml`, `package.json`, `src/server/lib/redis.ts`, `src/server/lib/rate-limiter.ts`, `prisma/schema.prisma`, `next.config.ts`), Hetzner Cloud pricing post-April-2026 increase, Coolify v4 docs, Cloudflare TOS 2.8, ICANN Transfer Policy.
+> **Last Updated**: 2026-05-20
+> **Source**: local code audit (`railway.toml`, `package.json`, `src/server/lib/redis.ts`, `src/server/lib/rate-limiter.ts`, `prisma/schema.prisma`, `next.config.ts`), Hetzner Cloud pricing post-April-2026 increase, Coolify v4 docs, Cloudflare TOS 2.8, ICANN Transfer Policy, OpenTofu Registry (hcloud / cloudflare / coolify providers).
+> **Changelog**:
+> - 0.2 (2026-05-20): Provisioning + config-management driven by **OpenTofu** (new `infra/` directory). Phases 0–5 rewritten declaratively. Coolify community-provider risk + state-file risk added to Risks table.
+> - 0.1 (2026-05-19): Initial draft.
 
 ## Summary
 
@@ -23,6 +26,12 @@ Internet
         -> Redis container, localhost only     (:6379)
 GitHub push -> Coolify webhook (HMAC) -> rebuild + zero-downtime swap
 Daily pg_dump -> Backblaze B2 (encrypted, second line beyond Coolify backup)
+
+Provisioning:
+OpenTofu (infra/) -> Hetzner Cloud API   (server, firewall, volume, SSH key)
+                  -> Cloudflare API      (DNS, proxy, WAF, Access for admin UI)
+                  -> cloud-init          (hardening + Coolify bootstrap on first boot)
+                  -> Coolify API         (apps, Postgres, Redis, env vars)
 ```
 
 Estimated total: **~€6/mo**, vs ~$20–40 on Railway. Savings are real (≈70–85%) but the **primary motivation is hands-on DevOps learning** — Docker, Traefik, Let's Encrypt, Postgres ops, SSH hardening, Cloudflare proxy, GitHub webhooks. Cost savings are secondary.
@@ -31,8 +40,8 @@ Estimated total: **~€6/mo**, vs ~$20–40 on Railway. Savings are real (≈70�
 
 1. Match current Railway functionality: Next.js web + Postgres + Redis, SSL, GitHub-driven deploys on push to `main`, health checks.
 2. Reduce monthly hosting spend by 50–70% with predictable pricing (no usage-based surprises).
-3. Build operational fluency end-to-end: provisioning, hardening, container orchestration, reverse-proxy + automatic TLS, database backups + restore drills, edge proxy via Cloudflare, webhook security.
-4. Produce a runbook good enough that a non-expert (i.e. the author) can recover from a box loss within hours.
+3. Build operational fluency end-to-end: **infrastructure as code (OpenTofu)**, provisioning, hardening, container orchestration, reverse-proxy + automatic TLS, database backups + restore drills, edge proxy via Cloudflare, webhook security.
+4. Produce a runbook good enough that a non-expert (i.e. the author) can recover from a box loss within hours. The runbook is `tofu apply` — the infrastructure is reproducible from code, not click-ops.
 5. Keep all external service integrations untouched: Sentry (errors), Brevo (transactional email), Google OAuth (Better Auth).
 
 ## Non-Goals
@@ -84,6 +93,43 @@ These are the only code/config changes induced by the migration. They go in a se
 5. Remove `railway.toml`. Replace start command logic — `prisma db push` runs as part of the Coolify "Pre-deployment Command" or in a startup script in the image.
 6. Add `.dockerignore` for `node_modules`, `.next`, `.git`, `.env*`.
 
+### Infrastructure as Code
+
+All provisioning is driven by **OpenTofu** (Linux Foundation fork of Terraform, MPL 2.0). The rationale and full Terraform-vs-OpenTofu comparison live in the decision plan; the short version: greenfield project, OSI-approved license, full provider parity for our stack, Hetzner publishes OpenTofu tutorials directly.
+
+The IaC layer lives in a new top-level `infra/` directory and is the single source of truth for everything below Coolify's "deploy this app" surface:
+
+```
+infra/
+├── README.md                       # Bootstrap + apply instructions
+├── versions.tf                     # required_providers: hcloud, cloudflare, coolify
+├── variables.tf                    # hcloud_token, cloudflare_api_token, coolify_url/token
+├── main.tf                         # hcloud_server (CAX11/FSN1), firewall, volume, SSH key
+├── cloudflare.tf                   # zone, DNS records, proxy, Access app for /coolify
+├── coolify.tf                      # app, Postgres, Redis, env vars, webhook
+├── cloud-init.yaml                 # first-boot: non-root user, sshd_config, ufw, fail2ban,
+│                                   #             unattended-upgrades, swapfile, Coolify install
+├── outputs.tf                      # server IP, admin URL, app URL
+└── terraform.tfvars.example        # documented inputs (real .tfvars gitignored)
+```
+
+Providers used:
+
+| Provider | Source | Purpose |
+| --- | --- | --- |
+| `hetznercloud/hcloud` | Official, vendor-maintained | VPS, firewall, volume, SSH key, project. |
+| `cloudflare/cloudflare` | Official, vendor-maintained | DNS records, zone settings, WAF rules, Access app for Coolify admin. |
+| Coolify provider | Community (`sierrajc/coolify`, `themarkwill/coolify`, or `marconneves/coolify` — picked during implementation) | Apps, databases, env vars, webhook config. Risked tracked in **Risks & Mitigations**. |
+
+State storage: OpenTofu native client-side state encryption + remote state in a Hetzner Object Storage bucket (S3-compatible) or Backblaze B2. No separate sops/age step required.
+
+Manual one-time steps that stay outside OpenTofu (because they pre-date or post-date the provider's reach):
+
+- Initial Hetzner project + API token creation.
+- Initial Cloudflare account + zone-level API token creation.
+- The first Coolify root password — generated on first boot by cloud-init, then handed to OpenTofu via a secret variable for subsequent runs.
+- Domain transfer to Porkbun / Cloudflare Registrar (Phase 4 — ICANN flow, not API-driven).
+
 ### Sizing & region rationale
 
 | Plan | vCPU / RAM / Disk | Price (EU) | Notes |
@@ -115,38 +161,57 @@ Predictability is part of the value: usage-spike surprises on Railway disappear.
 
 Each phase is independently verifiable. Don't proceed to the next until the current passes its checks.
 
-### Phase 1 — Provision & harden
+### Phase 0 — IaC bootstrap (one-time)
 
-1. Create Hetzner project; deploy **CAX11** in **FSN1**, Ubuntu 24.04 LTS, with SSH key pre-installed.
-2. Enable **Hetzner automated backups** on the server (+20%).
-3. Create non-root sudo user; copy SSH key. Disable `PasswordAuthentication` and `PermitRootLogin` in `sshd_config`.
-4. Install + enable `ufw` (allow 22/80/443 only) and `fail2ban` (default `sshd` jail).
-5. Install `unattended-upgrades` for automatic security patches.
-6. Create a **Hetzner Cloud Firewall** at the edge with the same 22/80/443 allowlist (belt-and-suspenders).
-7. Add 4 GB swap (`fallocate /swapfile`, `mkswap`, `swapon`, `/etc/fstab` entry) to absorb Next.js build spikes on the 4 GB box.
+1. Install OpenTofu locally: `brew install opentofu` (macOS).
+2. Create Hetzner project + API token (Hetzner Cloud Console → Security → API Tokens, read/write).
+3. Create Cloudflare API token scoped to the target zone (Zone:DNS:Edit, Zone:Zone Settings:Edit, Account:Cloudflare Access:Edit).
+4. Provision a remote-state bucket (Hetzner Object Storage in FSN1 or a Backblaze B2 bucket). Enable versioning.
+5. Clone `infra/`, copy `terraform.tfvars.example` → `terraform.tfvars`, fill in tokens. **`terraform.tfvars` is gitignored.**
+6. `tofu init` → `tofu plan` → review carefully.
 
-**Verify**: SSH as non-root works, root SSH and password SSH refused, `ufw status` shows the rules, `fail2ban-client status sshd` is active.
+**Verify**: `tofu plan` exits cleanly and lists every resource the upcoming `tofu apply` will create. No surprise destroys.
 
-### Phase 2 — Install Coolify
+### Phase 1 — Provision & harden (`tofu apply`)
 
-1. Run Coolify's one-line installer as the sudo user (`curl … coolify.io/install.sh | sudo bash`).
-2. Set up a temporary subdomain on a domain you already control (or a Hetzner reverse DNS hostname) pointing at the VPS IP. Use this for Coolify's admin UI during cutover — **do not** expose the Coolify UI on the production domain.
-3. Put the Coolify admin domain behind **Cloudflare Access** (free for 50 users) or HTTP basic auth at minimum.
-4. Set the **GitHub webhook secret** in Coolify settings (long random string).
+`tofu apply` does the work; the steps below are what's declared in `infra/`, not commands to run manually.
 
-**Verify**: Coolify UI reachable only via the protected admin URL; HTTPS green; webhook secret saved.
+1. `hcloud_server` — **CAX11** in **FSN1**, Ubuntu 24.04 LTS, SSH key pre-installed, `backups = true` (Hetzner automated backups, +20%).
+2. `hcloud_firewall` at the edge with a 22/80/443 allowlist, attached to the server.
+3. `user_data` (cloud-init from `cloud-init.yaml`) handles the host-side hardening on first boot:
+   - non-root sudo user + SSH key
+   - `sshd_config`: `PasswordAuthentication no`, `PermitRootLogin no`
+   - `ufw` enabled with 22/80/443 only
+   - `fail2ban` with default `sshd` jail
+   - `unattended-upgrades` enabled
+   - 4 GB swapfile (`/swapfile`, persisted in `/etc/fstab`) to absorb Next.js build spikes
+   - Coolify v4 installer (`curl … coolify.io/install.sh | sudo bash`)
 
-### Phase 3 — Provision app services
+**Verify**: SSH as non-root works against the IP in `tofu output server_ip`; root SSH and password SSH refused; `ufw status` shows the rules; `fail2ban-client status sshd` is active; `swapon --show` lists `/swapfile`; Coolify UI reachable on `:8000` from the SSH tunnel (not yet public).
 
-1. In Coolify, create a **Postgres** resource. Record the generated `DATABASE_URL`.
-2. Create a **Redis** resource. Record `REDIS_URL`.
-3. Connect the GitHub repo. Configure the build:
+### Phase 2 — Wire Coolify (`tofu apply`, continued)
+
+Same `tofu apply` — Phase 2 resources just depend on Phase 1 outputs. Listed separately for runbook clarity.
+
+1. `cloudflare_record` for a temporary admin subdomain (e.g. `admin.<your-domain>`) → VPS IP, proxied. **Do not** expose the Coolify UI on the production app domain.
+2. `cloudflare_access_application` + `cloudflare_access_policy` — zero-trust gate on the admin subdomain (free for 50 users).
+3. `coolify_*` resources: GitHub webhook secret (random_password resource), GitHub source connection, Coolify project.
+
+**Verify**: Coolify UI reachable only through Cloudflare Access; HTTPS green; webhook secret stored in Coolify and matches the value in `infra/`.
+
+### Phase 3 — Provision app services (`tofu apply`, continued)
+
+Resources declared in `infra/coolify.tf`:
+
+1. `coolify_postgresql` — Postgres container. Output: `DATABASE_URL` (passed to the app as a secret env var).
+2. `coolify_redis` — Redis container. Output: `REDIS_URL`.
+3. `coolify_application` — connected to the GitHub repo:
    - Buildpack: Dockerfile (after the app-side PR lands) or Nixpacks fallback.
    - Branch: `main`.
    - Pre-deployment command: `pnpm prisma db push` (matches Railway behaviour).
    - Start command: `pnpm start` (or the Dockerfile `CMD`).
-4. Add env vars: `DATABASE_URL`, `REDIS_URL`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `BREVO_API_KEY`, `SENTRY_AUTH_TOKEN`, `SENTRY_DSN`, plus any other env vars currently set in Railway. Drop the `UPSTASH_*` pair.
-5. Deploy on a **temporary subdomain** (e.g. `covenant-staging.<a-domain-you-own>`) — not yet the production domain.
+4. `coolify_application_envs` — secrets and config: `DATABASE_URL`, `REDIS_URL`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `BREVO_API_KEY`, `FROM_EMAIL`, `SENTRY_AUTH_TOKEN`, `SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `NEXT_PUBLIC_APP_URL`, plus any other env vars currently set in Railway. Drop the `UPSTASH_*` pair. Secrets sourced from `terraform.tfvars` (gitignored) or environment.
+5. Domain on the application resource is a **temporary subdomain** (e.g. `covenant-staging.<a-domain-you-own>`) — not yet the production domain.
 
 **Verify**: app boots, `/api/health` returns 200, Google login round-trips, a forced error appears in Sentry, a test email arrives via Brevo, Better Auth session persists across replicas (Redis is doing its job).
 
@@ -160,16 +225,16 @@ Domain currently lives with Railway's third-party registrar. Standard ICANN flow
 4. **Caveat — ICANN 60-day lock**: a transfer is blocked if the domain was registered, last transferred, or had its registrant contact changed within 60 days. ICANN voted at ICANN 82 to retire this lock, but rollout is gradual — assume it still applies. If recently registered/changed, wait it out.
 5. Transfer completes in **5–7 days**. The domain keeps resolving at the old registrar's DNS until you change nameservers — there is no DNS-level downtime during transfer itself.
 
-### Phase 5 — DNS cutover
+### Phase 5 — DNS cutover (`tofu apply`)
 
-1. Once the transfer completes, point the domain's nameservers at Cloudflare (Cloudflare Registrar forces this anyway; Porkbun is configurable).
-2. In Cloudflare DNS:
-   - `A` record `@` → Hetzner VPS IP, proxied (orange cloud).
-   - `CNAME www` → apex, proxied.
-   - SSL/TLS mode: **Full (strict)**. Enable "Always Use HTTPS" and "Automatic HTTPS Rewrites".
-3. In Coolify, change the app's domain from the temporary subdomain to the real one. Coolify will issue a fresh Let's Encrypt cert via Traefik.
-4. Turn on Cloudflare **WAF managed rules** and **Bot Fight Mode**.
-5. Smoke-test the production URL.
+1. Once the transfer completes, point the domain's nameservers at Cloudflare (Cloudflare Registrar forces this anyway; Porkbun is configurable). This is the one DNS step done in the registrar UI, not OpenTofu, because the zone doesn't exist in Cloudflare until the nameservers point there.
+2. Flip the `production = true` variable in `terraform.tfvars` (or equivalent flag) and `tofu apply`. The flag toggles:
+   - `cloudflare_record` `A @` → Hetzner VPS IP, proxied (orange cloud).
+   - `cloudflare_record` `CNAME www` → apex, proxied.
+   - `cloudflare_zone_settings_override`: SSL/TLS mode **Full (strict)**, "Always Use HTTPS" on, "Automatic HTTPS Rewrites" on.
+   - `cloudflare_ruleset` for WAF managed rules, Bot Fight Mode.
+   - `coolify_application.domain` swapped from the temporary subdomain to the real one — Coolify issues a fresh Let's Encrypt cert via Traefik on apply.
+3. Smoke-test the production URL.
 
 **Verify**: real domain resolves to Cloudflare → Hetzner; HTTPS green end-to-end; `/api/health` returns 200; login works; no mixed-content warnings.
 
@@ -198,6 +263,8 @@ Domain currently lives with Railway's third-party registrar. Standard ICANN flow
 - Cloudflare SSL mode **Full (strict)**, "Always Use HTTPS", HSTS preload (only after verifying everything serves over HTTPS).
 - Cloudflare WAF managed rules + Bot Fight Mode on. Existing Better Auth + Upstash-replaced rate limiters keep the app-level fairness layer intact (see `docs/specs/ddos_protection.md`).
 - Sensitive env vars (`JWT_SECRET`, `BREVO_API_KEY`, `GOOGLE_CLIENT_SECRET`) marked as secrets in Coolify, not plaintext env.
+- `terraform.tfvars` (holding `hcloud_token`, `cloudflare_api_token`, app secrets) is gitignored. OpenTofu remote state lives in an object-storage bucket with **native state encryption** enabled — no plaintext credentials at rest.
+- Hetzner and Cloudflare API tokens are scoped to the minimum permissions required (project-scoped for Hetzner; zone-scoped for Cloudflare). Rotated on compromise via `tofu apply` after updating the variable.
 
 ## Risks & Mitigations
 
@@ -212,15 +279,19 @@ Domain currently lives with Railway's third-party registrar. Standard ICANN flow
 | **Cloudflare TOS 2.8** — non-HTML caching restriction. | We don't serve disproportionate media; covenant is HTML + API + small static assets. Compliant. |
 | **ICANN 60-day transfer lock.** | If the domain was registered or contact-changed in the last 60 days, wait out the lock before Phase 4. |
 | **Docker disk creep** filling 80 GB in weeks. | Weekly `docker system prune -af --volumes` cron. Monitor disk usage via Coolify Sentinel; alert at 70%. |
+| **Coolify provider is community-maintained** (`sierrajc` / `themarkwill` / `marconneves`), not official. May lag behind Coolify API changes or stop being maintained. | Pin to a specific version in `versions.tf`. If the provider stalls, fall back to a `null_resource` + `local-exec curl` against Coolify's REST API for the affected resources — still IaC, just less ergonomic. Treat this as a tolerable risk on a solo project; not a blocker. |
+| **OpenTofu state file leak** would expose `hcloud_token`, `cloudflare_api_token`, app secrets. | Enable OpenTofu native state encryption (client-side) on the remote backend. Store the encryption key separately (1Password / age key on disk, not in the repo). Object-storage bucket is private + versioned so a single bad apply can be rolled back. |
 
 ## Open Questions
 
 These do not block the migration but should be resolved before/shortly after cutover:
 
 - **Build location**: build on the VPS (simplest, risks OOM) or in GitHub Actions and push the image to GHCR or Coolify's registry (more robust, more moving parts)?
-- **Staging environment**: add a second tiny VPS (CX22 ~€4/mo) for staging now, or rely on Coolify preview deploys on the same box?
+- **Staging environment**: add a second tiny VPS (CX22 ~€4/mo) for staging now, or rely on Coolify preview deploys on the same box? With OpenTofu, "staging" can be a second workspace / `-var environment=staging` apply against the same module.
 - **Prisma workflow**: keep `db push` on cutover, then migrate to `prisma migrate deploy` as a separate change? Memory note already flags this project's `db push` preference — confirm it still applies in a self-hosted context.
 - **Monitoring**: Coolify Sentinel is enough for now, or set up a separate Better Stack / Grafana Cloud free tier for log aggregation?
+- **Coolify provider choice**: pick one of `sierrajc/coolify`, `themarkwill/coolify`, `marconneves/coolify` during the `infra/` PR. Evaluate by: last commit recency, resources supported (must cover `application`, `postgresql`, `redis`, `application_envs`), open-issue count.
+- **Remote-state backend**: Hetzner Object Storage (FSN1, S3-compatible, ~€0 at this scale) vs Backblaze B2 (already in the backup stack, slight cost). Pick one in the `infra/` PR.
 
 ## Alternatives Considered
 
@@ -248,4 +319,11 @@ Coolify wins for the stated goal — broad DevOps surface (Docker, Traefik, LE, 
 - [Cloudflare Registrar at-cost pricing](https://www.cloudflare.com/products/registrar/)
 - [Kamal Next.js + secrets-at-build-time issue](https://github.com/basecamp/kamal/issues/925)
 - [Dokploy / Coolify / CapRover comparison](https://docs.dokploy.com/docs/core/comparison)
+- [OpenTofu — Linux Foundation fork of Terraform](https://opentofu.org/)
+- [OpenTofu Registry](https://search.opentofu.org/)
+- [hetznercloud/hcloud OpenTofu provider](https://search.opentofu.org/provider/hetznercloud/hcloud/latest)
+- [cloudflare/cloudflare OpenTofu provider](https://search.opentofu.org/provider/cloudflare/cloudflare/latest)
+- [Hetzner community: Hetzner Cloud + OpenTofu tutorial](https://community.hetzner.com/tutorials/private-network-nat-lb-hetzner-opentofu/)
+- [OpenTofu state encryption docs](https://opentofu.org/docs/language/state/encryption/)
 - Existing internal spec: `docs/specs/ddos_protection.md` (Cloudflare-in-front rationale carries over).
+- Decision plan: `/Users/yifan/.claude/plans/analyze-the-current-app-kind-spring.md` (Terraform vs OpenTofu).
