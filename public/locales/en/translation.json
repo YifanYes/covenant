@@ -1298,7 +1298,7 @@
       "character_count": "{{count}} / {{max}}",
       "delete_message": "Delete message",
       "report_message": "Report this message",
-      "unknown_user": "Unknown adventurer",
+      "unknown_user": "Stranger",
       "delete_confirm": {
         "title": "Delete this message?",
         "description": "The message will be removed from the guild forum. This cannot be undone.",

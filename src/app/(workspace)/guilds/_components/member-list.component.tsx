@@ -111,7 +111,7 @@ export default function MemberList({ guildId, members, myUserId, myRole }: Membe
         const showKick = !isMe && canKick(member.role)
         const showRoleToggle = myRole === GuildRole.OWNER && !isMe && !isOwner
         const promote = member.role === GuildRole.MEMBER
-        const name = member.user.character?.name ?? member.user.name ?? t('guilds.forum.unknown_user')
+        const name = member.user.character?.name ?? t('guilds.forum.unknown_user')
         const joined = new Date(member.joinedAt)
 
         return (

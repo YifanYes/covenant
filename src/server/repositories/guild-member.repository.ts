@@ -17,7 +17,6 @@ export type GuildMemberWithGuildAndMembers = GuildMember & {
       joinedAt: Date
       user: {
         id: string
-        name: string | null
         image: string | null
         character: { name: string } | null
       }
@@ -43,7 +42,6 @@ export class GuildMemberRepository {
                 user: {
                   select: {
                     id: true,
-                    name: true,
                     image: true,
                     character: { select: { name: true } }
                   }

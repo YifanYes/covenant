@@ -6,7 +6,6 @@ import { resourceNotFound } from '../lib/errors'
 export type GuildMessageWithAuthor = GuildMessage & {
   user: {
     id: string
-    name: string | null
     image: string | null
     character: { name: string } | null
   }
@@ -16,7 +15,6 @@ const authorInclude = {
   user: {
     select: {
       id: true,
-      name: true,
       image: true,
       character: { select: { name: true } }
     }

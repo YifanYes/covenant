@@ -9,7 +9,6 @@ export type LoginType = z.infer<typeof loginSchema>
 
 export const signUpSchema = z
   .object({
-    name: z.string().min(1, 'errors.required_field'),
     email: z.email('errors.invalid_email'),
     password: z.string().min(8, 'errors.invalid_password_length'),
     confirmPassword: z.string().min(8, 'errors.invalid_password_length')

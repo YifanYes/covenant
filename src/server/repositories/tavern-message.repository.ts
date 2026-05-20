@@ -5,7 +5,6 @@ import type { TavernMessageCursorType } from '@shared/schemas/tavern.schemas'
 export type TavernMessageWithAuthor = TavernMessage & {
   user: {
     id: string
-    name: string | null
     image: string | null
     character: { id: string; name: string } | null
   }
@@ -15,7 +14,6 @@ const authorInclude = {
   user: {
     select: {
       id: true,
-      name: true,
       image: true,
       character: { select: { id: true, name: true } }
     }

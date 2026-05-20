@@ -21,7 +21,7 @@ export default function SignUp() {
     handleSubmit,
     formState: { errors, isValid, isDirty }
   } = useForm<SignUpType>({
-    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+    defaultValues: { email: '', password: '', confirmPassword: '' },
     resolver: standardSchemaResolver(signUpSchema),
     mode: 'onTouched'
   })
@@ -33,7 +33,7 @@ export default function SignUp() {
         const result = await authClient.signUp.email({
           email: data.email,
           password: data.password,
-          name: data.name,
+          name: '',
           callbackURL: '/objectives?tutorial=true'
         })
         if (result.error) {
@@ -75,13 +75,6 @@ export default function SignUp() {
   return (
     <div className="flex w-md flex-col gap-2.5">
       <h2>{t('sign_up.title')}</h2>
-      <TextInput
-        type="text"
-        placeholder={t('sign_up.name')}
-        {...register('name')}
-        {...(errors.name?.message && { errorMessage: t(errors.name.message) })}
-        required
-      />
       <TextInput
         type="email"
         placeholder={t('sign_up.email')}

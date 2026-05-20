@@ -20,7 +20,6 @@ export interface ChatRoomMessage {
   content: string
   createdAt: string | Date
   user: {
-    name: string | null
     character?: { name: string } | null
   }
 }
@@ -329,7 +328,7 @@ export default function ChatRoom<T extends ChatRoomMessage>({
               {grouped.map(({ msg, startsGroup, endsGroup }) => {
                 const isMine = msg.userId === myUserId
                 const created = toDate(msg.createdAt)
-                const name = msg.user.character?.name ?? msg.user.name ?? labels.unknownUser
+                const name = msg.user.character?.name ?? labels.unknownUser
                 const canDelete = deleteAction?.canDelete(msg) ?? false
                 const canReport = reportAction?.canReport(msg) ?? false
 

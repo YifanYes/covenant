@@ -45,27 +45,27 @@ describe('AuthService', () => {
 
   describe('updateTheme', () => {
     it('updates user theme via userRepo', async () => {
-      const result = await authService.updateTheme('user-1', { theme: 'dark' } as unknown as UpdateThemeType)
-      expect(mockUserRepo.update).toHaveBeenCalledWith('user-1', { theme: 'dark' })
+      const result = await authService.updateTheme('user-1', { theme: 'HOLY_KNIGHTS' } as UpdateThemeType)
+      expect(mockUserRepo.update).toHaveBeenCalledWith('user-1', { theme: 'HOLY_KNIGHTS' })
       expect(result.message).toBe('Theme updated successfully')
     })
   })
 
   describe('updateProfile', () => {
     it('updates user fields only when no characterName', async () => {
-      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', name: 'New' })
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', theme: 'HOLY_KNIGHTS' })
 
-      const result = await authService.updateProfile('user-1', { name: 'New' } as unknown as UpdateProfileType)
+      const result = await authService.updateProfile('user-1', { theme: 'HOLY_KNIGHTS' } as UpdateProfileType)
 
-      expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { name: 'New' } })
+      expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { theme: 'HOLY_KNIGHTS' } })
       expect(tx.character.update).not.toHaveBeenCalled()
-      expect(result).toEqual({ id: 'user-1', name: 'New' })
+      expect(result).toEqual({ id: 'user-1', theme: 'HOLY_KNIGHTS' })
     })
 
     it('updates character name only when no user fields', async () => {
       mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
 
-      await authService.updateProfile('user-1', { characterName: 'Hero' } as unknown as UpdateProfileType)
+      await authService.updateProfile('user-1', { characterName: 'Hero' } as UpdateProfileType)
 
       expect(tx.user.update).not.toHaveBeenCalled()
       expect(tx.character.update).toHaveBeenCalledWith({ where: { userId: 'user-1' }, data: { name: 'Hero' } })
@@ -75,11 +75,11 @@ describe('AuthService', () => {
       mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
 
       await authService.updateProfile('user-1', {
-        name: 'New',
+        theme: 'HOLY_KNIGHTS',
         characterName: 'Hero'
-      } as unknown as UpdateProfileType)
+      } as UpdateProfileType)
 
-      expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { name: 'New' } })
+      expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { theme: 'HOLY_KNIGHTS' } })
       expect(tx.character.update).toHaveBeenCalledWith({ where: { userId: 'user-1' }, data: { name: 'Hero' } })
     })
 
@@ -88,17 +88,17 @@ describe('AuthService', () => {
 
       await authService.updateProfile('user-1', {
         characterName: undefined
-      } as unknown as UpdateProfileType)
+      } as UpdateProfileType)
 
       expect(tx.user.update).not.toHaveBeenCalled()
       expect(tx.character.update).not.toHaveBeenCalled()
     })
 
     it('returns userRepo.findById result after transaction', async () => {
-      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', name: 'Resolved' })
-      const result = await authService.updateProfile('user-1', { name: 'X' } as unknown as UpdateProfileType)
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', theme: 'HOLY_KNIGHTS' })
+      const result = await authService.updateProfile('user-1', { theme: 'HOLY_KNIGHTS' } as UpdateProfileType)
       expect(mockUserRepo.findById).toHaveBeenCalledWith('user-1')
-      expect(result).toEqual({ id: 'user-1', name: 'Resolved' })
+      expect(result).toEqual({ id: 'user-1', theme: 'HOLY_KNIGHTS' })
     })
   })
 

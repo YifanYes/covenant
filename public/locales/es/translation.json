@@ -1298,7 +1298,7 @@
       "character_count": "{{count}} / {{max}}",
       "delete_message": "Eliminar mensaje",
       "report_message": "Reportar este mensaje",
-      "unknown_user": "Aventurero desconocido",
+      "unknown_user": "Forastero",
       "delete_confirm": {
         "title": "¿Eliminar este mensaje?",
         "description": "El mensaje se borrará del foro del gremio y no se puede recuperar.",

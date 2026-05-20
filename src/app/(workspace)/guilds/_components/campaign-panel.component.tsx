@@ -18,7 +18,7 @@ interface CampaignPanelProps {
   guildId: string
   myUserId: string
   myRole: GuildRoleType
-  members: Array<{ userId: string; user: { id: string; name: string | null; character: { name: string } | null } }>
+  members: Array<{ userId: string; user: { id: string; character: { name: string } | null } }>
 }
 
 function formatRemaining(expiresAt: Date, t: ReturnType<typeof useTranslation>['t']) {
@@ -165,7 +165,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
           <ol className="space-y-1">
             {campaign.leaderboard.map((entry, idx) => {
               const member = members.find((m) => m.userId === entry.userId)
-              const name = member?.user.character?.name || member?.user.name || t('guilds.forum.unknown_user')
+              const name = member?.user.character?.name || t('guilds.forum.unknown_user')
               const isMe = entry.userId === myUserId
               return (
                 <li

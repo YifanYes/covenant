@@ -106,11 +106,11 @@ export type GuildTierLabel = (typeof GUILD_TIER_LABELS)[keyof typeof GUILD_TIER_
 // Tailwind class fragments per tier. Used by the `GuildTierBadge` component.
 // `text` for label color, `bg` for chip background, `border` for outline.
 export const GUILD_TIER_COLORS: Record<GuildTierLabel, { text: string; bg: string; border: string }> = {
-  BRONZE:   { text: 'text-amber-700',  bg: 'bg-amber-100',  border: 'border-amber-600'  }, // bronze / copper
-  SILVER:   { text: 'text-slate-600',  bg: 'bg-slate-100',  border: 'border-slate-400'  }, // grey
-  GOLD:     { text: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-500' }, // yellow
-  DIAMOND:  { text: 'text-sky-700',    bg: 'bg-sky-100',    border: 'border-sky-400'    }, // light blue
-  PLATINUM: { text: 'text-zinc-700',   bg: 'bg-zinc-50',    border: 'border-zinc-300'   }  // pale / near-white
+  BRONZE: { text: 'text-amber-700', bg: 'bg-amber-100', border: 'border-amber-600' }, // bronze / copper
+  SILVER: { text: 'text-slate-600', bg: 'bg-slate-100', border: 'border-slate-400' }, // grey
+  GOLD: { text: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-500' }, // yellow
+  DIAMOND: { text: 'text-sky-700', bg: 'bg-sky-100', border: 'border-sky-400' }, // light blue
+  PLATINUM: { text: 'text-zinc-700', bg: 'bg-zinc-50', border: 'border-zinc-300' } // pale / near-white
 }
 ```
 

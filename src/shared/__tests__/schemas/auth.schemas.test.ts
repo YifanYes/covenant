@@ -25,7 +25,6 @@ describe('loginSchema', () => {
 
 describe('signUpSchema', () => {
   const valid = {
-    name: 'John Doe',
     email: 'user@example.com',
     password: 'password123',
     confirmPassword: 'password123'
@@ -47,12 +46,7 @@ describe('signUpSchema', () => {
     expect(result.success).toBe(false)
   })
 
-  it('rejects empty name', () => {
-    const result = signUpSchema.safeParse({ ...valid, name: '' })
-    expect(result.success).toBe(false)
-  })
-
-  it('accepts valid quartet', () => {
+  it('accepts valid trio', () => {
     const result = signUpSchema.safeParse(valid)
     expect(result.success).toBe(true)
   })
