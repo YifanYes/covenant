@@ -392,165 +392,6 @@
       }
     }
   },
-  "crafting": {
-    "title": "Crafting",
-    "materials": "Materials",
-    "recipes": "Recipes",
-    "craft": "Craft",
-    "crafting": "Crafting...",
-    "ingredients": "Ingredients",
-    "result": "Result",
-    "gold_cost": "Gold Cost",
-    "tier_required": "Requires Tier {{tier}}",
-    "missing_materials": "Missing Materials",
-    "no_materials": "No materials yet",
-    "no_recipes": "No recipes available",
-    "tier": {
-      "title": "Tier {{tier}}",
-      "description_1": "Basic recipes for novice crafters. Requires common materials.",
-      "description_2": "Intermediate recipes with improved stats. Requires uncommon materials.",
-      "description_3": "Advanced recipes for expert crafters. Requires rare materials."
-    },
-    "filter": {
-      "all": "All",
-      "weapon": "Weapons",
-      "armor": "Armor",
-      "consumable": "Consumables",
-      "accessory": "Accessories"
-    },
-    "success": {
-      "craft": "Item crafted successfully!"
-    },
-    "error": {
-      "craft": "Failed to craft item",
-      "insufficient_materials": "Insufficient materials",
-      "insufficient_gold": "Insufficient gold"
-    }
-  },
-  "materials": {
-    "functional_steel": {
-      "name": "Functional Steel",
-      "description": "Common steel used in everyday equipment."
-    },
-    "willow_wood": {
-      "name": "Willow Wood",
-      "description": "Flexible wood that channels mana effectively."
-    },
-    "copper": {
-      "name": "Copper",
-      "description": "A conductive metal used in magical equipment."
-    },
-    "quartz_crystal": {
-      "name": "Quartz Crystal",
-      "description": "A rare crystal that amplifies magical energy."
-    },
-    "reinforced_steel": {
-      "name": "Reinforced Steel",
-      "description": "Treated steel with enhanced durability."
-    },
-    "cold_iron": {
-      "name": "Cold Iron",
-      "description": "Iron forged at low temperatures, effective against demons."
-    },
-    "sacred_steel": {
-      "name": "Sacred Steel",
-      "description": "Holy metal blessed by the Church."
-    },
-    "silver": {
-      "name": "Silver",
-      "description": "A noble metal with purifying properties."
-    },
-    "gold_material": {
-      "name": "Gold",
-      "description": "Precious metal that enhances magical conductivity."
-    },
-    "ether": {
-      "name": "Ether",
-      "description": "Crystallized magical essence from powerful beings."
-    },
-    "iridium": {
-      "name": "Iridium",
-      "description": "An extremely rare metal from special encounters."
-    }
-  },
-  "recipes": {
-    "health_potion": {
-      "name": "Health Potion",
-      "description": "Brew a batch of healing potions."
-    },
-    "mana_potion": {
-      "name": "Mana Potion",
-      "description": "Brew a batch of mana restoration potions."
-    },
-    "official_sabre": {
-      "name": "Officer's Sabre",
-      "description": "Forge an elegant officer's blade."
-    },
-    "great_war_axe": {
-      "name": "Great War Axe",
-      "description": "Forge a devastating two-handed axe."
-    },
-    "advanced_revolver": {
-      "name": "Advanced Revolver",
-      "description": "Craft a precision revolver with improved mechanisms."
-    },
-    "ebony_staff": {
-      "name": "Ebony Staff",
-      "description": "Craft a powerful staff from dark wood."
-    },
-    "arcanist_codex": {
-      "name": "Arcanist Codex",
-      "description": "Bind a tome of concentrated arcane power."
-    },
-    "cold_iron_armor": {
-      "name": "Cold Iron Armor",
-      "description": "Forge armor effective against demons."
-    },
-    "bronze_plate_armor": {
-      "name": "Bronze Plate Armor",
-      "description": "Craft armor attuned to magical energies."
-    },
-    "water_drop": {
-      "name": "Water Drop Blade",
-      "description": "Forge a legendary blade of unmatched speed."
-    },
-    "war_breaker": {
-      "name": "War Breaker",
-      "description": "Forge a massive weapon that shatters defenses."
-    },
-    "wind_color": {
-      "name": "Wind Color",
-      "description": "Craft a swift ranged weapon blessed by the winds."
-    },
-    "ether_whisper": {
-      "name": "Ether Whisper Wand",
-      "description": "Craft a wand that channels pure ether."
-    },
-    "compendium_of_truths": {
-      "name": "Compendium of Truths",
-      "description": "Inscribe the ultimate tome of arcane knowledge."
-    },
-    "gothic_armor": {
-      "name": "Gothic Armor",
-      "description": "Forge imposing plate armor of legendary protection."
-    },
-    "gold_plate_armor": {
-      "name": "Gold Plate Armor",
-      "description": "Craft ornate armor infused with magical gold."
-    },
-    "guild_vanguard_blade": {
-      "name": "Vanguard's Oath",
-      "description": "A swift sabre etched with the sigils of bound allies. Available only to the banner-bound."
-    },
-    "guild_oathkeeper_staff": {
-      "name": "Oathkeeper Staff",
-      "description": "Carved from heartwood pledged at the founding rite. Sings when its guild is near."
-    },
-    "guild_aegis_plate": {
-      "name": "Aegis of the Banner",
-      "description": "Plate forged in shared purpose. Strangers cannot lift it; allies cannot put it down."
-    }
-  },
   "confirm": "Confirm",
   "confirm_delete_account_dialog": {
     "button": "Delete Account",
@@ -566,14 +407,6 @@
   "confirm_delete_habit_dialog": {
     "description": "This action is irreversible. This will permanently delete the habit.",
     "title": "Are you sure you want to delete the habit?"
-  },
-  "consumables": {
-    "error": "Failed to use consumable",
-    "health_restored": "+{{amount}} Health restored",
-    "mana_restored": "+{{amount}} Mana restored",
-    "success": "Consumable used!",
-    "title": "Consumables",
-    "use": "Use"
   },
   "copy_suffix": "(Copy)",
   "create": "Create",
@@ -1278,17 +1111,56 @@
       }
     },
     "role": {
-      "owner": "Owner",
-      "officer": "Officer",
+      "guild_master": "Guild Master",
+      "captain": "Captain",
       "member": "Member"
     },
     "role_label": "Role",
+    "tier": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "diamond": "Diamond",
+      "platinum": "Platinum"
+    },
+    "description": {
+      "edit_title": "Edit guild lore",
+      "save": "Save",
+      "cancel": "Cancel",
+      "placeholder": "Tell prospective members what your guild stands for…",
+      "char_count": "{{count}} / {{max}}",
+      "edit_cta": "Edit description",
+      "empty": "No lore yet. A Captain can write the guild's story.",
+      "success": "Description updated.",
+      "error": "Could not update description"
+    },
+    "title_pool": {
+      "title": "Member titles",
+      "description": "Captains manage a pool of titles members can display. Up to {{max}} titles, each up to {{length}} characters.",
+      "add_placeholder": "New title",
+      "add_cta": "Add",
+      "remove": "Remove title",
+      "empty": "No titles yet. Add one to get started.",
+      "save": "Save titles",
+      "success": "Title pool updated.",
+      "error": "Could not update title pool",
+      "confirm_delete_title": "Remove title from pool?",
+      "confirm_delete_description_one": "\"{{title}}\" is currently assigned to {{count}} member. Deleting it will also remove the title from that member.",
+      "confirm_delete_description_other": "\"{{title}}\" is currently assigned to {{count}} members. Deleting it will also remove the title from those members.",
+      "confirm_delete_cta": "Remove title"
+    },
+    "member_title": {
+      "assign": "Assign title",
+      "unassigned": "No title",
+      "success": "Title assigned.",
+      "error": "Could not assign title"
+    },
     "actions": "Actions",
     "member": {
       "you": "(you)",
       "joined": "Joined",
       "kick": "Remove from guild",
-      "promote": "Promote to officer",
+      "promote": "Promote to captain",
       "demote": "Demote to member"
     },
     "forum": {
@@ -1519,46 +1391,6 @@
     "tier": "Tier",
     "title": "Inventory"
   },
-  "investments": {
-    "amount": "Amount",
-    "anti_demon_barrier": {
-      "description": "The alchemists of Asuncion have developed a prototype sacred barrier capable of purifying lesser demons. They just need funds for materials... and maybe life insurance.",
-      "failure": "The alchemists ran out of funds mid-ritual. The 'barrier' turned out to be a curtain with glitter. The demons are laughing. Literally. (╥﹏╥)",
-      "name": "Anti-Demon Barrier",
-      "success": "The barrier rises! Lesser demons disintegrate on contact. The alchemists are as surprised as we are that it worked (・∀・)"
-    },
-    "completed": "Completed!",
-    "contribute": "Contribute",
-    "contribute_to": "Contribute to {{name}}",
-    "dark_heart_operation": {
-      "description": "While the Six Powers attack Santa Cruz, Sodom and Gomorrah are unprotected. A surgical strike could destroy their forges and disrupt their supply lines. Suicidal? Maybe. Epic? Definitely.",
-      "failure": "The squad was captured. Last transmissions spoke of 'demonic hospitality'. We don't want to know the details (゜-゜)",
-      "name": "Operation Dark Heart",
-      "success": "BOOM! The Infernal Forge burns... with its own fire. Ironic, isn't it? The Antichrist is fuming. More than usual ᕦ(ò_óˇ)ᕤ"
-    },
-    "days_remaining": "days remaining",
-    "error_contribute": "Error making contribution",
-    "gen2_armament_program": {
-      "description": "The Alchemists League offers to share their secrets of magical percussion and sealed cartridges... for a price. Capitalism survives even the apocalypse.",
-      "failure": "The League took the money and disappeared. Who could have imagined. Contracts now include 'no demons' as a valid excuse for non-payment ┐(´д`)┌",
-      "name": "Gen 2 Armament Program",
-      "success": "The League keeps their word! The new weapons fire without fail. The demons discover that 'magic-proof' doesn't mean 'bullet-proof' (☞゚ヮ゚)☞"
-    },
-    "gold": "gold",
-    "max": "Max",
-    "my_contribution": "My contribution",
-    "no_investments": "No active investments",
-    "providence_purification": {
-      "description": "The monks of Asuncion believe they can purify the ruins of Providence and create a secondary front. 'Believe' is the key word here.",
-      "failure": "The monks arrived at the ruins full of faith. They returned... well, they didn't return. The ruins now glow with a very unholy red (；一_一)",
-      "name": "Providence Purification Ritual",
-      "success": "Providence rises from the ashes! The monks sing victory... well, they sing hymns, but with great emotion ♪(´ε` )"
-    },
-    "subtitle": "Contribute gold to change the fate of the world",
-    "success_contribute": "Contribution successful!",
-    "title": "Investments",
-    "your_gold": "Your gold"
-  },
   "item_categories": {
     "rarity": {
       "common": "Common",
@@ -1721,26 +1553,6 @@
       "Watching the shadows for heresy..."
     ],
     "verifying_title": "Verifying..."
-  },
-  "morality": {
-    "title": "Morality",
-    "status": {
-      "saint": "Saint",
-      "neutral": "Neutral",
-      "demon": "Demon"
-    },
-    "change": {
-      "increased": "+{{amount}} Morality",
-      "decreased": "-{{amount}} Morality",
-      "became_saint": "You have ascended to Sainthood!",
-      "became_demon": "Darkness has consumed your soul...",
-      "left_saint": "You have fallen from grace...",
-      "left_demon": "A spark of light returns to your soul..."
-    }
-  },
-  "map": {
-    "lore": "The Six Infernal Powers have launched a lightning attack on Santa Cruz, the Silver Seat. The Order of Sacred Knights defends every wall while reinforcements are on the way. If the Silver Seat falls, the leadership of the Faithful falls.",
-    "title": "World Map"
   },
   "moods": {
     "happy": "Happy",
@@ -1940,9 +1752,6 @@
       "aria": "View source code on GitHub (AGPL-3.0)"
     }
   },
-  "nav": {
-    "quests": "Quests"
-  },
   "user_menu": {
     "aria": "User menu",
     "edit_name": "Edit character name"
@@ -1954,7 +1763,6 @@
     "dashboard": "Dashboard",
     "habits": "Habits",
     "inventory": "Inventory",
-    "investments": "Investments",
     "journaling": "Journaling",
     "objectives": "Objectives and areas",
     "open": "Expand menu",
@@ -2019,13 +1827,6 @@
       "clear": "Clear filters",
       "tier": "Tier",
       "type": "Type"
-    },
-    "materials": {
-      "title": "Materials",
-      "quantity": "Quantity",
-      "price_each": "{{price}}g each",
-      "total": "Total: {{total}}g",
-      "success": "Material purchased!"
     },
     "items_purchased": "items purchased",
     "no_items": "No items available",
@@ -2228,52 +2029,6 @@
     "kills_progress": "{{current}} / {{required}} enemies defeated",
     "max_tier_reached": "Maximum tier reached (Beta)",
     "tier_up_message": "You've reached Tier {{tier}}!"
-  },
-  "tactical": {
-    "actions": {
-      "attack": "Attack",
-      "move": "Move",
-      "next_turn": "Next Turn"
-    },
-    "click_to_attack": "Click an enemy to attack",
-    "click_to_move": "Click a highlighted tile to move",
-    "controls": {
-      "pan": "Right drag: Pan camera",
-      "select": "Left click: Select",
-      "zoom": "Scroll: Zoom"
-    },
-    "casting": "Casting...",
-    "click_confirm_ability": "Click Confirm to cast",
-    "click_to_target_ability": "Click a tile to target",
-    "moving": "Moving...",
-    "pattern": "Pattern",
-    "pattern_circle": "Circle",
-    "pattern_cone": "Cone",
-    "pattern_cross": "Cross",
-    "pattern_diamond": "Diamond",
-    "pattern_line": "Line",
-    "pattern_single": "Single",
-    "range": "Range",
-    "select_destination": "Select Destination",
-    "select_target": "Select Target",
-    "targets_affected": "Targets Affected",
-    "tile_info": {
-      "ally": "Ally",
-      "blocked": "Blocked",
-      "damage_per_turn": "Damage/Turn",
-      "effect": "Effect",
-      "effects": "Effects",
-      "enemy": "Enemy",
-      "hover_hint": "Hover over a tile to see info",
-      "move": "Move",
-      "move_cost": "Move Cost",
-      "position": "Position",
-      "range": "Range",
-      "selected": "Selected",
-      "terrain": "Terrain",
-      "tile": "Tile"
-    },
-    "tiles": "tiles"
   },
   "quests": {
     "title": "Quests",

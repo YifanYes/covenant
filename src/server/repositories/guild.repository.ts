@@ -25,6 +25,10 @@ export class GuildRepository {
     return this.prisma.guild.update({ where: { id }, data })
   }
 
+  async updateAvailableTitles(id: string, titles: string[]): Promise<Guild> {
+    return this.prisma.guild.update({ where: { id }, data: { availableTitles: titles } })
+  }
+
   async delete(id: string): Promise<void> {
     await this.prisma.guild.delete({ where: { id } })
   }

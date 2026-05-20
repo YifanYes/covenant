@@ -13,7 +13,9 @@ import {
   startCampaignSchema,
   transferOwnershipSchema,
   updateGuildSchema,
-  updateRoleSchema
+  updateMemberTitleSchema,
+  updateRoleSchema,
+  updateTitlePoolSchema
 } from '@shared/schemas/guilds.schemas'
 import { protectedProcedure, RATE_LIMITS, rateLimit, t } from '../trpc'
 
@@ -70,6 +72,20 @@ export const guildsRouter = t.router({
     .input(updateRoleSchema)
     .mutation(async ({ ctx, input }) => {
       return ctx.services.guild.updateRole(input, ctx.user.id)
+    }),
+
+  updateTitlePool: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
+    .input(updateTitlePoolSchema)
+    .mutation(async ({ ctx, input }) => {
+      return ctx.services.guild.updateTitlePool(input, ctx.user.id)
+    }),
+
+  updateMemberTitle: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
+    .input(updateMemberTitleSchema)
+    .mutation(async ({ ctx, input }) => {
+      return ctx.services.guild.updateMemberTitle(input, ctx.user.id)
     }),
 
   createInvite: protectedProcedure

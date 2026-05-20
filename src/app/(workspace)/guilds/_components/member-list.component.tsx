@@ -12,6 +12,7 @@ import { Crown, Shield, UserMinus, UserPlus, UserX } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import UserAvatar from '@/common/user-avatar.component'
+import MemberTitleSelect from './member-title-select.component'
 
 interface MemberListProps {
   guildId: string
@@ -22,29 +23,29 @@ interface MemberListProps {
     joinedAt: Date | string
     user: {
       id: string
-      name: string | null
       image: string | null
-      character: { name: string } | null
+      character: { id: string; name: string; title: string | null } | null
     }
   }>
+  availableTitles: string[]
   myUserId: string
   myRole: GuildRoleType
 }
 
 const ROLE_ORDER: Record<GuildRoleType, number> = {
-  [GuildRole.OWNER]: 0,
-  [GuildRole.OFFICER]: 1,
+  [GuildRole.GUILD_MASTER]: 0,
+  [GuildRole.CAPTAIN]: 1,
   [GuildRole.MEMBER]: 2
 }
 
 function roleLabel(role: string, t: (k: string) => string) {
-  if (role === GuildRole.OWNER) return t('guilds.role.owner')
-  if (role === GuildRole.OFFICER) return t('guilds.role.officer')
+  if (role === GuildRole.GUILD_MASTER) return t('guilds.role.guild_master')
+  if (role === GuildRole.CAPTAIN) return t('guilds.role.captain')
   return t('guilds.role.member')
 }
 
 function RoleBadge({ role, label }: { role: string; label: string }) {
-  if (role === GuildRole.OWNER) {
+  if (role === GuildRole.GUILD_MASTER) {
     return (
       <Badge className="gap-1 bg-accent/20 text-accent border-accent/40 hover:bg-accent/20">
         <Crown className="h-3 w-3" />
@@ -52,9 +53,9 @@ function RoleBadge({ role, label }: { role: string; label: string }) {
       </Badge>
     )
   }
-  if (role === GuildRole.OFFICER) {
+  if (role === GuildRole.CAPTAIN) {
     return (
-      <Badge variant="outline" className="gap-1 border-secondary/60 text-secondary-foreground">
+      <Badge className="gap-1 bg-secondary/15 text-secondary border-secondary/40 hover:bg-secondary/15">
         <Shield className="h-3 w-3" />
         {label}
       </Badge>
@@ -67,7 +68,7 @@ function RoleBadge({ role, label }: { role: string; label: string }) {
   )
 }
 
-export default function MemberList({ guildId, members, myUserId, myRole }: MemberListProps) {
+export default function MemberList({ guildId, members, availableTitles, myUserId, myRole }: MemberListProps) {
   const { t } = useTranslation()
 
   const sorted = [...members].sort((a, b) => {
@@ -98,21 +99,35 @@ export default function MemberList({ guildId, members, myUserId, myRole }: Membe
   )
 
   const canKick = (targetRole: string) => {
-    if (myRole === GuildRole.OWNER) return targetRole !== GuildRole.OWNER
-    if (myRole === GuildRole.OFFICER) return targetRole === GuildRole.MEMBER
+    if (myRole === GuildRole.GUILD_MASTER) return targetRole !== GuildRole.GUILD_MASTER
+    if (myRole === GuildRole.CAPTAIN) return targetRole === GuildRole.MEMBER
     return false
+  }
+
+  const canManageTitles = myRole === GuildRole.GUILD_MASTER || myRole === GuildRole.CAPTAIN
+
+  const canAssignTitle = (targetRole: string, targetUserId: string) => {
+    if (!canManageTitles) return false
+    if (targetUserId === myUserId) return false
+    if (targetRole === GuildRole.GUILD_MASTER) return false
+    if (myRole === GuildRole.CAPTAIN && targetRole === GuildRole.CAPTAIN) return false
+    return true
   }
 
   return (
     <ul className={cn(panelChrome, 'divide-y overflow-hidden')}>
       {sorted.map((member) => {
         const isMe = member.userId === myUserId
-        const isOwner = member.role === GuildRole.OWNER
+        const isOwner = member.role === GuildRole.GUILD_MASTER
         const showKick = !isMe && canKick(member.role)
-        const showRoleToggle = myRole === GuildRole.OWNER && !isMe && !isOwner
+        const showRoleToggle = myRole === GuildRole.GUILD_MASTER && !isMe && !isOwner
         const promote = member.role === GuildRole.MEMBER
         const name = member.user.character?.name ?? t('guilds.forum.unknown_user')
+        const characterTitle = member.user.character?.title ?? null
+        const displayTitle =
+          characterTitle && availableTitles.includes(characterTitle) ? characterTitle : null
         const joined = new Date(member.joinedAt)
+        const showTitleSelect = canAssignTitle(member.role, member.userId)
 
         return (
           <li
@@ -123,6 +138,11 @@ export default function MemberList({ guildId, members, myUserId, myRole }: Membe
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-2 min-w-0">
                 <span className="font-title text-sm truncate">{name}</span>
+                {displayTitle && (
+                  <span className="rounded-full border border-border/60 bg-muted/30 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                    {displayTitle}
+                  </span>
+                )}
                 {isMe && <span className="text-muted-foreground text-xs">{t('guilds.member.you')}</span>}
               </div>
               <span className="text-muted-foreground text-xs">
@@ -130,6 +150,14 @@ export default function MemberList({ guildId, members, myUserId, myRole }: Membe
               </span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
+              {showTitleSelect && (
+                <MemberTitleSelect
+                  guildId={guildId}
+                  memberId={member.id}
+                  currentTitle={characterTitle}
+                  availableTitles={availableTitles}
+                />
+              )}
               <RoleBadge role={member.role} label={roleLabel(member.role, t)} />
               {showRoleToggle && (
                 <Tooltip>
@@ -141,7 +169,7 @@ export default function MemberList({ guildId, members, myUserId, myRole }: Membe
                         roleMutation.mutate({
                           guildId,
                           targetUserId: member.userId,
-                          role: promote ? GuildRole.OFFICER : GuildRole.MEMBER
+                          role: promote ? GuildRole.CAPTAIN : GuildRole.MEMBER
                         })
                       }
                       disabled={roleMutation.isPending}

@@ -1,28 +1,49 @@
-import { GUILD_MESSAGE_MAX_LENGTH } from '@shared/constants/guild.constants'
+import {
+  GUILD_DESCRIPTION_HTML_MAX_LENGTH,
+  GUILD_MESSAGE_MAX_LENGTH,
+  GUILD_TITLE_MAX_LENGTH,
+  GUILD_TITLE_POOL_MAX_SIZE
+} from '@shared/constants/guild.constants'
 import { z } from 'zod'
 
 export const GuildRole = {
-  OWNER: 'OWNER',
-  OFFICER: 'OFFICER',
+  GUILD_MASTER: 'GUILD_MASTER',
+  CAPTAIN: 'CAPTAIN',
   MEMBER: 'MEMBER'
 } as const
 
 export type GuildRoleType = (typeof GuildRole)[keyof typeof GuildRole]
 
-export const guildRoleValues = [GuildRole.OWNER, GuildRole.OFFICER, GuildRole.MEMBER] as const
+export const guildRoleValues = [GuildRole.GUILD_MASTER, GuildRole.CAPTAIN, GuildRole.MEMBER] as const
 
 export const createGuildSchema = z.object({
   name: z.string().trim().min(3).max(80),
-  description: z.string().trim().max(500).optional()
+  description: z.string().trim().max(GUILD_DESCRIPTION_HTML_MAX_LENGTH).optional()
 })
 export type CreateGuildType = z.infer<typeof createGuildSchema>
 
 export const updateGuildSchema = z.object({
   guildId: z.uuid(),
   name: z.string().trim().min(3).max(80).optional(),
-  description: z.string().trim().max(500).optional()
+  description: z.string().trim().max(GUILD_DESCRIPTION_HTML_MAX_LENGTH).optional()
 })
 export type UpdateGuildType = z.infer<typeof updateGuildSchema>
+
+export const updateTitlePoolSchema = z.object({
+  guildId: z.uuid(),
+  titles: z
+    .array(z.string().trim().min(1).max(GUILD_TITLE_MAX_LENGTH))
+    .max(GUILD_TITLE_POOL_MAX_SIZE)
+    .transform((arr) => [...new Set(arr)])
+})
+export type UpdateTitlePoolType = z.infer<typeof updateTitlePoolSchema>
+
+export const updateMemberTitleSchema = z.object({
+  guildId: z.uuid(),
+  memberId: z.uuid(),
+  title: z.string().trim().min(1).max(GUILD_TITLE_MAX_LENGTH).nullable()
+})
+export type UpdateMemberTitleType = z.infer<typeof updateMemberTitleSchema>
 
 export const guildIdSchema = z.object({
   guildId: z.uuid()
@@ -90,7 +111,7 @@ export type TransferOwnershipType = z.infer<typeof transferOwnershipSchema>
 export const updateRoleSchema = z.object({
   guildId: z.uuid(),
   targetUserId: z.string().min(1),
-  role: z.enum([GuildRole.OFFICER, GuildRole.MEMBER])
+  role: z.enum([GuildRole.CAPTAIN, GuildRole.MEMBER])
 })
 export type UpdateRoleType = z.infer<typeof updateRoleSchema>
 

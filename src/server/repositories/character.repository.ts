@@ -231,4 +231,26 @@ export class CharacterRepository {
       data: { factionName: faction }
     })
   }
+
+  async updateTitle(characterId: string, title: string | null): Promise<Character> {
+    return this.prisma.character.update({
+      where: { id: characterId },
+      data: { title }
+    })
+  }
+
+  async clearTitlesForUsers(userIds: string[], titles: string[]): Promise<void> {
+    if (userIds.length === 0 || titles.length === 0) return
+    await this.prisma.character.updateMany({
+      where: { userId: { in: userIds }, title: { in: titles } },
+      data: { title: null }
+    })
+  }
+
+  async clearTitleForUser(userId: string): Promise<void> {
+    await this.prisma.character.updateMany({
+      where: { userId },
+      data: { title: null }
+    })
+  }
 }

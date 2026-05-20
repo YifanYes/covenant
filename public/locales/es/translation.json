@@ -392,165 +392,6 @@
       }
     }
   },
-  "crafting": {
-    "title": "Forja",
-    "materials": "Materiales",
-    "recipes": "Recetas",
-    "craft": "Forjar",
-    "crafting": "Forjando...",
-    "ingredients": "Ingredientes",
-    "result": "Resultado",
-    "gold_cost": "Coste en Oro",
-    "tier_required": "Requiere Tier {{tier}}",
-    "missing_materials": "Materiales faltantes",
-    "no_materials": "Sin materiales aún",
-    "no_recipes": "No hay recetas disponibles",
-    "tier": {
-      "title": "Tier {{tier}}",
-      "description_1": "Recetas básicas para artesanos novatos. Requiere materiales comunes.",
-      "description_2": "Recetas intermedias con estadísticas mejoradas. Requiere materiales poco comunes.",
-      "description_3": "Recetas avanzadas para artesanos expertos. Requiere materiales raros."
-    },
-    "filter": {
-      "all": "Todos",
-      "weapon": "Armas",
-      "armor": "Armaduras",
-      "consumable": "Consumibles",
-      "accessory": "Accesorios"
-    },
-    "success": {
-      "craft": "¡Objeto forjado con éxito!"
-    },
-    "error": {
-      "craft": "Error al forjar objeto",
-      "insufficient_materials": "Materiales insuficientes",
-      "insufficient_gold": "Oro insuficiente"
-    }
-  },
-  "materials": {
-    "functional_steel": {
-      "name": "Acero Funcional",
-      "description": "Acero común usado en equipo cotidiano."
-    },
-    "willow_wood": {
-      "name": "Madera de Sauce",
-      "description": "Madera flexible que canaliza el maná eficientemente."
-    },
-    "copper": {
-      "name": "Cobre",
-      "description": "Un metal conductor usado en equipo mágico."
-    },
-    "quartz_crystal": {
-      "name": "Cristal de Cuarzo",
-      "description": "Un cristal raro que amplifica la energía mágica."
-    },
-    "reinforced_steel": {
-      "name": "Acero Reforzado",
-      "description": "Acero tratado con mayor durabilidad."
-    },
-    "cold_iron": {
-      "name": "Hierro Frío",
-      "description": "Hierro forjado a bajas temperaturas, efectivo contra demonios."
-    },
-    "sacred_steel": {
-      "name": "Acero Sagrado",
-      "description": "Metal santo bendecido por la Iglesia."
-    },
-    "silver": {
-      "name": "Plata",
-      "description": "Un metal noble con propiedades purificadoras."
-    },
-    "gold_material": {
-      "name": "Oro",
-      "description": "Metal precioso que mejora la conductividad mágica."
-    },
-    "ether": {
-      "name": "Éter",
-      "description": "Esencia mágica cristalizada de seres poderosos."
-    },
-    "iridium": {
-      "name": "Iridio",
-      "description": "Un metal extremadamente raro de encuentros especiales."
-    }
-  },
-  "recipes": {
-    "health_potion": {
-      "name": "Poción de Salud",
-      "description": "Prepara un lote de pociones curativas."
-    },
-    "mana_potion": {
-      "name": "Poción de Maná",
-      "description": "Prepara un lote de pociones de restauración de maná."
-    },
-    "official_sabre": {
-      "name": "Sable de Oficial",
-      "description": "Forja una elegante espada de oficial."
-    },
-    "great_war_axe": {
-      "name": "Gran Hacha de Guerra",
-      "description": "Forja un hacha a dos manos devastadora."
-    },
-    "advanced_revolver": {
-      "name": "Revólver Avanzado",
-      "description": "Fabrica un revólver de precisión con mecanismos mejorados."
-    },
-    "ebony_staff": {
-      "name": "Báculo de Ébano",
-      "description": "Fabrica un poderoso báculo de madera oscura."
-    },
-    "arcanist_codex": {
-      "name": "Códice del Arcanista",
-      "description": "Encuaderna un tomo de poder arcano concentrado."
-    },
-    "cold_iron_armor": {
-      "name": "Armadura de Hierro Frío",
-      "description": "Forja una armadura efectiva contra demonios."
-    },
-    "bronze_plate_armor": {
-      "name": "Armadura de Placas de Bronce",
-      "description": "Fabrica una armadura sintonizada con energías mágicas."
-    },
-    "water_drop": {
-      "name": "Gota de Agua",
-      "description": "Forja una espada legendaria de velocidad inigualable."
-    },
-    "war_breaker": {
-      "name": "Rompe Guerras",
-      "description": "Forja un arma masiva que destroza defensas."
-    },
-    "wind_color": {
-      "name": "Color del Viento",
-      "description": "Fabrica un arma a distancia bendecida por los vientos."
-    },
-    "ether_whisper": {
-      "name": "Susurro del Éter",
-      "description": "Fabrica una vara que canaliza éter puro."
-    },
-    "compendium_of_truths": {
-      "name": "Compendio de Verdades",
-      "description": "Inscribe el tomo definitivo de conocimiento arcano."
-    },
-    "gothic_armor": {
-      "name": "Armadura Gótica",
-      "description": "Forja una imponente armadura de placas de protección legendaria."
-    },
-    "gold_plate_armor": {
-      "name": "Armadura de Placas de Oro",
-      "description": "Fabrica una armadura ornamentada infundida con oro mágico."
-    },
-    "guild_vanguard_blade": {
-      "name": "Juramento de Vanguardia",
-      "description": "Sable veloz grabado con los sellos de aliados jurados. Solo para los portadores del estandarte."
-    },
-    "guild_oathkeeper_staff": {
-      "name": "Báculo del Guardajuramentos",
-      "description": "Tallado en madera prometida en el rito fundacional. Canta cuando su gremio está cerca."
-    },
-    "guild_aegis_plate": {
-      "name": "Égida del Estandarte",
-      "description": "Placa forjada en propósito compartido. Los extraños no pueden alzarla; los aliados no pueden soltarla."
-    }
-  },
   "confirm": "Confirmar",
   "confirm_delete_account_dialog": {
     "button": "Eliminar cuenta",
@@ -566,14 +407,6 @@
   "confirm_delete_habit_dialog": {
     "description": "Esta acción es irreversible. Esto eliminará permanentemente el hábito.",
     "title": "¿Estás seguro de que quieres eliminar el hábito?"
-  },
-  "consumables": {
-    "error": "Error al usar el consumible",
-    "health_restored": "+{{amount}} Vidas restauradas",
-    "mana_restored": "+{{amount}} Maná restaurado",
-    "success": "¡Consumible usado!",
-    "title": "Consumibles",
-    "use": "Usar"
   },
   "copy_suffix": "(Copia)",
   "create": "Crear",
@@ -1278,17 +1111,56 @@
       }
     },
     "role": {
-      "owner": "Líder",
-      "officer": "Oficial",
+      "guild_master": "Maestro del Gremio",
+      "captain": "Capitán",
       "member": "Miembro"
     },
     "role_label": "Rol",
+    "tier": {
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro",
+      "diamond": "Diamante",
+      "platinum": "Platino"
+    },
+    "description": {
+      "edit_title": "Editar lore del gremio",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "placeholder": "Cuenta a los aspirantes qué representa tu gremio…",
+      "char_count": "{{count}} / {{max}}",
+      "edit_cta": "Editar descripción",
+      "empty": "Aún no hay lore. Un Capitán puede escribir la historia del gremio.",
+      "success": "Descripción actualizada.",
+      "error": "No se pudo actualizar la descripción"
+    },
+    "title_pool": {
+      "title": "Títulos de miembros",
+      "description": "Los Capitanes gestionan un grupo de títulos que los miembros pueden mostrar. Hasta {{max}} títulos, cada uno con un máximo de {{length}} caracteres.",
+      "add_placeholder": "Nuevo título",
+      "add_cta": "Añadir",
+      "remove": "Eliminar título",
+      "empty": "Aún no hay títulos. Añade uno para empezar.",
+      "save": "Guardar títulos",
+      "success": "Grupo de títulos actualizado.",
+      "error": "No se pudo actualizar el grupo de títulos",
+      "confirm_delete_title": "¿Eliminar título del grupo?",
+      "confirm_delete_description_one": "\"{{title}}\" está asignado actualmente a {{count}} miembro. Si lo eliminas, también se quitará el título de ese miembro.",
+      "confirm_delete_description_other": "\"{{title}}\" está asignado actualmente a {{count}} miembros. Si lo eliminas, también se quitará el título de esos miembros.",
+      "confirm_delete_cta": "Eliminar título"
+    },
+    "member_title": {
+      "assign": "Asignar título",
+      "unassigned": "Sin título",
+      "success": "Título asignado.",
+      "error": "No se pudo asignar el título"
+    },
     "actions": "Acciones",
     "member": {
       "you": "(tú)",
       "joined": "Se unió",
       "kick": "Expulsar del gremio",
-      "promote": "Promover a oficial",
+      "promote": "Promover a capitán",
       "demote": "Degradar a miembro"
     },
     "forum": {
@@ -1519,46 +1391,6 @@
     "tier": "Tier",
     "title": "Inventario"
   },
-  "investments": {
-    "amount": "Cantidad",
-    "anti_demon_barrier": {
-      "description": "Los alquimistas de Asunción han desarrollado un prototipo de barrera sagrada capaz de purificar demonios menores. Solo necesitan fondos para los materiales... y quizás un seguro de vida.",
-      "failure": "Los alquimistas se quedaron sin fondos a mitad del ritual. La 'barrera' resultó ser una cortina con purpurina. Los demonios están riéndose. Literalmente. (╥﹏╥)",
-      "name": "Barrera Anti-Demonios",
-      "success": "¡La barrera se alza! Los demonios menores se desintegran al tocarla. Los alquimistas están tan sorprendidos como nosotros de que funcionara (・∀・)"
-    },
-    "completed": "¡Completado!",
-    "contribute": "Contribuir",
-    "contribute_to": "Contribuir a {{name}}",
-    "dark_heart_operation": {
-      "description": "Mientras los Seis Poderes atacan Santa Cruz, Sodoma y Gomorra están desprotegidas. Un golpe quirúrgico podría destruir sus fundiciones y desbaratar sus líneas de suministro. ¿Suicida? Quizás. ¿Épico? Definitivamente.",
-      "failure": "El escuadrón fue capturado. Las últimas transmisiones hablaban de 'hospitalidad demoníaca'. No queremos saber los detalles (゜-゜)",
-      "name": "Operación Corazón Oscuro",
-      "success": "¡BOOM! La Forja Infernal arde... con su propio fuego. Irónico, ¿no? El Anticristo está que echa humo. Más humo del habitual ᕦ(ò_óˇ)ᕤ"
-    },
-    "days_remaining": "días restantes",
-    "error_contribute": "Error al realizar la contribución",
-    "gen2_armament_program": {
-      "description": "La Liga de los Alquimistas ofrece compartir sus secretos de percusión mágica y cartuchos sellados... por un precio. El capitalismo sobrevive incluso al apocalipsis.",
-      "failure": "La Liga se quedó con el dinero y desapareció. Quién lo hubiera imaginado. Los contratos ahora incluyen 'sin demonios' como excusa válida de impago ┐(´д`)┌",
-      "name": "Programa de Armamento Gen 2",
-      "success": "¡La Liga cumple su palabra! Las nuevas armas disparan sin fallar. Los demonios descubren que 'a prueba de magia' no significa 'a prueba de balas' (☞゚ヮ゚)☞"
-    },
-    "gold": "oro",
-    "max": "Máximo",
-    "my_contribution": "Mi contribución",
-    "no_investments": "No hay inversiones activas",
-    "providence_purification": {
-      "description": "Los monjes de Asunción creen que pueden purificar las ruinas de Providencia y crear un frente secundario. 'Creemos' es la palabra clave aquí.",
-      "failure": "Los monjes llegaron a las ruinas llenos de fe. Volvieron... bueno, no volvieron. Las ruinas ahora brillan con un rojo muy poco sagrado (；一_一)",
-      "name": "Ritual de Purificación de Providencia",
-      "success": "¡Providencia renace de las cenizas! Los monjes cantan victoria... bueno, cantan himnos, pero con mucha emoción ♪(´ε` )"
-    },
-    "subtitle": "Contribuye oro para cambiar el destino del mundo",
-    "success_contribute": "¡Contribución realizada con éxito!",
-    "title": "Inversiones",
-    "your_gold": "Tu oro"
-  },
   "item_categories": {
     "rarity": {
       "common": "Común",
@@ -1721,26 +1553,6 @@
       "Vigilando las sombras en busca de herejía..."
     ],
     "verifying_title": "Verificando..."
-  },
-  "morality": {
-    "title": "Moralidad",
-    "status": {
-      "saint": "Santo",
-      "neutral": "Neutral",
-      "demon": "Demonio"
-    },
-    "change": {
-      "increased": "+{{amount}} Moralidad",
-      "decreased": "-{{amount}} Moralidad",
-      "became_saint": "Has ascendido a la Santidad!",
-      "became_demon": "La oscuridad ha consumido tu alma...",
-      "left_saint": "Has caído en desgracia...",
-      "left_demon": "Una chispa de luz regresa a tu alma..."
-    }
-  },
-  "map": {
-    "lore": "Los Seis Poderes Infernales han lanzado un ataque relámpago a Santa Cruz, la Sede Plateada. La Orden de los Caballeros Sagrados defiende cada muralla mientras los refuerzos vienen en camino. Si cae la Sede Plateada, cae el liderazgo de los Fieles.",
-    "title": "Mapa del Mundo"
   },
   "moods": {
     "happy": "Feliz",
@@ -1940,9 +1752,6 @@
       "aria": "Ver código fuente en GitHub (AGPL-3.0)"
     }
   },
-  "nav": {
-    "quests": "Misiones"
-  },
   "user_menu": {
     "aria": "Menú de usuario",
     "edit_name": "Editar nombre del personaje"
@@ -1954,7 +1763,6 @@
     "dashboard": "Panel de control",
     "habits": "Hábitos",
     "inventory": "Inventario",
-    "investments": "Inversiones",
     "journaling": "Diario",
     "objectives": "Objetivos y áreas",
     "open": "Expandir menú",
@@ -2019,13 +1827,6 @@
       "clear": "Limpiar filtros",
       "tier": "Tier",
       "type": "Tipo"
-    },
-    "materials": {
-      "title": "Materiales",
-      "quantity": "Cantidad",
-      "price_each": "{{price}}g cada uno",
-      "total": "Total: {{total}}g",
-      "success": "¡Material comprado!"
     },
     "items_purchased": "objetos comprados",
     "no_items": "No hay objetos disponibles",
@@ -2228,52 +2029,6 @@
     "kills_progress": "{{current}} / {{required}} enemigos derrotados",
     "max_tier_reached": "Tier máximo alcanzado (Beta)",
     "tier_up_message": "¡Has alcanzado el Tier {{tier}}!"
-  },
-  "tactical": {
-    "actions": {
-      "attack": "Atacar",
-      "move": "Mover",
-      "next_turn": "Siguiente Turno"
-    },
-    "click_to_attack": "Haz clic en un enemigo para atacar",
-    "click_to_move": "Haz clic en una casilla resaltada para moverte",
-    "controls": {
-      "pan": "Arrastrar derecho: Mover cámara",
-      "select": "Clic izquierdo: Seleccionar",
-      "zoom": "Scroll: Zoom"
-    },
-    "casting": "Lanzando...",
-    "click_confirm_ability": "Haz clic en Confirmar para lanzar",
-    "click_to_target_ability": "Haz clic en una casilla para apuntar",
-    "moving": "Moviendo...",
-    "pattern": "Patrón",
-    "pattern_circle": "Círculo",
-    "pattern_cone": "Cono",
-    "pattern_cross": "Cruz",
-    "pattern_diamond": "Diamante",
-    "pattern_line": "Línea",
-    "pattern_single": "Individual",
-    "range": "Rango",
-    "select_destination": "Seleccionar Destino",
-    "select_target": "Seleccionar Objetivo",
-    "targets_affected": "Objetivos Afectados",
-    "tile_info": {
-      "ally": "Aliado",
-      "blocked": "Bloqueado",
-      "damage_per_turn": "Daño/Turno",
-      "effect": "Efecto",
-      "effects": "Efectos",
-      "enemy": "Enemigo",
-      "hover_hint": "Pasa el cursor sobre una casilla para ver info",
-      "move": "Movimiento",
-      "move_cost": "Coste de Movimiento",
-      "position": "Posición",
-      "range": "Alcance",
-      "selected": "Seleccionado",
-      "terrain": "Terreno",
-      "tile": "Casilla"
-    },
-    "tiles": "casillas"
   },
   "quests": {
     "title": "Misiones",

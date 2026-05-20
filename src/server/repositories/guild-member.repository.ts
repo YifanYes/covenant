@@ -5,9 +5,11 @@ export type GuildMemberWithGuildAndMembers = GuildMember & {
     id: string
     name: string
     description: string | null
+    availableTitles: string[]
     factionName: string
     capacity: number
     ownerId: string
+    tier: number
     createdAt: Date
     updatedAt: Date
     members: Array<{
@@ -18,7 +20,7 @@ export type GuildMemberWithGuildAndMembers = GuildMember & {
       user: {
         id: string
         image: string | null
-        character: { name: string } | null
+        character: { id: string; name: string; title: string | null } | null
       }
     }>
   }
@@ -29,6 +31,18 @@ export class GuildMemberRepository {
 
   async findByUserId(userId: string): Promise<GuildMember | null> {
     return this.prisma.guildMember.findUnique({ where: { userId } })
+  }
+
+  async findById(id: string): Promise<GuildMember | null> {
+    return this.prisma.guildMember.findUnique({ where: { id } })
+  }
+
+  async findUserIdsByGuild(guildId: string): Promise<string[]> {
+    const rows = await this.prisma.guildMember.findMany({
+      where: { guildId },
+      select: { userId: true }
+    })
+    return rows.map((r) => r.userId)
   }
 
   async findByUserIdWithGuildAndMembers(userId: string): Promise<GuildMemberWithGuildAndMembers | null> {
@@ -43,7 +57,7 @@ export class GuildMemberRepository {
                   select: {
                     id: true,
                     image: true,
-                    character: { select: { name: true } }
+                    character: { select: { id: true, name: true, title: true } }
                   }
                 }
               },

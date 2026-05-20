@@ -9,6 +9,24 @@ export const GUILD_TIER_THRESHOLDS = [0, 1000, 5000, 15000, 40000] as const
 
 export const MAX_GUILD_TIER = GUILD_TIER_THRESHOLDS.length
 
+export const GUILD_TIER_LABELS = {
+  1: 'BRONZE',
+  2: 'SILVER',
+  3: 'GOLD',
+  4: 'DIAMOND',
+  5: 'PLATINUM'
+} as const
+
+export type GuildTierLabel = (typeof GUILD_TIER_LABELS)[keyof typeof GUILD_TIER_LABELS]
+
+export const GUILD_TIER_COLORS: Record<GuildTierLabel, { text: string; bg: string; border: string }> = {
+  BRONZE: { text: 'text-amber-700', bg: 'bg-amber-100', border: 'border-amber-700' },
+  SILVER: { text: 'text-slate-500', bg: 'bg-slate-100', border: 'border-slate-500' },
+  GOLD: { text: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-700' },
+  DIAMOND: { text: 'text-sky-600', bg: 'bg-sky-100', border: 'border-sky-600' },
+  PLATINUM: { text: 'text-zinc-500', bg: 'bg-zinc-100', border: 'border-zinc-500' }
+}
+
 /**
  * Per-event contribution weights. Raw campaign event amounts are imbalanced
  * (ENEMY_KILL fires with amount=1; GOLD_EARNED fires with amount=8–25 per kill).

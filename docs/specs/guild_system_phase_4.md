@@ -20,13 +20,13 @@ Changes on top of the existing guild infra:
 - Guild emblems and banners.
 - Guild discovery directory (separate work; cross-linked).
 - Description-level reporting / auto-hide.
-- Cross-guild surfaces for `GuildMember.title` (profile pages, leaderboards, etc.). Title is intra-guild only.
+- Cross-guild surfaces for the guild title (profile pages, leaderboards, etc.). Title is intra-guild only — assigned by the owning guild, stored on `Character.title`, displayed only on guild surfaces. (The existing inventory `CharacterPreview` already renders `Character.title`; that surface is left as-is.)
 
 ## Current State
 
 | Layer                 | What exists                                                                                                                                                                                                              |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Schema                | `Guild.description String? @db.VarChar(500)`, `GuildMember.role String @default("MEMBER") @db.VarChar(20)`, `Guild.tier Int @default(1)` (tiers 1–5)                                                                     |
+| Schema                | `Guild.description String? @db.VarChar(500)`, `GuildMember.role String @default("MEMBER") @db.VarChar(20)`, `Guild.tier Int @default(1)` (tiers 1–5), `Character.title String? @db.VarChar(255)` (already exists; reused for guild-assigned title — no new field on `GuildMember`) |
 | Code roles            | `GuildRole` enum used at ~14 sites: `OWNER`, `OFFICER`, `MEMBER`                                                                                                                                                         |
 | Rich-text infra       | `src/components/ui/tiptap-editor.component.tsx` (StarterKit + Underline + Placeholder, emits HTML via `editor.getHTML()`), already consumed by `src/app/(workspace)/journaling/_components/journal-editor.component.tsx` |
 | HTML sanitizer        | `src/shared/lib/sanitize-rich-text.lib.ts` exports `sanitizeRichText` (DOMPurify; allowlist: `p`, `br`, `strong`, `em`, `u`, `h1`, `h2`, `ul`, `ol`, `li`, `blockquote`, `code`, `pre`, `hr`)                            |
@@ -41,20 +41,19 @@ Changes on top of the existing guild infra:
 model Guild {
   // ...existing fields
   description     String?  @db.Text          // was: String? @db.VarChar(500). Widened for rich-text lore.
-  availableTitles String[] @db.VarChar(32)   // officer-managed pool, max GUILD_TITLE_POOL_MAX_SIZE items
-}
-
-model GuildMember {
-  // ...existing fields
-  title String? @db.VarChar(32)              // single-select from owning guild's availableTitles (denormalized copy)
+  availableTitles String[] @db.VarChar(32)   // captain-managed pool, max GUILD_TITLE_POOL_MAX_SIZE items
 }
 ```
 
+**No new column on `GuildMember`.** The assigned title is stored on `Character.title` (already `String? @db.VarChar(255)` on `prisma/schema.prisma:89`). One character per user (`Character.userId @unique`) and one guild membership per user (`GuildMember.userId @unique`), so `(Character, GuildMember)` is effectively 1:1 through `User` — no ambiguity about which character a member's title belongs to.
+
 `GuildMember.role` column stays `String @default("MEMBER") @db.VarChar(20)`. Default literal `"MEMBER"` is unchanged (see Role rename).
+
+The DB column width for `Character.title` (`VarChar(255)`) is wider than the 32-char product cap; the cap is enforced at the Zod/service layer (`GUILD_TITLE_MAX_LENGTH`), not in DB. No schema migration on `Character`.
 
 Apply via `pnpm prisma db push` (per project convention: no migration files; schema is the source of truth).
 
-**Backfill required**: none for `description` (existing ≤500-char strings render as plain text inside `<p>` once Tiptap touches them; sanitizer passes plain text through) or `availableTitles` (defaults to `[]`). One SQL backfill needed for `role` — see next section.
+**Backfill required**: none for `description` (existing ≤500-char strings render as plain text inside `<p>` once Tiptap touches them; sanitizer passes plain text through), none for `availableTitles` (defaults to `[]`), and none for `Character.title` (existing values preserved; today there is no write path beyond seed/onboarding). One SQL backfill needed for `role` — see next section.
 
 ### Role rename — DB-value rename, not display-only
 
@@ -137,7 +136,7 @@ Add to `src/shared/constants/guild.constants.ts` (extend or create):
 
 - Update `updateGuildSchema` (or equivalent) — relax `description` cap from 500 to `GUILD_DESCRIPTION_HTML_MAX_LENGTH`.
 - `updateTitlePoolSchema`: `{ guildId: uuid, titles: z.array(z.string().trim().min(1).max(32)).max(20).transform(arr => [...new Set(arr)]) }` — dedupe in transform.
-- `updateMemberTitleSchema`: `{ guildId: uuid, memberId: uuid, title: z.string().max(32).nullable() }`.
+- `updateMemberTitleSchema`: `{ guildId: uuid, memberId: uuid, title: z.string().trim().min(1).max(32).nullable() }`. `memberId` is `GuildMember.id`; the service resolves it to `GuildMember.userId` → `Character.id` and writes to `Character.title`.
 
 ### Service layer (`src/server/services/guild.service.ts`)
 
@@ -151,15 +150,25 @@ New methods:
 - `updateTitlePool(input, userId)` — requires `GUILD_MASTER` or `CAPTAIN`.
   - Apply caps (already in Zod, repeat as defense-in-depth).
   - Compute `removed = currentPool \ newPool`.
-  - Atomically: replace `Guild.availableTitles` and set `GuildMember.title = null` for any member whose `title ∈ removed`. Use `prisma.$transaction([...])`.
+  - Atomically, in a single `prisma.$transaction([...])`:
+    1. Replace `Guild.availableTitles`.
+    2. Clear the assigned title for every character whose owning user is a member of this guild and whose `Character.title ∈ removed`. Single bulk `UPDATE "characters" SET title = NULL WHERE title = ANY($1) AND "userId" IN (SELECT "userId" FROM "guild_members" WHERE "guildId" = $2)` (or the Prisma equivalent using `character.updateMany` with `userId: { in: memberUserIds }` after a `guild_members.findMany`).
 - `updateMemberTitle(input, userId)` — requires `GUILD_MASTER` or `CAPTAIN`.
   - Load the guild; validate `input.title` is `null` OR ∈ `guild.availableTitles`. Reject out-of-pool strings (prevents crafted-tRPC bypass).
+  - Resolve `memberId` → `GuildMember` row → `userId` → `Character` (via `Character.userId`); reject if the member is not in this guild or has no character. Write to `Character.title`.
   - Cannot title self (anti-vanity). Cannot retitle another captain or master — reuse the role-guard pattern from `promoteMember` (`guild.service.ts:182-193`).
+
+**Membership lifecycle**:
+
+- On `leaveGuild` / `kickMember`: clear `Character.title` for that user (the title belonged to the guild they're leaving).
+- On `deleteGuild`: `prisma.$transaction` already cascades `GuildMember`; extend it to clear `Character.title` for the affected member users in the same transaction. `Character` has no FK to `Guild`, so the cascade is explicit, not DB-driven.
+- On `joinGuild`: no-op (a new member has no inherited title; if `Character.title` is somehow non-null from a prior membership that didn't clean up, leave it — it will be overwritten on the next captain assignment, and the next bullet hardens this).
+- Defensive read: render paths on guild surfaces (`MemberRow`) display `Character.title` only when it ∈ the current `Guild.availableTitles`. Stale orphan strings render as no title rather than as a fake assignment.
 
 ### Repositories
 
 - `src/server/repositories/guild.repository.ts` — add `updateAvailableTitles(guildId, titles[])`.
-- `src/server/repositories/guild-member.repository.ts` — add `updateTitle(memberId, title)` and `clearTitlesInGuild(guildId, titles[])` for the cascade.
+- `src/server/repositories/character.repository.ts` — add `updateTitle(characterId, title)` (single-row) and `clearTitlesForUsers(userIds[], titles[])` for the pool-removal cascade. Both write to `Character.title`. The guild-member side only contributes the `userId` set; no new methods on `guild-member.repository.ts` for title.
 
 ### Router (`src/server/routers/guilds.router.ts`)
 
@@ -179,13 +188,13 @@ New procedures (apply existing rate-limit middleware — see `reportMessage` pre
 - `guild-description-editor.component.tsx` — wraps `TiptapEditor`; captain+ only; mutation calls `guilds.updateGuild`. Char counter (plain length / 5000) using `replace(/<[^>]*>/g, '')` pattern.
 - `guild-description-view.component.tsx` — clone of `journal-content.component.tsx`; wraps `sanitizeRichText` + `dangerouslySetInnerHTML`.
 - `title-pool-editor.component.tsx` — captain+ settings UI; inline add/remove rows; ≤20 items, ≤32 chars each; save calls `guilds.updateTitlePool`.
-- `member-title-select.component.tsx` — single-select via `src/components/ui/select.component.tsx`; options = `availableTitles + [unassigned]`; captain+ inline on member row.
+- `member-title-select.component.tsx` — single-select via `src/components/ui/select.component.tsx`; options = `availableTitles + [unassigned]`; captain+ inline on member row. Reads current value from the member's `character.title`; mutation calls `guilds.updateMemberTitle` which writes through to `Character.title`.
 
 **Modified**:
 
 - `src/app/(workspace)/guilds/[guildId]/page.tsx` — render `GuildDescriptionView`; captain+ sees editor toggle.
 - Existing edit-description dialog — swap textarea for `TiptapEditor`.
-- `src/app/(workspace)/guilds/_components/guild-members-list.component.tsx` (or equivalent) — render `member.title` next to character name; captain+ sees `MemberTitleSelect`. Update role badges to GUILD_MASTER / CAPTAIN / MEMBER labels.
+- `src/app/(workspace)/guilds/_components/guild-members-list.component.tsx` (or equivalent) — render `member.user.character.title` next to character name (filtered through `availableTitles` per the defensive-read rule above); captain+ sees `MemberTitleSelect`. Update role badges to GUILD_MASTER / CAPTAIN / MEMBER labels. The guild-members query must `include: { user: { include: { character: { select: { id: true, name: true, title: true } } } } }` (or the existing equivalent path) so the title hydrates without an N+1.
 - Guild settings tab — add Title Pool editor section, captain+ only.
 - `src/app/(workspace)/guilds/join/[token]/page.tsx:56-57` — swap the plain `<p>{guild.description}</p>` for `GuildDescriptionView`.
 - All tier-render sites — replace `Tier {n}` strings with `<GuildTierBadge tier={guild.tier} />` (label localized via `guilds.tier.*`, color from `GUILD_TIER_COLORS`).
@@ -202,7 +211,7 @@ Per-guild description and title-pool entries stay in the author's language. UI c
 4. A Captain can add and remove titles in the pool editor; the pool is capped at 20 items, each ≤32 chars; duplicates are dropped.
 5. A Captain can assign a title to a member via single-select of the pool. Out-of-pool strings (via crafted tRPC) are rejected. A Captain cannot title themselves and cannot retitle another Captain or the Master.
 6. Removing a title from the pool clears that title from every member currently assigned it (atomic cascade).
-7. Member titles appear next to character names inside the owning guild only; they do not appear on profile pages or leaderboards.
+7. Member titles appear next to character names inside the owning guild only (read from `Character.title`, filtered through the owning guild's current `availableTitles`); they do not appear on profile pages or leaderboards. When a member leaves or is kicked, or the guild is deleted, the character's title is cleared in the same transaction.
 8. Role badges across the app render `Guild Master` / `Guild Captain` / `Guild Member` (and Spanish equivalents).
 9. Tier labels render as `Bronze` / `Silver` / `Gold` / `Diamond` / `Platinum` everywhere `Guild.tier` is shown, each inside a `GuildTierBadge` chip whose color matches the tier (bronze=amber, silver=grey, gold=yellow, diamond=sky-blue, platinum=pale-zinc).
 10. `pnpm test`, `pnpm typecheck`, and `pnpm lint` are clean.
@@ -214,14 +223,16 @@ Per-guild description and title-pool entries stay in the author's language. UI c
 3. `pnpm typecheck`, `pnpm test`, `pnpm lint` — all clean. New unit tests cover:
    - `updateGuild`: plain-length cap, server-side sanitize, null/empty handling
    - `updateTitlePool`: ≤20 items, ≤32 char per item, dedupe, captain+ gate, cascade-clear of removed titles
-   - `updateMemberTitle`: title must be `null` or ∈ pool, self-title block, captain-on-captain block
+   - `updateMemberTitle`: title must be `null` or ∈ pool, self-title block, captain-on-captain block; writes to `Character.title`, not any new column
+   - `leaveGuild` / `kickMember` / `deleteGuild`: `Character.title` is cleared for the departing user(s) in the same transaction as the membership row removal
    - Role-gate tests pass with new GUILD_MASTER / CAPTAIN / MEMBER values
 4. Local browser run:
    - Existing guild with a ≤500-char plain description renders unchanged.
    - Guild Master edits the description with formatting → reload → renders sanitized.
    - Pasting `<script>alert(1)</script>` into Tiptap and saving does not execute the script.
    - Captain adds "Quartermaster" and "Scout" to the pool, assigns "Scout" to a member → name + title appear in the members list.
-   - Captain removes "Scout" from the pool → the assigned member's title clears automatically.
+   - Captain removes "Scout" from the pool → the assigned member's `Character.title` clears automatically (verify in DB: `SELECT title FROM characters WHERE "userId" = ...` returns `NULL`).
+   - That member leaves the guild → `Character.title` is `NULL` afterward.
    - A crafted tRPC call assigning a string outside the pool returns a validation error.
    - Visiting `/guilds/join/[token]` as a non-member shows the formatted description.
    - Role badges across the app read `Guild Master` / `Guild Captain` / `Guild Member`. Tier badges read `Bronze` / `Silver` / `Gold` / `Diamond` / `Platinum` and render in tier-matched colors (visually distinct across all five tiers).
@@ -231,7 +242,7 @@ Per-guild description and title-pool entries stay in the author's language. UI c
 - `docs/product/guild_system.md` — canonical Phase 1–3 documentation; append Phase 4 section on completion and link back to this spec.
 - `docs/specs/freemium_model.md` — guild creation + capacity are premium-gated; identity-layer features (description, titles) are not premium-gated by this spec.
 - `docs/specs/warfronts.md` — adjacent identity/lore work at the world-objective layer; same i18n posture (user text doesn't translate).
-- `prisma/schema.prisma` — `Guild`, `GuildMember`, `GuildMessageReport` models.
+- `prisma/schema.prisma` — `Guild`, `GuildMember`, `Character` (reuses existing `title` column), `GuildMessageReport` models.
 - `src/components/ui/tiptap-editor.component.tsx` — rich-text input, reused.
 - `src/shared/lib/sanitize-rich-text.lib.ts` — `sanitizeRichText`, reused.
 - `src/app/(workspace)/journaling/_components/journal-editor.component.tsx`, `.../journal-content.component.tsx` — pattern source.

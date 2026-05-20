@@ -11,6 +11,8 @@ import Popover, { PopoverContent, PopoverTrigger } from '@/ui/popover.component'
 import { Progress } from '@/ui/progress.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { GuildRole } from '@shared/schemas/guilds.schemas'
+import { GUILD_TIER_COLORS, GUILD_TIER_LABELS } from '@shared/constants/guild-progression.constants'
+import GuildTierBadge from '../_components/guild-tier-badge.component'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { redirect, useParams, usePathname, useRouter } from 'next/navigation'
@@ -106,14 +108,14 @@ export default function GuildLayout({ children }: { children: ReactNode }) {
 
   const { guild, myRole } = data
   const myUserId = session?.user?.id ?? ''
-  const isOwner = myRole === GuildRole.OWNER
-  const canManage = myRole === GuildRole.OWNER || myRole === GuildRole.OFFICER
+  const isOwner = myRole === GuildRole.GUILD_MASTER
+  const canManage = myRole === GuildRole.GUILD_MASTER || myRole === GuildRole.CAPTAIN
   const fillPct = Math.min(100, Math.round((guild.members.length / Math.max(1, guild.capacity)) * 100))
   const roleLabel =
-    myRole === GuildRole.OWNER
-      ? t('guilds.role.owner')
-      : myRole === GuildRole.OFFICER
-        ? t('guilds.role.officer')
+    myRole === GuildRole.GUILD_MASTER
+      ? t('guilds.role.guild_master')
+      : myRole === GuildRole.CAPTAIN
+        ? t('guilds.role.captain')
         : t('guilds.role.member')
 
   const activeSegment = getActiveSegment(pathname, guild.id)
@@ -123,10 +125,13 @@ export default function GuildLayout({ children }: { children: ReactNode }) {
     redirect(`/guilds/${guild.id}/forum`)
   }
 
+  const tier = progressionQuery.data?.tier ?? guild.tier ?? 1
   const tierBadge = t('guilds.progression.tier_badge', {
-    tier: progressionQuery.data?.tier ?? 1,
+    tier,
     max: progressionQuery.data?.maxTier ?? 1
   })
+  const tierClamped = Math.max(1, Math.min(5, Math.round(tier))) as 1 | 2 | 3 | 4 | 5
+  const tierPalette = GUILD_TIER_COLORS[GUILD_TIER_LABELS[tierClamped]]
 
   return (
     <GuildProvider value={{ guild, myRole, myUserId, isOwner, canManage }}>
@@ -139,11 +144,15 @@ export default function GuildLayout({ children }: { children: ReactNode }) {
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="mt-1 inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/30 px-2 py-0.5 text-[11px] tabular-nums text-muted-foreground transition hover:bg-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+                    className={cn(
+                      'mt-1 inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50',
+                      tierPalette.bg,
+                      tierPalette.border
+                    )}
                     aria-label={tierBadge}
                   >
-                    {isOwner && <Crown className="h-3 w-3 text-accent" />}
-                    <span>{tierBadge}</span>
+                    {isOwner && <Crown className={cn('h-3 w-3', tierPalette.text)} />}
+                    <GuildTierBadge tier={tier} className="border-0 bg-transparent px-0 py-0" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent align="start" className="w-72 space-y-3 text-xs">
@@ -169,11 +178,11 @@ export default function GuildLayout({ children }: { children: ReactNode }) {
                   {progressionQuery.data && (
                     <div className="space-y-1">
                       <div className="flex items-center justify-between text-muted-foreground">
-                        <span>
-                          {t('guilds.progression.tier_badge', {
-                            tier: progressionQuery.data.tier,
-                            max: progressionQuery.data.maxTier
-                          })}
+                        <span className="inline-flex items-center gap-1.5">
+                          <GuildTierBadge tier={progressionQuery.data.tier} />
+                          <span className="text-[10px] tabular-nums text-muted-foreground">
+                            {progressionQuery.data.tier} / {progressionQuery.data.maxTier}
+                          </span>
                         </span>
                         <span className="tabular-nums">
                           {progressionQuery.data.nextThreshold !== null

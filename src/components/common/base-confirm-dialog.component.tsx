@@ -16,6 +16,7 @@ import LoaderButton from './loader-button.component'
 interface BaseConfirmDialogProps {
   titleKey: string
   descriptionKey?: string
+  descriptionValues?: Record<string, unknown>
   onConfirm: () => void
   confirmLabelKey?: string
   cancelLabelKey?: string
@@ -31,6 +32,7 @@ interface BaseConfirmDialogProps {
 export default function BaseConfirmDialog({
   titleKey,
   descriptionKey,
+  descriptionValues,
   onConfirm,
   confirmLabelKey,
   cancelLabelKey,
@@ -50,7 +52,9 @@ export default function BaseConfirmDialog({
       <AlertDialogContent className={contentClassName}>
         <AlertDialogHeader>
           <AlertDialogTitle>{t(titleKey)}</AlertDialogTitle>
-          <AlertDialogDescription>{descriptionKey ? t(descriptionKey) : null}</AlertDialogDescription>
+          <AlertDialogDescription>
+            {descriptionKey ? t(descriptionKey, descriptionValues) : null}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="hover:bg-foreground/10 cursor-pointer">

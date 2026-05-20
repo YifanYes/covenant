@@ -22,7 +22,7 @@ const PAGE_SIZE = 50
 
 export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProps) {
   const { t } = useTranslation()
-  const canModerate = myRole === GuildRole.OWNER || myRole === GuildRole.OFFICER
+  const canModerate = myRole === GuildRole.GUILD_MASTER || myRole === GuildRole.CAPTAIN
 
   const messagesQuery = useQuery({
     ...trpcOptions.guilds.getMessages.queryOptions({ guildId, limit: PAGE_SIZE }),

@@ -1,5 +1,6 @@
 'use client'
 import LoaderButton from '@/common/loader-button.component'
+import { panelChrome } from '@/components/rpg/rpg-styles'
 import Button from '@/ui/button.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -7,6 +8,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { Shield } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import GuildDescriptionView from '../../_components/guild-description-view.component'
 
 export default function JoinByTokenPage() {
   const { t } = useTranslation()
@@ -36,13 +38,15 @@ export default function JoinByTokenPage() {
 
   if (previewQuery.error || !previewQuery.data) {
     return (
-      <div className="min-h-screen p-6 flex flex-col items-center justify-center gap-4 text-center">
-        <Shield className="h-10 w-10 text-muted-foreground" />
-        <h1 className="text-xl font-semibold">{t('guilds.join.invalid_title')}</h1>
-        <p className="text-muted-foreground text-sm max-w-md">{t('guilds.join.invalid_description')}</p>
-        <Button variant="outline" onClick={() => router.push('/guilds')}>
-          {t('guilds.back')}
-        </Button>
+      <div className="min-h-screen p-6 flex items-center justify-center">
+        <div className={`${panelChrome} w-full max-w-2xl p-8 flex flex-col items-center gap-4 text-center`}>
+          <Shield className="h-14 w-14 text-muted-foreground" />
+          <h1 className="font-title text-xl">{t('guilds.join.invalid_title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('guilds.join.invalid_description')}</p>
+          <Button variant="outline" onClick={() => router.push('/guilds')}>
+            {t('guilds.back')}
+          </Button>
+        </div>
       </div>
     )
   }
@@ -50,32 +54,39 @@ export default function JoinByTokenPage() {
   const { valid, reason, guild } = previewQuery.data
 
   return (
-    <div className="min-h-screen p-6 flex flex-col items-center justify-center gap-4">
-      <Shield className="h-10 w-10" />
-      <h1 className="text-2xl font-semibold">{guild.name}</h1>
-      {guild.description && (
-        <p className="text-muted-foreground text-sm max-w-md text-center">{guild.description}</p>
-      )}
-      <p className="text-muted-foreground text-sm">
-        {t('guilds.join.member_count', { count: guild.memberCount, capacity: guild.capacity })}
-      </p>
+    <div className="min-h-screen p-6 flex items-center justify-center">
+      <div className={`${panelChrome} w-full max-w-2xl p-8 space-y-6`}>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Shield className="h-14 w-14" />
+          <h1 className="font-title text-2xl break-words">{guild.name}</h1>
+          <p className="text-muted-foreground text-sm">
+            {t('guilds.join.member_count', { count: guild.memberCount, capacity: guild.capacity })}
+          </p>
+        </div>
 
-      {!valid && (
-        <p className="text-destructive text-sm">
-          {t(`guilds.join.invalid_reason.${reason ?? 'unknown'}`)}
-        </p>
-      )}
+        {guild.description && (
+          <div className="border-t border-border/60 pt-6">
+            <GuildDescriptionView html={guild.description} className="text-base" />
+          </div>
+        )}
 
-      <div className="flex gap-2 mt-4">
-        <Button variant="outline" onClick={() => router.push('/guilds')}>
-          {t('guilds.back')}
-        </Button>
-        <LoaderButton
-          disabled={!valid}
-          isLoading={joinMutation.isPending}
-          onClick={() => joinMutation.mutate({ token })}
-          label={t('guilds.join.cta')}
-        />
+        {!valid && (
+          <p className="text-destructive text-sm text-center">
+            {t(`guilds.join.invalid_reason.${reason ?? 'unknown'}`)}
+          </p>
+        )}
+
+        <div className="flex gap-2 justify-end pt-4 border-t border-border/60">
+          <Button variant="outline" onClick={() => router.push('/guilds')}>
+            {t('guilds.back')}
+          </Button>
+          <LoaderButton
+            disabled={!valid}
+            isLoading={joinMutation.isPending}
+            onClick={() => joinMutation.mutate({ token })}
+            label={t('guilds.join.cta')}
+          />
+        </div>
       </div>
     </div>
   )

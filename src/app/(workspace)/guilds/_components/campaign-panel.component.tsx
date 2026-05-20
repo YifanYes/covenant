@@ -62,7 +62,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
     })
   )
 
-  const canManage = myRole === GuildRole.OWNER || myRole === GuildRole.OFFICER
+  const canManage = myRole === GuildRole.GUILD_MASTER || myRole === GuildRole.CAPTAIN
   const campaign = activeQuery.data
 
   if (activeQuery.isLoading) {

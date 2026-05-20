@@ -11,6 +11,12 @@ import {
   getNextTierThreshold,
   MAX_GUILD_TIER
 } from '@/shared/constants/guild-progression.constants'
+import {
+  GUILD_DESCRIPTION_MAX_LENGTH,
+  GUILD_TITLE_MAX_LENGTH,
+  GUILD_TITLE_POOL_MAX_SIZE
+} from '@shared/constants/guild.constants'
+import { sanitizeRichText } from '@shared/lib/sanitize-rich-text.lib'
 import type {
   CreateGuildType,
   CreateInviteType,
@@ -21,7 +27,9 @@ import type {
   StartCampaignType,
   TransferOwnershipType,
   UpdateGuildType,
-  UpdateRoleType
+  UpdateMemberTitleType,
+  UpdateRoleType,
+  UpdateTitlePoolType
 } from '@shared/schemas/guilds.schemas'
 import { GuildRole, type GuildRoleType } from '@shared/schemas/guilds.schemas'
 import { TRPCError } from '@trpc/server'
@@ -59,6 +67,18 @@ function isRewardPool(value: unknown): value is RewardPoolType {
   )
 }
 
+function sanitizeGuildDescription(description: string): string {
+  const sanitized = sanitizeRichText(description)
+  const plain = sanitized.replace(/<[^>]*>/g, '')
+  if (plain.length > GUILD_DESCRIPTION_MAX_LENGTH) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Description exceeds ${GUILD_DESCRIPTION_MAX_LENGTH} characters`
+    })
+  }
+  return sanitized
+}
+
 export class GuildService {
   constructor(
     private prisma: PrismaClient,
@@ -79,18 +99,20 @@ export class GuildService {
     const user = await this.userRepository.findById(userId)
     const factionName = user?.theme ?? DEFAULT_FACTION
 
+    const description = input.description !== undefined ? sanitizeGuildDescription(input.description) : undefined
+
     try {
       return await this.prisma.$transaction(async (tx) => {
         const guild = await tx.guild.create({
           data: {
             name: input.name,
-            description: input.description,
+            description,
             ownerId: userId,
             factionName
           }
         })
         await tx.guildMember.create({
-          data: { guildId: guild.id, userId, role: GuildRole.OWNER }
+          data: { guildId: guild.id, userId, role: GuildRole.GUILD_MASTER }
         })
         return guild
       })
@@ -114,16 +136,28 @@ export class GuildService {
   }
 
   async updateGuild(input: UpdateGuildType, userId: string) {
-    await this.requireRole(input.guildId, userId, [GuildRole.OWNER])
+    await this.requireRole(input.guildId, userId, [GuildRole.GUILD_MASTER])
+
+    const description = input.description !== undefined ? sanitizeGuildDescription(input.description) : undefined
+
     return this.guildRepository.update(input.guildId, {
       name: input.name,
-      description: input.description
+      description
     })
   }
 
   async dissolveGuild(guildId: string, userId: string) {
-    await this.requireRole(guildId, userId, [GuildRole.OWNER])
-    await this.guildRepository.delete(guildId)
+    await this.requireRole(guildId, userId, [GuildRole.GUILD_MASTER])
+    const memberUserIds = await this.guildMemberRepository.findUserIdsByGuild(guildId)
+    await this.prisma.$transaction(async (tx) => {
+      if (memberUserIds.length > 0) {
+        await tx.character.updateMany({
+          where: { userId: { in: memberUserIds } },
+          data: { title: null }
+        })
+      }
+      await tx.guild.delete({ where: { id: guildId } })
+    })
     return { message: 'Guild dissolved' }
   }
 
@@ -135,18 +169,24 @@ export class GuildService {
 
     const memberCount = await this.guildMemberRepository.countByGuild(membership.guildId)
 
-    if (membership.role === GuildRole.OWNER) {
+    if (membership.role === GuildRole.GUILD_MASTER) {
       if (memberCount > 1) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Transfer ownership before leaving the guild'
         })
       }
-      await this.guildRepository.delete(membership.guildId)
+      await this.prisma.$transaction(async (tx) => {
+        await tx.character.updateMany({ where: { userId }, data: { title: null } })
+        await tx.guild.delete({ where: { id: membership.guildId } })
+      })
       return { dissolved: true }
     }
 
-    await this.guildMemberRepository.delete(membership.id)
+    await this.prisma.$transaction(async (tx) => {
+      await tx.character.updateMany({ where: { userId }, data: { title: null } })
+      await tx.guildMember.delete({ where: { id: membership.id } })
+    })
     return { dissolved: false }
   }
 
@@ -155,7 +195,7 @@ export class GuildService {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'You already own this guild' })
     }
 
-    await this.requireRole(input.guildId, userId, [GuildRole.OWNER])
+    await this.requireRole(input.guildId, userId, [GuildRole.GUILD_MASTER])
 
     const target = await this.guildMemberRepository.findByUserAndGuild(input.newOwnerUserId, input.guildId)
     if (!target) {
@@ -166,8 +206,8 @@ export class GuildService {
     if (!currentOwner) throw notFound()
 
     await this.prisma.$transaction(async (tx) => {
-      await tx.guildMember.update({ where: { id: target.id }, data: { role: GuildRole.OWNER } })
-      await tx.guildMember.update({ where: { id: currentOwner.id }, data: { role: GuildRole.OFFICER } })
+      await tx.guildMember.update({ where: { id: target.id }, data: { role: GuildRole.GUILD_MASTER } })
+      await tx.guildMember.update({ where: { id: currentOwner.id }, data: { role: GuildRole.CAPTAIN } })
       await tx.guild.update({ where: { id: input.guildId }, data: { ownerId: input.newOwnerUserId } })
     })
 
@@ -179,26 +219,29 @@ export class GuildService {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'Use leave to remove yourself' })
     }
 
-    const actor = await this.requireRole(input.guildId, userId, [GuildRole.OWNER, GuildRole.OFFICER])
+    const actor = await this.requireRole(input.guildId, userId, [GuildRole.GUILD_MASTER, GuildRole.CAPTAIN])
     const target = await this.guildMemberRepository.findByUserAndGuild(input.targetUserId, input.guildId)
     if (!target) throw notFound()
 
-    if (target.role === GuildRole.OWNER) {
+    if (target.role === GuildRole.GUILD_MASTER) {
       log.warn(
         { guildId: input.guildId, actorId: userId, targetId: input.targetUserId },
-        'Attempt to kick guild owner'
+        'Attempt to kick guild master'
       )
-      throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot kick the guild owner' })
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot kick the guild master' })
     }
-    if (actor.role === GuildRole.OFFICER && target.role === GuildRole.OFFICER) {
+    if (actor.role === GuildRole.CAPTAIN && target.role === GuildRole.CAPTAIN) {
       log.warn(
         { guildId: input.guildId, actorId: userId, targetId: input.targetUserId },
-        'Officer attempted to kick another officer'
+        'Captain attempted to kick another captain'
       )
-      throw new TRPCError({ code: 'FORBIDDEN', message: 'Officers cannot kick other officers' })
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Captains cannot kick other captains' })
     }
 
-    await this.guildMemberRepository.delete(target.id)
+    await this.prisma.$transaction(async (tx) => {
+      await tx.character.updateMany({ where: { userId: target.userId }, data: { title: null } })
+      await tx.guildMember.delete({ where: { id: target.id } })
+    })
     return { message: 'Member removed' }
   }
 
@@ -206,24 +249,108 @@ export class GuildService {
     if (input.targetUserId === userId) {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'You cannot change your own role' })
     }
-    await this.requireRole(input.guildId, userId, [GuildRole.OWNER])
+    await this.requireRole(input.guildId, userId, [GuildRole.GUILD_MASTER])
 
     const target = await this.guildMemberRepository.findByUserAndGuild(input.targetUserId, input.guildId)
     if (!target) throw notFound()
-    if (target.role === GuildRole.OWNER) {
+    if (target.role === GuildRole.GUILD_MASTER) {
       log.warn(
         { guildId: input.guildId, actorId: userId, targetId: input.targetUserId },
-        'Attempt to change owner role via updateRole'
+        'Attempt to change guild master role via updateRole'
       )
-      throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot change the owner role here' })
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot change the guild master role here' })
     }
 
     await this.guildMemberRepository.updateRole(target.id, input.role)
     return { message: 'Role updated' }
   }
 
+  async updateTitlePool(input: UpdateTitlePoolType, userId: string) {
+    await this.requireRole(input.guildId, userId, [GuildRole.GUILD_MASTER, GuildRole.CAPTAIN])
+
+    if (input.titles.length > GUILD_TITLE_POOL_MAX_SIZE) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Title pool cannot exceed ${GUILD_TITLE_POOL_MAX_SIZE} entries`
+      })
+    }
+    if (input.titles.some((title) => title.length === 0 || title.length > GUILD_TITLE_MAX_LENGTH)) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Each title must be 1-${GUILD_TITLE_MAX_LENGTH} characters`
+      })
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      const guild = await tx.guild.findUnique({
+        where: { id: input.guildId },
+        select: { availableTitles: true }
+      })
+      if (!guild) throw notFound()
+      const removed = guild.availableTitles.filter((t) => !input.titles.includes(t))
+
+      await tx.guild.update({
+        where: { id: input.guildId },
+        data: { availableTitles: input.titles }
+      })
+      if (removed.length > 0) {
+        const memberRows = await tx.guildMember.findMany({
+          where: { guildId: input.guildId },
+          select: { userId: true }
+        })
+        const userIds = memberRows.map((r) => r.userId)
+        if (userIds.length > 0) {
+          await tx.character.updateMany({
+            where: { userId: { in: userIds }, title: { in: removed } },
+            data: { title: null }
+          })
+        }
+      }
+    })
+
+    return { titles: input.titles }
+  }
+
+  async updateMemberTitle(input: UpdateMemberTitleType, userId: string) {
+    const actor = await this.requireRole(input.guildId, userId, [GuildRole.GUILD_MASTER, GuildRole.CAPTAIN])
+
+    const guild = await this.guildRepository.findById(input.guildId)
+    if (!guild) throw notFound()
+
+    if (input.title !== null && !guild.availableTitles.includes(input.title)) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Title is not in the guild title pool' })
+    }
+
+    const target = await this.guildMemberRepository.findById(input.memberId)
+    if (!target || target.guildId !== input.guildId) throw notFound()
+
+    if (target.userId === userId) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'You cannot title yourself' })
+    }
+    if (target.role === GuildRole.GUILD_MASTER) {
+      log.warn(
+        { guildId: input.guildId, actorId: userId, targetUserId: target.userId },
+        'Attempt to retitle guild master'
+      )
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot retitle the guild master' })
+    }
+    if (actor.role === GuildRole.CAPTAIN && target.role === GuildRole.CAPTAIN) {
+      log.warn(
+        { guildId: input.guildId, actorId: userId, targetUserId: target.userId },
+        'Captain attempted to retitle another captain'
+      )
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'Captains cannot retitle other captains' })
+    }
+
+    const character = await this.characterRepository.findByUserId(target.userId)
+    if (!character) throw notFound()
+
+    await this.characterRepository.updateTitle(character.id, input.title)
+    return { title: input.title }
+  }
+
   async createInvite(input: CreateInviteType, userId: string) {
-    await this.requireRole(input.guildId, userId, [GuildRole.OWNER, GuildRole.OFFICER])
+    await this.requireRole(input.guildId, userId, [GuildRole.GUILD_MASTER, GuildRole.CAPTAIN])
 
     const activeCount = await this.guildInviteRepository.countActiveByGuild(input.guildId)
     if (activeCount >= MAX_ACTIVE_INVITES_PER_GUILD) {
@@ -248,13 +375,13 @@ export class GuildService {
   async revokeInvite(inviteId: string, userId: string) {
     const invite = await this.guildInviteRepository.findById(inviteId)
     if (!invite) throw notFound()
-    await this.requireRole(invite.guildId, userId, [GuildRole.OWNER, GuildRole.OFFICER])
+    await this.requireRole(invite.guildId, userId, [GuildRole.GUILD_MASTER, GuildRole.CAPTAIN])
     await this.guildInviteRepository.revoke(inviteId)
     return { message: 'Invite revoked' }
   }
 
   async listInvites(guildId: string, userId: string) {
-    await this.requireRole(guildId, userId, [GuildRole.OWNER, GuildRole.OFFICER])
+    await this.requireRole(guildId, userId, [GuildRole.GUILD_MASTER, GuildRole.CAPTAIN])
     return this.guildInviteRepository.findByGuild(guildId)
   }
 
@@ -382,7 +509,7 @@ export class GuildService {
     if (!actor) throw notFound()
 
     const isAuthor = message.userId === userId
-    const isModerator = actor.role === GuildRole.OWNER || actor.role === GuildRole.OFFICER
+    const isModerator = actor.role === GuildRole.GUILD_MASTER || actor.role === GuildRole.CAPTAIN
     if (!isAuthor && !isModerator) {
       log.warn({ messageId, userId }, 'Unauthorized guild message delete attempt')
       throw notFound()
@@ -447,7 +574,7 @@ export class GuildService {
   // ========== Campaigns ==========
 
   async startCampaign(input: StartCampaignType, userId: string) {
-    await this.requireRole(input.guildId, userId, [GuildRole.OWNER, GuildRole.OFFICER])
+    await this.requireRole(input.guildId, userId, [GuildRole.GUILD_MASTER, GuildRole.CAPTAIN])
 
     const template = getCampaignTemplate(input.templateId)
     if (!template) {

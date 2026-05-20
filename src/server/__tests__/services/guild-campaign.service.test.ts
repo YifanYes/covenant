@@ -65,14 +65,14 @@ describe('GuildService — campaigns', () => {
     })
 
     it('rejects unknown template id', async () => {
-      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.OWNER })
+      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.GUILD_MASTER })
       await expect(service.startCampaign({ guildId: 'g-1', templateId: 'NOPE' }, 'u1')).rejects.toThrow(
         'Unknown campaign template'
       )
     })
 
     it('rejects when active campaign exists', async () => {
-      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.OWNER })
+      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.GUILD_MASTER })
       guildRepo.findActiveCampaignByGuild.mockResolvedValue({ id: 'c-existing' })
       await expect(service.startCampaign({ guildId: 'g-1', templateId: 'KILL_RAMPAGE' }, 'u1')).rejects.toThrow(
         'already active'
@@ -80,7 +80,7 @@ describe('GuildService — campaigns', () => {
     })
 
     it('creates a campaign when officer + no active', async () => {
-      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.OFFICER })
+      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.CAPTAIN })
       guildRepo.findActiveCampaignByGuild.mockResolvedValue(null)
       guildRepo.createCampaign.mockResolvedValue({
         id: 'c-1',
