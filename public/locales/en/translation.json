@@ -1132,7 +1132,8 @@
       "edit_cta": "Edit description",
       "empty": "No lore yet. A Captain can write the guild's story.",
       "success": "Description updated.",
-      "error": "Could not update description"
+      "error": "Could not update description",
+      "too_long": "This tale runs too long for the scroll. Trim it down."
     },
     "title_pool": {
       "title": "Member titles",

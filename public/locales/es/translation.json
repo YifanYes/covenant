@@ -1132,7 +1132,8 @@
       "edit_cta": "Editar descripción",
       "empty": "Aún no hay lore. Un Capitán puede escribir la historia del gremio.",
       "success": "Descripción actualizada.",
-      "error": "No se pudo actualizar la descripción"
+      "error": "No se pudo actualizar la descripción",
+      "too_long": "Este relato es demasiado largo para el pergamino. Recórtalo."
     },
     "title_pool": {
       "title": "Títulos de miembros",

@@ -1,10 +1,10 @@
 'use client'
 import { panelChrome } from '@/components/rpg/rpg-styles'
+import { cn } from '@/lib/cn.lib'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import Separator from '@/ui/separator.component'
-import { cn } from '@/lib/cn.lib'
-import { Battery, Heart, Money, FileText as ScriptText, Shield, Zap } from 'pixelarticons/react'
 import type { InventoryCharacter } from '@shared/types/gamification.types'
+import { Battery, Heart, Money, FileText as ScriptText, Shield, Zap } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import CharacterDeathOverlay from './character-death-overlay.component'
 
@@ -26,7 +26,7 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
   return (
     <Card className={cn(panelChrome, 'relative flex min-h-0 w-full flex-1 flex-col gap-0')}>
       <CardHeader className="flex shrink-0 flex-row items-center justify-between pb-2">
-        <CardTitle className="flex items-center gap-2 text-sm font-medium">
+        <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <ScriptText className="h-4 w-4" />
           {t('inventory.stats_title')}
         </CardTitle>
@@ -36,9 +36,9 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-orange-400" />
-            <span className="text-sm font-medium">{t('inventory.phys')}</span>
+            <span className="text-base font-medium">{t('inventory.phys')}</span>
           </div>
-          <span className="text-sm font-bold text-orange-400/90">
+          <span className="text-base font-bold text-orange-400/90">
             {currentClass.strengthAtk} / {currentClass.strengthDef}
           </span>
         </div>
@@ -46,9 +46,9 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-sky-400" />
-            <span className="text-sm font-medium">{t('inventory.magic')}</span>
+            <span className="text-base font-medium">{t('inventory.magic')}</span>
           </div>
-          <span className="text-sm font-bold text-sky-400/90">
+          <span className="text-base font-bold text-sky-400/90">
             {currentClass.magicAtk} / {currentClass.magicDef}
           </span>
         </div>
@@ -59,9 +59,9 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Heart className="h-4 w-4 text-emerald-500" />
-            <span className="text-sm font-medium">{t('inventory.health')}</span>
+            <span className="text-base font-medium">{t('inventory.health')}</span>
           </div>
-          <span className="text-sm font-bold text-emerald-500/90">
+          <span className="text-base font-bold text-emerald-500/90">
             {currentClass.health} / {currentClass.maxHealth}
           </span>
         </div>
@@ -69,9 +69,9 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-blue-400" />
-            <span className="text-sm font-medium">{t('inventory.mana')}</span>
+            <span className="text-base font-medium">{t('inventory.mana')}</span>
           </div>
-          <span className="text-sm font-bold text-blue-400/90">
+          <span className="text-base font-bold text-blue-400/90">
             {currentClass.mana} / {currentClass.maxMana}
           </span>
         </div>
@@ -79,17 +79,17 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-blue-300" />
-            <span className="text-sm font-medium">{t('inventory.mana_regen')}</span>
+            <span className="text-base font-medium">{t('inventory.mana_regen')}</span>
           </div>
-          <span className="text-sm font-bold text-blue-300/90">{currentClass.manaRegen}</span>
+          <span className="text-base font-bold text-blue-300/90">{currentClass.manaRegen}</span>
         </div>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Money className="h-4 w-4 text-amber-400" />
-            <span className="text-sm font-medium">{t('inventory.gold')}</span>
+            <span className="text-base font-medium">{t('inventory.gold')}</span>
           </div>
-          <span className="text-sm font-bold text-amber-400/90">{character.gold}</span>
+          <span className="text-base font-bold text-amber-400/90">{character.gold}</span>
         </div>
 
         <Separator className="bg-sidebar-border my-1 w-auto" />
@@ -97,9 +97,9 @@ export default function CharacterStatus({ character }: CharacterStatusProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Battery className="h-4 w-4 text-blue-300" />
-            <span className="text-sm font-medium">{t('combat.mana_reserve')}</span>
+            <span className="text-base font-medium">{t('combat.mana_reserve')}</span>
           </div>
-          <span className="text-sm font-black text-blue-300/90">{character.manaReserve ?? 0}</span>
+          <span className="text-base font-black text-blue-300/90">{character.manaReserve ?? 0}</span>
         </div>
       </CardContent>
 
