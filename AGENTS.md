@@ -27,7 +27,7 @@ Pre-push: Husky runs full build+test via `.husky/pre-push`, mirrors Railway `bui
 
 ## Deployment / Railway
 
-- Config: `railway.toml` — `railpack` builder, `buildCommand`/`startCommand`
+- Config: `railway.toml` — `railpack` builder, `buildCommand` / `preDeployCommand` (runs `prisma db push` once per deploy) / `startCommand` (`pnpm start` only — no schema mutation on container restart)
 - Healthcheck: `/api/health`, 100s timeout
 - Preview envs: Railway dashboard → Project Settings → Environments → "Generate Environments for PRs"
 - CI: `.github/workflows/pr.yml` runs lint/TS/build/tests on PRs
