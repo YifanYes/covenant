@@ -6,11 +6,11 @@ import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/t
 import { invalidators } from '@/utils/query-invalidation.utils'
 import { getRewardText } from '@/utils/text.utils'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import { Check, Braces as Code, Loader } from 'pixelarticons/react'
 import { HabitTimespan } from '@shared/schemas/habits.schemas'
 import { useMutation } from '@tanstack/react-query'
 import type { ManipulateType, OpUnitType } from 'dayjs'
 import dayjs from 'dayjs'
+import { Check, Braces as Code, Loader } from 'pixelarticons/react'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -55,7 +55,7 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
           await queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })
           await invalidators.character()
         },
-        onError: () => toast.error(t('habits.error.complete'))
+        onError: () => toast.error(t('habits.error.internal.complete'))
       })
     )
 

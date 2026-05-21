@@ -21,11 +21,6 @@
 
 ## High Priority
 
-- [ ] Guild system Phase 4 — community lore + roleplay surfaces. Player-authored creative layer on top of guild infra. Habit-tracker-with-RPG-skin product benefits especially: lore reframes chores as quests and is stickier than leaderboards (lore decay slow, leaderboards reset weekly). Stage to keep moderation surface bounded.
-  - **Identity layer (ship-first)** — guild lore field (rich text, ~5000 char), officer-set `GuildMember.title` ("Quartermaster", "Scout"), guild emblem/banner from preset list. Pair with custom campaign names from parametric-campaigns proposal. Officer-gated, length-capped, soft-delete on report. Schema: extend `Guild` (`lore Text?`, `emblem String?`) + add `GuildMember.title`. No economy exposure, reversible by clearing field. ~2–3 days.
-  - **Interactive RP layer (defer further)** — player-authored quests/encounters/NPC dialogue, free-form avatar uploads, RP-mode chat channel separate from forum. Blocked on moderation pipeline (no infra today for NSFW/harassment review) and on identity-layer retention signal.
-  - Risks: T&S burden on solo maintainer, localization (user text doesn't translate — accept per-guild), empty-shell problem if guild critical mass missing — solve discovery/capacity first.
-
 - [ ] PostHog integration — `docs/specs/posthog_integration.md`.
 
 - [ ] Beta wipe tools. Required for controlled beta iteration.
@@ -44,11 +39,13 @@
 
 - [ ] Render character with equipped items. Visual feedback closes the gear loop — without it, equipping a sword feels invisible.
 
-- [ ] Define story decisions. Story branches are the tier-progression payoff in the core loop.
-
 - [ ] Press kit: Screenshots, description, logo, and a tested 2-line pitch.
 
 - [ ] Discord setup — server, roles, welcome bot, weekly update template. Roadmap Phase 3 infrastructure block (Discord servidor, roles configurados, bot de bienvenida, template para weekly update). Beta tester comms channel.
+
+- [ ] Mana service tests `[beta-risk]`. `src/server/services/mana.service.ts` is the reward-calc spine for tasks/habits/objectives/journaling and is the only major service without a test file. Beta launch with a quietly broken mana grant = silent core-loop break and a polluted PostHog dataset (every reward event carries `mana_earned`). Pure-function tests, no infra. New file: `src/server/__tests__/services/mana.service.test.ts`. Cover task/habit/objective/journal reward paths plus at least one streak-bonus case.
+
+- [ ] Onboarding tutorial — Tasks vs Habits vs Quests distinction `[onboarding]` `[beta-risk]`. Promoted from Medium. Habitica's #1 churn driver: users hit the Habit/Daily/To-Do/class confusion wall. Minimum viable: `User.hasSeenOnboarding Boolean @default(false)`, one dismissable modal on first workspace entry covering task type semantics + faction/class consequences + basic combat loop, paired with empty-state one-liners on each page. Touches `prisma/schema.prisma`, new modal component, `(workspace)/layout.tsx`, i18n in both locales.
 
 ## Medium Priority
 
@@ -72,13 +69,24 @@
 
 - [ ] Per-habit difficulty levels `[loop]`. Add `difficulty` enum on `Habit` (`TRIVIAL | EASY | MEDIUM | HARD`, default `EASY`); scale base dice reward (1/2/3/5) + streak bonus multiplier. Current uniform 2 dice + streak bonus (`src/server/services/habit.service.ts:74-79`) scales poorly across effort tiers. Ship reward-scaling alone; penalty modulation out of scope. Mitigate "mark everything HARD" with per-day soft cap on habit dice. See `docs/specs/habitica_inspired_features.md` §3.
 
-- [ ] "Last completed" timestamp per habit `[retention]`. Surface staleness ("haven't journaled in 23 days") on habit cards + dashboard "neglected" widget. Schema: derive from `HabitCompletion` max-date aggregate, or denormalize `lastCompletedAt DateTime?` on `Habit`. Habitica top-requested feature — users track this manually today. Pair with consistency heatmap above.
+- [ ] Calendar view week and day grid `[retention]`.
 
-- [ ] Calendar view for tasks + quests `[retention]`. Month/week/day grid of scheduled habits + tasks. Complements year-heatmap (retrospective) with prospective planning surface. Internal-only — no Google Calendar sync (separate backlog item). Habitica #1 missing feature alongside analytics.
+- [ ] Calendar timezone + scoping fixes `[bug]`. Holistic pass on `src/app/(workspace)/calendar/_components/integrated-calendar.component.tsx` + `day-details-sheet.component.tsx` + backend:
+  - **Tasks router ignores timezone.** `src/server/services/task.service.ts:65-75` builds month boundaries with `new Date(y, m, 1)` — server-local time. `journaling.getMoodCalendar` accepts `timezoneOffset`; tasks should too. Users in different TZ from server get wrong tasks at month edges. Add `timezoneOffset` to `getByDateInputSchema` and shift boundaries the same way `journal.service.ts:94-103` does.
+  - **DST drift.** `new Date().getTimezoneOffset()` at `integrated-calendar:17` returns offset at _now_, not at the target month. Navigating across a DST transition shifts boundaries 1h. Compute offset at the target date instead, or use `dayjs/plugin/timezone` with the user's IANA zone.
+  - **Duplicate offset compute.** Both `integrated-calendar:17` and `day-details-sheet:30` recompute. Extract `useTimezoneOffset(date?)` hook.
+  - **Double month normalization.** `useCalendarStore` holds raw `monthIndex` (can exceed 0-11); `getMonth()` (`src/utils/calendar.utils.ts`) normalizes internally; `integrated-calendar:22-24` normalizes again to derive `year`. Move to `{ year, monthIndex }` in store or return both from `getMonth`.
+  - **DayDetailsSheet spillover.** `tasks` prop = current `monthIndex` only. Clicking a spillover day (prev/next month cells in the grid) shows empty tasks even when tasks exist. Either fetch spillover ranges, restrict clicks to current month, or fetch by date in the sheet itself.
+  - **Schema round-trip.** `getByDateInputSchema.monthIndex` is `z.string().optional()` then router does `Number(...)`. Change to `z.number().int().min(0).max(11).optional()` and drop the `.toString()` at `integrated-calendar:28`.
+  - Not a bug: do **not** swap `new Date().getTimezoneOffset()` for `dayjs().utcOffset()` — opposite sign convention, would break backend math in `journal.service.ts:96`.
 
-- [ ] Kind mode / streak freeze `[retention]`. Per-user toggle that converts missed dailies into "skipped" (no HP loss, streak preserved with `*` marker) instead of failure. Targets ADHD/depression cohort that abandons app from punishment guilt — top Habitica retention complaint. Schema: `User.gentleMode Boolean @default(false)` + `HabitCompletion.skipped Boolean`. Distinct from manual vacation/pause mode — this is an always-on cushion.
+- [ ] Tasks: per-tab visibility toggles + in-page Settings tab `[ux]` `[measure]`. Add a Settings tab (or popover) inside `/tasks` exposing (a) the default-view picker — currently in `/settings` via `useUserPreferencesStore.defaultTasksView` — moved next to the surface it controls; (b) booleans `showListTab` / `showKanbanTab` / `showTableTab` / `showMatrixTab` persisted in `useUserPreferencesStore`, default all `true`. Hidden tabs disappear from `TabsList` in `src/app/(workspace)/tasks/page.tsx:46-51` but stay deep-linkable via `?view=`. Guard: at least one tab must remain visible; hiding the active one falls back to first remaining. Keep or proxy the `/settings` entry. i18n under `tasks.settings.*` in both locales.
 
-- [ ] Onboarding tutorial — Habits vs Tasks vs Quests distinction `[onboarding]`. New-user guided tour covering task type semantics, faction/class consequences, basic combat loop. Habitica feedback: users churn at the Habit/Daily/To-Do/class confusion wall. Pair with empty-state copy on each page.
+- [ ] PostHog: track Tasks tab usage `[measure]`. Add events `tasks_view_changed { view, source: 'tab_click' | 'default' | 'url_param' }` fired from `handleViewChange` (`src/app/(workspace)/tasks/page.tsx:30-38`) and `tasks_view_loaded { view }` on mount with the resolved `activeView`. Tells us which of list/kanban/table/matrix to keep or cut after beta data lands. Add event rows to `docs/specs/posthog_integration.md` taxonomy table.
+
+- [ ] Dashboard N+1 + first test `[beta-risk]`. `src/server/services/dashboard.service.ts:149-206` triple-nested in-memory loop — refactor before user counts grow. New file: `src/server/__tests__/services/dashboard.service.test.ts` to lock the fixed shape and prevent regression.
+
+- [ ] Audit Objectives → mana → dashboard wiring `[audit]`. Confirm completing an Objective fires the `objective_completed` PostHog event with non-zero `mana_earned` and that the user's mana reserve and dashboard reflect it. Objective is the Goal-tracking pillar named in `MISSION.md`; if it doesn't drive the core loop, the central analytics question in `docs/specs/posthog_integration.md` can't be answered. No code change if everything works.
 
 ## Low Priority
 
@@ -109,12 +117,19 @@ Deferred until the core loop has been validated with real beta users. Specs for 
   - `EnemyTemplate.manaRegen` field removal — hardcoded `0` on every enemy after Phase 2A locked "no regen". Still consumed by `inventory/character-status.component.tsx`. Drop field + UI reference together.
 
 - [ ] Conversation-type quests — dialog with branching choices and outcomes
+
 - [ ] Multi-part quest arcs with recurring NPCs. Chained quests (A unlocks B unlocks C), shared characters across chapters. Extends conversation-type quests (single dialog → narrative threading). Schema: `Quest.parentQuestId String?` + completion-gate predicates. Habitica feedback: top creative-content request alongside team quests.
+
 - [ ] Barrier encounters / class-gated objectives. Quest steps requiring specific ability tags (Mage burns ward, Warrior breaches door, Herald heals NPC) — forces party composition diversity. Blocked on guild parties shipping.
+
 - [ ] Heavy-hitter scaling in party combat. When parties ship, prevent high-tier players one-shotting bosses (Habitica's biggest party gripe). Mitigate via per-player damage cap, level-scaled contribution, or share-of-final-blow reward split. Defer until party combat exists.
+
 - [ ] Alternative cosmetic theme/reskin (non-fantasy). Solar-punk / sci-fi / minimalist toggle per user. Habitica feedback: fantasy locks out a chunk of audience. Asset cost is high — ship only if beta surfaces discovery friction from the fantasy framing.
+
 - [ ] Veteran gold/resource sink. Once endgame players accumulate idle gold, add rare expensive sinks: guild buffs, cosmetic upgrades, quest unlocks, prestige tiers. Defer until retention long enough to surface the problem.
+
 - [ ] Interest-tagged guild discovery (study group / ADHD / artists / language-learning / etc.). Tag guilds by theme so users find compatible communities — the gap left by Habitica killing public guilds in 2023. Folds into Guild Phase 4 discovery work — pair tagging with search/filter UI.
+
 - [ ] Google Calendar (and iCal) sync. Two-way sync of scheduled tasks/dailies. Habitica feedback: most-requested integration. Deferrable — internal calendar view (Medium) covers the primary use case first.
 - [ ] AI report of the month — monthly AI-generated summary of productivity, streaks, objective progress
 - [ ] Map page interactivity — clickable regions, faction war state, quest entry points
@@ -122,7 +137,6 @@ Deferred until the core loop has been validated with real beta users. Specs for 
 - [ ] Account deletion: pre-delete data export prompt (folds into "Account management" data export)
 - [ ] Breadcrumbs on nested routes (`/quests/[questId]`, `/inventory/[tab]`)
 - [ ] Post-combat summary screen — XP/gold/loot between combat end and `/quests` redirect
-- [ ] N+1 risk in `dashboard.service.ts:149-206` — triple-nested in-memory loop, refactor before user counts grow
 - [ ] Theme system: OS-preference option (light/dark already exist)
 
 - [ ] **Abandon-quest feature.** Add a UI affordance to abandon an active quest mid-run (currently quests only end on victory or defeat). Fires `combat_finished { outcome: 'abandoned' }` and unlocks the `abandoned` enum value reserved in the PostHog event taxonomy. See `docs/specs/posthog_integration.md` event table.

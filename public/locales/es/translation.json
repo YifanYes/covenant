@@ -461,10 +461,12 @@
     },
     "blindspot": {
       "all_areas_covered": "¡Todas las áreas están cubiertas!",
+      "all_habits_covered": "¡Todos los hábitos están cubiertos!",
       "all_objectives_covered": "¡Todos los objetivos están cubiertos!",
       "areas": "Áreas",
       "days": "días",
-      "no_blindspots_line1": "Todas las áreas y objetivos están en marcha",
+      "habits": "Hábitos",
+      "no_blindspots_line1": "Todas las áreas, objetivos y hábitos están en marcha",
       "no_blindspots_line2": "¡Buen trabajo, sigue así!",
       "objectives": "Objetivos",
       "title": "El punto ciego",
@@ -480,12 +482,29 @@
       "title_efficiency": "Métricas de eficiencia"
     },
     "habits": {
+      "all_done": "¡Todos los hábitos diarios completados hoy!",
+      "completion_success": "Hábito marcado como completado",
+      "quick_complete": "Marcar como completado",
       "completed": "Completados",
       "completion": "Progreso",
       "no_habits": "Sin hábitos",
       "none": "Ninguno",
       "remaining": "Pendiente",
       "title": "Hábitos diarios"
+    },
+    "summary": {
+      "due_soon_one": "{{count}} tarea pendiente en los próximos 2 días",
+      "due_soon_other": "{{count}} tareas pendientes en los próximos 2 días",
+      "habits_done": "{{done}}/{{total}} hábitos diarios completados",
+      "neglected_one": "{{count}} elemento descuidado",
+      "neglected_other": "{{count}} elementos descuidados"
+    },
+    "trend": {
+      "completions": "Completados",
+      "daily_avg": "Media diaria",
+      "last_14d": "en los últimos 14 días",
+      "no_data": "Aún no hay suficiente actividad para mostrar tendencia.",
+      "title": "Momento"
     },
     "task_status": {
       "DOING": "En proceso",

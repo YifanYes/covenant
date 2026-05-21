@@ -17,6 +17,7 @@ export interface DashboardData {
   habitsMetrics: {
     completedToday: number
     totalDaily: number
+    incompleteDaily: IncompleteHabit[]
   }
   efficiencyMetrics: {
     meanHabitRate: number
@@ -27,7 +28,25 @@ export interface DashboardData {
   taskMetrics: {
     areas: AreaMetric[]
     objectives: ObjectiveMetric[]
+    habits: HabitMetric[]
   }
+  summary: {
+    dueSoonCount: number
+    neglectedCount: number
+  }
+  completionsTrend: TrendPoint[]
+}
+
+export interface IncompleteHabit {
+  id: string
+  name: string
+  recurrence: number
+  completedToday: number
+}
+
+export interface TrendPoint {
+  date: string
+  count: number
 }
 
 export interface UpdatedTask {
@@ -39,11 +58,12 @@ export interface UpdatedTask {
   effort: string | null
   impact: string | null
   order: number
-  createdAt: string | undefined
-  updatedAt: string | undefined
+  createdAt?: string
+  updatedAt?: string
   dueDate: string | null
-  completedAt: Date | null
+  completedAt: string | null
   userId: string
+  areaColor: string | null
 }
 
 export interface AreaMetric {
@@ -58,6 +78,11 @@ export interface AreaMetric {
 }
 
 export interface ObjectiveMetric {
+  name: string
+  lastCompletion: string | null
+}
+
+export interface HabitMetric {
   name: string
   lastCompletion: string | null
 }

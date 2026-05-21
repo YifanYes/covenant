@@ -249,15 +249,33 @@ export class TaskRepository {
     })
   }
 
-  async findUpcoming(userId: string, limit: number, before: Date): Promise<Task[]> {
+  async findUpcoming(
+    userId: string,
+    limit: number,
+    from: Date,
+    before: Date
+  ): Promise<Array<Task & { areas: Array<{ color: string | null }> }>> {
     return this.prisma.task.findMany({
       where: {
         userId,
         status: { not: TaskStatus.DONE },
-        dueDate: { not: null, lte: before }
+        dueDate: { gte: from, lte: before }
+      },
+      include: {
+        areas: { select: { color: true } }
       },
       orderBy: { dueDate: 'asc' },
       take: limit
+    })
+  }
+
+  async countUpcoming(userId: string, from: Date, before: Date): Promise<number> {
+    return this.prisma.task.count({
+      where: {
+        userId,
+        status: { not: TaskStatus.DONE },
+        dueDate: { gte: from, lte: before }
+      }
     })
   }
 

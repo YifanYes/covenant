@@ -3,18 +3,16 @@ import DatePicker from '@/forms/date-picker.component'
 import MultiSelect from '@/forms/multi-select.component'
 import { useDateFormat } from '@/hooks/use-date-format'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
-import { cn } from '@/lib/cn.lib'
 import { useTasksStore } from '@/stores/tasks.store'
-import { taskPriorityTypes } from '@/types/constants.types'
 import Button from '@/ui/button.component'
 import Input from '@/ui/input.component'
 import Select, { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select.component'
 import Table, { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table.component'
 import { invalidators } from '@/utils/query-invalidation.utils'
 import { getRewardText } from '@/utils/text.utils'
-import { getPriorityStyles } from '@/utils/theme.utils'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import EmptyState from '@/components/empty-state.component'
+import TaskTypeBadge from '@/components/tasks/task-type-badge.component'
 import { ChevronLeft, ChevronRight, Cancel as Close, Bulletlist, Plus } from 'pixelarticons/react'
 import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -34,12 +32,6 @@ const EFFORT_IMPACT_FILTER_ITEMS = [
   { id: `${TaskImpact.LOW}|${TaskEffort.LOW}`, labelKey: 'tasks.task_types.fill_in' },
   { id: `${TaskImpact.LOW}|${TaskEffort.HIGH}`, labelKey: 'tasks.task_types.thankless_task' }
 ] as const
-
-// Determine task type based on effort and impact
-const getTaskType = (t: (key: string) => string, effort?: string | null, impact?: string | null): string => {
-  const key = effort && impact && taskPriorityTypes[impact]?.[effort]
-  return key ? t(key) : '-'
-}
 
 // Memoized row component to prevent unnecessary re-renders
 interface TaskRowProps {
@@ -64,14 +56,7 @@ const TaskRow = memo(function TaskRow({ task, onSelect, onStatusChange, isUpdati
     <TableRow className="hover:bg-muted/50 cursor-pointer" onClick={() => !isUpdating && onSelect()}>
       <TableCell className="py-2 pr-4 font-medium wrap-break-word whitespace-normal">{task.title}</TableCell>
       <TableCell className="py-2">
-        <span
-          className={cn(
-            'rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase',
-            getPriorityStyles(task.effort, task.impact)
-          )}
-        >
-          {getTaskType(t, task.effort, task.impact)}
-        </span>
+        <TaskTypeBadge effort={task.effort} impact={task.impact} />
       </TableCell>
       <TableCell className="py-2" onClick={(e) => e.stopPropagation()}>
         <Select value={task.status} disabled={isUpdating} onValueChange={(value) => onStatusChange(task.id, value)}>

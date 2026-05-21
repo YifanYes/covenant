@@ -1,14 +1,15 @@
 'use client'
+import TaskTypeBadge from '@/components/tasks/task-type-badge.component'
 import { cn } from '@/lib/cn.lib'
-import type { Task } from '@/types/models.types'
 import { getColorClasses } from '@/utils/theme.utils'
-import { Calendar as CalendarMonth } from 'pixelarticons/react'
+import type { UpdatedTask } from '@shared/types/dashboard.types'
 import dayjs from 'dayjs'
+import { Calendar as CalendarMonth } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 import DashboardSectionWrapperComponent from '../dashboard-section-wrapper.component'
 
 interface UpcomingTasksComponentProps {
-  tasks: Task[]
+  tasks: UpdatedTask[]
 }
 
 export default function UpcomingTasksComponent({ tasks }: UpcomingTasksComponentProps) {
@@ -25,15 +26,16 @@ export default function UpcomingTasksComponent({ tasks }: UpcomingTasksComponent
       {tasks && tasks.length > 0 ? (
         <div className="scrollbar-thin scrollbar-thumb-muted h-55 space-y-2 overflow-y-auto pr-4">
           {tasks.map((task, index) => {
-            const colorClass = task.color
-              ? getColorClasses(task.color, { bg: 'bg-muted', text: 'text-muted-foreground' }).bg
+            const colorClass = task.areaColor
+              ? getColorClasses(task.areaColor, { bg: 'bg-muted', text: 'text-muted-foreground' }).bg
               : 'bg-muted'
             const taskDate = task.dueDate ? dayjs(task.dueDate).format('DD MMM') : null
 
             return (
-              <div key={index} className="bg-card/30 flex items-center gap-3 rounded-md border px-3 py-2">
+              <div key={index} className="bg-card/30 flex items-center gap-2 rounded-md border px-3 py-2">
                 <div className={cn('h-2 w-2 shrink-0 rounded-full', colorClass)} />
                 <span className="text-foreground flex-1 truncate text-sm">{task.title}</span>
+                <TaskTypeBadge effort={task.effort} impact={task.impact} className="shrink-0" />
                 {taskDate && <span className="text-muted-foreground shrink-0 text-xs">{taskDate}</span>}
               </div>
             )

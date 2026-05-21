@@ -148,6 +148,22 @@ export class HabitRepository {
     })
   }
 
+  async findAllWithLastCompletion(
+    userId: string
+  ): Promise<Array<{ name: string; completions: { completedAt: Date }[] }>> {
+    return this.prisma.habit.findMany({
+      where: { userId, deletedAt: null },
+      select: {
+        name: true,
+        completions: {
+          orderBy: { completedAt: 'desc' },
+          take: 1,
+          select: { completedAt: true }
+        }
+      }
+    })
+  }
+
   async findCompletionsByDate(
     userId: string,
     after: Date

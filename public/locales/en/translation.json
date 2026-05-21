@@ -461,10 +461,12 @@
     },
     "blindspot": {
       "all_areas_covered": "All areas are covered!",
+      "all_habits_covered": "All habits are covered!",
       "all_objectives_covered": "All objectives are covered!",
       "areas": "Areas",
       "days": "days",
-      "no_blindspots_line1": "All areas and objectives are on track",
+      "habits": "Habits",
+      "no_blindspots_line1": "All areas, objectives and habits are on track",
       "no_blindspots_line2": "Good job, keep it up!",
       "objectives": "Objectives",
       "title": "The Blindspot",
@@ -480,12 +482,29 @@
       "title_efficiency": "Efficiency Metrics"
     },
     "habits": {
+      "all_done": "All daily habits complete for today!",
       "completed": "Completed",
       "completion": "Completion",
+      "completion_success": "Habit marked complete",
       "no_habits": "No habits",
       "none": "None",
+      "quick_complete": "Mark complete",
       "remaining": "Remaining",
       "title": "Daily Habits"
+    },
+    "summary": {
+      "due_soon_one": "{{count}} task due in the next 2 days",
+      "due_soon_other": "{{count}} tasks due in the next 2 days",
+      "habits_done": "{{done}}/{{total}} daily habits done",
+      "neglected_one": "{{count}} item neglected",
+      "neglected_other": "{{count}} items neglected"
+    },
+    "trend": {
+      "completions": "Completions",
+      "daily_avg": "Daily avg",
+      "last_14d": "in last 14 days",
+      "no_data": "Not enough activity yet to chart a trend.",
+      "title": "Momentum"
     },
     "task_status": {
       "DOING": "Doing",

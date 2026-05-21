@@ -24,7 +24,7 @@ export default function BlindspotListComponent({ items, emptyKey }: BlindspotLis
     <ul className="list-inside list-disc space-y-1 text-xs">
       {data.map((item, i) => (
         <li key={i}>
-          {parseTranslationKey(item.name)}: {item.lastCompletion ? dayjs(item.lastCompletion).get('days') : '∞'}{' '}
+          {parseTranslationKey(item.name)}: {item.lastCompletion ? dayjs().diff(item.lastCompletion, 'day') : '∞'}{' '}
           {t('dashboard.blindspot.days')}
         </li>
       ))}

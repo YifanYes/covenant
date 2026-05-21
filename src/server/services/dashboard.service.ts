@@ -1,6 +1,6 @@
-import type { Area, HabitCompletion, Objective, Task } from '@/generated/prisma'
+import type { Area, Habit, HabitCompletion, Objective, Task } from '@/generated/prisma'
 import { TaskStatus } from '@shared/schemas/tasks.schemas'
-import type { DashboardData } from '@shared/types/dashboard.types'
+import type { DashboardData, IncompleteHabit, TrendPoint } from '@shared/types/dashboard.types'
 import dayjs from 'dayjs'
 import type { AreaRepository } from '../repositories/area.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
@@ -208,20 +208,71 @@ export class DashboardService {
     return { areas: Object.values(areas), objectives: Object.values(objectives) }
   }
 
-  private parseUpcomingTasks(tasks: Task[]): DashboardData['upcomingTasks'] {
-    return tasks.map((task) => ({
+  private parseUpcomingTasks(
+    tasks: Array<Task & { areas: Array<{ color: string | null }> }>
+  ): DashboardData['upcomingTasks'] {
+    return tasks.map(({ areas, ...task }) => ({
       ...task,
       createdAt: task.createdAt?.toISOString(),
       updatedAt: task.updatedAt?.toISOString(),
-      dueDate: task.dueDate?.toISOString() || null
+      dueDate: task.dueDate?.toISOString() || null,
+      completedAt: task.completedAt?.toISOString() ?? null,
+      areaColor: areas[0]?.color ?? null
     }))
   }
 
-  async getDashboardData(userId: string): Promise<DashboardData> {
+  private getIncompleteDailyHabits(
+    habits: Array<Habit & { completions: HabitCompletion[] }>,
+    now: dayjs.Dayjs
+  ): IncompleteHabit[] {
+    return habits
+      .filter((h) => h.timespan === 'DAILY')
+      .map((h) => {
+        const completedToday = h.completions.filter((c) => dayjs(c.completedAt).isSame(now, 'day')).length
+        return { id: h.id, name: h.name, recurrence: h.recurrence, completedToday }
+      })
+      .filter((h) => h.completedToday < h.recurrence)
+  }
+
+  private getCompletionsTrend(
+    metricsTasks: Task[],
+    habitsWithCompletions: Array<{ completions: HabitCompletion[] }>,
+    now: dayjs.Dayjs,
+    timezoneOffset: number
+  ): TrendPoint[] {
+    const days = 14
+    const offsetMs = timezoneOffset * 60 * 1000
+    const toUserDay = (d: Date): string => {
+      const u = new Date(d.getTime() - offsetMs)
+      return `${u.getUTCFullYear()}-${String(u.getUTCMonth() + 1).padStart(2, '0')}-${String(u.getUTCDate()).padStart(2, '0')}`
+    }
+    const counts: Record<string, number> = {}
+    const nowMs = now.valueOf()
+    for (let i = 0; i < days; i++) {
+      counts[toUserDay(new Date(nowMs - i * 24 * 60 * 60 * 1000))] = 0
+    }
+    for (const task of metricsTasks) {
+      if (task.status !== TaskStatus.DONE || !task.completedAt) continue
+      const key = toUserDay(task.completedAt)
+      if (key in counts) counts[key]++
+    }
+    for (const habit of habitsWithCompletions) {
+      for (const c of habit.completions) {
+        const key = toUserDay(c.completedAt)
+        if (key in counts) counts[key]++
+      }
+    }
+    return Object.entries(counts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, count]) => ({ date, count }))
+  }
+
+  async getDashboardData(userId: string, timezoneOffset = 0): Promise<DashboardData> {
     const now = dayjs()
     const today = now.toDate()
     const previousTwoMonths = now.subtract(2, 'month').toDate()
     const lastWeek = now.subtract(1, 'week').toDate()
+    const todayStart = now.startOf('day').toDate()
     const comingTwoDays = now.startOf('day').add(2, 'day').toDate()
 
     const [
@@ -229,8 +280,10 @@ export class DashboardService {
       doingCount,
       todoCount,
       upcomingTasks,
+      dueSoonCount,
       habits,
       habitsWithAreas,
+      habitsLastCompletion,
       metricsTasks,
       allAreas,
       character
@@ -238,9 +291,11 @@ export class DashboardService {
       this.taskRepository.countByStatus(userId, [TaskStatus.TODO, TaskStatus.DOING], today),
       this.taskRepository.countByStatus(userId, TaskStatus.DOING, today, 'gte', true),
       this.taskRepository.countByStatus(userId, TaskStatus.TODO, today, 'gte', true),
-      this.taskRepository.findUpcoming(userId, 10, comingTwoDays),
+      this.taskRepository.findUpcoming(userId, 10, todayStart, comingTwoDays),
+      this.taskRepository.countUpcoming(userId, todayStart, comingTwoDays),
       this.habitRepository.findCompletionsByDate(userId, lastWeek),
       this.habitRepository.findCompletionsWithAreas(userId, previousTwoMonths),
+      this.habitRepository.findAllWithLastCompletion(userId),
       this.taskRepository.findRecentWithObjectives(userId, previousTwoMonths),
       this.areaRepository.findWithHierarchy(userId),
       this.characterRepository.findWithClasses(userId)
@@ -254,6 +309,20 @@ export class DashboardService {
     const { mostCommonType, mostFocusedArea, mostFocusedObjective } = this.getEfficiencyMetrics(metricsTasks)
     const parsedUpcomingTasks = this.parseUpcomingTasks(upcomingTasks)
     const { areas, objectives } = this.getActiveAreasAndObjectives(allAreas, habitsWithAreas, now)
+    const habitBlindspots = habitsLastCompletion.map((h) => ({
+      name: h.name,
+      lastCompletion: h.completions[0]?.completedAt?.toISOString() ?? null
+    }))
+    const incompleteDaily = this.getIncompleteDailyHabits(habits, now)
+    const completionsTrend = this.getCompletionsTrend(metricsTasks, habitsWithAreas, now, timezoneOffset)
+
+    const staleCutoff = now.subtract(2, 'week')
+    const isStale = (lastCompletion: string | null) =>
+      lastCompletion === null || dayjs(lastCompletion).isBefore(staleCutoff)
+    const neglectedCount =
+      areas.filter((a) => isStale(a.lastCompletion)).length +
+      objectives.filter((o) => isStale(o.lastCompletion)).length +
+      habitBlindspots.filter((h) => isStale(h.lastCompletion)).length
 
     return {
       characterName: character?.name || null,
@@ -273,9 +342,11 @@ export class DashboardService {
         DOING: doingCount,
         OVERDUE: overdueCount
       },
-      habitsMetrics: { completedToday, totalDaily },
+      habitsMetrics: { completedToday, totalDaily, incompleteDaily },
       efficiencyMetrics: { meanHabitRate, mostCommonType, mostFocusedArea, mostFocusedObjective },
-      taskMetrics: { areas, objectives }
+      taskMetrics: { areas, objectives, habits: habitBlindspots },
+      summary: { dueSoonCount, neglectedCount },
+      completionsTrend
     }
   }
 }

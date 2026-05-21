@@ -36,6 +36,7 @@ export const invalidators = {
   habits: async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() }),
+      queryClient.invalidateQueries({ queryKey: trpcOptions.dashboard.get.queryKey() }),
       // Phase 2A: habit completion grants mana; surface live in sidebar.
       queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() }),
       queryClient.invalidateQueries({ queryKey: trpcOptions.character.getTodayReserveBreakdown.queryKey() })

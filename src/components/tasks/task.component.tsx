@@ -1,10 +1,10 @@
 'use client'
+import TaskTypeBadge from '@/components/tasks/task-type-badge.component'
 import { cn } from '@/lib/cn.lib'
 import { areaBorderStyles, areaSimpleStyles } from '@/types/colors.types'
-import { taskPriorityTypes } from '@/types/constants.types'
 import { allIcons } from '@/types/icons.types'
 import { type Area, type Task as TaskType } from '@/types/models.types'
-import { getColorClasses, getPriorityStyles } from '@/utils/theme.utils'
+import { getColorClasses } from '@/utils/theme.utils'
 import dayjs from 'dayjs'
 import { uniqBy } from 'es-toolkit/compat'
 import { useTranslation } from 'react-i18next'
@@ -12,24 +12,9 @@ import { useTranslation } from 'react-i18next'
 function TaskMetaBadges({ task, taskAreas }: { task: TaskType; taskAreas: Area[] }) {
   const { t } = useTranslation()
 
-  const getTaskType = (effort: string | null | undefined, impact: string | null | undefined): string => {
-    if (!effort || !impact) return '-'
-    const key = taskPriorityTypes[impact]?.[effort]
-    return key ? t(key) : '-'
-  }
-
   return (
     <>
-      {(task.effort || task.impact) && (
-        <span
-          className={cn(
-            'rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase',
-            getPriorityStyles(task.effort, task.impact)
-          )}
-        >
-          {getTaskType(task.effort, task.impact)}
-        </span>
-      )}
+      <TaskTypeBadge effort={task.effort} impact={task.impact} />
       {taskAreas.length > 0 && (
         <div className="flex items-center gap-1">
           {taskAreas.map(({ id, name, icon, color }) => {

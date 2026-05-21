@@ -23,7 +23,7 @@ export default function AreasDistribution({ areas }: AreasDistributionProps) {
       title={t('dashboard.areas_distribution.title')}
       icon={TrackChanges}
       iconColorClass="text-orange-500"
-      className="gap-0"
+      className="gap-0 lg:col-span-2"
     >
       {localizedData.length > 0 ? (
         <ChartContainer config={config} className="h-full min-h-55 w-full">
