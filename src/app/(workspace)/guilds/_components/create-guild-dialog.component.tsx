@@ -12,7 +12,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { Plus } from 'pixelarticons/react'
 import { useState, type ReactNode } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -47,7 +47,6 @@ export default function CreateGuildDialog({ trigger, open: controlledOpen, onOpe
     handleSubmit,
     reset,
     control,
-    watch,
     formState: { errors, isValid, isDirty }
   } = useForm<CreateGuildType>({
     resolver: standardSchemaResolver(createGuildSchema),
@@ -55,7 +54,7 @@ export default function CreateGuildDialog({ trigger, open: controlledOpen, onOpe
     defaultValues: { name: '', description: '' }
   })
 
-  const descriptionHtml = watch('description') ?? ''
+  const descriptionHtml = useWatch({ control, name: 'description' }) ?? ''
   const descriptionPlainLength = descriptionHtml.replace(/<[^>]*>/g, '').trim().length
   const descriptionHtmlLength = descriptionHtml.trim().length
   const descriptionPlainOver = descriptionPlainLength > GUILD_DESCRIPTION_MAX_LENGTH

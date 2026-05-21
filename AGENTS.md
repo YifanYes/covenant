@@ -6,6 +6,36 @@ Covenant — gamified productivity, RPG progression. Next.js 16 + tRPC + Prisma/
 
 Design system: `@DESIGN.md`.
 
+## Working principles
+
+### Think before coding
+
+- State assumptions explicit. Uncertain → ask.
+- Multiple interpretations → present, don't pick silent.
+- Simpler approach exists → say so. Push back when warranted.
+- Unclear → stop, name confusion, ask.
+
+### Simplicity first
+
+- Min code solve problem. Nothing speculative.
+- No features beyond ask. No abstractions for single-use code.
+- No configurability not requested. No error handling for impossible scenarios.
+
+### Surgical edits
+
+- Touch only what required. Match existing style even if you'd write different.
+- No "improvements" to adjacent code, comments, formatting.
+- No refactor of things not broken.
+- Clean orphans YOUR change created (unused imports/vars/functions). Don't sweep pre-existing dead code — mention instead.
+- Every changed line trace to user request.
+
+### Goal-driven execution
+
+- Define verifiable success criteria before coding.
+- "Fix bug" → write failing test reproducing bug, then make pass.
+- "Add validation" → write tests for invalid inputs, then make pass.
+- Multi-step task → state brief plan with per-step verify check.
+
 ## Quickstart
 
 - Node `>=24.0.0`, pnpm `11.1.2` (enforced via `packageManager`)
@@ -41,6 +71,7 @@ Pre-push: Husky runs full build+test via `.husky/pre-push`, mirrors Railway `bui
 - Services: inject mock repos via constructors
 - Single test: `pnpm vitest run src/server/__tests__/services/character.service.test.ts`
 - Coverage: `pnpm test:coverage`
+- Test-first for bugs and validation: write failing test reproducing issue, then make pass.
 
 ## Database / Prisma
 
@@ -95,7 +126,7 @@ const mutation = useMutation(
 )
 ```
 
-Footgun: `trpc.*.queryOptions()` does NOT work. Use `trpcOptions` for options.
+Footgun: `trpc.*.queryOptions()` NOT work. Use `trpcOptions` for options.
 
 ### Server-Side tRPC (RSC)
 
@@ -119,7 +150,7 @@ const data = await trpc.dashboard.getData()
 ## Forms & Dialogs
 
 - Forms: `react-hook-form` + `standardSchemaResolver` from `@hookform/resolvers/standard-schema`, validated by Zod schemas in `src/shared/schemas/`. Use `Controller` for non-native inputs (Tiptap, Select, etc.).
-- Form modals: `src/components/common/base-form-dialog.component.tsx`. Pass i18n keys (not translated strings) for `title` / `submitLabel` / `cancelLabel` — component calls `t()` internally. Wire `onSubmit={handleSubmit(onSubmit)}`, `isSubmitDisabled`, `isLoading`. Use `extraFooterActions` for left-aligned secondary actions (e.g. delete).
+- Form modals: `src/components/common/base-form-dialog.component.tsx`. Pass i18n keys (not translated strings) for `title` / `submitLabel` / `cancelLabel` — component calls `t()` internal. Wire `onSubmit={handleSubmit(onSubmit)}`, `isSubmitDisabled`, `isLoading`. Use `extraFooterActions` for left-aligned secondary actions (e.g. delete).
 - Destructive confirmations: `src/components/common/base-confirm-dialog.component.tsx`. Default `variant="destructive"`. Pass i18n keys for `title` / `description` / `confirmLabel`.
 - Do NOT hand-roll `<Dialog><DialogContent>...<LoaderButton/>` in feature code when base dialog fits.
 
@@ -139,7 +170,7 @@ Conventional: `<type>: <description>` (`fix:`, `feat:`, `docs:`, `test:`, `build
 
 Trace EVERY caller/reference of affected logic. Fix all paths one pass. Never fix only 1–2 of 3+.
 
-- Minimal targeted fixes. No adjacent refactor unless asked.
+- See Working principles → Surgical edits for scope rules.
 - No strict validation rejecting existing/legacy state.
 - Verify all existing features still work before commit.
 

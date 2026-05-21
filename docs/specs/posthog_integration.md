@@ -421,3 +421,19 @@ Once the v1 core-loop signal validates the reward direction, add the Sink Warnin
 - Onboarding funnel events: `landing_viewed`, `signup_started`, `onboarding_started`, `onboarding_completed`
 - Combat outcome cohorts: `combat_first_victory`, `combat_first_defeat` (computed in PostHog, no code changes)
 - `user_signed_in` / `user_signed_out` if DAU/retention from `$pageview` proves insufficient
+
+### Phase 7: Sentry consolidation (decision point)
+
+Evaluate folding error tracking into PostHog and removing `@sentry/nextjs`. **Not a default — revisit only when all three conditions hold:**
+
+1. Phase 2 session replay shipped on PostHog with PII-masking pass (parity with current `replaysOnErrorSampleRate: 0.1`)
+2. Sentry tracing (`tracesSampleRate: 0.1` at `sentry.shared.config.ts:51`) confirmed not load-bearing — i.e. no active APM/perf workflow depending on transactions
+3. Cost or tool-sprawl pain materializes (Sentry bill, or context-switching cost across two dashboards)
+
+If consolidating, the swap touches:
+
+- Remove `@sentry/nextjs`, `sentry.{shared,server,edge}.config.ts`, `instrumentation-client.ts` Sentry block, `withSentryConfig` wrapper + `tunnelRoute` in `next.config.ts`
+- Port `scrubPii` logic to PostHog `before_send` hook (cookies, sensitive headers, `request.data` mask)
+- Wire PostHog source map upload into build (CLI step, replaces `withSentryConfig` source map upload)
+- Add `/ingest` reverse-proxy rewrite (Phase 3) to match Sentry's `/monitoring` tunnel ad-block resilience
+- Drop `SENTRY_*` env vars; drop `.env.sentry-build-plugin`
