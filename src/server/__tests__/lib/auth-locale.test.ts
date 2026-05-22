@@ -104,17 +104,17 @@ describe('resolveEmailLocale', () => {
   })
 
   it('returns user locale from database when stored', async () => {
-    mockPrismaUserFindUnique.mockResolvedValue({ locale: 'en' })
+    mockPrismaUserFindUnique.mockResolvedValue({ userSettings: { locale: 'en' } })
     const result = await resolveEmailLocale(email)
     expect(result).toBe('en')
     expect(mockPrismaUserFindUnique).toHaveBeenCalledWith({
       where: { email },
-      select: { locale: true }
+      select: { userSettings: { select: { locale: true } } }
     })
   })
 
   it('returns validated locale even when stored locale is invalid', async () => {
-    mockPrismaUserFindUnique.mockResolvedValue({ locale: 'fr' })
+    mockPrismaUserFindUnique.mockResolvedValue({ userSettings: { locale: 'fr' } })
     const result = await resolveEmailLocale(email)
     expect(result).toBe(DEFAULT_LOCALE)
   })
@@ -159,7 +159,7 @@ describe('resolveEmailLocale', () => {
   })
 
   it('prefers stored locale over callbackURL and cookie', async () => {
-    mockPrismaUserFindUnique.mockResolvedValue({ locale: 'en' })
+    mockPrismaUserFindUnique.mockResolvedValue({ userSettings: { locale: 'en' } })
     const ctx = {
       query: { callbackURL: 'https://example.com/login?locale=es' },
       getCookie: vi.fn().mockReturnValue('es')

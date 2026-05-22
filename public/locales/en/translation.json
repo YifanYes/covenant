@@ -1750,8 +1750,6 @@
       "YYYY-MM-DD": "ISO (Year-Month-Day)",
       "DD MMM YYYY": "Day Month Year"
     },
-    "default_tasks_view_label": "Default Tasks View",
-    "default_tasks_view_placeholder": "Select default view",
     "email_label": "Email",
     "language_label": "Language",
     "language_placeholder": "Select language",
@@ -2022,7 +2020,22 @@
       "quick_win": "Quick Win",
       "thankless_task": "Thankless Task"
     },
-    "title": "Tasks"
+    "title": "Tasks",
+    "settings": {
+      "tab_label": "Settings",
+      "title": "Tasks Settings",
+      "default_view_label": "Default Tasks View",
+      "default_view_placeholder": "Select default view",
+      "visible_tabs_label": "Visible tabs",
+      "show_list": "Show List tab",
+      "show_kanban": "Show Kanban tab",
+      "show_table": "Show Table tab",
+      "show_matrix": "Show Matrix tab",
+      "at_least_one_visible": "At least one tab must remain visible",
+      "saved": "Tasks settings saved",
+      "save_error": "Failed to save tasks settings",
+      "save": "Save"
+    }
   },
   "update": "Update",
   "update_area_dialog": {

@@ -37,11 +37,25 @@ export const updateProfileSchema = z
     locale: z.enum(LOCALES).optional(),
     colorMode: z.enum(COLOR_MODES).optional(),
     defaultTasksView: z.enum(TASKS_VIEWS).optional(),
-    dateFormat: z.enum(DATE_FORMATS).optional()
+    dateFormat: z.enum(DATE_FORMATS).optional(),
+    showListTab: z.boolean().optional(),
+    showKanbanTab: z.boolean().optional(),
+    showTableTab: z.boolean().optional(),
+    showMatrixTab: z.boolean().optional()
   })
   .refine((d) => Object.values(d).some((v) => v !== undefined), {
     message: 'errors.no_fields_to_update'
   })
+  .refine(
+    (d) => {
+      const tabs = [d.showListTab, d.showKanbanTab, d.showTableTab, d.showMatrixTab]
+      const definedCount = tabs.filter((v) => v !== undefined).length
+      if (definedCount === 0) return true
+      if (definedCount !== 4) return false
+      return tabs.some((v) => v === true)
+    },
+    { message: 'tasks.settings.at_least_one_visible', path: ['showListTab'] }
+  )
 export type UpdateProfileType = z.infer<typeof updateProfileSchema>
 
 export const forgotPasswordSchema = z.object({

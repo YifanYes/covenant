@@ -48,14 +48,28 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
   })
 
   const setPreferences = useUserPreferencesStore((s) => s.setPreferences)
+  const settings = profile?.userSettings
   useEffect(() => {
-    if (!profile) return
+    if (!settings) return
     setPreferences({
-      language: profile.locale,
-      defaultTasksView: profile.defaultTasksView,
-      dateFormat: profile.dateFormat as DateFormat
+      language: settings.locale,
+      defaultTasksView: settings.defaultTasksView,
+      dateFormat: settings.dateFormat as DateFormat,
+      showListTab: settings.showListTab,
+      showKanbanTab: settings.showKanbanTab,
+      showTableTab: settings.showTableTab,
+      showMatrixTab: settings.showMatrixTab
     })
-  }, [profile, setPreferences])
+  }, [
+    settings?.locale,
+    settings?.defaultTasksView,
+    settings?.dateFormat,
+    settings?.showListTab,
+    settings?.showKanbanTab,
+    settings?.showTableTab,
+    settings?.showMatrixTab,
+    setPreferences
+  ])
 
   const completeMutation = useMutation(
     trpcOptions.character.completeTutorial.mutationOptions({

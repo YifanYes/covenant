@@ -97,7 +97,7 @@ export class GuildService {
     }
 
     const user = await this.userRepository.findById(userId)
-    const factionName = user?.theme ?? DEFAULT_FACTION
+    const factionName = user?.userSettings?.theme ?? DEFAULT_FACTION
 
     const description = input.description !== undefined ? sanitizeGuildDescription(input.description) : undefined
 

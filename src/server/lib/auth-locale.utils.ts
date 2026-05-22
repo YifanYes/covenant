@@ -28,10 +28,10 @@ export function extractLocaleFromCallbackURL(callbackURL: string | undefined): S
 export async function resolveEmailLocale(email: string, ctx?: GenericEndpointContext): Promise<SupportedLocale> {
   const stored = await prisma.user.findUnique({
     where: { email },
-    select: { locale: true }
+    select: { userSettings: { select: { locale: true } } }
   })
-  if (stored?.locale) {
-    return validateLocale(stored.locale)
+  if (stored?.userSettings?.locale) {
+    return validateLocale(stored.userSettings.locale)
   }
 
   const callbackURL = ctx?.query?.callbackURL as string | undefined

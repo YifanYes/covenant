@@ -1,11 +1,14 @@
-import type { PrismaClient, User } from '@/generated/prisma'
+import type { PrismaClient, User, UserSettings } from '@/generated/prisma'
+
+export type UserWithSettings = User & { userSettings: UserSettings | null }
 
 export class UserRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async findById(userId: string): Promise<User | null> {
+  async findById(userId: string): Promise<UserWithSettings | null> {
     return this.prisma.user.findUnique({
-      where: { id: userId }
+      where: { id: userId },
+      include: { userSettings: true }
     })
   }
 

@@ -10,17 +10,19 @@ describe('AuthService', () => {
   let authService: AuthService
   let mockPrisma: ReturnType<typeof createPrismaMock>
   let mockUserRepo: ReturnType<typeof createRepoMock<UserRepository>>
-  let tx: { character: TxRepo; user: TxRepo }
+  let tx: { character: TxRepo; userSettings: TxRepo }
 
   beforeEach(() => {
     vi.clearAllMocks()
 
     tx = {
       character: createRepoMock<any>(),
-      user: createRepoMock<any>()
+      userSettings: createRepoMock<any>()
     }
 
     mockPrisma = createPrismaMock(tx)
+    // top-level userSettings used by updateTheme + getProfile safety net
+    ;(mockPrisma as any).userSettings = createRepoMock<any>()
 
     mockUserRepo = createRepoMock<UserRepository>()
 
@@ -44,70 +46,97 @@ describe('AuthService', () => {
   })
 
   describe('updateTheme', () => {
-    it('updates user theme via userRepo', async () => {
+    it('upserts user theme via userSettings', async () => {
       const result = await authService.updateTheme('user-1', { theme: 'HOLY_KNIGHTS' } as UpdateThemeType)
-      expect(mockUserRepo.update).toHaveBeenCalledWith('user-1', { theme: 'HOLY_KNIGHTS' })
+      expect((mockPrisma as any).userSettings.upsert).toHaveBeenCalledWith({
+        where: { userId: 'user-1' },
+        update: { theme: 'HOLY_KNIGHTS' },
+        create: { userId: 'user-1', theme: 'HOLY_KNIGHTS' }
+      })
       expect(result.message).toBe('Theme updated successfully')
     })
   })
 
   describe('updateProfile', () => {
-    it('updates user fields only when no characterName', async () => {
-      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', theme: 'HOLY_KNIGHTS' })
+    it('upserts userSettings when only settings fields provided', async () => {
+      mockUserRepo.findById.mockResolvedValue({
+        id: 'user-1',
+        userSettings: { theme: 'HOLY_KNIGHTS' }
+      })
 
       const result = await authService.updateProfile('user-1', { theme: 'HOLY_KNIGHTS' } as UpdateProfileType)
 
-      expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { theme: 'HOLY_KNIGHTS' } })
+      expect(tx.userSettings.upsert).toHaveBeenCalledWith({
+        where: { userId: 'user-1' },
+        update: { theme: 'HOLY_KNIGHTS' },
+        create: { userId: 'user-1', theme: 'HOLY_KNIGHTS' }
+      })
       expect(tx.character.update).not.toHaveBeenCalled()
-      expect(result).toEqual({ id: 'user-1', theme: 'HOLY_KNIGHTS' })
+      expect(result).toEqual({ id: 'user-1', userSettings: { theme: 'HOLY_KNIGHTS' } })
     })
 
-    it('updates character name only when no user fields', async () => {
-      mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
+    it('updates character name only when no settings fields', async () => {
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', userSettings: {} })
 
       await authService.updateProfile('user-1', { characterName: 'Hero' } as UpdateProfileType)
 
-      expect(tx.user.update).not.toHaveBeenCalled()
+      expect(tx.userSettings.upsert).not.toHaveBeenCalled()
       expect(tx.character.update).toHaveBeenCalledWith({ where: { userId: 'user-1' }, data: { name: 'Hero' } })
     })
 
-    it('updates both user fields and character name', async () => {
-      mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
+    it('updates both settings and character name', async () => {
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', userSettings: {} })
 
       await authService.updateProfile('user-1', {
         theme: 'HOLY_KNIGHTS',
         characterName: 'Hero'
       } as UpdateProfileType)
 
-      expect(tx.user.update).toHaveBeenCalledWith({ where: { id: 'user-1' }, data: { theme: 'HOLY_KNIGHTS' } })
+      expect(tx.userSettings.upsert).toHaveBeenCalled()
       expect(tx.character.update).toHaveBeenCalledWith({ where: { userId: 'user-1' }, data: { name: 'Hero' } })
     })
 
     it('skips both updates when input only has characterName: undefined', async () => {
-      mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', userSettings: {} })
 
       await authService.updateProfile('user-1', {
         characterName: undefined
       } as UpdateProfileType)
 
-      expect(tx.user.update).not.toHaveBeenCalled()
+      expect(tx.userSettings.upsert).not.toHaveBeenCalled()
       expect(tx.character.update).not.toHaveBeenCalled()
     })
 
-    it('returns userRepo.findById result after transaction', async () => {
-      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', theme: 'HOLY_KNIGHTS' })
-      const result = await authService.updateProfile('user-1', { theme: 'HOLY_KNIGHTS' } as UpdateProfileType)
-      expect(mockUserRepo.findById).toHaveBeenCalledWith('user-1')
-      expect(result).toEqual({ id: 'user-1', theme: 'HOLY_KNIGHTS' })
+    it('rejects when all four tab booleans are false', async () => {
+      await expect(
+        authService.updateProfile('user-1', {
+          showListTab: false,
+          showKanbanTab: false,
+          showTableTab: false,
+          showMatrixTab: false
+        } as UpdateProfileType)
+      ).rejects.toThrow('tasks.settings.at_least_one_visible')
     })
   })
 
   describe('getProfile', () => {
-    it('delegates to userRepo.findById', async () => {
-      mockUserRepo.findById.mockResolvedValue({ id: 'user-1' })
+    it('returns profile when userSettings already exists', async () => {
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', userSettings: { theme: 'HOLY_KNIGHTS' } })
       const result = await authService.getProfile('user-1')
       expect(mockUserRepo.findById).toHaveBeenCalledWith('user-1')
-      expect(result).toEqual({ id: 'user-1' })
+      expect(result).toEqual({ id: 'user-1', userSettings: { theme: 'HOLY_KNIGHTS' } })
+    })
+
+    it('upserts userSettings row when missing', async () => {
+      mockUserRepo.findById.mockResolvedValue({ id: 'user-1', userSettings: null })
+      ;(mockPrisma as any).userSettings.upsert.mockResolvedValue({ theme: 'HOLY_KNIGHTS' })
+      const result = await authService.getProfile('user-1')
+      expect((mockPrisma as any).userSettings.upsert).toHaveBeenCalledWith({
+        where: { userId: 'user-1' },
+        create: { userId: 'user-1' },
+        update: {}
+      })
+      expect(result).toEqual({ id: 'user-1', userSettings: { theme: 'HOLY_KNIGHTS' } })
     })
   })
 })

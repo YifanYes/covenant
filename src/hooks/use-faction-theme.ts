@@ -45,7 +45,7 @@ export function useFactionThemeProvider({ initialFaction }: { initialFaction: Fa
   })
   const updateThemeMutation = useMutation(trpcOptions.auth.updateTheme.mutationOptions())
   const lastSyncedTheme = useRef<string | null>(null)
-  const faction = overrideFaction || (profile?.theme as Faction) || initialFaction
+  const faction = overrideFaction || (profile?.userSettings?.theme as Faction | undefined) || initialFaction
 
   const syncStorage = (value: string) => {
     localStorage.setItem(STORAGE_KEY, value)
@@ -58,16 +58,17 @@ export function useFactionThemeProvider({ initialFaction }: { initialFaction: Fa
     updateThemeMutation.mutate({ theme: newFaction })
   }
 
-  if (overrideFaction !== null && profile?.theme === overrideFaction) {
+  if (overrideFaction !== null && profile?.userSettings?.theme === overrideFaction) {
     setOverrideFaction(null)
   }
 
   useEffect(() => {
-    if (!profile?.theme || profile.theme === lastSyncedTheme.current) return
+    const theme = profile?.userSettings?.theme
+    if (!theme || theme === lastSyncedTheme.current) return
 
-    syncStorage(profile.theme)
-    lastSyncedTheme.current = profile.theme
-  }, [profile?.theme])
+    syncStorage(theme)
+    lastSyncedTheme.current = theme
+  }, [profile?.userSettings?.theme])
 
   useLayoutEffect(() => {
     const root = document.documentElement

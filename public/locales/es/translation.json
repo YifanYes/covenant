@@ -1750,8 +1750,6 @@
       "YYYY-MM-DD": "ISO (Año-Mes-Día)",
       "DD MMM YYYY": "Día Mes Año"
     },
-    "default_tasks_view_label": "Vista de tareas predeterminada",
-    "default_tasks_view_placeholder": "Seleccionar vista predeterminada",
     "email_label": "Correo electrónico",
     "language_label": "Idioma",
     "language_placeholder": "Seleccionar idioma",
@@ -2022,7 +2020,22 @@
       "quick_win": "Victoria Rápida",
       "thankless_task": "Tarea Ingrata"
     },
-    "title": "Tareas"
+    "title": "Tareas",
+    "settings": {
+      "tab_label": "Ajustes",
+      "title": "Ajustes de tareas",
+      "default_view_label": "Vista de tareas predeterminada",
+      "default_view_placeholder": "Seleccionar vista predeterminada",
+      "visible_tabs_label": "Pestañas visibles",
+      "show_list": "Mostrar pestaña Lista",
+      "show_kanban": "Mostrar pestaña Kanban",
+      "show_table": "Mostrar pestaña Tabla",
+      "show_matrix": "Mostrar pestaña Matriz",
+      "at_least_one_visible": "Al menos una pestaña debe permanecer visible",
+      "saved": "Ajustes de tareas guardados",
+      "save_error": "Error al guardar los ajustes de tareas",
+      "save": "Guardar"
+    }
   },
   "update": "Actualizar",
   "update_area_dialog": {

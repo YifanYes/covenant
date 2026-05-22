@@ -7,14 +7,27 @@ import { persist } from 'zustand/middleware'
 export { DATE_FORMATS }
 export type DateFormat = (typeof DATE_FORMATS)[number]
 
-type UserPreferencesStore = {
+type TabVisibility = {
+  showListTab: boolean
+  showKanbanTab: boolean
+  showTableTab: boolean
+  showMatrixTab: boolean
+}
+
+type UserPreferencesStore = TabVisibility & {
   language: string
   defaultTasksView: string
   dateFormat: DateFormat
   setLanguage: (language: string) => void
-  setDefaultTasksView: (view: string) => void
   setDateFormat: (format: DateFormat) => void
-  setPreferences: (preferences: { language: string; defaultTasksView: string; dateFormat: DateFormat }) => void
+  setPreferences: (
+    preferences: Partial<{
+      language: string
+      defaultTasksView: string
+      dateFormat: DateFormat
+    }> &
+      Partial<TabVisibility>
+  ) => void
 }
 
 export const useUserPreferencesStore = create<UserPreferencesStore>()(
@@ -23,11 +36,13 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       language: 'en',
       defaultTasksView: 'list',
       dateFormat: 'L',
+      showListTab: true,
+      showKanbanTab: true,
+      showTableTab: true,
+      showMatrixTab: true,
       setLanguage: (language: string) => set({ language }),
-      setDefaultTasksView: (defaultTasksView: string) => set({ defaultTasksView }),
       setDateFormat: (dateFormat: DateFormat) => set({ dateFormat }),
-      setPreferences: (preferences: { language: string; defaultTasksView: string; dateFormat: DateFormat }) =>
-        set(preferences)
+      setPreferences: (preferences) => set(preferences)
     }),
     {
       name: 'covenant-user-preferences',

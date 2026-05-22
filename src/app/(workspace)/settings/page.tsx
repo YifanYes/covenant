@@ -10,7 +10,7 @@ import { useUserPreferencesStore, type DateFormat } from '@/stores/user-preferen
 import Label from '@/ui/label.component'
 import Switch from '@/ui/switch.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import { DATE_FORMATS, TASKS_VIEWS, type TasksView } from '@shared/schemas/auth.schemas'
+import { DATE_FORMATS } from '@shared/schemas/auth.schemas'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Moon, CloudSun as Sun } from 'pixelarticons/react'
@@ -21,7 +21,6 @@ import { toast } from 'sonner'
 
 type SettingsFormValues = {
   language: string
-  defaultTasksView: string
   dateFormat: DateFormat
   theme: 'light' | 'dark'
   faction: Faction
@@ -62,8 +61,7 @@ function persistLocaleCookie(value: string) {
 
 export default function Settings() {
   const { t, i18n } = useTranslation()
-  const { language, defaultTasksView, dateFormat, setLanguage, setDefaultTasksView, setDateFormat } =
-    useUserPreferencesStore()
+  const { language, dateFormat, setLanguage, setDateFormat } = useUserPreferencesStore()
   const { theme, toggleTheme } = useTheme()
   const { faction } = useFactionTheme()
 
@@ -76,7 +74,6 @@ export default function Settings() {
     mode: 'onChange',
     defaultValues: {
       language,
-      defaultTasksView,
       dateFormat,
       theme,
       faction
@@ -87,13 +84,12 @@ export default function Settings() {
     if (!isDirty) {
       reset({
         language,
-        defaultTasksView,
         dateFormat,
         theme,
         faction
       })
     }
-  }, [language, defaultTasksView, dateFormat, theme, faction, isDirty, reset])
+  }, [language, dateFormat, theme, faction, isDirty, reset])
 
   const watchedTheme = useWatch({ control, name: 'theme' })
   const watchedFaction = useWatch({ control, name: 'faction' })
@@ -135,14 +131,12 @@ export default function Settings() {
     try {
       const factionChanged = values.faction !== faction
       const languageChanged = values.language !== language
-      const defaultTasksViewChanged = values.defaultTasksView !== defaultTasksView
       const dateFormatChanged = values.dateFormat !== dateFormat
       const themeChanged = values.theme !== theme
 
       const payload: Parameters<typeof updateProfileMutation.mutateAsync>[0] = {}
       if (factionChanged) payload.theme = values.faction
       if (languageChanged) payload.locale = values.language as 'en' | 'es'
-      if (defaultTasksViewChanged) payload.defaultTasksView = values.defaultTasksView as TasksView
       if (dateFormatChanged) payload.dateFormat = values.dateFormat
       if (themeChanged) payload.colorMode = values.theme
 
@@ -156,7 +150,6 @@ export default function Settings() {
       if (languageChanged) persistLocaleCookie(values.language)
 
       if (languageChanged) setLanguage(values.language)
-      if (defaultTasksViewChanged) setDefaultTasksView(values.defaultTasksView)
       if (dateFormatChanged) setDateFormat(values.dateFormat)
       if (themeChanged) toggleTheme()
 
@@ -194,22 +187,6 @@ export default function Settings() {
               value={field.value}
               onChange={(v) => v && field.onChange(v)}
               options={['en', 'es'].map((value) => ({ value, label: t(`languages.${value}`) }))}
-            />
-          )}
-        />
-        <Controller
-          name="defaultTasksView"
-          control={control}
-          render={({ field }) => (
-            <SingleSelect
-              label={t('settings.default_tasks_view_label')}
-              placeholder={t('settings.default_tasks_view_placeholder')}
-              value={field.value}
-              onChange={(v) => v && field.onChange(v)}
-              options={TASKS_VIEWS.map((value) => ({
-                value,
-                label: t(`tasks.tabs.${value}`)
-              }))}
             />
           )}
         />

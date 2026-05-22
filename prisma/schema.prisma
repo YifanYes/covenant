@@ -9,22 +9,18 @@ datasource db {
 
 // Better Auth Models
 model User {
-  id             String          @id
-  name           String?
-  email          String          @unique
-  emailVerified  Boolean         @default(false)
-  image          String?
-  theme                String          @default("HOLY_KNIGHTS")
-  locale               String          @default("es")
-  colorMode            String          @default("light")
-  defaultTasksView     String          @default("list")
-  dateFormat           String          @default("L")
+  id                   String          @id
+  name                 String?
+  email                String          @unique
+  emailVerified        Boolean         @default(false)
+  image                String?
   tutorialCompletedAt  DateTime?       @db.Timestamp(6)
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
   sessions             Session[]
   accounts             Account[]
   character            Character?
+  userSettings         UserSettings?
   journalEntries       JournalEntry[]
   guildMembership      GuildMember?
   ownedGuilds          Guild[]         @relation("GuildOwner")
@@ -34,6 +30,25 @@ model User {
   tavernReports        TavernMessageReport[]
 
   @@map("users")
+}
+
+model UserSettings {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @unique
+  defaultTasksView String   @default("list")
+  locale           String   @default("es")
+  theme            String   @default("HOLY_KNIGHTS")
+  colorMode        String   @default("light")
+  dateFormat       String   @default("L")
+  showListTab      Boolean  @default(true)
+  showKanbanTab    Boolean  @default(true)
+  showTableTab     Boolean  @default(true)
+  showMatrixTab    Boolean  @default(true)
+  createdAt        DateTime @default(now()) @db.Timestamp(6)
+  updatedAt        DateTime @updatedAt @db.Timestamp(6)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
 }
 
 model Session {

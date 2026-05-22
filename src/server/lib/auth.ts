@@ -133,11 +133,9 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user, context) => {
+        after: async (user, context) => {
           const locale = await resolveCreateUserLocale(context ?? undefined)
-          return { data: { ...user, locale } }
-        },
-        after: async (user) => {
+          await prisma.userSettings.create({ data: { userId: user.id, locale } })
           logger.info({ event: 'AUTH_SIGNUP', userId: user.id }, 'User registered')
         }
       }
