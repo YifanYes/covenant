@@ -12,8 +12,8 @@ import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, useSyncExternalStore } from 'react'
-import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import ProductivityLayout from './productivity-layout'
 import RPGLayout from './rpg-layout'
 
@@ -60,16 +60,7 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       showTableTab: settings.showTableTab,
       showMatrixTab: settings.showMatrixTab
     })
-  }, [
-    settings?.locale,
-    settings?.defaultTasksView,
-    settings?.dateFormat,
-    settings?.showListTab,
-    settings?.showKanbanTab,
-    settings?.showTableTab,
-    settings?.showMatrixTab,
-    setPreferences
-  ])
+  }, [settings, setPreferences])
 
   const completeMutation = useMutation(
     trpcOptions.character.completeTutorial.mutationOptions({
@@ -92,8 +83,8 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
     if (tutorialFromParam) {
       router.replace(pathname)
     }
-  // run once on mount to strip ?tutorial=true without re-triggering on navigation
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // run once on mount to strip ?tutorial=true without re-triggering on navigation
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
