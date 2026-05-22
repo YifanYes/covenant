@@ -279,13 +279,20 @@ export class TaskRepository {
     })
   }
 
-  async findRecentWithObjectives(
-    userId: string,
-    after: Date
-  ): Promise<Array<Task & { objectives: Array<{ name: string; areas: Array<{ name: string }> }> }>> {
-    return this.prisma.task.findMany({
-      where: { userId, updatedAt: { gte: after } },
+  async findCompletedWithObjectives(userId: string, after: Date): Promise<DoneTaskWithObjectives[]> {
+    const rows = await this.prisma.task.findMany({
+      where: {
+        userId,
+        status: TaskStatus.DONE,
+        completedAt: { gte: after, not: null }
+      },
       include: { objectives: { include: { areas: true } } }
     })
+    return rows as DoneTaskWithObjectives[]
   }
+}
+
+export type DoneTaskWithObjectives = Omit<Task, 'completedAt'> & {
+  completedAt: Date
+  objectives: Array<{ id: string; name: string; areas: Array<{ id: string; name: string }> }>
 }

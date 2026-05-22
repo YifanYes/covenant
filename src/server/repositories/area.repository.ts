@@ -1,6 +1,6 @@
 import type { CreateAreaBodyType, UpdateAreaBodyType } from '@shared/schemas/areas.schemas'
 import { TRPCError } from '@trpc/server'
-import type { Area, Objective, PrismaClient, Task } from '@/generated/prisma'
+import type { Area, Objective, PrismaClient } from '@/generated/prisma'
 
 export class AreaRepository {
   constructor(private prisma: PrismaClient) {}
@@ -40,15 +40,11 @@ export class AreaRepository {
     return area
   }
 
-  async findWithHierarchy(userId: string): Promise<(Area & { objectives: (Objective & { tasks: Task[] })[] })[]> {
+  async findWithHierarchy(userId: string): Promise<(Area & { objectives: Objective[] })[]> {
     return this.prisma.area.findMany({
       where: { userId },
       include: {
-        objectives: {
-          include: {
-            tasks: true
-          }
-        }
+        objectives: true
       }
     })
   }

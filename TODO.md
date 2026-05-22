@@ -84,8 +84,6 @@
 
 - [ ] PostHog: track Tasks tab usage `[measure]`. Add events `tasks_view_changed { view, source: 'tab_click' | 'default' | 'url_param' }` fired from `handleViewChange` (`src/app/(workspace)/tasks/page.tsx:30-38`) and `tasks_view_loaded { view }` on mount with the resolved `activeView`. Tells us which of list/kanban/table/matrix to keep or cut after beta data lands. Add event rows to `docs/specs/posthog_integration.md` taxonomy table.
 
-- [ ] Dashboard N+1 + first test `[beta-risk]`. `src/server/services/dashboard.service.ts:149-206` triple-nested in-memory loop — refactor before user counts grow. New file: `src/server/__tests__/services/dashboard.service.test.ts` to lock the fixed shape and prevent regression.
-
 - [ ] Audit Objectives → mana → dashboard wiring `[audit]`. Confirm completing an Objective fires the `objective_completed` PostHog event with non-zero `mana_earned` and that the user's mana reserve and dashboard reflect it. Objective is the Goal-tracking pillar named in `MISSION.md`; if it doesn't drive the core loop, the central analytics question in `docs/specs/posthog_integration.md` can't be answered. No code change if everything works.
 
 ## Low Priority
