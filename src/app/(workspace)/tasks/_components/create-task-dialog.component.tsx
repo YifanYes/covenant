@@ -16,7 +16,6 @@ import {
   createTaskSchema,
   TaskEffort,
   TaskImpact,
-  TaskStatus,
   type CreateTaskType
 } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -41,6 +40,9 @@ export default function CreateTaskDialog({ trigger, open: controlledOpen, onOpen
   const { monthIndex } = useCalendarStore()
   const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
+  const { data: statusesData } = useSuspenseQuery(trpcOptions.userTaskStatus.getAll.queryOptions())
+  const defaultStatusId =
+    statusesData.statuses.find((s) => s.isDefault)?.id ?? statusesData.statuses[0]?.id ?? ''
 
   const mutation = useMutation(
     trpcOptions.tasks.create.mutationOptions({
@@ -72,7 +74,7 @@ export default function CreateTaskDialog({ trigger, open: controlledOpen, onOpen
     defaultValues: {
       title: '',
       description: '',
-      status: TaskStatus.TODO,
+      statusId: defaultStatusId,
       dueDate: undefined,
       objectives: [],
       areas: []

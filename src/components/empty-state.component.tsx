@@ -8,7 +8,7 @@ type EmptyStateProps = {
   title: string
   description: string
   action?: ReactNode
-  size?: 'compact' | 'default'
+  size?: 'compact' | 'default' | 'large'
   className?: string
   descriptionClassName?: string
   actionFullWidth?: boolean
@@ -25,29 +25,54 @@ export default function EmptyState({
   actionFullWidth = false
 }: EmptyStateProps) {
   const isCompact = size === 'compact'
+  const isLarge = size === 'large'
 
   return (
     <div
       className={cn(
         'flex flex-col items-center justify-center gap-3 text-center',
-        isCompact ? 'py-6' : 'min-h-64 gap-6 py-12',
+        isCompact && 'py-6',
+        !isCompact && !isLarge && 'min-h-64 gap-6 py-12',
+        isLarge && 'min-h-96 gap-8 py-16',
         className
       )}
     >
       <div
         className={cn(
           'bg-muted flex items-center justify-center rounded-full',
-          isCompact ? 'h-10 w-10' : 'h-16 w-16'
+          isCompact && 'h-10 w-10',
+          !isCompact && !isLarge && 'h-16 w-16',
+          isLarge && 'h-24 w-24'
         )}
       >
-        <div className={cn('text-muted-foreground', isCompact ? 'h-5 w-5' : 'h-8 w-8')}>{icon}</div>
+        <div
+          className={cn(
+            'text-muted-foreground flex items-center justify-center',
+            isCompact && '[&_svg]:h-5 [&_svg]:w-5',
+            !isCompact && !isLarge && '[&_svg]:h-8 [&_svg]:w-8',
+            isLarge && '[&_svg]:h-12 [&_svg]:w-12'
+          )}
+        >
+          {icon}
+        </div>
       </div>
       <div className="flex flex-col items-center gap-1 text-center">
-        <h3 className={cn('font-semibold', isCompact ? 'text-sm' : 'text-lg')}>{title}</h3>
+        <h3
+          className={cn(
+            'font-semibold',
+            isCompact && 'text-sm',
+            !isCompact && !isLarge && 'text-lg',
+            isLarge && 'text-2xl'
+          )}
+        >
+          {title}
+        </h3>
         <p
           className={cn(
-            'text-muted-foreground whitespace-pre-line max-w-xs',
-            isCompact ? 'text-xs' : 'text-sm',
+            'text-muted-foreground whitespace-pre-line',
+            isCompact && 'text-xs max-w-xs',
+            !isCompact && !isLarge && 'text-sm max-w-xs',
+            isLarge && 'text-base max-w-md',
             descriptionClassName
           )}
         >

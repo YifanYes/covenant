@@ -979,7 +979,15 @@
     "invalid_email": "Invalid email",
     "invalid_password_length": "Password must have at least 8 characters",
     "password_mismatch": "Passwords do not match",
-    "required_field": "Required field"
+    "required_field": "Required field",
+    "task_status": {
+      "label_reserved": "TODO, DOING and DONE are reserved status names.",
+      "label_collision": "A status with this name already exists.",
+      "protected_locked": "TODO, DOING and DONE statuses cannot be renamed.",
+      "cannot_delete_protected": "TODO, DOING and DONE statuses cannot be deleted.",
+      "min_one_required": "At least one status must remain.",
+      "protected_required": "TODO, DOING and DONE statuses are required."
+    }
   },
   "not_found_page": {
     "title": "404 - Page Not Found",
@@ -1872,6 +1880,25 @@
     "DONE": "Done",
     "TODO": "To Do"
   },
+  "task_status_settings": {
+    "title": "Task statuses",
+    "description": "Customize how you label your task workflow.",
+    "add": "Add status",
+    "add_title": "Create task status",
+    "label_placeholder": "Status name",
+    "color_label": "Color",
+    "color_placeholder": "Choose a color",
+    "delete_aria": "Delete status",
+    "protected_locked": "Reserved statuses (TODO, DOING, DONE) cannot be renamed or deleted.",
+    "protected_required": "TODO, DOING and DONE statuses are required.",
+    "delete_confirm_title": "Delete status?",
+    "delete_confirm_description": "Tasks currently in \"{{label}}\" will be moved to \"{{defaultLabel}}\".",
+    "create_success": "Status created",
+    "create_error": "Failed to create status",
+    "update_error": "Failed to update status",
+    "delete_success": "Status \"{{label}}\" deleted",
+    "delete_error": "Failed to delete status"
+  },
   "tavern": {
     "title": "The Tavern",
     "subtitle": "A live, worldwide chatroom where every player can share news, ask questions, and trade rumors.",
@@ -1934,6 +1961,14 @@
       "table": {
         "title": "No tasks found",
         "description": "Your task ledger is suspiciously empty.\nTime to fill it with deeds worth singing about."
+      },
+      "list": {
+        "title": "No tasks yet",
+        "description": "Your quest log awaits its first entry.\nAdd a task and start your campaign."
+      },
+      "kanban": {
+        "title": "Board's empty",
+        "description": "No quests on the board, no battles to fight.\nDrop in your first task and bring this board to life."
       },
       "calendar": "Start by creating a new task. Link it to an objective or area to give it purpose.",
       "matrix": {
@@ -2034,7 +2069,8 @@
       "at_least_one_visible": "At least one tab must remain visible",
       "saved": "Tasks settings saved",
       "save_error": "Failed to save tasks settings",
-      "save": "Save"
+      "save": "Save",
+      "unsaved_changes": "Unsaved changes"
     }
   },
   "update": "Update",
@@ -2119,7 +2155,7 @@
     },
     "tier": {
       "title": "Tier Up",
-      "body": "Defeat enemies to climb your class tier. Higher tiers unlock new gear and abilities."
+      "body": "Defeat enemies to climb your class tier. Higher tiers unlock new gear in the shop and new abilities."
     },
     "gear": {
       "title": "Equip Gear",

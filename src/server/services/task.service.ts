@@ -2,19 +2,21 @@ import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constant
 import {
   TaskEffort,
   TaskImpact,
-  TaskStatus,
   type BulkUpdateTaskItem,
   type CreateTaskType,
   type GetTasksFilteredInput,
   type UpdateTaskType
 } from '@shared/schemas/tasks.schemas'
+import { TRPCError } from '@trpc/server'
 import type { TaskRepository } from '../repositories/task.repository'
+import type { UserTaskStatusRepository } from '../repositories/user-task-status.repository'
 import type { GuildService } from './guild.service'
 import type { ManaService } from './mana.service'
 
 export class TaskService {
   constructor(
     private taskRepository: TaskRepository,
+    private userTaskStatusRepository: UserTaskStatusRepository,
     private manaService: ManaService,
     private guildService?: GuildService
   ) {}
@@ -29,8 +31,8 @@ export class TaskService {
 
     const groupedTasks = tasks.reduce(
       (acc, task) => {
-        if (!acc[task.status]) acc[task.status] = []
-        acc[task.status].push(task)
+        if (!acc[task.statusId]) acc[task.statusId] = []
+        acc[task.statusId].push(task)
         return acc
       },
       {} as Record<string, typeof tasks>
@@ -40,13 +42,13 @@ export class TaskService {
   }
 
   async getFiltered(userId: string, input: GetTasksFilteredInput) {
-    const { search, status, effortImpact, dueDate, page, pageSize } = input
+    const { search, statusIds, effortImpact, dueDate, page, pageSize } = input
 
     const result = await this.taskRepository.findFiltered(
       userId,
       {
         search,
-        status,
+        statusIds,
         effortImpact,
         dueDate: dueDate ? new Date(dueDate) : undefined
       },
@@ -74,10 +76,17 @@ export class TaskService {
     return { tasks }
   }
 
-  async update(userId: string, input: UpdateTaskType, completingStatus: TaskStatus) {
+  async update(userId: string, input: UpdateTaskType) {
     const existingTask = await this.taskRepository.findByIdOrThrow(input.id, userId)
+    const doneStatus = await this.userTaskStatusRepository.findDoneByUserId(userId)
+    if (!doneStatus) {
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DONE status missing for user' })
+    }
 
-    const isCompleting = input.status === completingStatus && existingTask.status !== completingStatus
+    const isCompleting =
+      input.statusId !== undefined &&
+      input.statusId === doneStatus.id &&
+      existingTask.statusId !== doneStatus.id
 
     const task = await this.taskRepository.update(input.id, input, isCompleting)
 
@@ -93,9 +102,14 @@ export class TaskService {
     return { task, manaEarned, reserveGained }
   }
 
-  async bulkUpdate(userId: string, tasks: BulkUpdateTaskItem[], completingStatus: TaskStatus) {
+  async bulkUpdate(userId: string, tasks: BulkUpdateTaskItem[]) {
     if (tasks.length === 0) {
       return { message: 'Tasks updated successfully', manaEarned: 0, reserveGained: 0 }
+    }
+
+    const doneStatus = await this.userTaskStatusRepository.findDoneByUserId(userId)
+    if (!doneStatus) {
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DONE status missing for user' })
     }
 
     const existing = await this.taskRepository.findManyByIds(
@@ -107,7 +121,7 @@ export class TaskService {
     const completing = tasks.flatMap((t) => {
       const prev = existingById.get(t.id)
       if (!prev) return []
-      if (t.status !== completingStatus || prev.status === completingStatus) return []
+      if (t.statusId !== doneStatus.id || prev.statusId === doneStatus.id) return []
       return [{ id: t.id, impact: prev.impact }]
     })
 
@@ -150,7 +164,7 @@ export class TaskService {
     const newTaskInput: CreateTaskType = {
       title: `${original.title}${titleSuffix || ' (copy)'}`,
       description: original.description || undefined,
-      status: original.status,
+      statusId: original.statusId,
       order: original.order,
       color: original.color || undefined,
       effort: (original.effort ?? undefined) as TaskEffort | undefined,

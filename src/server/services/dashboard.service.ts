@@ -1,11 +1,11 @@
 import type { Area, Habit, HabitCompletion, Objective, Task } from '@/generated/prisma'
-import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import type { DashboardData, IncompleteHabit, TrendPoint } from '@shared/types/dashboard.types'
 import dayjs from 'dayjs'
 import type { AreaRepository } from '../repositories/area.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { HabitRepository } from '../repositories/habit.repository'
 import type { DoneTaskWithObjectives, TaskRepository } from '../repositories/task.repository'
+import type { UserTaskStatusRepository } from '../repositories/user-task-status.repository'
 import type { CharacterService } from './character.service'
 
 export class DashboardService {
@@ -14,7 +14,8 @@ export class DashboardService {
     private taskRepository: TaskRepository,
     private habitRepository: HabitRepository,
     private areaRepository: AreaRepository,
-    private characterRepository: CharacterRepository
+    private characterRepository: CharacterRepository,
+    private userTaskStatusRepository: UserTaskStatusRepository
   ) {}
 
   private getMax(record: Record<string, number>) {
@@ -285,6 +286,11 @@ export class DashboardService {
     const todayStart = now.startOf('day').toDate()
     const comingTwoDays = now.startOf('day').add(2, 'day').toDate()
 
+    const userStatuses = await this.userTaskStatusRepository.findAll(userId)
+    const todoStatus = userStatuses.find((s) => s.label === 'TODO')
+    const doingStatus = userStatuses.find((s) => s.label === 'DOING')
+    const nonDoneStatusIds = userStatuses.filter((s) => s.label !== 'DONE').map((s) => s.id)
+
     const [
       overdueCount,
       doingCount,
@@ -298,9 +304,13 @@ export class DashboardService {
       allAreas,
       character
     ] = await Promise.all([
-      this.taskRepository.countByStatus(userId, [TaskStatus.TODO, TaskStatus.DOING], today),
-      this.taskRepository.countByStatus(userId, TaskStatus.DOING, today, 'gte', true),
-      this.taskRepository.countByStatus(userId, TaskStatus.TODO, today, 'gte', true),
+      this.taskRepository.countByStatusIds(userId, nonDoneStatusIds, today),
+      doingStatus
+        ? this.taskRepository.countByStatusIds(userId, doingStatus.id, today, 'gte', true)
+        : Promise.resolve(0),
+      todoStatus
+        ? this.taskRepository.countByStatusIds(userId, todoStatus.id, today, 'gte', true)
+        : Promise.resolve(0),
       this.taskRepository.findUpcoming(userId, 10, todayStart, comingTwoDays),
       this.taskRepository.countUpcoming(userId, todayStart, comingTwoDays),
       this.habitRepository.findCompletionsByDate(userId, lastWeek),

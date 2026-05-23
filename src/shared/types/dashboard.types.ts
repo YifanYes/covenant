@@ -53,7 +53,7 @@ export interface UpdatedTask {
   id: string
   title: string
   description: string | null
-  status: string
+  statusId: string
   color: string | null
   effort: string | null
   impact: string | null

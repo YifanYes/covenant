@@ -5,7 +5,6 @@ import {
   getByDateInputSchema,
   getTasksFilteredSchema,
   taskIdSchema,
-  TaskStatus,
   updateTaskSchema
 } from '@shared/schemas/tasks.schemas'
 import { protectedProcedure, rateLimit, RATE_LIMITS, t } from '../trpc'
@@ -30,11 +29,11 @@ export const tasksRouter = t.router({
   }),
 
   update: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(updateTaskSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.task.update(ctx.user.id, input, TaskStatus.DONE)
+    return ctx.services.task.update(ctx.user.id, input)
   }),
 
   bulkUpdate: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(bulkUpdateTasksSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.task.bulkUpdate(ctx.user.id, input.tasks, TaskStatus.DONE)
+    return ctx.services.task.bulkUpdate(ctx.user.id, input.tasks)
   }),
 
   delete: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).input(taskIdSchema).mutation(async ({ ctx, input }) => {

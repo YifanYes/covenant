@@ -3,6 +3,7 @@ import { CharacterClassName, CLASS_INITIAL_STATS } from '@/shared/constants/clas
 import { Faction } from '@/shared/constants/factions.constants'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
+import { defaultUserTaskStatuses } from '@shared/schemas/user-task-statuses.schemas'
 import type { CharacterDataType, InventoryItemType } from '@shared/schemas/inventory.schemas'
 import type { CharacterClassType, CharacterWithClasses } from '@shared/types/character.types'
 import { TRPCError } from '@trpc/server'
@@ -150,6 +151,44 @@ export class CharacterRepository {
     })
   }
 
+  async createWithDefaults(userId: string, input: CreateCharacterType): Promise<Character> {
+    return this.prisma.$transaction(async (tx) => {
+      const character = await tx.character.create({
+        data: {
+          userId,
+          name: input.name,
+          factionName: Faction.HOLY_KNIGHTS,
+          currentClass: input.className,
+          magicNature: input.magicNature,
+          data: {},
+          gold: 0,
+          manaReserve: 0,
+          inventory: [],
+          loadout: [],
+          classes: {
+            create: {
+              className: input.className,
+              ...CLASS_INITIAL_STATS[input.className as CharacterClassName]
+            }
+          }
+        },
+        include: { classes: true }
+      })
+
+      await tx.area.createMany({
+        data: defaultAreas.map((area) => ({ ...area, userId })),
+        skipDuplicates: true
+      })
+
+      await tx.userTaskStatus.createMany({
+        data: defaultUserTaskStatuses.map((status) => ({ ...status, userId })),
+        skipDuplicates: true
+      })
+
+      return character
+    })
+  }
+
   async updateManaReserve(characterId: string, manaReserve: number): Promise<void> {
     await this.prisma.character.update({
       where: { id: characterId },
@@ -160,6 +199,13 @@ export class CharacterRepository {
   async createAreas(userId: string): Promise<void> {
     await this.prisma.area.createMany({
       data: defaultAreas.map((area) => ({ ...area, userId })),
+      skipDuplicates: true
+    })
+  }
+
+  async createTaskStatuses(userId: string): Promise<void> {
+    await this.prisma.userTaskStatus.createMany({
+      data: defaultUserTaskStatuses.map((status) => ({ ...status, userId })),
       skipDuplicates: true
     })
   }

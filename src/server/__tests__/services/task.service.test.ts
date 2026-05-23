@@ -3,20 +3,25 @@ import { MANA_REWARDS } from '@/shared/constants/rewards.constants'
 import {
   TaskEffort,
   TaskImpact,
-  TaskStatus,
   type CreateTaskType,
   type UpdateTaskType
 } from '@shared/schemas/tasks.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { TaskRepository } from '../../repositories/task.repository'
+import type { UserTaskStatusRepository } from '../../repositories/user-task-status.repository'
 import type { GuildService } from '../../services/guild.service'
 import type { ManaService } from '../../services/mana.service'
 import { TaskService } from '../../services/task.service'
 import { createRepoMock } from '../helpers/mock-repo'
 
+const TODO_ID = 'status-todo'
+const DOING_ID = 'status-doing'
+const DONE_ID = 'status-done'
+
 describe('TaskService', () => {
   let taskService: TaskService
   let mockTaskRepo: ReturnType<typeof createRepoMock<TaskRepository>>
+  let mockStatusRepo: ReturnType<typeof createRepoMock<UserTaskStatusRepository>>
   let mockManaService: ReturnType<typeof createRepoMock<ManaService>>
   let mockGuildService: ReturnType<typeof createRepoMock<GuildService>>
 
@@ -25,6 +30,17 @@ describe('TaskService', () => {
 
     mockTaskRepo = createRepoMock<TaskRepository>()
     mockTaskRepo.bulkUpdate.mockResolvedValue(undefined)
+
+    mockStatusRepo = createRepoMock<UserTaskStatusRepository>()
+    mockStatusRepo.findDoneByUserId.mockResolvedValue({
+      id: DONE_ID,
+      userId: 'user-1',
+      label: 'DONE',
+      color: 'green',
+      isDefault: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    })
 
     mockManaService = createRepoMock<ManaService>()
     mockManaService.addManaFromCompletion.mockResolvedValue({
@@ -47,7 +63,7 @@ describe('TaskService', () => {
     mockGuildService = createRepoMock<GuildService>()
     mockGuildService.recordCampaignEvent.mockResolvedValue(undefined)
 
-    taskService = new TaskService(mockTaskRepo, mockManaService, mockGuildService)
+    taskService = new TaskService(mockTaskRepo, mockStatusRepo, mockManaService, mockGuildService)
   })
 
   describe('create', () => {
@@ -67,12 +83,12 @@ describe('TaskService', () => {
       const userId = 'user-1'
       const taskId = 'task-1'
       mockTaskRepo.findByIdOrThrow.mockResolvedValue({
-        status: TaskStatus.TODO,
+        statusId: TODO_ID,
         impact: TaskEffort.HIGH,
         title: 'Task'
       })
 
-      const updateInput = { id: taskId, status: TaskStatus.DONE, title: 'Task' }
+      const updateInput = { id: taskId, statusId: DONE_ID, title: 'Task' }
       mockTaskRepo.update.mockResolvedValue({ ...updateInput, impact: TaskEffort.HIGH })
 
       mockManaService.addManaFromCompletion.mockResolvedValue({
@@ -84,7 +100,7 @@ describe('TaskService', () => {
         newReserve: 0
       })
 
-      const result = await taskService.update(userId, updateInput as unknown as UpdateTaskType, TaskStatus.DONE)
+      const result = await taskService.update(userId, updateInput as unknown as UpdateTaskType)
 
       expect(result.manaEarned).toBe(MANA_REWARDS.TASK_HIGH_IMPACT)
       expect(mockManaService.addManaFromCompletion).toHaveBeenCalledWith(userId, 'task', { impact: TaskEffort.HIGH })
@@ -94,12 +110,12 @@ describe('TaskService', () => {
       const userId = 'user-1'
       const taskId = 'task-1'
 
-      mockTaskRepo.findByIdOrThrow.mockResolvedValue({ status: TaskStatus.TODO, title: 'Old Title' })
+      mockTaskRepo.findByIdOrThrow.mockResolvedValue({ statusId: TODO_ID, title: 'Old Title' })
 
-      const updateInput = { id: taskId, status: TaskStatus.TODO, title: 'New Title' }
+      const updateInput = { id: taskId, statusId: TODO_ID, title: 'New Title' }
       mockTaskRepo.update.mockResolvedValue(updateInput)
 
-      const result = await taskService.update(userId, updateInput as unknown as UpdateTaskType, TaskStatus.TODO)
+      const result = await taskService.update(userId, updateInput as unknown as UpdateTaskType)
 
       expect(result.manaEarned).toBe(0)
       expect(mockManaService.addManaFromCompletion).not.toHaveBeenCalled()
@@ -110,9 +126,9 @@ describe('TaskService', () => {
     it('should award mana and record campaign event for tasks transitioning to DONE', async () => {
       const userId = 'user-1'
       mockTaskRepo.findManyByIds.mockResolvedValue([
-        { id: 'task-1', status: TaskStatus.TODO, impact: TaskImpact.HIGH },
-        { id: 'task-2', status: TaskStatus.DOING, impact: TaskImpact.LOW },
-        { id: 'task-3', status: TaskStatus.DONE, impact: TaskImpact.HIGH }
+        { id: 'task-1', statusId: TODO_ID, impact: TaskImpact.HIGH },
+        { id: 'task-2', statusId: DOING_ID, impact: TaskImpact.LOW },
+        { id: 'task-3', statusId: DONE_ID, impact: TaskImpact.HIGH }
       ])
       mockManaService.addManaFromCompletions.mockResolvedValue({
         success: true,
@@ -124,12 +140,12 @@ describe('TaskService', () => {
       })
 
       const input = [
-        { id: 'task-1', status: TaskStatus.DONE, order: 0 },
-        { id: 'task-2', status: TaskStatus.DONE, order: 1 },
-        { id: 'task-3', status: TaskStatus.DONE, order: 2 }
+        { id: 'task-1', statusId: DONE_ID, order: 0 },
+        { id: 'task-2', statusId: DONE_ID, order: 1 },
+        { id: 'task-3', statusId: DONE_ID, order: 2 }
       ]
 
-      const result = await taskService.bulkUpdate(userId, input, TaskStatus.DONE)
+      const result = await taskService.bulkUpdate(userId, input)
 
       expect(mockTaskRepo.bulkUpdate).toHaveBeenCalledWith(userId, input, ['task-1', 'task-2'], expect.any(Date))
       expect(mockManaService.addManaFromCompletions).toHaveBeenCalledWith(userId, 'task', [
@@ -145,16 +161,16 @@ describe('TaskService', () => {
     it('should NOT award rewards for reorder-only or already-DONE moves', async () => {
       const userId = 'user-1'
       mockTaskRepo.findManyByIds.mockResolvedValue([
-        { id: 'task-1', status: TaskStatus.TODO, impact: TaskImpact.HIGH },
-        { id: 'task-2', status: TaskStatus.DONE, impact: TaskImpact.LOW }
+        { id: 'task-1', statusId: TODO_ID, impact: TaskImpact.HIGH },
+        { id: 'task-2', statusId: DONE_ID, impact: TaskImpact.LOW }
       ])
 
       const input = [
-        { id: 'task-1', status: TaskStatus.DOING, order: 0 },
-        { id: 'task-2', status: TaskStatus.DONE, order: 1 }
+        { id: 'task-1', statusId: DOING_ID, order: 0 },
+        { id: 'task-2', statusId: DONE_ID, order: 1 }
       ]
 
-      const result = await taskService.bulkUpdate(userId, input, TaskStatus.DONE)
+      const result = await taskService.bulkUpdate(userId, input)
 
       expect(mockTaskRepo.bulkUpdate).toHaveBeenCalledWith(userId, input, [], expect.any(Date))
       expect(mockManaService.addManaFromCompletions).not.toHaveBeenCalled()
@@ -164,7 +180,7 @@ describe('TaskService', () => {
     })
 
     it('should be a no-op when given an empty task list', async () => {
-      const result = await taskService.bulkUpdate('user-1', [], TaskStatus.DONE)
+      const result = await taskService.bulkUpdate('user-1', [])
       expect(mockTaskRepo.findManyByIds).not.toHaveBeenCalled()
       expect(mockTaskRepo.bulkUpdate).not.toHaveBeenCalled()
       expect(result.manaEarned).toBe(0)

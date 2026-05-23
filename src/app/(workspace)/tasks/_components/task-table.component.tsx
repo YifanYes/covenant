@@ -14,17 +14,14 @@ import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import EmptyState from '@/components/empty-state.component'
 import TaskTypeBadge from '@/components/tasks/task-type-badge.component'
 import { ChevronLeft, ChevronRight, Cancel as Close, Bulletlist, Plus } from 'pixelarticons/react'
-import { TaskEffort, TaskImpact, TaskStatus } from '@shared/schemas/tasks.schemas'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { TaskEffort, TaskImpact } from '@shared/schemas/tasks.schemas'
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 const PAGE_SIZE = 20
-
-// Static options extracted outside component to avoid recreation
-const STATUS_OPTIONS = Object.values(TaskStatus)
 
 const EFFORT_IMPACT_FILTER_ITEMS = [
   { id: `${TaskImpact.HIGH}|${TaskEffort.LOW}`, labelKey: 'tasks.task_types.quick_win' },
@@ -33,22 +30,27 @@ const EFFORT_IMPACT_FILTER_ITEMS = [
   { id: `${TaskImpact.LOW}|${TaskEffort.HIGH}`, labelKey: 'tasks.task_types.thankless_task' }
 ] as const
 
-// Memoized row component to prevent unnecessary re-renders
+interface StatusOption {
+  id: string
+  label: string
+}
+
 interface TaskRowProps {
   task: {
     id: string
     title: string
     effort: string | null
     impact: string | null
-    status: string
+    statusId: string
     dueDate: string | Date | null
   }
+  statusOptions: StatusOption[]
   onSelect: () => void
-  onStatusChange: (taskId: string, newStatus: string) => void
+  onStatusChange: (taskId: string, newStatusId: string) => void
   isUpdating: boolean
 }
 
-const TaskRow = memo(function TaskRow({ task, onSelect, onStatusChange, isUpdating }: TaskRowProps) {
+const TaskRow = memo(function TaskRow({ task, statusOptions, onSelect, onStatusChange, isUpdating }: TaskRowProps) {
   const { t } = useTranslation()
   const { formatDate } = useDateFormat()
 
@@ -59,14 +61,18 @@ const TaskRow = memo(function TaskRow({ task, onSelect, onStatusChange, isUpdati
         <TaskTypeBadge effort={task.effort} impact={task.impact} />
       </TableCell>
       <TableCell className="py-2" onClick={(e) => e.stopPropagation()}>
-        <Select value={task.status} disabled={isUpdating} onValueChange={(value) => onStatusChange(task.id, value)}>
+        <Select
+          value={task.statusId}
+          disabled={isUpdating}
+          onValueChange={(value) => onStatusChange(task.id, value)}
+        >
           <SelectTrigger className="w-32.5">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {STATUS_OPTIONS.map((status) => (
-              <SelectItem key={status} value={status}>
-                {t(`task_status.${status}`)}
+            {statusOptions.map((status) => (
+              <SelectItem key={status.id} value={status.id}>
+                {t(`task_status.${status.label}` as Parameters<typeof t>[0], { defaultValue: status.label })}
               </SelectItem>
             ))}
           </SelectContent>
@@ -82,15 +88,31 @@ const TaskRow = memo(function TaskRow({ task, onSelect, onStatusChange, isUpdati
 export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
   const { t } = useTranslation()
   const { setSelectedTask } = useTasksStore()
+  const { data: statusesData } = useSuspenseQuery(trpcOptions.userTaskStatus.getAll.queryOptions())
+  const statuses = statusesData.statuses
+
+  const defaultStatusFilter = useMemo(
+    () => statuses.filter((s) => s.label !== 'DONE').map((s) => s.id),
+    [statuses]
+  )
+
   const form = useForm({
     defaultValues: {
       searchQuery: '',
-      statusFilter: [TaskStatus.TODO, TaskStatus.DOING] as (TaskStatus | 'all')[],
+      statusFilter: ['all'] as string[],
       effortImpactFilter: ['all'],
       dateFilter: null as Date | null,
       page: 1
     }
   })
+
+  useEffect(() => {
+    if (defaultStatusFilter.length > 0 && form.getValues('statusFilter').includes('all')) {
+      form.setValue('statusFilter', defaultStatusFilter)
+    }
+    // intentionally run once on mount with available statuses
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultStatusFilter.length])
 
   const {
     searchQuery = '',
@@ -102,10 +124,8 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
     control: form.control
   })
 
-  // Debounce search query to avoid excessive API calls
   const debouncedSearch = useDebouncedValue(searchQuery, 300)
 
-  // Track previous filter values to reset page when they change
   const prevFiltersRef = useRef({
     statusFilter: JSON.stringify(statusFilter),
     effortImpactFilter: JSON.stringify(effortImpactFilter),
@@ -113,7 +133,6 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
     debouncedSearch
   })
 
-  // Reset page to 1 when any filter changes (not page itself)
   useEffect(() => {
     const currentFilters = {
       statusFilter: JSON.stringify(statusFilter),
@@ -136,11 +155,10 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
     }
   }, [statusFilter, effortImpactFilter, dateFilter, debouncedSearch, page, form])
 
-  // Memoized query parameters for server-side filtering
   const queryParams = useMemo(
     () => ({
       search: debouncedSearch || undefined,
-      status: statusFilter.includes('all') ? undefined : (statusFilter as TaskStatus[]),
+      statusIds: statusFilter.includes('all') ? undefined : statusFilter,
       effortImpact: effortImpactFilter.includes('all') ? undefined : effortImpactFilter,
       dueDate: dateFilter ? dateFilter.toISOString() : undefined,
       page,
@@ -168,11 +186,13 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
   const totalCount = data?.totalCount ?? 0
 
   const handleStatusChange = useCallback(
-    (taskId: string, newStatus: string) => {
+    (taskId: string, newStatusId: string) => {
+      const task = tasks.find((t) => t.id === taskId)
+      if (!task) return
       updateTaskMutation.mutate({
         id: taskId,
-        title: tasks.find((t) => t.id === taskId)?.title || '',
-        status: newStatus
+        title: task.title,
+        statusId: newStatusId
       })
     },
     [tasks, updateTaskMutation]
@@ -191,16 +211,24 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
   const hasActiveFilters =
     searchQuery !== '' || !statusFilter.includes('all') || !effortImpactFilter.includes('all') || dateFilter !== null
 
-  // Memoized filter items with translations
   const statusFilterItems = useMemo(
     () => [
       { id: 'all', label: t('tasks.filters.all_statuses') },
-      ...STATUS_OPTIONS.map((status) => ({
-        id: status,
-        label: t(`task_status.${status}`)
+      ...statuses.map((status) => ({
+        id: status.id,
+        label: t(`task_status.${status.label}` as Parameters<typeof t>[0], { defaultValue: status.label })
       }))
     ],
-    [t]
+    [t, statuses]
+  )
+
+  const statusOptions = useMemo(
+    () =>
+      statuses.map((status) => ({
+        id: status.id,
+        label: status.label
+      })),
+    [statuses]
   )
 
   const effortImpactFilterItems = useMemo(
@@ -308,6 +336,7 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
                   <TaskRow
                     key={task.id}
                     task={task}
+                    statusOptions={statusOptions}
                     onSelect={() => setSelectedTask(task)}
                     onStatusChange={handleStatusChange}
                     isUpdating={updateTaskMutation.isPending}
@@ -319,7 +348,6 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
         </div>
       </div>
 
-      {/* Pagination controls */}
       {totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between">
           <p className="text-muted-foreground text-sm">

@@ -1,13 +1,23 @@
-import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import dayjs from 'dayjs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AreaRepository } from '../../repositories/area.repository'
 import type { CharacterRepository } from '../../repositories/character.repository'
 import type { HabitRepository } from '../../repositories/habit.repository'
 import type { TaskRepository } from '../../repositories/task.repository'
+import type { UserTaskStatusRepository } from '../../repositories/user-task-status.repository'
 import type { CharacterService } from '../../services/character.service'
 import { DashboardService } from '../../services/dashboard.service'
 import { createRepoMock } from '../helpers/mock-repo'
+
+const TODO_ID = 'status-todo'
+const DOING_ID = 'status-doing'
+const DONE_ID = 'status-done'
+
+const seededStatuses = [
+  { id: TODO_ID, userId: 'user-1', label: 'TODO', color: 'gray', isDefault: true, createdAt: new Date(), updatedAt: new Date() },
+  { id: DOING_ID, userId: 'user-1', label: 'DOING', color: 'blue', isDefault: false, createdAt: new Date(), updatedAt: new Date() },
+  { id: DONE_ID, userId: 'user-1', label: 'DONE', color: 'green', isDefault: false, createdAt: new Date(), updatedAt: new Date() }
+]
 
 const FAKE_NOW = new Date('2026-05-15T12:00:00Z')
 
@@ -38,7 +48,7 @@ const buildDoneTask = (overrides: {
   id: 'task-1',
   title: 'Task title',
   description: null,
-  status: TaskStatus.DONE,
+  statusId: DONE_ID,
   order: 0,
   dueDate: null,
   userId: 'user-1',
@@ -57,6 +67,7 @@ describe('DashboardService', () => {
   let mockHabitRepo: ReturnType<typeof createRepoMock<HabitRepository>>
   let mockAreaRepo: ReturnType<typeof createRepoMock<AreaRepository>>
   let mockCharacterRepo: ReturnType<typeof createRepoMock<CharacterRepository>>
+  let mockStatusRepo: ReturnType<typeof createRepoMock<UserTaskStatusRepository>>
   let mockCharacterService: ReturnType<typeof createRepoMock<CharacterService>>
   let dashboardService: DashboardService
 
@@ -68,9 +79,10 @@ describe('DashboardService', () => {
     mockHabitRepo = createRepoMock<HabitRepository>()
     mockAreaRepo = createRepoMock<AreaRepository>()
     mockCharacterRepo = createRepoMock<CharacterRepository>()
+    mockStatusRepo = createRepoMock<UserTaskStatusRepository>()
     mockCharacterService = createRepoMock<CharacterService>()
 
-    mockTaskRepo.countByStatus.mockResolvedValue(0)
+    mockTaskRepo.countByStatusIds.mockResolvedValue(0)
     mockTaskRepo.countUpcoming.mockResolvedValue(0)
     mockTaskRepo.findUpcoming.mockResolvedValue([])
     mockTaskRepo.findCompletedWithObjectives.mockResolvedValue([])
@@ -79,13 +91,15 @@ describe('DashboardService', () => {
     mockHabitRepo.findAllWithLastCompletion.mockResolvedValue([])
     mockAreaRepo.findWithHierarchy.mockResolvedValue([])
     mockCharacterRepo.findWithClasses.mockResolvedValue(null)
+    mockStatusRepo.findAll.mockResolvedValue(seededStatuses)
 
     dashboardService = new DashboardService(
       mockCharacterService as unknown as CharacterService,
       mockTaskRepo as unknown as TaskRepository,
       mockHabitRepo as unknown as HabitRepository,
       mockAreaRepo as unknown as AreaRepository,
-      mockCharacterRepo as unknown as CharacterRepository
+      mockCharacterRepo as unknown as CharacterRepository,
+      mockStatusRepo as unknown as UserTaskStatusRepository
     )
   })
 
@@ -97,7 +111,7 @@ describe('DashboardService', () => {
     it('returns expected DashboardData for representative input', async () => {
       const today = new Date('2026-05-15T10:00:00Z')
 
-      mockTaskRepo.countByStatus
+      mockTaskRepo.countByStatusIds
         .mockResolvedValueOnce(1) // OVERDUE
         .mockResolvedValueOnce(2) // DOING
         .mockResolvedValueOnce(3) // TODO
@@ -107,7 +121,7 @@ describe('DashboardService', () => {
           id: 'up-1',
           title: 'Upcoming',
           description: null,
-          status: TaskStatus.TODO,
+          statusId: TODO_ID,
           order: 0,
           dueDate: today,
           userId: 'user-1',

@@ -30,7 +30,7 @@ export default function SingleSelect({
     <FormField label={label} required={required} errorMessage={errorMessage} htmlFor={fieldId}>
       <Select onValueChange={onChange} value={value}>
         <SelectTrigger
-          className="hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 dark:hover:text-foreground w-full transition-all duration-200"
+          className="hover:bg-accent hover:text-accent-foreground dark:hover:bg-input/50 dark:hover:text-foreground w-full"
           id={fieldId}
           aria-invalid={!!errorMessage}
         >

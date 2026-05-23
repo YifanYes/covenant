@@ -20,7 +20,6 @@ import Textarea from '@/ui/textarea.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { updateObjectiveSchema, type UpdateObjectiveBodyType } from '@shared/schemas/objectives.schemas'
-import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -39,6 +38,9 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
   const { data: tasksData } = useSuspenseQuery(trpcOptions.tasks.getAll.queryOptions())
   const { data: habitsData } = useSuspenseQuery(trpcOptions.habits.getAll.queryOptions())
+  const { data: statusesData } = useSuspenseQuery(trpcOptions.userTaskStatus.getAll.queryOptions())
+  const doneStatusId = statusesData.statuses.find((s) => s.label === 'DONE')?.id ?? null
+  const incompleteStatusIds = statusesData.statuses.filter((s) => s.label !== 'DONE').map((s) => s.id)
 
   const updateMutation = useMutation(
     trpcOptions.objectives.update.mutationOptions({
@@ -102,12 +104,9 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
 
   const taskItems = useMemo(() => {
     const grouped = (tasksData?.tasks ?? {}) as Record<string, { id: string; title: string }[]>
-    const incomplete = [
-      ...(grouped[TaskStatus.TODO] ?? []),
-      ...(grouped[TaskStatus.DOING] ?? [])
-    ]
+    const incomplete = incompleteStatusIds.flatMap((id) => grouped[id] ?? [])
     const linked = objective.tasks ?? []
-    const linkedDone = linked.filter((task) => task.status === TaskStatus.DONE)
+    const linkedDone = linked.filter((task) => task.status?.label === 'DONE')
     const merged = [...incomplete, ...linkedDone]
     const seen = new Set<string>()
     return merged
@@ -117,7 +116,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
         return true
       })
       .map((task) => ({ id: task.id, label: task.title }))
-  }, [tasksData, objective.tasks])
+  }, [tasksData, objective.tasks, incompleteStatusIds])
 
   const habitItems = useMemo(() => {
     return (habitsData?.habits ?? []).map((habit) => ({ id: habit.id, label: habit.name }))
@@ -125,14 +124,14 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
 
   const { totalTasks, doneTasks, pendingTasks, totalHabits } = useMemo(() => {
     const tasks = objective.tasks ?? []
-    const done = tasks.filter((t) => t.status === TaskStatus.DONE).length
+    const done = tasks.filter((t) => t.status?.label === 'DONE' || t.statusId === doneStatusId).length
     return {
       totalTasks: tasks.length,
       doneTasks: done,
       pendingTasks: tasks.length - done,
       totalHabits: objective.habits?.length ?? 0
     }
-  }, [objective.tasks, objective.habits])
+  }, [objective.tasks, objective.habits, doneStatusId])
 
   const hasAnyLinks = totalTasks > 0 || totalHabits > 0
   const hasActiveLinks = pendingTasks > 0 || totalHabits > 0

@@ -17,7 +17,6 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import {
   TaskEffort,
   TaskImpact,
-  TaskStatus,
   updateTaskSchema,
   type UpdateTaskType
 } from '@shared/schemas/tasks.schemas'
@@ -35,6 +34,7 @@ export default function UpdateTaskDialog() {
   const { selectedTask, setSelectedTask } = useTasksStore()
   const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
+  const { data: statusesData } = useSuspenseQuery(trpcOptions.userTaskStatus.getAll.queryOptions())
 
   const monthIndexParams = { monthIndex: monthIndex.toString(), year: dayjs().year().toString() }
 
@@ -97,7 +97,12 @@ export default function UpdateTaskDialog() {
   useEffect(() => {
     if (selectedTask) {
       reset({
-        ...selectedTask,
+        id: selectedTask.id,
+        title: selectedTask.title,
+        description: selectedTask.description ?? undefined,
+        statusId: selectedTask.statusId,
+        color: selectedTask.color ?? undefined,
+        order: selectedTask.order,
         objectives: map(selectedTask?.objectives, (objective) => objective.id),
         areas: map(selectedTask?.areas, (area) => area.id),
         dueDate: !isNil(selectedTask?.dueDate) ? new Date(selectedTask.dueDate) : undefined,
@@ -158,13 +163,16 @@ export default function UpdateTaskDialog() {
         </div>
         <div className="grid gap-3">
           <Controller
-            name="status"
+            name="statusId"
             control={control}
             render={({ field }) => (
               <SingleSelect
-                value={field.value}
+                value={field.value ?? undefined}
                 placeholder={t('update_task_dialog.status_placeholder')}
-                options={map(TaskStatus, (status) => ({ value: status, label: t(`task_status.${status}`) }))}
+                options={statusesData.statuses.map((status) => ({
+                  value: status.id,
+                  label: t(`task_status.${status.label}` as Parameters<typeof t>[0], { defaultValue: status.label })
+                }))}
                 onChange={field.onChange}
               />
             )}

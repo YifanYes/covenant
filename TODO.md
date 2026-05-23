@@ -49,10 +49,6 @@
 
 ## Medium Priority
 
-- [ ] User-defined task statuses.
-  - Tasks currently use fixed statuses (TODO/IN_PROGRESS/DONE or equivalent). Allow users to create, rename, reorder, and delete custom statuses per workspace or globally. Enables personal workflows (e.g. "Waiting", "Blocked", "In Review") without forcing the default three-state model.
-  - Schema: new `TaskStatus` entity (id, userId, label, color, position, isDefault); migrate existing `Task.status` enum column to FK. Guard: at least one status must remain; deletion re-assigns tasks to a chosen fallback.
-
 - [ ] Accessibility in combat.
   - Combat grid sprites are styled `div`s with no `role="img"`, `aria-label`, or alt text. No keyboard navigation for tactical grid. ~30 aria attributes across 78 components (~38% coverage).
 

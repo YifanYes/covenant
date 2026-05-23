@@ -16,11 +16,13 @@ const reIndex = (arr: TaskType[]) => arr.map((t, i) => ({ ...t, order: i }))
 
 export default function TaskList({
   id,
+  label,
   group,
   mutation,
   variant = 'list'
 }: {
   id: string
+  label: string
   group: string
   mutation: ReorderTasksMutation
   variant?: 'list' | 'kanban'
@@ -50,7 +52,7 @@ export default function TaskList({
       const sourceVals = sourceParent.data.getValues(sourceParent.el) as TaskType[]
       const targetVals = targetParent.data.getValues(targetParent.el) as TaskType[]
       const draggedIds = new Set(draggedNodes.map((n) => (n.data.value as TaskType).id))
-      const targetWithStatus = targetVals.map((t) => (draggedIds.has(t.id) ? { ...t, status: targetId } : t))
+      const targetWithStatus = targetVals.map((t) => (draggedIds.has(t.id) ? { ...t, statusId: targetId } : t))
       const allTasks = useTasksStore.getState().tasks
       commit({
         ...allTasks,
@@ -64,13 +66,15 @@ export default function TaskList({
     setValues(tasks?.[id] ?? [])
   }, [tasks, id, setValues])
 
-  const lowerId = id.toLowerCase()
+  const lowerLabel = label.toLowerCase()
   const isKanban = variant === 'kanban'
 
   return (
     <section className={cn('w-full', isKanban ? 'flex h-full min-h-0 flex-col py-2' : 'py-4')}>
       <header className="mb-2 flex items-center justify-between">
-        <h2 className="text-md font-medium">{t(`task_status.${id}`).toUpperCase()}</h2>
+        <h2 className="text-md font-medium">
+          {t(`task_status.${label}` as Parameters<typeof t>[0], { defaultValue: label }).toUpperCase()}
+        </h2>
       </header>
       <div
         className={cn(
@@ -83,10 +87,10 @@ export default function TaskList({
             <EmptyState
               size="compact"
               icon={<Flag className="h-5 w-5" />}
-              title={t(`tasks.empty_state.${lowerId}.title` as Parameters<typeof t>[0], {
+              title={t(`tasks.empty_state.${lowerLabel}.title` as Parameters<typeof t>[0], {
                 defaultValue: t('tasks.empty_state.todo.title')
               })}
-              description={t(`tasks.empty_state.${lowerId}.description` as Parameters<typeof t>[0], {
+              description={t(`tasks.empty_state.${lowerLabel}.description` as Parameters<typeof t>[0], {
                 defaultValue: t('tasks.empty_state.todo.description')
               })}
             />

@@ -1,11 +1,5 @@
 import { z } from 'zod'
 
-export enum TaskStatus {
-  TODO = 'TODO',
-  DOING = 'DOING',
-  DONE = 'DONE'
-}
-
 export enum TaskEffort {
   HIGH = 'HIGH',
   LOW = 'LOW'
@@ -19,7 +13,7 @@ export enum TaskImpact {
 export const createTaskSchema = z.object({
   title: z.string().min(1, 'errors.required_field'),
   description: z.string().optional(),
-  status: z.string().min(1, 'errors.required_field'),
+  statusId: z.uuid(),
   color: z.string().optional(),
   effort: z.enum(TaskEffort).optional(),
   impact: z.enum(TaskImpact).optional(),
@@ -37,7 +31,7 @@ export const updateTaskSchema = z.object({
   id: z.uuid(),
   title: z.string().min(1, 'errors.required_field'),
   description: z.string().nullish(),
-  status: z.string().optional(),
+  statusId: z.uuid().optional(),
   color: z.string().nullish(),
   effort: z.enum(TaskEffort).nullish(),
   impact: z.enum(TaskImpact).nullish(),
@@ -64,7 +58,7 @@ export const bulkUpdateTasksSchema = z.object({
   tasks: z.array(
     z.object({
       id: z.uuid(),
-      status: z.string().min(1, 'errors.required_field'),
+      statusId: z.uuid(),
       order: z.number().int().min(0)
     })
   )
@@ -79,7 +73,7 @@ export const getByDateInputSchema = z.object({
 
 export const getTasksFilteredSchema = z.object({
   search: z.string().optional(),
-  status: z.array(z.enum(TaskStatus)).optional(),
+  statusIds: z.array(z.uuid()).optional(),
   effortImpact: z.array(z.string()).optional(),
   dueDate: z.string().optional(),
   page: z.number().int().min(1).default(1),

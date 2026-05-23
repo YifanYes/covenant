@@ -221,24 +221,41 @@ model Area {
   @@map("areas")
 }
 
+model UserTaskStatus {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String
+  label     String   @db.VarChar(50)
+  color     String?  @db.VarChar(50)
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+  tasks     Task[]
+
+  @@unique([userId, label])
+  @@index([userId])
+  @@map("user_task_statuses")
+}
+
 model Task {
-  id          String      @id @default(uuid()) @db.Uuid
-  title       String      @db.VarChar(255)
+  id          String         @id @default(uuid()) @db.Uuid
+  title       String         @db.VarChar(255)
   description String?
-  status      String      @db.VarChar(255)
-  order       Int         @default(0)
-  dueDate     DateTime?   @db.Timestamp(6)
+  statusId    String         @db.Uuid
+  order       Int            @default(0)
+  dueDate     DateTime?      @db.Timestamp(6)
   userId      String
-  createdAt   DateTime    @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime    @updatedAt @db.Timestamp(6)
-  color       String?     @db.VarChar(255)
-  effort      String?     @db.VarChar(50)
-  impact      String?     @db.VarChar(50)
-  completedAt DateTime?   @db.Timestamp(6)
-  objectives  Objective[] @relation("ObjectiveToTask")
-  areas       Area[]      @relation("AreaToTask")
+  createdAt   DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime       @updatedAt @db.Timestamp(6)
+  color       String?        @db.VarChar(255)
+  effort      String?        @db.VarChar(50)
+  impact      String?        @db.VarChar(50)
+  completedAt DateTime?      @db.Timestamp(6)
+  status      UserTaskStatus @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  objectives  Objective[]    @relation("ObjectiveToTask")
+  areas       Area[]         @relation("AreaToTask")
 
   @@index([userId])
+  @@index([statusId])
   @@map("tasks")
 }
 

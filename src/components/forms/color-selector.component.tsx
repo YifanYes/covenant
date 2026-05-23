@@ -12,7 +12,8 @@ export default function ColorSelector({
   onChange,
   label,
   required,
-  errorMessage
+  errorMessage,
+  placeholder
 }: {
   className?: string
   value?: string
@@ -20,9 +21,10 @@ export default function ColorSelector({
   label?: string
   required?: boolean
   errorMessage?: string
+  placeholder?: string
 }) {
   const { t } = useTranslation()
-  const placeholderText = t('colors.placeholder')
+  const placeholderText = placeholder ?? t('colors.placeholder')
   const { fieldId, effectivePlaceholder } = useFormField({
     placeholder: placeholderText,
     required,

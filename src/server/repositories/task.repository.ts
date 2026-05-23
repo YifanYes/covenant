@@ -1,6 +1,5 @@
 import { Prisma, type PrismaClient, type Task } from '@/generated/prisma'
 import type { BulkUpdateTaskItem, CreateTaskType, UpdateTaskType } from '@shared/schemas/tasks.schemas'
-import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
@@ -8,6 +7,7 @@ import { logger } from '../lib/logger'
 const log = logger.child({ component: 'task-repository' })
 
 const TASK_INCLUDE = {
+  status: true,
   objectives: {
     include: { areas: true }
   },
@@ -21,7 +21,7 @@ export class TaskRepository {
     return this.prisma.task.create({
       data: {
         title: input.title,
-        status: input.status,
+        statusId: input.statusId,
         order: input.order || 0,
         ...(input.description && { description: input.description }),
         ...(input.dueDate && { dueDate: input.dueDate }),
@@ -44,7 +44,7 @@ export class TaskRepository {
     return this.prisma.task.findMany({
       where: { userId },
       include: TASK_INCLUDE,
-      orderBy: [{ status: 'asc' }, { order: 'asc' }]
+      orderBy: [{ status: { createdAt: 'asc' } }, { order: 'asc' }]
     })
   }
 
@@ -52,25 +52,22 @@ export class TaskRepository {
     userId: string,
     filters: {
       search?: string
-      status?: string[]
-      effortImpact?: string[] // HIGH | LOW
+      statusIds?: string[]
+      effortImpact?: string[]
       dueDate?: Date
     },
     pagination: { page: number; pageSize: number }
   ): Promise<{ tasks: Task[]; totalCount: number }> {
     const where: Prisma.TaskWhereInput = { userId }
 
-    // Search filter (case-insensitive title match)
     if (filters.search) {
       where.title = { contains: filters.search, mode: 'insensitive' }
     }
 
-    // Status filter
-    if (filters.status?.length) {
-      where.status = { in: filters.status }
+    if (filters.statusIds?.length) {
+      where.statusId = { in: filters.statusIds }
     }
 
-    // Effort/Impact filter
     if (filters.effortImpact?.length) {
       where.OR = filters.effortImpact.map((combo) => {
         const [impact, effort] = combo.split('|')
@@ -78,7 +75,6 @@ export class TaskRepository {
       })
     }
 
-    // Due date filter (exact day match)
     if (filters.dueDate) {
       const startOfDay = new Date(filters.dueDate)
       startOfDay.setHours(0, 0, 0, 0)
@@ -91,7 +87,7 @@ export class TaskRepository {
       this.prisma.task.findMany({
         where,
         include: TASK_INCLUDE,
-        orderBy: [{ status: 'asc' }, { order: 'asc' }],
+        orderBy: [{ status: { createdAt: 'asc' } }, { order: 'asc' }],
         skip: (pagination.page - 1) * pagination.pageSize,
         take: pagination.pageSize
       }),
@@ -140,7 +136,7 @@ export class TaskRepository {
       where: { id: input.id },
       data: {
         ...(input.title && { title: input.title }),
-        ...(input.status !== undefined && { status: input.status }),
+        ...(input.statusId !== undefined && { statusId: input.statusId }),
         ...(input.description !== undefined && { description: input.description }),
         ...(input.dueDate !== undefined && { dueDate: input.dueDate }),
         ...(input.order !== undefined && { order: input.order }),
@@ -159,21 +155,21 @@ export class TaskRepository {
     })
   }
 
-  async updateStatusAndOrder(id: string, status: string, order: number): Promise<Task> {
+  async updateStatusAndOrder(id: string, statusId: string, order: number): Promise<Task> {
     return this.prisma.task.update({
       where: { id },
-      data: { status, order }
+      data: { statusId, order }
     })
   }
 
   async findManyByIds(
     ids: string[],
     userId: string
-  ): Promise<Array<Pick<Task, 'id' | 'status' | 'impact'>>> {
+  ): Promise<Array<Pick<Task, 'id' | 'statusId' | 'impact'>>> {
     if (ids.length === 0) return []
     return this.prisma.task.findMany({
       where: { id: { in: ids }, userId },
-      select: { id: true, status: true, impact: true }
+      select: { id: true, statusId: true, impact: true }
     })
   }
 
@@ -190,7 +186,7 @@ export class TaskRepository {
       for (const t of tasks) {
         const result = await tx.task.updateMany({
           where: { id: t.id, userId },
-          data: { status: t.status, order: t.order }
+          data: { statusId: t.statusId, order: t.order }
         })
         updated += result.count
       }
@@ -220,16 +216,16 @@ export class TaskRepository {
     })
   }
 
-  async countByStatus(
+  async countByStatusIds(
     userId: string,
-    status: TaskStatus | TaskStatus[],
+    statusIds: string | string[],
     dueDate?: Date,
     dueDateComparison: 'lt' | 'gte' = 'lt',
     includeNoDueDate = false
   ): Promise<number> {
-    const baseWhere = {
+    const baseWhere: Prisma.TaskWhereInput = {
       userId,
-      status: Array.isArray(status) ? { in: status } : status
+      statusId: Array.isArray(statusIds) ? { in: statusIds } : statusIds
     }
 
     if (dueDate && includeNoDueDate) {
@@ -258,7 +254,7 @@ export class TaskRepository {
     return this.prisma.task.findMany({
       where: {
         userId,
-        status: { not: TaskStatus.DONE },
+        status: { label: { not: 'DONE' } },
         dueDate: { gte: from, lte: before }
       },
       include: {
@@ -273,7 +269,7 @@ export class TaskRepository {
     return this.prisma.task.count({
       where: {
         userId,
-        status: { not: TaskStatus.DONE },
+        status: { label: { not: 'DONE' } },
         dueDate: { gte: from, lte: before }
       }
     })
@@ -283,7 +279,7 @@ export class TaskRepository {
     const rows = await this.prisma.task.findMany({
       where: {
         userId,
-        status: TaskStatus.DONE,
+        status: { label: 'DONE' },
         completedAt: { gte: after, not: null }
       },
       include: { objectives: { include: { areas: true } } }

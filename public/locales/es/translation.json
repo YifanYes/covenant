@@ -979,7 +979,15 @@
     "invalid_email": "Correo electrónico no válido",
     "invalid_password_length": "La contraseña debe tener al menos 8 caracteres",
     "password_mismatch": "Las contraseñas no coinciden",
-    "required_field": "Campo requerido"
+    "required_field": "Campo requerido",
+    "task_status": {
+      "label_reserved": "TODO, DOING y DONE son nombres de estado reservados.",
+      "label_collision": "Ya existe un estado con ese nombre.",
+      "protected_locked": "Los estados TODO, DOING y DONE no se pueden renombrar.",
+      "cannot_delete_protected": "Los estados TODO, DOING y DONE no se pueden eliminar.",
+      "min_one_required": "Debe quedar al menos un estado.",
+      "protected_required": "Los estados TODO, DOING y DONE son obligatorios."
+    }
   },
   "not_found_page": {
     "title": "404 - Página no encontrada",
@@ -1872,6 +1880,25 @@
     "DONE": "Completado",
     "TODO": "Por hacer"
   },
+  "task_status_settings": {
+    "title": "Estados de tareas",
+    "description": "Personaliza las etiquetas de tu flujo de trabajo.",
+    "add": "Añadir estado",
+    "add_title": "Crear estado de tarea",
+    "label_placeholder": "Nombre del estado",
+    "color_label": "Color",
+    "color_placeholder": "Elige un color",
+    "delete_aria": "Eliminar estado",
+    "protected_locked": "Los estados reservados (TODO, DOING, DONE) no se pueden renombrar ni eliminar.",
+    "protected_required": "Los estados TODO, DOING y DONE son obligatorios.",
+    "delete_confirm_title": "¿Eliminar estado?",
+    "delete_confirm_description": "Las tareas actualmente en \"{{label}}\" se moverán a \"{{defaultLabel}}\".",
+    "create_success": "Estado creado",
+    "create_error": "Error al crear el estado",
+    "update_error": "Error al actualizar el estado",
+    "delete_success": "Estado \"{{label}}\" eliminado",
+    "delete_error": "Error al eliminar el estado"
+  },
   "tavern": {
     "title": "La Taberna",
     "subtitle": "Una sala de chat global en vivo donde todos los jugadores comparten noticias, preguntan y intercambian rumores.",
@@ -1934,6 +1961,14 @@
       "table": {
         "title": "No se encontraron tareas",
         "description": "Tu libro de misiones está sospechosamente vacío.\nEs hora de llenarlo de hazañas dignas de ser cantadas."
+      },
+      "list": {
+        "title": "Sin tareas aún",
+        "description": "Tu registro de misiones espera su primera entrada.\nAñade una tarea y comienza tu campaña."
+      },
+      "kanban": {
+        "title": "Tablero vacío",
+        "description": "No hay misiones en el tablero, no hay batallas que librar.\nAñade tu primera tarea y dale vida al tablero."
       },
       "calendar": "Empieza creando una nueva tarea. Vincúlala a un objetivo o área para darle propósito.",
       "matrix": {
@@ -2034,7 +2069,8 @@
       "at_least_one_visible": "Al menos una pestaña debe permanecer visible",
       "saved": "Ajustes de tareas guardados",
       "save_error": "Error al guardar los ajustes de tareas",
-      "save": "Guardar"
+      "save": "Guardar",
+      "unsaved_changes": "Cambios sin guardar"
     }
   },
   "update": "Actualizar",
@@ -2118,8 +2154,8 @@
       "body": "Elige habilidades para atacar, potenciar o defender. Cada movimiento cuesta maná. El Golpe Básico siempre es gratis."
     },
     "tier": {
-      "title": "Sube de Rango",
-      "body": "Derrota enemigos para subir el rango de tu clase. Rangos más altos desbloquean nuevo equipo y habilidades."
+      "title": "Sube de Tier",
+      "body": "Derrota enemigos para subir el tier de tu clase. Tiers más altos desbloquean nuevo equipo en la tienda y nuevas habilidades."
     },
     "gear": {
       "title": "Equipa tu Botín",

@@ -76,12 +76,12 @@ export default function Tasks() {
           </div>
         </div>
 
-        <TabsContent value="list" className="mt-1">
-          <TasksListBoard />
+        <TabsContent value="list" className="mt-4 flex-1 overflow-hidden">
+          <TasksListBoard onCreate={() => setCreateOpen(true)} />
         </TabsContent>
 
         <TabsContent value="kanban" className="mt-4 flex-1 overflow-hidden">
-          <TaskKanban />
+          <TaskKanban onCreate={() => setCreateOpen(true)} />
         </TabsContent>
 
         <TabsContent value="table" className="mt-4 flex flex-1 flex-col overflow-hidden">

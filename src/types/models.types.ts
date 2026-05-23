@@ -21,11 +21,19 @@ export type Objective = {
   tasks?: Task[]
 }
 
+export type UserTaskStatus = {
+  id: string
+  label: string
+  color: string | null
+  isDefault: boolean
+}
+
 export type Task = {
   id: string
   title: string
   description?: string | null
-  status: string
+  statusId: string
+  status?: UserTaskStatus | null
   color?: string | null
   effort?: string | null
   impact?: string | null

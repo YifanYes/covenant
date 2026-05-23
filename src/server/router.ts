@@ -11,6 +11,7 @@ import { questRouter } from './routers/quest.router'
 import { storeRouter } from './routers/store.router'
 import { tasksRouter } from './routers/tasks.router'
 import { tavernRouter } from './routers/tavern.router'
+import { userTaskStatusRouter } from './routers/user-task-status.router'
 import { publicProcedure, t } from './trpc'
 
 export const appRouter = t.router({
@@ -31,7 +32,8 @@ export const appRouter = t.router({
   killRecord: killRecordRouter,
   store: storeRouter,
   guilds: guildsRouter,
-  tavern: tavernRouter
+  tavern: tavernRouter,
+  userTaskStatus: userTaskStatusRouter
 })
 
 export type AppRouter = typeof appRouter

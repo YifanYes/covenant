@@ -28,10 +28,7 @@ export class CharacterService {
   }
 
   async createCharacter(userId: string, input: CreateCharacterType) {
-    const character = await this.characterRepository.create(userId, input)
-    await this.characterRepository.createAreas(userId)
-
-    return character
+    return this.characterRepository.createWithDefaults(userId, input)
   }
 
   async getCharacterById(characterId: string, userId?: string) {

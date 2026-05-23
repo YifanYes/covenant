@@ -3,7 +3,6 @@ import Task from '@/tasks/task.component'
 import type { Habit, Task as TaskType } from '@/types/models.types'
 import Dialog, { DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/ui/dialog.component'
 import { Repeat } from 'pixelarticons/react'
-import { TaskStatus } from '@shared/schemas/tasks.schemas'
 import { useTranslation } from 'react-i18next'
 import ObjectiveHabitCard from './objective-habit-card.component'
 
@@ -16,7 +15,7 @@ interface ObjectiveSummaryListProps {
 
 export default function ObjectiveSummaryList({ title, tasks, habits, setSelectedTask }: ObjectiveSummaryListProps) {
   const { t } = useTranslation()
-  const pendingTasks = tasks.filter((task) => task.status !== TaskStatus.DONE)
+  const pendingTasks = tasks.filter((task) => task.status?.label !== 'DONE')
 
   const tasksShown = Math.min(pendingTasks.length, 2)
   const habitsShown = Math.min(habits.length, Math.max(0, 2 - tasksShown))
