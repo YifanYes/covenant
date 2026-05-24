@@ -1,4 +1,5 @@
 'use client'
+import { useTutorialTrigger } from '@/hooks/use-tutorial-trigger'
 import type { Objective } from '@/types/models.types'
 import Button from '@/ui/button.component'
 import { trpcOptions } from '@/utils/trpc.utils'
@@ -9,12 +10,14 @@ import { useTranslation } from 'react-i18next'
 import AreaFilterChip from './_components/areas/area-filter-chip.component'
 import CreateAreaDialog from './_components/areas/create-area-dialog.component'
 import CreateObjectiveDialog from './_components/create-objective-dialog.component'
+import FirstQuestChecklist from './_components/first-quest-checklist.component'
 import ObjectiveCard from './_components/objective-card.component'
 
 const ALL_AREAS_ID = '__all__'
 
 export default function Objectives() {
   const { t } = useTranslation()
+  useTutorialTrigger('mana')
   const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
@@ -46,6 +49,7 @@ export default function Objectives() {
 
   return (
     <div className="flex w-full flex-col gap-y-16 p-6">
+      <FirstQuestChecklist />
       <section className="flex flex-col gap-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">{t('areas.title')}</h1>

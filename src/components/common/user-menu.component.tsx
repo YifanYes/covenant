@@ -15,7 +15,7 @@ import { useTutorialStore } from '@/stores/tutorial.store'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { Delete, Logout, Reload, User } from 'pixelarticons/react'
+import { Bulletlist, Delete, Logout, Reload, User } from 'pixelarticons/react'
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -25,7 +25,7 @@ export default function UserMenu() {
   const router = useRouter()
   const { email, signOut } = useAuthStore()
   const { data: character } = useQuery(trpcOptions.character.getCurrentClass.queryOptions())
-  const reopen = useTutorialStore((s) => s.reopen)
+  const replayAll = useTutorialStore((s) => s.replayAll)
 
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -48,14 +48,24 @@ export default function UserMenu() {
   }
 
   const resetTutorialMutation = useMutation(
-    trpcOptions.character.resetTutorial.mutationOptions({
+    trpcOptions.character.resetTutorialSlides.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
-        reopen()
+        replayAll()
       },
       onError: () => toast.error(t('settings.replay_tutorial_error'))
     })
   )
+
+  const reopenOnboardingMutation = useMutation(
+    trpcOptions.character.reopenOnboarding.mutationOptions({
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() }),
+      onError: () => toast.error(t('user_menu.reopen_onboarding_error'))
+    })
+  )
+
+  const onboardingDismissed = Boolean(character?.onboardingProgress?.dismissedAt)
 
   const handleLogout = () => {
     signOut()
@@ -105,6 +115,16 @@ export default function UserMenu() {
               <Reload />
               {t('settings.replay_tutorial')}
             </DropdownMenuItem>
+            {onboardingDismissed && (
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={() => reopenOnboardingMutation.mutate()}
+                disabled={reopenOnboardingMutation.isPending}
+              >
+                <Bulletlist />
+                {t('user_menu.reopen_onboarding')}
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer" variant="destructive" onSelect={() => setDeleteOpen(true)}>
               <Delete />

@@ -22,36 +22,65 @@ describe('CharacterService', () => {
   })
 
   describe('tutorial', () => {
-    it('completeTutorial calls userRepo.setTutorialCompletedAt with a Date', async () => {
-      mockUserRepo.setTutorialCompletedAt.mockResolvedValue({ tutorialCompletedAt: new Date() })
+    it('markTutorialSlideSeen appends to user.tutorialSlidesSeen idempotently', async () => {
+      mockUserRepo.getTutorialSlidesSeen.mockResolvedValue([])
+      mockUserRepo.setTutorialSlidesSeen.mockResolvedValue({} as never)
 
-      await characterService.completeTutorial('user-1')
+      const first = await characterService.markTutorialSlideSeen('user-1', 'mana')
+      expect(mockUserRepo.setTutorialSlidesSeen).toHaveBeenCalledWith('user-1', ['mana'])
+      expect(first.tutorialSlidesSeen).toEqual(['mana'])
 
-      expect(mockUserRepo.setTutorialCompletedAt).toHaveBeenCalledWith('user-1', expect.any(Date))
+      mockUserRepo.getTutorialSlidesSeen.mockResolvedValue(['mana'])
+      const second = await characterService.markTutorialSlideSeen('user-1', 'mana')
+      expect(mockUserRepo.setTutorialSlidesSeen).toHaveBeenCalledTimes(1)
+      expect(second.tutorialSlidesSeen).toEqual(['mana'])
     })
 
-    it('resetTutorial calls userRepo.setTutorialCompletedAt with null', async () => {
-      mockUserRepo.setTutorialCompletedAt.mockResolvedValue({ tutorialCompletedAt: null })
+    it('resetTutorialSlides clears user.tutorialSlidesSeen', async () => {
+      mockUserRepo.setTutorialSlidesSeen.mockResolvedValue({} as never)
 
-      await characterService.resetTutorial('user-1')
+      const result = await characterService.resetTutorialSlides('user-1')
 
-      expect(mockUserRepo.setTutorialCompletedAt).toHaveBeenCalledWith('user-1', null)
+      expect(mockUserRepo.setTutorialSlidesSeen).toHaveBeenCalledWith('user-1', [])
+      expect(result.tutorialSlidesSeen).toEqual([])
     })
 
-    it('getCurrentClass exposes tutorialCompletedAt from user', async () => {
-      const ts = new Date('2026-01-01')
+    it('getCurrentClass exposes tutorialSlidesSeen and onboardingProgress', async () => {
       const character = {
         ...mockCharacter(),
         factionName: 'HOLY_KNIGHTS',
         title: null,
         magicNature: null,
-        user: { tutorialCompletedAt: ts }
+        onboardingProgress: { habitCreated: true },
+        user: { tutorialSlidesSeen: ['mana'] }
       }
       mockCharacterRepo.findWithClasses.mockResolvedValue(character)
 
       const result = await characterService.getCurrentClass('user-1')
 
-      expect(result?.tutorialCompletedAt).toEqual(ts)
+      expect(result?.tutorialSlidesSeen).toEqual(['mana'])
+      expect(result?.onboardingProgress).toEqual({ habitCreated: true })
+    })
+  })
+
+  describe('onboarding progress', () => {
+    it('updateOnboardingProgress merges patch via repo', async () => {
+      mockCharacterRepo.updateOnboardingProgress.mockResolvedValue(undefined)
+
+      await characterService.updateOnboardingProgress('user-1', { habitCreated: true })
+
+      expect(mockCharacterRepo.updateOnboardingProgress).toHaveBeenCalledWith('user-1', { habitCreated: true })
+    })
+
+    it('dismissOnboarding writes dismissedAt ISO string', async () => {
+      mockCharacterRepo.updateOnboardingProgress.mockResolvedValue(undefined)
+
+      await characterService.dismissOnboarding('user-1')
+
+      expect(mockCharacterRepo.updateOnboardingProgress).toHaveBeenCalledWith(
+        'user-1',
+        expect.objectContaining({ dismissedAt: expect.any(String) })
+      )
     })
   })
 

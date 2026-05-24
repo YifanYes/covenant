@@ -178,7 +178,7 @@ export class ServiceFactory {
   }
 
   get habit(): HabitService {
-    return (this._habitService ??= new HabitService(this.habitRepository, this.mana, this.guild))
+    return (this._habitService ??= new HabitService(this.habitRepository, this.mana, this.guild, this.characterRepository))
   }
 
   get journal(): JournalService {
@@ -194,7 +194,8 @@ export class ServiceFactory {
       this.taskRepository,
       this.userTaskStatusRepository,
       this.mana,
-      this.guild
+      this.guild,
+      this.characterRepository
     ))
   }
 
@@ -235,7 +236,8 @@ export class ServiceFactory {
       this.characterQuestRepository,
       this.combatEnemyRepository,
       this.character,
-      this.mana
+      this.mana,
+      this.characterRepository
     ))
   }
 

@@ -1,4 +1,5 @@
-import type { PrismaClient, User, UserSettings } from '@/generated/prisma'
+import { Prisma, type PrismaClient, type User, type UserSettings } from '@/generated/prisma'
+import type { TutorialSlideId } from '@shared/schemas/onboarding.schemas'
 
 export type UserWithSettings = User & { userSettings: UserSettings | null }
 
@@ -18,17 +19,25 @@ export class UserRepository {
     })
   }
 
-  async update(userId: string, data: Partial<User>): Promise<User> {
+  async update(userId: string, data: Prisma.UserUpdateInput): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
       data
     })
   }
 
-  async setTutorialCompletedAt(userId: string, value: Date | null): Promise<User> {
+  async setTutorialSlidesSeen(userId: string, slideIds: TutorialSlideId[]): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
-      data: { tutorialCompletedAt: value }
+      data: { tutorialSlidesSeen: slideIds }
     })
+  }
+
+  async getTutorialSlidesSeen(userId: string): Promise<TutorialSlideId[]> {
+    const row = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { tutorialSlidesSeen: true }
+    })
+    return ((row?.tutorialSlidesSeen as unknown as TutorialSlideId[]) ?? []) as TutorialSlideId[]
   }
 }

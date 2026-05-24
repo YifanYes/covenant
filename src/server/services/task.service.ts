@@ -8,21 +8,33 @@ import {
   type UpdateTaskType
 } from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
+import { logger } from '../lib/logger'
+import type { CharacterRepository } from '../repositories/character.repository'
 import type { TaskRepository } from '../repositories/task.repository'
 import type { UserTaskStatusRepository } from '../repositories/user-task-status.repository'
 import type { GuildService } from './guild.service'
 import type { ManaService } from './mana.service'
+
+const log = logger.child({ service: 'task' })
 
 export class TaskService {
   constructor(
     private taskRepository: TaskRepository,
     private userTaskStatusRepository: UserTaskStatusRepository,
     private manaService: ManaService,
-    private guildService?: GuildService
+    private guildService?: GuildService,
+    private characterRepository?: CharacterRepository
   ) {}
 
   async create(userId: string, input: CreateTaskType) {
     const task = await this.taskRepository.create(userId, input)
+    if (this.characterRepository) {
+      try {
+        await this.characterRepository.updateOnboardingProgress(userId, { taskCreated: true })
+      } catch (err) {
+        log.warn({ err, userId }, 'onboarding tick failed: taskCreated')
+      }
+    }
     return { task }
   }
 

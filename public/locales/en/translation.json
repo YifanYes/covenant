@@ -1030,7 +1030,7 @@
     "empty_state": {
       "action": "Create your first habit",
       "title": "No habits yet",
-      "description": "Your daily training regimen is empty. Even heroes need discipline.\nCreate a habit and build your legend one day at a time."
+      "description": "Habits are daily disciplines that build streaks. e.g. Drink water · Read 10 pages · 20 push-ups."
     },
     "error": {
       "internal": {
@@ -1693,7 +1693,7 @@
     },
     "empty": {
       "title": "No objectives yet",
-      "description": "Objectives are your big goals. Create your first one to start your journey.",
+      "description": "Objectives are long-term goals. Group tasks and habits under one banner. e.g. Run a 10k · Ship the side project.",
       "action": "Create your first objective"
     },
     "filter": {
@@ -1816,7 +1816,9 @@
   },
   "user_menu": {
     "aria": "User menu",
-    "edit_name": "Edit character name"
+    "edit_name": "Edit character name",
+    "reopen_onboarding": "Show first quest",
+    "reopen_onboarding_error": "Couldn't reopen the checklist. Please try again."
   },
   "sidebar": {
     "calendar": "Calendar",
@@ -2000,7 +2002,7 @@
       },
       "list": {
         "title": "No tasks yet",
-        "description": "Your quest log awaits its first entry.\nAdd a task and start your campaign."
+        "description": "Tasks are one-shot to-dos. e.g. Pay rent · Finish PR review · Call dentist."
       },
       "kanban": {
         "title": "Board's empty",
@@ -2137,7 +2139,7 @@
   },
   "quests": {
     "title": "Quests",
-    "subtitle": "Choose your mission. Every victory shapes the war.",
+    "subtitle": "Quests are RPG combat. Spend Mana, defeat enemies, earn gear. Not a to-do — the reward.",
     "available": "Available Quests",
     "active_quest": "Active Quest",
     "start": "Start Quest",
@@ -2187,15 +2189,51 @@
     },
     "combat": {
       "title": "Move in Combat",
-      "body": "Pick abilities to attack, buff, or defend. Each move costs mana. Basic Strike is always free."
-    },
-    "tier": {
-      "title": "Tier Up",
-      "body": "Defeat enemies to climb your class tier. Higher tiers unlock new gear in the shop and new abilities."
+      "body": "Pick abilities to attack, buff, or defend. Each move costs mana. Basic Strike is always free. Win quests → climb tiers → unlock harder content."
     },
     "gear": {
       "title": "Equip Gear",
       "body": "Buy gear in the Shop and equip it from your Inventory. Stronger gear, tougher quests."
+    },
+    "character": {
+      "title": "Forge Your Hero",
+      "body": "Before your first quest, choose a class and uncover your magic nature.",
+      "cta": "Continue"
     }
+  },
+  "first_quest_checklist": {
+    "aria": "First quest checklist",
+    "title": "Your First Quest",
+    "subtitle": "{{completed}} of {{total}} steps complete. Forge your legend.",
+    "steps": {
+      "habitCreated": {
+        "title": "Create your first habit",
+        "body": "Daily discipline forges heroes.",
+        "cta": "Habits"
+      },
+      "taskCreated": {
+        "title": "Create your first task",
+        "body": "One-shot quests for one-shot deeds.",
+        "cta": "Tasks"
+      },
+      "manaEarned": {
+        "title": "Earn your first mana",
+        "body": "Complete a habit or task to feel the spark.",
+        "cta": ""
+      },
+      "questStarted": {
+        "title": "Spend mana on a quest",
+        "body": "Pick a foe in the quest board and strike.",
+        "cta": "Quests"
+      },
+      "gearEquipped": {
+        "title": "Equip your first gear",
+        "body": "Tier 1 gear is free — claim it in your inventory.",
+        "cta": "Inventory"
+      }
+    },
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "skip": "Skip onboarding"
   }
 }

@@ -1,6 +1,9 @@
 import type { PrismaClient } from '@/generated/prisma'
 import { getTaskMana, MANA_REWARDS, type ManaSource, type TaskImpact } from '@/shared/constants/rewards.constants'
+import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
+
+const log = logger.child({ service: 'mana' })
 
 export interface ManaGrantContext {
   impact?: TaskImpact | string | null
@@ -63,7 +66,20 @@ export class ManaService {
       await this.characterRepository.updateManaReserve(character.id, newReserve)
     }
 
+    if (amount > 0) {
+      await this.tickManaEarned(userId, character.onboardingProgress)
+    }
+
     return { success: true, amount, manaApplied, reserveGained, newMana, newReserve }
+  }
+
+  private async tickManaEarned(userId: string, progress: unknown): Promise<void> {
+    if ((progress as { manaEarned?: boolean } | null)?.manaEarned) return
+    try {
+      await this.characterRepository.updateOnboardingProgress(userId, { manaEarned: true })
+    } catch (err) {
+      log.warn({ err, userId }, 'onboarding tick failed: manaEarned')
+    }
   }
 
   /**
@@ -102,6 +118,10 @@ export class ManaService {
     }
     if (reserveGained > 0) {
       await this.characterRepository.updateManaReserve(character.id, newReserve)
+    }
+
+    if (amount > 0) {
+      await this.tickManaEarned(userId, character.onboardingProgress)
     }
 
     return { success: true, amount, manaApplied, reserveGained, newMana, newReserve }

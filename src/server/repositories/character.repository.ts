@@ -33,7 +33,7 @@ export class CharacterRepository {
   async findWithClasses(userId: string): Promise<CharacterWithClasses | null> {
     const character = await this.prisma.character.findUnique({
       where: { userId },
-      include: { classes: true, user: { select: { tutorialCompletedAt: true } } }
+      include: { classes: true, user: { select: { tutorialSlidesSeen: true } } }
     })
 
     return character as unknown as CharacterWithClasses | null
@@ -298,5 +298,26 @@ export class CharacterRepository {
       where: { userId },
       data: { title: null }
     })
+  }
+
+  async getOnboardingProgress(userId: string): Promise<Record<string, unknown>> {
+    const row = await this.prisma.character.findUnique({
+      where: { userId },
+      select: { onboardingProgress: true }
+    })
+    return (row?.onboardingProgress as Record<string, unknown> | null) ?? {}
+  }
+
+  async updateOnboardingProgress(userId: string, patch: Record<string, unknown>): Promise<void> {
+    if (Object.keys(patch).length === 0) return
+    const patchJson = JSON.stringify(patch)
+    await this.prisma.$executeRaw`
+      UPDATE "characters"
+      SET "onboardingProgress" = COALESCE("onboardingProgress", '{}'::jsonb) || ${patchJson}::jsonb
+      WHERE "userId" = ${userId}
+        AND COALESCE("onboardingProgress", '{}'::jsonb)
+            IS DISTINCT FROM
+            (COALESCE("onboardingProgress", '{}'::jsonb) || ${patchJson}::jsonb)
+    `
   }
 }

@@ -2,6 +2,7 @@
 
 import AbilityPanel from '@/components/ability-panel.component'
 import OnboardingRedirect from '@/components/shared/onboarding-redirect'
+import { useTutorialTrigger } from '@/hooks/use-tutorial-trigger'
 import Tabs, { TabsContent, TabsList, TabsTrigger } from '@/ui/tabs.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { SlotType, type InventoryCharacter, type InventoryItem } from '@shared/types/gamification.types'
@@ -23,6 +24,7 @@ const isInventoryTab = (v: string | null): v is InventoryTab =>
 
 export default function Inventory() {
   const { t } = useTranslation()
+  useTutorialTrigger('gear')
   const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
   const pathname = usePathname()
   const router = useRouter()

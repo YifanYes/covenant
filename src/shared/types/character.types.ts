@@ -37,7 +37,8 @@ export interface CharacterType {
 
 export type CharacterWithClasses = CharacterType & {
   classes: CharacterClassType[]
-  user?: { tutorialCompletedAt: Date | null }
+  onboardingProgress?: unknown
+  user?: { tutorialSlidesSeen: unknown }
 }
 
 export interface CharacterProgress {

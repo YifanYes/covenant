@@ -175,7 +175,7 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
         await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getFiltered.queryKey(queryParams) })
         await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
         await invalidators.character()
-        toast.success(t('tasks.success.update', { manaReward: getRewardText(data.manaEarned, data.reserveGained) }))
+        toast.success(t('tasks.success.update', { manaReward: getRewardText(data.manaEarned, data.reserveGained, t('combat.mana_reserve')) }))
       },
       onError: (error) => toast.error(t('tasks.error.internal.update'), { description: error.message })
     })

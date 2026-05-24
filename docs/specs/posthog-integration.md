@@ -180,8 +180,27 @@ The set below is the **Pareto-strict v1 set** — only events that load-bear on 
 | `journal_entry_created` | `journal.service.ts` (entry-create path)                                     | `entry_id`, `mana_earned`, `reserve_gained`                                                                                  |
 | `combat_started`        | `quest.service.ts` `startQuest` (after tactical state created)               | `quest_id`, `character_tier`, `enemy_template_id`, `encounter_index`, `reserve_at_start`, `mana_at_start`                    |
 | `combat_finished`       | `combat.service.ts` — both player-victory and player-defeat resolution paths | `quest_id`, `enemy_id`, `outcome` (`'victory'` \| `'defeat'` \| `'abandoned'`), `gold_earned` (nullable on defeat/abandoned) |
+| `loop_closed`           | `task.service.ts` `update` (DONE transition), `habit.service.ts` `createCompletion`, `quest.service.ts` `startQuest` — whichever call first satisfies both conditions | `d_since_signup` (whole days, `floor((now - user.createdAt) / 86400000)`) |
 
 > The `'abandoned'` value is reserved in the enum for a future quest-abandon UI (no current fire site — quests today only end on victory or full defeat). Tracked in `TODO.md`.
+
+### `loop_closed` — onboarding activation event
+
+Fires exactly once per user the first time both conditions hold:
+
+1. ≥1 task or habit completed (any path that grants mana — `task_completed` or `habit_completed` already covers the trigger surface).
+2. ≥1 quest started (`combat_started` covers the trigger surface).
+
+Rationale and KPI framing live in `docs/specs/onboarding.original.md` §3: `loop_closed` is the canonical activation event for D30 cohort regression. Ship-stable success criterion: **D7 retention among `loop_closed` users ≥ 2× D7 among non-`loop_closed` users** (n ≥ 200 signups). If the ratio falls below 2×, `loop_closed` is the wrong KPI — hunt for a better activation event before optimizing the funnel.
+
+**Idempotency.** The event must fire exactly once per user. Two options:
+
+- **Recommended (no schema change):** Use a PostHog person property `loop_closed_at` set on first fire. Guard each candidate call site by reading the person property via `getFlagsSnapshot`-adjacent helper (or by checking a memoized in-process cache keyed by `userId` for hot-path overhead). On first satisfied check, capture the event and `$set` `loop_closed_at = now`. Subsequent fires short-circuit on the property read.
+- **Alternative (schema change):** Add `Character.loopClosedAt DateTime?` and guard at the service layer. Single DB read on every task/habit/quest action — higher cost than the PostHog property. Pick this only if PostHog person-property reads prove unreliable under load.
+
+**Onboarding checklist overlap.** The `Character.onboardingProgress` blob (see `docs/product/onboarding.md`) already tracks `manaEarned`, `taskCreated`, `habitCreated`, `questStarted` for the in-product checklist. `loop_closed` is a strict superset of "earn mana from a task/habit AND start a quest" — reuse the blob as the guard at the service layer (`progress.manaEarned && progress.questStarted`) to avoid both an extra DB column and an extra PostHog round-trip.
+
+Hook order: each candidate call site (`task.service.update`, `habit.service.createCompletion`, `quest.service.startQuest`) must (a) tick its own onboarding flag, then (b) re-read `Character.onboardingProgress`, then (c) fire `loop_closed` if both `(manaEarned || taskCreated || habitCreated)` and `questStarted` are now set AND a separate `loopClosedAt` person-property check returns null.
 
 ### Client-captured events
 
@@ -320,11 +339,11 @@ If client-side event volume turns out materially lower than server-side after la
 | `src/app/layout.tsx:69`                       | `<PostHogProvider>` between `<SentryProvider>` and `<TRPCProvider>`                                                                             |
 | `src/server/context.ts:39`                    | Adds `analytics` to ctx return                                                                                                                  |
 | `src/server/lib/auth.ts:133-159`              | `databaseHooks.user.create.after` fires `user_signed_up` + `identify`                                                                           |
-| `src/server/services/task.service.ts:82`      | `task_completed` after `addManaFromCompletion` on the completing path                                                                           |
-| `src/server/services/habit.service.ts:71-79`  | `habit_completed` after streak-aware mana award                                                                                                 |
+| `src/server/services/task.service.ts:82`      | `task_completed` after `addManaFromCompletion` on the completing path; also evaluates `loop_closed` guard (see Event Taxonomy)                  |
+| `src/server/services/habit.service.ts:71-79`  | `habit_completed` after streak-aware mana award; also evaluates `loop_closed` guard                                                             |
 | `src/server/services/objective.service.ts`    | `objective_completed` on the completion path                                                                                                    |
 | `src/server/services/journal.service.ts`      | `journal_entry_created` on entry-create path                                                                                                    |
-| `src/server/services/quest.service.ts:144`    | `combat_started` after tactical state created                                                                                                   |
+| `src/server/services/quest.service.ts:144`    | `combat_started` after tactical state created; also evaluates `loop_closed` guard                                                               |
 | `src/server/services/combat.service.ts`       | `combat_finished` (`outcome: 'victory'`) at the `processEnemyDefeat` callsite; `combat_finished` (`outcome: 'defeat'`) when player HP reaches 0 |
 | `src/server/services/character.service.ts:24` | `character_created` + `identify` after `createCharacter`                                                                                        |
 | _(no banner change required)_                 | Provider reuses the existing `covenant.cookie_consent.changed` event already dispatched at `cookie-banner.component.tsx:47`                     |
@@ -366,7 +385,7 @@ The following are deliberately deferred. Each is a real signal — but does not 
 - **Self-hosted PostHog**.
 - **Per-event tests.** Manual verification via PostHog "Live events" dashboard during QA.
 - **Quest "claim reward" event.** No claim API exists today — rewards fire on enemy defeat. Add when a claim step is introduced.
-- **Onboarding-funnel events** beyond `character_created`.
+- **Multi-step onboarding-funnel events** beyond `character_created` and `loop_closed` (`landing_viewed`, `signup_started`, `onboarding_started`, `onboarding_completed`). `loop_closed` alone answers the v1 activation question; per-step funnel instrumentation lands in Phase 6 if drop-off concentrates inside a single step.
 
 ---
 
@@ -383,12 +402,14 @@ Init is prod-gated, so verification runs against a prod-like build (`pnpm build 
 7. **Journal entry** — create an entry → `journal_entry_created` with `mana_earned`.
 8. **Combat victory** — start a quest → `combat_started` with `reserve_at_start` / `mana_at_start` snapshot. Defeat an enemy → `combat_finished` with `outcome: 'victory'` and `gold_earned`.
 9. **Combat defeat** — die in combat → `combat_finished` with `outcome: 'defeat'` and `gold_earned: null`. Confirms defeat fire site.
-10. **UTM** — visit `/` with `?utm_source=test&utm_campaign=foo` → person properties contain `$initial_utm_source=test`, `$initial_utm_campaign=foo`.
-11. **Feature flag** — create flag `demo_flag` in PostHog, gate a sample render via server `isFeatureEnabled('demo_flag', userId)`, toggle in PostHog → render flips on next request.
-12. **Consent gate** — clear localStorage, reload `/` → DevTools Network shows zero requests to `eu.i.posthog.com`. Click "Accept" on cookie banner → first `$pageview` fires automatically (via history listener).
-13. **Server independence** — repeat (4) with localStorage cleared → `task_completed` still arrives. Confirms server-side capture is consent-independent for authenticated business events.
-14. **No-PII server capture** — inspect any server-captured event in PostHog → `$ip` and `$geoip_*` fields absent. Confirms `disableGeoip` + per-capture nulling.
-15. **Sign-out reset** — sign out → no `user_signed_out` event (cut in v1), but `posthog.reset()` fires; subsequent client interactions show no further person attribution.
+
+10. **`loop_closed` — first-time activation.** Fresh signup → complete one habit or task → start one quest. `loop_closed` fires exactly once on whichever of the two actions came second, with `d_since_signup = 0`. Repeat further completions / quest starts → no further `loop_closed` event. Person property `loop_closed_at` is set on the first fire and read on subsequent guards.
+11. **UTM** — visit `/` with `?utm_source=test&utm_campaign=foo` → person properties contain `$initial_utm_source=test`, `$initial_utm_campaign=foo`.
+12. **Feature flag** — create flag `demo_flag` in PostHog, gate a sample render via server `isFeatureEnabled('demo_flag', userId)`, toggle in PostHog → render flips on next request.
+13. **Consent gate** — clear localStorage, reload `/` → DevTools Network shows zero requests to `eu.i.posthog.com`. Click "Accept" on cookie banner → first `$pageview` fires automatically (via history listener).
+14. **Server independence** — repeat (4) with localStorage cleared → `task_completed` still arrives. Confirms server-side capture is consent-independent for authenticated business events.
+15. **No-PII server capture** — inspect any server-captured event in PostHog → `$ip` and `$geoip_*` fields absent. Confirms `disableGeoip` + per-capture nulling.
+16. **Sign-out reset** — sign out → no `user_signed_out` event (cut in v1), but `posthog.reset()` fires; subsequent client interactions show no further person attribution.
 
 ---
 

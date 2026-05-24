@@ -8,6 +8,10 @@ import {
   updateCharacterNameSchema,
   useConsumableSchema
 } from '@shared/schemas/character.schemas'
+import {
+  markTutorialSlideSeenSchema,
+  updateOnboardingProgressSchema
+} from '@shared/schemas/onboarding.schemas'
 import { z } from 'zod'
 import { protectedProcedure, rateLimit, RATE_LIMITS, t } from '../trpc'
 
@@ -75,11 +79,25 @@ export const characterRouter = t.router({
     return ctx.services.character.updateName(ctx.user.id, input.name)
   }),
 
-  completeTutorial: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).mutation(({ ctx }) =>
-    ctx.services.character.completeTutorial(ctx.user.id)
-  ),
+  markTutorialSlideSeen: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
+    .input(markTutorialSlideSeenSchema)
+    .mutation(({ ctx, input }) => ctx.services.character.markTutorialSlideSeen(ctx.user.id, input.slideId)),
 
-  resetTutorial: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).mutation(({ ctx }) =>
-    ctx.services.character.resetTutorial(ctx.user.id)
-  )
+  resetTutorialSlides: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
+    .mutation(({ ctx }) => ctx.services.character.resetTutorialSlides(ctx.user.id)),
+
+  updateOnboardingProgress: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
+    .input(updateOnboardingProgressSchema)
+    .mutation(({ ctx, input }) => ctx.services.character.updateOnboardingProgress(ctx.user.id, input)),
+
+  dismissOnboarding: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
+    .mutation(({ ctx }) => ctx.services.character.dismissOnboarding(ctx.user.id)),
+
+  reopenOnboarding: protectedProcedure
+    .use(rateLimit(RATE_LIMITS.write))
+    .mutation(({ ctx }) => ctx.services.character.reopenOnboarding(ctx.user.id))
 })

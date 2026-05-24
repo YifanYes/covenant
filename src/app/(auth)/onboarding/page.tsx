@@ -36,9 +36,9 @@ export default function Onboarding() {
 
   const createCharacterMutation = useMutation({
     ...trpcOptions.character.create.mutationOptions(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
-      router.push('/objectives')
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+      router.push('/objectives?tutorial=true')
     },
     onError: (error) => toast.error(t('onboarding.error.title'), { description: error.message })
   })

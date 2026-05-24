@@ -27,7 +27,7 @@ export const useReorderTasksMutation = () => {
           await invalidators.character()
           await queryClient.invalidateQueries({ queryKey: trpcOptions.tasks.getAll.queryKey() })
           toast.success(
-            t('tasks.success.update', { manaReward: getRewardText(result.manaEarned, result.reserveGained) })
+            t('tasks.success.update', { manaReward: getRewardText(result.manaEarned, result.reserveGained, t('combat.mana_reserve')) })
           )
         }
       },

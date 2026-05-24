@@ -3,6 +3,7 @@ import LoaderButton from '@/common/loader-button.component'
 import { panelChrome, rpgDialogContent } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
 import type { QuestTemplate } from '@/shared/constants/quests.constants'
+import { useTutorialStore } from '@/stores/tutorial.store'
 import { Badge } from '@/ui/badge.component'
 import Dialog, {
   DialogClose,
@@ -32,6 +33,12 @@ export default function QuestsPage() {
   const { t } = useTranslation()
   const router = useRouter()
   const [selectedQuest, setSelectedQuest] = useState<QuestWithStatus | null>(null)
+  const enqueueIfUnseen = useTutorialStore((s) => s.enqueueIfUnseen)
+
+  const handleSelectQuest = (quest: QuestWithStatus) => {
+    enqueueIfUnseen('combat')
+    setSelectedQuest(quest)
+  }
 
   const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
   const characterId = characterData?.id
@@ -43,6 +50,7 @@ export default function QuestsPage() {
       onSuccess: (result) => {
         toast.success(t('quests.started'))
         queryClient.invalidateQueries({ queryKey: trpcOptions.quest.list.queryKey() })
+        queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
         setSelectedQuest(null)
         router.push(`/quests/${result.quest.id}`)
       },
@@ -69,7 +77,7 @@ export default function QuestsPage() {
             <button
               key={quest.id}
               type="button"
-              onClick={() => setSelectedQuest(quest)}
+              onClick={() => handleSelectQuest(quest)}
               className={cn(
                 panelChrome,
                 'group cursor-pointer overflow-hidden text-left transition-all hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',

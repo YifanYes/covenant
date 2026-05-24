@@ -8,31 +8,31 @@ import Dialog, {
   DialogTitle
 } from '@/components/ui/dialog.component'
 import Button from '@/ui/button.component'
-import { Gamepad, Sword, Trophy, Shield } from 'pixelarticons/react'
-import { useState } from 'react'
+import type { TutorialSlideId } from '@shared/schemas/onboarding.schemas'
+import { Gamepad, HumanArmsUp, Shield, Sword } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
 
 type Props = {
-  open: boolean
-  onComplete: () => void
+  slide: TutorialSlideId | null
+  current: number
+  total: number
+  ctaLabel?: string
+  onClose: () => void
 }
 
-const slides = ['mana', 'combat', 'tier', 'gear'] as const
-type Slide = (typeof slides)[number]
-
-const SlideIcon: Record<Slide, React.ComponentType<{ className?: string }>> = {
+const SlideIcon: Record<TutorialSlideId, React.ComponentType<{ className?: string }>> = {
+  character: HumanArmsUp,
   mana: Gamepad,
   combat: Sword,
-  tier: Trophy,
   gear: Shield
 }
 
-export default function TutorialDialog({ open, onComplete }: Props) {
+export default function TutorialDialog({ slide, current, total, ctaLabel, onClose }: Props) {
   const { t } = useTranslation()
-  const [step, setStep] = useState(0)
-  const isLast = step === slides.length - 1
-  const slide = slides[step]
-  const Icon = SlideIcon[slide]
+  const open = slide !== null
+  const Icon = slide ? SlideIcon[slide] : null
+  const showDots = total > 1
+  const label = ctaLabel ?? t('tutorial.done')
 
   return (
     <Dialog open={open}>
@@ -42,41 +42,31 @@ export default function TutorialDialog({ open, onComplete }: Props) {
         onPointerDownOutside={(e) => e.preventDefault()}
         className="max-w-sm"
       >
+        {showDots && (
+          <div className="absolute right-4 top-4 flex gap-1.5">
+            {Array.from({ length: total }, (_, i) => (
+              <span
+                key={i}
+                className={`size-2 rounded-full transition-colors ${i === current ? 'bg-primary' : 'bg-muted'}`}
+              />
+            ))}
+          </div>
+        )}
+
         <DialogHeader className="items-center">
-          <Icon className="size-12 text-primary" />
-          <DialogTitle className="text-center text-xl">{t(`tutorial.${slide}.title`)}</DialogTitle>
-          <DialogDescription className="text-center">{t(`tutorial.${slide}.body`)}</DialogDescription>
+          {Icon && <Icon className="size-12 text-primary" />}
+          <DialogTitle className="text-center text-xl">
+            {slide ? t(`tutorial.${slide}.title`) : ''}
+          </DialogTitle>
+          <DialogDescription className="text-center">
+            {slide ? t(`tutorial.${slide}.body`) : ''}
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="flex justify-center gap-1.5 py-2">
-          {slides.map((slide, i) => (
-            <span
-              key={slide}
-              className={`size-2 rounded-full transition-colors ${i === step ? 'bg-primary' : 'bg-muted'}`}
-            />
-          ))}
-        </div>
-
-        <DialogFooter className="flex-row items-center justify-between sm:justify-between">
-          <Button variant="ghost" size="sm" onClick={onComplete} className="text-muted-foreground">
-            {t('tutorial.skip')}
+        <DialogFooter className="justify-center sm:justify-center">
+          <Button size="sm" onClick={onClose}>
+            {label}
           </Button>
-          <div className="flex gap-2">
-            {step > 0 && (
-              <Button variant="outline" size="sm" onClick={() => setStep((s) => s - 1)}>
-                {t('tutorial.back')}
-              </Button>
-            )}
-            {isLast ? (
-              <Button size="sm" onClick={onComplete}>
-                {t('tutorial.done')}
-              </Button>
-            ) : (
-              <Button size="sm" onClick={() => setStep((s) => s + 1)}>
-                {t('tutorial.next')}
-              </Button>
-            )}
-          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

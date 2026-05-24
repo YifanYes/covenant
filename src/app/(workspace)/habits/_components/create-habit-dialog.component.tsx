@@ -35,7 +35,10 @@ export default function CreateHabitDialog({ trigger, open: controlledOpen, onOpe
     trpcOptions.habits.create.mutationOptions({
       onSuccess: async () => {
         toast.success(t('habits.success.create'))
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() }),
+          queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
+        ])
         setOpen(false)
       },
       onError: (error) => toast.error(t('habits.error.internal.create'), { description: error.message })

@@ -2,6 +2,7 @@ import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constant
 import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
 import { resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
+import type { CharacterRepository } from '../repositories/character.repository'
 import type { HabitRepository } from '../repositories/habit.repository'
 import type { GuildService } from './guild.service'
 import type { ManaService } from './mana.service'
@@ -12,11 +13,19 @@ export class HabitService {
   constructor(
     private habitRepository: HabitRepository,
     private manaService: ManaService,
-    private guildService?: GuildService
+    private guildService?: GuildService,
+    private characterRepository?: CharacterRepository
   ) {}
 
   async create(userId: string, input: CreateHabitType) {
     const habit = await this.habitRepository.create(userId, input)
+    if (this.characterRepository) {
+      try {
+        await this.characterRepository.updateOnboardingProgress(userId, { habitCreated: true })
+      } catch (err) {
+        log.warn({ err, userId }, 'onboarding tick failed: habitCreated')
+      }
+    }
     return { habit }
   }
 

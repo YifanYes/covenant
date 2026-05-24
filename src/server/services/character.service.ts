@@ -3,6 +3,11 @@ import type { CharacterClassName, MagicNature } from '@/shared/constants/classes
 import { createInventoryItem, TIER_1_ITEMS } from '@/shared/constants/items.constants'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import type { CharacterDataType } from '@shared/schemas/inventory.schemas'
+import type {
+  OnboardingProgress,
+  TutorialSlideId,
+  UpdateOnboardingProgressInput
+} from '@shared/schemas/onboarding.schemas'
 import type { AbilityDefinition } from '@shared/types/ability.types'
 import type { CharacterWithClasses } from '@shared/types/character.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
@@ -64,7 +69,8 @@ export class CharacterService {
       tier,
       inventory: character.inventory as unknown as InventoryItem[],
       loadout: character.loadout as unknown as InventoryItem[],
-      tutorialCompletedAt: character.user?.tutorialCompletedAt ?? null,
+      tutorialSlidesSeen: ((character.user?.tutorialSlidesSeen as TutorialSlideId[] | null) ?? []) as TutorialSlideId[],
+      onboardingProgress: ((character.onboardingProgress as OnboardingProgress | null) ?? {}) as OnboardingProgress,
       classes: character.classes.map((c) => ({
         id: c.id,
         className: c.className,
@@ -100,12 +106,31 @@ export class CharacterService {
     return this.characterRepository.updateName(userId, name)
   }
 
-  async completeTutorial(userId: string) {
-    return this.userRepository.setTutorialCompletedAt(userId, new Date())
+  async markTutorialSlideSeen(userId: string, slideId: TutorialSlideId) {
+    const seen = await this.userRepository.getTutorialSlidesSeen(userId)
+    if (seen.includes(slideId)) {
+      return { tutorialSlidesSeen: seen }
+    }
+    const next = [...seen, slideId]
+    await this.userRepository.setTutorialSlidesSeen(userId, next)
+    return { tutorialSlidesSeen: next }
   }
 
-  async resetTutorial(userId: string) {
-    return this.userRepository.setTutorialCompletedAt(userId, null)
+  async resetTutorialSlides(userId: string) {
+    await this.userRepository.setTutorialSlidesSeen(userId, [])
+    return { tutorialSlidesSeen: [] as TutorialSlideId[] }
+  }
+
+  async updateOnboardingProgress(userId: string, patch: UpdateOnboardingProgressInput) {
+    await this.characterRepository.updateOnboardingProgress(userId, patch)
+  }
+
+  async dismissOnboarding(userId: string) {
+    await this.characterRepository.updateOnboardingProgress(userId, { dismissedAt: new Date().toISOString() })
+  }
+
+  async reopenOnboarding(userId: string) {
+    await this.characterRepository.updateOnboardingProgress(userId, { dismissedAt: undefined })
   }
 
   async switchClass(userId: string, className: string) {
@@ -173,6 +198,15 @@ export class CharacterService {
     newLoadout.push(itemToEquip)
 
     await this.characterRepository.updateInventoryAndLoadout(character.id, newInventory, newLoadout)
+
+    const progress = (character.onboardingProgress as OnboardingProgress | null) ?? {}
+    if (!progress.gearEquipped) {
+      try {
+        await this.characterRepository.updateOnboardingProgress(userId, { gearEquipped: true })
+      } catch (err) {
+        log.warn({ err, userId }, 'onboarding tick failed: gearEquipped')
+      }
+    }
 
     return { success: true }
   }

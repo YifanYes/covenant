@@ -11,6 +11,7 @@ import { TRPCError } from '@trpc/server'
 import { resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
+import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
 import type { CharacterService } from './character.service'
 import type { ManaService } from './mana.service'
@@ -22,7 +23,8 @@ export class QuestService {
     private characterQuestRepository: CharacterQuestRepository,
     private combatEnemyRepository: CombatEnemyRepository,
     private characterService: CharacterService,
-    private manaService: ManaService
+    private manaService: ManaService,
+    private characterRepository?: CharacterRepository
   ) {}
 
   private async assertCharacterOwnership(characterId: string, userId: string): Promise<void> {
@@ -216,6 +218,17 @@ export class QuestService {
         }
       })
       await this.characterQuestRepository.updateTacticalState(quest.id, tacticalState)
+
+      if (this.characterRepository) {
+        const progress = (character.onboardingProgress as { questStarted?: boolean } | null) ?? {}
+        if (!progress.questStarted) {
+          try {
+            await this.characterRepository.updateOnboardingProgress(userId, { questStarted: true })
+          } catch (err) {
+            log.warn({ err, userId }, 'onboarding tick failed: questStarted')
+          }
+        }
+      }
 
       return {
         quest,

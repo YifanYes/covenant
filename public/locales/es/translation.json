@@ -1030,7 +1030,7 @@
     "empty_state": {
       "action": "Crear tu primer hábito",
       "title": "Sin hábitos",
-      "description": "Tu régimen de entrenamiento diario está vacío. Hasta los héroes necesitan disciplina.\nCrea un hábito y construye tu leyenda un día a la vez."
+      "description": "Los hábitos son disciplinas diarias que forjan rachas. p. ej. Beber agua · Leer 10 páginas · 20 flexiones."
     },
     "error": {
       "internal": {
@@ -1693,7 +1693,7 @@
     },
     "empty": {
       "title": "Aún no hay objetivos",
-      "description": "Los objetivos son tus grandes metas. Crea el primero para comenzar tu viaje.",
+      "description": "Los objetivos son metas a largo plazo. Agrupan tareas y hábitos bajo un mismo estandarte. p. ej. Correr un 10k · Lanzar el proyecto personal.",
       "action": "Crea tu primer objetivo"
     },
     "filter": {
@@ -1816,7 +1816,9 @@
   },
   "user_menu": {
     "aria": "Menú de usuario",
-    "edit_name": "Editar nombre del personaje"
+    "edit_name": "Editar nombre del personaje",
+    "reopen_onboarding": "Mostrar primera misión",
+    "reopen_onboarding_error": "No pudimos reabrir la lista. Inténtalo de nuevo."
   },
   "sidebar": {
     "calendar": "Calendario",
@@ -2000,7 +2002,7 @@
       },
       "list": {
         "title": "Sin tareas aún",
-        "description": "Tu registro de misiones espera su primera entrada.\nAñade una tarea y comienza tu campaña."
+        "description": "Las tareas son pendientes únicos. p. ej. Pagar el alquiler · Revisar la PR · Llamar al dentista."
       },
       "kanban": {
         "title": "Tablero vacío",
@@ -2137,7 +2139,7 @@
   },
   "quests": {
     "title": "Misiones",
-    "subtitle": "Elige tu misión. Cada victoria da forma a la guerra.",
+    "subtitle": "Las misiones son combate RPG. Gasta Maná, derrota enemigos y consigue equipo. No son pendientes — son la recompensa.",
     "available": "Misiones Disponibles",
     "active_quest": "Misión Activa",
     "start": "Iniciar Misión",
@@ -2187,15 +2189,51 @@
     },
     "combat": {
       "title": "Combate por Turnos",
-      "body": "Elige habilidades para atacar, potenciar o defender. Cada movimiento cuesta maná. El Golpe Básico siempre es gratis."
-    },
-    "tier": {
-      "title": "Sube de Tier",
-      "body": "Derrota enemigos para subir el tier de tu clase. Tiers más altos desbloquean nuevo equipo en la tienda y nuevas habilidades."
+      "body": "Elige habilidades para atacar, potenciar o defender. Cada movimiento cuesta maná. El Golpe Básico siempre es gratis. Gana misiones → sube de tier → desbloquea contenido más duro."
     },
     "gear": {
       "title": "Equipa tu Botín",
       "body": "Compra equipo en la Tienda y equípalo desde tu Inventario. Mejor equipo, misiones más duras."
+    },
+    "character": {
+      "title": "Forja tu Héroe",
+      "body": "Antes de tu primera misión, elige una clase y descubre tu naturaleza mágica.",
+      "cta": "Continuar"
     }
+  },
+  "first_quest_checklist": {
+    "aria": "Lista de la primera misión",
+    "title": "Tu Primera Misión",
+    "subtitle": "{{completed}} de {{total}} pasos completos. Forja tu leyenda.",
+    "steps": {
+      "habitCreated": {
+        "title": "Crea tu primer hábito",
+        "body": "La disciplina diaria forja héroes.",
+        "cta": "Hábitos"
+      },
+      "taskCreated": {
+        "title": "Crea tu primera tarea",
+        "body": "Misiones únicas para hazañas únicas.",
+        "cta": "Tareas"
+      },
+      "manaEarned": {
+        "title": "Gana tu primer maná",
+        "body": "Completa un hábito o tarea para sentir la chispa.",
+        "cta": ""
+      },
+      "questStarted": {
+        "title": "Gasta maná en una misión",
+        "body": "Elige un enemigo en el tablón de misiones y ataca.",
+        "cta": "Misiones"
+      },
+      "gearEquipped": {
+        "title": "Equípate por primera vez",
+        "body": "El equipo Tier 1 es gratis — recógelo en tu inventario.",
+        "cta": "Inventario"
+      }
+    },
+    "collapse": "Contraer",
+    "expand": "Expandir",
+    "skip": "Saltar onboarding"
   }
 }

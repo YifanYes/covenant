@@ -48,7 +48,7 @@ export function useHabitCompletion(habit: Habit) {
         const currentCount = periodCompletions + 1
         toast.success(
           t(currentCount >= recurrence ? 'habits.success.target_met' : 'habits.success.progress', {
-            manaReward: getRewardText(data.manaEarned, data.reserveGained)
+            manaReward: getRewardText(data.manaEarned, data.reserveGained, t('combat.mana_reserve'))
           })
         )
         await queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })
