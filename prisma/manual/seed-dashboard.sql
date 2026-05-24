@@ -24,6 +24,10 @@ DECLARE
   k                   int;
   day_offset          int;
   task_status         text;
+  task_status_id      uuid;
+  status_todo_id      uuid;
+  status_doing_id     uuid;
+  status_done_id      uuid;
   task_impact         text;
   task_effort         text;
   task_due            timestamp;
@@ -39,6 +43,18 @@ BEGIN
   IF target_user_id IS NULL THEN
     RAISE EXCEPTION 'No user found with email %', target_email;
   END IF;
+
+  -- Ensure default TODO/DOING/DONE statuses exist for this user, then capture their IDs.
+  INSERT INTO user_task_statuses (id, "userId", label, "isDefault", "createdAt", "updatedAt")
+  VALUES
+    (gen_random_uuid(), target_user_id, 'TODO',  true,  now_ts, now_ts),
+    (gen_random_uuid(), target_user_id, 'DOING', false, now_ts, now_ts),
+    (gen_random_uuid(), target_user_id, 'DONE',  false, now_ts, now_ts)
+  ON CONFLICT ("userId", label) DO NOTHING;
+
+  SELECT id INTO status_todo_id  FROM user_task_statuses WHERE "userId" = target_user_id AND label = 'TODO';
+  SELECT id INTO status_doing_id FROM user_task_statuses WHERE "userId" = target_user_id AND label = 'DOING';
+  SELECT id INTO status_done_id  FROM user_task_statuses WHERE "userId" = target_user_id AND label = 'DONE';
 
   IF EXISTS (SELECT 1 FROM areas WHERE "userId" = target_user_id AND name LIKE 'SEED %') THEN
     RAISE NOTICE 'Seed already present for %, skipping', target_email;
@@ -238,13 +254,19 @@ BEGIN
         task_obj_idx := ((i - 51) % 18) + 1;
       END IF;
 
-      INSERT INTO tasks (id, title, description, status, "order", "dueDate", "userId",
+      task_status_id := CASE task_status
+        WHEN 'TODO'  THEN status_todo_id
+        WHEN 'DOING' THEN status_doing_id
+        WHEN 'DONE'  THEN status_done_id
+      END;
+
+      INSERT INTO tasks (id, title, description, "statusId", "order", "dueDate", "userId",
                          "createdAt", "updatedAt", color, effort, impact, "completedAt")
       VALUES (
         task_ids[i],
         'SEED Task ' || lpad(i::text, 3, '0'),
         'Seeded task for dashboard validation',
-        task_status,
+        task_status_id,
         i,
         task_due,
         target_user_id,

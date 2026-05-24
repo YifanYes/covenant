@@ -54,11 +54,16 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
     setPreferences({
       language: settings.locale,
       defaultTasksView: settings.defaultTasksView,
+      defaultHabitsView: settings.defaultHabitsView,
       dateFormat: settings.dateFormat as DateFormat,
       showListTab: settings.showListTab,
       showKanbanTab: settings.showKanbanTab,
       showTableTab: settings.showTableTab,
-      showMatrixTab: settings.showMatrixTab
+      showMatrixTab: settings.showMatrixTab,
+      showTodayTab: settings.showTodayTab,
+      showHabitsListTab: settings.showHabitsListTab,
+      showGridTab: settings.showGridTab,
+      showHeatmapTab: settings.showHeatmapTab
     })
   }, [settings, setPreferences])
 

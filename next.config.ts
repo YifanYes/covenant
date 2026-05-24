@@ -48,9 +48,9 @@ export default withSentryConfig(withMDX(nextConfig), {
 
   org:
     process.env.SENTRY_ORG ??
-    (process.env.NODE_ENV === 'production'
+    (process.env.NODE_ENV === 'production' && process.env.SENTRY_AUTH_TOKEN
       ? (() => {
-          throw new Error('SENTRY_ORG required in production')
+          throw new Error('SENTRY_ORG required when uploading source maps')
         })()
       : undefined),
 

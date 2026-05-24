@@ -1,4 +1,5 @@
 'use client'
+
 import BaseFormDialog from '@/common/base-form-dialog.component'
 import AreasSelector from '@/forms/areas-selector.component'
 import ObjectivesSelector from '@/forms/objectives-selector.component'
@@ -18,7 +19,7 @@ import { toast } from 'sonner'
 import ConfirmDeleteHabitDialog from './confirm-delete-habit-dialog.component'
 import HabitCard from './habit-card.component'
 
-export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
+export default function UpdateHabitDialog({ habit, trigger }: { habit: Habit; trigger?: React.ReactNode }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
@@ -95,7 +96,7 @@ export default function UpdateHabitDialog({ habit }: { habit: Habit }) {
       isLoading={updateMutation.isPending}
       isSubmitDisabled={!isValid || !isDirty}
       extraFooterActions={<ConfirmDeleteHabitDialog habit={habit} onDeleteSuccess={handleDeleteSuccess} />}
-      trigger={<HabitCard habit={habit} />}
+      trigger={trigger ?? <HabitCard habit={habit} />}
     >
       <div className="grid gap-4">
         <div className="grid gap-3">

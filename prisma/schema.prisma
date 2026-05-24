@@ -9,44 +9,49 @@ datasource db {
 
 // Better Auth Models
 model User {
-  id                   String          @id
-  name                 String?
-  email                String          @unique
-  emailVerified        Boolean         @default(false)
-  image                String?
-  tutorialCompletedAt  DateTime?       @db.Timestamp(6)
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
-  sessions             Session[]
-  accounts             Account[]
-  character            Character?
-  userSettings         UserSettings?
-  journalEntries       JournalEntry[]
-  guildMembership      GuildMember?
-  ownedGuilds          Guild[]         @relation("GuildOwner")
-  guildMessages        GuildMessage[]
-  guildReports         GuildMessageReport[]
-  tavernMessages       TavernMessage[]
-  tavernReports        TavernMessageReport[]
+  id                  String                @id
+  name                String?
+  email               String                @unique
+  emailVerified       Boolean               @default(false)
+  image               String?
+  tutorialCompletedAt DateTime?             @db.Timestamp(6)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  sessions            Session[]
+  accounts            Account[]
+  character           Character?
+  userSettings        UserSettings?
+  journalEntries      JournalEntry[]
+  guildMembership     GuildMember?
+  ownedGuilds         Guild[]               @relation("GuildOwner")
+  guildMessages       GuildMessage[]
+  guildReports        GuildMessageReport[]
+  tavernMessages      TavernMessage[]
+  tavernReports       TavernMessageReport[]
 
   @@map("users")
 }
 
 model UserSettings {
-  id               String   @id @default(uuid()) @db.Uuid
-  userId           String   @unique
-  defaultTasksView String   @default("list")
-  locale           String   @default("es")
-  theme            String   @default("HOLY_KNIGHTS")
-  colorMode        String   @default("light")
-  dateFormat       String   @default("L")
-  showListTab      Boolean  @default(true)
-  showKanbanTab    Boolean  @default(true)
-  showTableTab     Boolean  @default(true)
-  showMatrixTab    Boolean  @default(true)
-  createdAt        DateTime @default(now()) @db.Timestamp(6)
-  updatedAt        DateTime @updatedAt @db.Timestamp(6)
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @unique
+  defaultTasksView  String   @default("list")
+  defaultHabitsView String   @default("today")
+  locale            String   @default("es")
+  theme             String   @default("HOLY_KNIGHTS")
+  colorMode         String   @default("light")
+  dateFormat        String   @default("L")
+  showListTab       Boolean  @default(true)
+  showKanbanTab     Boolean  @default(true)
+  showTableTab      Boolean  @default(true)
+  showMatrixTab     Boolean  @default(true)
+  showTodayTab      Boolean  @default(true)
+  showHabitsListTab Boolean  @default(true)
+  showGridTab       Boolean  @default(true)
+  showHeatmapTab    Boolean  @default(true)
+  createdAt         DateTime @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime @updatedAt @db.Timestamp(6)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_settings")
 }
@@ -99,23 +104,23 @@ model Verification {
 }
 
 model Character {
-  id          String           @id @default(uuid()) @db.Uuid
-  name        String           @db.VarChar(255)
-  title       String?          @db.VarChar(255)
-  factionName String           @default("HOLY_KNIGHTS")
-  currentClass String          @db.VarChar(50)
-  data        Json?            @default("{}")
-  createdAt   DateTime         @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime         @updatedAt @db.Timestamp(6)
-  userId      String           @unique
-  gold        Int              @default(0)
-  manaReserve Int              @default(0)
-  inventory   Json?            @default("[]")
-  loadout     Json?            @default("[]")
-  magicNature         String?          @db.VarChar(50)
-  user                User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quests              CharacterQuest[]
-  classes             CharacterClass[]
+  id           String           @id @default(uuid()) @db.Uuid
+  name         String           @db.VarChar(255)
+  title        String?          @db.VarChar(255)
+  factionName  String           @default("HOLY_KNIGHTS")
+  currentClass String           @db.VarChar(50)
+  data         Json?            @default("{}")
+  createdAt    DateTime         @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime         @updatedAt @db.Timestamp(6)
+  userId       String           @unique
+  gold         Int              @default(0)
+  manaReserve  Int              @default(0)
+  inventory    Json?            @default("[]")
+  loadout      Json?            @default("[]")
+  magicNature  String?          @db.VarChar(50)
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quests       CharacterQuest[]
+  classes      CharacterClass[]
 
   @@map("characters")
 }
@@ -299,7 +304,7 @@ model JournalEntry {
   updatedAt DateTime  @updatedAt @db.Timestamp(6)
   deletedAt DateTime? @db.Timestamp(6)
 
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, createdAt])
   @@index([userId, createdAt])
@@ -307,22 +312,22 @@ model JournalEntry {
 }
 
 model Guild {
-  id                 String          @id @default(uuid()) @db.Uuid
-  name               String          @db.VarChar(80)
-  description        String?         @db.Text
-  availableTitles    String[]        @default([]) @db.VarChar(32)
-  ownerId            String
-  factionName        String          @default("HOLY_KNIGHTS")
-  capacity           Int             @default(50)
-  tier               Int             @default(1)
-  totalContribution  Int             @default(0)
-  createdAt          DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt          DateTime        @updatedAt @db.Timestamp(6)
-  members     GuildMember[]
-  messages    GuildMessage[]
-  invites     GuildInvite[]
-  campaigns   GuildCampaign[]
-  owner       User            @relation("GuildOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  id                String          @id @default(uuid()) @db.Uuid
+  name              String          @db.VarChar(80)
+  description       String?         @db.Text
+  availableTitles   String[]        @default([]) @db.VarChar(32)
+  ownerId           String
+  factionName       String          @default("HOLY_KNIGHTS")
+  capacity          Int             @default(50)
+  tier              Int             @default(1)
+  totalContribution Int             @default(0)
+  createdAt         DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime        @updatedAt @db.Timestamp(6)
+  members           GuildMember[]
+  messages          GuildMessage[]
+  invites           GuildInvite[]
+  campaigns         GuildCampaign[]
+  owner             User            @relation("GuildOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
   @@map("guilds")
@@ -343,15 +348,15 @@ model GuildMember {
 }
 
 model GuildMessage {
-  id          String                @id @default(uuid()) @db.Uuid
-  guildId     String                @db.Uuid
+  id          String               @id @default(uuid()) @db.Uuid
+  guildId     String               @db.Uuid
   userId      String
-  content     String                @db.VarChar(2000)
-  createdAt   DateTime              @default(now()) @db.Timestamp(6)
-  deletedAt   DateTime?             @db.Timestamp(6)
-  reportCount Int                   @default(0)
-  guild       Guild                 @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String               @db.VarChar(2000)
+  createdAt   DateTime             @default(now()) @db.Timestamp(6)
+  deletedAt   DateTime?            @db.Timestamp(6)
+  reportCount Int                  @default(0)
+  guild       Guild                @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   reports     GuildMessageReport[]
 
   @@index([guildId, createdAt, id])
@@ -425,14 +430,14 @@ model GuildCampaignProgress {
 }
 
 model TavernMessage {
-  id          String    @id @default(uuid()) @db.Uuid
+  id          String                @id @default(uuid()) @db.Uuid
   userId      String
-  characterId String    @db.Uuid
-  content     String    @db.VarChar(500)
-  createdAt   DateTime  @default(now()) @db.Timestamp(6)
-  deletedAt   DateTime? @db.Timestamp(6)
-  reportCount Int       @default(0)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  characterId String                @db.Uuid
+  content     String                @db.VarChar(500)
+  createdAt   DateTime              @default(now()) @db.Timestamp(6)
+  deletedAt   DateTime?             @db.Timestamp(6)
+  reportCount Int                   @default(0)
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   reports     TavernMessageReport[]
 
   @@index([createdAt, id])

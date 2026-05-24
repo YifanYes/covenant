@@ -1054,7 +1054,43 @@
     },
     "title": "Habits",
     "last_completed": "Last: {{relative}}",
-    "never_completed": "Never completed"
+    "never_completed": "Never completed",
+    "tabs": {
+      "today": "Today",
+      "list": "List",
+      "grid": "Grid",
+      "heatmap": "Heatmap"
+    },
+    "today": {
+      "section_daily": "Daily",
+      "section_weekly": "This week",
+      "section_monthly": "This month",
+      "done_section": "Done ({{count}})",
+      "all_done_title": "All done",
+      "all_done": "Every habit for this period is met. Discipline is yours today."
+    },
+    "list": {
+      "progress": "{{current}}/{{target}}"
+    },
+    "heatmap": {
+      "total_year": "{{count}} this year"
+    },
+    "settings": {
+      "tab_label": "Settings",
+      "title": "Habits Settings",
+      "default_view_label": "Default Habits View",
+      "default_view_placeholder": "Select default view",
+      "visible_tabs_label": "Visible tabs",
+      "show_today": "Show Today tab",
+      "show_list": "Show List tab",
+      "show_grid": "Show Grid tab",
+      "show_heatmap": "Show Heatmap tab",
+      "at_least_one_visible": "At least one tab must remain visible",
+      "saved": "Habits settings saved",
+      "save_error": "Failed to save habits settings",
+      "save": "Save",
+      "unsaved_changes": "Unsaved changes"
+    }
   },
   "guilds": {
     "title": "Guilds",

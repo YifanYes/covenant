@@ -12,11 +12,16 @@ type TabVisibility = {
   showKanbanTab: boolean
   showTableTab: boolean
   showMatrixTab: boolean
+  showTodayTab: boolean
+  showHabitsListTab: boolean
+  showGridTab: boolean
+  showHeatmapTab: boolean
 }
 
 type UserPreferencesStore = TabVisibility & {
   language: string
   defaultTasksView: string
+  defaultHabitsView: string
   dateFormat: DateFormat
   setLanguage: (language: string) => void
   setDateFormat: (format: DateFormat) => void
@@ -24,6 +29,7 @@ type UserPreferencesStore = TabVisibility & {
     preferences: Partial<{
       language: string
       defaultTasksView: string
+      defaultHabitsView: string
       dateFormat: DateFormat
     }> &
       Partial<TabVisibility>
@@ -35,11 +41,16 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
     (set) => ({
       language: 'en',
       defaultTasksView: 'list',
+      defaultHabitsView: 'today',
       dateFormat: 'L',
       showListTab: true,
       showKanbanTab: true,
       showTableTab: true,
       showMatrixTab: true,
+      showTodayTab: true,
+      showHabitsListTab: true,
+      showGridTab: true,
+      showHeatmapTab: true,
       setLanguage: (language: string) => set({ language }),
       setDateFormat: (dateFormat: DateFormat) => set({ dateFormat }),
       setPreferences: (preferences) => set(preferences)

@@ -1,96 +1,27 @@
 'use client'
-import { useDateFormat } from '@/hooks/use-date-format'
+
+import { useHabitCalendar } from '@/hooks/use-habit-calendar'
+import { useHabitCompletion } from '@/hooks/use-habit-completion'
 import type { Habit } from '@/types/models.types'
 import Button from '@/ui/button.component'
 import Tooltip, { TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/tooltip.component'
-import { invalidators } from '@/utils/query-invalidation.utils'
-import { getRewardText } from '@/utils/text.utils'
-import { queryClient, trpcOptions } from '@/utils/trpc.utils'
-import { HabitTimespan } from '@shared/schemas/habits.schemas'
-import { useMutation } from '@tanstack/react-query'
-import type { ManipulateType, OpUnitType } from 'dayjs'
-import dayjs from 'dayjs'
 import { Check, Braces as Code, Loader } from 'pixelarticons/react'
-import { forwardRef, useMemo } from 'react'
+import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
-
-const timespanUnits: Record<HabitTimespan, OpUnitType> = {
-  [HabitTimespan.DAILY]: 'day',
-  [HabitTimespan.WEEKLY]: 'week',
-  [HabitTimespan.MONTHLY]: 'month'
-}
 
 // forwarding ref and event handlers so the trigger can attach to root div
 const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttributes<HTMLDivElement>>(
-  (
-    { habit: { completions = [], recurrence = 1, id, name, description, timespan, lastCompletedAt }, ...props },
-    ref
-  ) => {
+  ({ habit, ...props }, ref) => {
     const { t } = useTranslation()
-    const { formatDate } = useDateFormat()
-    const timespanUnit = timespanUnits[timespan as HabitTimespan]
-
-    const { lastCompletedLabel, isNeglected } = useMemo(() => {
-      if (!lastCompletedAt) {
-        return { lastCompletedLabel: t('habits.never_completed'), isNeglected: true }
-      }
-      const last = dayjs(lastCompletedAt)
-      return {
-        lastCompletedLabel: t('habits.last_completed', { relative: last.fromNow() }),
-        isNeglected: last.isBefore(dayjs().subtract(1, timespanUnit as ManipulateType))
-      }
-    }, [lastCompletedAt, timespanUnit, t])
-
-    const createCompletion = useMutation(
-      trpcOptions.habits.createCompletion.mutationOptions({
-        onSuccess: async (data) => {
-          const currentCount =
-            completions.filter(({ completedAt }) => dayjs().isSame(completedAt, timespanUnit)).length + 1
-          toast.success(
-            t(currentCount >= recurrence ? 'habits.success.target_met' : 'habits.success.progress', {
-              manaReward: getRewardText(data.manaEarned, data.reserveGained)
-            })
-          )
-          await queryClient.invalidateQueries({ queryKey: trpcOptions.habits.getAll.queryKey() })
-          await invalidators.character()
-        },
-        onError: () => toast.error(t('habits.error.internal.complete'))
-      })
-    )
-
-    // Generate calendar data for the last 36 days (5 weeks 1 day)
-    const calendarDays = useMemo(() => {
-      const completionCounts = new Map<string, number>()
-
-      completions.forEach((completion) => {
-        const dateStr = formatDate(completion?.completedAt)
-        completionCounts.set(dateStr, (completionCounts.get(dateStr) || 0) + 1)
-      })
-
-      return Array.from({ length: 36 }).map((_, i) => {
-        const date = dayjs().subtract(35 - i, 'day')
-        const count = completionCounts.get(formatDate(date)) || 0
-        return {
-          date: formatDate(date),
-          count,
-          style: count > 0 ? { opacity: Math.max(0.3, Math.min(count / recurrence, 1)) } : {},
-          background: date.isAfter(dayjs(), 'day') ? 'bg-muted/10' : count > 0 ? 'bg-primary' : 'bg-muted/30'
-        }
-      })
-    }, [completions, recurrence, formatDate])
-
-    const { periodCompletions, isPeriodCompleted } = useMemo(() => {
-      const completionsInPeriod = completions.filter((c) => dayjs(c.completedAt).isSame(dayjs(), timespanUnit))
-      return {
-        periodCompletions: completionsInPeriod.length,
-        isPeriodCompleted: completionsInPeriod.length >= recurrence
-      }
-    }, [completions, recurrence, timespanUnit])
+    const { name, description } = habit
+    const { complete, isPending, periodCompletions, isPeriodCompleted, lastCompletedLabel, isNeglected, recurrence } =
+      useHabitCompletion(habit)
+    const calendarDays = useHabitCalendar(habit, 36)
+    const progressLabel = t('habits.list.progress', { current: periodCompletions, target: recurrence })
 
     const handleMarkComplete = (e: React.MouseEvent) => {
       e.stopPropagation()
-      createCompletion.mutate({ id })
+      complete()
     }
 
     return (
@@ -123,20 +54,15 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
               </TooltipProvider>
             </div>
           </div>
+          <span className="text-muted-foreground text-xs tabular-nums">{progressLabel}</span>
           <Button
             size="icon"
             variant={isPeriodCompleted ? 'default' : 'outline'}
             onClick={handleMarkComplete}
-            disabled={createCompletion.isPending || periodCompletions >= recurrence}
+            disabled={isPending || periodCompletions >= recurrence}
             className="h-8 w-8 shrink-0"
           >
-            {createCompletion.isPending ? (
-              <Loader className="h-3.5 w-3.5 animate-spin" />
-            ) : recurrence > 1 && periodCompletions + 1 < recurrence ? (
-              <span className="text-xs font-bold">+1</span>
-            ) : (
-              <Check className="h-3.5 w-3.5" />
-            )}
+            {isPending ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
           </Button>
         </div>
 
@@ -149,11 +75,10 @@ const HabitCard = forwardRef<HTMLDivElement, { habit: Habit } & React.HTMLAttrib
             {calendarDays.map(({ date, count, background, style }, index) => (
               <div
                 key={index}
-                className="relative flex aspect-square items-center justify-center overflow-hidden rounded-sm"
+                className="relative aspect-square overflow-hidden rounded-sm"
                 title={`${date}: ${count}`}
               >
                 <div className={`absolute inset-0 ${background}`} style={style} />
-                {count > 1 && <span className="text-background relative z-10 text-xs font-bold">+{count}</span>}
               </div>
             ))}
           </div>

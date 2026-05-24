@@ -35,6 +35,15 @@ export class AuthService {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'tasks.settings.at_least_one_visible' })
     }
 
+    if (
+      settingsFields.showTodayTab === false &&
+      settingsFields.showHabitsListTab === false &&
+      settingsFields.showGridTab === false &&
+      settingsFields.showHeatmapTab === false
+    ) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'habits.settings.at_least_one_visible' })
+    }
+
     await this.prisma.$transaction(async (tx) => {
       if (Object.keys(settingsFields).length > 0) {
         await tx.userSettings.upsert({

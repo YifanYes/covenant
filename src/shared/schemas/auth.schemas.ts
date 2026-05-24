@@ -27,6 +27,8 @@ export type UpdateThemeType = z.infer<typeof updateThemeSchema>
 export const DATE_FORMATS = ['L', 'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', 'DD MMM YYYY'] as const
 export const TASKS_VIEWS = ['list', 'kanban', 'table', 'matrix'] as const
 export type TasksView = (typeof TASKS_VIEWS)[number]
+export const HABITS_VIEWS = ['today', 'list', 'grid', 'heatmap'] as const
+export type HabitsView = (typeof HABITS_VIEWS)[number]
 export const LOCALES = ['en', 'es'] as const
 export const COLOR_MODES = ['light', 'dark'] as const
 
@@ -37,11 +39,16 @@ export const updateProfileSchema = z
     locale: z.enum(LOCALES).optional(),
     colorMode: z.enum(COLOR_MODES).optional(),
     defaultTasksView: z.enum(TASKS_VIEWS).optional(),
+    defaultHabitsView: z.enum(HABITS_VIEWS).optional(),
     dateFormat: z.enum(DATE_FORMATS).optional(),
     showListTab: z.boolean().optional(),
     showKanbanTab: z.boolean().optional(),
     showTableTab: z.boolean().optional(),
-    showMatrixTab: z.boolean().optional()
+    showMatrixTab: z.boolean().optional(),
+    showTodayTab: z.boolean().optional(),
+    showHabitsListTab: z.boolean().optional(),
+    showGridTab: z.boolean().optional(),
+    showHeatmapTab: z.boolean().optional()
   })
   .refine((d) => Object.values(d).some((v) => v !== undefined), {
     message: 'errors.no_fields_to_update'
@@ -55,6 +62,16 @@ export const updateProfileSchema = z
       return tabs.some((v) => v === true)
     },
     { message: 'tasks.settings.at_least_one_visible', path: ['showListTab'] }
+  )
+  .refine(
+    (d) => {
+      const tabs = [d.showTodayTab, d.showHabitsListTab, d.showGridTab, d.showHeatmapTab]
+      const definedCount = tabs.filter((v) => v !== undefined).length
+      if (definedCount === 0) return true
+      if (definedCount !== 4) return false
+      return tabs.some((v) => v === true)
+    },
+    { message: 'habits.settings.at_least_one_visible', path: ['showTodayTab'] }
   )
 export type UpdateProfileType = z.infer<typeof updateProfileSchema>
 

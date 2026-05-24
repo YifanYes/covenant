@@ -1054,7 +1054,43 @@
     },
     "title": "Hábitos",
     "last_completed": "Última: {{relative}}",
-    "never_completed": "Nunca completado"
+    "never_completed": "Nunca completado",
+    "tabs": {
+      "today": "Hoy",
+      "list": "Lista",
+      "grid": "Cuadrícula",
+      "heatmap": "Mapa de calor"
+    },
+    "today": {
+      "section_daily": "Diario",
+      "section_weekly": "Esta semana",
+      "section_monthly": "Este mes",
+      "done_section": "Hechos ({{count}})",
+      "all_done_title": "Todo listo",
+      "all_done": "Cada hábito de este periodo está cumplido. Hoy la disciplina es tuya."
+    },
+    "list": {
+      "progress": "{{current}}/{{target}}"
+    },
+    "heatmap": {
+      "total_year": "{{count}} este año"
+    },
+    "settings": {
+      "tab_label": "Ajustes",
+      "title": "Ajustes de Hábitos",
+      "default_view_label": "Vista de hábitos por defecto",
+      "default_view_placeholder": "Selecciona la vista por defecto",
+      "visible_tabs_label": "Pestañas visibles",
+      "show_today": "Mostrar pestaña Hoy",
+      "show_list": "Mostrar pestaña Lista",
+      "show_grid": "Mostrar pestaña Cuadrícula",
+      "show_heatmap": "Mostrar pestaña Mapa de calor",
+      "at_least_one_visible": "Al menos una pestaña debe permanecer visible",
+      "saved": "Ajustes de hábitos guardados",
+      "save_error": "No se pudieron guardar los ajustes de hábitos",
+      "save": "Guardar",
+      "unsaved_changes": "Cambios sin guardar"
+    }
   },
   "guilds": {
     "title": "Gremios",
