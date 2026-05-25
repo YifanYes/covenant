@@ -3,7 +3,6 @@ import BaseConfirmDialog from '@/common/base-confirm-dialog.component'
 import { useAuthStore } from '@/stores/auth.store'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { useMutation } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -15,15 +14,16 @@ interface ConfirmDeleteAccountDialogProps {
 export const ConfirmDeleteAccountDialog = ({ open, onOpenChange }: ConfirmDeleteAccountDialogProps) => {
   const { t } = useTranslation()
   const { signOut } = useAuthStore()
-  const router = useRouter()
 
   const deleteAccountMutation = useMutation(
     trpcOptions.auth.deleteAccount.mutationOptions({
       onSuccess: async () => {
         await signOut()
-        router.push('/sign-up')
         toast.success(t('confirm_delete_account_dialog.success'))
         onOpenChange(false)
+        // Hard nav clears the in-memory session atom + RQ cache so the destination
+        // page doesn't see a stale logged-in session and bounce back to a protected route.
+        window.location.assign('/sign-up')
       },
       onError: (error) => toast.error(t('confirm_delete_account_dialog.error'), { description: error.message })
     })

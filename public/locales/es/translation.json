@@ -969,6 +969,14 @@
       "body": "Haz clic en el sello para elegir una nueva contraseña. El enlace expira en 60 minutos.",
       "cta": "Restablecer contraseña",
       "footer": "Si no solicitaste un restablecimiento, puedes ignorar este mensaje — tu contraseña no ha cambiado."
+    },
+    "emailChange": {
+      "subject": "Confirma tu nuevo correo de Covenant",
+      "preview": "Confirma tu nuevo correo para mantener tu pacto.",
+      "heading": "Aprueba tu nuevo correo",
+      "body": "Haz clic en el sello para confirmar esta dirección como el nuevo correo de tu cuenta de Covenant. El enlace expira en 60 minutos.",
+      "cta": "Confirmar nuevo correo",
+      "footer": "Si no solicitaste un cambio de correo, puedes ignorar este mensaje — el correo de tu cuenta no ha cambiado."
     }
   },
   "error_page": {
@@ -979,6 +987,7 @@
     "invalid_email": "Correo electrónico no válido",
     "invalid_password_length": "La contraseña debe tener al menos 8 caracteres",
     "password_mismatch": "Las contraseñas no coinciden",
+    "new_password_same_as_current": "La nueva contraseña debe ser distinta de la actual",
     "required_field": "Campo requerido",
     "task_status": {
       "label_reserved": "TODO, DOING y DONE son nombres de estado reservados.",
@@ -1816,9 +1825,46 @@
   },
   "user_menu": {
     "aria": "Menú de usuario",
-    "edit_name": "Editar nombre del personaje",
     "reopen_onboarding": "Mostrar primera misión",
     "reopen_onboarding_error": "No pudimos reabrir la lista. Inténtalo de nuevo."
+  },
+  "profile": {
+    "title": "Perfil",
+    "load_error": "No se pudo cargar tu perfil. Actualiza e inténtalo de nuevo.",
+    "character": {
+      "title": "Personaje"
+    },
+    "email": {
+      "title": "Correo electrónico",
+      "verified": "Verificado",
+      "unverified": "Sin verificar",
+      "resend_button": "Reenviar correo de verificación",
+      "resend_cooldown": "Reenviar en {{seconds}}s",
+      "resend_success": "Correo de verificación enviado",
+      "resend_error": "No se pudo enviar el correo de verificación",
+      "change_button": "Cambiar correo",
+      "change_success": "Enlace de verificación enviado a tu nuevo correo",
+      "change_error": "No se pudo cambiar el correo",
+      "new_email_label": "Nuevo correo"
+    },
+    "password": {
+      "title": "Contraseña",
+      "current_label": "Contraseña actual",
+      "new_label": "Nueva contraseña",
+      "confirm_label": "Confirmar nueva contraseña",
+      "submit": "Actualizar contraseña",
+      "success": "Contraseña actualizada",
+      "error": "No se pudo actualizar la contraseña"
+    },
+    "tutorial": {
+      "title": "Tutorial",
+      "replay_success": "Tutorial reiniciado. Las diapositivas se reproducirán.",
+      "reopen_success": "Lista de la primera misión reabierta"
+    },
+    "danger_zone": {
+      "title": "Zona de peligro",
+      "description": "Acciones irreversibles. Procede con cuidado."
+    }
   },
   "sidebar": {
     "calendar": "Calendario",

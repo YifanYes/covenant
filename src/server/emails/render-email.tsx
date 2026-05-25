@@ -14,7 +14,7 @@ function getLogoSvg(): string {
   return cachedLogoSvg
 }
 
-type EmailType = 'verification' | 'passwordReset'
+type EmailType = 'verification' | 'passwordReset' | 'emailChange'
 
 export async function renderEmail({
   type,

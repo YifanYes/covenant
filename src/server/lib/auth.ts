@@ -13,6 +13,25 @@ import { emailService } from '../services/email.service'
 
 const redisClient = redis
 
+// Better Auth JWTs are HS256-signed and arrive at our callbacks already trusted (they were
+// just minted by Better Auth's own endpoint). Decode-only is enough to route the email
+// template — verification happens server-side when the recipient clicks the link.
+function decodeVerificationRequestType(token: string | undefined): string | null {
+  if (!token) return null
+  const segments = token.split('.')
+  if (segments.length < 2) return null
+  try {
+    const payload = JSON.parse(Buffer.from(segments[1], 'base64url').toString('utf-8')) as unknown
+    if (typeof payload === 'object' && payload !== null && 'requestType' in payload) {
+      const requestType = (payload as { requestType?: unknown }).requestType
+      return typeof requestType === 'string' ? requestType : null
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   secret: env.JWT_SECRET,
@@ -70,13 +89,17 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
-    sendVerificationEmail: async ({ user, url }) => {
+    sendVerificationEmail: async ({ user, url, token }) => {
       const locale = await resolveEmailLocale(user.email)
-      const { subject, html } = await renderEmail({ type: 'verification', url, locale })
+      // Better Auth reuses this callback for the email-change flow. When the JWT carries
+      // `requestType: change-email-verification`, the click target updates the account email,
+      // so render the email-change template instead of the signup verification template.
+      const emailType = decodeVerificationRequestType(token) === 'change-email-verification' ? 'emailChange' : 'verification'
+      const { subject, html } = await renderEmail({ type: emailType, url, locale })
       try {
         await emailService.sendEmail({ to: user.email, subject, html })
       } catch (err) {
-        logger.error({ event: 'EMAIL_SEND_FAILED', type: 'verification', userId: user.id, err }, 'Failed to send verification email')
+        logger.error({ event: 'EMAIL_SEND_FAILED', type: emailType, userId: user.id, err }, 'Failed to send verification email')
         throw err
       }
     }
@@ -100,6 +123,16 @@ export const auth = betterAuth({
       enabled: true,
       trustedProviders: ['google'],
       allowDifferentEmails: false
+    }
+  },
+  user: {
+    changeEmail: {
+      // Only `sendVerificationEmail` is wired (above). Defining `sendChangeEmailConfirmation`
+      // here would put Better Auth into a two-step flow: the first click only triggers a
+      // *second* email to the new address, and only the second click actually swaps the
+      // account email. One-step is the expected UX — one email, click, done.
+      // Verified against better-auth@1.6.9 `api/routes/update-user.mjs::changeEmail`.
+      enabled: true
     }
   },
   plugins: [

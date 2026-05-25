@@ -90,3 +90,24 @@ export const resetPasswordSchema = z
     path: ['confirmPassword']
   })
 export type ResetPasswordType = z.infer<typeof resetPasswordSchema>
+
+export const changeEmailSchema = z.object({
+  newEmail: z.email('errors.invalid_email')
+})
+export type ChangeEmailType = z.infer<typeof changeEmailSchema>
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(8, 'errors.invalid_password_length'),
+    newPassword: z.string().min(8, 'errors.invalid_password_length'),
+    confirmPassword: z.string().min(8, 'errors.invalid_password_length')
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: 'errors.password_mismatch',
+    path: ['confirmPassword']
+  })
+  .refine((d) => d.newPassword !== d.currentPassword, {
+    message: 'errors.new_password_same_as_current',
+    path: ['newPassword']
+  })
+export type ChangePasswordType = z.infer<typeof changePasswordSchema>
