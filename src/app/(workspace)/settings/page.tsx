@@ -165,16 +165,28 @@ export default function Settings() {
 
   return (
     <>
-      <div className="flex max-w-md items-center justify-between">
+      <div className="flex max-w-md items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">{t('settings.title')}</h1>
-        <LoaderButton
-          onClick={handleSubmit(onSubmit)}
-          isLoading={isSubmitting}
-          disabled={isSaveDisabled}
-          variant="outline"
-          className="cursor-pointer shrink-0"
-          label={t('save_changes')}
-        />
+        <div className="flex items-center gap-3">
+          {isDirty && !isSubmitting && (
+            <span
+              role="status"
+              aria-live="polite"
+              className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-300 inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium"
+            >
+              <span className="size-1.5 rounded-full bg-amber-500" aria-hidden />
+              {t('settings.unsaved_changes')}
+            </span>
+          )}
+          <LoaderButton
+            onClick={handleSubmit(onSubmit)}
+            isLoading={isSubmitting}
+            disabled={isSaveDisabled}
+            variant="outline"
+            className="cursor-pointer shrink-0"
+            label={t('save_changes')}
+          />
+        </div>
       </div>
       <div className="flex max-w-md flex-col gap-6 py-6">
         <Controller

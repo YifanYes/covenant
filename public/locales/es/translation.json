@@ -1817,6 +1817,7 @@
     "replay_tutorial_error": "No se pudo reiniciar el tutorial. Inténtalo de nuevo.",
     "saved_success": "Configuración guardada",
     "save_error": "Error al guardar la configuración",
+    "unsaved_changes": "Cambios sin guardar",
     "source": {
       "label": "Código",
       "label_with_sha": "Código ({{sha}})",
