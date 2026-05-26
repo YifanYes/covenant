@@ -14,6 +14,20 @@ export interface BlogPost {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: '2026-05-24-week-in-review',
+    title: {
+      en: 'A Week in Covenant: A Fresh Home Page, Tasks Your Way, and Guild Identity',
+      es: 'Una semana en Covenant: Una página de inicio renovada, tareas a tu manera e identidad de gremio'
+    },
+    date: '2026-05-24',
+    author: 'Yifan',
+    tags: ['release-notes', 'features'],
+    excerpt: {
+      en: 'The dashboard gets a real home page with a trend chart and quick-complete habits, tasks gain user-defined statuses and per-tab visibility, habits add Today/List/Heatmap views, guilds get lore, member titles, and tier badges, plus a checklist-based onboarding revision.',
+      es: 'El panel estrena una página de inicio de verdad con un gráfico de tendencias y hábitos de completado rápido, las tareas ganan estados definidos por el usuario y visibilidad por pestaña, los hábitos añaden vistas Hoy/Lista/Mapa de calor, los gremios estrenan lore, títulos de miembro e insignias de nivel, más una revisión de incorporación basada en lista de verificación.'
+    }
+  },
+  {
     slug: '2026-05-18-week-in-review',
     title: {
       en: 'A Week in Covenant: Combat Reborn and Guilds Complete',
@@ -54,5 +68,9 @@ export const POST_IMPORTS: Record<
   '2026-05-18-week-in-review': {
     en: () => import('./_posts/2026-05-18-week-in-review.en.mdx'),
     es: () => import('./_posts/2026-05-18-week-in-review.es.mdx')
+  },
+  '2026-05-24-week-in-review': {
+    en: () => import('./_posts/2026-05-24-week-in-review.en.mdx'),
+    es: () => import('./_posts/2026-05-24-week-in-review.es.mdx')
   }
 }
