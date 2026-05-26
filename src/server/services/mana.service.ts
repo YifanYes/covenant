@@ -1,7 +1,14 @@
 import type { PrismaClient } from '@/generated/prisma'
-import { getTaskMana, MANA_REWARDS, type ManaSource, type TaskImpact } from '@/shared/constants/rewards.constants'
+import {
+  getManaForSource,
+  getTaskMana,
+  MANA_REWARDS,
+  type ManaSource,
+  type TaskImpact
+} from '@/shared/constants/rewards.constants'
 import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
+import { splitMana } from '../utils/mana'
 
 const log = logger.child({ service: 'mana' })
 
@@ -46,18 +53,18 @@ export class ManaService {
       return { success: false, amount: 0, manaApplied: 0, reserveGained: 0, newMana: 0, newReserve: 0 }
     }
 
-    const amount = this.amountFor(source, ctx)
+    const amount = getManaForSource(source, ctx)
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     if (!currentClass) {
       return { success: false, amount, manaApplied: 0, reserveGained: 0, newMana: 0, newReserve: 0 }
     }
 
-    const room = Math.max(0, currentClass.maxMana - currentClass.mana)
-    const manaApplied = Math.min(amount, room)
-    const reserveGained = amount - manaApplied
-    const newMana = currentClass.mana + manaApplied
-    const currentReserve = character.manaReserve ?? 0
-    const newReserve = currentReserve + reserveGained
+    const { manaApplied, reserveGained, newMana, newReserve } = splitMana({
+      amount,
+      mana: currentClass.mana,
+      maxMana: currentClass.maxMana,
+      reserve: character.manaReserve ?? 0
+    })
 
     if (manaApplied > 0) {
       await this.characterRepository.updateHealth(currentClass.id, currentClass.health, newMana)
@@ -100,18 +107,18 @@ export class ManaService {
       return { success: false, amount: 0, manaApplied: 0, reserveGained: 0, newMana: 0, newReserve: 0 }
     }
 
-    const amount = contexts.reduce((sum, ctx) => sum + this.amountFor(source, ctx), 0)
+    const amount = contexts.reduce((sum, ctx) => sum + getManaForSource(source, ctx), 0)
     const currentClass = character.classes.find((c) => c.className === character.currentClass)
     if (!currentClass) {
       return { success: false, amount, manaApplied: 0, reserveGained: 0, newMana: 0, newReserve: 0 }
     }
 
-    const room = Math.max(0, currentClass.maxMana - currentClass.mana)
-    const manaApplied = Math.min(amount, room)
-    const reserveGained = amount - manaApplied
-    const newMana = currentClass.mana + manaApplied
-    const currentReserve = character.manaReserve ?? 0
-    const newReserve = currentReserve + reserveGained
+    const { manaApplied, reserveGained, newMana, newReserve } = splitMana({
+      amount,
+      mana: currentClass.mana,
+      maxMana: currentClass.maxMana,
+      reserve: character.manaReserve ?? 0
+    })
 
     if (manaApplied > 0) {
       await this.characterRepository.updateHealth(currentClass.id, currentClass.health, newMana)
@@ -138,11 +145,14 @@ export class ManaService {
     if (!currentClass) return { added: 0, newMana: 0, newReserve: character.manaReserve ?? 0 }
 
     const reserve = character.manaReserve ?? 0
-    const room = Math.max(0, currentClass.maxMana - currentClass.mana)
-    const added = Math.min(reserve, room)
+    const { manaApplied: added, newMana } = splitMana({
+      amount: reserve,
+      mana: currentClass.mana,
+      maxMana: currentClass.maxMana,
+      reserve: 0
+    })
     if (added <= 0) return { added: 0, newMana: currentClass.mana, newReserve: reserve }
 
-    const newMana = currentClass.mana + added
     const newReserve = reserve - added
 
     await this.characterRepository.updateHealth(currentClass.id, currentClass.health, newMana)
@@ -259,11 +269,4 @@ export class ManaService {
     return streak
   }
 
-  private amountFor(source: ManaSource, ctx: ManaGrantContext): number {
-    if (source === 'task') return getTaskMana(ctx.impact)
-    if (source === 'habit') return MANA_REWARDS.HABIT
-    if (source === 'objective') return MANA_REWARDS.OBJECTIVE
-    if (source === 'journal') return MANA_REWARDS.JOURNAL
-    return 0
-  }
 }

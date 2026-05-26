@@ -43,10 +43,6 @@
 
 - [ ] Discord setup — server, roles, welcome bot, weekly update template. Roadmap Phase 3 infrastructure block (Discord servidor, roles configurados, bot de bienvenida, template para weekly update). Beta tester comms channel.
 
-- [ ] Mana service tests `[beta-risk]`. `src/server/services/mana.service.ts` is the reward-calc spine for tasks/habits/objectives/journaling and is the only major service without a test file. Beta launch with a quietly broken mana grant = silent core-loop break and a polluted PostHog dataset (every reward event carries `mana_earned`). Pure-function tests, no infra. New file: `src/server/__tests__/services/mana.service.test.ts`. Cover task/habit/objective/journal reward paths plus at least one streak-bonus case.
-
-- [ ] Onboarding tutorial — Tasks vs Habits vs Quests distinction `[onboarding]` `[beta-risk]`. Promoted from Medium. Habitica's #1 churn driver: users hit the Habit/Daily/To-Do/class confusion wall. Minimum viable: `User.hasSeenOnboarding Boolean @default(false)`, one dismissable modal on first workspace entry covering task type semantics + faction/class consequences + basic combat loop, paired with empty-state one-liners on each page. Touches `prisma/schema.prisma`, new modal component, `(workspace)/layout.tsx`, i18n in both locales.
-
 ## Medium Priority
 
 - [ ] Accessibility in combat.

@@ -26,3 +26,15 @@ export function getTaskMana(impact: TaskImpact | string | null | undefined): num
   if (impact === 'MEDIUM') return MANA_REWARDS.TASK_MID_IMPACT
   return MANA_REWARDS.TASK_LOW_IMPACT
 }
+
+export interface ManaSourceContext {
+  impact?: TaskImpact | string | null
+}
+
+export function getManaForSource(source: ManaSource, ctx: ManaSourceContext = {}): number {
+  if (source === 'task') return getTaskMana(ctx.impact)
+  if (source === 'habit') return MANA_REWARDS.HABIT
+  if (source === 'objective') return MANA_REWARDS.OBJECTIVE
+  if (source === 'journal') return MANA_REWARDS.JOURNAL
+  return 0
+}
