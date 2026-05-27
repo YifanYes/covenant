@@ -41,7 +41,7 @@ describe('ManaService', () => {
 
     it('returns failure shape but preserves amount when currentClass mismatches', async () => {
       const character = buildCharacter({ mana: 0, maxMana: 10 })
-      character.currentClass = CharacterClassName.MAGE
+      character.currentClass = CharacterClassName.HERALD
       mockRepo.findWithClasses.mockResolvedValue(character)
 
       const result = await service.addManaFromCompletion('user-1', 'habit')
@@ -162,9 +162,7 @@ describe('ManaService', () => {
     })
 
     it('aggregates mixed-impact tasks in a single character read and single health write', async () => {
-      mockRepo.findWithClasses.mockResolvedValue(
-        buildCharacter({ mana: 0, maxMana: 100, classId: 'cl-1', id: 'c-1' })
-      )
+      mockRepo.findWithClasses.mockResolvedValue(buildCharacter({ mana: 0, maxMana: 100, classId: 'cl-1', id: 'c-1' }))
 
       const result = await service.addManaFromCompletions('user-1', 'task', [
         { impact: 'HIGH' },
@@ -191,7 +189,7 @@ describe('ManaService', () => {
 
     it('preserves reserve when currentClass missing', async () => {
       const character = buildCharacter({ reserve: 7 })
-      character.currentClass = CharacterClassName.MAGE
+      character.currentClass = CharacterClassName.HERALD
       mockRepo.findByIdWithClasses.mockResolvedValue(character)
 
       const result = await service.topUpFromReserve('c-1')
@@ -393,9 +391,7 @@ describe('ManaService', () => {
     })
 
     it('counts consecutive days ending today', () => {
-      expect(
-        service.calculateStreakFromDates([day('2026-05-24'), day('2026-05-25'), day('2026-05-26')])
-      ).toBe(3)
+      expect(service.calculateStreakFromDates([day('2026-05-24'), day('2026-05-25'), day('2026-05-26')])).toBe(3)
     })
 
     it('counts consecutive days ending yesterday (1-day grace)', () => {
@@ -408,19 +404,12 @@ describe('ManaService', () => {
 
     it('breaks on gap, ignoring older runs', () => {
       expect(
-        service.calculateStreakFromDates([
-          day('2026-05-20'),
-          day('2026-05-21'),
-          day('2026-05-25'),
-          day('2026-05-26')
-        ])
+        service.calculateStreakFromDates([day('2026-05-20'), day('2026-05-21'), day('2026-05-25'), day('2026-05-26')])
       ).toBe(2)
     })
 
     it('deduplicates same-day completions', () => {
-      expect(
-        service.calculateStreakFromDates([day('2026-05-26'), day('2026-05-26'), day('2026-05-25')])
-      ).toBe(2)
+      expect(service.calculateStreakFromDates([day('2026-05-26'), day('2026-05-26'), day('2026-05-25')])).toBe(2)
     })
 
     it('calculateHabitStreak proxies through completedAt', () => {
