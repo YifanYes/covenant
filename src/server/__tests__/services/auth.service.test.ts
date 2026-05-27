@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- TODO: replace tx-model `any` with PrismaClient delegate types */
 import type { UpdateProfileType, UpdateThemeType } from '@shared/schemas/auth.schemas'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { UserRepository } from '../../repositories/user.repository'

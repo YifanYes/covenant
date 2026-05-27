@@ -1,20 +1,19 @@
+import type { PrismaClient } from '@/generated/prisma'
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CharacterRepository } from '../../repositories/character.repository'
+import { createRepoMock } from '../helpers/mock-repo'
 
 describe('CharacterRepository - Authorization', () => {
   let characterRepository: CharacterRepository
-  let mockPrisma: any
+  let characterModel: ReturnType<typeof createRepoMock<PrismaClient['character']>>
+  let mockPrisma: PrismaClient
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockPrisma = {
-      character: {
-        findUnique: vi.fn(),
-        update: vi.fn()
-      }
-    }
+    characterModel = createRepoMock<PrismaClient['character']>()
+    mockPrisma = { character: characterModel } as unknown as PrismaClient
 
     characterRepository = new CharacterRepository(mockPrisma)
   })
@@ -24,12 +23,12 @@ describe('CharacterRepository - Authorization', () => {
       const characterId = 'char-1'
       const userId = 'user-1'
 
-      mockPrisma.character.findUnique.mockResolvedValue({ userId })
+      characterModel.findUnique.mockResolvedValue({ userId } as never)
 
       const result = await characterRepository.verifyOwnership(characterId, userId)
 
       expect(result).toBe(true)
-      expect(mockPrisma.character.findUnique).toHaveBeenCalledWith({
+      expect(characterModel.findUnique).toHaveBeenCalledWith({
         where: { id: characterId },
         select: { userId: true }
       })
@@ -40,7 +39,7 @@ describe('CharacterRepository - Authorization', () => {
       const userId = 'user-1'
       const otherUserId = 'user-2'
 
-      mockPrisma.character.findUnique.mockResolvedValue({ userId: otherUserId })
+      characterModel.findUnique.mockResolvedValue({ userId: otherUserId } as never)
 
       const result = await characterRepository.verifyOwnership(characterId, userId)
 
@@ -51,7 +50,7 @@ describe('CharacterRepository - Authorization', () => {
       const characterId = 'non-existent'
       const userId = 'user-1'
 
-      mockPrisma.character.findUnique.mockResolvedValue(null)
+      characterModel.findUnique.mockResolvedValue(null as never)
 
       const result = await characterRepository.verifyOwnership(characterId, userId)
 
@@ -60,11 +59,6 @@ describe('CharacterRepository - Authorization', () => {
   })
 
   describe('findByIdWithClassesOrThrow', () => {
-    beforeEach(() => {
-      // Need to add the include for classes
-      mockPrisma.character.findUnique = vi.fn()
-    })
-
     it('should return character when found and no userId check required', async () => {
       const characterId = 'char-1'
       const character = {
@@ -74,7 +68,7 @@ describe('CharacterRepository - Authorization', () => {
         classes: []
       }
 
-      mockPrisma.character.findUnique.mockResolvedValue(character)
+      characterModel.findUnique.mockResolvedValue(character as never)
 
       const result = await characterRepository.findByIdWithClassesOrThrow(characterId)
 
@@ -91,7 +85,7 @@ describe('CharacterRepository - Authorization', () => {
         classes: []
       }
 
-      mockPrisma.character.findUnique.mockResolvedValue(character)
+      characterModel.findUnique.mockResolvedValue(character as never)
 
       const result = await characterRepository.findByIdWithClassesOrThrow(characterId, userId)
 
@@ -101,7 +95,7 @@ describe('CharacterRepository - Authorization', () => {
     it('should throw NOT_FOUND when character does not exist', async () => {
       const characterId = 'non-existent'
 
-      mockPrisma.character.findUnique.mockResolvedValue(null)
+      characterModel.findUnique.mockResolvedValue(null as never)
 
       await expect(characterRepository.findByIdWithClassesOrThrow(characterId)).rejects.toThrow(TRPCError)
       await expect(characterRepository.findByIdWithClassesOrThrow(characterId)).rejects.toMatchObject({
@@ -120,7 +114,7 @@ describe('CharacterRepository - Authorization', () => {
         classes: []
       }
 
-      mockPrisma.character.findUnique.mockResolvedValue(character)
+      characterModel.findUnique.mockResolvedValue(character as never)
 
       await expect(characterRepository.findByIdWithClassesOrThrow(characterId, userId)).rejects.toThrow(TRPCError)
       await expect(characterRepository.findByIdWithClassesOrThrow(characterId, userId)).rejects.toMatchObject({

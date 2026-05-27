@@ -1,5 +1,11 @@
 # TODOs
 
+## Beta Blockers (closed friends beta, week of 2026-06-01)
+
+- [ ] PostHog integration — `docs/specs/posthog_integration.md`. Ship before beta starts; events can't be backfilled. Bundle Tasks-tab tracking (see Medium) into the same PR.
+
+- [ ] Audit Objectives → mana → dashboard wiring `[audit]`. Confirm completing an Objective fires the `objective_completed` PostHog event with non-zero `mana_earned` and that the user's mana reserve and dashboard reflect it. Objective is the Goal-tracking pillar named in `MISSION.md`; if it doesn't drive the core loop, the central analytics question in `docs/specs/posthog_integration.md` can't be answered. No code change if everything works.
+
 ## Quick Wins
 
 - [ ] Set up `privacy@covenantrpg.com` email forwarder before going public
@@ -21,9 +27,7 @@
 
 ## High Priority
 
-- [ ] PostHog integration — `docs/specs/posthog_integration.md`.
-
-- [ ] Beta wipe tools. Required for controlled beta iteration.
+> Post-beta hardening for public launch. None block the closed friends beta — friends-only traffic = no hostile abuse, no GDPR strangers, no press scrutiny.
 
 - [ ] Welcome email + email retry/throttle
   - `EmailService` is single-attempt with 5s timeout. Verification + password-reset endpoints are rate-limited via Better Auth (3 req / 10s per IP on sign-up, 3 req / 60s on `/forget-password`), but there is no per-recipient cap and no welcome email. Abuse vector + Brevo cost risk if a single email is targeted from many IPs.
@@ -32,8 +36,7 @@
 - [ ] Content Security Policy
   - `next.config.ts` now sets HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy (all delivered in the auth hardening pass). CSP was intentionally deferred — needs allowlist work for Next.js inline scripts, Google OAuth, and Sentry tunneling. Worth a dedicated pass.
 
-- [ ] Account management — profile edit, data export
-  - Settings page covers email/language/theme/faction/logout/delete-account but lacks profile name/character edit and GDPR-compliant data export.
+- [ ] Account management — data export for GDPR compliance
 
 - [ ] Add Github OAuth
 
@@ -72,9 +75,23 @@
   - **Schema round-trip.** `getByDateInputSchema.monthIndex` is `z.string().optional()` then router does `Number(...)`. Change to `z.number().int().min(0).max(11).optional()` and drop the `.toString()` at `integrated-calendar:28`.
   - Not a bug: do **not** swap `new Date().getTimezoneOffset()` for `dayjs().utcOffset()` — opposite sign convention, would break backend math in `journal.service.ts:96`.
 
-- [ ] PostHog: track Tasks tab usage `[measure]`. Add events `tasks_view_changed { view, source: 'tab_click' | 'default' | 'url_param' }` fired from `handleViewChange` (`src/app/(workspace)/tasks/page.tsx:30-38`) and `tasks_view_loaded { view }` on mount with the resolved `activeView`. Tells us which of list/kanban/table/matrix to keep or cut after beta data lands. Add event rows to `docs/specs/posthog_integration.md` taxonomy table.
+- [ ] PostHog: track Tasks tab usage `[measure]`. Add events `tasks_view_changed { view, source: 'tab_click' | 'default' | 'url_param' }` fired from `handleViewChange` (`src/app/(workspace)/tasks/page.tsx:30-38`) and `tasks_view_loaded { view }` on mount with the resolved `activeView`. Tells us which of list/kanban/table/matrix to keep or cut after beta data lands. Add event rows to `docs/specs/posthog_integration.md` taxonomy table. **Bundle with PostHog integration in Beta Blockers — events must be live at beta start to capture week-1 data.**
 
-- [ ] Audit Objectives → mana → dashboard wiring `[audit]`. Confirm completing an Objective fires the `objective_completed` PostHog event with non-zero `mana_earned` and that the user's mana reserve and dashboard reflect it. Objective is the Goal-tracking pillar named in `MISSION.md`; if it doesn't drive the core loop, the central analytics question in `docs/specs/posthog_integration.md` can't be answered. No code change if everything works.
+- [ ] Options-bag constructors for fat services `[test][refactor]`. `GuildService` (7 positional args), `CombatService` (8), `DashboardService` (6), `QuestService` (5), `TaskService` (5) — every test re-lists deps in order. Adding a dep means touching every test file. Switch to `new GuildService({ prisma, guildRepo, ... })`. Touches `src/server/services/*.ts`, `src/server/services/service.factory.ts`, and the matching `__tests__/services/*.test.ts`. Cuts test prologue ~40%, additive future changes.
+
+- [ ] Backfill tx-model `any` in grandfathered service tests `[test][debt]`. Five files carry `/* eslint-disable @typescript-eslint/no-explicit-any */` headers with `TODO: replace tx-model any with PrismaClient delegate types`: `auth.service.test.ts`, `guild.service.test.ts`, `guild-campaign.service.test.ts`, `guild-progression.service.test.ts`, `tavern.service.test.ts`. Replace `createRepoMock<any>()` for tx models with `createRepoMock<PrismaClient['guild']>()` etc., then drop the file-level disable.
+
+- [ ] Typed fixtures for Dashboard + Store `[test]`. `dashboard.service.test.ts` has 28 `as any` casts; `store.service.test.ts` has 5. Means fixture shapes drift from real Prisma return types. Extend `src/server/__tests__/fixtures/` to cover dashboard rollups and store inventory shapes, then strip the casts. After this lands, consider promoting `no-explicit-any` to error project-wide.
+
+- [ ] tRPC router tests via `createCaller` `[test]`. Currently 1 router test (rate-limit only). All other procedures, input validation, and auth context middleware are untested — bugs here ship. One `createCaller()` test per router with mocked `ServiceFactory`. Start with high-risk routers: auth, character, guild.
+
+- [ ] Playwright happy-path E2E `[test]`. Zero frontend coverage today. Single test: login → create habit → complete → mana grant visible on dashboard. Single browser, runs in CI after build. Catches the class of bugs that mocked unit tests cannot (real Next.js routing, tRPC wire, hydration, mana display).
+
+- [ ] Real-DB repo integration tier `[test]`. Repository tests currently mock Prisma — they assert `findUnique` was called with the right `where` clause, which re-states implementation. Real bugs (schema typos, bad joins, N+1) escape. Add testcontainers (or docker-compose Postgres) for a separate `pnpm test:db` tier; keep current mocked unit tier as-is. Defer until a repo bug actually ships.
+
+- [ ] Ratchet vitest coverage thresholds `[test]`. Baselines in `vitest.config.ts` set to current floor minus small buffer (services 75/65/70/75, utils 60/35/75/60). Raise after each coverage-improving PR; target services 85+, utils 80+.
+
+- [ ] Reduce over-assertion in service tests `[test]`. Many tests call `expect(repo.foo).toHaveBeenCalledWith(exactArgs)` on every internal call, locking tests to implementation. Prefer asserting return values + state-changing calls only. Refactor opportunistically when touching a test for other reasons.
 
 ## Low Priority
 
@@ -97,7 +114,6 @@ Deferred until the core loop has been validated with real beta users. Specs for 
 - [ ] Combat redesign — post-beta cleanup. Deferred items surfaced during Phase 2 implementation, not load-bearing for beta:
   - Tier 4 abilities for Inquisitor + Demon Hunter classes (both classes out of beta scope; no T4 abilities defined for any class).
   - Empirical balance data — current tuning backed only by fight-count tests, not playtest data. Run 10× T1/T2/T3 parity fights and log average duration; flag stat axes outside 3–5 turn band.
-  - `ManaService.scrubManaPotions` auto-invocation — runtime scrub exists but is uncalled. Wire into `CharacterService.getCurrentClass` or one-off deploy script before any real user has `mana_potion` rows.
   - Non-catalog ability i18n + ES item flavor — `blinding_faith` / `disruption_storm` / `fireball` / `fragility_curse` / `lightning_burst` / `righteous_charge` / `templar_burst` / `temporal_prison` / `igneous_cut` / `shield_bash` still contain "dice" copy; ES item flavor at `es/translation.json:1383/1399/1427/1467` still mentions "dado". No live consumer, but stale.
   - AI selection unit test — Phase 2B asserts outcomes (mana drains, fallback fires) not ordering (cost-tier sort, HP-low filter). Add focused test for `executeEnemyMove` selection algorithm.
   - `CombatLogType` enum prune — legacy variants (`PLAYER_HITS` / `ENEMY_DEFENDS` / `PLAYER_DEFENDS` / `MANA_REGEN` / `PHASE_COMPLETE` / `STATUS_EXPIRED`) no longer have emitters but UI consumers reference them. Prune when combat-log UI gets its own pass.
@@ -121,7 +137,6 @@ Deferred until the core loop has been validated with real beta users. Specs for 
 - [ ] Google Calendar (and iCal) sync. Two-way sync of scheduled tasks/dailies. Habitica feedback: most-requested integration. Deferrable — internal calendar view (Medium) covers the primary use case first.
 - [ ] AI report of the month — monthly AI-generated summary of productivity, streaks, objective progress
 - [ ] Map page interactivity — clickable regions, faction war state, quest entry points
-- [ ] Email change flow
 - [ ] Account deletion: pre-delete data export prompt (folds into "Account management" data export)
 - [ ] Breadcrumbs on nested routes (`/quests/[questId]`, `/inventory/[tab]`)
 - [ ] Post-combat summary screen — XP/gold/loot between combat end and `/quests` redirect

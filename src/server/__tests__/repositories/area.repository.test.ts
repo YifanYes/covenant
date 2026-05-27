@@ -1,21 +1,19 @@
+import type { PrismaClient } from '@/generated/prisma'
 import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AreaRepository } from '../../repositories/area.repository'
+import { createRepoMock } from '../helpers/mock-repo'
 
 describe('AreaRepository - Authorization', () => {
   let areaRepository: AreaRepository
-  let mockPrisma: any
+  let areaModel: ReturnType<typeof createRepoMock<PrismaClient['area']>>
+  let mockPrisma: PrismaClient
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockPrisma = {
-      area: {
-        findUnique: vi.fn(),
-        update: vi.fn(),
-        delete: vi.fn()
-      }
-    }
+    areaModel = createRepoMock<PrismaClient['area']>()
+    mockPrisma = { area: areaModel } as unknown as PrismaClient
 
     areaRepository = new AreaRepository(mockPrisma)
   })
@@ -28,14 +26,14 @@ describe('AreaRepository - Authorization', () => {
       const existingArea = { id: areaId, userId, name: 'Old Name' }
       const updatedArea = { id: areaId, userId, name: 'Updated Name' }
 
-      mockPrisma.area.findUnique.mockResolvedValue(existingArea)
-      mockPrisma.area.update.mockResolvedValue(updatedArea)
+      areaModel.findUnique.mockResolvedValue(existingArea as never)
+      areaModel.update.mockResolvedValue(updatedArea as never)
 
       const result = await areaRepository.update(areaId, userId, input)
 
       expect(result).toEqual(updatedArea)
-      expect(mockPrisma.area.findUnique).toHaveBeenCalledWith({ where: { id: areaId } })
-      expect(mockPrisma.area.update).toHaveBeenCalled()
+      expect(areaModel.findUnique).toHaveBeenCalledWith({ where: { id: areaId } })
+      expect(areaModel.update).toHaveBeenCalled()
     })
 
     it('should throw NOT_FOUND when area does not exist', async () => {
@@ -43,13 +41,13 @@ describe('AreaRepository - Authorization', () => {
       const userId = 'user-1'
       const input = { id: areaId, name: 'Updated Name' }
 
-      mockPrisma.area.findUnique.mockResolvedValue(null)
+      areaModel.findUnique.mockResolvedValue(null as never)
 
       await expect(areaRepository.update(areaId, userId, input)).rejects.toThrow(TRPCError)
       await expect(areaRepository.update(areaId, userId, input)).rejects.toMatchObject({
         code: 'NOT_FOUND'
       })
-      expect(mockPrisma.area.update).not.toHaveBeenCalled()
+      expect(areaModel.update).not.toHaveBeenCalled()
     })
 
     it('should throw NOT_FOUND when user does not own the area', async () => {
@@ -59,13 +57,13 @@ describe('AreaRepository - Authorization', () => {
       const input = { id: areaId, name: 'Updated Name' }
       const existingArea = { id: areaId, userId: otherUserId, name: 'Old Name' }
 
-      mockPrisma.area.findUnique.mockResolvedValue(existingArea)
+      areaModel.findUnique.mockResolvedValue(existingArea as never)
 
       await expect(areaRepository.update(areaId, userId, input)).rejects.toThrow(TRPCError)
       await expect(areaRepository.update(areaId, userId, input)).rejects.toMatchObject({
         code: 'NOT_FOUND'
       })
-      expect(mockPrisma.area.update).not.toHaveBeenCalled()
+      expect(areaModel.update).not.toHaveBeenCalled()
     })
   })
 
@@ -75,27 +73,27 @@ describe('AreaRepository - Authorization', () => {
       const userId = 'user-1'
       const existingArea = { id: areaId, userId, name: 'Test Area' }
 
-      mockPrisma.area.findUnique.mockResolvedValue(existingArea)
-      mockPrisma.area.delete.mockResolvedValue(existingArea)
+      areaModel.findUnique.mockResolvedValue(existingArea as never)
+      areaModel.delete.mockResolvedValue(existingArea as never)
 
       const result = await areaRepository.delete(areaId, userId)
 
       expect(result).toEqual(existingArea)
-      expect(mockPrisma.area.findUnique).toHaveBeenCalledWith({ where: { id: areaId } })
-      expect(mockPrisma.area.delete).toHaveBeenCalledWith({ where: { id: areaId } })
+      expect(areaModel.findUnique).toHaveBeenCalledWith({ where: { id: areaId } })
+      expect(areaModel.delete).toHaveBeenCalledWith({ where: { id: areaId } })
     })
 
     it('should throw NOT_FOUND when area does not exist', async () => {
       const areaId = 'non-existent'
       const userId = 'user-1'
 
-      mockPrisma.area.findUnique.mockResolvedValue(null)
+      areaModel.findUnique.mockResolvedValue(null as never)
 
       await expect(areaRepository.delete(areaId, userId)).rejects.toThrow(TRPCError)
       await expect(areaRepository.delete(areaId, userId)).rejects.toMatchObject({
         code: 'NOT_FOUND'
       })
-      expect(mockPrisma.area.delete).not.toHaveBeenCalled()
+      expect(areaModel.delete).not.toHaveBeenCalled()
     })
 
     it('should throw NOT_FOUND when user does not own the area', async () => {
@@ -104,13 +102,13 @@ describe('AreaRepository - Authorization', () => {
       const otherUserId = 'user-2'
       const existingArea = { id: areaId, userId: otherUserId, name: 'Test Area' }
 
-      mockPrisma.area.findUnique.mockResolvedValue(existingArea)
+      areaModel.findUnique.mockResolvedValue(existingArea as never)
 
       await expect(areaRepository.delete(areaId, userId)).rejects.toThrow(TRPCError)
       await expect(areaRepository.delete(areaId, userId)).rejects.toMatchObject({
         code: 'NOT_FOUND'
       })
-      expect(mockPrisma.area.delete).not.toHaveBeenCalled()
+      expect(areaModel.delete).not.toHaveBeenCalled()
     })
   })
 })

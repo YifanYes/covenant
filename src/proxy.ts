@@ -11,8 +11,8 @@ export function proxy(request: NextRequest) {
 
   // Public routes
   const authRoutes = ['/login', '/sign-up', '/auth/callback', '/forgot-password', '/reset-password']
-  const landingRoutes = ['/', '/news', '/mechanics', '/magic-nature', '/roadmap']
-  const landingPrefixRoutes = ['/story', '/card']
+  const landingRoutes = ['/', '/mechanics', '/magic-nature', '/roadmap']
+  const landingPrefixRoutes = ['/story', '/card', '/news', '/privacy', '/tos']
   const isPublicRoute =
     authRoutes.some((r) => pathname.startsWith(r)) ||
     pathname.startsWith('/api/') ||

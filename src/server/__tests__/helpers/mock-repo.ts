@@ -3,6 +3,7 @@ import type { Mock } from 'vitest'
 import { vi } from 'vitest'
 
 type MockedMethods<T> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mock return must accept anything callers chain
   [K in keyof T]: T[K] extends (...args: infer A) => unknown ? Mock<(...args: A) => any> : T[K]
 }
 
