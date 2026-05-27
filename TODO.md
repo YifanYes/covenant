@@ -48,8 +48,7 @@
 
 ## Medium Priority
 
-- [ ] Accessibility in combat.
-  - Combat grid sprites are styled `div`s with no `role="img"`, `aria-label`, or alt text. No keyboard navigation for tactical grid. ~30 aria attributes across 78 components (~38% coverage).
+- [ ] Accessibility in combat. Combat grid sprites are styled `div`s with no `role="img"`, `aria-label`, or alt text. No keyboard navigation for tactical grid. ~30 aria attributes across 78 components (~38% coverage).
 
 - [ ] 404 / invalid ID handling. Invalid quest/task IDs hit generic error boundary; no redirect to listing or "this doesn't exist" empty state.
 

@@ -14,7 +14,11 @@ interface PlayerSpriteProps {
 
 export default function PlayerSprite({ currentClass, name, animation, damageNumbers, className }: PlayerSpriteProps) {
   return (
-    <div className={`relative h-28 w-28 shrink-0 p-2 ${className ?? ''}`} style={{ transform: 'scaleX(-1)' }}>
+    <div
+      aria-hidden="true"
+      className={`relative h-28 w-28 shrink-0 p-2 ${className ?? ''}`}
+      style={{ transform: 'scaleX(-1)' }}
+    >
       <CombatUnitSprite
         imageUrl={`/assets/classes/${currentClass}.png`}
         alt={name}

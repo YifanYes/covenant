@@ -37,19 +37,40 @@ export default function EnemySprite({
         ? t(template.name)
         : t('combat.unknown_enemy')
 
+  const handleSelect = () => {
+    if (!isTargetable || !onSelectTarget) return
+    onSelectTarget(targetingMode === 'all' ? 'all' : enemy.id)
+  }
+
   return (
     <div
+      role={isTargetable ? 'button' : undefined}
+      tabIndex={isTargetable ? 0 : undefined}
+      aria-label={
+        isTargetable
+          ? t(targetingMode === 'all' ? 'combat.a11y.target_all' : 'combat.a11y.target_enemy', { name })
+          : undefined
+      }
+      aria-hidden={isDead ? true : undefined}
       className={cn(
         'relative h-28 w-28 shrink-0 p-2',
-        isTargetable && 'cursor-pointer rounded-xl ring-2 ring-emerald-500/50 hover:ring-emerald-500',
+        isTargetable &&
+          'cursor-pointer rounded-xl ring-2 ring-emerald-500/50 hover:ring-emerald-500 focus-visible:ring-emerald-400 focus-visible:outline-none',
         targetingMode === 'all' && !isDead && 'ring-amber-500/50 hover:ring-amber-500',
         className
       )}
       style={{ transform: 'scaleX(-1)' }}
-      onClick={() => {
-        if (!isTargetable || !onSelectTarget) return
-        onSelectTarget(targetingMode === 'all' ? 'all' : enemy.id)
-      }}
+      onClick={handleSelect}
+      onKeyDown={
+        isTargetable
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                handleSelect()
+              }
+            }
+          : undefined
+      }
     >
       <CombatUnitSprite
         imageUrl={template ? `/assets/enemies/${template.imageId}.png` : '/assets/enemies/default.png'}

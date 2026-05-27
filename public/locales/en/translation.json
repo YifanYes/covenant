@@ -353,6 +353,10 @@
       "all": "Targeting all enemies",
       "cancel": "Cancel selection"
     },
+    "a11y": {
+      "target_enemy": "Target {{name}}",
+      "target_all": "Target all enemies (including {{name}})"
+    },
     "potion_used": "Used",
     "potion_healed": "+{{amount}} HP restored",
     "potion_mana": "+{{amount}} MP restored",

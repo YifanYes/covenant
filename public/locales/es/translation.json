@@ -353,6 +353,10 @@
       "all": "Atacando a todos los enemigos",
       "cancel": "Cancelar selección"
     },
+    "a11y": {
+      "target_enemy": "Apuntar a {{name}}",
+      "target_all": "Apuntar a todos los enemigos (incluido {{name}})"
+    },
     "potion_used": "Usada",
     "potion_healed": "+{{amount}} PV restaurados",
     "potion_mana": "+{{amount}} PM restaurados",
