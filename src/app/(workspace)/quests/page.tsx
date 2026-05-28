@@ -1,4 +1,6 @@
 'use client'
+
+import ConfirmAbandonQuestDialog from '@/app/(workspace)/quests/_components/confirm-abandon-quest-dialog.component'
 import LoaderButton from '@/common/loader-button.component'
 import { panelChrome, rpgDialogContent } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
@@ -178,17 +180,25 @@ export default function QuestsPage() {
 
               <DialogFooter>
                 {selectedQuest.isActive ? (
-                  <LoaderButton
-                    onClick={() => {
-                      const questRecordId = selectedQuest.activeCharacterQuestId
-                      setSelectedQuest(null)
-                      if (questRecordId) {
-                        router.push(`/quests/${questRecordId}`)
-                      }
-                    }}
-                    isLoading={false}
-                    label={t('quests.continue')}
-                  />
+                  <>
+                    {selectedQuest.activeCharacterQuestId && (
+                      <ConfirmAbandonQuestDialog
+                        questId={selectedQuest.activeCharacterQuestId}
+                        onAbandonSuccess={() => setSelectedQuest(null)}
+                      />
+                    )}
+                    <LoaderButton
+                      onClick={() => {
+                        const questRecordId = selectedQuest.activeCharacterQuestId
+                        setSelectedQuest(null)
+                        if (questRecordId) {
+                          router.push(`/quests/${questRecordId}`)
+                        }
+                      }}
+                      isLoading={false}
+                      label={t('quests.continue')}
+                    />
+                  </>
                 ) : (
                   <LoaderButton
                     onClick={() => {

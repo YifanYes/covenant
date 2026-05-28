@@ -297,6 +297,10 @@ export class QuestService {
 
   async abandonQuest(questId: string, userId: string) {
     await this.assertQuestOwnership(questId, userId)
+    // TODO(posthog): fire `combat_finished` once the analytics wrapper lands.
+    // Payload per docs/specs/posthog-integration.md event table:
+    //   { quest_id: questId, enemy_id: <active enemy from tactical state>, outcome: 'abandoned', gold_earned: null }
+    // Read active enemy via characterQuestRepository.findByIdWithTacticalState(questId) before the abandon call.
     await this.characterQuestRepository.abandon(questId)
   }
 

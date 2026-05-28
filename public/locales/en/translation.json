@@ -2213,7 +2213,15 @@
       "hard": "Hard"
     },
     "error": {
-      "start": "Failed to start quest"
+      "start": "Failed to start quest",
+      "abandon": "Could not abandon quest"
+    },
+    "abandon": {
+      "button": "Abandon Quest",
+      "confirm_title": "Abandon this quest?",
+      "confirm_description": "All progress on this run will be lost. You can start the quest again afterwards.",
+      "confirm_cta": "Abandon",
+      "success": "Quest abandoned"
     },
     "patrol_north_gate": {
       "name": "Patrol: North Gate",

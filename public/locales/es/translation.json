@@ -2213,7 +2213,15 @@
       "hard": "Difícil"
     },
     "error": {
-      "start": "Error al iniciar la misión"
+      "start": "Error al iniciar la misión",
+      "abandon": "No se pudo abandonar la misión"
+    },
+    "abandon": {
+      "button": "Abandonar Misión",
+      "confirm_title": "¿Abandonar esta misión?",
+      "confirm_description": "Se perderá todo el progreso de esta misión. Podrás iniciarla de nuevo después.",
+      "confirm_cta": "Abandonar",
+      "success": "Misión abandonada"
     },
     "patrol_north_gate": {
       "name": "Patrulla: Puerta Norte",

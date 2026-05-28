@@ -48,8 +48,6 @@
 
 ## Medium Priority
 
-- [ ] Accessibility in combat. Combat grid sprites are styled `div`s with no `role="img"`, `aria-label`, or alt text. No keyboard navigation for tactical grid. ~30 aria attributes across 78 components (~38% coverage).
-
 - [ ] 404 / invalid ID handling. Invalid quest/task IDs hit generic error boundary; no redirect to listing or "this doesn't exist" empty state.
 
 - [ ] Re-enable strict TLS verification on prod database.
@@ -140,8 +138,6 @@ Deferred until the core loop has been validated with real beta users. Specs for 
 - [ ] Breadcrumbs on nested routes (`/quests/[questId]`, `/inventory/[tab]`)
 - [ ] Post-combat summary screen — XP/gold/loot between combat end and `/quests` redirect
 - [ ] Theme system: OS-preference option (light/dark already exist)
-
-- [ ] **Abandon-quest feature.** Add a UI affordance to abandon an active quest mid-run (currently quests only end on victory or defeat). Fires `combat_finished { outcome: 'abandoned' }` and unlocks the `abandoned` enum value reserved in the PostHog event taxonomy. See `docs/specs/posthog_integration.md` event table.
 
 - [ ] **Evaluate `@posthog/next` once stable.** PostHog ships a unified Next.js package (bundles `PostHogProvider`, `PostHogPageView`, middleware-based reverse proxy at `/ingest`, server-side flag bootstrapping, and synchronized client/server identity). Currently pre-release — PostHog explicitly recommends the manual `posthog-js` + `posthog-node` setup for production. When the package leaves pre-release, revisit and decide whether to migrate. Likely replaces `src/lib/posthog/client.ts`, `src/components/common/posthog-provider.component.tsx`, and the planned manual proxy work. See `docs/specs/posthog_integration.md` "Out of Scope".
 
