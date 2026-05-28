@@ -2,6 +2,7 @@ import { sanitizeRichText } from '@shared/lib/sanitize-rich-text.lib'
 import type { CreateJournalEntryType, UpdateJournalEntryType } from '@shared/schemas/journal.schemas'
 import { TRPCError } from '@trpc/server'
 import { Prisma, type PrismaClient } from '@/generated/prisma'
+import { analytics as defaultAnalytics, type AnalyticsService } from '../lib/analytics'
 import { resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { JournalRepository } from '../repositories/journal.repository'
@@ -13,7 +14,8 @@ export class JournalService {
   constructor(
     private prisma: PrismaClient,
     private journalRepository: JournalRepository,
-    private manaService: ManaService
+    private manaService: ManaService,
+    private analytics: AnalyticsService = defaultAnalytics
   ) {}
 
   async create(userId: string, input: CreateJournalEntryType) {
@@ -43,6 +45,11 @@ export class JournalService {
         manaEarned = result.manaApplied
         reserveGained = result.reserveGained
       }
+      this.analytics.track(userId, 'journal_entry_created', {
+        entry_id: entry.id,
+        mana_earned: manaEarned,
+        reserve_gained: reserveGained
+      })
     }
 
     const dates = await this.journalRepository.findEntryDates(userId, 1000)

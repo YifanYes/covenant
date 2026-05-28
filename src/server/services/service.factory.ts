@@ -1,4 +1,5 @@
 import type { PrismaClient } from '@/generated/prisma'
+import { analytics } from '../lib/analytics'
 import { AreaRepository } from '../repositories/area.repository'
 import { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import { CharacterRepository } from '../repositories/character.repository'
@@ -144,7 +145,12 @@ export class ServiceFactory {
   }
 
   get character(): CharacterService {
-    return (this._characterService ??= new CharacterService(this.characterRepository, this.userRepository, this.mana))
+    return (this._characterService ??= new CharacterService(
+      this.characterRepository,
+      this.userRepository,
+      this.mana,
+      analytics
+    ))
   }
 
   get mana(): ManaService {
@@ -161,7 +167,8 @@ export class ServiceFactory {
       this.killRecord,
       undefined,
       this.prisma,
-      this.guild
+      this.guild,
+      analytics
     ))
   }
 
@@ -178,15 +185,21 @@ export class ServiceFactory {
   }
 
   get habit(): HabitService {
-    return (this._habitService ??= new HabitService(this.habitRepository, this.mana, this.guild, this.characterRepository))
+    return (this._habitService ??= new HabitService(
+      this.habitRepository,
+      this.mana,
+      this.guild,
+      this.characterRepository,
+      analytics
+    ))
   }
 
   get journal(): JournalService {
-    return (this._journalService ??= new JournalService(this.prisma, this.journalRepository, this.mana))
+    return (this._journalService ??= new JournalService(this.prisma, this.journalRepository, this.mana, analytics))
   }
 
   get objective(): ObjectiveService {
-    return (this._objectiveService ??= new ObjectiveService(this.objectiveRepository, this.mana))
+    return (this._objectiveService ??= new ObjectiveService(this.objectiveRepository, this.mana, analytics))
   }
 
   get task(): TaskService {
@@ -195,7 +208,8 @@ export class ServiceFactory {
       this.userTaskStatusRepository,
       this.mana,
       this.guild,
-      this.characterRepository
+      this.characterRepository,
+      analytics
     ))
   }
 
@@ -237,7 +251,8 @@ export class ServiceFactory {
       this.combatEnemyRepository,
       this.character,
       this.mana,
-      this.characterRepository
+      this.characterRepository,
+      analytics
     ))
   }
 

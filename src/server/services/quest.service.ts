@@ -8,11 +8,13 @@ import type { EncounterState } from '@shared/types/combat.types'
 import type { InventoryItem } from '@shared/types/gamification.types'
 import type { TacticalStateData } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
+import { analytics as defaultAnalytics, type AnalyticsService } from '../lib/analytics'
 import { resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { CombatEnemyRepository } from '../repositories/combat-enemy.repository'
+import { evaluateLoopClosed } from '../utils/loop-closed.utils'
 import type { CharacterService } from './character.service'
 import type { ManaService } from './mana.service'
 
@@ -24,7 +26,8 @@ export class QuestService {
     private combatEnemyRepository: CombatEnemyRepository,
     private characterService: CharacterService,
     private manaService: ManaService,
-    private characterRepository?: CharacterRepository
+    private characterRepository?: CharacterRepository,
+    private analytics: AnalyticsService = defaultAnalytics
   ) {}
 
   private async assertCharacterOwnership(characterId: string, userId: string): Promise<void> {
@@ -219,6 +222,14 @@ export class QuestService {
       })
       await this.characterQuestRepository.updateTacticalState(quest.id, tacticalState)
 
+      this.analytics.track(userId, 'combat_started', {
+        quest_id: quest.id,
+        character_tier: characterTier,
+        enemy_template_id: selected.enemyId,
+        reserve_at_start: character.manaReserve ?? 0,
+        mana_at_start: playerManaCurrent
+      })
+
       if (this.characterRepository) {
         const progress = (character.onboardingProgress as { questStarted?: boolean } | null) ?? {}
         if (!progress.questStarted) {
@@ -228,6 +239,7 @@ export class QuestService {
             log.warn({ err, userId }, 'onboarding tick failed: questStarted')
           }
         }
+        await evaluateLoopClosed(userId, this.characterRepository, this.analytics)
       }
 
       return {
@@ -297,11 +309,15 @@ export class QuestService {
 
   async abandonQuest(questId: string, userId: string) {
     await this.assertQuestOwnership(questId, userId)
-    // TODO(posthog): fire `combat_finished` once the analytics wrapper lands.
-    // Payload per docs/specs/posthog-integration.md event table:
-    //   { quest_id: questId, enemy_id: <active enemy from tactical state>, outcome: 'abandoned', gold_earned: null }
-    // Read active enemy via characterQuestRepository.findByIdWithTacticalState(questId) before the abandon call.
+    const snapshot = await this.characterQuestRepository.findByIdWithTacticalState(questId)
+    const enemyId = snapshot?.tacticalState?.units?.find((u) => !u.id.startsWith('player-'))?.id ?? ''
     await this.characterQuestRepository.abandon(questId)
+    this.analytics.track(userId, 'combat_finished', {
+      quest_id: questId,
+      enemy_id: enemyId,
+      outcome: 'abandoned',
+      gold_earned: null
+    })
   }
 
   async getTacticalState(questId: string, userId: string): Promise<TacticalStateData | null> {

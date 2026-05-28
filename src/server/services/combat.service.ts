@@ -4,6 +4,7 @@ import type { CharacterClassType, CharacterWithClasses } from '@shared/types/cha
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import type { TacticalMoveResult, TacticalStateData } from '@shared/types/tactical-combat.types'
 import { TRPCError } from '@trpc/server'
+import { analytics as defaultAnalytics, type AnalyticsService } from '../lib/analytics'
 import { resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { CharacterQuestRepository } from '../repositories/character-quest.repository'
@@ -45,7 +46,8 @@ export class CombatService {
     private killRecordService?: KillRecordService,
     private manaService?: ManaService,
     private prisma?: PrismaClient,
-    private guildService?: GuildService
+    private guildService?: GuildService,
+    private analytics: AnalyticsService = defaultAnalytics
   ) {}
 
   private async assertQuestOwnership(questId: string, userId: string): Promise<void> {
@@ -174,6 +176,29 @@ export class CombatService {
   // POKÉMON-STYLE COMBAT ENTRY POINTS (Phase 2A)
   // ============================================================
 
+  private fireCombatFinished(userId: string, questId: string, result: TacticalMoveResult): void {
+    const killedEnemy = result.effects.find((e) => e.killed && !e.unitId.startsWith('player-'))
+    if (killedEnemy) {
+      this.analytics.track(userId, 'combat_finished', {
+        quest_id: questId,
+        enemy_id: killedEnemy.unitId,
+        outcome: 'victory',
+        gold_earned: result.goldReward ?? 0
+      })
+      return
+    }
+    const playerKilled = result.effects.find((e) => e.killed && e.unitId.startsWith('player-'))
+    if (playerKilled) {
+      const enemyId = result.updatedState.units.find((u) => !u.id.startsWith('player-'))?.id ?? ''
+      this.analytics.track(userId, 'combat_finished', {
+        quest_id: questId,
+        enemy_id: enemyId,
+        outcome: 'defeat',
+        gold_earned: null
+      })
+    }
+  }
+
   async playerExecuteMove(
     userId: string,
     questId: string,
@@ -209,6 +234,7 @@ export class CombatService {
           })
           const playerAfter = enemyResult.updatedState.units.find((u) => u.id.startsWith('player-'))
           if (!playerAfter || playerAfter.currentHealth <= 0) {
+            this.fireCombatFinished(userId, questId, enemyResult)
             return enemyResult
           }
           // Stale-target short-circuit: if every target of the queued player move is
@@ -220,6 +246,7 @@ export class CombatService {
             return !!u && u.currentHealth > 0
           })
           if (targetIds.length > 0 && !targetsStillAlive) {
+            this.fireCombatFinished(userId, questId, enemyResult)
             return enemyResult
           }
           precedingEnemy = enemyResult
@@ -237,7 +264,9 @@ export class CombatService {
         userId
       })
 
-      return precedingEnemy ? mergeMoveResults(precedingEnemy, playerResult) : playerResult
+      const merged = precedingEnemy ? mergeMoveResults(precedingEnemy, playerResult) : playerResult
+      this.fireCombatFinished(userId, questId, merged)
+      return merged
     })
   }
 
@@ -262,9 +291,11 @@ export class CombatService {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'Cannot execute AI turn for player units' })
     }
 
-    return this.withQuestLock(questId, () =>
-      executeEnemyMove({ participationId: questId, enemyId, repos: this.repos, userId })
-    )
+    return this.withQuestLock(questId, async () => {
+      const result = await executeEnemyMove({ participationId: questId, enemyId, repos: this.repos, userId })
+      this.fireCombatFinished(userId, questId, result)
+      return result
+    })
   }
 
   async playerUsePotion(

@@ -19,7 +19,13 @@ const envSchema = z.object({
   // Distributed rate-limit backing store (Upstash Redis REST API). Optional in dev/test;
   // when unset, rate limiting falls back to in-memory per-instance state.
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional()
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
+  // PostHog analytics + feature flags. Optional in dev/test; init is gated on
+  // NODE_ENV === 'production' so unset keys outside prod simply no-op.
+  POSTHOG_KEY: z.string().min(1).optional(),
+  POSTHOG_HOST: z.string().url().default('https://eu.i.posthog.com'),
+  NEXT_PUBLIC_POSTHOG_KEY: z.string().min(1).optional(),
+  NEXT_PUBLIC_POSTHOG_HOST: z.string().url().default('https://eu.i.posthog.com')
 })
 
 const _env = envSchema.safeParse(process.env)

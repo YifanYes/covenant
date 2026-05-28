@@ -1,4 +1,5 @@
 import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
+import { getManaForSource } from '@/shared/constants/rewards.constants'
 import {
   TaskEffort,
   TaskImpact,
@@ -8,10 +9,12 @@ import {
   type UpdateTaskType
 } from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
+import { analytics as defaultAnalytics, type AnalyticsService } from '../lib/analytics'
 import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { TaskRepository } from '../repositories/task.repository'
 import type { UserTaskStatusRepository } from '../repositories/user-task-status.repository'
+import { evaluateLoopClosed } from '../utils/loop-closed.utils'
 import type { GuildService } from './guild.service'
 import type { ManaService } from './mana.service'
 
@@ -23,7 +26,8 @@ export class TaskService {
     private userTaskStatusRepository: UserTaskStatusRepository,
     private manaService: ManaService,
     private guildService?: GuildService,
-    private characterRepository?: CharacterRepository
+    private characterRepository?: CharacterRepository,
+    private analytics: AnalyticsService = defaultAnalytics
   ) {}
 
   async create(userId: string, input: CreateTaskType) {
@@ -109,6 +113,17 @@ export class TaskService {
       manaEarned = result.manaApplied
       reserveGained = result.reserveGained
       await this.guildService?.recordCampaignEvent(userId, CAMPAIGN_EVENT_TYPE.TASK_COMPLETION, 1)
+
+      this.analytics.track(userId, 'task_completed', {
+        task_id: task.id,
+        impact: task.impact ?? '',
+        mana_earned: manaEarned,
+        reserve_gained: reserveGained
+      })
+
+      if (this.characterRepository) {
+        await evaluateLoopClosed(userId, this.characterRepository, this.analytics)
+      }
     }
 
     return { task, manaEarned, reserveGained }
@@ -155,6 +170,23 @@ export class TaskService {
     )
 
     await this.guildService?.recordCampaignEvent(userId, CAMPAIGN_EVENT_TYPE.TASK_COMPLETION, completing.length)
+
+    let remainingManaApplied = manaResult.manaApplied
+    for (const task of completing) {
+      const amount = getManaForSource('task', { impact: task.impact })
+      const manaEarned = Math.min(amount, remainingManaApplied)
+      remainingManaApplied -= manaEarned
+      this.analytics.track(userId, 'task_completed', {
+        task_id: task.id,
+        impact: task.impact ?? '',
+        mana_earned: manaEarned,
+        reserve_gained: amount - manaEarned
+      })
+    }
+
+    if (this.characterRepository) {
+      await evaluateLoopClosed(userId, this.characterRepository, this.analytics)
+    }
 
     return {
       message: 'Tasks updated successfully',

@@ -310,6 +310,13 @@ export class CharacterRepository {
 
   async updateOnboardingProgress(userId: string, patch: Record<string, unknown>): Promise<void> {
     if (Object.keys(patch).length === 0) return
+    // Defense in depth: `loopClosedAt` is server-only (set via `setLoopClosedAt`).
+    // Strip it here so a misrouted client payload can never flip the activation guard.
+    if ('loopClosedAt' in patch) {
+      const { loopClosedAt: _stripped, ...rest } = patch
+      patch = rest
+      if (Object.keys(patch).length === 0) return
+    }
     const patchJson = JSON.stringify(patch)
     await this.prisma.$executeRaw`
       UPDATE "characters"
@@ -319,5 +326,18 @@ export class CharacterRepository {
             IS DISTINCT FROM
             (COALESCE("onboardingProgress", '{}'::jsonb) || ${patchJson}::jsonb)
     `
+  }
+
+  // Server-only path for the PostHog `loop_closed` guard. Kept separate from
+  // `updateOnboardingProgress` so a router payload can never land here.
+  async setLoopClosedAt(userId: string, iso: string): Promise<boolean> {
+    const patchJson = JSON.stringify({ loopClosedAt: iso })
+    const updated = await this.prisma.$executeRaw`
+      UPDATE "characters"
+      SET "onboardingProgress" = COALESCE("onboardingProgress", '{}'::jsonb) || ${patchJson}::jsonb
+      WHERE "userId" = ${userId}
+        AND NOT (COALESCE("onboardingProgress", '{}'::jsonb) ? 'loopClosedAt')
+    `
+    return updated > 0
   }
 }

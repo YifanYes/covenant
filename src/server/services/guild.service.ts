@@ -102,8 +102,8 @@ export class GuildService {
     const description = input.description !== undefined ? sanitizeGuildDescription(input.description) : undefined
 
     try {
-      return await this.prisma.$transaction(async (tx) => {
-        const guild = await tx.guild.create({
+      const guild = await this.prisma.$transaction(async (tx) => {
+        const created = await tx.guild.create({
           data: {
             name: input.name,
             description,
@@ -112,10 +112,11 @@ export class GuildService {
           }
         })
         await tx.guildMember.create({
-          data: { guildId: guild.id, userId, role: GuildRole.GUILD_MASTER }
+          data: { guildId: created.id, userId, role: GuildRole.GUILD_MASTER }
         })
-        return guild
+        return created
       })
+      return guild
     } catch (error) {
       if (isUniqueConstraintError(error)) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'You already belong to a guild' })
@@ -446,7 +447,7 @@ export class GuildService {
     const inviteUsedCondition = invite.maxUses == null ? {} : { usedCount: { lt: invite.maxUses } }
 
     try {
-      return await this.prisma.$transaction(async (tx) => {
+      const result = await this.prisma.$transaction(async (tx) => {
         const claim = await tx.guildInvite.updateMany({
           where: {
             id: invite.id,
@@ -471,6 +472,7 @@ export class GuildService {
 
         return { guildId: guild.id }
       })
+      return result
     } catch (error) {
       if (isUniqueConstraintError(error)) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'You already belong to a guild' })

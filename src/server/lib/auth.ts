@@ -4,6 +4,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { nextCookies } from 'better-auth/next-js'
 import { env } from '../config'
 import { checkLockout, clearLockout, recordFailure } from './account-lockout'
+import { analytics } from './analytics'
 import { resolveCreateUserLocale, resolveEmailLocale } from './auth-locale.utils'
 import { logger } from './logger'
 import { prisma } from './prisma'
@@ -170,6 +171,15 @@ export const auth = betterAuth({
           const locale = await resolveCreateUserLocale(context ?? undefined)
           await prisma.userSettings.create({ data: { userId: user.id, locale } })
           logger.info({ event: 'AUTH_SIGNUP', userId: user.id }, 'User registered')
+
+          const path = (context as { path?: string } | undefined)?.path
+          const signupMethod: 'email' | 'google' = path?.includes('google') ? 'google' : 'email'
+          const emailDomain = typeof user.email === 'string' ? (user.email.split('@')[1] ?? '') : ''
+          analytics.identify(user.id, { locale, signup_at: new Date().toISOString() })
+          analytics.track(user.id, 'user_signed_up', {
+            signup_method: signupMethod,
+            email_domain: emailDomain
+          })
         }
       }
     },

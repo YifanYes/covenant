@@ -12,6 +12,7 @@ import type { AbilityDefinition } from '@shared/types/ability.types'
 import type { CharacterWithClasses } from '@shared/types/character.types'
 import { ItemType, type InventoryItem } from '@shared/types/gamification.types'
 import { TRPCError } from '@trpc/server'
+import { analytics as defaultAnalytics, type AnalyticsService } from '../lib/analytics'
 import { resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
@@ -25,7 +26,8 @@ export class CharacterService {
   constructor(
     private characterRepository: CharacterRepository,
     private userRepository: UserRepository,
-    private manaService?: ManaService
+    private manaService?: ManaService,
+    private analytics: AnalyticsService = defaultAnalytics
   ) {}
 
   getCharacterProgress(character: CharacterWithClasses) {
@@ -33,7 +35,19 @@ export class CharacterService {
   }
 
   async createCharacter(userId: string, input: CreateCharacterType) {
-    return this.characterRepository.createWithDefaults(userId, input)
+    const character = await this.characterRepository.createWithDefaults(userId, input)
+    const faction = (character as { factionName?: string | null }).factionName ?? ''
+    this.analytics.setPersonProperties(userId, {
+      faction,
+      character_class: input.className,
+      magic_nature: input.magicNature
+    })
+    this.analytics.track(userId, 'character_created', {
+      faction,
+      magic_nature: input.magicNature,
+      character_class: input.className
+    })
+    return character
   }
 
   async getCharacterById(characterId: string, userId?: string) {

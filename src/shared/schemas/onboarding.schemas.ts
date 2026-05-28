@@ -11,7 +11,12 @@ export const onboardingProgressSchema = z.object({
   questStarted: z.boolean().optional(),
   gearEquipped: z.boolean().optional(),
   dismissedAt: z.string().datetime().optional(),
-  collapsed: z.boolean().optional()
+  collapsed: z.boolean().optional(),
+  // Server-only: guard for the PostHog `loop_closed` activation event. Set by
+  // src/server/utils/loop-closed.utils.ts after the first task/habit completion +
+  // quest start. Intentionally absent from `updateOnboardingProgressSchema` so
+  // router callers can't flip it; the repository also strips it on writes.
+  loopClosedAt: z.string().datetime().optional()
 })
 export type OnboardingProgress = z.infer<typeof onboardingProgressSchema>
 

@@ -1,3 +1,4 @@
+import { PostHogProvider } from '@/components/common/posthog-provider.component'
 import { SentryProvider } from '@/components/common/sentry-provider.component'
 import ThemeProvider, { Theme } from '@/components/common/theme-provider.component'
 import Toaster from '@/components/ui/toaster.component'
@@ -82,12 +83,14 @@ export default async function RootLayout({
       >
         <I18nProvider initialLang={lang}>
           <SentryProvider>
-            <TRPCProvider>
-              <ThemeProvider initialTheme={theme as Theme} initialFaction={faction as Faction}>
-                <Toaster />
-                {children}
-              </ThemeProvider>
-            </TRPCProvider>
+            <PostHogProvider>
+              <TRPCProvider>
+                <ThemeProvider initialTheme={theme as Theme} initialFaction={faction as Faction}>
+                  <Toaster />
+                  {children}
+                </ThemeProvider>
+              </TRPCProvider>
+            </PostHogProvider>
           </SentryProvider>
         </I18nProvider>
       </body>
