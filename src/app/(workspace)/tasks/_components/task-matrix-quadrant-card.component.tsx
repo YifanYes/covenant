@@ -57,13 +57,13 @@ export default function TaskMatrixQuadrantCard({ quadrant, t, onTaskClick }: Mat
               bg: quadrant.bgColor,
               text: quadrant.title
             })
-            const taskAreas = uniqBy(task.objectives?.flatMap(({ areas = [] }) => areas) || [], ({ id }: Area) => id)
+            const taskAreas = uniqBy(task.objectives?.flatMap(({ areas = [] }) => areas) || [], ({ publicId }: Area) => publicId)
             const visibleAreas = taskAreas.slice(0, 3)
             const remainingAreas = taskAreas.length - 3
 
             return (
               <button
-                key={task.id}
+                key={task.publicId}
                 onClick={() => onTaskClick(task)}
                 className="border-foreground/20 hover:border-primary group bg-card text-card-foreground relative flex w-full cursor-pointer flex-row items-center justify-between gap-3 overflow-hidden rounded-md border-2 px-3 py-2 text-left transition-colors"
               >
@@ -74,11 +74,11 @@ export default function TaskMatrixQuadrantCard({ quadrant, t, onTaskClick }: Mat
 
                 {taskAreas.length > 0 && (
                   <div className="flex shrink-0 items-center gap-2">
-                    {visibleAreas.map(({ id, name, icon, color }) => {
+                    {visibleAreas.map(({ publicId, name, icon, color }) => {
                       const areaStyle = areaSimpleStyles.find(({ color: areaColor }) => areaColor === color)
                       const currentIcon = allIcons.find(({ name: iconName }) => iconName === icon)
                       return !areaStyle || !currentIcon ? null : (
-                        <div key={id} title={t(name)}>
+                        <div key={publicId} title={t(name)}>
                           <currentIcon.component className={`size-3.5 ${areaStyle.styles}`} />
                         </div>
                       )

@@ -42,7 +42,7 @@ export default function UpcomingTaskCardComponent({ task }: UpcomingTaskCardProp
                   {taskAreas.map((area) => {
                     const { icon, styles } = getAreaStylesAndIcon(area)
                     return !icon || !styles ? null : (
-                      <div key={area.id} title={t(area.name)} className="flex items-center">
+                      <div key={area.publicId} title={t(area.name)} className="flex items-center">
                         <icon.component className={cn('size-3.5', styles)} />
                       </div>
                     )

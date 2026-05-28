@@ -10,6 +10,7 @@ import Textarea from '@/ui/textarea.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { HabitTimespan, updateHabitSchema, type UpdateHabitType } from '@shared/schemas/habits.schemas'
+import { z } from 'zod'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { map } from 'es-toolkit/compat'
 import { useEffect, useState } from 'react'
@@ -42,11 +43,11 @@ export default function UpdateHabitDialog({ habit, trigger }: { habit: Habit; tr
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<UpdateHabitType>({
+  } = useForm<z.input<typeof updateHabitSchema>, unknown, UpdateHabitType>({
     resolver: standardSchemaResolver(updateHabitSchema),
     mode: 'onSubmit',
     defaultValues: {
-      id: habit.id,
+      publicId: habit.publicId,
       name: habit.name,
       description: habit.description || '',
       recurrence: habit.recurrence,
@@ -60,13 +61,13 @@ export default function UpdateHabitDialog({ habit, trigger }: { habit: Habit; tr
   useEffect(() => {
     if (open) {
       reset({
-        id: habit.id,
+        publicId: habit.publicId,
         name: habit.name,
         description: habit.description || '',
         recurrence: habit.recurrence,
         timespan: habit.timespan as HabitTimespan,
-        objectives: map(habit.objectives || [], (objective) => objective.id),
-        areas: map(habit.areas || [], (area) => area.id)
+        objectives: map(habit.objectives || [], (objective) => objective.publicId),
+        areas: map(habit.areas || [], (area) => area.publicId)
       })
     }
   }, [open, habit, reset])

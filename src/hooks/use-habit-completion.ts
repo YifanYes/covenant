@@ -20,7 +20,7 @@ export const timespanUnits: Record<HabitTimespan, OpUnitType> = {
 
 export function useHabitCompletion(habit: Habit) {
   const { t } = useTranslation()
-  const { completions = [], recurrence = 1, id, timespan, lastCompletedAt } = habit
+  const { completions = [], recurrence = 1, publicId, timespan, lastCompletedAt } = habit
   const timespanUnit = timespanUnits[timespan as HabitTimespan]
 
   const { lastCompletedLabel, isNeglected } = useMemo(() => {
@@ -58,7 +58,7 @@ export function useHabitCompletion(habit: Habit) {
     })
   )
 
-  const complete = () => createCompletion.mutate({ id })
+  const complete = () => createCompletion.mutate({ publicId })
 
   return {
     complete,

@@ -29,7 +29,7 @@ export default function TaskSummaryList({ title, tasks, setSelectedTask }: TaskS
           </DialogHeader>
           <ul className="flex flex-col gap-1">
             {tasks.map((task) => (
-              <Task key={task.id} task={task} setSelectedTask={setSelectedTask} />
+              <Task key={task.publicId} task={task} setSelectedTask={setSelectedTask} />
             ))}
           </ul>
         </DialogContent>

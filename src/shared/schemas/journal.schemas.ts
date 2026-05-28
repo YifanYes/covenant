@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { publicIdSchema } from './ids.schemas'
 
 export const createJournalEntrySchema = z.object({
   content: z.string().min(1, 'errors.required_field').max(10000),
@@ -9,7 +10,7 @@ export const createJournalEntrySchema = z.object({
 export type CreateJournalEntryType = z.infer<typeof createJournalEntrySchema>
 
 export const updateJournalEntrySchema = z.object({
-  id: z.uuid(),
+  publicId: publicIdSchema,
   content: z.string().min(1, 'errors.required_field').max(10000).optional(),
   mood: z.string().max(20).optional(),
   color: z.string().max(7).optional()
@@ -17,7 +18,7 @@ export const updateJournalEntrySchema = z.object({
 export type UpdateJournalEntryType = z.infer<typeof updateJournalEntrySchema>
 
 export const journalEntryIdSchema = z.object({
-  id: z.uuid()
+  publicId: publicIdSchema
 })
 
 export const journalDateSchema = z.object({

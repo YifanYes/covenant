@@ -44,14 +44,14 @@ describe('KillRecordService', () => {
 
     it('paginates: returns limit and nextCursor when more rows exist', async () => {
       mockCharacterRepo.findByUserId.mockResolvedValue({ id: 'char-1' })
-      const rows = Array.from({ length: 4 }, (_, i) => ({ id: `e-${i}` }))
+      const rows = Array.from({ length: 4 }, (_, i) => ({ id: BigInt(i), publicId: `enpub00000${i}` }))
       mockCombatEnemyRepo.getDefeatedEnemiesByCharacter.mockResolvedValue(rows)
 
       const result = await killRecordService.getKillRecord('user-1', 3)
 
       expect(mockCombatEnemyRepo.getDefeatedEnemiesByCharacter).toHaveBeenCalledWith('char-1', 4, undefined)
       expect(result.enemies).toHaveLength(3)
-      expect(result.nextCursor).toBe('e-2')
+      expect(result.nextCursor).toBe('enpub000002')
     })
 
     it('no nextCursor when fewer rows than limit+1', async () => {
@@ -66,9 +66,11 @@ describe('KillRecordService', () => {
 
     it('passes cursor through to repo', async () => {
       mockCharacterRepo.findByUserId.mockResolvedValue({ id: 'char-1' })
+      mockCombatEnemyRepo.findByPublicId.mockResolvedValue({ id: BigInt(50), publicId: 'enmpub000050' })
       mockCombatEnemyRepo.getDefeatedEnemiesByCharacter.mockResolvedValue([])
-      await killRecordService.getKillRecord('user-1', 10, 'cursor-x')
-      expect(mockCombatEnemyRepo.getDefeatedEnemiesByCharacter).toHaveBeenCalledWith('char-1', 11, 'cursor-x')
+      await killRecordService.getKillRecord('user-1', 10, 'enmpub000050')
+      expect(mockCombatEnemyRepo.findByPublicId).toHaveBeenCalledWith('enmpub000050')
+      expect(mockCombatEnemyRepo.getDefeatedEnemiesByCharacter).toHaveBeenCalledWith('char-1', 11, BigInt(50))
     })
   })
 
@@ -165,14 +167,14 @@ describe('KillRecordService', () => {
       mockCharacterRepo.findByIdWithClasses.mockResolvedValue(mockCharWithClasses())
       mockCombatEnemyRepo.getKillStats.mockResolvedValue({ totalKills: 10 })
 
-      await killRecordService.checkAndApplyTierProgressionByCharacterId('char-1')
+      await killRecordService.checkAndApplyTierProgressionByCharacterId(BigInt(1))
 
-      expect(mockCharacterRepo.findByIdWithClasses).toHaveBeenCalledWith('char-1')
+      expect(mockCharacterRepo.findByIdWithClasses).toHaveBeenCalledWith(BigInt(1))
     })
 
     it('throws NOT_FOUND when character missing', async () => {
       mockCharacterRepo.findByIdWithClasses.mockResolvedValue(null)
-      await expect(killRecordService.checkAndApplyTierProgressionByCharacterId('char-1')).rejects.toThrow(TRPCError)
+      await expect(killRecordService.checkAndApplyTierProgressionByCharacterId(BigInt(1))).rejects.toThrow(TRPCError)
     })
   })
 

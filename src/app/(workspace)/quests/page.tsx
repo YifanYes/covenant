@@ -23,7 +23,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
-type QuestWithStatus = QuestTemplate & { isActive: boolean; activeCharacterQuestId: string | null }
+type QuestWithStatus = QuestTemplate & { isActive: boolean; activeCharacterQuestPublicId: string | null }
 
 const difficultyBadge: Record<string, string> = {
   EASY: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
@@ -43,9 +43,9 @@ export default function QuestsPage() {
   }
 
   const { data: characterData } = useSuspenseQuery(trpcOptions.character.getCurrentClass.queryOptions())
-  const characterId = characterData?.id
+  const characterSlug = characterData?.slug
 
-  const { data: quests } = useSuspenseQuery(trpcOptions.quest.list.queryOptions({ characterId }))
+  const { data: quests } = useSuspenseQuery(trpcOptions.quest.list.queryOptions({ characterSlug }))
 
   const startMutation = useMutation(
     trpcOptions.quest.start.mutationOptions({
@@ -54,7 +54,7 @@ export default function QuestsPage() {
         queryClient.invalidateQueries({ queryKey: trpcOptions.quest.list.queryKey() })
         queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
         setSelectedQuest(null)
-        router.push(`/quests/${result.quest.id}`)
+        router.push(`/quests/${result.quest.publicId}`)
       },
       onError: (error) => {
         toast.error(t('quests.error.start'), { description: error.message })
@@ -181,15 +181,15 @@ export default function QuestsPage() {
               <DialogFooter>
                 {selectedQuest.isActive ? (
                   <>
-                    {selectedQuest.activeCharacterQuestId && (
+                    {selectedQuest.activeCharacterQuestPublicId && (
                       <ConfirmAbandonQuestDialog
-                        questId={selectedQuest.activeCharacterQuestId}
+                        questPublicId={selectedQuest.activeCharacterQuestPublicId}
                         onAbandonSuccess={() => setSelectedQuest(null)}
                       />
                     )}
                     <LoaderButton
                       onClick={() => {
-                        const questRecordId = selectedQuest.activeCharacterQuestId
+                        const questRecordId = selectedQuest.activeCharacterQuestPublicId
                         setSelectedQuest(null)
                         if (questRecordId) {
                           router.push(`/quests/${questRecordId}`)
@@ -202,8 +202,8 @@ export default function QuestsPage() {
                 ) : (
                   <LoaderButton
                     onClick={() => {
-                      if (characterId) {
-                        startMutation.mutate({ questId: selectedQuest.id, characterId })
+                      if (characterSlug) {
+                        startMutation.mutate({ questTemplateId: selectedQuest.id, characterSlug })
                       }
                     }}
                     isLoading={startMutation.isPending}

@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 interface InviteLinkCardProps {
-  guildId: string
+  guildSlug: string
 }
 
 type TFn = ReturnType<typeof useTranslation>['t']
@@ -32,11 +32,11 @@ function formatExpiry(expiresAt: Date, t: TFn) {
   return { label: t('guilds.invite.expires_in_minutes', { count: mins }), expired: false }
 }
 
-export default function InviteLinkCard({ guildId }: InviteLinkCardProps) {
+export default function InviteLinkCard({ guildSlug }: InviteLinkCardProps) {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
-  const invitesQuery = useQuery(trpcOptions.guilds.listInvites.queryOptions({ guildId }))
+  const invitesQuery = useQuery(trpcOptions.guilds.listInvites.queryOptions({ guildSlug }))
   const invites = invitesQuery.data ?? []
   const activeInvite = invites[0]
 
@@ -44,7 +44,7 @@ export default function InviteLinkCard({ guildId }: InviteLinkCardProps) {
     trpcOptions.guilds.createInvite.mutationOptions({
       onSuccess: async () => {
         toast.success(t('guilds.invite.created'))
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.listInvites.queryKey({ guildId }) })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.listInvites.queryKey({ guildSlug }) })
       },
       onError: (error) => toast.error(t('guilds.invite.error_create'), { description: error.message })
     })
@@ -54,7 +54,7 @@ export default function InviteLinkCard({ guildId }: InviteLinkCardProps) {
     trpcOptions.guilds.revokeInvite.mutationOptions({
       onSuccess: async () => {
         toast.success(t('guilds.invite.revoked'))
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.listInvites.queryKey({ guildId }) })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.listInvites.queryKey({ guildSlug }) })
       },
       onError: (error) => toast.error(t('guilds.invite.error_revoke'), { description: error.message })
     })
@@ -89,7 +89,7 @@ export default function InviteLinkCard({ guildId }: InviteLinkCardProps) {
         <LoaderButton
           size="sm"
           isLoading={createMutation.isPending}
-          onClick={() => createMutation.mutate({ guildId, expiresInHours: 168 })}
+          onClick={() => createMutation.mutate({ guildSlug, expiresInHours: 168 })}
           icon={<Plus className="h-4 w-4" />}
           label={t('guilds.invite.generate')}
         />
@@ -125,7 +125,7 @@ export default function InviteLinkCard({ guildId }: InviteLinkCardProps) {
               variant="ghost"
               size="sm"
               isLoading={revokeMutation.isPending}
-              onClick={() => revokeMutation.mutate({ inviteId: activeInvite.id })}
+              onClick={() => revokeMutation.mutate({ invitePublicId: activeInvite.publicId })}
               className="text-destructive hover:text-destructive"
               label={t('guilds.invite.revoke')}
             />

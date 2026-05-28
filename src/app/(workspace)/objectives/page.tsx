@@ -13,15 +13,13 @@ import CreateObjectiveDialog from './_components/create-objective-dialog.compone
 import FirstQuestChecklist from './_components/first-quest-checklist.component'
 import ObjectiveCard from './_components/objective-card.component'
 
-const ALL_AREAS_ID = '__all__'
-
 export default function Objectives() {
   const { t } = useTranslation()
   useTutorialTrigger('mana')
   const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
 
-  const [selectedAreaId, setSelectedAreaId] = useState<string>(ALL_AREAS_ID)
+  const [selectedAreaPublicId, setSelectedAreaPublicId] = useState<string | null>(null)
 
   const objectives = useMemo(
     () => (objectivesData.objectives ?? []) as Objective[],
@@ -33,16 +31,16 @@ export default function Objectives() {
     const map = new Map<string, number>()
     for (const obj of objectives) {
       for (const area of obj.areas ?? []) {
-        map.set(area.id, (map.get(area.id) ?? 0) + 1)
+        map.set(area.publicId, (map.get(area.publicId) ?? 0) + 1)
       }
     }
     return map
   }, [objectives])
 
   const filteredObjectives = useMemo(() => {
-    if (selectedAreaId === ALL_AREAS_ID) return objectives
-    return objectives.filter((obj) => obj.areas?.some((a) => a.id === selectedAreaId))
-  }, [objectives, selectedAreaId])
+    if (selectedAreaPublicId === null) return objectives
+    return objectives.filter((obj) => obj.areas?.some((a) => a.publicId === selectedAreaPublicId))
+  }, [objectives, selectedAreaPublicId])
 
   const hasObjectives = objectives.length > 0
   const hasFilteredObjectives = filteredObjectives.length > 0
@@ -58,10 +56,10 @@ export default function Objectives() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setSelectedAreaId(ALL_AREAS_ID)}
-            aria-pressed={selectedAreaId === ALL_AREAS_ID}
+            onClick={() => setSelectedAreaPublicId(null)}
+            aria-pressed={selectedAreaPublicId === null}
             className={`border-foreground/30 inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-sm transition-all duration-200 ${
-              selectedAreaId === ALL_AREAS_ID
+              selectedAreaPublicId === null
                 ? 'bg-foreground text-background ring-foreground/40 scale-105 shadow-sm ring-2'
                 : 'bg-background hover:bg-foreground/5 opacity-80 hover:opacity-100'
             }`}
@@ -70,7 +68,7 @@ export default function Objectives() {
             <span>{t('objectives.filter.all')}</span>
             <span
               className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold ${
-                selectedAreaId === ALL_AREAS_ID ? 'bg-background/20' : 'bg-foreground/10'
+                selectedAreaPublicId === null ? 'bg-background/20' : 'bg-foreground/10'
               }`}
             >
               {objectives.length}
@@ -78,11 +76,11 @@ export default function Objectives() {
           </button>
           {areas.map((area) => (
             <AreaFilterChip
-              key={area.id}
+              key={area.publicId}
               area={area}
-              count={countByArea.get(area.id) ?? 0}
-              selected={selectedAreaId === area.id}
-              onSelect={() => setSelectedAreaId(area.id)}
+              count={countByArea.get(area.publicId) ?? 0}
+              selected={selectedAreaPublicId === area.publicId}
+              onSelect={() => setSelectedAreaPublicId(area.publicId)}
             />
           ))}
         </div>
@@ -114,14 +112,14 @@ export default function Objectives() {
           <div className="border-foreground/15 flex min-h-48 flex-col items-center justify-center gap-4 rounded-lg border border-dashed py-10 text-center">
             <Target className="text-muted-foreground h-8 w-8" />
             <p className="text-muted-foreground max-w-xs text-sm">{t('objectives.filter.empty_for_area')}</p>
-            <Button variant="outline" onClick={() => setSelectedAreaId(ALL_AREAS_ID)}>
+            <Button variant="outline" onClick={() => setSelectedAreaPublicId(null)}>
               {t('objectives.filter.all')}
             </Button>
           </div>
         ) : (
           <div className="3xl:grid-cols-6 grid grid-cols-1 gap-4 py-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5">
             {filteredObjectives.map((objective) => (
-              <ObjectiveCard key={objective.id} objective={objective} />
+              <ObjectiveCard key={objective.publicId} objective={objective} />
             ))}
           </div>
         )}

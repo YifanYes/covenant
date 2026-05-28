@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { publicIdSchema } from './ids.schemas'
 
 export const createAreaSchema = z.object({
   name: z.string().min(1, 'errors.required_field'),
@@ -8,7 +9,7 @@ export const createAreaSchema = z.object({
 export type CreateAreaBodyType = z.infer<typeof createAreaSchema>
 
 export const updateAreaSchema = z.object({
-  id: z.uuid(),
+  publicId: publicIdSchema,
   name: z.string().min(1, 'errors.required_field'),
   color: z.string().optional(),
   icon: z.string().optional()
@@ -16,7 +17,7 @@ export const updateAreaSchema = z.object({
 export type UpdateAreaBodyType = z.infer<typeof updateAreaSchema>
 
 export const deleteAreaSchema = z.object({
-  id: z.uuid()
+  publicId: publicIdSchema
 })
 
 export const defaultAreas = [

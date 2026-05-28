@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { publicIdSchema } from './ids.schemas'
 
 export const DONE_LABEL = 'DONE' as const
 export const PROTECTED_LABELS = ['TODO', 'DOING', 'DONE'] as const
@@ -20,14 +21,14 @@ export const createUserTaskStatusSchema = z.object({
 export type CreateUserTaskStatusBodyType = z.infer<typeof createUserTaskStatusSchema>
 
 export const updateUserTaskStatusSchema = z.object({
-  id: z.uuid(),
+  publicId: publicIdSchema,
   label: z.string().min(1, 'errors.required_field').max(50).optional(),
   color: z.string().nullish()
 })
 export type UpdateUserTaskStatusBodyType = z.infer<typeof updateUserTaskStatusSchema>
 
 export const deleteUserTaskStatusSchema = z.object({
-  id: z.uuid()
+  publicId: publicIdSchema
 })
 export type DeleteUserTaskStatusBodyType = z.infer<typeof deleteUserTaskStatusSchema>
 
@@ -40,11 +41,11 @@ export const bulkApplyUserTaskStatusesSchema = z.object({
   ),
   update: z.array(
     z.object({
-      id: z.uuid(),
+      publicId: publicIdSchema,
       label: z.string().min(1, 'errors.required_field').max(50).optional(),
       color: z.string().nullish()
     })
   ),
-  delete: z.array(z.object({ id: z.uuid() }))
+  delete: z.array(z.object({ publicId: publicIdSchema }))
 })
 export type BulkApplyUserTaskStatusesBodyType = z.infer<typeof bulkApplyUserTaskStatusesSchema>

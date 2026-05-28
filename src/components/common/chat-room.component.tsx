@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next'
 const GROUP_WINDOW_MS = 5 * 60 * 1000
 
 export interface ChatRoomMessage {
-  id: string
+  publicId: string
   userId: string
   content: string
   createdAt: string | Date
@@ -26,7 +26,7 @@ export interface ChatRoomMessage {
 
 interface MessageCursor {
   createdAt: string
-  id: string
+  publicId: string
 }
 
 interface ConfirmCopy {
@@ -157,21 +157,23 @@ export default function ChatRoom<T extends ChatRoomMessage>({
     if (liveMessages.length === 0) {
       return [...olderMessages].sort((a, b) => {
         const diff = toDate(a.createdAt).getTime() - toDate(b.createdAt).getTime()
-        return diff !== 0 ? diff : a.id.localeCompare(b.id)
+        if (diff !== 0) return diff
+        return a.publicId < b.publicId ? -1 : a.publicId > b.publicId ? 1 : 0
       })
     }
-    const liveIds = new Set(liveMessages.map((m) => m.id))
+    const liveIds = new Set(liveMessages.map((m) => m.publicId))
     const oldestLiveTime = toDate(liveMessages[0].createdAt).getTime()
     const filteredOlder = olderMessages.filter(
-      (m) => !liveIds.has(m.id) && toDate(m.createdAt).getTime() < oldestLiveTime
+      (m) => !liveIds.has(m.publicId) && toDate(m.createdAt).getTime() < oldestLiveTime
     )
     return [...filteredOlder, ...liveMessages].sort((a, b) => {
       const diff = toDate(a.createdAt).getTime() - toDate(b.createdAt).getTime()
-      return diff !== 0 ? diff : a.id.localeCompare(b.id)
+      if (diff !== 0) return diff
+      return a.publicId < b.publicId ? -1 : a.publicId > b.publicId ? 1 : 0
     })
   }, [liveMessages, olderMessages, pagination])
 
-  const lastMessageId = messages[messages.length - 1]?.id
+  const lastMessageId = messages[messages.length - 1]?.publicId
 
   useLayoutEffect(() => {
     const prevLength = previousMessagesLengthRef.current
@@ -208,7 +210,7 @@ export default function ChatRoom<T extends ChatRoomMessage>({
 
   const pendingNewCount = useMemo(() => {
     if (!lastSeenId || !lastMessageId || lastSeenId === lastMessageId) return 0
-    const idx = messages.findIndex((m) => m.id === lastSeenId)
+    const idx = messages.findIndex((m) => m.publicId === lastSeenId)
     return idx < 0 ? 0 : messages.length - 1 - idx
   }, [messages, lastSeenId, lastMessageId])
 
@@ -234,22 +236,22 @@ export default function ChatRoom<T extends ChatRoomMessage>({
     try {
       const result = await pagination.fetchOlder({
         createdAt: toDate(oldest.createdAt).toISOString(),
-        id: oldest.id
+        publicId: oldest.publicId
       })
       if (result.length < pagination.pageSize) setHasMoreOlder(false)
-      const liveIds = new Set(liveMessages.map((m) => m.id))
+      const liveIds = new Set(liveMessages.map((m) => m.publicId))
       const liveOldestTime = liveMessages.length > 0 ? toDate(liveMessages[0].createdAt).getTime() : Infinity
       const liveNewestTime =
         liveMessages.length > 0 ? toDate(liveMessages[liveMessages.length - 1].createdAt).getTime() : -Infinity
       setOlderMessages((prev) => {
         const pruned = prev.filter((m) => {
-          if (liveIds.has(m.id)) return false
+          if (liveIds.has(m.publicId)) return false
           const t = toDate(m.createdAt).getTime()
           if (t >= liveOldestTime && t <= liveNewestTime) return false
           return true
         })
-        const existing = new Set(pruned.map((m) => m.id))
-        const additions = result.filter((m) => !existing.has(m.id) && !liveIds.has(m.id))
+        const existing = new Set(pruned.map((m) => m.publicId))
+        const additions = result.filter((m) => !existing.has(m.publicId) && !liveIds.has(m.publicId))
         if (additions.length === 0 && pruned.length === prev.length) return prev
         return [...pruned, ...additions]
       })
@@ -344,7 +346,7 @@ export default function ChatRoom<T extends ChatRoomMessage>({
 
                 return (
                   <li
-                    key={msg.id}
+                    key={msg.publicId}
                     className={cn(
                       'group/msg flex gap-2',
                       isMine ? 'flex-row-reverse' : 'flex-row',

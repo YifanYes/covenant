@@ -24,51 +24,57 @@ describe('Authorization - Service Layer', () => {
     })
 
     describe('update', () => {
-      it('should pass userId to repository for authorization', async () => {
+      it('should resolve publicId then pass userId to repo for authorization', async () => {
         const userId = 'user-1'
-        const input = { id: 'area-1', name: 'Updated Name' }
-        const updatedArea = { id: 'area-1', userId, name: 'Updated Name' }
+        const input = { publicId: 'pubid1234567', name: 'Updated Name' }
+        const existingArea = { id: BigInt(1), publicId: 'pubid1234567', userId, name: 'Old Name' }
+        const updatedArea = { id: BigInt(1), publicId: 'pubid1234567', userId, name: 'Updated Name' }
 
+        mockAreaRepo.findByPublicId.mockResolvedValue(existingArea)
         mockAreaRepo.update.mockResolvedValue(updatedArea)
 
         await areaService.update(userId, input)
 
-        expect(mockAreaRepo.update).toHaveBeenCalledWith('area-1', userId, input)
+        expect(mockAreaRepo.findByPublicId).toHaveBeenCalledWith('pubid1234567', userId)
+        expect(mockAreaRepo.update).toHaveBeenCalledWith(BigInt(1), userId, input)
       })
 
-      it('should propagate authorization errors from repository', async () => {
+      it('should throw NOT_FOUND when publicId resolves nothing', async () => {
         const userId = 'user-1'
-        const input = { id: 'area-1', name: 'Updated Name' }
+        const input = { publicId: 'missingxxxxx', name: 'Updated Name' }
 
-        mockAreaRepo.update.mockRejectedValue(new TRPCError({ code: 'NOT_FOUND', message: 'Area area-1 not found' }))
+        mockAreaRepo.findByPublicId.mockResolvedValue(null)
 
         await expect(areaService.update(userId, input)).rejects.toMatchObject({
           code: 'NOT_FOUND'
         })
+        expect(mockAreaRepo.update).not.toHaveBeenCalled()
       })
     })
 
     describe('delete', () => {
-      it('should pass userId to repository for authorization', async () => {
+      it('should resolve publicId then pass userId to repo for authorization', async () => {
         const userId = 'user-1'
-        const areaId = 'area-1'
+        const publicId = 'pubid1234567'
+        const existingArea = { id: BigInt(1), publicId, userId, name: 'Test Area' }
 
-        mockAreaRepo.delete.mockResolvedValue({ id: areaId, userId })
+        mockAreaRepo.findByPublicId.mockResolvedValue(existingArea)
+        mockAreaRepo.delete.mockResolvedValue(existingArea)
 
-        await areaService.delete(userId, areaId)
+        await areaService.delete(userId, publicId)
 
-        expect(mockAreaRepo.delete).toHaveBeenCalledWith(areaId, userId)
+        expect(mockAreaRepo.findByPublicId).toHaveBeenCalledWith(publicId, userId)
+        expect(mockAreaRepo.delete).toHaveBeenCalledWith(BigInt(1), userId)
       })
 
-      it('should propagate authorization errors from repository', async () => {
+      it('should throw NOT_FOUND when publicId resolves nothing', async () => {
         const userId = 'user-1'
-        const areaId = 'area-1'
+        mockAreaRepo.findByPublicId.mockResolvedValue(null)
 
-        mockAreaRepo.delete.mockRejectedValue(new TRPCError({ code: 'NOT_FOUND', message: 'Area area-1 not found' }))
-
-        await expect(areaService.delete(userId, areaId)).rejects.toMatchObject({
+        await expect(areaService.delete(userId, 'missingxxxxx')).rejects.toMatchObject({
           code: 'NOT_FOUND'
         })
+        expect(mockAreaRepo.delete).not.toHaveBeenCalled()
       })
     })
   })
@@ -97,43 +103,48 @@ describe('Authorization - Service Layer', () => {
     })
 
     describe('update', () => {
-      it('should pass userId to repository for authorization', async () => {
+      it('resolves publicId then calls repo.update', async () => {
         const userId = 'user-1'
-        const input = { id: 'objective-1', name: 'Updated Name' }
-        const updatedObjective = { id: 'objective-1', userId, name: 'Updated Name' }
+        const input = { publicId: 'objpub000010', name: 'Updated Name' }
+        const existing = { id: BigInt(10), publicId: 'objpub000010', userId }
+        const updatedObjective = { id: BigInt(10), publicId: 'objpub000010', userId, name: 'Updated Name' }
 
+        mockObjectiveRepo.findByPublicId.mockResolvedValue(existing)
         mockObjectiveRepo.update.mockResolvedValue(updatedObjective)
 
         await objectiveService.update(userId, input)
 
-        expect(mockObjectiveRepo.update).toHaveBeenCalledWith('objective-1', userId, input)
+        expect(mockObjectiveRepo.findByPublicId).toHaveBeenCalledWith('objpub000010', userId)
+        expect(mockObjectiveRepo.update).toHaveBeenCalledWith(BigInt(10), userId, input)
       })
     })
 
     describe('complete', () => {
-      it('should pass userId to repository for authorization', async () => {
+      it('resolves publicId then calls repo.complete', async () => {
         const userId = 'user-1'
-        const objectiveId = 'objective-1'
-        const completedObjective = { id: objectiveId, userId, completedAt: new Date() }
+        const existing = { id: BigInt(10), publicId: 'objpub000010', userId }
+        const completedObjective = { id: BigInt(10), publicId: 'objpub000010', userId, completedAt: new Date() }
 
+        mockObjectiveRepo.findByPublicId.mockResolvedValue(existing)
         mockObjectiveRepo.complete.mockResolvedValue(completedObjective)
 
-        await objectiveService.complete(userId, objectiveId)
+        await objectiveService.complete(userId, 'objpub000010')
 
-        expect(mockObjectiveRepo.complete).toHaveBeenCalledWith(objectiveId, userId)
+        expect(mockObjectiveRepo.complete).toHaveBeenCalledWith(BigInt(10), userId)
       })
     })
 
     describe('delete', () => {
-      it('should pass userId to repository for authorization', async () => {
+      it('resolves publicId then calls repo.delete', async () => {
         const userId = 'user-1'
-        const objectiveId = 'objective-1'
+        const existing = { id: BigInt(10), publicId: 'objpub000010', userId }
 
-        mockObjectiveRepo.delete.mockResolvedValue({ id: objectiveId, userId })
+        mockObjectiveRepo.findByPublicId.mockResolvedValue(existing)
+        mockObjectiveRepo.delete.mockResolvedValue({ id: BigInt(10), publicId: 'objpub000010', userId })
 
-        await objectiveService.delete(userId, objectiveId)
+        await objectiveService.delete(userId, 'objpub000010')
 
-        expect(mockObjectiveRepo.delete).toHaveBeenCalledWith(objectiveId, userId)
+        expect(mockObjectiveRepo.delete).toHaveBeenCalledWith(BigInt(10), userId)
       })
     })
   })
@@ -152,7 +163,7 @@ describe('Authorization - Service Layer', () => {
 
     describe('getCharacterById', () => {
       it('should pass userId to repository for authorization when provided', async () => {
-        const characterId = 'char-1'
+        const characterId = BigInt(100)
         const userId = 'user-1'
         const character = { id: characterId, userId, name: 'Test Character', classes: [] }
 
@@ -164,7 +175,7 @@ describe('Authorization - Service Layer', () => {
       })
 
       it('should not require userId for public lookups', async () => {
-        const characterId = 'char-1'
+        const characterId = BigInt(100)
         const character = { id: characterId, userId: 'user-1', name: 'Test Character', classes: [] }
 
         mockCharacterRepo.findByIdWithClassesOrThrow.mockResolvedValue(character)
@@ -177,7 +188,7 @@ describe('Authorization - Service Layer', () => {
 
     describe('verifyCharacterOwnership', () => {
       it('should return true when user owns character', async () => {
-        const characterId = 'char-1'
+        const characterId = BigInt(100)
         const userId = 'user-1'
 
         mockCharacterRepo.verifyOwnership.mockResolvedValue(true)
@@ -189,7 +200,7 @@ describe('Authorization - Service Layer', () => {
       })
 
       it('should return false when user does not own character', async () => {
-        const characterId = 'char-1'
+        const characterId = BigInt(100)
         const userId = 'user-1'
 
         mockCharacterRepo.verifyOwnership.mockResolvedValue(false)

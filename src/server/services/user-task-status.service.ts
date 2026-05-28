@@ -32,7 +32,7 @@ export class UserTaskStatusService {
   }
 
   async update(userId: string, input: UpdateUserTaskStatusBodyType) {
-    const existing = await this.userTaskStatusRepository.findByIdOrThrow(input.id, userId)
+    const existing = await this.userTaskStatusRepository.findByPublicIdOrThrow(input.publicId, userId)
 
     if (input.label !== undefined && input.label !== existing.label) {
       if (isProtectedLabel(existing.label)) {
@@ -51,8 +51,8 @@ export class UserTaskStatusService {
     return { status }
   }
 
-  async delete(userId: string, id: string) {
-    const existing = await this.userTaskStatusRepository.findByIdOrThrow(id, userId)
+  async delete(userId: string, publicId: string) {
+    const existing = await this.userTaskStatusRepository.findByPublicIdOrThrow(publicId, userId)
 
     if (isProtectedLabel(existing.label)) {
       throw badRequest('errors.task_status.cannot_delete_protected')
@@ -80,27 +80,27 @@ export class UserTaskStatusService {
 
   async bulkApply(userId: string, input: BulkApplyUserTaskStatusesBodyType) {
     const existing = await this.userTaskStatusRepository.findAll(userId)
-    const existingById = new Map(existing.map((s) => [s.id, s]))
+    const existingByPublicId = new Map(existing.map((s) => [s.publicId, s]))
 
-    const deleteIds = new Set<string>()
+    const deleteIds = new Set<bigint>()
     for (const del of input.delete) {
-      const cur = existingById.get(del.id)
+      const cur = existingByPublicId.get(del.publicId)
       if (!cur) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: `Task status ${del.id} not found` })
+        throw new TRPCError({ code: 'NOT_FOUND', message: `Task status ${del.publicId} not found` })
       }
       if (isProtectedLabel(cur.label)) {
         throw badRequest('errors.task_status.cannot_delete_protected')
       }
-      deleteIds.add(del.id)
+      deleteIds.add(cur.id)
     }
 
-    const updates: Array<{ id: string; label?: string; color?: string | null }> = []
+    const updates: Array<{ id: bigint; label?: string; color?: string | null }> = []
     for (const upd of input.update) {
-      if (deleteIds.has(upd.id)) continue
-      const cur = existingById.get(upd.id)
+      const cur = existingByPublicId.get(upd.publicId)
       if (!cur) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: `Task status ${upd.id} not found` })
+        throw new TRPCError({ code: 'NOT_FOUND', message: `Task status ${upd.publicId} not found` })
       }
+      if (deleteIds.has(cur.id)) continue
       if (upd.label !== undefined && upd.label !== cur.label) {
         if (isProtectedLabel(cur.label)) {
           throw badRequest('errors.task_status.protected_locked')
@@ -109,7 +109,7 @@ export class UserTaskStatusService {
           throw badRequest('errors.task_status.label_reserved')
         }
       }
-      updates.push(upd)
+      updates.push({ id: cur.id, label: upd.label, color: upd.color })
     }
 
     for (const c of input.create) {

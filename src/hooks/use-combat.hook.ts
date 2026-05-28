@@ -31,7 +31,7 @@ export function useCombat(
 
   const currentClass = character.classes.find((c) => c.className === character.currentClass)!
 
-  const { data: tacticalState } = useSuspenseQuery(trpcOptions.quest.getTacticalState.queryOptions({ questId }))
+  const { data: tacticalState } = useSuspenseQuery(trpcOptions.quest.getTacticalState.queryOptions({ questPublicId: questId }))
 
   const [localEnemies, setLocalEnemies] = useState<EnemyState[]>(initialEnemies)
   const [localLog, setLocalLog] = useState<CombatLogEntry[]>(initialCombatLog)
@@ -87,7 +87,7 @@ export function useCombat(
     queryClient.invalidateQueries({ queryKey: trpcOptions.quest.list.queryKey() })
     queryClient.invalidateQueries({ queryKey: trpcOptions.character.getCurrentClass.queryKey() })
     queryClient.invalidateQueries({
-      queryKey: trpcOptions.quest.getTacticalState.queryKey({ questId })
+      queryKey: trpcOptions.quest.getTacticalState.queryKey({ questPublicId: questId })
     })
   }, [questId])
 
@@ -227,7 +227,7 @@ export function useCombat(
   const executeMove = useCallback(
     (moveId: string, targetIds: string[]) => {
       moveMutation.mutate({
-        questId,
+        questPublicId: questId,
         casterId: playerUnit?.id ?? 'player-1',
         moveId,
         targetIds
@@ -272,7 +272,7 @@ export function useCombat(
 
   const usePotion = useCallback(
     (consumableId: string) => {
-      potionMutation.mutate({ questId, consumableId })
+      potionMutation.mutate({ questPublicId: questId, consumableId })
     },
     [questId, potionMutation]
   )
@@ -301,7 +301,7 @@ export function useCombat(
         const template = getEnemy(current.templateId)
         if (!template) continue
         try {
-          await enemyTurnMutation.mutateAsync({ questId, enemyId: current.id })
+          await enemyTurnMutation.mutateAsync({ questPublicId: questId, enemyId: current.id })
         } catch {
           break
         }

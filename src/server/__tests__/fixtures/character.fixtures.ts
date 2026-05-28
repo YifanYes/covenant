@@ -3,7 +3,7 @@ import { ALL_ITEMS, CONSUMABLES } from '@/shared/constants/items.constants'
 import { ItemRarity, ItemType } from '@shared/types/gamification.types'
 
 export interface BuildCharacterOpts {
-  id?: string
+  id?: bigint
   userId?: string
   mana?: number
   maxMana?: number
@@ -11,7 +11,7 @@ export interface BuildCharacterOpts {
   health?: number
   maxHealth?: number
   className?: CharacterClassName
-  classId?: string
+  classId?: bigint
   onboardingProgress?: Record<string, unknown> | null
   data?: Record<string, unknown>
   inventory?: unknown[]
@@ -26,7 +26,7 @@ export interface BuildCharacterOpts {
 export const buildCharacter = (opts: BuildCharacterOpts = {}) => {
   const className = opts.className ?? CharacterClassName.TEMPLAR
   return {
-    id: opts.id ?? 'char-123',
+    id: opts.id ?? BigInt(123),
     userId: opts.userId ?? 'user-123',
     name: 'Test Character',
     gold: opts.gold ?? 100,
@@ -36,7 +36,7 @@ export const buildCharacter = (opts: BuildCharacterOpts = {}) => {
     data: opts.data ?? { equippedAbilities: [] },
     classes: [
       {
-        id: opts.classId ?? 'class-1',
+        id: opts.classId ?? BigInt(1),
         className,
         tier: 1,
         health: opts.health ?? 100,
@@ -57,8 +57,8 @@ export const buildCharacter = (opts: BuildCharacterOpts = {}) => {
   }
 }
 
-export const mockCharacter = (overrides = {}) => ({
-  id: 'char-123',
+export const mockCharacter = (overrides: Record<string, unknown> = {}) => ({
+  id: BigInt(123),
   userId: 'user-123',
   name: 'Test Character',
   gold: 100,
@@ -69,7 +69,7 @@ export const mockCharacter = (overrides = {}) => ({
   },
   classes: [
     {
-      id: 'class-1',
+      id: BigInt(1),
       className: CharacterClassName.TEMPLAR,
       tier: 1,
       health: 100,

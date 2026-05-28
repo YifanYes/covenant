@@ -79,7 +79,7 @@ export default function HabitToday() {
               </h2>
               <div className="overflow-hidden rounded-md border">
                 {sectionHabits.map((habit) => (
-                  <HabitRow key={habit.id} habit={habit} />
+                  <HabitRow key={habit.publicId} habit={habit} />
                 ))}
               </div>
             </section>
@@ -102,7 +102,7 @@ export default function HabitToday() {
           {doneOpen && (
             <div className="overflow-hidden rounded-md border opacity-70">
               {doneHabits.map((habit) => (
-                <HabitRow key={habit.id} habit={habit} showTimespanBadge />
+                <HabitRow key={habit.publicId} habit={habit} showTimespanBadge />
               ))}
             </div>
           )}

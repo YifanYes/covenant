@@ -46,7 +46,7 @@ export const guildsRouter = t.router({
     .use(rateLimit(RATE_LIMITS.strict))
     .input(guildIdSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.services.guild.dissolveGuild(input.guildId, ctx.user.id)
+      return ctx.services.guild.dissolveGuild(input.guildSlug, ctx.user.id)
     }),
 
   leave: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).mutation(async ({ ctx }) => {
@@ -99,11 +99,11 @@ export const guildsRouter = t.router({
     .use(rateLimit(RATE_LIMITS.write))
     .input(revokeInviteSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.services.guild.revokeInvite(input.inviteId, ctx.user.id)
+      return ctx.services.guild.revokeInvite(input.invitePublicId, ctx.user.id)
     }),
 
   listInvites: protectedProcedure.input(guildIdSchema).query(async ({ ctx, input }) => {
-    return ctx.services.guild.listInvites(input.guildId, ctx.user.id)
+    return ctx.services.guild.listInvites(input.guildSlug, ctx.user.id)
   }),
 
   getInvitePreview: protectedProcedure
@@ -135,22 +135,22 @@ export const guildsRouter = t.router({
     .use(rateLimit(RATE_LIMITS.write))
     .input(deleteMessageSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.services.guild.deleteMessage(input.messageId, ctx.user.id)
+      return ctx.services.guild.deleteMessage(input.messagePublicId, ctx.user.id)
     }),
 
   reportMessage: protectedProcedure
     .use(rateLimit(RATE_LIMITS.write))
     .input(reportMessageSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.services.guild.reportMessage(input.messageId, ctx.user.id)
+      return ctx.services.guild.reportMessage(input.messagePublicId, ctx.user.id)
     }),
 
   getCurrentCampaign: protectedProcedure.input(guildIdSchema).query(async ({ ctx, input }) => {
-    return ctx.services.guild.getCurrentCampaign(input.guildId, ctx.user.id)
+    return ctx.services.guild.getCurrentCampaign(input.guildSlug, ctx.user.id)
   }),
 
   getCampaignHistory: protectedProcedure.input(guildIdSchema).query(async ({ ctx, input }) => {
-    return ctx.services.guild.listCampaignHistory(input.guildId, ctx.user.id)
+    return ctx.services.guild.listCampaignHistory(input.guildSlug, ctx.user.id)
   }),
 
   startCampaign: protectedProcedure
@@ -164,6 +164,6 @@ export const guildsRouter = t.router({
     .use(rateLimit(RATE_LIMITS.write))
     .input(campaignIdSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.services.guild.claimCampaignReward(input.campaignId, ctx.user.id)
+      return ctx.services.guild.claimCampaignReward(input.campaignPublicId, ctx.user.id)
     })
 })

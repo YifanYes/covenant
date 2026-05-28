@@ -4,7 +4,7 @@ import { uniqBy } from 'es-toolkit/compat'
 import type { TFunction } from 'i18next'
 
 export const getUpcomingTaskAreas = (task: Task) =>
-  uniqBy(task.objectives?.flatMap(({ areas = [] }) => areas) || [], ({ id }: Area) => id)
+  uniqBy(task.objectives?.flatMap(({ areas = [] }) => areas) || [], ({ publicId }: Area) => publicId)
 
 export const getTaskType = (
   effort: string | null | undefined,

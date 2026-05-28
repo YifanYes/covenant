@@ -2,6 +2,7 @@ import type { GuildMessage, Prisma, PrismaClient } from '@/generated/prisma'
 import { AUTO_HIDE_THRESHOLD } from '@shared/constants/chat-room.constants'
 import type { GuildMessageCursorType } from '@shared/schemas/guilds.schemas'
 import { resourceNotFound } from '../lib/errors'
+import { generatePublicId } from '../lib/public-id'
 
 export type GuildMessageWithAuthor = GuildMessage & {
   user: {
@@ -25,18 +26,25 @@ export class GuildMessageRepository {
   constructor(private prisma: PrismaClient) {}
 
   async findByGuild(
-    guildId: string,
+    guildId: bigint,
     options: { limit?: number; cursor?: GuildMessageCursorType } = {}
   ): Promise<GuildMessageWithAuthor[]> {
     const limit = options.limit ?? 50
-    const cursorWhere: Prisma.GuildMessageWhereInput | undefined = options.cursor
-      ? {
+    let cursorWhere: Prisma.GuildMessageWhereInput | undefined
+    if (options.cursor) {
+      const cursorRow = await this.prisma.guildMessage.findUnique({
+        where: { publicId: options.cursor.publicId },
+        select: { id: true }
+      })
+      if (cursorRow) {
+        cursorWhere = {
           OR: [
             { createdAt: { lt: new Date(options.cursor.createdAt) } },
-            { createdAt: new Date(options.cursor.createdAt), id: { lt: options.cursor.id } }
+            { createdAt: new Date(options.cursor.createdAt), id: { lt: cursorRow.id } }
           ]
         }
-      : undefined
+      }
+    }
 
     return this.prisma.guildMessage.findMany({
       where: {
@@ -51,25 +59,29 @@ export class GuildMessageRepository {
     })
   }
 
-  async findById(id: string): Promise<GuildMessage | null> {
+  async findById(id: bigint): Promise<GuildMessage | null> {
     return this.prisma.guildMessage.findUnique({ where: { id } })
   }
 
-  async create(data: { guildId: string; userId: string; content: string }): Promise<GuildMessageWithAuthor> {
+  async findByPublicId(publicId: string): Promise<GuildMessage | null> {
+    return this.prisma.guildMessage.findUnique({ where: { publicId } })
+  }
+
+  async create(data: { guildId: bigint; userId: string; content: string }): Promise<GuildMessageWithAuthor> {
     return this.prisma.guildMessage.create({
-      data,
+      data: { ...data, publicId: generatePublicId() },
       include: authorInclude
     })
   }
 
-  async softDelete(id: string): Promise<void> {
+  async softDelete(id: bigint): Promise<void> {
     await this.prisma.guildMessage.update({
       where: { id },
       data: { deletedAt: new Date() }
     })
   }
 
-  async recordReport(messageId: string, reporterId: string): Promise<void> {
+  async recordReport(messageId: bigint, reporterId: string): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       await tx.guildMessageReport.create({
         data: { messageId, reporterId }

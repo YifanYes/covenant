@@ -138,7 +138,7 @@ export class ManaService {
    * Drain Reserve into active mana until full or Reserve is empty.
    * Called by quest.service at the start of every Encounter (initial spawn + each spawn after a defeat).
    */
-  async topUpFromReserve(characterId: string): Promise<{ added: number; newMana: number; newReserve: number }> {
+  async topUpFromReserve(characterId: bigint): Promise<{ added: number; newMana: number; newReserve: number }> {
     const character = await this.characterRepository.findByIdWithClasses(characterId)
     if (!character) return { added: 0, newMana: 0, newReserve: 0 }
     const currentClass = character.classes.find((c) => c.className === character.currentClass)

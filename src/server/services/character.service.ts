@@ -50,11 +50,11 @@ export class CharacterService {
     return character
   }
 
-  async getCharacterById(characterId: string, userId?: string) {
+  async getCharacterById(characterId: bigint, userId?: string) {
     return this.characterRepository.findByIdWithClassesOrThrow(characterId, userId)
   }
 
-  async verifyCharacterOwnership(characterId: string, userId: string): Promise<boolean> {
+  async verifyCharacterOwnership(characterId: bigint, userId: string): Promise<boolean> {
     return this.characterRepository.verifyOwnership(characterId, userId)
   }
 
@@ -71,7 +71,7 @@ export class CharacterService {
     const { tier } = getCharacterProgress(character)
 
     return {
-      id: character.id,
+      slug: character.slug,
       name: character.name,
       title: character.title,
       factionName: character.factionName,
@@ -269,15 +269,15 @@ export class CharacterService {
     return { success: true }
   }
 
-  async updateHealth(classId: string, health: number, mana: number): Promise<void> {
+  async updateHealth(classId: bigint, health: number, mana: number): Promise<void> {
     await this.characterRepository.updateHealth(classId, health, mana)
   }
 
-  async updateProgress(classId: string, tier: number, maxHealth: number, maxMana: number): Promise<void> {
+  async updateProgress(classId: bigint, tier: number, maxHealth: number, maxMana: number): Promise<void> {
     await this.characterRepository.updateProgress(classId, tier, maxHealth, maxMana)
   }
 
-  async updateData(characterId: string, data: CharacterDataType): Promise<void> {
+  async updateData(characterId: bigint, data: CharacterDataType): Promise<void> {
     await this.characterRepository.updateCharacterData(characterId, data)
   }
 

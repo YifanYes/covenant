@@ -65,7 +65,7 @@ export default function DayDetailsSheet({ date, open, onOpenChange, tasks, habit
             {dayTasks.length > 0 ? (
               <ul className="rounded-md border divide-y">
                 {dayTasks.map((task) => (
-                  <Task key={task.id} task={task} setSelectedTask={setSelectedTask} hideHover />
+                  <Task key={task.publicId} task={task} setSelectedTask={setSelectedTask} hideHover />
                 ))}
               </ul>
             ) : (
@@ -85,7 +85,7 @@ export default function DayDetailsSheet({ date, open, onOpenChange, tasks, habit
             {dayHabits.length > 0 ? (
               <ul className="space-y-2">
                 {dayHabits.map((habit) => (
-                  <li key={habit.id} className="flex items-center gap-2 rounded-md border px-3 py-2">
+                  <li key={habit.publicId} className="flex items-center gap-2 rounded-md border px-3 py-2">
                     <Check className="h-4 w-4 text-primary shrink-0" />
                     <span className="text-sm font-medium">{habit.name}</span>
                   </li>

@@ -6,6 +6,8 @@ import type { ManaService } from '../../services/mana.service'
 import { ObjectiveService } from '../../services/objective.service'
 import { createRepoMock } from '../helpers/mock-repo'
 
+const OBJ_PUB = 'objpub000001'
+
 describe('ObjectiveService', () => {
   let objectiveService: ObjectiveService
   let mockObjectiveRepo: ReturnType<typeof createRepoMock<ObjectiveRepository>>
@@ -31,49 +33,57 @@ describe('ObjectiveService', () => {
   describe('create', () => {
     it('creates objective via repo', async () => {
       const input = { name: 'Ship feature' } as unknown as CreateObjectiveBodyType
-      mockObjectiveRepo.create.mockResolvedValue({ id: 'o-1', ...input })
+      const created = { id: BigInt(1), publicId: OBJ_PUB, name: 'Ship feature' }
+      mockObjectiveRepo.create.mockResolvedValue(created)
 
       const result = await objectiveService.create('user-1', input)
 
-      expect(result.objective).toEqual({ id: 'o-1', ...input })
+      expect(result.objective).toEqual(created)
       expect(mockObjectiveRepo.create).toHaveBeenCalledWith('user-1', input)
     })
   })
 
   describe('getAll', () => {
     it('returns objectives wrapped', async () => {
-      mockObjectiveRepo.findAll.mockResolvedValue([{ id: 'o-1' }, { id: 'o-2' }])
+      mockObjectiveRepo.findAll.mockResolvedValue([
+        { id: BigInt(1), publicId: 'objpub000001' },
+        { id: BigInt(2), publicId: 'objpub000002' }
+      ])
       const { objectives } = await objectiveService.getAll('user-1')
       expect(objectives).toHaveLength(2)
     })
   })
 
   describe('update', () => {
-    it('passes id, userId, input to repo', async () => {
-      const input = { id: 'o-1', name: 'Renamed' } as unknown as UpdateObjectiveBodyType
-      mockObjectiveRepo.update.mockResolvedValue({ id: 'o-1', name: 'Renamed' })
+    it('resolves publicId then updates', async () => {
+      const input = { publicId: OBJ_PUB, name: 'Renamed' } as unknown as UpdateObjectiveBodyType
+      mockObjectiveRepo.findByPublicId.mockResolvedValue({ id: BigInt(1), publicId: OBJ_PUB })
+      mockObjectiveRepo.update.mockResolvedValue({ id: BigInt(1), publicId: OBJ_PUB, name: 'Renamed' })
 
       const result = await objectiveService.update('user-1', input)
 
-      expect(mockObjectiveRepo.update).toHaveBeenCalledWith('o-1', 'user-1', input)
-      expect(result.objective).toEqual({ id: 'o-1', name: 'Renamed' })
+      expect(mockObjectiveRepo.findByPublicId).toHaveBeenCalledWith(OBJ_PUB, 'user-1')
+      expect(mockObjectiveRepo.update).toHaveBeenCalledWith(BigInt(1), 'user-1', input)
+      expect(result.objective).toEqual({ id: BigInt(1), publicId: OBJ_PUB, name: 'Renamed' })
     })
   })
 
   describe('complete', () => {
     it('completes objective and grants mana', async () => {
-      mockObjectiveRepo.complete.mockResolvedValue({ id: 'o-1', completedAt: new Date() })
+      mockObjectiveRepo.findByPublicId.mockResolvedValue({ id: BigInt(1), publicId: OBJ_PUB })
+      mockObjectiveRepo.complete.mockResolvedValue({ id: BigInt(1), publicId: OBJ_PUB, completedAt: new Date() })
 
-      const result = await objectiveService.complete('user-1', 'o-1')
+      const result = await objectiveService.complete('user-1', OBJ_PUB)
 
-      expect(mockObjectiveRepo.complete).toHaveBeenCalledWith('o-1', 'user-1')
+      expect(mockObjectiveRepo.complete).toHaveBeenCalledWith(BigInt(1), 'user-1')
       expect(mockManaService.addManaFromCompletion).toHaveBeenCalledWith('user-1', 'objective')
       expect(result.manaEarned).toBe(MANA_REWARDS.OBJECTIVE)
       expect(result.reserveGained).toBe(0)
     })
 
     it('returns reserveGained when mana overflows', async () => {
-      mockObjectiveRepo.complete.mockResolvedValue({ id: 'o-1' })
+      mockObjectiveRepo.findByPublicId.mockResolvedValue({ id: BigInt(1), publicId: OBJ_PUB })
+      mockObjectiveRepo.complete.mockResolvedValue({ id: BigInt(1), publicId: OBJ_PUB })
       mockManaService.addManaFromCompletion.mockResolvedValue({
         success: true,
         amount: MANA_REWARDS.OBJECTIVE,
@@ -83,7 +93,7 @@ describe('ObjectiveService', () => {
         newReserve: 6
       })
 
-      const result = await objectiveService.complete('user-1', 'o-1')
+      const result = await objectiveService.complete('user-1', OBJ_PUB)
 
       expect(result.manaEarned).toBe(4)
       expect(result.reserveGained).toBe(6)
@@ -92,8 +102,9 @@ describe('ObjectiveService', () => {
 
   describe('delete', () => {
     it('delegates to repo', async () => {
-      const result = await objectiveService.delete('user-1', 'o-1')
-      expect(mockObjectiveRepo.delete).toHaveBeenCalledWith('o-1', 'user-1')
+      mockObjectiveRepo.findByPublicId.mockResolvedValue({ id: BigInt(1), publicId: OBJ_PUB })
+      const result = await objectiveService.delete('user-1', OBJ_PUB)
+      expect(mockObjectiveRepo.delete).toHaveBeenCalledWith(BigInt(1), 'user-1')
       expect(result.message).toBe('Objective deleted successfully')
     })
   })

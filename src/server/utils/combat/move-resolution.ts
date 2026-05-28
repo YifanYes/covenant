@@ -140,7 +140,7 @@ function decrementStatusEffects(unit: TacticalUnitState): TacticalUnitState {
  *   7. Persist tactical state; process enemy defeats and spawn next enemy if needed.
  */
 export async function executeMove(args: {
-  participationId: string
+  participationId: bigint
   casterId: string
   moveId: string
   targetIds: string[]
@@ -491,7 +491,7 @@ export async function executeMove(args: {
  * Returns the same shape as executeMove but with `casterId` = enemy unit id.
  */
 export async function executeEnemyMove(args: {
-  participationId: string
+  participationId: bigint
   enemyId: string
   repos: CombatRewardDeps
   userId?: string

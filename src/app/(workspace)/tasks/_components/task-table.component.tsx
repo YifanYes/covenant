@@ -31,22 +31,22 @@ const EFFORT_IMPACT_FILTER_ITEMS = [
 ] as const
 
 interface StatusOption {
-  id: string
+  publicId: string
   label: string
 }
 
 interface TaskRowProps {
   task: {
-    id: string
+    publicId: string
     title: string
     effort: string | null
     impact: string | null
-    statusId: string
+    statusPublicId: string
     dueDate: string | Date | null
   }
   statusOptions: StatusOption[]
   onSelect: () => void
-  onStatusChange: (taskId: string, newStatusId: string) => void
+  onStatusChange: (taskPublicId: string, newStatusPublicId: string) => void
   isUpdating: boolean
 }
 
@@ -62,16 +62,16 @@ const TaskRow = memo(function TaskRow({ task, statusOptions, onSelect, onStatusC
       </TableCell>
       <TableCell className="py-2" onClick={(e) => e.stopPropagation()}>
         <Select
-          value={task.statusId}
+          value={task.statusPublicId}
           disabled={isUpdating}
-          onValueChange={(value) => onStatusChange(task.id, value)}
+          onValueChange={(value) => onStatusChange(task.publicId, value)}
         >
           <SelectTrigger className="w-32.5">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {statusOptions.map((status) => (
-              <SelectItem key={status.id} value={status.id}>
+              <SelectItem key={status.publicId} value={status.publicId}>
                 {t(`task_status.${status.label}` as Parameters<typeof t>[0], { defaultValue: status.label })}
               </SelectItem>
             ))}
@@ -92,7 +92,7 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
   const statuses = statusesData.statuses
 
   const defaultStatusFilter = useMemo(
-    () => statuses.filter((s) => s.label !== 'DONE').map((s) => s.id),
+    () => statuses.filter((s) => s.label !== 'DONE').map((s) => s.publicId),
     [statuses]
   )
 
@@ -100,7 +100,7 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
     defaultValues: {
       searchQuery: '',
       statusFilter: ['all'] as string[],
-      effortImpactFilter: ['all'],
+      effortImpactFilter: ['all'] as string[],
       dateFilter: null as Date | null,
       page: 1
     }
@@ -110,7 +110,6 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
     if (defaultStatusFilter.length > 0 && form.getValues('statusFilter').includes('all')) {
       form.setValue('statusFilter', defaultStatusFilter)
     }
-    // intentionally run once on mount with available statuses
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultStatusFilter.length])
 
@@ -158,7 +157,7 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
   const queryParams = useMemo(
     () => ({
       search: debouncedSearch || undefined,
-      statusIds: statusFilter.includes('all') ? undefined : statusFilter,
+      statusPublicIds: statusFilter.includes('all') ? undefined : statusFilter,
       effortImpact: effortImpactFilter.includes('all') ? undefined : effortImpactFilter,
       dueDate: dateFilter ? dateFilter.toISOString() : undefined,
       page,
@@ -186,13 +185,13 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
   const totalCount = data?.totalCount ?? 0
 
   const handleStatusChange = useCallback(
-    (taskId: string, newStatusId: string) => {
-      const task = tasks.find((t) => t.id === taskId)
+    (taskPublicId: string, newStatusPublicId: string) => {
+      const task = tasks.find((t) => t.publicId === taskPublicId)
       if (!task) return
       updateTaskMutation.mutate({
-        id: taskId,
+        publicId: taskPublicId,
         title: task.title,
-        statusId: newStatusId
+        statusPublicId: newStatusPublicId
       })
     },
     [tasks, updateTaskMutation]
@@ -215,7 +214,7 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
     () => [
       { id: 'all', label: t('tasks.filters.all_statuses') },
       ...statuses.map((status) => ({
-        id: status.id,
+        id: status.publicId,
         label: t(`task_status.${status.label}` as Parameters<typeof t>[0], { defaultValue: status.label })
       }))
     ],
@@ -225,7 +224,7 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
   const statusOptions = useMemo(
     () =>
       statuses.map((status) => ({
-        id: status.id,
+        publicId: status.publicId,
         label: status.label
       })),
     [statuses]
@@ -334,7 +333,7 @@ export default function TaskTable({ onCreate }: { onCreate?: () => void }) {
               ) : (
                 tasks.map((task) => (
                   <TaskRow
-                    key={task.id}
+                    key={task.publicId}
                     task={task}
                     statusOptions={statusOptions}
                     onSelect={() => setSelectedTask(task)}

@@ -27,7 +27,7 @@ export default function GuildSettingsPage() {
         </div>
         {editingDescription ? (
           <GuildDescriptionEditor
-            guildId={guild.id}
+            guildSlug={guild.slug}
             initialHtml={guild.description ?? ''}
             onClose={() => setEditingDescription(false)}
           />
@@ -39,12 +39,12 @@ export default function GuildSettingsPage() {
       </section>
 
       <TitlePoolEditor
-        guildId={guild.id}
+        guildSlug={guild.slug}
         initialTitles={guild.availableTitles ?? []}
         memberTitles={guild.members.map((m) => m.user.character?.title ?? null)}
       />
 
-      <InviteLinkCard guildId={guild.id} />
+      <InviteLinkCard guildSlug={guild.slug} />
     </div>
   )
 }

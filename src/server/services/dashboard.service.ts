@@ -121,7 +121,7 @@ export class DashboardService {
   private getActiveAreasAndObjectives(
     hierarchy: (Area & { objectives: Objective[] })[],
     doneTasks: DoneTaskWithObjectives[],
-    habitsWithAreas: { objectives: { areas: { id: string }[] }[]; completions: { completedAt: Date }[] }[],
+    habitsWithAreas: { objectives: { areas: { id: bigint }[] }[]; completions: { completedAt: Date }[] }[],
     now: dayjs.Dayjs,
     timezoneOffset: number
   ) {
@@ -148,7 +148,7 @@ export class DashboardService {
     const objectives: Record<string, { name: string; lastCompletion: string | null }> = {}
 
     for (const area of hierarchy) {
-      areas[area.id] ??= {
+      areas[area.id.toString()] ??= {
         name: area.name,
         color: area.color,
         icon: area.icon,
@@ -159,7 +159,7 @@ export class DashboardService {
         lastCompletion: null
       }
       for (const objective of area.objectives) {
-        objectives[objective.id] ??= { name: objective.name, lastCompletion: null }
+        objectives[objective.id.toString()] ??= { name: objective.name, lastCompletion: null }
       }
     }
 
@@ -173,13 +173,14 @@ export class DashboardService {
 
       const areaIdsForTask = new Set<string>()
       for (const obj of task.objectives) {
-        const objRec = objectives[obj.id]
+        const objRec = objectives[obj.id.toString()]
         if (objRec && (!objRec.lastCompletion || iso > objRec.lastCompletion)) {
           objRec.lastCompletion = iso
         }
-        for (const a of obj.areas) areaIdsForTask.add(a.id)
+        for (const a of obj.areas) areaIdsForTask.add(a.id.toString())
       }
 
+      const taskIdStr = task.id.toString()
       for (const areaId of areaIdsForTask) {
         const areaRec = areas[areaId]
         if (!areaRec) continue
@@ -190,8 +191,8 @@ export class DashboardService {
           seen = new Set()
           countedTasksPerArea.set(areaId, seen)
         }
-        if (seen.has(task.id)) continue
-        seen.add(task.id)
+        if (seen.has(taskIdStr)) continue
+        seen.add(taskIdStr)
         if (period === 'curr') areaRec.tasksThisMonth++
         else areaRec.tasksLastMonth++
       }
@@ -208,7 +209,7 @@ export class DashboardService {
       }
       if (!curr && !prev) continue
 
-      const uniqueAreaIds = new Set(habit.objectives.flatMap((o) => o.areas.map((a) => a.id)))
+      const uniqueAreaIds = new Set(habit.objectives.flatMap((o) => o.areas.map((a) => a.id.toString())))
       for (const areaId of uniqueAreaIds) {
         const areaRec = areas[areaId]
         if (!areaRec) continue
@@ -225,6 +226,9 @@ export class DashboardService {
   ): DashboardData['upcomingTasks'] {
     return tasks.map(({ areas, ...task }) => ({
       ...task,
+      id: task.id.toString(),
+      statusId: task.statusId.toString(),
+      userId: task.userId,
       createdAt: task.createdAt?.toISOString(),
       updatedAt: task.updatedAt?.toISOString(),
       dueDate: task.dueDate?.toISOString() || null,
@@ -241,7 +245,7 @@ export class DashboardService {
       .filter((h) => h.timespan === 'DAILY')
       .map((h) => {
         const completedToday = h.completions.filter((c) => dayjs(c.completedAt).isSame(now, 'day')).length
-        return { id: h.id, name: h.name, recurrence: h.recurrence, completedToday }
+        return { publicId: h.publicId, name: h.name, recurrence: h.recurrence, completedToday }
       })
       .filter((h) => h.completedToday < h.recurrence)
   }

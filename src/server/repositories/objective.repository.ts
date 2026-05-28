@@ -3,6 +3,7 @@ import type { CreateObjectiveBodyType, UpdateObjectiveBodyType } from '@shared/s
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
+import { generatePublicId } from '../lib/public-id'
 
 const log = logger.child({ component: 'objective-repository' })
 
@@ -16,16 +17,23 @@ export class ObjectiveRepository {
   async create(userId: string, input: CreateObjectiveBodyType): Promise<Objective> {
     return this.prisma.objective.create({
       data: {
+        publicId: generatePublicId(),
         name: input.name,
         ...(input.description && { description: input.description }),
         ...(input.dueDate && { dueDate: input.dueDate }),
         userId,
         areas: {
-          connect: input.areas?.map((areaId) => ({ id: areaId })) || []
+          connect: input.areas?.map((publicId) => ({ publicId })) || []
         }
       },
       include: OBJECTIVE_INCLUDE
     })
+  }
+
+  async findByPublicId(publicId: string, userId: string): Promise<Objective | null> {
+    const objective = await this.prisma.objective.findUnique({ where: { publicId } })
+    if (!objective || objective.userId !== userId) return null
+    return objective
   }
 
   async findAll(userId: string): Promise<Objective[]> {
@@ -45,7 +53,7 @@ export class ObjectiveRepository {
     })
   }
 
-  async update(id: string, userId: string, input: UpdateObjectiveBodyType): Promise<Objective> {
+  async update(id: bigint, userId: string, input: UpdateObjectiveBodyType): Promise<Objective> {
     const objective = await this.prisma.objective.findUnique({ where: { id } })
     if (!objective) {
       throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
@@ -62,20 +70,20 @@ export class ObjectiveRepository {
         ...(input.description && { description: input.description }),
         ...(input.dueDate && { dueDate: input.dueDate }),
         areas: {
-          set: input.areas?.map((areaId) => ({ id: areaId })) || []
+          set: input.areas?.map((publicId) => ({ publicId })) || []
         },
         ...(input.tasks !== undefined && {
-          tasks: { set: input.tasks.map((taskId) => ({ id: taskId })) }
+          tasks: { set: input.tasks.map((publicId) => ({ publicId })) }
         }),
         ...(input.habits !== undefined && {
-          habits: { set: input.habits.map((habitId) => ({ id: habitId })) }
+          habits: { set: input.habits.map((publicId) => ({ publicId })) }
         })
       },
       include: OBJECTIVE_INCLUDE
     })
   }
 
-  async complete(id: string, userId: string): Promise<Objective> {
+  async complete(id: bigint, userId: string): Promise<Objective> {
     const objective = await this.prisma.objective.findUnique({ where: { id } })
     if (!objective) {
       throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
@@ -91,7 +99,7 @@ export class ObjectiveRepository {
     })
   }
 
-  async delete(id: string, userId: string): Promise<Objective> {
+  async delete(id: bigint, userId: string): Promise<Objective> {
     const objective = await this.prisma.objective.findUnique({ where: { id } })
     if (!objective) {
       throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
@@ -106,7 +114,7 @@ export class ObjectiveRepository {
     })
   }
 
-  async findByIdOrThrow(id: string, userId: string): Promise<Objective> {
+  async findByIdOrThrow(id: bigint, userId: string): Promise<Objective> {
     const objective = await this.prisma.objective.findUnique({
       where: { id }
     })

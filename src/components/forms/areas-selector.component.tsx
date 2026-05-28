@@ -25,7 +25,7 @@ export default function AreasSelector<TFieldValues extends FieldValues = FieldVa
     <MultiSelect
       name={name ?? ('areas' as FieldPath<TFieldValues>)}
       control={control}
-      items={areas.map(({ id, name: label }) => ({ id, label: t(label) })) || []}
+      items={areas.map(({ publicId, name: label }) => ({ id: publicId, label: t(label) })) || []}
       placeholder={placeholder || t('areas.selector.placeholder')}
       label={label}
     />

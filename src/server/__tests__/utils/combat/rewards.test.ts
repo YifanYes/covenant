@@ -88,8 +88,8 @@ describe('rewards utilities', () => {
         updateProgress: vi.fn().mockResolvedValue(undefined),
         findById: vi
           .fn()
-          .mockResolvedValueOnce({ id: 'q-1', characterId: 'char-1', questId: 'unknown', progress: 1, target: 1000 })
-          .mockResolvedValueOnce({ id: 'q-1', characterId: 'char-1', questId: 'unknown', progress: 1, target: 1000 }),
+          .mockResolvedValueOnce({ id: BigInt(1), characterId: 'char-1', questId: 'unknown', progress: 1, target: 1000 })
+          .mockResolvedValueOnce({ id: BigInt(1), characterId: 'char-1', questId: 'unknown', progress: 1, target: 1000 }),
         getCombatStats: vi.fn().mockResolvedValue(null),
         updateCombatStats: vi.fn().mockResolvedValue(undefined),
         updateTacticalState: vi.fn().mockResolvedValue(undefined),
@@ -119,7 +119,7 @@ describe('rewards utilities', () => {
       })
 
       const result = await processEnemyDefeat(
-        'q-1',
+        BigInt(1),
         state,
         ['enemy-1'],
         {
@@ -147,7 +147,7 @@ describe('rewards utilities', () => {
       })
 
       const result = await processEnemyDefeat(
-        'q-1',
+        BigInt(1),
         state,
         ['enemy-1'],
         {
@@ -172,7 +172,7 @@ describe('rewards utilities', () => {
       })
 
       const result = await processEnemyDefeat(
-        'q-1',
+        BigInt(1),
         state,
         ['enemy-1'],
         {

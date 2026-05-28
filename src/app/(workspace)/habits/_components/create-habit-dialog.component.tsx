@@ -10,6 +10,7 @@ import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus } from 'pixelarticons/react'
 import { createHabitSchema, HabitTimespan, type CreateHabitType } from '@shared/schemas/habits.schemas'
+import { z } from 'zod'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { type ReactNode, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -51,7 +52,7 @@ export default function CreateHabitDialog({ trigger, open: controlledOpen, onOpe
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<CreateHabitType>({
+  } = useForm<z.input<typeof createHabitSchema>, unknown, CreateHabitType>({
     resolver: standardSchemaResolver(createHabitSchema),
     mode: 'onSubmit',
     defaultValues: {

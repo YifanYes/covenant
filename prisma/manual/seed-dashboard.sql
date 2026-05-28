@@ -14,20 +14,21 @@ DECLARE
   target_email   text := 'PLACEHOLDER_EMAIL@example.com';
   target_user_id text;
   now_ts         timestamp := now();
-  area_ids       uuid[];
-  obj_ids        uuid[];
-  habit_ids      uuid[];
-  task_ids       uuid[];
+  area_ids       bigint[] := '{}';
+  obj_ids        bigint[] := '{}';
+  habit_ids      bigint[] := '{}';
+  task_ids       bigint[] := '{}';
+  new_id         bigint;
+  status_todo_id      bigint;
+  status_doing_id     bigint;
+  status_done_id      bigint;
+  task_status_id      bigint;
   colors         text[] := ARRAY['green','purple','orange','red','blue','yellow','teal','lime','green','purple'];
   icons          text[] := ARRAY['Money','Zap','Users','Heart','Briefcase','HumanRun','Gamepad','Visible','Money','Zap'];
   i                   int;
   k                   int;
   day_offset          int;
   task_status         text;
-  task_status_id      uuid;
-  status_todo_id      uuid;
-  status_doing_id     uuid;
-  status_done_id      uuid;
   task_impact         text;
   task_effort         text;
   task_due            timestamp;
@@ -45,11 +46,11 @@ BEGIN
   END IF;
 
   -- Ensure default TODO/DOING/DONE statuses exist for this user, then capture their IDs.
-  INSERT INTO user_task_statuses (id, "userId", label, "isDefault", "createdAt", "updatedAt")
+  INSERT INTO user_task_statuses ("userId", label, "isDefault", "createdAt", "updatedAt")
   VALUES
-    (gen_random_uuid(), target_user_id, 'TODO',  true,  now_ts, now_ts),
-    (gen_random_uuid(), target_user_id, 'DOING', false, now_ts, now_ts),
-    (gen_random_uuid(), target_user_id, 'DONE',  false, now_ts, now_ts)
+    (target_user_id, 'TODO',  true,  now_ts, now_ts),
+    (target_user_id, 'DOING', false, now_ts, now_ts),
+    (target_user_id, 'DONE',  false, now_ts, now_ts)
   ON CONFLICT ("userId", label) DO NOTHING;
 
   SELECT id INTO status_todo_id  FROM user_task_statuses WHERE "userId" = target_user_id AND label = 'TODO';
@@ -59,37 +60,34 @@ BEGIN
   IF EXISTS (SELECT 1 FROM areas WHERE "userId" = target_user_id AND name LIKE 'SEED %') THEN
     RAISE NOTICE 'Seed already present for %, skipping', target_email;
   ELSE
-    -- Pre-generate UUIDs so we can wire FKs without RETURNING into a temp table.
-    area_ids  := ARRAY(SELECT gen_random_uuid() FROM generate_series(1, 10));
-    obj_ids   := ARRAY(SELECT gen_random_uuid() FROM generate_series(1, 20));
-    habit_ids := ARRAY(SELECT gen_random_uuid() FROM generate_series(1, 12));
-    task_ids  := ARRAY(SELECT gen_random_uuid() FROM generate_series(1, 100));
-
     ---------------------------------------------------------------- AREAS
     FOR i IN 1..10 LOOP
-      INSERT INTO areas (id, name, color, icon, "userId", "createdAt", "updatedAt")
+      INSERT INTO areas (name, color, icon, "userId", "createdAt", "updatedAt")
       VALUES (
-        area_ids[i],
         'SEED Area ' || lpad(i::text, 2, '0'),
         colors[i],
         icons[i],
         target_user_id,
         now_ts - interval '90 days',
         now_ts
-      );
+      )
+      RETURNING id INTO new_id;
+      area_ids := area_ids || new_id;
     END LOOP;
 
     ---------------------------------------------------------- OBJECTIVES
     FOR i IN 1..20 LOOP
-      INSERT INTO objectives (id, name, description, "userId", "createdAt", "updatedAt")
+      INSERT INTO objectives (name, description, "userId", "createdAt", "updatedAt")
       VALUES (
-        obj_ids[i],
         'SEED Obj ' || lpad(i::text, 2, '0'),
         'Seeded objective for dashboard validation',
         target_user_id,
         now_ts - interval '90 days',
         now_ts
-      );
+      )
+      RETURNING id INTO new_id;
+      obj_ids := obj_ids || new_id;
+
       -- Primary area link. Stale objs 19/20 attach to stale areas 9/10.
       INSERT INTO "_AreaToObjective" ("A", "B") VALUES (
         CASE
@@ -97,12 +95,12 @@ BEGIN
           WHEN i = 20 THEN area_ids[10]
           ELSE area_ids[((i - 1) % 8) + 1]
         END,
-        obj_ids[i]
+        new_id
       );
       -- ~1/3 of active objectives link to a second area for variety.
       IF i % 3 = 0 AND i < 19 THEN
         INSERT INTO "_AreaToObjective" ("A", "B")
-        VALUES (area_ids[(i % 8) + 1], obj_ids[i]);
+        VALUES (area_ids[(i % 8) + 1], new_id);
       END IF;
     END LOOP;
 
@@ -119,9 +117,8 @@ BEGIN
         habit_recurr := 1;
       END IF;
 
-      INSERT INTO habits (id, name, description, recurrence, timespan, "userId", "createdAt", "updatedAt")
+      INSERT INTO habits (name, description, recurrence, timespan, "userId", "createdAt", "updatedAt")
       VALUES (
-        habit_ids[i],
         'SEED Habit ' || lpad(i::text, 2, '0'),
         'Seeded habit for dashboard validation',
         habit_recurr,
@@ -129,12 +126,14 @@ BEGIN
         target_user_id,
         now_ts - interval '90 days',
         now_ts
-      );
+      )
+      RETURNING id INTO new_id;
+      habit_ids := habit_ids || new_id;
 
       INSERT INTO "_AreaToHabit" ("A", "B")
-      VALUES (area_ids[((i - 1) % 8) + 1], habit_ids[i]);
+      VALUES (area_ids[((i - 1) % 8) + 1], new_id);
       INSERT INTO "_HabitToObjective" ("A", "B")
-      VALUES (habit_ids[i], obj_ids[((i - 1) % 18) + 1]);
+      VALUES (new_id, obj_ids[((i - 1) % 18) + 1]);
     END LOOP;
 
     ---------------------------------------------------- HABIT COMPLETIONS
@@ -147,9 +146,8 @@ BEGIN
         FOR day_offset IN 0..89 LOOP
           IF random() < 0.80 THEN
             FOR k IN 1..completions_per_day LOOP
-              INSERT INTO habit_completions (id, "habitId", "userId", "completedAt")
+              INSERT INTO habit_completions ("habitId", "userId", "completedAt")
               VALUES (
-                gen_random_uuid(),
                 habit_ids[i],
                 target_user_id,
                 now_ts - (day_offset || ' days')::interval - (k * 2 || ' hours')::interval
@@ -161,9 +159,8 @@ BEGIN
         -- WEEKLY: one completion every 7 days at ~85% prob
         FOR day_offset IN 0..89 LOOP
           IF day_offset % 7 = 0 AND random() < 0.85 THEN
-            INSERT INTO habit_completions (id, "habitId", "userId", "completedAt")
+            INSERT INTO habit_completions ("habitId", "userId", "completedAt")
             VALUES (
-              gen_random_uuid(),
               habit_ids[i],
               target_user_id,
               now_ts - (day_offset || ' days')::interval
@@ -173,10 +170,10 @@ BEGIN
       END IF;
     END LOOP;
     -- Stale habits
-    INSERT INTO habit_completions (id, "habitId", "userId", "completedAt")
-    VALUES (gen_random_uuid(), habit_ids[11], target_user_id, now_ts - interval '25 days');
-    INSERT INTO habit_completions (id, "habitId", "userId", "completedAt")
-    VALUES (gen_random_uuid(), habit_ids[12], target_user_id, now_ts - interval '40 days');
+    INSERT INTO habit_completions ("habitId", "userId", "completedAt")
+    VALUES (habit_ids[11], target_user_id, now_ts - interval '25 days');
+    INSERT INTO habit_completions ("habitId", "userId", "completedAt")
+    VALUES (habit_ids[12], target_user_id, now_ts - interval '40 days');
 
     ---------------------------------------------------------------- TASKS
     FOR i IN 1..100 LOOP
@@ -260,10 +257,9 @@ BEGIN
         WHEN 'DONE'  THEN status_done_id
       END;
 
-      INSERT INTO tasks (id, title, description, "statusId", "order", "dueDate", "userId",
+      INSERT INTO tasks (title, description, "statusId", "order", "dueDate", "userId",
                          "createdAt", "updatedAt", color, effort, impact, "completedAt")
       VALUES (
-        task_ids[i],
         'SEED Task ' || lpad(i::text, 3, '0'),
         'Seeded task for dashboard validation',
         task_status_id,
@@ -276,9 +272,12 @@ BEGIN
         task_effort,
         task_impact,
         task_completed
-      );
-      INSERT INTO "_AreaToTask" ("A", "B") VALUES (area_ids[task_area_idx], task_ids[i]);
-      INSERT INTO "_ObjectiveToTask" ("A", "B") VALUES (obj_ids[task_obj_idx], task_ids[i]);
+      )
+      RETURNING id INTO new_id;
+      task_ids := task_ids || new_id;
+
+      INSERT INTO "_AreaToTask" ("A", "B") VALUES (area_ids[task_area_idx], new_id);
+      INSERT INTO "_ObjectiveToTask" ("A", "B") VALUES (obj_ids[task_obj_idx], new_id);
     END LOOP;
 
     RAISE NOTICE 'Seeded dashboard data for % (10 areas, 20 objectives, 12 habits, 100 tasks)', target_email;

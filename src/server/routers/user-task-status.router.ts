@@ -29,7 +29,7 @@ export const userTaskStatusRouter = t.router({
     .use(rateLimit(RATE_LIMITS.strict))
     .input(deleteUserTaskStatusSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.services.userTaskStatus.delete(ctx.user.id, input.id)
+      return ctx.services.userTaskStatus.delete(ctx.user.id, input.publicId)
     }),
 
   bulkApply: protectedProcedure

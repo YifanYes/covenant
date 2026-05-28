@@ -6,7 +6,7 @@ export default function GuildMembersPage() {
   const { guild, myRole, myUserId } = useGuild()
   return (
     <MemberList
-      guildId={guild.id}
+      guildSlug={guild.slug}
       members={guild.members}
       availableTitles={guild.availableTitles ?? []}
       myUserId={myUserId}

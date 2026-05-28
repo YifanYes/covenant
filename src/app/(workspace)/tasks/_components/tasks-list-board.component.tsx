@@ -56,8 +56,8 @@ export default function TasksListBoard({ onCreate }: { onCreate?: () => void }) 
     <div className="flex h-full flex-col gap-4 overflow-y-auto">
       {visibleStatuses.map((status) => (
         <TaskList
-          key={status.id}
-          id={status.id}
+          key={String(status.id)}
+          id={String(status.id)}
           label={status.label}
           group="tasks"
           mutation={reorderMutation}

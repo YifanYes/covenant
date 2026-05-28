@@ -5,10 +5,12 @@ import { QueryClient } from '@tanstack/react-query'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { createTRPCReact } from '@trpc/react-query'
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
+import superjson from 'superjson'
 
 // Same-origin link — cookies sent automatically
 const trpcLink = httpBatchLink({
-  url: '/api/trpc'
+  url: '/api/trpc',
+  transformer: superjson
 })
 
 export const queryClient = new QueryClient({

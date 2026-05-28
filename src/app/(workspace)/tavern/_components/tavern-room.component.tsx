@@ -54,7 +54,7 @@ export default function TavernRoom({ myUserId }: TavernRoomProps) {
     })
   )
 
-  const fetchOlder = async (cursor: { createdAt: string; id: string }) => {
+  const fetchOlder = async (cursor: { createdAt: string; publicId: string }) => {
     try {
       return await queryClient.fetchQuery(
         trpcOptions.tavern.getMessages.queryOptions({ cursor, limit: PAGE_SIZE })
@@ -81,7 +81,7 @@ export default function TavernRoom({ myUserId }: TavernRoomProps) {
       pagination={{ fetchOlder, pageSize: PAGE_SIZE }}
       deleteAction={{
         canDelete: (msg) => msg.userId === myUserId,
-        onDelete: (msg) => deleteMutation.mutate({ id: msg.id }),
+        onDelete: (msg) => deleteMutation.mutate({ publicId: msg.publicId }),
         isPending: deleteMutation.isPending,
         confirm: {
           titleKey: 'tavern.delete_confirm.title',
@@ -91,7 +91,7 @@ export default function TavernRoom({ myUserId }: TavernRoomProps) {
       }}
       reportAction={{
         canReport: (msg) => msg.userId !== myUserId,
-        onReport: (msg) => reportMutation.mutate({ messageId: msg.id }),
+        onReport: (msg) => reportMutation.mutate({ publicId: msg.publicId }),
         isPending: reportMutation.isPending,
         confirm: {
           titleKey: 'tavern.report_confirm.title',

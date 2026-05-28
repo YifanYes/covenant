@@ -17,11 +17,11 @@ function TaskMetaBadges({ task, taskAreas }: { task: TaskType; taskAreas: Area[]
       <TaskTypeBadge effort={task.effort} impact={task.impact} />
       {taskAreas.length > 0 && (
         <div className="flex items-center gap-1">
-          {taskAreas.map(({ id, name, icon, color }) => {
+          {taskAreas.map(({ publicId, name, icon, color }) => {
             const areaStyle = areaSimpleStyles.find(({ color: areaColor }) => areaColor === color)
             const currentIcon = allIcons.find(({ name: iconName }) => iconName === icon)
             return !areaStyle || !currentIcon ? null : (
-              <div key={id} title={t(name)} className="flex items-center">
+              <div key={publicId} title={t(name)} className="flex items-center">
                 <currentIcon.component className={cn('size-3.5', areaStyle.styles)} />
               </div>
             )
@@ -43,7 +43,7 @@ export default function Task({
   hideHover?: boolean
   variant?: 'row' | 'card'
 }) {
-  const taskAreas = uniqBy(task.objectives?.flatMap(({ areas = [] }) => areas) || [], ({ id }: Area) => id)
+  const taskAreas = uniqBy(task.objectives?.flatMap(({ areas = [] }) => areas) || [], ({ publicId }: Area) => publicId)
   const hasMeta =
     task.effort || task.impact || (task.objectives && task.objectives.length > 0) || taskAreas.length > 0
   const hasCardMeta = task.effort || task.impact || taskAreas.length > 0
@@ -111,7 +111,7 @@ export default function Task({
               <div className="flex flex-wrap items-center gap-2">
                 {task.objectives.map((objective) => (
                   <span
-                    key={objective.id}
+                    key={objective.publicId}
                     className="text-muted-foreground border-muted-foreground/30 rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase"
                   >
                     {objective.name}

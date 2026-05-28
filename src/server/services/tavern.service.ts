@@ -6,24 +6,14 @@ import { TRPCError } from '@trpc/server'
 import type { PrismaClient } from '@/generated/prisma'
 import { resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
+import { isPrismaUniqueViolation } from '../lib/prisma-errors'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { TavernMessageRepository } from '../repositories/tavern-message.repository'
 
 const log = logger.child({ service: 'tavern' })
 
-const PRISMA_UNIQUE_CONSTRAINT = 'P2002'
-
 function isDisabled(): boolean {
   return process.env.TAVERN_DISABLED === '1'
-}
-
-function isUniqueConstraintError(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    (error as { code?: unknown }).code === PRISMA_UNIQUE_CONSTRAINT
-  )
 }
 
 export class TavernService {
@@ -69,44 +59,44 @@ export class TavernService {
     })
   }
 
-  async deleteMessage(id: string, userId: string) {
-    const deleted = await this.tavernMessageRepository.softDeleteByAuthor(id, userId)
+  async deleteMessage(publicId: string, userId: string) {
+    const deleted = await this.tavernMessageRepository.softDeleteByPublicIdAndAuthor(publicId, userId)
     if (deleted === 0) {
-      log.warn({ messageId: id, userId }, 'deleteMessage: unauthorized or missing tavern message')
+      log.warn({ messagePublicId: publicId, userId }, 'deleteMessage: unauthorized or missing tavern message')
       throw resourceNotFound()
     }
     return { message: 'Message deleted' }
   }
 
-  async reportMessage(messageId: string, reporterId: string) {
+  async reportMessage(messagePublicId: string, reporterId: string) {
     try {
       await this.prisma.$transaction(async (tx) => {
         const message = await tx.tavernMessage.findFirst({
-          where: { id: messageId, deletedAt: null },
-          select: { userId: true }
+          where: { publicId: messagePublicId, deletedAt: null },
+          select: { id: true, userId: true }
         })
         if (!message) {
-          log.warn({ messageId, reporterId }, 'reportMessage: tavern message not found')
+          log.warn({ messagePublicId, reporterId }, 'reportMessage: tavern message not found')
           throw resourceNotFound()
         }
         if (message.userId === reporterId) {
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'You cannot report your own message' })
         }
         await tx.tavernMessageReport.create({
-          data: { messageId, reporterId }
+          data: { messageId: message.id, reporterId }
         })
         const updated = await tx.tavernMessage.updateMany({
-          where: { id: messageId, deletedAt: null },
+          where: { id: message.id, deletedAt: null },
           data: { reportCount: { increment: 1 } }
         })
         if (updated.count === 0) {
-          log.warn({ messageId, reporterId }, 'reportMessage: tavern message gone after report insert')
+          log.warn({ messagePublicId, reporterId }, 'reportMessage: tavern message gone after report insert')
           throw resourceNotFound()
         }
       })
     } catch (error) {
       if (error instanceof TRPCError) throw error
-      if (isUniqueConstraintError(error)) {
+      if (isPrismaUniqueViolation(error)) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'You have already reported this message' })
       }
       throw error

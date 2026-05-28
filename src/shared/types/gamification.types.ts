@@ -108,7 +108,7 @@ export interface InventoryCharacterClass {
 
 // Character data returned by getCurrentClass endpoint
 export interface InventoryCharacter {
-  id: string
+  slug: string
   name: string
   title: string | null
   factionName: string

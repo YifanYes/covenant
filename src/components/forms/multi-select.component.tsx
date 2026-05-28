@@ -6,7 +6,10 @@ import { useEffect, useRef, useState } from 'react'
 import { type Control, Controller, type FieldPath, type FieldValues } from 'react-hook-form'
 import FormField from './form-field.component'
 
-export default function MultiSelect<TFieldValues extends FieldValues = FieldValues>({
+export default function MultiSelect<
+  TFieldValues extends FieldValues = FieldValues,
+  TItemId extends bigint | string = bigint
+>({
   name,
   control,
   items,
@@ -19,14 +22,14 @@ export default function MultiSelect<TFieldValues extends FieldValues = FieldValu
   name: FieldPath<TFieldValues>
   control: Control<TFieldValues>
   items: {
-    id: string
+    id: TItemId
     label: string
   }[]
   placeholder?: string
   label?: string
   required?: boolean
   errorMessage?: string
-  exclusiveValue?: string
+  exclusiveValue?: TItemId
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const [openAbove, setOpenAbove] = useState(false)
@@ -72,17 +75,17 @@ export default function MultiSelect<TFieldValues extends FieldValues = FieldValu
       name={name}
       control={control}
       render={({ field }) => {
-        const value: string[] = field.value || []
+        const value: TItemId[] = field.value || []
 
-        const toggleItem = (id: string) => {
-          if (exclusiveValue && id === exclusiveValue) {
+        const toggleItem = (id: TItemId) => {
+          if (exclusiveValue != null && id === exclusiveValue) {
             field.onChange([exclusiveValue])
             return
           }
 
           let newValue = [...value]
 
-          if (exclusiveValue && newValue.includes(exclusiveValue)) {
+          if (exclusiveValue != null && newValue.includes(exclusiveValue)) {
             newValue = []
           }
 
@@ -134,7 +137,7 @@ export default function MultiSelect<TFieldValues extends FieldValues = FieldValu
                     const isSelected = value.includes(item.id)
                     return (
                       <div
-                        key={item.id}
+                        key={String(item.id)}
                         className={cn(
                           'relative flex cursor-pointer items-center px-2 py-1.5 text-sm transition-all duration-200 outline-none select-none',
                           isSelected

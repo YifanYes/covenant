@@ -29,17 +29,17 @@ const TAB_FIELD_TO_VIEW: Record<TabField, TasksView> = {
   showMatrixTab: 'matrix'
 }
 
-type StatusBaseline = { id: string; label: string; color: string | null }
+type StatusBaseline = { publicId: string; label: string; color: string | null }
 
 type BulkApplyPayload = {
   create: Array<{ label: string; color?: string | null }>
-  update: Array<{ id: string; label?: string; color?: string | null }>
-  delete: Array<{ id: string }>
+  update: Array<{ publicId: string; label?: string; color?: string | null }>
+  delete: Array<{ publicId: string }>
 }
 
 const diffStatuses = (baseline: StatusBaseline[], current: TaskStatusDraft[]): BulkApplyPayload => {
-  const baselineById = new Map(baseline.map((s) => [s.id, s]))
-  const currentIds = new Set(current.map((s) => s.id))
+  const baselineByPublicId = new Map(baseline.map((s) => [s.publicId, s]))
+  const currentIds = new Set(current.map((s) => s.publicId))
 
   const create: BulkApplyPayload['create'] = current
     .filter((s) => s.isNew)
@@ -48,9 +48,9 @@ const diffStatuses = (baseline: StatusBaseline[], current: TaskStatusDraft[]): B
   const update: BulkApplyPayload['update'] = []
   for (const s of current) {
     if (s.isNew) continue
-    const prev = baselineById.get(s.id)
+    const prev = baselineByPublicId.get(s.publicId)
     if (!prev) continue
-    const patch: { id: string; label?: string; color?: string | null } = { id: s.id }
+    const patch: { publicId: string; label?: string; color?: string | null } = { publicId: s.publicId }
     let dirty = false
     if (prev.label !== s.label) {
       patch.label = s.label
@@ -63,7 +63,7 @@ const diffStatuses = (baseline: StatusBaseline[], current: TaskStatusDraft[]): B
     if (dirty) update.push(patch)
   }
 
-  const del = baseline.filter((s) => !currentIds.has(s.id)).map((s) => ({ id: s.id }))
+  const del = baseline.filter((s) => !currentIds.has(s.publicId)).map((s) => ({ publicId: s.publicId }))
 
   return { create, update, delete: del }
 }
@@ -88,7 +88,7 @@ export default function TasksSettingsForm() {
   const initialStatuses = useMemo<TaskStatusDraft[]>(
     () =>
       statusesData.statuses.map((s) => ({
-        id: s.id,
+        publicId: s.publicId,
         label: s.label,
         color: s.color,
         isDefault: s.isDefault

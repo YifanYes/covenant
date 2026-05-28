@@ -23,7 +23,7 @@ describe('Character Ownership Validation', () => {
 
   describe('verifyCharacterOwnership integration', () => {
     it('should allow access when ownership is verified', async () => {
-      const characterId = 'char-1'
+      const characterId = BigInt(100)
       const userId = 'user-1'
 
       mockCharacterService.verifyCharacterOwnership.mockResolvedValue(true)
@@ -34,7 +34,7 @@ describe('Character Ownership Validation', () => {
     })
 
     it('should deny access when ownership is not verified', async () => {
-      const characterId = 'char-1'
+      const characterId = BigInt(100)
       const userId = 'user-1'
 
       mockCharacterService.verifyCharacterOwnership.mockResolvedValue(false)
@@ -45,7 +45,7 @@ describe('Character Ownership Validation', () => {
     })
 
     it('should deny access for non-existent characters', async () => {
-      const characterId = 'non-existent'
+      const characterId = BigInt(999)
       const userId = 'user-1'
 
       mockCharacterService.verifyCharacterOwnership.mockResolvedValue(false)
@@ -64,12 +64,12 @@ describe('Character Ownership Validation', () => {
      * 3. If true, proceed with service call
      */
     it('should follow the router authorization pattern', async () => {
-      const characterId = 'char-1'
+      const characterId = BigInt(100)
       const userId = 'user-1'
       const mockServiceMethod = vi.fn().mockResolvedValue({ success: true })
 
       // Simulate the router pattern
-      async function routerHandler(inputCharacterId: string, inputUserId: string) {
+      async function routerHandler(inputCharacterId: bigint, inputUserId: string) {
         const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
         if (!isOwner) {
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
@@ -87,12 +87,12 @@ describe('Character Ownership Validation', () => {
     })
 
     it('should throw NOT_FOUND when ownership check fails', async () => {
-      const characterId = 'char-1'
+      const characterId = BigInt(100)
       const userId = 'user-1'
       const mockServiceMethod = vi.fn()
 
       // Simulate the router pattern
-      async function routerHandler(inputCharacterId: string, inputUserId: string) {
+      async function routerHandler(inputCharacterId: bigint, inputUserId: string) {
         const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
         if (!isOwner) {
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found or access denied' })
@@ -113,14 +113,14 @@ describe('Character Ownership Validation', () => {
     })
 
     it('should check ownership before service call (activity.list pattern)', async () => {
-      const characterId = 'char-1'
+      const characterId = BigInt(100)
       const userId = 'user-1'
       const mockActivityService = {
         getActivities: vi.fn().mockResolvedValue([])
       }
 
       // Simulate quest.list router pattern
-      async function activityListHandler(inputCharacterId: string | undefined, inputUserId: string) {
+      async function activityListHandler(inputCharacterId: bigint | undefined, inputUserId: string) {
         if (inputCharacterId) {
           const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
           if (!isOwner) {
@@ -145,7 +145,7 @@ describe('Character Ownership Validation', () => {
       }
 
       // Simulate quest.list router pattern
-      async function activityListHandler(inputCharacterId: string | undefined, inputUserId: string) {
+      async function activityListHandler(inputCharacterId: bigint | undefined, inputUserId: string) {
         if (inputCharacterId) {
           const isOwner = await mockCharacterService.verifyCharacterOwnership(inputCharacterId, inputUserId)
           if (!isOwner) {

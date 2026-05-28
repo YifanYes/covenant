@@ -9,6 +9,7 @@ import type { Area } from '@/types/models.types'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { defaultAreas, updateAreaSchema, type UpdateAreaBodyType } from '@shared/schemas/areas.schemas'
+import { z } from 'zod'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -44,11 +45,11 @@ export default function UpdateAreaDialog({ area, trigger: triggerOverride }: Upd
     handleSubmit,
     reset,
     formState: { errors, isValid, isDirty }
-  } = useForm<UpdateAreaBodyType>({
+  } = useForm<z.input<typeof updateAreaSchema>, unknown, UpdateAreaBodyType>({
     resolver: standardSchemaResolver(updateAreaSchema),
     mode: 'onSubmit',
     defaultValues: {
-      id: area.id,
+      publicId: area.publicId,
       name: area.name,
       color: area.color || '',
       icon: area.icon || ''
@@ -59,7 +60,7 @@ export default function UpdateAreaDialog({ area, trigger: triggerOverride }: Upd
   useEffect(() => {
     if (open) {
       reset({
-        id: area.id,
+        publicId: area.publicId,
         name: area.name,
         color: area.color || '',
         icon: area.icon || ''

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { publicIdSchema } from './ids.schemas'
 
 export enum TaskEffort {
   HIGH = 'HIGH',
@@ -13,7 +14,7 @@ export enum TaskImpact {
 export const createTaskSchema = z.object({
   title: z.string().min(1, 'errors.required_field'),
   description: z.string().optional(),
-  statusId: z.uuid(),
+  statusPublicId: publicIdSchema,
   color: z.string().optional(),
   effort: z.enum(TaskEffort).optional(),
   impact: z.enum(TaskImpact).optional(),
@@ -22,16 +23,16 @@ export const createTaskSchema = z.object({
     .date()
     .nullish()
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
-  objectives: z.array(z.uuid()).optional(),
-  areas: z.array(z.uuid()).optional()
+  objectives: z.array(publicIdSchema).optional(),
+  areas: z.array(publicIdSchema).optional()
 })
 export type CreateTaskType = z.input<typeof createTaskSchema>
 
 export const updateTaskSchema = z.object({
-  id: z.uuid(),
+  publicId: publicIdSchema,
   title: z.string().min(1, 'errors.required_field'),
   description: z.string().nullish(),
-  statusId: z.uuid().optional(),
+  statusPublicId: publicIdSchema.optional(),
   color: z.string().nullish(),
   effort: z.enum(TaskEffort).nullish(),
   impact: z.enum(TaskImpact).nullish(),
@@ -40,25 +41,25 @@ export const updateTaskSchema = z.object({
     .date()
     .nullish()
     .or(z.string().transform((str) => (str ? new Date(str) : null))),
-  objectives: z.array(z.uuid()).optional(),
-  areas: z.array(z.uuid()).optional()
+  objectives: z.array(publicIdSchema).optional(),
+  areas: z.array(publicIdSchema).optional()
 })
 export type UpdateTaskType = z.input<typeof updateTaskSchema>
 
 export const taskIdSchema = z.object({
-  id: z.uuid()
+  publicId: publicIdSchema
 })
 
 export const duplicateTaskSchema = z.object({
-  id: z.uuid(),
+  publicId: publicIdSchema,
   titleSuffix: z.string().optional()
 })
 
 export const bulkUpdateTasksSchema = z.object({
   tasks: z.array(
     z.object({
-      id: z.uuid(),
-      statusId: z.uuid(),
+      publicId: publicIdSchema,
+      statusPublicId: publicIdSchema,
       order: z.number().int().min(0)
     })
   )
@@ -73,7 +74,7 @@ export const getByDateInputSchema = z.object({
 
 export const getTasksFilteredSchema = z.object({
   search: z.string().optional(),
-  statusIds: z.array(z.uuid()).optional(),
+  statusPublicIds: z.array(publicIdSchema).optional(),
   effortImpact: z.array(z.string()).optional(),
   dueDate: z.string().optional(),
   page: z.number().int().min(1).default(1),

@@ -135,7 +135,7 @@ describe('executeMove — potionUsedThisTurn reset', () => {
     const { stateRef, repos, mocks } = makeRepos(initial)
 
     await executeMove({
-      participationId: 'quest-1',
+      participationId: BigInt(1),
       casterId: 'enemy-1',
       moveId: 'basic_strike',
       targetIds: ['player-1'],
@@ -157,7 +157,7 @@ describe('executeMove — potionUsedThisTurn reset', () => {
     const { stateRef, repos } = makeRepos(initial)
 
     await executeMove({
-      participationId: 'quest-1',
+      participationId: BigInt(1),
       casterId: 'player-1',
       moveId: 'basic_strike',
       targetIds: ['enemy-1'],
@@ -183,7 +183,7 @@ describe('executeEnemyMove — mana drain + AI selection', () => {
     }
     const { stateRef, repos } = makeRepos(initial)
 
-    await executeEnemyMove({ participationId: 'quest-1', enemyId: 'enemy-1', repos })
+    await executeEnemyMove({ participationId: BigInt(1), enemyId: 'enemy-1', repos })
 
     const enemy = stateRef.current.units.find((u) => u.id === 'enemy-1')!
     // plasma_missile costs 3; enemy starts at 6 → expect 3 left.
@@ -203,7 +203,7 @@ describe('executeEnemyMove — mana drain + AI selection', () => {
     }
     const { stateRef, repos } = makeRepos(initial)
 
-    const first = await executeEnemyMove({ participationId: 'quest-1', enemyId: 'enemy-1', repos })
+    const first = await executeEnemyMove({ participationId: BigInt(1), enemyId: 'enemy-1', repos })
     expect(first.moveId).toBe('plasma_missile')
     expect(stateRef.current.units.find((u) => u.id === 'enemy-1')!.currentMana).toBe(0)
 
@@ -214,7 +214,7 @@ describe('executeEnemyMove — mana drain + AI selection', () => {
       currentTurnIndex: 1
     }
 
-    const second = await executeEnemyMove({ participationId: 'quest-1', enemyId: 'enemy-1', repos })
+    const second = await executeEnemyMove({ participationId: BigInt(1), enemyId: 'enemy-1', repos })
     expect(second.moveId).toBe('basic_strike')
   })
 
@@ -226,7 +226,7 @@ describe('executeEnemyMove — mana drain + AI selection', () => {
     }
     const { repos } = makeRepos(initial)
 
-    const result = await executeEnemyMove({ participationId: 'quest-1', enemyId: 'enemy-1', repos })
+    const result = await executeEnemyMove({ participationId: BigInt(1), enemyId: 'enemy-1', repos })
 
     const opener = result.logEntries[0]
     expect(opener.type).toBe('ENEMY_ATTACKS')
@@ -257,7 +257,7 @@ describe('executeEnemyMove — DOT-kill spawn', () => {
     const { stateRef, repos, mocks } = makeRepos(initial)
 
     const result = await executeEnemyMove({
-      participationId: 'quest-1',
+      participationId: BigInt(1),
       enemyId: 'enemy-1',
       repos
     })
@@ -287,7 +287,7 @@ describe('executeEnemyMove — DOT-kill spawn', () => {
     const reposNoEnemyRepo = { ...repos, combatEnemyRepository: undefined }
 
     const result = await executeEnemyMove({
-      participationId: 'quest-1',
+      participationId: BigInt(1),
       enemyId: 'enemy-1',
       repos: reposNoEnemyRepo as never
     })

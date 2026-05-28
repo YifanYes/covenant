@@ -47,7 +47,7 @@ export interface EnemyDefeatResult {
  * Unified logic extracted from executeTacticalAttack and executeTacticalAbility.
  */
 export async function processEnemyDefeat(
-  questId: string,
+  questId: bigint,
   updatedState: TacticalStateData,
   killedEnemyIds: string[],
   repos: CombatRewardDeps,
@@ -66,8 +66,8 @@ export async function processEnemyDefeat(
   // Fallback: if no active enemy found by status, try finding by ID from tactical state
   if (!activeEnemy) {
     const enemyUnit = updatedState.units.find((u) => !u.id.startsWith('player-'))
-    if (enemyUnit) {
-      activeEnemy = await repos.combatEnemyRepository.findById(enemyUnit.id)
+    if (enemyUnit && /^\d+$/.test(enemyUnit.id)) {
+      activeEnemy = await repos.combatEnemyRepository.findById(BigInt(enemyUnit.id))
     }
   }
 
@@ -188,7 +188,7 @@ export async function processEnemyDefeat(
     const newEnemyName = `${nameKeys.prefix}|${nameKeys.suffix}`
 
     result.nextEnemy = {
-      id: newEnemy.id,
+      id: newEnemy.id.toString(),
       templateId: selected.enemyId,
       name: newEnemyName,
       currentHealth: scaledTemplate.health,
@@ -218,7 +218,7 @@ export async function processEnemyDefeat(
         }
       }
       const newTacticalState = createTacticalStateWithNewEnemy(updatedState, refreshedPlayer, {
-        id: newEnemy.id,
+        id: newEnemy.id.toString(),
         templateId: selected.enemyId,
         name: newEnemyName,
         health: { current: scaledTemplate.health, max: scaledTemplate.health },

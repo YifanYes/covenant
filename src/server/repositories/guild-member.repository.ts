@@ -1,8 +1,9 @@
 import type { GuildMember, PrismaClient } from '@/generated/prisma'
+import { generatePublicId } from '../lib/public-id'
 
 export type GuildMemberWithGuildAndMembers = GuildMember & {
   guild: {
-    id: string
+    slug: string
     name: string
     description: string | null
     availableTitles: string[]
@@ -13,14 +14,14 @@ export type GuildMemberWithGuildAndMembers = GuildMember & {
     createdAt: Date
     updatedAt: Date
     members: Array<{
-      id: string
+      publicId: string
       userId: string
       role: string
       joinedAt: Date
       user: {
         id: string
         image: string | null
-        character: { id: string; name: string; title: string | null } | null
+        character: { slug: string; name: string; title: string | null } | null
       }
     }>
   }
@@ -33,11 +34,15 @@ export class GuildMemberRepository {
     return this.prisma.guildMember.findUnique({ where: { userId } })
   }
 
-  async findById(id: string): Promise<GuildMember | null> {
+  async findById(id: bigint): Promise<GuildMember | null> {
     return this.prisma.guildMember.findUnique({ where: { id } })
   }
 
-  async findUserIdsByGuild(guildId: string): Promise<string[]> {
+  async findByPublicId(publicId: string): Promise<GuildMember | null> {
+    return this.prisma.guildMember.findUnique({ where: { publicId } })
+  }
+
+  async findUserIdsByGuild(guildId: bigint): Promise<string[]> {
     const rows = await this.prisma.guildMember.findMany({
       where: { guildId },
       select: { userId: true }
@@ -57,7 +62,7 @@ export class GuildMemberRepository {
                   select: {
                     id: true,
                     image: true,
-                    character: { select: { id: true, name: true, title: true } }
+                    character: { select: { slug: true, name: true, title: true } }
                   }
                 }
               },
@@ -66,27 +71,27 @@ export class GuildMemberRepository {
           }
         }
       }
-    })
+    }) as Promise<GuildMemberWithGuildAndMembers | null>
   }
 
-  async findByUserAndGuild(userId: string, guildId: string): Promise<GuildMember | null> {
+  async findByUserAndGuild(userId: string, guildId: bigint): Promise<GuildMember | null> {
     const member = await this.prisma.guildMember.findUnique({ where: { userId } })
     return member && member.guildId === guildId ? member : null
   }
 
-  async create(data: { guildId: string; userId: string; role: string }): Promise<GuildMember> {
-    return this.prisma.guildMember.create({ data })
+  async create(data: { guildId: bigint; userId: string; role: string }): Promise<GuildMember> {
+    return this.prisma.guildMember.create({ data: { ...data, publicId: generatePublicId() } })
   }
 
-  async updateRole(id: string, role: string): Promise<GuildMember> {
+  async updateRole(id: bigint, role: string): Promise<GuildMember> {
     return this.prisma.guildMember.update({ where: { id }, data: { role } })
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: bigint): Promise<void> {
     await this.prisma.guildMember.delete({ where: { id } })
   }
 
-  async countByGuild(guildId: string): Promise<number> {
+  async countByGuild(guildId: bigint): Promise<number> {
     return this.prisma.guildMember.count({ where: { guildId } })
   }
 }

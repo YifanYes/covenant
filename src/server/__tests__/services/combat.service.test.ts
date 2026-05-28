@@ -81,6 +81,7 @@ describe('CombatService (Phase 2A)', () => {
     mockCharacterRepo = createRepoMock<CharacterRepository>()
     mockCharacterQuestRepo = createRepoMock<CharacterQuestRepository>()
     mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+    mockCharacterQuestRepo.findByPublicId.mockResolvedValue({ id: BigInt(1), publicId: 'qstpub000001' })
     mockCharacterService = createRepoMock<CharacterService>()
 
     combatService = new CombatService(mockCharacterRepo, mockCharacterQuestRepo, mockCharacterService)
@@ -244,18 +245,18 @@ describe('CombatService (Phase 2A)', () => {
       executeEnemyMoveMock.mockResolvedValue(mkEnemyResult())
       executeMoveMock.mockResolvedValue(mkPlayerResult())
 
-      const result = await combatService.playerExecuteMove('user-1', 'quest-1', 'player-1', 'basic_strike', [
+      const result = await combatService.playerExecuteMove('user-1', 'qstpub000001', 'player-1', 'basic_strike', [
         'enemy-spawn-1'
       ])
 
       expect(executeEnemyMoveMock).toHaveBeenCalledTimes(1)
       expect(executeEnemyMoveMock.mock.calls[0][0]).toMatchObject({
-        participationId: 'quest-1',
+        participationId: BigInt(1),
         enemyId: 'enemy-spawn-1'
       })
       expect(executeMoveMock).toHaveBeenCalledTimes(1)
       expect(executeMoveMock.mock.calls[0][0]).toMatchObject({
-        participationId: 'quest-1',
+        participationId: BigInt(1),
         casterId: 'player-1',
         moveId: 'basic_strike'
       })
@@ -271,7 +272,7 @@ describe('CombatService (Phase 2A)', () => {
       })
       executeEnemyMoveMock.mockResolvedValue(lethal)
 
-      const result = await combatService.playerExecuteMove('user-1', 'quest-1', 'player-1', 'basic_strike', [
+      const result = await combatService.playerExecuteMove('user-1', 'qstpub000001', 'player-1', 'basic_strike', [
         'enemy-spawn-1'
       ])
 
@@ -288,7 +289,7 @@ describe('CombatService (Phase 2A)', () => {
       })
       executeMoveMock.mockResolvedValue(mkPlayerResult())
 
-      await combatService.playerExecuteMove('user-1', 'quest-1', 'player-1', 'basic_strike', ['enemy-spawn-1'])
+      await combatService.playerExecuteMove('user-1', 'qstpub000001', 'player-1', 'basic_strike', ['enemy-spawn-1'])
 
       expect(executeEnemyMoveMock).not.toHaveBeenCalled()
       expect(executeMoveMock).toHaveBeenCalledTimes(1)
@@ -305,7 +306,7 @@ describe('CombatService (Phase 2A)', () => {
       })
       executeMoveMock.mockResolvedValue(mkPlayerResult())
 
-      await combatService.playerExecuteMove('user-1', 'quest-1', 'player-1', 'basic_strike', ['enemy-spawn-1'])
+      await combatService.playerExecuteMove('user-1', 'qstpub000001', 'player-1', 'basic_strike', ['enemy-spawn-1'])
 
       expect(executeEnemyMoveMock).not.toHaveBeenCalled()
       expect(executeMoveMock).toHaveBeenCalledTimes(1)
@@ -316,34 +317,34 @@ describe('CombatService (Phase 2A)', () => {
     it('playerExecuteMove throws NOT_FOUND if user does not own the quest', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
       await expect(
-        combatService.playerExecuteMove('user-1', 'quest-1', 'player-1', 'basic_strike', ['enemy-1'])
+        combatService.playerExecuteMove('user-1', 'qstpub000001', 'player-1', 'basic_strike', ['enemy-1'])
       ).rejects.toThrow(RESOURCE_NOT_FOUND_OR_FORBIDDEN)
     })
 
     it('playerExecuteMove throws FORBIDDEN if casterId is not a player unit', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
       await expect(
-        combatService.playerExecuteMove('user-1', 'quest-1', 'enemy-1', 'basic_strike', ['enemy-2'])
+        combatService.playerExecuteMove('user-1', 'qstpub000001', 'enemy-1', 'basic_strike', ['enemy-2'])
       ).rejects.toThrow('Cannot execute move for enemy units')
     })
 
     it('playerEnemyTurn throws NOT_FOUND if user does not own the quest', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
-      await expect(combatService.playerEnemyTurn('user-1', 'quest-1', 'enemy-1')).rejects.toThrow(
+      await expect(combatService.playerEnemyTurn('user-1', 'qstpub000001', 'enemy-1')).rejects.toThrow(
         RESOURCE_NOT_FOUND_OR_FORBIDDEN
       )
     })
 
     it('playerEnemyTurn throws BAD_REQUEST if enemyId is a player unit', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
-      await expect(combatService.playerEnemyTurn('user-1', 'quest-1', 'player-1')).rejects.toThrow(
+      await expect(combatService.playerEnemyTurn('user-1', 'qstpub000001', 'player-1')).rejects.toThrow(
         'Cannot execute AI turn for player units'
       )
     })
 
     it('playerUsePotion throws NOT_FOUND if user does not own the quest', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
-      await expect(combatService.playerUsePotion('user-1', 'quest-1', 'health_potion')).rejects.toThrow(
+      await expect(combatService.playerUsePotion('user-1', 'qstpub000001', 'health_potion')).rejects.toThrow(
         RESOURCE_NOT_FOUND_OR_FORBIDDEN
       )
     })

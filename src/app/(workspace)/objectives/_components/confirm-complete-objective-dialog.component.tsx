@@ -33,7 +33,7 @@ export default function ConfirmCompleteObjectiveDialog({ objective, onCompleteSu
     })
   )
 
-  const handleComplete = () => completeMutation.mutate({ id: objective.id })
+  const handleComplete = () => completeMutation.mutate({ publicId: objective.publicId })
 
   return (
     <BaseConfirmDialog

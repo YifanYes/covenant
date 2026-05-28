@@ -9,6 +9,7 @@ import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { MOODS } from '@shared/constants/journal.constants'
 import { updateJournalEntrySchema, type UpdateJournalEntryType } from '@shared/schemas/journal.schemas'
+import { z } from 'zod'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
@@ -17,7 +18,7 @@ import { toast } from 'sonner'
 
 interface EditEntryDialogProps {
   entry: {
-    id: string
+    publicId: string
     content: string
     mood: string | null
     color: string | null
@@ -59,11 +60,11 @@ export default function EditEntryDialog({ entry, open, onOpenChange }: EditEntry
     })
   )
 
-  const { control, handleSubmit, reset, setValue } = useForm<UpdateJournalEntryType>({
+  const { control, handleSubmit, reset, setValue } = useForm<z.input<typeof updateJournalEntrySchema>, unknown, UpdateJournalEntryType>({
     resolver: standardSchemaResolver(updateJournalEntrySchema),
     mode: 'onSubmit',
     defaultValues: {
-      id: entry.id,
+      publicId: entry.publicId,
       content: entry.content,
       mood: entry.mood || undefined,
       color: entry.color || undefined
@@ -73,7 +74,7 @@ export default function EditEntryDialog({ entry, open, onOpenChange }: EditEntry
   useEffect(() => {
     if (open) {
       reset({
-        id: entry.id,
+        publicId: entry.publicId,
         content: entry.content,
         mood: entry.mood || undefined,
         color: entry.color || undefined
@@ -175,7 +176,7 @@ export default function EditEntryDialog({ entry, open, onOpenChange }: EditEntry
         titleKey="journaling.delete.title"
         descriptionKey="journaling.delete.description"
         confirmLabelKey="journaling.delete.button"
-        onConfirm={() => deleteMutation.mutate({ id: entry.id })}
+        onConfirm={() => deleteMutation.mutate({ publicId: entry.publicId })}
         isLoading={deleteMutation.isPending}
       />
     </>

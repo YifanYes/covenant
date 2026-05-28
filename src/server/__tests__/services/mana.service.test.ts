@@ -51,7 +51,7 @@ describe('ManaService', () => {
     })
 
     it('writes mana only when grant fits entirely in active bar', async () => {
-      mockRepo.findWithClasses.mockResolvedValue(buildCharacter({ mana: 0, maxMana: 10, classId: 'cl-1', id: 'c-1' }))
+      mockRepo.findWithClasses.mockResolvedValue(buildCharacter({ mana: 0, maxMana: 10, classId: BigInt(10), id: BigInt(1) }))
 
       const result = await service.addManaFromCompletion('user-1', 'objective')
 
@@ -60,13 +60,13 @@ describe('ManaService', () => {
         manaApplied: MANA_REWARDS.OBJECTIVE,
         newMana: MANA_REWARDS.OBJECTIVE
       })
-      expect(mockRepo.updateHealth).toHaveBeenCalledWith('cl-1', 100, MANA_REWARDS.OBJECTIVE)
+      expect(mockRepo.updateHealth).toHaveBeenCalledWith(BigInt(10), 100, MANA_REWARDS.OBJECTIVE)
       expect(mockRepo.updateManaReserve).not.toHaveBeenCalled()
     })
 
     it('writes both mana and reserve on overflow', async () => {
       mockRepo.findWithClasses.mockResolvedValue(
-        buildCharacter({ mana: 8, maxMana: 10, reserve: 1, classId: 'cl-1', id: 'c-1' })
+        buildCharacter({ mana: 8, maxMana: 10, reserve: 1, classId: BigInt(10), id: BigInt(1) })
       )
 
       const result = await service.addManaFromCompletion('user-1', 'objective')
@@ -78,13 +78,13 @@ describe('ManaService', () => {
         newMana: 10,
         newReserve: 1 + (MANA_REWARDS.OBJECTIVE - 2)
       })
-      expect(mockRepo.updateHealth).toHaveBeenCalledWith('cl-1', 100, 10)
-      expect(mockRepo.updateManaReserve).toHaveBeenCalledWith('c-1', 1 + (MANA_REWARDS.OBJECTIVE - 2))
+      expect(mockRepo.updateHealth).toHaveBeenCalledWith(BigInt(10), 100, 10)
+      expect(mockRepo.updateManaReserve).toHaveBeenCalledWith(BigInt(1), 1 + (MANA_REWARDS.OBJECTIVE - 2))
     })
 
     it('writes reserve only and skips updateHealth when mana already full', async () => {
       mockRepo.findWithClasses.mockResolvedValue(
-        buildCharacter({ mana: 10, maxMana: 10, reserve: 0, classId: 'cl-1', id: 'c-1' })
+        buildCharacter({ mana: 10, maxMana: 10, reserve: 0, classId: BigInt(10), id: BigInt(1) })
       )
 
       const result = await service.addManaFromCompletion('user-1', 'habit')
@@ -96,7 +96,7 @@ describe('ManaService', () => {
         newReserve: MANA_REWARDS.HABIT
       })
       expect(mockRepo.updateHealth).not.toHaveBeenCalled()
-      expect(mockRepo.updateManaReserve).toHaveBeenCalledWith('c-1', MANA_REWARDS.HABIT)
+      expect(mockRepo.updateManaReserve).toHaveBeenCalledWith(BigInt(1), MANA_REWARDS.HABIT)
     })
 
     it('ticks onboarding flag once when manaEarned is unset', async () => {
@@ -162,7 +162,7 @@ describe('ManaService', () => {
     })
 
     it('aggregates mixed-impact tasks in a single character read and single health write', async () => {
-      mockRepo.findWithClasses.mockResolvedValue(buildCharacter({ mana: 0, maxMana: 100, classId: 'cl-1', id: 'c-1' }))
+      mockRepo.findWithClasses.mockResolvedValue(buildCharacter({ mana: 0, maxMana: 100, classId: BigInt(10), id: BigInt(1) }))
 
       const result = await service.addManaFromCompletions('user-1', 'task', [
         { impact: 'HIGH' },
@@ -181,7 +181,7 @@ describe('ManaService', () => {
     it('returns zero shape when character missing', async () => {
       mockRepo.findByIdWithClasses.mockResolvedValue(null)
 
-      const result = await service.topUpFromReserve('c-1')
+      const result = await service.topUpFromReserve(BigInt(1))
 
       expect(result).toEqual({ added: 0, newMana: 0, newReserve: 0 })
       expect(mockRepo.updateHealth).not.toHaveBeenCalled()
@@ -192,7 +192,7 @@ describe('ManaService', () => {
       character.currentClass = CharacterClassName.HERALD
       mockRepo.findByIdWithClasses.mockResolvedValue(character)
 
-      const result = await service.topUpFromReserve('c-1')
+      const result = await service.topUpFromReserve(BigInt(1))
 
       expect(result).toEqual({ added: 0, newMana: 0, newReserve: 7 })
     })
@@ -200,7 +200,7 @@ describe('ManaService', () => {
     it('no-ops without writing when reserve is empty', async () => {
       mockRepo.findByIdWithClasses.mockResolvedValue(buildCharacter({ mana: 4, maxMana: 10, reserve: 0 }))
 
-      const result = await service.topUpFromReserve('c-1')
+      const result = await service.topUpFromReserve(BigInt(1))
 
       expect(result).toEqual({ added: 0, newMana: 4, newReserve: 0 })
       expect(mockRepo.updateHealth).not.toHaveBeenCalled()
@@ -210,7 +210,7 @@ describe('ManaService', () => {
     it('no-ops without writing when mana already full', async () => {
       mockRepo.findByIdWithClasses.mockResolvedValue(buildCharacter({ mana: 10, maxMana: 10, reserve: 5 }))
 
-      const result = await service.topUpFromReserve('c-1')
+      const result = await service.topUpFromReserve(BigInt(1))
 
       expect(result).toEqual({ added: 0, newMana: 10, newReserve: 5 })
       expect(mockRepo.updateHealth).not.toHaveBeenCalled()
@@ -218,25 +218,25 @@ describe('ManaService', () => {
 
     it('drains reserve into mana when room exceeds reserve', async () => {
       mockRepo.findByIdWithClasses.mockResolvedValue(
-        buildCharacter({ mana: 5, maxMana: 10, reserve: 3, classId: 'cl-1', id: 'c-1' })
+        buildCharacter({ mana: 5, maxMana: 10, reserve: 3, classId: BigInt(10), id: BigInt(1) })
       )
 
-      const result = await service.topUpFromReserve('c-1')
+      const result = await service.topUpFromReserve(BigInt(1))
 
       expect(result).toEqual({ added: 3, newMana: 8, newReserve: 0 })
-      expect(mockRepo.updateHealth).toHaveBeenCalledWith('cl-1', 100, 8)
-      expect(mockRepo.updateManaReserve).toHaveBeenCalledWith('c-1', 0)
+      expect(mockRepo.updateHealth).toHaveBeenCalledWith(BigInt(10), 100, 8)
+      expect(mockRepo.updateManaReserve).toHaveBeenCalledWith(BigInt(1), 0)
     })
 
     it('caps drain at remaining room when reserve exceeds room', async () => {
       mockRepo.findByIdWithClasses.mockResolvedValue(
-        buildCharacter({ mana: 7, maxMana: 10, reserve: 20, classId: 'cl-1', id: 'c-1' })
+        buildCharacter({ mana: 7, maxMana: 10, reserve: 20, classId: BigInt(10), id: BigInt(1) })
       )
 
-      const result = await service.topUpFromReserve('c-1')
+      const result = await service.topUpFromReserve(BigInt(1))
 
       expect(result).toEqual({ added: 3, newMana: 10, newReserve: 17 })
-      expect(mockRepo.updateManaReserve).toHaveBeenCalledWith('c-1', 17)
+      expect(mockRepo.updateManaReserve).toHaveBeenCalledWith(BigInt(1), 17)
     })
   })
 
@@ -336,7 +336,7 @@ describe('ManaService', () => {
     it('removes potions from inventory and loadout, refunds gold, sets flag', async () => {
       mockRepo.findWithClasses.mockResolvedValue(
         buildCharacter({
-          id: 'c-1',
+          id: BigInt(1),
           inventory: [{ definitionId: 'mana_potion' }, { definitionId: 'sword' }, { definitionId: 'mana_potion' }],
           loadout: [{ definitionId: 'mana_potion' }, { definitionId: 'shield' }]
         })
@@ -346,20 +346,20 @@ describe('ManaService', () => {
 
       expect(result).toEqual({ removed: 3, goldRefunded: 75 })
       expect(mockRepo.updateInventoryAndLoadout).toHaveBeenCalledWith(
-        'c-1',
+        BigInt(1),
         [{ definitionId: 'sword' }],
         [{ definitionId: 'shield' }]
       )
-      expect(mockRepo.addGold).toHaveBeenCalledWith('c-1', 75)
+      expect(mockRepo.addGold).toHaveBeenCalledWith(BigInt(1), 75)
       expect(mockRepo.updateCharacterData).toHaveBeenCalledWith(
-        'c-1',
+        BigInt(1),
         expect.objectContaining({ scrubbedManaPotions: true })
       )
     })
 
     it('skips inventory write and gold refund when no potions found, still sets flag', async () => {
       mockRepo.findWithClasses.mockResolvedValue(
-        buildCharacter({ id: 'c-1', inventory: [{ definitionId: 'sword' }], loadout: [] })
+        buildCharacter({ id: BigInt(1), inventory: [{ definitionId: 'sword' }], loadout: [] })
       )
 
       const result = await service.scrubManaPotions('user-1')

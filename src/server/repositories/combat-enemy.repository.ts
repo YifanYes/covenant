@@ -1,16 +1,23 @@
 import { Prisma, type PrismaClient } from '@/generated/prisma'
 import { CombatEnemyStatus } from '@shared/types/gamification.types'
+import { generatePublicId } from '../lib/public-id'
 
 export class CombatEnemyRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async findById(id: string) {
+  async findById(id: bigint) {
     return this.prisma.combatEnemy.findUnique({
       where: { id }
     })
   }
 
-  async getActiveEnemy(characterQuestId: string) {
+  async findByPublicId(publicId: string) {
+    return this.prisma.combatEnemy.findUnique({
+      where: { publicId }
+    })
+  }
+
+  async getActiveEnemy(characterQuestId: bigint) {
     return this.prisma.combatEnemy.findFirst({
       where: {
         characterQuestId,
@@ -19,14 +26,14 @@ export class CombatEnemyRepository {
     })
   }
 
-  async getEnemiesByQuest(characterQuestId: string) {
+  async getEnemiesByQuest(characterQuestId: bigint) {
     return this.prisma.combatEnemy.findMany({
       where: { characterQuestId },
       orderBy: { spawnedAt: 'desc' }
     })
   }
 
-  async getDefeatedEnemies(characterQuestId: string) {
+  async getDefeatedEnemies(characterQuestId: bigint) {
     return this.prisma.combatEnemy.findMany({
       where: {
         characterQuestId,
@@ -37,7 +44,7 @@ export class CombatEnemyRepository {
   }
 
   async createEnemy(data: {
-    characterQuestId: string
+    characterQuestId: bigint
     templateId: string
     namePrefix: string
     nameSuffix: string
@@ -46,6 +53,7 @@ export class CombatEnemyRepository {
   }) {
     return this.prisma.combatEnemy.create({
       data: {
+        publicId: generatePublicId(),
         characterQuestId: data.characterQuestId,
         templateId: data.templateId,
         namePrefix: data.namePrefix,
@@ -59,7 +67,7 @@ export class CombatEnemyRepository {
   }
 
   async updateEnemy(
-    enemyId: string,
+    enemyId: bigint,
     data: {
       currentHealth?: number
       turnsElapsed?: number
@@ -96,7 +104,7 @@ export class CombatEnemyRepository {
     })
   }
 
-  async defeatEnemy(enemyId: string) {
+  async defeatEnemy(enemyId: bigint) {
     return this.prisma.combatEnemy.update({
       where: { id: enemyId },
       data: {
@@ -107,7 +115,7 @@ export class CombatEnemyRepository {
     })
   }
 
-  async appendToCombatLog(enemyId: string, entries: unknown[]) {
+  async appendToCombatLog(enemyId: bigint, entries: unknown[]) {
     const enemy = await this.prisma.combatEnemy.findUnique({
       where: { id: enemyId },
       select: { combatLog: true }
@@ -123,7 +131,7 @@ export class CombatEnemyRepository {
     })
   }
 
-  async getDefeatedEnemiesByCharacter(characterId: string, limit = 50, cursor?: string) {
+  async getDefeatedEnemiesByCharacter(characterId: bigint, limit = 50, cursor?: bigint) {
     return this.prisma.combatEnemy.findMany({
       where: {
         characterQuest: {
@@ -137,7 +145,7 @@ export class CombatEnemyRepository {
     })
   }
 
-  async getKillStats(characterId: string) {
+  async getKillStats(characterId: bigint) {
     const result = await this.prisma.combatEnemy.aggregate({
       where: {
         characterQuest: {

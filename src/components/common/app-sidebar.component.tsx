@@ -22,7 +22,22 @@ import Tooltip, { TooltipContent, TooltipTrigger } from '@/ui/tooltip.component'
 import { trpcOptions } from '@/utils/trpc.utils'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { Battery, BookOpen, Bulletlist, Calendar, Castle, ChevronDown, Coffee, Grid3x3, PenSquare, Settings2, Shield, Store, Suitcase, Trophy } from 'pixelarticons/react'
+import {
+  Battery,
+  BookOpen,
+  Bulletlist,
+  Calendar,
+  Castle,
+  ChevronDown,
+  Coffee,
+  Grid3x3,
+  PenSquare,
+  Settings2,
+  Shield,
+  Store,
+  Suitcase,
+  Trophy
+} from 'pixelarticons/react'
 import { useSyncExternalStore, type ElementType } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -49,7 +64,15 @@ function SidebarSectionMenu({ items }: { items: SidebarItem[] }) {
   )
 }
 
-function SidebarSection({ title, items, collapsibleId }: { title?: string; items: SidebarItem[]; collapsibleId?: string }) {
+function SidebarSection({
+  title,
+  items,
+  collapsibleId
+}: {
+  title?: string
+  items: SidebarItem[]
+  collapsibleId?: string
+}) {
   const open = useSidebarUIStore((s) => (collapsibleId ? (s.sectionsOpen[collapsibleId] ?? true) : true))
   const setSectionOpen = useSidebarUIStore((s) => s.setSectionOpen)
 
@@ -67,7 +90,7 @@ function SidebarSection({ title, items, collapsibleId }: { title?: string; items
   return (
     <Collapsible open={open} onOpenChange={(v) => setSectionOpen(collapsibleId, v)} className="group/collapsible">
       <SidebarGroup>
-        <SidebarGroupLabel asChild className="font-title text-sidebar-foreground">
+        <SidebarGroupLabel asChild className="font-title text-sidebar-foreground cursor-pointer">
           <CollapsibleTrigger className="flex w-full items-center">
             {title}
             <ChevronDown className="ml-auto h-3 w-3 transition-transform group-data-[state=closed]/collapsible:-rotate-90" />
@@ -99,9 +122,7 @@ function ManaIndicator() {
             {currentClass.mana}/{currentClass.maxMana}
           </span>
           {manaReserve > 0 && (
-            <span className="rounded bg-blue-500/20 px-1 text-[10px] font-bold text-blue-300">
-              +{manaReserve}
-            </span>
+            <span className="rounded bg-blue-500/20 px-1 text-[10px] font-bold text-blue-300">+{manaReserve}</span>
           )}
         </div>
       </TooltipTrigger>
@@ -216,7 +237,11 @@ export default function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarSection collapsibleId="productivity" title={t('sidebar.productivity')} items={sidebarItems.productivity} />
+        <SidebarSection
+          collapsibleId="productivity"
+          title={t('sidebar.productivity')}
+          items={sidebarItems.productivity}
+        />
         <SidebarSection collapsibleId="rpg" title={t('sidebar.rpg')} items={sidebarItems.rpg} />
         <ManaIndicator />
         <Separator />

@@ -37,10 +37,10 @@ export const tasksRouter = t.router({
   }),
 
   delete: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).input(taskIdSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.task.delete(ctx.user.id, input.id)
+    return ctx.services.task.delete(ctx.user.id, input.publicId)
   }),
 
   duplicate: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).input(duplicateTaskSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.task.duplicate(ctx.user.id, input.id, input.titleSuffix)
+    return ctx.services.task.duplicate(ctx.user.id, input.publicId, input.titleSuffix)
   })
 })

@@ -2,17 +2,22 @@ import type { PrismaClient } from '@/generated/prisma'
 import type { QuestStatus } from '@/shared/constants/quests.constants'
 import type { ActiveStatusEffect } from '@shared/types/ability.types'
 import { parseTacticalState, type TacticalStateData } from '@shared/types/tactical-combat.types'
+import { generatePublicId } from '../lib/public-id'
 
 export class CharacterQuestRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async findById(id: string) {
+  async findById(id: bigint) {
     return this.prisma.characterQuest.findUnique({ where: { id } })
   }
 
-  async findActiveByCharacterId(characterId: string): Promise<{
-    id: string
-    characterId: string
+  async findByPublicId(publicId: string) {
+    return this.prisma.characterQuest.findUnique({ where: { publicId } })
+  }
+
+  async findActiveByCharacterId(characterId: bigint): Promise<{
+    id: bigint
+    characterId: bigint
     questId: string
     status: string
     progress: number
@@ -48,9 +53,9 @@ export class CharacterQuestRepository {
     }
   }
 
-  async findByIdWithTacticalState(id: string): Promise<{
-    id: string
-    characterId: string
+  async findByIdWithTacticalState(id: bigint): Promise<{
+    id: bigint
+    characterId: bigint
     tacticalState: TacticalStateData | null
   } | null> {
     const result = await this.prisma.characterQuest.findUnique({
@@ -67,8 +72,8 @@ export class CharacterQuestRepository {
     }
   }
 
-  async findByIdWithAbilities(id: string): Promise<{
-    id: string
+  async findByIdWithAbilities(id: bigint): Promise<{
+    id: bigint
     activeAbilities: Record<string, ActiveStatusEffect> | null
     enemyActiveAbilities: Record<string, ActiveStatusEffect> | null
   } | null> {
@@ -86,9 +91,10 @@ export class CharacterQuestRepository {
     }
   }
 
-  async create(characterId: string, questId: string, target: number) {
+  async create(characterId: bigint, questId: string, target: number) {
     return this.prisma.characterQuest.create({
       data: {
+        publicId: generatePublicId(),
         characterId,
         questId,
         status: 'ACTIVE' satisfies QuestStatus,
@@ -99,7 +105,7 @@ export class CharacterQuestRepository {
     })
   }
 
-  async updateProgress(id: string, killDelta: number, goldDelta: number): Promise<void> {
+  async updateProgress(id: bigint, killDelta: number, goldDelta: number): Promise<void> {
     await this.prisma.characterQuest.update({
       where: { id },
       data: {
@@ -109,21 +115,21 @@ export class CharacterQuestRepository {
     })
   }
 
-  async complete(id: string): Promise<void> {
+  async complete(id: bigint): Promise<void> {
     await this.prisma.characterQuest.update({
       where: { id },
       data: { status: 'COMPLETED' satisfies QuestStatus, completedAt: new Date() }
     })
   }
 
-  async abandon(id: string): Promise<void> {
+  async abandon(id: bigint): Promise<void> {
     await this.prisma.characterQuest.update({
       where: { id },
       data: { status: 'ABANDONED' satisfies QuestStatus }
     })
   }
 
-  async updateTacticalState(id: string, tacticalState: TacticalStateData): Promise<void> {
+  async updateTacticalState(id: bigint, tacticalState: TacticalStateData): Promise<void> {
     await this.prisma.characterQuest.update({
       where: { id },
       data: { tacticalState: tacticalState as unknown as object }
@@ -131,7 +137,7 @@ export class CharacterQuestRepository {
   }
 
   async updateAbilities(
-    id: string,
+    id: bigint,
     activeAbilities: Record<string, ActiveStatusEffect>,
     enemyActiveAbilities: Record<string, ActiveStatusEffect>
   ): Promise<void> {
@@ -144,21 +150,21 @@ export class CharacterQuestRepository {
     })
   }
 
-  async updateActiveAbilities(id: string, activeAbilities: Record<string, ActiveStatusEffect>): Promise<void> {
+  async updateActiveAbilities(id: bigint, activeAbilities: Record<string, ActiveStatusEffect>): Promise<void> {
     await this.prisma.characterQuest.update({
       where: { id },
       data: { activeAbilities: activeAbilities as unknown as object }
     })
   }
 
-  async updateCombatStats<T extends object>(id: string, combatStats: T): Promise<void> {
+  async updateCombatStats<T extends object>(id: bigint, combatStats: T): Promise<void> {
     await this.prisma.characterQuest.update({
       where: { id },
       data: { combatStats: combatStats as unknown as object }
     })
   }
 
-  async getCombatStats<T>(id: string): Promise<T | null> {
+  async getCombatStats<T>(id: bigint): Promise<T | null> {
     const result = await this.prisma.characterQuest.findUnique({
       where: { id },
       select: { combatStats: true }
@@ -167,7 +173,7 @@ export class CharacterQuestRepository {
     return result?.combatStats as T | null
   }
 
-  async verifyOwnership(id: string, userId: string): Promise<boolean> {
+  async verifyOwnership(id: bigint, userId: string): Promise<boolean> {
     const quest = await this.prisma.characterQuest.findUnique({
       where: { id },
       include: { character: { select: { userId: true } } }

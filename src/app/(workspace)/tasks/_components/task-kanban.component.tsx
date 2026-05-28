@@ -54,8 +54,8 @@ export default function TaskKanban({ onCreate }: { onCreate?: () => void }) {
     <div className="grid h-full min-h-0 grid-cols-1 gap-4 md:grid-cols-3">
       {statusesData.statuses.map((status) => (
         <TaskList
-          key={status.id}
-          id={status.id}
+          key={String(status.id)}
+          id={String(status.id)}
           label={status.label}
           group="tasks"
           mutation={reorderMutation}

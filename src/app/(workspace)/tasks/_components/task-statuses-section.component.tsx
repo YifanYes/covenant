@@ -305,7 +305,8 @@ export default function TaskStatusesSection({
         <AddStatusDialog
           existingLabels={existingLabels}
           onAdd={(label, color) =>
-            append({ id: crypto.randomUUID(), label, color, isDefault: false, isNew: true })
+            // Synthetic publicId prefix marks unsaved drafts; backend ignores when isNew = true.
+            append({ publicId: `draft-${Date.now()}-${fields.length}`, label, color, isDefault: false, isNew: true })
           }
         />
       </div>

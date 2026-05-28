@@ -50,7 +50,7 @@ export class CombatService {
     private analytics: AnalyticsService = defaultAnalytics
   ) {}
 
-  private async assertQuestOwnership(questId: string, userId: string): Promise<void> {
+  private async assertQuestOwnership(questId: bigint, userId: string): Promise<void> {
     const isOwner = await this.characterQuestRepository.verifyOwnership(questId, userId)
     if (!isOwner) {
       log.warn({ userId, questId }, 'assertQuestOwnership: ownership check failed')
@@ -116,7 +116,7 @@ export class CombatService {
 
     const currentClass = this.getCurrentClassFromCharacter(character)
     const activeQuest = await this.characterQuestRepository.findActiveByCharacterId(character.id)
-    const participation: { id: string; tacticalState: TacticalStateData | null } | null = activeQuest
+    const participation: { id: bigint; tacticalState: TacticalStateData | null } | null = activeQuest
       ? { id: activeQuest.id, tacticalState: activeQuest.tacticalState }
       : null
 
@@ -176,11 +176,11 @@ export class CombatService {
   // POKÉMON-STYLE COMBAT ENTRY POINTS (Phase 2A)
   // ============================================================
 
-  private fireCombatFinished(userId: string, questId: string, result: TacticalMoveResult): void {
+  private fireCombatFinished(userId: string, questId: bigint, result: TacticalMoveResult): void {
     const killedEnemy = result.effects.find((e) => e.killed && !e.unitId.startsWith('player-'))
     if (killedEnemy) {
       this.analytics.track(userId, 'combat_finished', {
-        quest_id: questId,
+        quest_id: questId.toString(),
         enemy_id: killedEnemy.unitId,
         outcome: 'victory',
         gold_earned: result.goldReward ?? 0
@@ -191,7 +191,7 @@ export class CombatService {
     if (playerKilled) {
       const enemyId = result.updatedState.units.find((u) => !u.id.startsWith('player-'))?.id ?? ''
       this.analytics.track(userId, 'combat_finished', {
-        quest_id: questId,
+        quest_id: questId.toString(),
         enemy_id: enemyId,
         outcome: 'defeat',
         gold_earned: null
@@ -199,13 +199,20 @@ export class CombatService {
     }
   }
 
+  private async resolveQuest(questPublicId: string): Promise<bigint> {
+    const quest = await this.characterQuestRepository.findByPublicId(questPublicId)
+    if (!quest) throw new TRPCError({ code: 'NOT_FOUND', message: 'Quest not found' })
+    return quest.id
+  }
+
   async playerExecuteMove(
     userId: string,
-    questId: string,
+    questPublicId: string,
     casterId: string,
     moveId: string,
     targetIds: string[]
   ): Promise<TacticalMoveResult> {
+    const questId = await this.resolveQuest(questPublicId)
     await this.assertQuestOwnership(questId, userId)
     if (!casterId.startsWith('player-')) {
       log.warn({ userId, questId, casterId, moveId }, 'playerExecuteMove: caster is not a player unit')
@@ -274,17 +281,18 @@ export class CombatService {
   // lock keyed by questId. Without this, two near-simultaneous executeMove calls
   // can both observe `currentTurnIndex` on a living enemy and each trigger an
   // enemy auto-turn, resulting in duplicate damage / log entries.
-  private async withQuestLock<T>(questId: string, fn: () => Promise<T>): Promise<T> {
+  private async withQuestLock<T>(questId: bigint, fn: () => Promise<T>): Promise<T> {
     if (!this.prisma) {
       return fn()
     }
     return this.prisma.$transaction(async (tx) => {
-      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${questId}))`
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${questId.toString()}))`
       return fn()
     })
   }
 
-  async playerEnemyTurn(userId: string, questId: string, enemyId: string): Promise<TacticalMoveResult> {
+  async playerEnemyTurn(userId: string, questPublicId: string, enemyId: string): Promise<TacticalMoveResult> {
+    const questId = await this.resolveQuest(questPublicId)
     await this.assertQuestOwnership(questId, userId)
     if (enemyId.startsWith('player-')) {
       log.warn({ userId, questId, enemyId }, 'playerEnemyTurn: enemyId is a player unit')
@@ -300,9 +308,10 @@ export class CombatService {
 
   async playerUsePotion(
     userId: string,
-    questId: string,
+    questPublicId: string,
     consumableId: string
   ): Promise<{ success: boolean; healthRestored?: number }> {
+    const questId = await this.resolveQuest(questPublicId)
     await this.assertQuestOwnership(questId, userId)
     return this.useConsumable(userId, consumableId, { markPotionTurn: true })
   }

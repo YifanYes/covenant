@@ -20,9 +20,9 @@ describe('AreaRepository - Authorization', () => {
 
   describe('update', () => {
     it('should update area when user owns it', async () => {
-      const areaId = 'area-1'
+      const areaId = BigInt(1)
       const userId = 'user-1'
-      const input = { id: areaId, name: 'Updated Name' }
+      const input = { publicId: 'abcdefghijkl', name: 'Updated Name' }
       const existingArea = { id: areaId, userId, name: 'Old Name' }
       const updatedArea = { id: areaId, userId, name: 'Updated Name' }
 
@@ -37,9 +37,9 @@ describe('AreaRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when area does not exist', async () => {
-      const areaId = 'non-existent'
+      const areaId = BigInt(999)
       const userId = 'user-1'
-      const input = { id: areaId, name: 'Updated Name' }
+      const input = { publicId: 'abcdefghijkl', name: 'Updated Name' }
 
       areaModel.findUnique.mockResolvedValue(null as never)
 
@@ -51,10 +51,10 @@ describe('AreaRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when user does not own the area', async () => {
-      const areaId = 'area-1'
+      const areaId = BigInt(1)
       const userId = 'user-1'
       const otherUserId = 'user-2'
-      const input = { id: areaId, name: 'Updated Name' }
+      const input = { publicId: 'abcdefghijkl', name: 'Updated Name' }
       const existingArea = { id: areaId, userId: otherUserId, name: 'Old Name' }
 
       areaModel.findUnique.mockResolvedValue(existingArea as never)
@@ -69,7 +69,7 @@ describe('AreaRepository - Authorization', () => {
 
   describe('delete', () => {
     it('should delete area when user owns it', async () => {
-      const areaId = 'area-1'
+      const areaId = BigInt(1)
       const userId = 'user-1'
       const existingArea = { id: areaId, userId, name: 'Test Area' }
 
@@ -84,7 +84,7 @@ describe('AreaRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when area does not exist', async () => {
-      const areaId = 'non-existent'
+      const areaId = BigInt(999)
       const userId = 'user-1'
 
       areaModel.findUnique.mockResolvedValue(null as never)
@@ -97,7 +97,7 @@ describe('AreaRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when user does not own the area', async () => {
-      const areaId = 'area-1'
+      const areaId = BigInt(1)
       const userId = 'user-1'
       const otherUserId = 'user-2'
       const existingArea = { id: areaId, userId: otherUserId, name: 'Test Area' }

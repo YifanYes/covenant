@@ -15,7 +15,7 @@ import { toast } from 'sonner'
 import StartCampaignDialog from './start-campaign-dialog.component'
 
 interface CampaignPanelProps {
-  guildId: string
+  guildSlug: string
   myUserId: string
   myRole: GuildRoleType
   members: Array<{ userId: string; user: { id: string; character: { name: string } | null } }>
@@ -32,16 +32,16 @@ function formatRemaining(expiresAt: Date, t: ReturnType<typeof useTranslation>['
   return t('guilds.campaigns.remaining_minutes', { count: mins })
 }
 
-export default function CampaignPanel({ guildId, myUserId, myRole, members }: CampaignPanelProps) {
+export default function CampaignPanel({ guildSlug, myUserId, myRole, members }: CampaignPanelProps) {
   const { t } = useTranslation()
 
   const activeQuery = useQuery({
-    ...trpcOptions.guilds.getCurrentCampaign.queryOptions({ guildId }),
+    ...trpcOptions.guilds.getCurrentCampaign.queryOptions({ guildSlug }),
     refetchInterval: 7000,
     refetchIntervalInBackground: false
   })
 
-  const historyQuery = useQuery(trpcOptions.guilds.getCampaignHistory.queryOptions({ guildId }))
+  const historyQuery = useQuery(trpcOptions.guilds.getCampaignHistory.queryOptions({ guildSlug }))
 
   const claimMutation = useMutation(
     trpcOptions.guilds.claimCampaignReward.mutationOptions({
@@ -49,11 +49,11 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
         toast.success(t('guilds.campaigns.success.claim', { gold: result.goldClaimed }))
 
         await queryClient.invalidateQueries({
-          queryKey: trpcOptions.guilds.getCurrentCampaign.queryKey({ guildId })
+          queryKey: trpcOptions.guilds.getCurrentCampaign.queryKey({ guildSlug })
         })
 
         await queryClient.invalidateQueries({
-          queryKey: trpcOptions.guilds.getCampaignHistory.queryKey({ guildId })
+          queryKey: trpcOptions.guilds.getCampaignHistory.queryKey({ guildSlug })
         })
 
         await queryClient.invalidateQueries({ queryKey: trpcOptions.character.get.queryKey() })
@@ -74,7 +74,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
     )
   }
 
-  const otherHistory = (historyQuery.data ?? []).filter((c) => c.id !== campaign?.id)
+  const otherHistory = (historyQuery.data ?? []).filter((c) => c.publicId !== campaign?.publicId)
 
   if (!campaign) {
     return (
@@ -87,7 +87,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
               <p className="text-muted-foreground text-sm mt-1 max-w-md">{t('guilds.campaigns.empty.description')}</p>
             </div>
           </div>
-          {canManage && <StartCampaignDialog guildId={guildId} />}
+          {canManage && <StartCampaignDialog guildSlug={guildSlug} />}
         </div>
         {otherHistory.length > 0 && <HistoryList history={otherHistory} t={t} />}
       </div>
@@ -134,7 +134,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
         {canClaim && (
           <LoaderButton
             isLoading={claimMutation.isPending}
-            onClick={() => claimMutation.mutate({ campaignId: campaign.id })}
+            onClick={() => claimMutation.mutate({ campaignPublicId: campaign.publicId })}
             icon={<Coins className="h-4 w-4" />}
             label={t('guilds.campaigns.claim_cta', { gold: campaign.myShare })}
           />
@@ -196,7 +196,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
 
       {isCompleted && canManage && (
         <div className="pt-2 border-t">
-          <StartCampaignDialog guildId={guildId} />
+          <StartCampaignDialog guildSlug={guildSlug} />
         </div>
       )}
 
@@ -206,7 +206,7 @@ export default function CampaignPanel({ guildId, myUserId, myRole, members }: Ca
 }
 
 interface CampaignHistoryItem {
-  id: string
+  publicId: string
   templateId: string
   target: number
   progress: number
@@ -223,7 +223,7 @@ function HistoryList({ history, t }: { history: CampaignHistoryItem[]; t: Return
         {history.slice(0, 5).map((c) => {
           const tpl = getCampaignTemplate(c.templateId)
           return (
-            <li key={c.id} className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+            <li key={c.publicId} className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
               <span className="truncate">{tpl ? t(tpl.nameKey) : c.templateId}</span>
               <span className="tabular-nums">
                 {c.progress} / {c.target}
