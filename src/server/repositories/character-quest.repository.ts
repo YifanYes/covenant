@@ -17,6 +17,7 @@ export class CharacterQuestRepository {
 
   async findActiveByCharacterId(characterId: bigint): Promise<{
     id: bigint
+    publicId: string
     characterId: bigint
     questId: string
     status: string
@@ -29,6 +30,7 @@ export class CharacterQuestRepository {
       where: { characterId, status: 'ACTIVE' },
       select: {
         id: true,
+        publicId: true,
         characterId: true,
         questId: true,
         status: true,
@@ -43,6 +45,7 @@ export class CharacterQuestRepository {
 
     return {
       id: result.id,
+      publicId: result.publicId,
       characterId: result.characterId,
       questId: result.questId,
       status: result.status,

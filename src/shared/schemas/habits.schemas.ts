@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { bigintIdSchema, publicIdSchema } from './ids.schemas'
+import { publicIdSchema } from './ids.schemas'
 
 export enum HabitTimespan {
   DAILY = 'DAILY',
@@ -12,7 +12,7 @@ export const createHabitSchema = z.object({
   description: z.string().optional(),
   recurrence: z.number().int().min(1),
   timespan: z.enum(HabitTimespan),
-  objectives: z.array(bigintIdSchema).optional(),
+  objectives: z.array(publicIdSchema).optional(),
   areas: z.array(publicIdSchema).optional()
 })
 export type CreateHabitType = z.infer<typeof createHabitSchema>
@@ -23,7 +23,7 @@ export const updateHabitSchema = z.object({
   description: z.string().optional(),
   recurrence: z.number().int().min(1).optional(),
   timespan: z.enum(HabitTimespan).optional(),
-  objectives: z.array(bigintIdSchema).optional(),
+  objectives: z.array(publicIdSchema).optional(),
   areas: z.array(publicIdSchema).optional()
 })
 export type UpdateHabitType = z.infer<typeof updateHabitSchema>

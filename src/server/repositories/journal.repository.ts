@@ -1,4 +1,4 @@
-import type { JournalEntry, PrismaClient } from '@/generated/prisma'
+import { Prisma, type JournalEntry, type PrismaClient } from '@/generated/prisma'
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { generatePublicId } from '../lib/public-id'
@@ -38,23 +38,33 @@ export class JournalRepository {
   }
 
   async update(id: bigint, userId: string, content?: string, mood?: string | null, color?: string | null, tx?: any): Promise<JournalEntry> {
-    await this.findByIdOrThrow(id, userId, tx)
-    return this.getClient(tx).journalEntry.update({
-      where: { id },
-      data: {
-        ...(content !== undefined && { content }),
-        ...(mood !== undefined && { mood: mood || null }),
-        ...(color !== undefined && { color: color || null })
+    // Ownership re-checked here (userId + not-deleted) via extendedWhereUnique as defense-in-depth.
+    // Map Prisma's P2025 to NOT_FOUND so a soft-delete race doesn't leak as INTERNAL_SERVER_ERROR.
+    try {
+      return await this.getClient(tx).journalEntry.update({
+        where: { id, userId, deletedAt: null },
+        data: {
+          ...(content !== undefined && { content }),
+          ...(mood !== undefined && { mood: mood || null }),
+          ...(color !== undefined && { color: color || null })
+        }
+      })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
       }
-    })
+      throw error
+    }
   }
 
   async softDelete(id: bigint, userId: string, tx?: any): Promise<void> {
-    await this.findByIdOrThrow(id, userId, tx)
-    await this.getClient(tx).journalEntry.update({
-      where: { id },
+    const result = await this.getClient(tx).journalEntry.updateMany({
+      where: { id, userId, deletedAt: null },
       data: { deletedAt: new Date() }
     })
+    if (result.count !== 1) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+    }
   }
 
   async findById(id: bigint, userId: string, tx?: any): Promise<JournalEntry | null> {
@@ -70,14 +80,6 @@ export class JournalRepository {
       where: { publicId, deletedAt: null }
     })
     if (entry && entry.userId !== userId) return null
-    return entry
-  }
-
-  async findByIdOrThrow(id: bigint, userId: string, tx?: any): Promise<JournalEntry> {
-    const entry = await this.findById(id, userId, tx)
-    if (!entry) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
-    }
     return entry
   }
 

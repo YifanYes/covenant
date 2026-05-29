@@ -284,11 +284,10 @@ export class QuestService {
     const quest = await this.characterQuestRepository.findActiveByCharacterId(characterId)
     if (!quest) return null
 
-    const questRow = await this.characterQuestRepository.findById(quest.id)
     const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(quest.id)
 
     return {
-      publicId: questRow?.publicId ?? '',
+      publicId: quest.publicId,
       questId: quest.questId,
       status: quest.status,
       progress: quest.progress,
@@ -316,10 +315,7 @@ export class QuestService {
       await this.assertCharacterOwnership(characterId, userId)
       const active = await this.characterQuestRepository.findActiveByCharacterId(characterId)
       activeQuestTemplateId = active?.questId ?? null
-      if (active) {
-        const row = await this.characterQuestRepository.findById(active.id)
-        activeCharacterQuestPublicId = row?.publicId ?? null
-      }
+      activeCharacterQuestPublicId = active?.publicId ?? null
     }
 
     return Object.values(QUESTS).map((template) => ({

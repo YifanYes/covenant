@@ -286,7 +286,9 @@ export class CombatService {
       return fn()
     }
     return this.prisma.$transaction(async (tx) => {
-      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${questId.toString()}))`
+      // questId is a native bigint → maps to the pg_advisory_xact_lock(bigint) overload,
+      // using the full 64-bit keyspace instead of hashtext(text) which collided for small ids.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(${questId})`
       return fn()
     })
   }

@@ -2,7 +2,10 @@ import type { GuildMessage, Prisma, PrismaClient } from '@/generated/prisma'
 import { AUTO_HIDE_THRESHOLD } from '@shared/constants/chat-room.constants'
 import type { GuildMessageCursorType } from '@shared/schemas/guilds.schemas'
 import { resourceNotFound } from '../lib/errors'
+import { logger } from '../lib/logger'
 import { generatePublicId } from '../lib/public-id'
+
+const log = logger.child({ component: 'guild-message-repository' })
 
 export type GuildMessageWithAuthor = GuildMessage & {
   user: {
@@ -36,13 +39,15 @@ export class GuildMessageRepository {
         where: { publicId: options.cursor.publicId },
         select: { id: true }
       })
-      if (cursorRow) {
-        cursorWhere = {
-          OR: [
-            { createdAt: { lt: new Date(options.cursor.createdAt) } },
-            { createdAt: new Date(options.cursor.createdAt), id: { lt: cursorRow.id } }
-          ]
-        }
+      if (!cursorRow) {
+        log.warn({ cursor: options.cursor.publicId }, 'findByGuild: cursor row not found, returning empty page')
+        return []
+      }
+      cursorWhere = {
+        OR: [
+          { createdAt: { lt: new Date(options.cursor.createdAt) } },
+          { createdAt: new Date(options.cursor.createdAt), id: { lt: cursorRow.id } }
+        ]
       }
     }
 

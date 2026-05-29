@@ -60,17 +60,15 @@ export class TaskService {
 
   async getAll(userId: string) {
     const tasks = await this.taskRepository.findAll(userId)
-    const statuses = await this.userTaskStatusRepository.findAll(userId)
-    const statusPublicIdById = new Map(statuses.map((s) => [s.id.toString(), s.publicId]))
 
     const decorated = tasks.map((task) => ({
       ...task,
-      statusPublicId: statusPublicIdById.get(task.statusId.toString()) ?? ''
+      statusPublicId: task.status.publicId
     }))
 
     const groupedTasks = decorated.reduce(
       (acc, task) => {
-        const key = task.statusPublicId || task.statusId.toString()
+        const key = task.statusPublicId
         if (!acc[key]) acc[key] = []
         acc[key].push(task)
         return acc
@@ -102,13 +100,10 @@ export class TaskService {
       { page, pageSize }
     )
 
-    const statuses = await this.userTaskStatusRepository.findAll(userId)
-    const statusPublicIdById = new Map(statuses.map((s) => [s.id.toString(), s.publicId]))
-
     return {
       tasks: result.tasks.map((task) => ({
         ...task,
-        statusPublicId: statusPublicIdById.get(task.statusId.toString()) ?? ''
+        statusPublicId: task.status.publicId
       })),
       totalCount: result.totalCount,
       page,
@@ -126,13 +121,10 @@ export class TaskService {
 
     const tasks = await this.taskRepository.findByDate(userId, startDate, endDate)
 
-    const statuses = await this.userTaskStatusRepository.findAll(userId)
-    const statusPublicIdById = new Map(statuses.map((s) => [s.id.toString(), s.publicId]))
-
     return {
       tasks: tasks.map((task) => ({
         ...task,
-        statusPublicId: statusPublicIdById.get(task.statusId.toString()) ?? ''
+        statusPublicId: task.status.publicId
       }))
     }
   }

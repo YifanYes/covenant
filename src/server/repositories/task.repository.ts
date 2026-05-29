@@ -13,7 +13,9 @@ const TASK_INCLUDE = {
     include: { areas: true }
   },
   areas: true
-}
+} satisfies Prisma.TaskInclude
+
+export type TaskWithRelations = Prisma.TaskGetPayload<{ include: typeof TASK_INCLUDE }>
 
 export class TaskRepository {
   constructor(private prisma: PrismaClient) {}
@@ -42,7 +44,7 @@ export class TaskRepository {
     })
   }
 
-  async findAll(userId: string): Promise<Task[]> {
+  async findAll(userId: string): Promise<TaskWithRelations[]> {
     return this.prisma.task.findMany({
       where: { userId },
       include: TASK_INCLUDE,
@@ -59,7 +61,7 @@ export class TaskRepository {
       dueDate?: Date
     },
     pagination: { page: number; pageSize: number }
-  ): Promise<{ tasks: Task[]; totalCount: number }> {
+  ): Promise<{ tasks: TaskWithRelations[]; totalCount: number }> {
     const where: Prisma.TaskWhereInput = { userId }
 
     if (filters.search) {
@@ -99,7 +101,7 @@ export class TaskRepository {
     return { tasks, totalCount }
   }
 
-  async findByDate(userId: string, startDate: Date, endDate: Date): Promise<Task[]> {
+  async findByDate(userId: string, startDate: Date, endDate: Date): Promise<TaskWithRelations[]> {
     return this.prisma.task.findMany({
       where: {
         userId,

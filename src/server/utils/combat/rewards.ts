@@ -4,12 +4,15 @@ import { generateEnemyNameKeys } from '@/shared/constants/enemy-names.constants'
 import { getQuestById, selectEnemyWithFallback } from '@/shared/constants/quests.constants'
 import type { EncounterState } from '@shared/types/combat.types'
 import type { TacticalStateData, TacticalUnitState } from '@shared/types/tactical-combat.types'
+import { logger } from '../../lib/logger'
 import type { CharacterQuestRepository } from '../../repositories/character-quest.repository'
 import type { CharacterRepository } from '../../repositories/character.repository'
 import type { CombatEnemyRepository } from '../../repositories/combat-enemy.repository'
 import type { GuildService } from '../../services/guild.service'
 import type { KillRecordService } from '../../services/kill-record.service'
 import type { ManaService } from '../../services/mana.service'
+
+const log = logger.child({ component: 'combat-rewards' })
 
 /** Minimal repo set used by functions that only read/write combat state (no reward processing). */
 export interface CombatStateRepos {
@@ -68,6 +71,8 @@ export async function processEnemyDefeat(
     const enemyUnit = updatedState.units.find((u) => !u.id.startsWith('player-'))
     if (enemyUnit && /^\d+$/.test(enemyUnit.id)) {
       activeEnemy = await repos.combatEnemyRepository.findById(BigInt(enemyUnit.id))
+    } else if (enemyUnit) {
+      log.warn({ enemyId: enemyUnit.id }, 'rewards: legacy non-numeric enemy id, skipping lookup')
     }
   }
 

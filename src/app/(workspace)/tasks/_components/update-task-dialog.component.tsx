@@ -167,13 +167,13 @@ export default function UpdateTaskDialog() {
             control={control}
             render={({ field }) => (
               <SingleSelect
-                value={field.value != null ? String(field.value) : undefined}
+                value={field.value ?? undefined}
                 placeholder={t('update_task_dialog.status_placeholder')}
                 options={statusesData.statuses.map((status) => ({
-                  value: String(status.id),
+                  value: status.publicId,
                   label: t(`task_status.${status.label}` as Parameters<typeof t>[0], { defaultValue: status.label })
                 }))}
-                onChange={(v) => field.onChange(v != null ? BigInt(v) : v)}
+                onChange={field.onChange}
               />
             )}
           />

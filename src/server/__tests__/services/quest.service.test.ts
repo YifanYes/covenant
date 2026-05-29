@@ -129,7 +129,6 @@ describe('QuestService', () => {
       }
 
       mockCharacterQuestRepo.findActiveByCharacterId.mockResolvedValue(quest)
-      mockCharacterQuestRepo.findById.mockResolvedValue({ ...quest, publicId: QUEST_PUB })
       mockCombatEnemyRepo.getActiveEnemy.mockResolvedValue(enemy)
 
       const result = await questService.getActiveQuest(CHAR_SLUG, 'user-123')
@@ -175,7 +174,6 @@ describe('QuestService', () => {
       mockCharacterQuestRepo.findActiveByCharacterId.mockResolvedValue(
         mockCharacterQuest({ questId: 'patrol_north_gate' })
       )
-      mockCharacterQuestRepo.findById.mockResolvedValue({ id: BigInt(1), publicId: QUEST_PUB })
 
       const result = await questService.getAvailableQuests('user-123', CHAR_SLUG)
       const active = result.find((q) => q.id === 'patrol_north_gate')

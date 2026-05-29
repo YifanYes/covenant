@@ -14,6 +14,8 @@ Review of the uuid → BigInt PK + `publicId` migration covering 146 modified fi
 
 **Verdict:** ship with fixes. Four high-severity items are client-side regressions that break feature flows; fix those before merging. Mediums are follow-up cleanup.
 
+**Resolution (this PR):** H1–H4 and M1–M6 fixed. M7 reframed as a security-hygiene task and **deferred** to its own scoped change (see M7). Lows/nits untouched. `pnpm typecheck` clean; 498/498 unit tests pass.
+
 ---
 
 ## High
@@ -91,11 +93,19 @@ Review of the uuid → BigInt PK + `publicId` migration covering 146 modified fi
 - **Issue:** `if (enemyUnit && /^\d+$/.test(enemyUnit.id))` quietly skips enemy lookup for legacy tactical states where `enemyUnit.id` is still a UUID string. Behavior is correct but invisible.
 - **Fix:** add `log.warn({ enemyId: enemyUnit.id }, 'rewards: legacy non-numeric enemy id, skipping lookup')` so the migration tail is observable.
 
-### M7. DTO mapping only in AreaService
+### M7. DTO mapping only in AreaService — DEFERRED to a separate security task
 
 - **Location:** `src/server/services/area.service.ts:6-22` (`toDTO`)
 - **Issue:** `AreaService` introduces an explicit `toDTO` that strips BigInt `id` and `userId`; every other service returns Prisma rows directly. Inconsistent API contract — clients see different shapes per resource.
-- **Fix:** pick one model — DTO everywhere or `Omit` types at the tRPC boundary — and apply it consistently.
+- **Security follow-up (why this is more than cosmetics):** the leaked `userId` is the **better-auth `User.id`**. It is an identifier, not a credential (sessions are cookie-based), so this is disclosure/hygiene, not takeover. Two cases:
+  - *Own* userId in `task`/`habit`/`journal` responses and the `covenant-store` localStorage (`auth.store.ts`, cleared on `signOut`) — **low risk**, standard practice, cosmetic to trim.
+  - *Other users'* userId in **guild/tavern chat** — every message author's better-auth id (row `userId` + selected `user.id`) ships to all room members. **Low-to-medium**: no IDOR today (authz is session-derived, resources addressed by `publicId`/`slug`), ids are random (not enumerable), but it is needless exposure of an internal auth identifier to third parties.
+- **Why it isn't a mechanical `Omit`:** the client computes ownership client-side from the leaked id — `tavern-room.component.tsx:83` (`msg.userId === myUserId`) and `member-list.component.tsx:120` (`member.userId === myUserId`). Stripping `userId` would break the delete button and "is me" markers.
+- **Scoped fix (separate task):**
+  1. Server computes `isMine`/`isAuthor` against the session user; return that boolean instead of `userId`.
+  2. Strip `userId` + `user.id` from chat/member responses; expose only character identity (`slug`/`name`).
+  3. (Cosmetic) strip `userId` from own-resource responses (`task`/`habit`/`journal`) — safe, `models.types` never references it.
+  4. Audit: confirm no tRPC procedure trusts a client-supplied `userId` for authorization.
 
 ---
 

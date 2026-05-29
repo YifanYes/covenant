@@ -33,7 +33,7 @@ export class HabitRepository {
         timespan: input.timespan,
         userId,
         objectives: {
-          connect: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
+          connect: input.objectives?.map((publicId) => ({ publicId })) || []
         },
         areas: {
           connect: input.areas?.map((publicId) => ({ publicId })) || []
@@ -102,7 +102,7 @@ export class HabitRepository {
         ...(input.recurrence && { recurrence: input.recurrence }),
         ...(input.timespan && { timespan: input.timespan }),
         objectives: {
-          set: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
+          set: input.objectives?.map((publicId) => ({ publicId })) || []
         },
         areas: {
           set: input.areas?.map((publicId) => ({ publicId })) || []
