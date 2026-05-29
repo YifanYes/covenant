@@ -1,5 +1,5 @@
 import { Prisma, type PrismaClient, type Task } from '@/generated/prisma'
-import type { BulkUpdateTaskItem, CreateTaskType, UpdateTaskType } from '@shared/schemas/tasks.schemas'
+import type { CreateTaskType, UpdateTaskType } from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'

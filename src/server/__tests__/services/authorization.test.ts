@@ -1,4 +1,3 @@
-import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AreaRepository } from '../../repositories/area.repository'
 import type { CharacterRepository } from '../../repositories/character.repository'
