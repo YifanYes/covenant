@@ -1,8 +1,11 @@
 import { initTRPC, TRPCError } from '@trpc/server'
+import superjson from 'superjson'
 import type { Context } from './context'
 import { checkRateLimit, type RateLimitConfig } from './lib/rate-limiter'
 
-export const t = initTRPC.context<Context>().create()
+export const t = initTRPC.context<Context>().create({
+  transformer: superjson
+})
 
 export const isAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.user) {

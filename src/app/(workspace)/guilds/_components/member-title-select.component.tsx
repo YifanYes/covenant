@@ -9,16 +9,16 @@ import { toast } from 'sonner'
 const UNASSIGNED = '__unassigned__'
 
 interface MemberTitleSelectProps {
-  guildId: string
-  memberId: string
+  guildSlug: string
+  memberPublicId: string
   currentTitle: string | null
   availableTitles: string[]
   disabled?: boolean
 }
 
 export default function MemberTitleSelect({
-  guildId,
-  memberId,
+  guildSlug,
+  memberPublicId,
   currentTitle,
   availableTitles,
   disabled
@@ -39,7 +39,7 @@ export default function MemberTitleSelect({
 
   const handleChange = (next: string) => {
     const title = next === UNASSIGNED ? null : next
-    mutation.mutate({ guildId, memberId, title })
+    mutation.mutate({ guildSlug, memberPublicId, title })
   }
 
   return (

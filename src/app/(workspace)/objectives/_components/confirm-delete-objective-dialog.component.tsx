@@ -30,7 +30,7 @@ export default function ConfirmDeleteObjectiveDialog({ objective, onDeleteSucces
     })
   )
 
-  const handleDelete = () => deleteMutation.mutate({ id: objective.id })
+  const handleDelete = () => deleteMutation.mutate({ publicId: objective.publicId })
 
   return (
     <BaseConfirmDialog

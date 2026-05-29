@@ -9,6 +9,8 @@ import type { CharacterClassType, CharacterWithClasses } from '@shared/types/cha
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN, resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
+import { generatePublicId } from '../lib/public-id'
+import { createWithUniqueSlug } from '../lib/slug'
 
 const log = logger.child({ component: 'character-repository' })
 
@@ -48,7 +50,7 @@ export class CharacterRepository {
     return character
   }
 
-  async findByIdWithClasses(id: string): Promise<CharacterWithClasses | null> {
+  async findByIdWithClasses(id: bigint): Promise<CharacterWithClasses | null> {
     const character = await this.prisma.character.findUnique({
       where: { id },
       include: { classes: true }
@@ -57,7 +59,21 @@ export class CharacterRepository {
     return character as unknown as CharacterWithClasses | null
   }
 
-  async findByIdWithClassesOrThrow(id: string, userId?: string): Promise<CharacterWithClasses> {
+  async findBySlugWithClasses(userId: string, slug: string): Promise<CharacterWithClasses | null> {
+    const character = await this.prisma.character.findUnique({
+      where: { userId_slug: { userId, slug } },
+      include: { classes: true }
+    })
+    return character as unknown as CharacterWithClasses | null
+  }
+
+  async findBySlug(userId: string, slug: string) {
+    return this.prisma.character.findUnique({
+      where: { userId_slug: { userId, slug } }
+    })
+  }
+
+  async findByIdWithClassesOrThrow(id: bigint, userId?: string): Promise<CharacterWithClasses> {
     const character = await this.findByIdWithClasses(id)
     if (!character) {
       throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
@@ -69,7 +85,7 @@ export class CharacterRepository {
     return character
   }
 
-  async verifyOwnership(characterId: string, userId: string): Promise<boolean> {
+  async verifyOwnership(characterId: bigint, userId: string): Promise<boolean> {
     const character = await this.prisma.character.findUnique({
       where: { id: characterId },
       select: { userId: true }
@@ -77,28 +93,28 @@ export class CharacterRepository {
     return character?.userId === userId
   }
 
-  async updateHealth(classId: string, health: number, mana: number): Promise<void> {
+  async updateHealth(classId: bigint, health: number, mana: number): Promise<void> {
     await this.prisma.characterClass.update({
       where: { id: classId },
       data: { health, mana }
     })
   }
 
-  async updateProgress(classId: string, tier: number, maxHealth: number, maxMana: number): Promise<void> {
+  async updateProgress(classId: bigint, tier: number, maxHealth: number, maxMana: number): Promise<void> {
     await this.prisma.characterClass.update({
       where: { id: classId },
       data: { tier, maxHealth, maxMana }
     })
   }
 
-  async updateGold(characterId: string, gold: number): Promise<void> {
+  async updateGold(characterId: bigint, gold: number): Promise<void> {
     await this.prisma.character.update({
       where: { id: characterId },
       data: { gold }
     })
   }
 
-  async addGold(characterId: string, amount: number): Promise<void> {
+  async addGold(characterId: bigint, amount: number): Promise<void> {
     await this.prisma.character.update({
       where: { id: characterId },
       data: { gold: { increment: amount } }
@@ -106,7 +122,7 @@ export class CharacterRepository {
   }
 
   async updateInventoryAndLoadout(
-    characterId: string,
+    characterId: bigint,
     inventory: InventoryItemType[],
     loadout: InventoryItemType[]
   ): Promise<void> {
@@ -126,36 +142,11 @@ export class CharacterRepository {
   }
 
   async create(userId: string, input: CreateCharacterType): Promise<Character> {
-    return this.prisma.character.create({
-      data: {
-        userId,
-        name: input.name,
-        factionName: Faction.HOLY_KNIGHTS,
-        currentClass: input.className,
-        magicNature: input.magicNature,
-        data: {},
-        gold: 0,
-        manaReserve: 0,
-        inventory: [],
-        loadout: [],
-        classes: {
-          create: {
-            className: input.className,
-            ...CLASS_INITIAL_STATS[input.className as CharacterClassName]
-          }
-        }
-      },
-      include: {
-        classes: true
-      }
-    })
-  }
-
-  async createWithDefaults(userId: string, input: CreateCharacterType): Promise<Character> {
-    return this.prisma.$transaction(async (tx) => {
-      const character = await tx.character.create({
+    return createWithUniqueSlug(input.name, (slug) =>
+      this.prisma.character.create({
         data: {
           userId,
+          slug,
           name: input.name,
           factionName: Faction.HOLY_KNIGHTS,
           currentClass: input.className,
@@ -172,24 +163,55 @@ export class CharacterRepository {
             }
           }
         },
-        include: { classes: true }
+        include: {
+          classes: true
+        }
       })
-
-      await tx.area.createMany({
-        data: defaultAreas.map((area) => ({ ...area, userId })),
-        skipDuplicates: true
-      })
-
-      await tx.userTaskStatus.createMany({
-        data: defaultUserTaskStatuses.map((status) => ({ ...status, userId })),
-        skipDuplicates: true
-      })
-
-      return character
-    })
+    )
   }
 
-  async updateManaReserve(characterId: string, manaReserve: number): Promise<void> {
+  async createWithDefaults(userId: string, input: CreateCharacterType): Promise<Character> {
+    return createWithUniqueSlug(input.name, (slug) =>
+      this.prisma.$transaction(async (tx) => {
+        const character = await tx.character.create({
+          data: {
+            userId,
+            slug,
+            name: input.name,
+            factionName: Faction.HOLY_KNIGHTS,
+            currentClass: input.className,
+            magicNature: input.magicNature,
+            data: {},
+            gold: 0,
+            manaReserve: 0,
+            inventory: [],
+            loadout: [],
+            classes: {
+              create: {
+                className: input.className,
+                ...CLASS_INITIAL_STATS[input.className as CharacterClassName]
+              }
+            }
+          },
+          include: { classes: true }
+        })
+
+        await tx.area.createMany({
+          data: defaultAreas.map((area) => ({ ...area, userId, publicId: generatePublicId() })),
+          skipDuplicates: true
+        })
+
+        await tx.userTaskStatus.createMany({
+          data: defaultUserTaskStatuses.map((status) => ({ ...status, userId, publicId: generatePublicId() })),
+          skipDuplicates: true
+        })
+
+        return character
+      })
+    )
+  }
+
+  async updateManaReserve(characterId: bigint, manaReserve: number): Promise<void> {
     await this.prisma.character.update({
       where: { id: characterId },
       data: { manaReserve }
@@ -198,14 +220,14 @@ export class CharacterRepository {
 
   async createAreas(userId: string): Promise<void> {
     await this.prisma.area.createMany({
-      data: defaultAreas.map((area) => ({ ...area, userId })),
+      data: defaultAreas.map((area) => ({ ...area, userId, publicId: generatePublicId() })),
       skipDuplicates: true
     })
   }
 
   async createTaskStatuses(userId: string): Promise<void> {
     await this.prisma.userTaskStatus.createMany({
-      data: defaultUserTaskStatuses.map((status) => ({ ...status, userId })),
+      data: defaultUserTaskStatuses.map((status) => ({ ...status, userId, publicId: generatePublicId() })),
       skipDuplicates: true
     })
   }
@@ -217,7 +239,7 @@ export class CharacterRepository {
     })
   }
 
-  async updateCharacterData(characterId: string, data: CharacterDataType): Promise<Character> {
+  async updateCharacterData(characterId: bigint, data: CharacterDataType): Promise<Character> {
     return this.prisma.character.update({
       where: { id: characterId },
       data: { data: data as unknown as Prisma.InputJsonValue }
@@ -225,7 +247,7 @@ export class CharacterRepository {
   }
 
   async updateInventoryAndGold(
-    characterId: string,
+    characterId: bigint,
     inventory: InventoryItemType[],
     gold: number
   ): Promise<Character> {
@@ -235,7 +257,7 @@ export class CharacterRepository {
     })
   }
 
-  async createClass(characterId: string, className: string): Promise<CharacterClassType> {
+  async createClass(characterId: bigint, className: string): Promise<CharacterClassType> {
     const result = await this.prisma.characterClass.create({
       data: {
         characterId,
@@ -246,7 +268,7 @@ export class CharacterRepository {
     return result as unknown as CharacterClassType
   }
 
-  async updateCurrentClass(characterId: string, className: string): Promise<Character> {
+  async updateCurrentClass(characterId: bigint, className: string): Promise<Character> {
     return this.prisma.character.update({
       where: { id: characterId },
       data: { currentClass: className },
@@ -264,21 +286,21 @@ export class CharacterRepository {
     return this.findWithClasses(userId)
   }
 
-  async updateCharacterClass(classId: string, data: { equippedAbilities?: string[] }): Promise<void> {
+  async updateCharacterClass(classId: bigint, data: { equippedAbilities?: string[] }): Promise<void> {
     await this.prisma.characterClass.update({
       where: { id: classId },
       data
     })
   }
 
-  async updateFaction(characterId: string, faction: string): Promise<Character> {
+  async updateFaction(characterId: bigint, faction: string): Promise<Character> {
     return this.prisma.character.update({
       where: { id: characterId },
       data: { factionName: faction }
     })
   }
 
-  async updateTitle(characterId: string, title: string | null): Promise<Character> {
+  async updateTitle(characterId: bigint, title: string | null): Promise<Character> {
     return this.prisma.character.update({
       where: { id: characterId },
       data: { title }

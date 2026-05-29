@@ -20,9 +20,9 @@ describe('ObjectiveRepository - Authorization', () => {
 
   describe('update', () => {
     it('should update objective when user owns it', async () => {
-      const objectiveId = 'objective-1'
+      const objectiveId = BigInt(10)
       const userId = 'user-1'
-      const input = { id: objectiveId, name: 'Updated Name' }
+      const input = { publicId: 'objpub000010', name: 'Updated Name' }
       const existingObjective = { id: objectiveId, userId, name: 'Old Name' }
       const updatedObjective = { id: objectiveId, userId, name: 'Updated Name' }
 
@@ -37,9 +37,9 @@ describe('ObjectiveRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when objective does not exist', async () => {
-      const objectiveId = 'non-existent'
+      const objectiveId = BigInt(999)
       const userId = 'user-1'
-      const input = { id: objectiveId, name: 'Updated Name' }
+      const input = { publicId: 'objpub000010', name: 'Updated Name' }
 
       objectiveModel.findUnique.mockResolvedValue(null as never)
 
@@ -51,10 +51,10 @@ describe('ObjectiveRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when user does not own the objective', async () => {
-      const objectiveId = 'objective-1'
+      const objectiveId = BigInt(10)
       const userId = 'user-1'
       const otherUserId = 'user-2'
-      const input = { id: objectiveId, name: 'Updated Name' }
+      const input = { publicId: 'objpub000010', name: 'Updated Name' }
       const existingObjective = { id: objectiveId, userId: otherUserId, name: 'Old Name' }
 
       objectiveModel.findUnique.mockResolvedValue(existingObjective as never)
@@ -69,7 +69,7 @@ describe('ObjectiveRepository - Authorization', () => {
 
   describe('complete', () => {
     it('should complete objective when user owns it', async () => {
-      const objectiveId = 'objective-1'
+      const objectiveId = BigInt(10)
       const userId = 'user-1'
       const existingObjective = { id: objectiveId, userId, name: 'Test Objective', completedAt: null }
       const completedObjective = { ...existingObjective, completedAt: new Date() }
@@ -85,7 +85,7 @@ describe('ObjectiveRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when objective does not exist', async () => {
-      const objectiveId = 'non-existent'
+      const objectiveId = BigInt(999)
       const userId = 'user-1'
 
       objectiveModel.findUnique.mockResolvedValue(null as never)
@@ -98,7 +98,7 @@ describe('ObjectiveRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when user does not own the objective', async () => {
-      const objectiveId = 'objective-1'
+      const objectiveId = BigInt(10)
       const userId = 'user-1'
       const otherUserId = 'user-2'
       const existingObjective = { id: objectiveId, userId: otherUserId, name: 'Test Objective' }
@@ -115,7 +115,7 @@ describe('ObjectiveRepository - Authorization', () => {
 
   describe('delete', () => {
     it('should delete objective when user owns it', async () => {
-      const objectiveId = 'objective-1'
+      const objectiveId = BigInt(10)
       const userId = 'user-1'
       const existingObjective = { id: objectiveId, userId, name: 'Test Objective' }
 
@@ -130,7 +130,7 @@ describe('ObjectiveRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when objective does not exist', async () => {
-      const objectiveId = 'non-existent'
+      const objectiveId = BigInt(999)
       const userId = 'user-1'
 
       objectiveModel.findUnique.mockResolvedValue(null as never)
@@ -143,7 +143,7 @@ describe('ObjectiveRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when user does not own the objective', async () => {
-      const objectiveId = 'objective-1'
+      const objectiveId = BigInt(10)
       const userId = 'user-1'
       const otherUserId = 'user-2'
       const existingObjective = { id: objectiveId, userId: otherUserId, name: 'Test Objective' }

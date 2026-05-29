@@ -30,7 +30,7 @@ function DayEntryPanel({ date, timezoneOffset }: { date: string; timezoneOffset:
   return (
     <div className="space-y-3">
       {entries.map((entry) => (
-        <div key={entry.id} className="rounded-xl border bg-background p-4">
+        <div key={entry.publicId} className="rounded-xl border bg-background p-4">
           <p className="text-muted-foreground text-xs font-medium">{formatDate(entry.createdAt)}</p>
           <JournalContent html={entry.content} className="mt-2 text-sm" />
           {entry.mood && (

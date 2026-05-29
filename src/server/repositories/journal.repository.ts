@@ -1,6 +1,7 @@
-import type { JournalEntry, PrismaClient } from '@/generated/prisma'
+import { Prisma, type JournalEntry, type PrismaClient } from '@/generated/prisma'
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
+import { generatePublicId } from '../lib/public-id'
 
 function getUtcDayBounds(date?: Date, timezoneOffset = 0) {
   const now = date || new Date()
@@ -32,31 +33,41 @@ export class JournalRepository {
 
   async create(userId: string, content: string, mood?: string | null, color?: string | null, tx?: any): Promise<JournalEntry> {
     return this.getClient(tx).journalEntry.create({
-      data: { userId, content, mood: mood || null, color: color || null }
+      data: { userId, publicId: generatePublicId(), content, mood: mood || null, color: color || null }
     })
   }
 
-  async update(id: string, userId: string, content?: string, mood?: string | null, color?: string | null, tx?: any): Promise<JournalEntry> {
-    await this.findByIdOrThrow(id, userId, tx)
-    return this.getClient(tx).journalEntry.update({
-      where: { id },
-      data: {
-        ...(content !== undefined && { content }),
-        ...(mood !== undefined && { mood: mood || null }),
-        ...(color !== undefined && { color: color || null })
+  async update(id: bigint, userId: string, content?: string, mood?: string | null, color?: string | null, tx?: any): Promise<JournalEntry> {
+    // Ownership re-checked here (userId + not-deleted) via extendedWhereUnique as defense-in-depth.
+    // Map Prisma's P2025 to NOT_FOUND so a soft-delete race doesn't leak as INTERNAL_SERVER_ERROR.
+    try {
+      return await this.getClient(tx).journalEntry.update({
+        where: { id, userId, deletedAt: null },
+        data: {
+          ...(content !== undefined && { content }),
+          ...(mood !== undefined && { mood: mood || null }),
+          ...(color !== undefined && { color: color || null })
+        }
+      })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
       }
-    })
+      throw error
+    }
   }
 
-  async softDelete(id: string, userId: string, tx?: any): Promise<void> {
-    await this.findByIdOrThrow(id, userId, tx)
-    await this.getClient(tx).journalEntry.update({
-      where: { id },
+  async softDelete(id: bigint, userId: string, tx?: any): Promise<void> {
+    const result = await this.getClient(tx).journalEntry.updateMany({
+      where: { id, userId, deletedAt: null },
       data: { deletedAt: new Date() }
     })
+    if (result.count !== 1) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+    }
   }
 
-  async findById(id: string, userId: string, tx?: any): Promise<JournalEntry | null> {
+  async findById(id: bigint, userId: string, tx?: any): Promise<JournalEntry | null> {
     const entry = await this.getClient(tx).journalEntry.findUnique({
       where: { id, deletedAt: null }
     })
@@ -64,11 +75,11 @@ export class JournalRepository {
     return entry
   }
 
-  async findByIdOrThrow(id: string, userId: string, tx?: any): Promise<JournalEntry> {
-    const entry = await this.findById(id, userId, tx)
-    if (!entry) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
-    }
+  async findByPublicId(publicId: string, userId: string, tx?: any): Promise<JournalEntry | null> {
+    const entry = await this.getClient(tx).journalEntry.findUnique({
+      where: { publicId, deletedAt: null }
+    })
+    if (entry && entry.userId !== userId) return null
     return entry
   }
 

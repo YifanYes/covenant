@@ -83,11 +83,11 @@ export default function UpdateTaskDialog() {
     mode: 'onSubmit'
   })
 
-  const onDelete = () => !isUndefined(selectedTask) && deleteMutation.mutate({ id: selectedTask.id })
+  const onDelete = () => !isUndefined(selectedTask) && deleteMutation.mutate({ publicId: selectedTask.publicId })
   const onUpdate = (data: UpdateTaskType) => updateMutation.mutate(data)
   const onDuplicate = () =>
     !isUndefined(selectedTask) &&
-    duplicateMutation.mutate({ id: selectedTask.id, titleSuffix: t('copy_suffix', { defaultValue: '(Copy)' }) })
+    duplicateMutation.mutate({ publicId: selectedTask.publicId, titleSuffix: t('copy_suffix', { defaultValue: '(Copy)' }) })
 
   const handleOpenChange = () => {
     setSelectedTask(undefined)
@@ -97,14 +97,14 @@ export default function UpdateTaskDialog() {
   useEffect(() => {
     if (selectedTask) {
       reset({
-        id: selectedTask.id,
+        publicId: selectedTask.publicId,
         title: selectedTask.title,
         description: selectedTask.description ?? undefined,
-        statusId: selectedTask.statusId,
+        statusPublicId: selectedTask.statusPublicId,
         color: selectedTask.color ?? undefined,
         order: selectedTask.order,
-        objectives: map(selectedTask?.objectives, (objective) => objective.id),
-        areas: map(selectedTask?.areas, (area) => area.id),
+        objectives: map(selectedTask?.objectives, (objective) => objective.publicId),
+        areas: map(selectedTask?.areas, (area) => area.publicId),
         dueDate: !isNil(selectedTask?.dueDate) ? new Date(selectedTask.dueDate) : undefined,
         effort: selectedTask?.effort as TaskEffort | undefined,
         impact: selectedTask?.impact as TaskImpact | undefined
@@ -163,14 +163,14 @@ export default function UpdateTaskDialog() {
         </div>
         <div className="grid gap-3">
           <Controller
-            name="statusId"
+            name="statusPublicId"
             control={control}
             render={({ field }) => (
               <SingleSelect
                 value={field.value ?? undefined}
                 placeholder={t('update_task_dialog.status_placeholder')}
                 options={statusesData.statuses.map((status) => ({
-                  value: status.id,
+                  value: status.publicId,
                   label: t(`task_status.${status.label}` as Parameters<typeof t>[0], { defaultValue: status.label })
                 }))}
                 onChange={field.onChange}

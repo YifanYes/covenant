@@ -7,6 +7,7 @@ import Button from '@/ui/button.component'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { startCampaignSchema, type StartCampaignType } from '@shared/schemas/guilds.schemas'
+import { z } from 'zod'
 import { useMutation } from '@tanstack/react-query'
 import { Flag } from 'pixelarticons/react'
 import { type ReactNode, useState } from 'react'
@@ -15,16 +16,16 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 interface StartCampaignDialogProps {
-  guildId: string
+  guildSlug: string
   trigger?: ReactNode
 }
 
-export default function StartCampaignDialog({ guildId, trigger }: StartCampaignDialogProps) {
+export default function StartCampaignDialog({ guildSlug, trigger }: StartCampaignDialogProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
-  const activeKey = trpcOptions.guilds.getCurrentCampaign.queryKey({ guildId })
-  const historyKey = trpcOptions.guilds.getCampaignHistory.queryKey({ guildId })
+  const activeKey = trpcOptions.guilds.getCurrentCampaign.queryKey({ guildSlug })
+  const historyKey = trpcOptions.guilds.getCampaignHistory.queryKey({ guildSlug })
 
   const mutation = useMutation(
     trpcOptions.guilds.startCampaign.mutationOptions({
@@ -45,17 +46,17 @@ export default function StartCampaignDialog({ guildId, trigger }: StartCampaignD
     handleSubmit,
     reset,
     formState: { isValid }
-  } = useForm<StartCampaignType>({
+  } = useForm<z.input<typeof startCampaignSchema>, unknown, StartCampaignType>({
     resolver: standardSchemaResolver(startCampaignSchema),
     mode: 'onSubmit',
-    defaultValues: { guildId, templateId: defaultTemplateId }
+    defaultValues: { guildSlug, templateId: defaultTemplateId }
   })
 
   const onSubmit = (data: StartCampaignType) => mutation.mutate(data)
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
-    if (!isOpen) reset({ guildId, templateId: defaultTemplateId })
+    if (!isOpen) reset({ guildSlug, templateId: defaultTemplateId })
   }
 
   return (

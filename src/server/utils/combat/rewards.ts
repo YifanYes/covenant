@@ -4,12 +4,15 @@ import { generateEnemyNameKeys } from '@/shared/constants/enemy-names.constants'
 import { getQuestById, selectEnemyWithFallback } from '@/shared/constants/quests.constants'
 import type { EncounterState } from '@shared/types/combat.types'
 import type { TacticalStateData, TacticalUnitState } from '@shared/types/tactical-combat.types'
+import { logger } from '../../lib/logger'
 import type { CharacterQuestRepository } from '../../repositories/character-quest.repository'
 import type { CharacterRepository } from '../../repositories/character.repository'
 import type { CombatEnemyRepository } from '../../repositories/combat-enemy.repository'
 import type { GuildService } from '../../services/guild.service'
 import type { KillRecordService } from '../../services/kill-record.service'
 import type { ManaService } from '../../services/mana.service'
+
+const log = logger.child({ component: 'combat-rewards' })
 
 /** Minimal repo set used by functions that only read/write combat state (no reward processing). */
 export interface CombatStateRepos {
@@ -47,7 +50,7 @@ export interface EnemyDefeatResult {
  * Unified logic extracted from executeTacticalAttack and executeTacticalAbility.
  */
 export async function processEnemyDefeat(
-  questId: string,
+  questId: bigint,
   updatedState: TacticalStateData,
   killedEnemyIds: string[],
   repos: CombatRewardDeps,
@@ -66,8 +69,10 @@ export async function processEnemyDefeat(
   // Fallback: if no active enemy found by status, try finding by ID from tactical state
   if (!activeEnemy) {
     const enemyUnit = updatedState.units.find((u) => !u.id.startsWith('player-'))
-    if (enemyUnit) {
-      activeEnemy = await repos.combatEnemyRepository.findById(enemyUnit.id)
+    if (enemyUnit && /^\d+$/.test(enemyUnit.id)) {
+      activeEnemy = await repos.combatEnemyRepository.findById(BigInt(enemyUnit.id))
+    } else if (enemyUnit) {
+      log.warn({ enemyId: enemyUnit.id }, 'rewards: legacy non-numeric enemy id, skipping lookup')
     }
   }
 
@@ -188,7 +193,7 @@ export async function processEnemyDefeat(
     const newEnemyName = `${nameKeys.prefix}|${nameKeys.suffix}`
 
     result.nextEnemy = {
-      id: newEnemy.id,
+      id: newEnemy.id.toString(),
       templateId: selected.enemyId,
       name: newEnemyName,
       currentHealth: scaledTemplate.health,
@@ -218,7 +223,7 @@ export async function processEnemyDefeat(
         }
       }
       const newTacticalState = createTacticalStateWithNewEnemy(updatedState, refreshedPlayer, {
-        id: newEnemy.id,
+        id: newEnemy.id.toString(),
         templateId: selected.enemyId,
         name: newEnemyName,
         health: { current: scaledTemplate.health, max: scaledTemplate.health },

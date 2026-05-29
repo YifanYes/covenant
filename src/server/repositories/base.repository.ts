@@ -11,7 +11,7 @@ const log = logger.child({ component: 'base-repository' })
  * @template T The entity type returned by the repository
  * @template TModel The Prisma model delegate type
  */
-export abstract class BaseRepository<T extends { id: string }> {
+export abstract class BaseRepository<T extends { id: bigint }> {
   constructor(protected prisma: PrismaClient) {}
 
   /**
@@ -19,21 +19,21 @@ export abstract class BaseRepository<T extends { id: string }> {
    * Subclasses must implement this to return the appropriate model.
    */
   protected abstract get model(): {
-    findUnique: (args: { where: { id: string } }) => Promise<T | null>
-    delete: (args: { where: { id: string } }) => Promise<T>
+    findUnique: (args: { where: { id: bigint } }) => Promise<T | null>
+    delete: (args: { where: { id: bigint } }) => Promise<T>
   }
 
   /**
    * Find an entity by its ID.
    */
-  async findById(id: string): Promise<T | null> {
+  async findById(id: bigint): Promise<T | null> {
     return this.model.findUnique({ where: { id } })
   }
 
   /**
    * Find an entity by its ID, throwing if not found.
    */
-  async findByIdOrThrow(id: string): Promise<T> {
+  async findByIdOrThrow(id: bigint): Promise<T> {
     const entity = await this.findById(id)
     if (!entity) {
       throw new TRPCError({
@@ -47,7 +47,7 @@ export abstract class BaseRepository<T extends { id: string }> {
   /**
    * Delete an entity by its ID.
    */
-  async delete(id: string): Promise<void> {
+  async delete(id: bigint): Promise<void> {
     await this.model.delete({ where: { id } })
   }
 }
@@ -59,12 +59,12 @@ export abstract class BaseRepository<T extends { id: string }> {
  * @template T The entity type returned by the repository
  */
 export abstract class UserScopedRepository<
-  T extends { id: string; userId: string }
+  T extends { id: bigint; userId: string }
 > extends BaseRepository<T> {
   protected abstract override get model(): {
-    findUnique: (args: { where: { id: string } }) => Promise<T | null>
+    findUnique: (args: { where: { id: bigint } }) => Promise<T | null>
     findFirst: (args: { where: { userId: string } }) => Promise<T | null>
-    delete: (args: { where: { id: string } }) => Promise<T>
+    delete: (args: { where: { id: bigint } }) => Promise<T>
   }
 
   /**
@@ -92,7 +92,7 @@ export abstract class UserScopedRepository<
    * Find an entity by ID with ownership validation.
    * Throws if the entity doesn't exist or doesn't belong to the user.
    */
-  async findByIdWithOwnershipOrThrow(id: string, userId: string): Promise<T> {
+  async findByIdWithOwnershipOrThrow(id: bigint, userId: string): Promise<T> {
     const entity = await this.model.findUnique({ where: { id } })
     if (!entity) {
       throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })

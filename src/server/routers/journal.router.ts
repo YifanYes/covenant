@@ -19,11 +19,11 @@ export const journalingRouter = t.router({
   }),
 
   delete: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).input(journalEntryIdSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.journal.delete(ctx.user.id, input.id)
+    return ctx.services.journal.delete(ctx.user.id, input.publicId)
   }),
 
   getById: protectedProcedure.input(journalEntryIdSchema).query(async ({ ctx, input }) => {
-    return ctx.services.journal.getById(ctx.user.id, input.id)
+    return ctx.services.journal.getById(ctx.user.id, input.publicId)
   }),
 
   getByDate: protectedProcedure.input(journalDateSchema).query(async ({ ctx, input }) => {

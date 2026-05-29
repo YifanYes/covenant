@@ -100,7 +100,7 @@ export const invalidators = {
     if (questId) {
       promises.push(
         queryClient.invalidateQueries({
-          queryKey: trpcOptions.quest.getTacticalState.queryKey({ questId })
+          queryKey: trpcOptions.quest.getTacticalState.queryKey({ questPublicId: questId })
         })
       )
     }

@@ -10,6 +10,7 @@ import {
 } from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
 import { analytics as defaultAnalytics, type AnalyticsService } from '../lib/analytics'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { TaskRepository } from '../repositories/task.repository'
@@ -19,6 +20,8 @@ import type { GuildService } from './guild.service'
 import type { ManaService } from './mana.service'
 
 const log = logger.child({ service: 'task' })
+
+const notFound = () => new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
 
 export class TaskService {
   constructor(
@@ -30,8 +33,21 @@ export class TaskService {
     private analytics: AnalyticsService = defaultAnalytics
   ) {}
 
+  private async resolveTask(publicId: string, userId: string): Promise<bigint> {
+    const task = await this.taskRepository.findByPublicId(publicId, userId)
+    if (!task) throw notFound()
+    return task.id
+  }
+
+  private async resolveStatus(publicId: string, userId: string): Promise<bigint> {
+    const status = await this.userTaskStatusRepository.findByPublicId(publicId, userId)
+    if (!status) throw notFound()
+    return status.id
+  }
+
   async create(userId: string, input: CreateTaskType) {
-    const task = await this.taskRepository.create(userId, input)
+    const statusId = await this.resolveStatus(input.statusPublicId, userId)
+    const task = await this.taskRepository.create(userId, input, statusId)
     if (this.characterRepository) {
       try {
         await this.characterRepository.updateOnboardingProgress(userId, { taskCreated: true })
@@ -45,20 +61,33 @@ export class TaskService {
   async getAll(userId: string) {
     const tasks = await this.taskRepository.findAll(userId)
 
-    const groupedTasks = tasks.reduce(
+    const decorated = tasks.map((task) => ({
+      ...task,
+      statusPublicId: task.status.publicId
+    }))
+
+    const groupedTasks = decorated.reduce(
       (acc, task) => {
-        if (!acc[task.statusId]) acc[task.statusId] = []
-        acc[task.statusId].push(task)
+        const key = task.statusPublicId
+        if (!acc[key]) acc[key] = []
+        acc[key].push(task)
         return acc
       },
-      {} as Record<string, typeof tasks>
+      {} as Record<string, typeof decorated>
     )
 
     return { tasks: groupedTasks }
   }
 
   async getFiltered(userId: string, input: GetTasksFilteredInput) {
-    const { search, statusIds, effortImpact, dueDate, page, pageSize } = input
+    const { search, statusPublicIds, effortImpact, dueDate, page, pageSize } = input
+
+    let statusIds: bigint[] | undefined
+    if (statusPublicIds?.length) {
+      const statuses = await this.userTaskStatusRepository.findAll(userId)
+      const idByPublicId = new Map(statuses.map((s) => [s.publicId, s.id]))
+      statusIds = statusPublicIds.map((p) => idByPublicId.get(p)).filter((id): id is bigint => id !== undefined)
+    }
 
     const result = await this.taskRepository.findFiltered(
       userId,
@@ -72,7 +101,10 @@ export class TaskService {
     )
 
     return {
-      tasks: result.tasks,
+      tasks: result.tasks.map((task) => ({
+        ...task,
+        statusPublicId: task.status.publicId
+      })),
       totalCount: result.totalCount,
       page,
       pageSize,
@@ -89,22 +121,33 @@ export class TaskService {
 
     const tasks = await this.taskRepository.findByDate(userId, startDate, endDate)
 
-    return { tasks }
+    return {
+      tasks: tasks.map((task) => ({
+        ...task,
+        statusPublicId: task.status.publicId
+      }))
+    }
   }
 
   async update(userId: string, input: UpdateTaskType) {
-    const existingTask = await this.taskRepository.findByIdOrThrow(input.id, userId)
+    const taskId = await this.resolveTask(input.publicId, userId)
+    const existingTask = await this.taskRepository.findByIdOrThrow(taskId, userId)
     const doneStatus = await this.userTaskStatusRepository.findDoneByUserId(userId)
     if (!doneStatus) {
       throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DONE status missing for user' })
     }
 
+    let nextStatusId: bigint | undefined
+    if (input.statusPublicId !== undefined) {
+      nextStatusId = await this.resolveStatus(input.statusPublicId, userId)
+    }
+
     const isCompleting =
-      input.statusId !== undefined &&
-      input.statusId === doneStatus.id &&
+      nextStatusId !== undefined &&
+      nextStatusId === doneStatus.id &&
       existingTask.statusId !== doneStatus.id
 
-    const task = await this.taskRepository.update(input.id, input, isCompleting)
+    const task = await this.taskRepository.update(taskId, input, nextStatusId, isCompleting)
 
     let manaEarned = 0
     let reserveGained = 0
@@ -115,7 +158,7 @@ export class TaskService {
       await this.guildService?.recordCampaignEvent(userId, CAMPAIGN_EVENT_TYPE.TASK_COMPLETION, 1)
 
       this.analytics.track(userId, 'task_completed', {
-        task_id: task.id,
+        task_id: task.publicId,
         impact: task.impact ?? '',
         mana_earned: manaEarned,
         reserve_gained: reserveGained
@@ -129,8 +172,8 @@ export class TaskService {
     return { task, manaEarned, reserveGained }
   }
 
-  async bulkUpdate(userId: string, tasks: BulkUpdateTaskItem[]) {
-    if (tasks.length === 0) {
+  async bulkUpdate(userId: string, items: BulkUpdateTaskItem[]) {
+    if (items.length === 0) {
       return { message: 'Tasks updated successfully', manaEarned: 0, reserveGained: 0 }
     }
 
@@ -139,22 +182,32 @@ export class TaskService {
       throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DONE status missing for user' })
     }
 
-    const existing = await this.taskRepository.findManyByIds(
-      tasks.map((t) => t.id),
-      userId
-    )
-    const existingById = new Map(existing.map((t) => [t.id, t]))
+    const statuses = await this.userTaskStatusRepository.findAll(userId)
+    const statusIdByPublicId = new Map(statuses.map((s) => [s.publicId, s.id]))
 
-    const completing = tasks.flatMap((t) => {
-      const prev = existingById.get(t.id)
+    const existing = await this.taskRepository.findManyByPublicIds(items.map((t) => t.publicId), userId)
+    const existingByPublicId = new Map(existing.map((t) => [t.publicId, t]))
+
+    const resolved: Array<{ id: bigint; publicId: string; statusId: bigint; order: number }> = []
+    for (const item of items) {
+      const prev = existingByPublicId.get(item.publicId)
+      const statusId = statusIdByPublicId.get(item.statusPublicId)
+      if (!prev || statusId === undefined) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: `Task ${item.publicId} not found` })
+      }
+      resolved.push({ id: prev.id, publicId: item.publicId, statusId, order: item.order })
+    }
+
+    const completing = resolved.flatMap((r) => {
+      const prev = existingByPublicId.get(r.publicId)
       if (!prev) return []
-      if (t.statusId !== doneStatus.id || prev.statusId === doneStatus.id) return []
-      return [{ id: t.id, impact: prev.impact }]
+      if (r.statusId !== doneStatus.id || prev.statusId === doneStatus.id) return []
+      return [{ id: r.id, publicId: r.publicId, impact: prev.impact }]
     })
 
     await this.taskRepository.bulkUpdate(
       userId,
-      tasks,
+      resolved.map((r) => ({ id: r.id, statusId: r.statusId, order: r.order })),
       completing.map((c) => c.id),
       new Date()
     )
@@ -177,7 +230,7 @@ export class TaskService {
       const manaEarned = Math.min(amount, remainingManaApplied)
       remainingManaApplied -= manaEarned
       this.analytics.track(userId, 'task_completed', {
-        task_id: task.id,
+        task_id: task.publicId,
         impact: task.impact ?? '',
         mana_earned: manaEarned,
         reserve_gained: amount - manaEarned
@@ -195,30 +248,34 @@ export class TaskService {
     }
   }
 
-  async delete(userId: string, id: string) {
-    await this.taskRepository.findByIdOrThrow(id, userId)
+  async delete(userId: string, publicId: string) {
+    const id = await this.resolveTask(publicId, userId)
     await this.taskRepository.delete(id)
-
-    return { message: `Task ${id} deleted successfully` }
+    return { message: `Task ${publicId} deleted successfully` }
   }
 
-  async duplicate(userId: string, id: string, titleSuffix?: string) {
+  async duplicate(userId: string, publicId: string, titleSuffix?: string) {
+    const id = await this.resolveTask(publicId, userId)
     const original = await this.taskRepository.findByIdOrThrow(id, userId)
+
+    const statuses = await this.userTaskStatusRepository.findAll(userId)
+    const originalStatus = statuses.find((s) => s.id === original.statusId)
+    if (!originalStatus) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'status missing for task' })
 
     const newTaskInput: CreateTaskType = {
       title: `${original.title}${titleSuffix || ' (copy)'}`,
       description: original.description || undefined,
-      statusId: original.statusId,
+      statusPublicId: originalStatus.publicId,
       order: original.order,
       color: original.color || undefined,
       effort: (original.effort ?? undefined) as TaskEffort | undefined,
       impact: (original.impact ?? undefined) as TaskImpact | undefined,
       dueDate: original.dueDate || undefined,
-      objectives: original.objectives.map((o) => o.id),
-      areas: original.areas.map((a) => a.id)
+      objectives: original.objectives.map((o) => o.publicId),
+      areas: original.areas.map((a) => a.publicId)
     }
 
-    const task = await this.taskRepository.create(userId, newTaskInput)
+    const task = await this.taskRepository.create(userId, newTaskInput, original.statusId)
 
     return { task }
   }

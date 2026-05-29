@@ -34,7 +34,7 @@ describe('JournalService', () => {
 
   describe('create', () => {
     it('should create entry and award mana on first entry of the day', async () => {
-      mockJournalRepo.create.mockResolvedValue({ id: 'entry-1', content: 'Hello', mood: 'happy', color: '#FFD700' })
+      mockJournalRepo.create.mockResolvedValue({ id: BigInt(1), content: 'Hello', mood: 'happy', color: '#FFD700' })
       mockJournalRepo.findEntryDates.mockResolvedValue([
         new Date(),
         new Date(Date.now() - 86400000),
@@ -48,7 +48,7 @@ describe('JournalService', () => {
         timezoneOffset: 0
       })
 
-      expect(result.entry).toEqual({ id: 'entry-1', content: 'Hello', mood: 'happy', color: '#FFD700' })
+      expect(result.entry).toEqual({ id: BigInt(1), content: 'Hello', mood: 'happy', color: '#FFD700' })
       expect(result.manaEarned).toBe(1)
       expect(result.streak).toBe(3)
       expect(mockManaService.addManaFromCompletion).toHaveBeenCalledWith('user-1', 'journal')
@@ -57,7 +57,7 @@ describe('JournalService', () => {
     })
 
     it('should not award mana when grant fails', async () => {
-      mockJournalRepo.create.mockResolvedValue({ id: 'entry-1', content: 'Hello' })
+      mockJournalRepo.create.mockResolvedValue({ id: BigInt(1), content: 'Hello' })
       mockJournalRepo.findEntryDates.mockResolvedValue([new Date()])
       mockManaService.addManaFromCompletion.mockResolvedValue({ success: false, amount: 0, manaApplied: 0, reserveGained: 0, newMana: 0, newReserve: 0 })
 
@@ -73,7 +73,7 @@ describe('JournalService', () => {
     })
 
     it('should sanitize HTML content before writing', async () => {
-      mockJournalRepo.create.mockResolvedValue({ id: 'entry-1', content: '<p>safe</p>' })
+      mockJournalRepo.create.mockResolvedValue({ id: BigInt(1), content: '<p>safe</p>' })
       mockJournalRepo.findEntryDates.mockResolvedValue([new Date()])
 
       await journalService.create('user-1', {
@@ -91,7 +91,7 @@ describe('JournalService', () => {
     })
 
     it('should handle race condition when duplicate entry is created concurrently', async () => {
-      const existingEntry = { id: 'entry-existing', content: 'Existing', mood: 'calm', color: '#5F9EA0' }
+      const existingEntry = { id: BigInt(99), content: 'Existing', mood: 'calm', color: '#5F9EA0' }
       mockJournalRepo.create.mockRejectedValue(
         new Prisma.PrismaClientKnownRequestError('Unique constraint', {
           code: 'P2002',
@@ -116,21 +116,22 @@ describe('JournalService', () => {
 
   describe('update', () => {
     it('should update an entry', async () => {
-      mockJournalRepo.update.mockResolvedValue({ id: 'entry-1', content: 'New', mood: 'calm', color: '#5F9EA0' })
+      mockJournalRepo.findByPublicId.mockResolvedValue({ id: BigInt(1), publicId: 'jrnpub000001' })
+      mockJournalRepo.update.mockResolvedValue({ id: BigInt(1), publicId: 'jrnpub000001', content: 'New', mood: 'calm', color: '#5F9EA0' })
 
-      const result = await journalService.update('user-1', { id: 'entry-1', content: 'New', mood: 'calm', color: '#5F9EA0' })
+      const result = await journalService.update('user-1', { publicId: 'jrnpub000001', content: 'New', mood: 'calm', color: '#5F9EA0' })
 
       expect(result.content).toBe('New')
       expect(result.mood).toBe('calm')
       expect(result.color).toBe('#5F9EA0')
-      expect(mockJournalRepo.findByIdOrThrow).not.toHaveBeenCalled()
     })
 
     it('should sanitize HTML content before writing', async () => {
-      mockJournalRepo.update.mockResolvedValue({ id: 'entry-1', content: '<p>safe</p>' })
+      mockJournalRepo.findByPublicId.mockResolvedValue({ id: BigInt(1), publicId: 'jrnpub000001' })
+      mockJournalRepo.update.mockResolvedValue({ id: BigInt(1), publicId: 'jrnpub000001', content: '<p>safe</p>' })
 
       await journalService.update('user-1', {
-        id: 'entry-1',
+        publicId: 'jrnpub000001',
         content: '<p>safe</p><script>alert(1)</script>',
         mood: undefined,
         color: undefined
@@ -144,29 +145,28 @@ describe('JournalService', () => {
 
   describe('delete', () => {
     it('should delete an entry', async () => {
-      mockJournalRepo.findByIdOrThrow.mockResolvedValue({ id: 'entry-1' })
+      mockJournalRepo.findByPublicId.mockResolvedValue({ id: BigInt(1), publicId: 'jrnpub000001' })
       mockJournalRepo.softDelete.mockResolvedValue(undefined)
 
-      await journalService.delete('user-1', 'entry-1')
+      await journalService.delete('user-1', 'jrnpub000001')
 
-      expect(mockJournalRepo.findByIdOrThrow).toHaveBeenCalledWith('entry-1', 'user-1')
-      expect(mockJournalRepo.softDelete).toHaveBeenCalledWith('entry-1', 'user-1')
+      expect(mockJournalRepo.softDelete).toHaveBeenCalledWith(BigInt(1), 'user-1')
     })
   })
 
   describe('getById', () => {
-    it('should return an entry by id', async () => {
-      mockJournalRepo.findById.mockResolvedValue({ id: 'entry-1', content: 'Hello' })
+    it('should return an entry by publicId', async () => {
+      mockJournalRepo.findByPublicId.mockResolvedValue({ id: BigInt(1), publicId: 'jrnpub000001', content: 'Hello' })
 
-      const result = await journalService.getById('user-1', 'entry-1')
+      const result = await journalService.getById('user-1', 'jrnpub000001')
 
-      expect(result).toEqual({ id: 'entry-1', content: 'Hello' })
+      expect(result).toEqual({ id: BigInt(1), publicId: 'jrnpub000001', content: 'Hello' })
     })
 
     it('should throw NOT_FOUND when entry does not exist', async () => {
-      mockJournalRepo.findById.mockResolvedValue(null)
+      mockJournalRepo.findByPublicId.mockResolvedValue(null)
 
-      await expect(journalService.getById('user-1', 'entry-1')).rejects.toThrow('Resource not found or access denied')
+      await expect(journalService.getById('user-1', 'jrnpub000001')).rejects.toThrow('Resource not found or access denied')
     })
   })
 
@@ -174,15 +174,15 @@ describe('JournalService', () => {
     it('should return entries for a specific date', async () => {
       const dateStr = '2024-01-15'
       mockJournalRepo.findByDate.mockResolvedValue([
-        { id: 'entry-1', content: 'Hello' },
-        { id: 'entry-2', content: 'World' }
+        { id: BigInt(1), content: 'Hello' },
+        { id: BigInt(2), content: 'World' }
       ])
 
       const result = await journalService.getByDate('user-1', dateStr)
 
       expect(result).toEqual([
-        { id: 'entry-1', content: 'Hello' },
-        { id: 'entry-2', content: 'World' }
+        { id: BigInt(1), content: 'Hello' },
+        { id: BigInt(2), content: 'World' }
       ])
       expect(mockJournalRepo.findByDate).toHaveBeenCalledWith('user-1', dateStr, 0)
     })

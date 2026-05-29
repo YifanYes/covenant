@@ -14,12 +14,12 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 interface TitlePoolEditorProps {
-  guildId: string
+  guildSlug: string
   initialTitles: string[]
   memberTitles: Array<string | null>
 }
 
-export default function TitlePoolEditor({ guildId, initialTitles, memberTitles }: TitlePoolEditorProps) {
+export default function TitlePoolEditor({ guildSlug, initialTitles, memberTitles }: TitlePoolEditorProps) {
   const { t } = useTranslation()
   const [titles, setTitles] = useState<string[]>(initialTitles)
   const [draft, setDraft] = useState('')
@@ -76,11 +76,11 @@ export default function TitlePoolEditor({ guildId, initialTitles, memberTitles }
     const next = titles.filter((_, i) => i !== pendingDelete.idx)
     setTitles(next)
     setPendingDelete(null)
-    updateMutation.mutate({ guildId, titles: next })
+    updateMutation.mutate({ guildSlug, titles: next })
   }
 
   const handleSave = () => {
-    updateMutation.mutate({ guildId, titles })
+    updateMutation.mutate({ guildSlug, titles })
   }
 
   const atCap = titles.length >= GUILD_TITLE_POOL_MAX_SIZE

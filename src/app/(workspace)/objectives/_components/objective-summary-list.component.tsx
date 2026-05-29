@@ -38,13 +38,13 @@ export default function ObjectiveSummaryList({ title, tasks, habits, setSelected
             <span className="border-foreground/30 group-hover:border-primary pointer-events-none absolute right-0 bottom-0 h-3 w-3 border-r-2 border-b-2 transition-colors" />
             <div className="flex flex-col gap-1">
               {pendingTasks.slice(0, 2).map((task) => (
-                <div key={task.id} className="flex items-center gap-2">
+                <div key={task.publicId} className="flex items-center gap-2">
                   <div className="bg-primary size-1.5 rounded-full" />
                   <span className="text-foreground text-xs">{task.title}</span>
                 </div>
               ))}
               {habits.slice(0, Math.max(0, 2 - pendingTasks.length)).map((habit) => (
-                <div key={habit.id} className="flex items-center gap-2">
+                <div key={habit.publicId} className="flex items-center gap-2">
                   <Repeat className="text-secondary size-3" />
                   <span className="text-foreground text-xs">{habit.name}</span>
                 </div>
@@ -67,7 +67,7 @@ export default function ObjectiveSummaryList({ title, tasks, habits, setSelected
                 {pendingTasks.length > 0 ? (
                   <div className="flex flex-col gap-2">
                     {pendingTasks.map((task) => (
-                      <div key={task.id} className="rounded-lg border p-2">
+                      <div key={task.publicId} className="rounded-lg border p-2">
                         <Task task={task} setSelectedTask={setSelectedTask} hideHover />
                       </div>
                     ))}
@@ -86,7 +86,7 @@ export default function ObjectiveSummaryList({ title, tasks, habits, setSelected
                 {habits.length > 0 ? (
                   <div className="flex flex-col gap-2">
                     {habits.map((habit) => (
-                      <ObjectiveHabitCard key={habit.id} habit={habit} />
+                      <ObjectiveHabitCard key={habit.publicId} habit={habit} />
                     ))}
                   </div>
                 ) : (

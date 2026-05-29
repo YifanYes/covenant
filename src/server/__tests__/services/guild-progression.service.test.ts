@@ -275,11 +275,11 @@ describe('Guild progression (Phase 3)', () => {
 
     it('getMyProgression returns tier + nextThreshold + multiplier', async () => {
       memberRepo.findByUserId.mockResolvedValue({ guildId: 'g-1' })
-      guildRepo.findById.mockResolvedValue({ id: 'g-1', tier: 2, totalContribution: 2500 })
+      guildRepo.findById.mockResolvedValue({ id: 'g-1', slug: 'g-slug', tier: 2, totalContribution: 2500 })
       const x = await service.getMyProgression('u1')
       expect(x).toEqual(
         expect.objectContaining({
-          guildId: 'g-1',
+          guildSlug: 'g-slug',
           tier: 2,
           maxTier: 5,
           totalContribution: 2500,

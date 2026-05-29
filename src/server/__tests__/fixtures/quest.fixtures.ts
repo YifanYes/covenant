@@ -1,8 +1,9 @@
 import type { QuestStatus } from '@/shared/constants/quests.constants'
 
 export const mockCharacterQuest = (overrides: Record<string, unknown> = {}) => ({
-  id: 'quest-instance-1',
-  characterId: 'char-123',
+  id: BigInt(1),
+  publicId: 'questpub00001',
+  characterId: BigInt(123),
   questId: 'patrol_north_gate',
   status: 'ACTIVE' as QuestStatus,
   progress: 0,

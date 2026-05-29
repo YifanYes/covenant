@@ -1,6 +1,6 @@
 export interface CharacterClassType {
-  id: string
-  characterId: string
+  id: bigint
+  characterId: bigint
   className: string
   tier: number
   health: number
@@ -19,7 +19,8 @@ export interface CharacterClassType {
 }
 
 export interface CharacterType {
-  id: string
+  id: bigint
+  slug: string
   name: string
   title: string | null
   factionName: string

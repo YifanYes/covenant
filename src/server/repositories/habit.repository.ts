@@ -3,6 +3,7 @@ import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.sc
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
+import { generatePublicId } from '../lib/public-id'
 
 const log = logger.child({ component: 'habit-repository' })
 
@@ -25,20 +26,27 @@ export class HabitRepository {
   async create(userId: string, input: CreateHabitType): Promise<Habit> {
     return this.prisma.habit.create({
       data: {
+        publicId: generatePublicId(),
         name: input.name,
         ...(input.description && { description: input.description }),
         recurrence: input.recurrence,
         timespan: input.timespan,
         userId,
         objectives: {
-          connect: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
+          connect: input.objectives?.map((publicId) => ({ publicId })) || []
         },
         areas: {
-          connect: input.areas?.map((areaId) => ({ id: areaId })) || []
+          connect: input.areas?.map((publicId) => ({ publicId })) || []
         }
       },
       include: HABIT_INCLUDE
     })
+  }
+
+  async findByPublicId(publicId: string, userId: string): Promise<Habit | null> {
+    const habit = await this.prisma.habit.findUnique({ where: { publicId } })
+    if (!habit || habit.userId !== userId) return null
+    return habit
   }
 
   async findAll(userId: string): Promise<Habit[]> {
@@ -52,7 +60,7 @@ export class HabitRepository {
     })
   }
 
-  async findByIdOrThrow(id: string, userId: string): Promise<Habit> {
+  async findByIdOrThrow(id: bigint, userId: string): Promise<Habit> {
     const habit = await this.prisma.habit.findUnique({
       where: { id }
     })
@@ -68,7 +76,7 @@ export class HabitRepository {
     return habit
   }
 
-  async findByIdWithDetails(id: string): Promise<Habit | null> {
+  async findByIdWithDetails(id: bigint): Promise<Habit | null> {
     return this.prisma.habit.findUnique({
       where: {
         id,
@@ -85,33 +93,33 @@ export class HabitRepository {
     })
   }
 
-  async update(_id: string, input: UpdateHabitType): Promise<Habit> {
+  async update(id: bigint, input: UpdateHabitType): Promise<Habit> {
     return this.prisma.habit.update({
-      where: { id: input.id },
+      where: { id },
       data: {
         ...(input.name && { name: input.name }),
         ...(input.description && { description: input.description }),
         ...(input.recurrence && { recurrence: input.recurrence }),
         ...(input.timespan && { timespan: input.timespan }),
         objectives: {
-          set: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
+          set: input.objectives?.map((publicId) => ({ publicId })) || []
         },
         areas: {
-          set: input.areas?.map((areaId) => ({ id: areaId })) || []
+          set: input.areas?.map((publicId) => ({ publicId })) || []
         }
       },
       include: HABIT_INCLUDE
     })
   }
 
-  async softDelete(id: string): Promise<void> {
+  async softDelete(id: bigint): Promise<void> {
     await this.prisma.habit.update({
       where: { id },
       data: { deletedAt: new Date() }
     })
   }
 
-  async restore(id: string): Promise<Habit> {
+  async restore(id: bigint): Promise<Habit> {
     return this.prisma.habit.update({
       where: { id },
       data: { deletedAt: null },
@@ -136,13 +144,13 @@ export class HabitRepository {
     })
   }
 
-  async createCompletion(habitId: string, userId: string): Promise<HabitCompletion> {
+  async createCompletion(habitId: bigint, userId: string): Promise<HabitCompletion> {
     return this.prisma.habitCompletion.create({
-      data: { habitId, userId }
+      data: { habitId, userId, publicId: generatePublicId() }
     })
   }
 
-  async findCompletions(habitId: string, userId: string): Promise<HabitCompletion[]> {
+  async findCompletions(habitId: bigint, userId: string): Promise<HabitCompletion[]> {
     return this.prisma.habitCompletion.findMany({
       where: { habitId, userId }
     })
@@ -184,7 +192,7 @@ export class HabitRepository {
   ): Promise<
     Array<
       Habit & {
-        objectives: Array<{ areas: Array<{ id: string }> }>
+        objectives: Array<{ areas: Array<{ id: bigint }> }>
         completions: HabitCompletion[]
       }
     >
@@ -204,13 +212,19 @@ export class HabitRepository {
     })
   }
 
-  async findCompletionById(id: string): Promise<HabitCompletion | null> {
+  async findCompletionByPublicId(publicId: string, userId: string): Promise<HabitCompletion | null> {
+    const completion = await this.prisma.habitCompletion.findUnique({ where: { publicId } })
+    if (!completion || completion.userId !== userId) return null
+    return completion
+  }
+
+  async findCompletionById(id: bigint): Promise<HabitCompletion | null> {
     return this.prisma.habitCompletion.findUnique({
       where: { id }
     })
   }
 
-  async deleteCompletion(id: string): Promise<void> {
+  async deleteCompletion(id: bigint): Promise<void> {
     await this.prisma.habitCompletion.delete({
       where: { id }
     })

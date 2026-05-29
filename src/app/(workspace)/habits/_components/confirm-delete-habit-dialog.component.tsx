@@ -31,7 +31,7 @@ export default function ConfirmDeleteHabitDialog({
     })
   )
 
-  const handleDelete = () => deleteMutation.mutate({ id: habit.id })
+  const handleDelete = () => deleteMutation.mutate({ publicId: habit.publicId })
 
   return (
     <BaseConfirmDialog

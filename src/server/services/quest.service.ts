@@ -30,7 +30,7 @@ export class QuestService {
     private analytics: AnalyticsService = defaultAnalytics
   ) {}
 
-  private async assertCharacterOwnership(characterId: string, userId: string): Promise<void> {
+  private async assertCharacterOwnership(characterId: bigint, userId: string): Promise<void> {
     const isOwner = await this.characterService.verifyCharacterOwnership(characterId, userId)
     if (!isOwner) {
       log.warn({ userId, characterId }, 'assertCharacterOwnership: ownership check failed')
@@ -38,7 +38,7 @@ export class QuestService {
     }
   }
 
-  private async assertQuestOwnership(questId: string, userId: string): Promise<void> {
+  private async assertQuestOwnership(questId: bigint, userId: string): Promise<void> {
     const isOwner = await this.characterQuestRepository.verifyOwnership(questId, userId)
     if (!isOwner) {
       log.warn({ userId, questId }, 'assertQuestOwnership: ownership check failed')
@@ -118,12 +118,29 @@ export class QuestService {
     }
   }
 
-  async startQuest(questId: string, characterId: string, userId: string) {
+  private async resolveCharacter(characterSlug: string, userId: string): Promise<bigint> {
+    if (!this.characterRepository) {
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'characterRepository not wired' })
+    }
+    const character = await this.characterRepository.findBySlug(userId, characterSlug)
+    if (!character) throw resourceNotFound()
+    return character.id
+  }
+
+  private async resolveQuest(questPublicId: string, userId: string): Promise<bigint> {
+    const quest = await this.characterQuestRepository.findByPublicId(questPublicId)
+    if (!quest) throw resourceNotFound()
+    await this.assertQuestOwnership(quest.id, userId)
+    return quest.id
+  }
+
+  async startQuest(questTemplateId: string, characterSlug: string, userId: string) {
+    const characterId = await this.resolveCharacter(characterSlug, userId)
     await this.assertCharacterOwnership(characterId, userId)
 
-    const template = getQuestById(questId)
+    const template = getQuestById(questTemplateId)
     if (!template) {
-      log.warn({ userId, characterId, questId }, 'startQuest: quest template not found')
+      log.warn({ userId, characterSlug, questTemplateId }, 'startQuest: quest template not found')
       throw resourceNotFound()
     }
 
@@ -132,7 +149,7 @@ export class QuestService {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'Character already has an active quest' })
     }
 
-    const quest = await this.characterQuestRepository.create(characterId, questId, template.objective.target)
+    const quest = await this.characterQuestRepository.create(characterId, questTemplateId, template.objective.target)
 
     try {
       const character = await this.characterService.getCharacterById(characterId)
@@ -153,7 +170,7 @@ export class QuestService {
       const selected = selectEnemyWithFallback(template.enemySpawnWeights, characterTier, currentSlot?.type)
       if (!selected) {
         log.error(
-          { userId, characterId, questId, characterTier, slot: currentSlot?.type },
+          { userId, characterSlug, questTemplateId, characterTier, slot: currentSlot?.type },
           'startQuest: no suitable enemy found for spawn (catalog gap)'
         )
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'No suitable enemy found for spawn' })
@@ -204,7 +221,7 @@ export class QuestService {
           tier: refreshedClass?.tier ?? 1
         },
         enemy: {
-          unitId: activeEnemy.id,
+          unitId: activeEnemy.id.toString(),
           templateId: selected.enemyId,
           name: enemyName,
           health: { current: scaledTemplate.health, max: scaledTemplate.health },
@@ -223,7 +240,7 @@ export class QuestService {
       await this.characterQuestRepository.updateTacticalState(quest.id, tacticalState)
 
       this.analytics.track(userId, 'combat_started', {
-        quest_id: quest.id,
+        quest_id: quest.publicId,
         character_tier: characterTier,
         enemy_template_id: selected.enemyId,
         reserve_at_start: character.manaReserve ?? 0,
@@ -245,7 +262,7 @@ export class QuestService {
       return {
         quest,
         activeEnemy: {
-          id: activeEnemy.id,
+          publicId: activeEnemy.publicId,
           templateId: activeEnemy.templateId,
           namePrefix: activeEnemy.namePrefix,
           nameSuffix: activeEnemy.nameSuffix,
@@ -260,7 +277,8 @@ export class QuestService {
     }
   }
 
-  async getActiveQuest(characterId: string, userId: string) {
+  async getActiveQuest(characterSlug: string, userId: string) {
+    const characterId = await this.resolveCharacter(characterSlug, userId)
     await this.assertCharacterOwnership(characterId, userId)
 
     const quest = await this.characterQuestRepository.findActiveByCharacterId(characterId)
@@ -269,8 +287,7 @@ export class QuestService {
     const activeEnemy = await this.combatEnemyRepository.getActiveEnemy(quest.id)
 
     return {
-      id: quest.id,
-      characterId: quest.characterId,
+      publicId: quest.publicId,
       questId: quest.questId,
       status: quest.status,
       progress: quest.progress,
@@ -279,7 +296,7 @@ export class QuestService {
       tacticalState: quest.tacticalState,
       activeEnemy: activeEnemy
         ? {
-            id: activeEnemy.id,
+            publicId: activeEnemy.publicId,
             templateId: activeEnemy.templateId,
             namePrefix: activeEnemy.namePrefix,
             nameSuffix: activeEnemy.nameSuffix,
@@ -290,38 +307,39 @@ export class QuestService {
     }
   }
 
-  async getAvailableQuests(userId: string, characterId?: string) {
+  async getAvailableQuests(userId: string, characterSlug?: string) {
     let activeQuestTemplateId: string | null = null
-    let activeCharacterQuestId: string | null = null
-    if (characterId) {
+    let activeCharacterQuestPublicId: string | null = null
+    if (characterSlug) {
+      const characterId = await this.resolveCharacter(characterSlug, userId)
       await this.assertCharacterOwnership(characterId, userId)
       const active = await this.characterQuestRepository.findActiveByCharacterId(characterId)
       activeQuestTemplateId = active?.questId ?? null
-      activeCharacterQuestId = active?.id ?? null
+      activeCharacterQuestPublicId = active?.publicId ?? null
     }
 
     return Object.values(QUESTS).map((template) => ({
       ...template,
       isActive: template.id === activeQuestTemplateId,
-      activeCharacterQuestId: template.id === activeQuestTemplateId ? activeCharacterQuestId : null
+      activeCharacterQuestPublicId: template.id === activeQuestTemplateId ? activeCharacterQuestPublicId : null
     }))
   }
 
-  async abandonQuest(questId: string, userId: string) {
-    await this.assertQuestOwnership(questId, userId)
+  async abandonQuest(questPublicId: string, userId: string) {
+    const questId = await this.resolveQuest(questPublicId, userId)
     const snapshot = await this.characterQuestRepository.findByIdWithTacticalState(questId)
     const enemyId = snapshot?.tacticalState?.units?.find((u) => !u.id.startsWith('player-'))?.id ?? ''
     await this.characterQuestRepository.abandon(questId)
     this.analytics.track(userId, 'combat_finished', {
-      quest_id: questId,
+      quest_id: questPublicId,
       enemy_id: enemyId,
       outcome: 'abandoned',
       gold_earned: null
     })
   }
 
-  async getTacticalState(questId: string, userId: string): Promise<TacticalStateData | null> {
-    await this.assertQuestOwnership(questId, userId)
+  async getTacticalState(questPublicId: string, userId: string): Promise<TacticalStateData | null> {
+    const questId = await this.resolveQuest(questPublicId, userId)
 
     // Repository parses the JSON column through a tolerant schema, so legacy Phaser-grid
     // fields (tiles, gridWidth, turnNumber, position, hasMoved, stateVersion…) are

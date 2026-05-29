@@ -4,5 +4,5 @@ import { useGuild } from '../_guild-context'
 
 export default function GuildForumPage() {
   const { guild, myRole, myUserId } = useGuild()
-  return <GuildForum guildId={guild.id} myUserId={myUserId} myRole={myRole} />
+  return <GuildForum guildSlug={guild.slug} myUserId={myUserId} myRole={myRole} />
 }

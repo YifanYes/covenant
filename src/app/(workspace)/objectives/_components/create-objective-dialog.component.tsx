@@ -120,7 +120,7 @@ export default function CreateObjectiveDialog({ trigger }: CreateObjectiveDialog
         <MultiSelect
           name="areas"
           control={control}
-          items={areasData?.areas.map((a) => ({ id: a.id, label: t(a.name) })) || []}
+          items={areasData?.areas.map((a) => ({ id: a.publicId, label: t(a.name) })) || []}
           placeholder={t('create_objective_dialog.select_areas_placeholder')}
         />
       </div>

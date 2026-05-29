@@ -39,8 +39,8 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
   const { data: tasksData } = useSuspenseQuery(trpcOptions.tasks.getAll.queryOptions())
   const { data: habitsData } = useSuspenseQuery(trpcOptions.habits.getAll.queryOptions())
   const { data: statusesData } = useSuspenseQuery(trpcOptions.userTaskStatus.getAll.queryOptions())
-  const doneStatusId = statusesData.statuses.find((s) => s.label === 'DONE')?.id ?? null
-  const incompleteStatusIds = statusesData.statuses.filter((s) => s.label !== 'DONE').map((s) => s.id)
+  const doneStatusPublicId = statusesData.statuses.find((s) => s.label === 'DONE')?.publicId ?? null
+  const incompleteStatusPublicIds = statusesData.statuses.filter((s) => s.label !== 'DONE').map((s) => s.publicId)
 
   const updateMutation = useMutation(
     trpcOptions.objectives.update.mutationOptions({
@@ -64,13 +64,13 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
     resolver: standardSchemaResolver(updateObjectiveSchema),
     mode: 'onSubmit',
     defaultValues: {
-      id: objective.id,
+      publicId: objective.publicId,
       name: objective.name,
       description: objective.description || '',
       dueDate: objective.dueDate ? new Date(objective.dueDate) : undefined,
-      areas: objective.areas?.map((area) => area.id) || [],
-      tasks: objective.tasks?.map((task) => task.id) || [],
-      habits: objective.habits?.map((habit) => habit.id) || []
+      areas: objective.areas?.map((area) => area.publicId) || [],
+      tasks: objective.tasks?.map((task) => task.publicId) || [],
+      habits: objective.habits?.map((habit) => habit.publicId) || []
     }
   })
 
@@ -78,13 +78,13 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
   useEffect(() => {
     if (open) {
       reset({
-        id: objective.id,
+        publicId: objective.publicId,
         name: objective.name,
         description: objective.description || '',
         dueDate: objective.dueDate ? new Date(objective.dueDate) : undefined,
-        areas: objective.areas?.map((area) => area.id) || [],
-        tasks: objective.tasks?.map((task) => task.id) || [],
-        habits: objective.habits?.map((habit) => habit.id) || []
+        areas: objective.areas?.map((area) => area.publicId) || [],
+        tasks: objective.tasks?.map((task) => task.publicId) || [],
+        habits: objective.habits?.map((habit) => habit.publicId) || []
       })
     }
   }, [open, objective, reset])
@@ -103,35 +103,35 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
     : undefined
 
   const taskItems = useMemo(() => {
-    const grouped = (tasksData?.tasks ?? {}) as Record<string, { id: string; title: string }[]>
-    const incomplete = incompleteStatusIds.flatMap((id) => grouped[id] ?? [])
+    const grouped = (tasksData?.tasks ?? {}) as Record<string, { publicId: string; title: string }[]>
+    const incomplete = incompleteStatusPublicIds.flatMap((sid) => grouped[sid] ?? [])
     const linked = objective.tasks ?? []
     const linkedDone = linked.filter((task) => task.status?.label === 'DONE')
     const merged = [...incomplete, ...linkedDone]
     const seen = new Set<string>()
     return merged
       .filter((task) => {
-        if (seen.has(task.id)) return false
-        seen.add(task.id)
+        if (seen.has(task.publicId)) return false
+        seen.add(task.publicId)
         return true
       })
-      .map((task) => ({ id: task.id, label: task.title }))
-  }, [tasksData, objective.tasks, incompleteStatusIds])
+      .map((task) => ({ id: task.publicId, label: task.title }))
+  }, [tasksData, objective.tasks, incompleteStatusPublicIds])
 
   const habitItems = useMemo(() => {
-    return (habitsData?.habits ?? []).map((habit) => ({ id: habit.id, label: habit.name }))
+    return (habitsData?.habits ?? []).map((habit) => ({ id: habit.publicId, label: habit.name }))
   }, [habitsData])
 
   const { totalTasks, doneTasks, pendingTasks, totalHabits } = useMemo(() => {
     const tasks = objective.tasks ?? []
-    const done = tasks.filter((t) => t.status?.label === 'DONE' || t.statusId === doneStatusId).length
+    const done = tasks.filter((t) => t.status?.label === 'DONE' || t.statusPublicId === doneStatusPublicId).length
     return {
       totalTasks: tasks.length,
       doneTasks: done,
       pendingTasks: tasks.length - done,
       totalHabits: objective.habits?.length ?? 0
     }
-  }, [objective.tasks, objective.habits, doneStatusId])
+  }, [objective.tasks, objective.habits, doneStatusPublicId])
 
   const hasAnyLinks = totalTasks > 0 || totalHabits > 0
   const hasActiveLinks = pendingTasks > 0 || totalHabits > 0
@@ -165,7 +165,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
                   const currentIcon = allIcons.find((icon) => icon.name === area.icon)
                   if (!areaStyle || !currentIcon) return null
                   return (
-                    <div key={area.id} title={t(area.name)}>
+                    <div key={area.publicId} title={t(area.name)}>
                       <currentIcon.component className={`size-4 ${areaStyle.styles}`} />
                     </div>
                   )
@@ -266,7 +266,7 @@ export default function ObjectiveCard({ objective }: { objective: Objective }) {
           <MultiSelect
             name="areas"
             control={control}
-            items={areasData?.areas.map((a) => ({ id: a.id, label: t(a.name) })) || []}
+            items={areasData?.areas.map((a) => ({ id: a.publicId, label: t(a.name) })) || []}
             placeholder={t('create_objective_dialog.select_areas_placeholder')}
           />
           <MultiSelect

@@ -1,3 +1,4 @@
+import { publicIdSchema } from '@shared/schemas/ids.schemas'
 import { z } from 'zod'
 import { protectedProcedure, t } from '../trpc'
 
@@ -7,7 +8,7 @@ export const killRecordRouter = t.router({
       z
         .object({
           limit: z.number().min(1).max(100).optional(),
-          cursor: z.string().uuid().optional()
+          cursor: publicIdSchema.optional()
         })
         .optional()
     )

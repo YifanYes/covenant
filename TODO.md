@@ -2,8 +2,6 @@
 
 ## Beta Blockers (closed friends beta, week of 2026-06-01)
 
-- [ ] PostHog integration — `docs/specs/posthog_integration.md`. Ship before beta starts; events can't be backfilled. Bundle Tasks-tab tracking (see Medium) into the same PR.
-
 - [ ] Audit Objectives → mana → dashboard wiring `[audit]`. Confirm completing an Objective fires the `objective_completed` PostHog event with non-zero `mana_earned` and that the user's mana reserve and dashboard reflect it. Objective is the Goal-tracking pillar named in `MISSION.md`; if it doesn't drive the core loop, the central analytics question in `docs/specs/posthog_integration.md` can't be answered. No code change if everything works.
 
 ## Quick Wins

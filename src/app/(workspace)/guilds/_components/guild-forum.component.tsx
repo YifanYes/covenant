@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 interface GuildForumProps {
-  guildId: string
+  guildSlug: string
   myUserId: string
   myRole: GuildRoleType
 }
@@ -20,12 +20,12 @@ interface GuildForumProps {
 const POLL_INTERVAL_MS = 7_000
 const PAGE_SIZE = 50
 
-export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProps) {
+export default function GuildForum({ guildSlug, myUserId, myRole }: GuildForumProps) {
   const { t } = useTranslation()
   const canModerate = myRole === GuildRole.GUILD_MASTER || myRole === GuildRole.CAPTAIN
 
   const messagesQuery = useQuery({
-    ...trpcOptions.guilds.getMessages.queryOptions({ guildId, limit: PAGE_SIZE }),
+    ...trpcOptions.guilds.getMessages.queryOptions({ guildSlug, limit: PAGE_SIZE }),
     refetchInterval: POLL_INTERVAL_MS,
     refetchIntervalInBackground: false
   })
@@ -33,7 +33,7 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
   const sendMutation = useMutation(
     trpcOptions.guilds.sendMessage.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.getMessages.queryKey({ guildId }) })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.getMessages.queryKey({ guildSlug }) })
       },
       onError: (error) => toast.error(t('guilds.forum.error.send'), { description: error.message })
     })
@@ -42,7 +42,7 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
   const deleteMutation = useMutation(
     trpcOptions.guilds.deleteMessage.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.getMessages.queryKey({ guildId }) })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.getMessages.queryKey({ guildSlug }) })
         toast.success(t('guilds.forum.success.delete'))
       },
       onError: (error) => toast.error(t('guilds.forum.error.delete'), { description: error.message })
@@ -52,17 +52,17 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
   const reportMutation = useMutation(
     trpcOptions.guilds.reportMessage.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.getMessages.queryKey({ guildId }) })
+        await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.getMessages.queryKey({ guildSlug }) })
         toast.success(t('guilds.forum.success.report'))
       },
       onError: (error) => toast.error(t('guilds.forum.error.report'), { description: error.message })
     })
   )
 
-  const fetchOlder = async (cursor: { createdAt: string; id: string }) => {
+  const fetchOlder = async (cursor: { createdAt: string; publicId: string }) => {
     try {
       return await queryClient.fetchQuery(
-        trpcOptions.guilds.getMessages.queryOptions({ guildId, cursor, limit: PAGE_SIZE })
+        trpcOptions.guilds.getMessages.queryOptions({ guildSlug, cursor, limit: PAGE_SIZE })
       )
     } catch (error) {
       toast.error(t('guilds.forum.error.load_older'), {
@@ -81,12 +81,12 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
         isFetching: messagesQuery.isFetching,
         dataUpdatedAt: messagesQuery.dataUpdatedAt || undefined,
         onRefresh: () =>
-          queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.getMessages.queryKey({ guildId }) })
+          queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.getMessages.queryKey({ guildSlug }) })
       }}
       pagination={{ fetchOlder, pageSize: PAGE_SIZE }}
       deleteAction={{
         canDelete: (msg) => canModerate || msg.userId === myUserId,
-        onDelete: (msg) => deleteMutation.mutate({ messageId: msg.id }),
+        onDelete: (msg) => deleteMutation.mutate({ messagePublicId: msg.publicId }),
         isPending: deleteMutation.isPending,
         confirm: {
           titleKey: 'guilds.forum.delete_confirm.title',
@@ -96,7 +96,7 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
       }}
       reportAction={{
         canReport: (msg) => msg.userId !== myUserId,
-        onReport: (msg) => reportMutation.mutate({ messageId: msg.id }),
+        onReport: (msg) => reportMutation.mutate({ messagePublicId: msg.publicId }),
         isPending: reportMutation.isPending,
         confirm: {
           titleKey: 'guilds.forum.report_confirm.title',
@@ -114,7 +114,7 @@ export default function GuildForum({ guildId, myUserId, myRole }: GuildForumProp
         maxLength: GUILD_MESSAGE_MAX_LENGTH,
         warnRemaining: 200,
         dangerRemaining: 100,
-        onSubmit: (content) => sendMutation.mutateAsync({ guildId, content }),
+        onSubmit: (content) => sendMutation.mutateAsync({ guildSlug, content }),
         isPending: sendMutation.isPending,
         formatCount: (count, max) => t('guilds.forum.character_count', { count, max })
       }}

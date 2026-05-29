@@ -19,7 +19,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function QuestDetailPage() {
-  const { questId } = useParams<{ questId: string }>()
+  const { questId: questPublicId } = useParams<{ questId: string }>()
   const { t } = useTranslation()
   const { state: sidebarState } = useSidebar()
   const isMobile = useIsMobile()
@@ -28,7 +28,7 @@ export default function QuestDetailPage() {
   const character = characterData as unknown as InventoryCharacter
 
   const { data: activeQuest } = useSuspenseQuery(
-    trpcOptions.quest.getActive.queryOptions({ characterId: character.id })
+    trpcOptions.quest.getActive.queryOptions({ characterSlug: character.slug })
   )
 
   const questTemplate = getQuestById(activeQuest?.questId ?? '')
@@ -43,7 +43,7 @@ export default function QuestDetailPage() {
     const template = getEnemy(activeEnemy.templateId)
     const enemyMana = template?.mana ?? 0
     return {
-      id: activeEnemy.id,
+      id: activeEnemy.publicId,
       templateId: activeEnemy.templateId,
       currentHealth: activeEnemy.currentHealth,
       maxHealth: activeEnemy.maxHealth,
@@ -54,7 +54,7 @@ export default function QuestDetailPage() {
     }
   }, [activeEnemy])
 
-  if (!activeQuest || activeQuest.id !== questId) {
+  if (!activeQuest || activeQuest.publicId !== questPublicId) {
     return (
       <div className="flex h-full items-center justify-center">
         <p className="text-muted-foreground">{t('quests.not_found')}</p>
@@ -103,7 +103,7 @@ export default function QuestDetailPage() {
           character={character}
           enemies={[currentEnemy]}
           combatLog={combatLog}
-          questId={questId}
+          questId={questPublicId}
           sceneId={questTemplate?.id}
           className="min-h-0 flex-1"
         />

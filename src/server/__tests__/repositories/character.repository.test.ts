@@ -20,7 +20,7 @@ describe('CharacterRepository - Authorization', () => {
 
   describe('verifyOwnership', () => {
     it('should return true when user owns the character', async () => {
-      const characterId = 'char-1'
+      const characterId = BigInt(1)
       const userId = 'user-1'
 
       characterModel.findUnique.mockResolvedValue({ userId } as never)
@@ -35,7 +35,7 @@ describe('CharacterRepository - Authorization', () => {
     })
 
     it('should return false when user does not own the character', async () => {
-      const characterId = 'char-1'
+      const characterId = BigInt(1)
       const userId = 'user-1'
       const otherUserId = 'user-2'
 
@@ -47,7 +47,7 @@ describe('CharacterRepository - Authorization', () => {
     })
 
     it('should return false when character does not exist', async () => {
-      const characterId = 'non-existent'
+      const characterId = BigInt(999)
       const userId = 'user-1'
 
       characterModel.findUnique.mockResolvedValue(null as never)
@@ -60,7 +60,7 @@ describe('CharacterRepository - Authorization', () => {
 
   describe('findByIdWithClassesOrThrow', () => {
     it('should return character when found and no userId check required', async () => {
-      const characterId = 'char-1'
+      const characterId = BigInt(1)
       const character = {
         id: characterId,
         userId: 'user-1',
@@ -76,7 +76,7 @@ describe('CharacterRepository - Authorization', () => {
     })
 
     it('should return character when user owns it', async () => {
-      const characterId = 'char-1'
+      const characterId = BigInt(1)
       const userId = 'user-1'
       const character = {
         id: characterId,
@@ -93,7 +93,7 @@ describe('CharacterRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when character does not exist', async () => {
-      const characterId = 'non-existent'
+      const characterId = BigInt(999)
 
       characterModel.findUnique.mockResolvedValue(null as never)
 
@@ -104,7 +104,7 @@ describe('CharacterRepository - Authorization', () => {
     })
 
     it('should throw NOT_FOUND when user does not own the character', async () => {
-      const characterId = 'char-1'
+      const characterId = BigInt(1)
       const userId = 'user-1'
       const otherUserId = 'user-2'
       const character = {

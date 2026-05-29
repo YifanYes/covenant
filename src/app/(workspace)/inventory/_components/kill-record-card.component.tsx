@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
 interface DefeatedEnemy {
-  id: string
+  publicId: string
   templateId: string
   namePrefix: string
   nameSuffix: string
@@ -17,7 +17,7 @@ interface DefeatedEnemy {
   damageDealt: number
   damageTaken: number
   criticalHits: number
-  defeatedAt: string | null
+  defeatedAt: Date | string | null
   combatLog: unknown
 }
 

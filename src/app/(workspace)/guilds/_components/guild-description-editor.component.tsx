@@ -12,12 +12,12 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 interface GuildDescriptionEditorProps {
-  guildId: string
+  guildSlug: string
   initialHtml: string
   onClose?: () => void
 }
 
-export default function GuildDescriptionEditor({ guildId, initialHtml, onClose }: GuildDescriptionEditorProps) {
+export default function GuildDescriptionEditor({ guildSlug, initialHtml, onClose }: GuildDescriptionEditorProps) {
   const { t } = useTranslation()
   const [content, setContent] = useState(initialHtml)
 
@@ -36,7 +36,7 @@ export default function GuildDescriptionEditor({ guildId, initialHtml, onClose }
   const overLimit = plainLength > GUILD_DESCRIPTION_MAX_LENGTH
 
   const handleSave = () => {
-    updateMutation.mutate({ guildId, description: content })
+    updateMutation.mutate({ guildSlug, description: content })
   }
 
   return (

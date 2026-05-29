@@ -47,7 +47,7 @@ function IncompleteHabitRow({ habit }: { habit: IncompleteHabit }) {
       <Button
         size="icon"
         variant="outline"
-        onClick={() => complete.mutate({ id: habit.id })}
+        onClick={() => complete.mutate({ publicId: habit.publicId })}
         disabled={complete.isPending}
         className="h-7 w-7 shrink-0"
         title={t('dashboard.habits.quick_complete')}
@@ -96,7 +96,7 @@ export default function HabitsBlockComponent({ metrics }: HabitsBlockComponentPr
           ) : (
             <div className="scrollbar-thin scrollbar-thumb-muted max-h-44 space-y-2 overflow-y-auto pr-2">
               {incomplete.map((habit) => (
-                <IncompleteHabitRow key={habit.id} habit={habit} />
+                <IncompleteHabitRow key={habit.publicId} habit={habit} />
               ))}
             </div>
           )}

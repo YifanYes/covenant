@@ -3,12 +3,14 @@ import type { CreateJournalEntryType, UpdateJournalEntryType } from '@shared/sch
 import { TRPCError } from '@trpc/server'
 import { Prisma, type PrismaClient } from '@/generated/prisma'
 import { analytics as defaultAnalytics, type AnalyticsService } from '../lib/analytics'
-import { resourceNotFound } from '../lib/errors'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN, resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { JournalRepository } from '../repositories/journal.repository'
 import type { ManaService } from './mana.service'
 
 const log = logger.child({ service: 'journal' })
+
+const notFound = () => new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
 
 export class JournalService {
   constructor(
@@ -17,6 +19,12 @@ export class JournalService {
     private manaService: ManaService,
     private analytics: AnalyticsService = defaultAnalytics
   ) {}
+
+  private async resolve(publicId: string, userId: string): Promise<bigint> {
+    const entry = await this.journalRepository.findByPublicId(publicId, userId)
+    if (!entry) throw notFound()
+    return entry.id
+  }
 
   async create(userId: string, input: CreateJournalEntryType) {
     let manaEarned = 0
@@ -46,7 +54,7 @@ export class JournalService {
         reserveGained = result.reserveGained
       }
       this.analytics.track(userId, 'journal_entry_created', {
-        entry_id: entry.id,
+        entry_id: entry.publicId,
         mana_earned: manaEarned,
         reserve_gained: reserveGained
       })
@@ -59,20 +67,21 @@ export class JournalService {
   }
 
   async update(userId: string, input: UpdateJournalEntryType) {
+    const id = await this.resolve(input.publicId, userId)
     const sanitizedContent = input.content !== undefined ? sanitizeRichText(input.content) : undefined
-    const entry = await this.journalRepository.update(input.id, userId, sanitizedContent, input.mood, input.color)
+    const entry = await this.journalRepository.update(id, userId, sanitizedContent, input.mood, input.color)
     return entry
   }
 
-  async delete(userId: string, id: string) {
-    await this.journalRepository.findByIdOrThrow(id, userId)
+  async delete(userId: string, publicId: string) {
+    const id = await this.resolve(publicId, userId)
     await this.journalRepository.softDelete(id, userId)
   }
 
-  async getById(userId: string, id: string) {
-    const entry = await this.journalRepository.findById(id, userId)
+  async getById(userId: string, publicId: string) {
+    const entry = await this.journalRepository.findByPublicId(publicId, userId)
     if (!entry) {
-      log.warn({ entryId: id, userId }, 'getById: journal entry not found or not owned by user')
+      log.warn({ entryPublicId: publicId, userId }, 'getById: journal entry not found or not owned by user')
       throw resourceNotFound()
     }
     return entry

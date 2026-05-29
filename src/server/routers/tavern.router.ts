@@ -22,13 +22,13 @@ export const tavernRouter = t.router({
     .use(rateLimit(RATE_LIMITS.write))
     .input(deleteTavernMessageSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.services.tavern.deleteMessage(input.id, ctx.user.id)
+      return ctx.services.tavern.deleteMessage(input.publicId, ctx.user.id)
     }),
 
   reportMessage: protectedProcedure
     .use(rateLimit(RATE_LIMITS.write))
     .input(tavernMessageIdSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.services.tavern.reportMessage(input.messageId, ctx.user.id)
+      return ctx.services.tavern.reportMessage(input.publicId, ctx.user.id)
     })
 })

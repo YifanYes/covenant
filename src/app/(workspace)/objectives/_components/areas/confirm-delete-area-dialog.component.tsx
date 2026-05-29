@@ -30,7 +30,7 @@ export default function ConfirmDeleteAreaDialog({ area, onDeleteSuccess }: Props
     })
   )
 
-  const handleDelete = () => deleteMutation.mutate({ id: area.id })
+  const handleDelete = () => deleteMutation.mutate({ publicId: area.publicId })
 
   return (
     <BaseConfirmDialog

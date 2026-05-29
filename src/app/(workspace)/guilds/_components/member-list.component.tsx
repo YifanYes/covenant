@@ -15,16 +15,16 @@ import UserAvatar from '@/common/user-avatar.component'
 import MemberTitleSelect from './member-title-select.component'
 
 interface MemberListProps {
-  guildId: string
+  guildSlug: string
   members: Array<{
-    id: string
+    publicId: string
     userId: string
     role: string
     joinedAt: Date | string
     user: {
       id: string
       image: string | null
-      character: { id: string; name: string; title: string | null } | null
+      character: { slug: string; name: string; title: string | null } | null
     }
   }>
   availableTitles: string[]
@@ -68,7 +68,7 @@ function RoleBadge({ role, label }: { role: string; label: string }) {
   )
 }
 
-export default function MemberList({ guildId, members, availableTitles, myUserId, myRole }: MemberListProps) {
+export default function MemberList({ guildSlug, members, availableTitles, myUserId, myRole }: MemberListProps) {
   const { t } = useTranslation()
 
   const sorted = [...members].sort((a, b) => {
@@ -131,7 +131,7 @@ export default function MemberList({ guildId, members, availableTitles, myUserId
 
         return (
           <li
-            key={member.id}
+            key={member.publicId}
             className={cn('group/row flex items-center gap-3 p-3 transition-colors hover:bg-muted/30', isMe && 'bg-accent/5')}
           >
             <UserAvatar name={name} seed={member.userId} />
@@ -152,8 +152,8 @@ export default function MemberList({ guildId, members, availableTitles, myUserId
             <div className="flex items-center gap-2 shrink-0">
               {showTitleSelect && (
                 <MemberTitleSelect
-                  guildId={guildId}
-                  memberId={member.id}
+                  guildSlug={guildSlug}
+                  memberPublicId={member.publicId}
                   currentTitle={characterTitle}
                   availableTitles={availableTitles}
                 />
@@ -167,7 +167,7 @@ export default function MemberList({ guildId, members, availableTitles, myUserId
                       size="icon"
                       onClick={() =>
                         roleMutation.mutate({
-                          guildId,
+                          guildSlug,
                           targetUserId: member.userId,
                           role: promote ? GuildRole.CAPTAIN : GuildRole.MEMBER
                         })
@@ -189,7 +189,7 @@ export default function MemberList({ guildId, members, availableTitles, myUserId
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => kickMutation.mutate({ guildId, targetUserId: member.userId })}
+                      onClick={() => kickMutation.mutate({ guildSlug, targetUserId: member.userId })}
                       disabled={kickMutation.isPending}
                       className="opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100 text-destructive hover:text-destructive"
                     >

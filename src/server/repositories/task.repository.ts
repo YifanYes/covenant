@@ -1,8 +1,9 @@
 import { Prisma, type PrismaClient, type Task } from '@/generated/prisma'
-import type { BulkUpdateTaskItem, CreateTaskType, UpdateTaskType } from '@shared/schemas/tasks.schemas'
+import type { CreateTaskType, UpdateTaskType } from '@shared/schemas/tasks.schemas'
 import { TRPCError } from '@trpc/server'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../lib/errors'
 import { logger } from '../lib/logger'
+import { generatePublicId } from '../lib/public-id'
 
 const log = logger.child({ component: 'task-repository' })
 
@@ -12,16 +13,19 @@ const TASK_INCLUDE = {
     include: { areas: true }
   },
   areas: true
-}
+} satisfies Prisma.TaskInclude
+
+export type TaskWithRelations = Prisma.TaskGetPayload<{ include: typeof TASK_INCLUDE }>
 
 export class TaskRepository {
   constructor(private prisma: PrismaClient) {}
 
-  async create(userId: string, input: CreateTaskType): Promise<Task> {
+  async create(userId: string, input: CreateTaskType, statusId: bigint): Promise<Task> {
     return this.prisma.task.create({
       data: {
+        publicId: generatePublicId(),
         title: input.title,
-        statusId: input.statusId,
+        statusId,
         order: input.order || 0,
         ...(input.description && { description: input.description }),
         ...(input.dueDate && { dueDate: input.dueDate }),
@@ -30,17 +34,17 @@ export class TaskRepository {
         ...(input.impact && { impact: input.impact }),
         userId,
         objectives: {
-          connect: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
+          connect: input.objectives?.map((publicId) => ({ publicId })) || []
         },
         areas: {
-          connect: input.areas?.map((areaId) => ({ id: areaId })) || []
+          connect: input.areas?.map((publicId) => ({ publicId })) || []
         }
       },
       include: TASK_INCLUDE
     })
   }
 
-  async findAll(userId: string): Promise<Task[]> {
+  async findAll(userId: string): Promise<TaskWithRelations[]> {
     return this.prisma.task.findMany({
       where: { userId },
       include: TASK_INCLUDE,
@@ -52,12 +56,12 @@ export class TaskRepository {
     userId: string,
     filters: {
       search?: string
-      statusIds?: string[]
+      statusIds?: bigint[]
       effortImpact?: string[]
       dueDate?: Date
     },
     pagination: { page: number; pageSize: number }
-  ): Promise<{ tasks: Task[]; totalCount: number }> {
+  ): Promise<{ tasks: TaskWithRelations[]; totalCount: number }> {
     const where: Prisma.TaskWhereInput = { userId }
 
     if (filters.search) {
@@ -97,7 +101,7 @@ export class TaskRepository {
     return { tasks, totalCount }
   }
 
-  async findByDate(userId: string, startDate: Date, endDate: Date): Promise<Task[]> {
+  async findByDate(userId: string, startDate: Date, endDate: Date): Promise<TaskWithRelations[]> {
     return this.prisma.task.findMany({
       where: {
         userId,
@@ -111,10 +115,16 @@ export class TaskRepository {
     })
   }
 
+  async findByPublicId(publicId: string, userId: string): Promise<Task | null> {
+    const task = await this.prisma.task.findUnique({ where: { publicId } })
+    if (!task || task.userId !== userId) return null
+    return task
+  }
+
   async findByIdOrThrow(
-    id: string,
+    id: bigint,
     userId: string
-  ): Promise<Task & { objectives: { id: string }[]; areas: { id: string }[] }> {
+  ): Promise<Task & { objectives: { id: bigint; publicId: string }[]; areas: { id: bigint; publicId: string }[] }> {
     const task = await this.prisma.task.findUnique({
       where: { id },
       include: TASK_INCLUDE
@@ -131,12 +141,12 @@ export class TaskRepository {
     return task
   }
 
-  async update(_id: string, input: UpdateTaskType, isCompleting: boolean): Promise<Task> {
+  async update(id: bigint, input: UpdateTaskType, statusId: bigint | undefined, isCompleting: boolean): Promise<Task> {
     return this.prisma.task.update({
-      where: { id: input.id },
+      where: { id },
       data: {
         ...(input.title && { title: input.title }),
-        ...(input.statusId !== undefined && { statusId: input.statusId }),
+        ...(statusId !== undefined && { statusId }),
         ...(input.description !== undefined && { description: input.description }),
         ...(input.dueDate !== undefined && { dueDate: input.dueDate }),
         ...(input.order !== undefined && { order: input.order }),
@@ -145,53 +155,53 @@ export class TaskRepository {
         ...(input.impact !== undefined && { impact: input.impact }),
         ...(isCompleting && { completedAt: new Date() }),
         objectives: {
-          set: input.objectives?.map((objectiveId) => ({ id: objectiveId })) || []
+          set: input.objectives?.map((publicId) => ({ publicId })) || []
         },
         areas: {
-          set: input.areas?.map((areaId) => ({ id: areaId })) || []
+          set: input.areas?.map((publicId) => ({ publicId })) || []
         }
       },
       include: TASK_INCLUDE
     })
   }
 
-  async updateStatusAndOrder(id: string, statusId: string, order: number): Promise<Task> {
+  async updateStatusAndOrder(id: bigint, statusId: bigint, order: number): Promise<Task> {
     return this.prisma.task.update({
       where: { id },
       data: { statusId, order }
     })
   }
 
-  async findManyByIds(
-    ids: string[],
+  async findManyByPublicIds(
+    publicIds: string[],
     userId: string
-  ): Promise<Array<Pick<Task, 'id' | 'statusId' | 'impact'>>> {
-    if (ids.length === 0) return []
+  ): Promise<Array<Pick<Task, 'id' | 'publicId' | 'statusId' | 'impact'>>> {
+    if (publicIds.length === 0) return []
     return this.prisma.task.findMany({
-      where: { id: { in: ids }, userId },
-      select: { id: true, statusId: true, impact: true }
+      where: { publicId: { in: publicIds }, userId },
+      select: { id: true, publicId: true, statusId: true, impact: true }
     })
   }
 
   async bulkUpdate(
     userId: string,
-    tasks: BulkUpdateTaskItem[],
-    completingIds: string[] = [],
+    items: Array<{ id: bigint; statusId: bigint; order: number }>,
+    completingIds: bigint[] = [],
     completedAt: Date = new Date()
   ): Promise<void> {
-    if (tasks.length === 0) return
+    if (items.length === 0) return
 
     await this.prisma.$transaction(async (tx) => {
       let updated = 0
-      for (const t of tasks) {
+      for (const item of items) {
         const result = await tx.task.updateMany({
-          where: { id: t.id, userId },
-          data: { statusId: t.statusId, order: t.order }
+          where: { id: item.id, userId },
+          data: { statusId: item.statusId, order: item.order }
         })
         updated += result.count
       }
 
-      if (updated !== tasks.length) {
+      if (updated !== items.length) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Some tasks not found or access denied' })
       }
 
@@ -204,7 +214,7 @@ export class TaskRepository {
     })
   }
 
-  async delete(id: string): Promise<Task> {
+  async delete(id: bigint): Promise<Task> {
     return this.prisma.task.delete({
       where: { id }
     })
@@ -218,7 +228,7 @@ export class TaskRepository {
 
   async countByStatusIds(
     userId: string,
-    statusIds: string | string[],
+    statusIds: bigint | bigint[],
     dueDate?: Date,
     dueDateComparison: 'lt' | 'gte' = 'lt',
     includeNoDueDate = false
@@ -290,5 +300,5 @@ export class TaskRepository {
 
 export type DoneTaskWithObjectives = Omit<Task, 'completedAt'> & {
   completedAt: Date
-  objectives: Array<{ id: string; name: string; areas: Array<{ id: string; name: string }> }>
+  objectives: Array<{ id: bigint; name: string; areas: Array<{ id: bigint; name: string }> }>
 }

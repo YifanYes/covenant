@@ -32,7 +32,13 @@ export default function TaskList({
 
   const commit = (next: Record<string, TaskType[]>) => {
     setTasks(next)
-    mutation.debouncedMutate({ tasks: flatten(getValues(next)) })
+    mutation.debouncedMutate({
+      tasks: flatten(getValues(next)).map((t) => ({
+        publicId: t.publicId,
+        statusPublicId: t.statusPublicId ?? '',
+        order: t.order
+      }))
+    })
   }
 
   const [parent, values, setValues] = useDragAndDrop<HTMLUListElement, TaskType>(tasks?.[id] ?? [], {
@@ -51,8 +57,8 @@ export default function TaskList({
 
       const sourceVals = sourceParent.data.getValues(sourceParent.el) as TaskType[]
       const targetVals = targetParent.data.getValues(targetParent.el) as TaskType[]
-      const draggedIds = new Set(draggedNodes.map((n) => (n.data.value as TaskType).id))
-      const targetWithStatus = targetVals.map((t) => (draggedIds.has(t.id) ? { ...t, statusId: targetId } : t))
+      const draggedIds = new Set(draggedNodes.map((n) => (n.data.value as TaskType).publicId))
+      const targetWithStatus = targetVals.map((t) => (draggedIds.has(t.publicId) ? { ...t, statusPublicId: targetId } : t))
       const allTasks = useTasksStore.getState().tasks
       commit({
         ...allTasks,
@@ -105,7 +111,7 @@ export default function TaskList({
           data-list-id={id}
         >
           {map(values, (task: TaskType) => (
-            <Task key={task.id} task={task} setSelectedTask={setSelectedTask} variant={isKanban ? 'card' : 'row'} />
+            <Task key={task.publicId} task={task} setSelectedTask={setSelectedTask} variant={isKanban ? 'card' : 'row'} />
           ))}
         </ul>
       </div>

@@ -16,7 +16,7 @@ export default function GuildsLandingPage() {
 
   useEffect(() => {
     if (myGuildQuery.data?.guild) {
-      router.replace(`/guilds/${myGuildQuery.data.guild.id}`)
+      router.replace(`/guilds/${myGuildQuery.data.guild.slug}`)
     }
   }, [myGuildQuery.data, router])
 

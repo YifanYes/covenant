@@ -25,7 +25,7 @@ export default function ObjectivesSelector<TFieldValues extends FieldValues = Fi
     <MultiSelect
       name={name ?? ('objectives' as FieldPath<TFieldValues>)}
       control={control}
-      items={objectives.map(({ id, name: label }) => ({ id, label })) || []}
+      items={objectives.map(({ publicId, name: label }) => ({ id: publicId, label })) || []}
       placeholder={placeholder || t('objectives.selector.placeholder')}
       label={label}
     />

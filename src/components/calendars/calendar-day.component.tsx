@@ -48,7 +48,7 @@ export default function CalendarDay({ day, weekIndex, tasks, mood, isSelected, o
           })
           return (
             <button
-              key={task.id}
+              key={task.publicId}
               onClick={(e) => {
                 e.stopPropagation()
                 setSelectedTask(task)

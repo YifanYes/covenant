@@ -3,7 +3,7 @@ import { PROTECTED_LABELS } from '@shared/schemas/user-task-statuses.schemas'
 import { z } from 'zod'
 
 export const taskStatusDraftSchema = z.object({
-  id: z.string(),
+  publicId: z.string(),
   label: z.string().min(1, 'errors.required_field').max(50),
   color: z.string().nullable(),
   isDefault: z.boolean(),

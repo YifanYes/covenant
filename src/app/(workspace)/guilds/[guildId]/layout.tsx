@@ -25,8 +25,8 @@ import { GuildProvider } from './_guild-context'
 const TAB_SEGMENTS = ['forum', 'campaigns', 'members', 'settings'] as const
 type TabSegment = (typeof TAB_SEGMENTS)[number]
 
-function getActiveSegment(pathname: string, guildId: string): TabSegment | null {
-  const base = `/guilds/${guildId}/`
+function getActiveSegment(pathname: string, guildSlug: string): TabSegment | null {
+  const base = `/guilds/${guildSlug}/`
   if (!pathname.startsWith(base)) return null
   const seg = pathname.slice(base.length).split('/')[0]
   return (TAB_SEGMENTS as readonly string[]).includes(seg) ? (seg as TabSegment) : null
@@ -98,7 +98,7 @@ export default function GuildLayout({ children }: { children: ReactNode }) {
   }
 
   const data = guildQuery.data
-  if (!data || data.guild.id !== params.guildId) {
+  if (!data || data.guild.slug !== params.guildId) {
     return (
       <div className="p-6">
         <p className="text-muted-foreground">{t('guilds.errors.not_member')}</p>
@@ -118,11 +118,11 @@ export default function GuildLayout({ children }: { children: ReactNode }) {
         ? t('guilds.role.captain')
         : t('guilds.role.member')
 
-  const activeSegment = getActiveSegment(pathname, guild.id)
-  const tabHref = (segment: TabSegment) => `/guilds/${guild.id}/${segment}`
+  const activeSegment = getActiveSegment(pathname, guild.slug)
+  const tabHref = (segment: TabSegment) => `/guilds/${guild.slug}/${segment}`
 
   if (activeSegment === 'settings' && !canManage) {
-    redirect(`/guilds/${guild.id}/forum`)
+    redirect(`/guilds/${guild.slug}/forum`)
   }
 
   const tier = progressionQuery.data?.tier ?? guild.tier ?? 1
@@ -286,7 +286,7 @@ export default function GuildLayout({ children }: { children: ReactNode }) {
           onOpenChange={setDissolveOpen}
           titleKey="guilds.dissolve_confirm.title"
           descriptionKey="guilds.dissolve_confirm.description"
-          onConfirm={() => dissolveMutation.mutate({ guildId: guild.id })}
+          onConfirm={() => dissolveMutation.mutate({ guildSlug: guild.slug })}
           isLoading={dissolveMutation.isPending}
           contentClassName={rpgDialogContent}
         />

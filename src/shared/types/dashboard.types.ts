@@ -38,7 +38,7 @@ export interface DashboardData {
 }
 
 export interface IncompleteHabit {
-  id: string
+  publicId: string
   name: string
   recurrence: number
   completedToday: number

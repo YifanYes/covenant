@@ -6,6 +6,8 @@ import type { TavernMessageRepository } from '../../repositories/tavern-message.
 import { TavernService } from '../../services/tavern.service'
 import { createPrismaMock, createRepoMock } from '../helpers/mock-repo'
 
+const MSG_PUB = 'tavmsg000001'
+
 describe('TavernService', () => {
   let service: TavernService
   let prisma: ReturnType<typeof createPrismaMock>
@@ -27,7 +29,7 @@ describe('TavernService', () => {
 
     messageRepo = createRepoMock<TavernMessageRepository>()
     messageRepo.findRecent.mockResolvedValue([])
-    messageRepo.softDeleteByAuthor.mockResolvedValue(1)
+    messageRepo.softDeleteByPublicIdAndAuthor.mockResolvedValue(1)
 
     characterRepo = createRepoMock<CharacterRepository>()
     characterRepo.findByUserId.mockResolvedValue({ id: 'char-1', userId: 'u1' } as never)
@@ -38,17 +40,17 @@ describe('TavernService', () => {
   describe('getMessages', () => {
     it('returns messages in chronological order (oldest first)', async () => {
       const desc = [
-        { id: 'm3', createdAt: new Date('2026-01-03'), userId: 'u1' },
-        { id: 'm2', createdAt: new Date('2026-01-02'), userId: 'u2' },
-        { id: 'm1', createdAt: new Date('2026-01-01'), userId: 'u3' }
+        { id: BigInt(3), publicId: 'pubmsg000003', createdAt: new Date('2026-01-03'), userId: 'u1' },
+        { id: BigInt(2), publicId: 'pubmsg000002', createdAt: new Date('2026-01-02'), userId: 'u2' },
+        { id: BigInt(1), publicId: 'pubmsg000001', createdAt: new Date('2026-01-01'), userId: 'u3' }
       ]
       messageRepo.findRecent.mockResolvedValue(desc)
       const result = await service.getMessages({})
-      expect(result.map((m: { id: string }) => m.id)).toEqual(['m1', 'm2', 'm3'])
+      expect(result.map((m: { id: bigint }) => m.id)).toEqual([BigInt(1), BigInt(2), BigInt(3)])
     })
 
     it('passes cursor and limit to the repository', async () => {
-      const cursor = { createdAt: '2026-01-01T00:00:00.000Z', id: 'm-cursor' }
+      const cursor = { createdAt: '2026-01-01T00:00:00.000Z', publicId: 'pubmsg000099' }
       await service.getMessages({ cursor, limit: 25 })
       expect(messageRepo.findRecent).toHaveBeenCalledWith({ cursor, limit: 25 })
     })
@@ -56,7 +58,7 @@ describe('TavernService', () => {
 
   describe('sendMessage', () => {
     it('freezes characterId at send time', async () => {
-      messageRepo.create.mockResolvedValue({ id: 'm1' })
+      messageRepo.create.mockResolvedValue({ id: BigInt(1), publicId: MSG_PUB })
       await service.sendMessage({ content: 'Hello' }, 'u1')
       expect(messageRepo.create).toHaveBeenCalledWith({
         userId: 'u1',
@@ -66,7 +68,7 @@ describe('TavernService', () => {
     })
 
     it('trims content before storage', async () => {
-      messageRepo.create.mockResolvedValue({ id: 'm1' })
+      messageRepo.create.mockResolvedValue({ id: BigInt(1), publicId: MSG_PUB })
       await service.sendMessage({ content: '  hi  ' }, 'u1')
       expect(messageRepo.create.mock.calls[0][0].content).toBe('hi')
     })
@@ -94,50 +96,50 @@ describe('TavernService', () => {
 
   describe('deleteMessage', () => {
     it('deletes message via author-scoped repo update', async () => {
-      messageRepo.softDeleteByAuthor.mockResolvedValue(1)
-      await service.deleteMessage('m1', 'u1')
-      expect(messageRepo.softDeleteByAuthor).toHaveBeenCalledWith('m1', 'u1')
+      messageRepo.softDeleteByPublicIdAndAuthor.mockResolvedValue(1)
+      await service.deleteMessage(MSG_PUB, 'u1')
+      expect(messageRepo.softDeleteByPublicIdAndAuthor).toHaveBeenCalledWith(MSG_PUB, 'u1')
     })
 
     it('throws NOT_FOUND when author check fails', async () => {
-      messageRepo.softDeleteByAuthor.mockResolvedValue(0)
-      await expect(service.deleteMessage('m1', 'u2')).rejects.toMatchObject({ code: 'NOT_FOUND' })
+      messageRepo.softDeleteByPublicIdAndAuthor.mockResolvedValue(0)
+      await expect(service.deleteMessage(MSG_PUB, 'u2')).rejects.toMatchObject({ code: 'NOT_FOUND' })
     })
   })
 
   describe('reportMessage', () => {
     it('inserts a report and increments reportCount in one transaction', async () => {
-      txTavernMessage.findFirst.mockResolvedValue({ userId: 'author' })
-      await service.reportMessage('m1', 'reporter')
+      txTavernMessage.findFirst.mockResolvedValue({ id: BigInt(1), userId: 'author' })
+      await service.reportMessage(MSG_PUB, 'reporter')
       expect(txTavernMessage.findFirst).toHaveBeenCalledWith({
-        where: { id: 'm1', deletedAt: null },
-        select: { userId: true }
+        where: { publicId: MSG_PUB, deletedAt: null },
+        select: { id: true, userId: true }
       })
       expect(txTavernReport.create).toHaveBeenCalledWith({
-        data: { messageId: 'm1', reporterId: 'reporter' }
+        data: { messageId: BigInt(1), reporterId: 'reporter' }
       })
       expect(txTavernMessage.updateMany).toHaveBeenCalledWith({
-        where: { id: 'm1', deletedAt: null },
+        where: { id: BigInt(1), deletedAt: null },
         data: { reportCount: { increment: 1 } }
       })
     })
 
     it('refuses self-reports', async () => {
-      txTavernMessage.findFirst.mockResolvedValue({ userId: 'u1' })
-      await expect(service.reportMessage('m1', 'u1')).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+      txTavernMessage.findFirst.mockResolvedValue({ id: BigInt(1), userId: 'u1' })
+      await expect(service.reportMessage(MSG_PUB, 'u1')).rejects.toMatchObject({ code: 'BAD_REQUEST' })
       expect(txTavernReport.create).not.toHaveBeenCalled()
     })
 
     it('throws NOT_FOUND when message is missing or soft-deleted', async () => {
       txTavernMessage.findFirst.mockResolvedValue(null)
-      await expect(service.reportMessage('m1', 'reporter')).rejects.toMatchObject({ code: 'NOT_FOUND' })
+      await expect(service.reportMessage(MSG_PUB, 'reporter')).rejects.toMatchObject({ code: 'NOT_FOUND' })
       expect(txTavernReport.create).not.toHaveBeenCalled()
     })
 
     it('throws NOT_FOUND when the message is deleted between insert and increment', async () => {
-      txTavernMessage.findFirst.mockResolvedValue({ userId: 'author' })
+      txTavernMessage.findFirst.mockResolvedValue({ id: BigInt(1), userId: 'author' })
       txTavernMessage.updateMany.mockResolvedValue({ count: 0 })
-      await expect(service.reportMessage('m1', 'reporter')).rejects.toMatchObject({ code: 'NOT_FOUND' })
+      await expect(service.reportMessage(MSG_PUB, 'reporter')).rejects.toMatchObject({ code: 'NOT_FOUND' })
     })
 
     it('throws BAD_REQUEST on duplicate report (unique constraint)', async () => {
@@ -146,7 +148,7 @@ describe('TavernService', () => {
         err.code = 'P2002'
         throw err
       })
-      await expect(service.reportMessage('m1', 'reporter')).rejects.toMatchObject({
+      await expect(service.reportMessage(MSG_PUB, 'reporter')).rejects.toMatchObject({
         code: 'BAD_REQUEST'
       })
     })

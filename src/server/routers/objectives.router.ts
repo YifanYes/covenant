@@ -20,10 +20,10 @@ export const objectivesRouter = t.router({
   }),
 
   complete: protectedProcedure.use(rateLimit(RATE_LIMITS.write)).input(completeObjectiveSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.objective.complete(ctx.user.id, input.id)
+    return ctx.services.objective.complete(ctx.user.id, input.publicId)
   }),
 
   delete: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).input(deleteObjectiveSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.objective.delete(ctx.user.id, input.id)
+    return ctx.services.objective.delete(ctx.user.id, input.publicId)
   })
 })

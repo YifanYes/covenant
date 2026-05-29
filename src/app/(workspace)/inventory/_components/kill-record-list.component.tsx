@@ -5,7 +5,7 @@ import KillRecordCard from './kill-record-card.component'
 import KillRecordDetailDialog from './kill-record-detail-dialog.component'
 
 interface DefeatedEnemy {
-  id: string
+  publicId: string
   templateId: string
   namePrefix: string
   nameSuffix: string
@@ -14,7 +14,7 @@ interface DefeatedEnemy {
   damageDealt: number
   damageTaken: number
   criticalHits: number
-  defeatedAt: string | null
+  defeatedAt: Date | string | null
   combatLog: unknown
 }
 
@@ -44,7 +44,7 @@ export default function KillRecordList({ enemies }: KillRecordListProps) {
     <>
       <div className='flex flex-col gap-2 overflow-auto'>
         {enemies.map((enemy) => (
-          <KillRecordCard key={enemy.id} enemy={enemy} onClick={() => handleCardClick(enemy)} />
+          <KillRecordCard key={enemy.publicId} enemy={enemy} onClick={() => handleCardClick(enemy)} />
         ))}
       </div>
 

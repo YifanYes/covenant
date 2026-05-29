@@ -15,6 +15,6 @@ export const areasRouter = t.router({
   }),
 
   delete: protectedProcedure.use(rateLimit(RATE_LIMITS.strict)).input(deleteAreaSchema).mutation(async ({ ctx, input }) => {
-    return ctx.services.area.delete(ctx.user.id, input.id)
+    return ctx.services.area.delete(ctx.user.id, input.publicId)
   })
 })

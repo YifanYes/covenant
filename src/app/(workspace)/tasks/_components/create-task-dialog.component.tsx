@@ -41,8 +41,8 @@ export default function CreateTaskDialog({ trigger, open: controlledOpen, onOpen
   const { data: objectivesData } = useSuspenseQuery(trpcOptions.objectives.getAll.queryOptions())
   const { data: areasData } = useSuspenseQuery(trpcOptions.areas.getAll.queryOptions())
   const { data: statusesData } = useSuspenseQuery(trpcOptions.userTaskStatus.getAll.queryOptions())
-  const defaultStatusId =
-    statusesData.statuses.find((s) => s.isDefault)?.id ?? statusesData.statuses[0]?.id ?? ''
+  const defaultStatusPublicId =
+    statusesData.statuses.find((s) => s.isDefault)?.publicId ?? statusesData.statuses[0]?.publicId ?? ''
 
   const mutation = useMutation(
     trpcOptions.tasks.create.mutationOptions({
@@ -75,7 +75,7 @@ export default function CreateTaskDialog({ trigger, open: controlledOpen, onOpen
     defaultValues: {
       title: '',
       description: '',
-      statusId: defaultStatusId,
+      statusPublicId: defaultStatusPublicId,
       dueDate: undefined,
       objectives: [],
       areas: []

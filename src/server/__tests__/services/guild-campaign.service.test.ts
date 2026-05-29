@@ -37,17 +37,19 @@ describe('GuildService — campaigns', () => {
       guildCampaignProgress: createRepoMock<any>(),
       character: createRepoMock<any>()
     }
-    tx.guildCampaign.update.mockResolvedValue({ id: 'c-1', progress: 1, completedAt: null })
+    tx.guildCampaign.update.mockResolvedValue({ id: BigInt(100), progress: 1, completedAt: null })
     tx.guildCampaign.updateMany.mockResolvedValue({ count: 1 })
-    tx.guildCampaignProgress.upsert.mockResolvedValue({ id: 'p-1', contribution: 1 })
+    tx.guildCampaignProgress.upsert.mockResolvedValue({ id: BigInt(200), contribution: 1 })
     tx.guildCampaignProgress.count.mockResolvedValue(1)
     tx.guildCampaignProgress.findMany.mockResolvedValue([])
     tx.guildCampaignProgress.updateMany.mockResolvedValue({ count: 1 })
-    tx.character.update.mockResolvedValue({ id: 'char-1' })
+    tx.character.update.mockResolvedValue({ id: BigInt(300) })
 
     prisma = createPrismaMock(tx)
 
     guildRepo = createRepoMock<GuildRepository>()
+    guildRepo.findBySlug.mockResolvedValue({ id: BigInt(1), slug: 'g-slug' })
+    guildRepo.findCampaignByPublicId.mockResolvedValue({ id: BigInt(99), publicId: 'campub00001', guildId: BigInt(1) })
     memberRepo = createRepoMock<GuildMemberRepository>()
     messageRepo = createRepoMock<GuildMessageRepository>()
     inviteRepo = createRepoMock<GuildInviteRepository>()
@@ -60,22 +62,22 @@ describe('GuildService — campaigns', () => {
   describe('startCampaign', () => {
     it('rejects non-officer/owner', async () => {
       memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER })
-      await expect(service.startCampaign({ guildId: 'g-1', templateId: 'KILL_RAMPAGE' }, 'u1')).rejects.toBeInstanceOf(
+      await expect(service.startCampaign({ guildSlug: 'g-slug', templateId: 'KILL_RAMPAGE' }, 'u1')).rejects.toBeInstanceOf(
         TRPCError
       )
     })
 
     it('rejects unknown template id', async () => {
       memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.GUILD_MASTER })
-      await expect(service.startCampaign({ guildId: 'g-1', templateId: 'NOPE' }, 'u1')).rejects.toThrow(
+      await expect(service.startCampaign({ guildSlug: 'g-slug', templateId: 'NOPE' }, 'u1')).rejects.toThrow(
         'Unknown campaign template'
       )
     })
 
     it('rejects when active campaign exists', async () => {
       memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.GUILD_MASTER })
-      guildRepo.findActiveCampaignByGuild.mockResolvedValue({ id: 'c-existing' })
-      await expect(service.startCampaign({ guildId: 'g-1', templateId: 'KILL_RAMPAGE' }, 'u1')).rejects.toThrow(
+      guildRepo.findActiveCampaignByGuild.mockResolvedValue({ id: BigInt(99) })
+      await expect(service.startCampaign({ guildSlug: 'g-slug', templateId: 'KILL_RAMPAGE' }, 'u1')).rejects.toThrow(
         'already active'
       )
     })
@@ -84,8 +86,9 @@ describe('GuildService — campaigns', () => {
       memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.CAPTAIN })
       guildRepo.findActiveCampaignByGuild.mockResolvedValue(null)
       guildRepo.createCampaign.mockResolvedValue({
-        id: 'c-1',
-        guildId: 'g-1',
+        id: BigInt(100),
+        publicId: 'campub00001',
+        guildId: BigInt(1),
         templateId: 'KILL_RAMPAGE',
         eventType: 'ENEMY_KILL',
         target: 100,
@@ -94,11 +97,11 @@ describe('GuildService — campaigns', () => {
         expiresAt: new Date(),
         completedAt: null
       })
-      const result = await service.startCampaign({ guildId: 'g-1', templateId: 'KILL_RAMPAGE' }, 'u1')
-      expect(result.id).toBe('c-1')
+      const result = await service.startCampaign({ guildSlug: 'g-slug', templateId: 'KILL_RAMPAGE' }, 'u1')
+      expect(result.publicId).toBe('campub00001')
       expect(guildRepo.createCampaign).toHaveBeenCalledWith(
         expect.objectContaining({
-          guildId: 'g-1',
+          guildId: BigInt(1),
           templateId: 'KILL_RAMPAGE',
           eventType: 'ENEMY_KILL',
           startedBy: 'u1'
@@ -115,16 +118,16 @@ describe('GuildService — campaigns', () => {
     })
 
     it('no-ops when no active campaign', async () => {
-      memberRepo.findByUserId.mockResolvedValue({ guildId: 'g-1' })
+      memberRepo.findByUserId.mockResolvedValue({ guildId: BigInt(1) })
       guildRepo.findActiveCampaignByGuild.mockResolvedValue(null)
       await service.recordCampaignEvent('u1', CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)
       expect(prisma.$transaction).not.toHaveBeenCalled()
     })
 
     it('no-ops when event type does not match', async () => {
-      memberRepo.findByUserId.mockResolvedValue({ guildId: 'g-1' })
+      memberRepo.findByUserId.mockResolvedValue({ guildId: BigInt(1) })
       guildRepo.findActiveCampaignByGuild.mockResolvedValue({
-        id: 'c-1',
+        id: BigInt(100),
         eventType: CAMPAIGN_EVENT_TYPE.TASK_COMPLETION,
         expiresAt: new Date(Date.now() + 60_000)
       })
@@ -133,9 +136,9 @@ describe('GuildService — campaigns', () => {
     })
 
     it('no-ops when campaign has expired', async () => {
-      memberRepo.findByUserId.mockResolvedValue({ guildId: 'g-1' })
+      memberRepo.findByUserId.mockResolvedValue({ guildId: BigInt(1) })
       guildRepo.findActiveCampaignByGuild.mockResolvedValue({
-        id: 'c-1',
+        id: BigInt(100),
         eventType: CAMPAIGN_EVENT_TYPE.ENEMY_KILL,
         expiresAt: new Date(Date.now() - 60_000)
       })
@@ -144,9 +147,9 @@ describe('GuildService — campaigns', () => {
     })
 
     it('upserts progress and increments campaign on valid event', async () => {
-      memberRepo.findByUserId.mockResolvedValue({ guildId: 'g-1' })
+      memberRepo.findByUserId.mockResolvedValue({ guildId: BigInt(1) })
       guildRepo.findActiveCampaignByGuild.mockResolvedValue({
-        id: 'c-1',
+        id: BigInt(100),
         eventType: CAMPAIGN_EVENT_TYPE.ENEMY_KILL,
         expiresAt: new Date(Date.now() + 60_000),
         target: 100
@@ -157,16 +160,16 @@ describe('GuildService — campaigns', () => {
         progress: 50,
         target: 100
       })
-      tx.guildCampaign.update.mockResolvedValue({ id: 'c-1', progress: 51, completedAt: null })
+      tx.guildCampaign.update.mockResolvedValue({ id: BigInt(100), progress: 51, completedAt: null })
       await service.recordCampaignEvent('u1', CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)
       expect(tx.guildCampaignProgress.upsert).toHaveBeenCalled()
       expect(tx.guildCampaign.update).toHaveBeenCalled()
     })
 
     it('snapshots goldClaimed per contributor when target reached', async () => {
-      memberRepo.findByUserId.mockResolvedValue({ guildId: 'g-1' })
+      memberRepo.findByUserId.mockResolvedValue({ guildId: BigInt(1) })
       guildRepo.findActiveCampaignByGuild.mockResolvedValue({
-        id: 'c-1',
+        id: BigInt(100),
         eventType: CAMPAIGN_EVENT_TYPE.ENEMY_KILL,
         expiresAt: new Date(Date.now() + 60_000),
         target: 100
@@ -178,30 +181,30 @@ describe('GuildService — campaigns', () => {
         target: 100,
         rewardPool: { gold: 600 }
       })
-      tx.guildCampaign.update.mockResolvedValue({ id: 'c-1', progress: 100, completedAt: null })
+      tx.guildCampaign.update.mockResolvedValue({ id: BigInt(100), progress: 100, completedAt: null })
       // Race-safe completion: first updateMany sets completedAt with count=1 (this tx wins)
       tx.guildCampaign.updateMany.mockResolvedValueOnce({ count: 1 })
-      tx.guildCampaignProgress.findMany.mockResolvedValue([{ id: 'p-1' }, { id: 'p-2' }, { id: 'p-3' }])
+      tx.guildCampaignProgress.findMany.mockResolvedValue([{ id: BigInt(200) }, { id: BigInt(201) }, { id: BigInt(202) }])
       await service.recordCampaignEvent('u1', CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)
       // Stamp goldClaimed = floor(600 / 3) = 200 on contributor entries
       expect(tx.guildCampaignProgress.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { campaignId: 'c-1', contribution: { gt: 0 } },
+          where: { campaignId: BigInt(100), contribution: { gt: 0 } },
           data: { goldClaimed: 200 }
         })
       )
       expect(tx.guildCampaign.update).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          where: { id: 'c-1' },
+          where: { id: BigInt(100) },
           data: { contributorCount: 3 }
         })
       )
     })
 
     it('skips snapshot when another tx already completed the campaign', async () => {
-      memberRepo.findByUserId.mockResolvedValue({ guildId: 'g-1' })
+      memberRepo.findByUserId.mockResolvedValue({ guildId: BigInt(1) })
       guildRepo.findActiveCampaignByGuild.mockResolvedValue({
-        id: 'c-1',
+        id: BigInt(100),
         eventType: CAMPAIGN_EVENT_TYPE.ENEMY_KILL,
         expiresAt: new Date(Date.now() + 60_000),
         target: 100
@@ -213,7 +216,7 @@ describe('GuildService — campaigns', () => {
         target: 100,
         rewardPool: { gold: 600 }
       })
-      tx.guildCampaign.update.mockResolvedValue({ id: 'c-1', progress: 100, completedAt: null })
+      tx.guildCampaign.update.mockResolvedValue({ id: BigInt(100), progress: 100, completedAt: null })
       // First updateMany loses the race: count=0
       tx.guildCampaign.updateMany.mockResolvedValueOnce({ count: 0 })
       await service.recordCampaignEvent('u1', CAMPAIGN_EVENT_TYPE.ENEMY_KILL, 1)
@@ -234,8 +237,8 @@ describe('GuildService — campaigns', () => {
 
   describe('claimReward', () => {
     const baseCampaign = {
-      id: 'c-1',
-      guildId: 'g-1',
+      id: BigInt(100),
+      guildId: BigInt(1),
       completedAt: new Date(),
       contributorCount: 4,
       rewardPool: { gold: 400 }
@@ -244,65 +247,65 @@ describe('GuildService — campaigns', () => {
     it('rejects non-member', async () => {
       guildRepo.findCampaignById.mockResolvedValue(baseCampaign)
       memberRepo.findByUserAndGuild.mockResolvedValue(null)
-      await expect(service.claimCampaignReward('c-1', 'u1')).rejects.toBeInstanceOf(TRPCError)
+      await expect(service.claimCampaignReward('campub00001', 'u1')).rejects.toBeInstanceOf(TRPCError)
     })
 
     it('rejects when campaign not completed', async () => {
       guildRepo.findCampaignById.mockResolvedValue({ ...baseCampaign, completedAt: null })
-      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER, guildId: 'g-1' })
-      await expect(service.claimCampaignReward('c-1', 'u1')).rejects.toThrow('not been completed')
+      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER, guildId: BigInt(1) })
+      await expect(service.claimCampaignReward('campub00001', 'u1')).rejects.toThrow('not been completed')
     })
 
     it('rejects non-contributor (no progress entry)', async () => {
       guildRepo.findCampaignById.mockResolvedValue(baseCampaign)
-      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER, guildId: 'g-1' })
-      characterRepo.findByUserId.mockResolvedValue({ id: 'char-1' })
+      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER, guildId: BigInt(1) })
+      characterRepo.findByUserId.mockResolvedValue({ id: BigInt(300) })
       tx.guildCampaignProgress.updateMany.mockResolvedValueOnce({ count: 0 })
       tx.guildCampaignProgress.findUnique.mockResolvedValue(null)
-      await expect(service.claimCampaignReward('c-1', 'u1')).rejects.toThrow('did not contribute')
+      await expect(service.claimCampaignReward('campub00001', 'u1')).rejects.toThrow('did not contribute')
     })
 
     it('rejects late contributor (goldClaimed snapshot = 0) with late-contribution message', async () => {
       guildRepo.findCampaignById.mockResolvedValue(baseCampaign)
-      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER, guildId: 'g-1' })
-      characterRepo.findByUserId.mockResolvedValue({ id: 'char-1' })
+      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER, guildId: BigInt(1) })
+      characterRepo.findByUserId.mockResolvedValue({ id: BigInt(300) })
       tx.guildCampaignProgress.updateMany.mockResolvedValueOnce({ count: 0 })
       tx.guildCampaignProgress.findUnique.mockResolvedValue({
         contribution: 5,
         goldClaimed: 0,
         claimedAt: null
       })
-      await expect(service.claimCampaignReward('c-1', 'u1')).rejects.toThrow('after the target was reached')
+      await expect(service.claimCampaignReward('campub00001', 'u1')).rejects.toThrow('after the target was reached')
     })
 
     it('rejects double-claim', async () => {
       guildRepo.findCampaignById.mockResolvedValue(baseCampaign)
-      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER, guildId: 'g-1' })
-      characterRepo.findByUserId.mockResolvedValue({ id: 'char-1' })
+      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER, guildId: BigInt(1) })
+      characterRepo.findByUserId.mockResolvedValue({ id: BigInt(300) })
       tx.guildCampaignProgress.updateMany.mockResolvedValueOnce({ count: 0 })
       tx.guildCampaignProgress.findUnique.mockResolvedValue({
         contribution: 10,
         goldClaimed: 100,
         claimedAt: new Date()
       })
-      await expect(service.claimCampaignReward('c-1', 'u1')).rejects.toThrow('already claimed')
+      await expect(service.claimCampaignReward('campub00001', 'u1')).rejects.toThrow('already claimed')
     })
 
     it('awards snapshotted goldClaimed to contributor', async () => {
       guildRepo.findCampaignById.mockResolvedValue(baseCampaign)
-      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER, guildId: 'g-1' })
-      characterRepo.findByUserId.mockResolvedValue({ id: 'char-1' })
+      memberRepo.findByUserAndGuild.mockResolvedValue({ role: GuildRole.MEMBER, guildId: BigInt(1) })
+      characterRepo.findByUserId.mockResolvedValue({ id: BigInt(300) })
       tx.guildCampaignProgress.updateMany.mockResolvedValueOnce({ count: 1 })
       tx.guildCampaignProgress.findUnique.mockResolvedValue({
         contribution: 10,
         goldClaimed: 100,
         claimedAt: null
       })
-      const result = await service.claimCampaignReward('c-1', 'u1')
+      const result = await service.claimCampaignReward('campub00001', 'u1')
       expect(result.goldClaimed).toBe(100)
       expect(tx.character.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'char-1' },
+          where: { id: BigInt(300) },
           data: { gold: { increment: 100 } }
         })
       )

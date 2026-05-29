@@ -4,12 +4,13 @@ import type {
 } from '@shared/schemas/user-task-statuses.schemas'
 import { TRPCError } from '@trpc/server'
 import type { PrismaClient, UserTaskStatus } from '@/generated/prisma'
+import { generatePublicId } from '../lib/public-id'
 
 export interface BulkApplyOps {
   create: Array<{ label: string; color?: string | null }>
-  update: Array<{ id: string; label?: string; color?: string | null }>
-  delete: string[]
-  reassignToStatusId: string
+  update: Array<{ id: bigint; label?: string; color?: string | null }>
+  delete: bigint[]
+  reassignToStatusId: bigint
 }
 
 export class UserTaskStatusRepository {
@@ -22,10 +23,24 @@ export class UserTaskStatusRepository {
     })
   }
 
-  async findByIdOrThrow(id: string, userId: string): Promise<UserTaskStatus> {
+  async findByIdOrThrow(id: bigint, userId: string): Promise<UserTaskStatus> {
     const status = await this.prisma.userTaskStatus.findUnique({ where: { id } })
     if (!status || status.userId !== userId) {
       throw new TRPCError({ code: 'NOT_FOUND', message: `Task status ${id} not found` })
+    }
+    return status
+  }
+
+  async findByPublicId(publicId: string, userId: string): Promise<UserTaskStatus | null> {
+    const status = await this.prisma.userTaskStatus.findUnique({ where: { publicId } })
+    if (!status || status.userId !== userId) return null
+    return status
+  }
+
+  async findByPublicIdOrThrow(publicId: string, userId: string): Promise<UserTaskStatus> {
+    const status = await this.findByPublicId(publicId, userId)
+    if (!status) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: `Task status ${publicId} not found` })
     }
     return status
   }
@@ -42,7 +57,7 @@ export class UserTaskStatusRepository {
     })
   }
 
-  async findNextAfter(userId: string, excludeId: string): Promise<UserTaskStatus | null> {
+  async findNextAfter(userId: string, excludeId: bigint): Promise<UserTaskStatus | null> {
     return this.prisma.userTaskStatus.findFirst({
       where: { userId, id: { not: excludeId } },
       orderBy: { createdAt: 'asc' }
@@ -56,6 +71,7 @@ export class UserTaskStatusRepository {
   async create(userId: string, input: CreateUserTaskStatusBodyType): Promise<UserTaskStatus> {
     return this.prisma.userTaskStatus.create({
       data: {
+        publicId: generatePublicId(),
         userId,
         label: input.label,
         ...(input.color !== undefined && { color: input.color })
@@ -63,7 +79,7 @@ export class UserTaskStatusRepository {
     })
   }
 
-  async update(id: string, userId: string, input: UpdateUserTaskStatusBodyType): Promise<UserTaskStatus> {
+  async update(id: bigint, userId: string, input: UpdateUserTaskStatusBodyType): Promise<UserTaskStatus> {
     const existing = await this.findByIdOrThrow(id, userId)
     return this.prisma.userTaskStatus.update({
       where: { id: existing.id },
@@ -74,7 +90,7 @@ export class UserTaskStatusRepository {
     })
   }
 
-  async delete(id: string, userId: string, reassignToStatusId: string): Promise<void> {
+  async delete(id: bigint, userId: string, reassignToStatusId: bigint): Promise<void> {
     await this.prisma.$transaction([
       this.prisma.task.updateMany({
         where: { userId, statusId: id },
@@ -84,7 +100,7 @@ export class UserTaskStatusRepository {
     ])
   }
 
-  async setDefault(userId: string, id: string): Promise<void> {
+  async setDefault(userId: string, id: bigint): Promise<void> {
     await this.prisma.$transaction([
       this.prisma.userTaskStatus.updateMany({
         where: { userId, isDefault: true },
@@ -122,6 +138,7 @@ export class UserTaskStatusRepository {
       if (ops.create.length > 0) {
         await tx.userTaskStatus.createMany({
           data: ops.create.map((c) => ({
+            publicId: generatePublicId(),
             userId,
             label: c.label,
             ...(c.color !== undefined && c.color !== null && { color: c.color })

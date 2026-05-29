@@ -9,11 +9,11 @@ import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 
 interface JournalEntry {
-  id: string
+  publicId: string
   content: string
   mood: string | null
   color: string | null
-  createdAt: string
+  createdAt: string | Date
 }
 
 export default function EntryList() {
@@ -51,7 +51,7 @@ export default function EntryList() {
 
             return (
               <div
-                key={entry.id}
+                key={entry.publicId}
                 onClick={() => setEditingEntry(entry)}
                 className="relative cursor-pointer overflow-hidden rounded-xl border bg-background p-4 transition-colors hover:bg-muted/20"
               >

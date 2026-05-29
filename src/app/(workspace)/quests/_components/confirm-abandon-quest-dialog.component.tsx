@@ -9,10 +9,10 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 export default function ConfirmAbandonQuestDialog({
-  questId,
+  questPublicId,
   onAbandonSuccess
 }: {
-  questId: string
+  questPublicId: string
   onAbandonSuccess: () => void
 }) {
   const { t } = useTranslation()
@@ -31,7 +31,7 @@ export default function ConfirmAbandonQuestDialog({
     })
   )
 
-  const handleAbandon = () => abandonMutation.mutate({ questId })
+  const handleAbandon = () => abandonMutation.mutate({ questPublicId })
 
   return (
     <BaseConfirmDialog

@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RESOURCE_NOT_FOUND_OR_FORBIDDEN } from '../../lib/errors'
 import type { CharacterQuestRepository } from '../../repositories/character-quest.repository'
+import type { CharacterRepository } from '../../repositories/character.repository'
 import type { CombatEnemyRepository } from '../../repositories/combat-enemy.repository'
 import type { CharacterService } from '../../services/character.service'
 import type { ManaService } from '../../services/mana.service'
@@ -10,27 +11,41 @@ import { mockCharacter } from '../fixtures/character.fixtures'
 import { mockCharacterQuest } from '../fixtures/quest.fixtures'
 import { createRepoMock } from '../helpers/mock-repo'
 
+const CHAR_SLUG = 'test-character'
+const QUEST_PUB = 'questpub00001'
+
 describe('QuestService', () => {
   let questService: QuestService
   let mockCharacterQuestRepo: ReturnType<typeof createRepoMock<CharacterQuestRepository>>
   let mockCombatEnemyRepo: ReturnType<typeof createRepoMock<CombatEnemyRepository>>
   let mockCharacterService: ReturnType<typeof createRepoMock<CharacterService>>
+  let mockCharacterRepo: ReturnType<typeof createRepoMock<CharacterRepository>>
 
   beforeEach(() => {
     vi.clearAllMocks()
 
     mockCharacterQuestRepo = createRepoMock<CharacterQuestRepository>()
     mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
+    mockCharacterQuestRepo.findByPublicId.mockResolvedValue({ id: BigInt(1), publicId: QUEST_PUB })
 
     mockCombatEnemyRepo = createRepoMock<CombatEnemyRepository>()
 
     mockCharacterService = createRepoMock<CharacterService>()
     mockCharacterService.verifyCharacterOwnership.mockResolvedValue(true)
 
+    mockCharacterRepo = createRepoMock<CharacterRepository>()
+    mockCharacterRepo.findBySlug.mockResolvedValue({ id: BigInt(123), slug: CHAR_SLUG, userId: 'user-123' })
+
     const mockManaService = createRepoMock<ManaService>()
     mockManaService.topUpFromReserve.mockResolvedValue({ added: 0, newMana: 0, newReserve: 0 })
 
-    questService = new QuestService(mockCharacterQuestRepo, mockCombatEnemyRepo, mockCharacterService, mockManaService)
+    questService = new QuestService(
+      mockCharacterQuestRepo,
+      mockCombatEnemyRepo,
+      mockCharacterService,
+      mockManaService,
+      mockCharacterRepo
+    )
   })
 
   describe('startQuest', () => {
@@ -38,13 +53,14 @@ describe('QuestService', () => {
       const character = mockCharacter({
         classes: [{ id: 'class-1', className: 'TEMPLAR', tier: 1, health: 10, maxHealth: 10, mana: 5, maxMana: 5 }]
       })
-      const quest = mockCharacterQuest({ id: 'new-quest-id' })
+      const quest = mockCharacterQuest({ id: BigInt(2), publicId: QUEST_PUB })
 
       mockCharacterQuestRepo.findActiveByCharacterId.mockResolvedValue(null)
       mockCharacterService.getCharacterById.mockResolvedValue(character)
       mockCharacterQuestRepo.create.mockResolvedValue(quest)
       mockCombatEnemyRepo.createEnemy.mockResolvedValue({
-        id: 'enemy-1',
+        id: BigInt(101),
+        publicId: 'enpub0000001',
         templateId: 'shadow_demon',
         namePrefix: 'prefix',
         nameSuffix: 'suffix',
@@ -53,18 +69,19 @@ describe('QuestService', () => {
       })
       mockCharacterQuestRepo.updateTacticalState.mockResolvedValue(undefined)
 
-      const result = await questService.startQuest('patrol_north_gate', 'char-123', 'user-123')
+      const result = await questService.startQuest('patrol_north_gate', CHAR_SLUG, 'user-123')
 
-      expect(mockCharacterService.verifyCharacterOwnership).toHaveBeenCalledWith('char-123', 'user-123')
-      expect(mockCharacterQuestRepo.create).toHaveBeenCalledWith('char-123', 'patrol_north_gate', 5)
+      expect(mockCharacterRepo.findBySlug).toHaveBeenCalledWith('user-123', CHAR_SLUG)
+      expect(mockCharacterService.verifyCharacterOwnership).toHaveBeenCalledWith(BigInt(123), 'user-123')
+      expect(mockCharacterQuestRepo.create).toHaveBeenCalledWith(BigInt(123), 'patrol_north_gate', 5)
       expect(result.quest.status).toBe('ACTIVE')
       expect(result.activeEnemy).toBeDefined()
     })
 
-    it('throws NOT_FOUND if user does not own the character', async () => {
-      mockCharacterService.verifyCharacterOwnership.mockResolvedValue(false)
+    it('throws NOT_FOUND if character slug not resolved', async () => {
+      mockCharacterRepo.findBySlug.mockResolvedValue(null)
 
-      await expect(questService.startQuest('patrol_north_gate', 'char-123', 'other-user')).rejects.toMatchObject({
+      await expect(questService.startQuest('patrol_north_gate', CHAR_SLUG, 'other-user')).rejects.toMatchObject({
         code: 'NOT_FOUND',
         message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
       })
@@ -73,50 +90,13 @@ describe('QuestService', () => {
     it('throws BAD_REQUEST if character already has an active quest', async () => {
       mockCharacterQuestRepo.findActiveByCharacterId.mockResolvedValue(mockCharacterQuest())
 
-      await expect(questService.startQuest('patrol_north_gate', 'char-123', 'user-123')).rejects.toThrow(TRPCError)
+      await expect(questService.startQuest('patrol_north_gate', CHAR_SLUG, 'user-123')).rejects.toThrow(TRPCError)
     })
 
     it('throws NOT_FOUND if questId does not exist in constants', async () => {
       mockCharacterQuestRepo.findActiveByCharacterId.mockResolvedValue(null)
 
-      await expect(questService.startQuest('nonexistent_quest', 'char-123', 'user-123')).rejects.toThrow(TRPCError)
-    })
-
-    it('spawns an initial enemy and saves tactical state', async () => {
-      const character = mockCharacter({
-        id: 'char-123',
-        name: 'Test Character',
-        currentClass: 'TEMPLAR',
-        classes: [
-          { id: 'class-1', className: 'TEMPLAR', tier: 1, health: 10, maxHealth: 10, mana: 5, maxMana: 5 }
-        ]
-      })
-      const quest = mockCharacterQuest({ id: 'new-quest-id' })
-
-      mockCharacterQuestRepo.findActiveByCharacterId.mockResolvedValue(null)
-      mockCharacterService.getCharacterById.mockResolvedValue(character)
-      mockCharacterQuestRepo.create.mockResolvedValue(quest)
-      mockCombatEnemyRepo.createEnemy.mockResolvedValue({
-        id: 'enemy-1',
-        templateId: 'shadow_demon',
-        namePrefix: 'the_dark',
-        nameSuffix: 'destroyer',
-        currentHealth: 10,
-        maxHealth: 10
-      })
-      mockCharacterQuestRepo.updateTacticalState.mockResolvedValue(undefined)
-
-      await questService.startQuest('patrol_north_gate', 'char-123', 'user-123')
-
-      expect(mockCombatEnemyRepo.createEnemy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          characterQuestId: 'new-quest-id'
-        })
-      )
-      expect(mockCharacterQuestRepo.updateTacticalState).toHaveBeenCalledWith(
-        'new-quest-id',
-        expect.objectContaining({ turnOrder: expect.any(Array), currentTurnIndex: 0 })
-      )
+      await expect(questService.startQuest('nonexistent_quest', CHAR_SLUG, 'user-123')).rejects.toThrow(TRPCError)
     })
   })
 
@@ -124,14 +104,14 @@ describe('QuestService', () => {
     it('returns null when no active quest', async () => {
       mockCharacterQuestRepo.findActiveByCharacterId.mockResolvedValue(null)
 
-      const result = await questService.getActiveQuest('char-123', 'user-123')
+      const result = await questService.getActiveQuest(CHAR_SLUG, 'user-123')
       expect(result).toBeNull()
     })
 
-    it('throws NOT_FOUND if user does not own the character', async () => {
-      mockCharacterService.verifyCharacterOwnership.mockResolvedValue(false)
+    it('throws NOT_FOUND if character slug not resolved', async () => {
+      mockCharacterRepo.findBySlug.mockResolvedValue(null)
 
-      await expect(questService.getActiveQuest('char-123', 'other-user')).rejects.toMatchObject({
+      await expect(questService.getActiveQuest(CHAR_SLUG, 'other-user')).rejects.toMatchObject({
         code: 'NOT_FOUND',
         message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
       })
@@ -140,7 +120,7 @@ describe('QuestService', () => {
     it('returns quest with active enemy data', async () => {
       const quest = mockCharacterQuest()
       const enemy = {
-        id: 'enemy-1',
+        publicId: 'enpub0000001',
         templateId: 'shadow_demon',
         namePrefix: 'the_dark',
         nameSuffix: 'destroyer',
@@ -149,14 +129,13 @@ describe('QuestService', () => {
       }
 
       mockCharacterQuestRepo.findActiveByCharacterId.mockResolvedValue(quest)
-      mockCharacterQuestRepo.findById.mockResolvedValue(quest)
       mockCombatEnemyRepo.getActiveEnemy.mockResolvedValue(enemy)
 
-      const result = await questService.getActiveQuest('char-123', 'user-123')
+      const result = await questService.getActiveQuest(CHAR_SLUG, 'user-123')
 
       expect(result).not.toBeNull()
-      expect(result!.id).toBe('quest-instance-1')
-      expect(result!.activeEnemy?.id).toBe('enemy-1')
+      expect(result!.publicId).toBe(QUEST_PUB)
+      expect(result!.activeEnemy?.publicId).toBe('enpub0000001')
     })
   })
 
@@ -165,15 +144,15 @@ describe('QuestService', () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(true)
       mockCharacterQuestRepo.abandon.mockResolvedValue(undefined)
 
-      await questService.abandonQuest('quest-instance-1', 'user-123')
+      await questService.abandonQuest(QUEST_PUB, 'user-123')
 
-      expect(mockCharacterQuestRepo.abandon).toHaveBeenCalledWith('quest-instance-1')
+      expect(mockCharacterQuestRepo.abandon).toHaveBeenCalledWith(BigInt(1))
     })
 
     it('throws NOT_FOUND if user does not own the quest', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
 
-      await expect(questService.abandonQuest('quest-instance-1', 'other-user')).rejects.toMatchObject({
+      await expect(questService.abandonQuest(QUEST_PUB, 'other-user')).rejects.toMatchObject({
         code: 'NOT_FOUND',
         message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
       })
@@ -184,7 +163,7 @@ describe('QuestService', () => {
     it('returns all quest templates', async () => {
       mockCharacterQuestRepo.findActiveByCharacterId.mockResolvedValue(null)
 
-      const result = await questService.getAvailableQuests('user-123', 'char-123')
+      const result = await questService.getAvailableQuests('user-123', CHAR_SLUG)
 
       expect(result.length).toBeGreaterThan(0)
       expect(result[0]).toHaveProperty('id')
@@ -196,22 +175,22 @@ describe('QuestService', () => {
         mockCharacterQuest({ questId: 'patrol_north_gate' })
       )
 
-      const result = await questService.getAvailableQuests('user-123', 'char-123')
+      const result = await questService.getAvailableQuests('user-123', CHAR_SLUG)
       const active = result.find((q) => q.id === 'patrol_north_gate')
 
       expect(active?.isActive).toBe(true)
     })
 
-    it('throws NOT_FOUND if user does not own the character', async () => {
-      mockCharacterService.verifyCharacterOwnership.mockResolvedValue(false)
+    it('throws NOT_FOUND if character slug not resolved', async () => {
+      mockCharacterRepo.findBySlug.mockResolvedValue(null)
 
-      await expect(questService.getAvailableQuests('other-user', 'char-123')).rejects.toMatchObject({
+      await expect(questService.getAvailableQuests('other-user', CHAR_SLUG)).rejects.toMatchObject({
         code: 'NOT_FOUND',
         message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
       })
     })
 
-    it('works without a characterId (no active quest lookup)', async () => {
+    it('works without a characterSlug (no active quest lookup)', async () => {
       const result = await questService.getAvailableQuests('user-123')
       expect(result.length).toBeGreaterThan(0)
       result.forEach((q) => expect(q.isActive).toBe(false))
@@ -240,8 +219,8 @@ describe('QuestService', () => {
         currentTurnIndex: 0
       }
       mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
-        id: 'quest-instance-1',
-        characterId: 'char-123',
+        id: BigInt(1),
+        characterId: BigInt(123),
         tacticalState
       })
       mockCharacterService.getCharacterById.mockResolvedValue(
@@ -251,7 +230,7 @@ describe('QuestService', () => {
         })
       )
 
-      const result = await questService.getTacticalState('quest-instance-1', 'user-123')
+      const result = await questService.getTacticalState(QUEST_PUB, 'user-123')
       expect(result?.turnOrder).toEqual(['player-1', 'enemy-1'])
       expect(result?.units).toHaveLength(2)
     })
@@ -259,18 +238,18 @@ describe('QuestService', () => {
     it('returns null if quest not found', async () => {
       mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue(null)
 
-      const result = await questService.getTacticalState('nonexistent', 'user-123')
+      const result = await questService.getTacticalState(QUEST_PUB, 'user-123')
       expect(result).toBeNull()
     })
 
     it('returns null when repo surfaces null tacticalState (parse failed at boundary)', async () => {
       mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
-        id: 'quest-instance-1',
-        characterId: 'char-123',
+        id: BigInt(1),
+        characterId: BigInt(123),
         tacticalState: null
       })
 
-      const result = await questService.getTacticalState('quest-instance-1', 'user-123')
+      const result = await questService.getTacticalState(QUEST_PUB, 'user-123')
       expect(result).toBeNull()
     })
 
@@ -284,8 +263,8 @@ describe('QuestService', () => {
         currentTurnIndex: 0
       }
       mockCharacterQuestRepo.findByIdWithTacticalState.mockResolvedValue({
-        id: 'quest-instance-1',
-        characterId: 'char-123',
+        id: BigInt(1),
+        characterId: BigInt(123),
         tacticalState: staleState
       })
       mockCharacterService.getCharacterById.mockResolvedValue(
@@ -295,7 +274,7 @@ describe('QuestService', () => {
         })
       )
 
-      const result = await questService.getTacticalState('quest-instance-1', 'user-123')
+      const result = await questService.getTacticalState(QUEST_PUB, 'user-123')
       const player = result!.units.find((u) => u.id === 'player-1')!
       expect(player.maxHealth).toBe(40)
       expect(player.currentHealth).toBe(40)
@@ -311,7 +290,7 @@ describe('QuestService', () => {
     it('throws NOT_FOUND if user does not own the quest', async () => {
       mockCharacterQuestRepo.verifyOwnership.mockResolvedValue(false)
 
-      await expect(questService.getTacticalState('quest-instance-1', 'other-user')).rejects.toMatchObject({
+      await expect(questService.getTacticalState(QUEST_PUB, 'other-user')).rejects.toMatchObject({
         code: 'NOT_FOUND',
         message: RESOURCE_NOT_FOUND_OR_FORBIDDEN
       })

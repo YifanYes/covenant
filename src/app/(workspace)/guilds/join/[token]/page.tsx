@@ -26,7 +26,7 @@ export default function JoinByTokenPage() {
       onSuccess: async (result) => {
         toast.success(t('guilds.success.join'))
         await queryClient.invalidateQueries({ queryKey: trpcOptions.guilds.getMyGuild.queryKey() })
-        router.push(`/guilds/${result.guildId}`)
+        router.push(`/guilds/${result.guildSlug}`)
       },
       onError: (error) => toast.error(t('guilds.error.join'), { description: error.message })
     })

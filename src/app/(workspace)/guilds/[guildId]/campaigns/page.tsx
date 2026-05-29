@@ -4,5 +4,5 @@ import { useGuild } from '../_guild-context'
 
 export default function GuildCampaignsPage() {
   const { guild, myRole, myUserId } = useGuild()
-  return <CampaignPanel guildId={guild.id} myUserId={myUserId} myRole={myRole} members={guild.members} />
+  return <CampaignPanel guildSlug={guild.slug} myUserId={myUserId} myRole={myRole} members={guild.members} />
 }

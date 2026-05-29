@@ -9,31 +9,31 @@ datasource db {
 
 // Better Auth Models
 model User {
-  id                  String                @id
-  name                String?
-  email               String                @unique
-  emailVerified       Boolean               @default(false)
-  image               String?
-  tutorialSlidesSeen  Json?                 @default("[]")
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  sessions            Session[]
-  accounts            Account[]
-  character           Character?
-  userSettings        UserSettings?
-  journalEntries      JournalEntry[]
-  guildMembership     GuildMember?
-  ownedGuilds         Guild[]               @relation("GuildOwner")
-  guildMessages       GuildMessage[]
-  guildReports        GuildMessageReport[]
-  tavernMessages      TavernMessage[]
-  tavernReports       TavernMessageReport[]
+  id                 String                @id
+  name               String?
+  email              String                @unique
+  emailVerified      Boolean               @default(false)
+  image              String?
+  tutorialSlidesSeen Json?                 @default("[]")
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  sessions           Session[]
+  accounts           Account[]
+  character          Character?
+  userSettings       UserSettings?
+  journalEntries     JournalEntry[]
+  guildMembership    GuildMember?
+  ownedGuilds        Guild[]               @relation("GuildOwner")
+  guildMessages      GuildMessage[]
+  guildReports       GuildMessageReport[]
+  tavernMessages     TavernMessage[]
+  tavernReports      TavernMessageReport[]
 
   @@map("users")
 }
 
 model UserSettings {
-  id                String   @id @default(uuid()) @db.Uuid
+  id                BigInt   @id @default(autoincrement())
   userId            String   @unique
   defaultTasksView  String   @default("list")
   defaultHabitsView String   @default("today")
@@ -104,31 +104,33 @@ model Verification {
 }
 
 model Character {
-  id           String           @id @default(uuid()) @db.Uuid
-  name         String           @db.VarChar(255)
-  title        String?          @db.VarChar(255)
-  factionName  String           @default("HOLY_KNIGHTS")
-  currentClass String           @db.VarChar(50)
-  data         Json?            @default("{}")
-  createdAt    DateTime         @default(now()) @db.Timestamp(6)
-  updatedAt    DateTime         @updatedAt @db.Timestamp(6)
-  userId       String           @unique
-  gold         Int              @default(0)
-  manaReserve  Int              @default(0)
-  inventory    Json?            @default("[]")
-  loadout      Json?            @default("[]")
-  magicNature  String?          @db.VarChar(50)
-  onboardingProgress Json?      @default("{}")
-  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quests       CharacterQuest[]
-  classes      CharacterClass[]
+  id                 BigInt           @id @default(autoincrement())
+  slug               String
+  name               String           @db.VarChar(255)
+  title              String?          @db.VarChar(255)
+  factionName        String           @default("HOLY_KNIGHTS")
+  currentClass       String           @db.VarChar(50)
+  data               Json?            @default("{}")
+  createdAt          DateTime         @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime         @updatedAt @db.Timestamp(6)
+  userId             String           @unique
+  gold               Int              @default(0)
+  manaReserve        Int              @default(0)
+  inventory          Json?            @default("[]")
+  loadout            Json?            @default("[]")
+  magicNature        String?          @db.VarChar(50)
+  onboardingProgress Json?            @default("{}")
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quests             CharacterQuest[]
+  classes            CharacterClass[]
 
+  @@unique([userId, slug])
   @@map("characters")
 }
 
 model CharacterClass {
-  id                String    @id @default(uuid()) @db.Uuid
-  characterId       String    @db.Uuid
+  id                BigInt    @id @default(autoincrement())
+  characterId       BigInt
   className         String    @db.VarChar(50)
   health            Int       @default(30)
   mana              Int       @default(5)
@@ -151,8 +153,9 @@ model CharacterClass {
 }
 
 model CharacterQuest {
-  id                   String        @id @default(uuid()) @db.Uuid
-  characterId          String        @db.Uuid
+  id                   BigInt        @id @default(autoincrement())
+  publicId             String        @unique
+  characterId          BigInt
   questId              String        @db.VarChar(255)
   status               String        @db.VarChar(20)
   progress             Int           @default(0)
@@ -172,8 +175,9 @@ model CharacterQuest {
 }
 
 model CombatEnemy {
-  id               String         @id @default(uuid()) @db.Uuid
-  characterQuestId String         @db.Uuid
+  id               BigInt         @id @default(autoincrement())
+  publicId         String         @unique
+  characterQuestId BigInt
   templateId       String         @db.VarChar(255)
   namePrefix       String         @db.VarChar(100)
   nameSuffix       String         @db.VarChar(100)
@@ -194,7 +198,8 @@ model CombatEnemy {
 }
 
 model Objective {
-  id          String    @id @default(uuid()) @db.Uuid
+  id          BigInt    @id @default(autoincrement())
+  publicId    String    @unique
   name        String    @db.VarChar(255)
   description String?
   userId      String
@@ -211,7 +216,8 @@ model Objective {
 }
 
 model Area {
-  id         String      @id @default(uuid()) @db.Uuid
+  id         BigInt      @id @default(autoincrement())
+  publicId   String      @unique
   name       String      @db.VarChar(255)
   color      String?     @db.VarChar(255)
   icon       String?     @db.VarChar(255)
@@ -228,7 +234,8 @@ model Area {
 }
 
 model UserTaskStatus {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        BigInt   @id @default(autoincrement())
+  publicId  String   @unique
   userId    String
   label     String   @db.VarChar(50)
   color     String?  @db.VarChar(50)
@@ -243,10 +250,11 @@ model UserTaskStatus {
 }
 
 model Task {
-  id          String         @id @default(uuid()) @db.Uuid
+  id          BigInt         @id @default(autoincrement())
+  publicId    String         @unique
   title       String         @db.VarChar(255)
   description String?
-  statusId    String         @db.Uuid
+  statusId    BigInt
   order       Int            @default(0)
   dueDate     DateTime?      @db.Timestamp(6)
   userId      String
@@ -266,7 +274,8 @@ model Task {
 }
 
 model Habit {
-  id          String            @id @default(uuid()) @db.Uuid
+  id          BigInt            @id @default(autoincrement())
+  publicId    String            @unique
   name        String            @db.VarChar(255)
   description String?
   recurrence  Int               @default(1)
@@ -284,8 +293,9 @@ model Habit {
 }
 
 model HabitCompletion {
-  id          String   @id @default(uuid()) @db.Uuid
-  habitId     String   @db.Uuid
+  id          BigInt   @id @default(autoincrement())
+  publicId    String   @unique
+  habitId     BigInt
   userId      String
   completedAt DateTime @default(now()) @db.Timestamp(6)
   habit       Habit    @relation(fields: [habitId], references: [id])
@@ -296,7 +306,8 @@ model HabitCompletion {
 }
 
 model JournalEntry {
-  id        String    @id @default(uuid()) @db.Uuid
+  id        BigInt    @id @default(autoincrement())
+  publicId  String    @unique
   userId    String
   content   String    @db.Text
   mood      String?   @db.VarChar(20)
@@ -313,7 +324,9 @@ model JournalEntry {
 }
 
 model Guild {
-  id                String          @id @default(uuid()) @db.Uuid
+  id                BigInt          @id @default(autoincrement())
+  publicId          String          @unique
+  slug              String          @unique
   name              String          @db.VarChar(80)
   description       String?         @db.Text
   availableTitles   String[]        @default([]) @db.VarChar(32)
@@ -335,8 +348,9 @@ model Guild {
 }
 
 model GuildMember {
-  id       String   @id @default(uuid()) @db.Uuid
-  guildId  String   @db.Uuid
+  id       BigInt   @id @default(autoincrement())
+  publicId String   @unique
+  guildId  BigInt
   userId   String
   role     String   @default("MEMBER") @db.VarChar(20)
   joinedAt DateTime @default(now()) @db.Timestamp(6)
@@ -349,8 +363,9 @@ model GuildMember {
 }
 
 model GuildMessage {
-  id          String               @id @default(uuid()) @db.Uuid
-  guildId     String               @db.Uuid
+  id          BigInt               @id @default(autoincrement())
+  publicId    String               @unique
+  guildId     BigInt
   userId      String
   content     String               @db.VarChar(2000)
   createdAt   DateTime             @default(now()) @db.Timestamp(6)
@@ -365,8 +380,8 @@ model GuildMessage {
 }
 
 model GuildMessageReport {
-  id         String       @id @default(uuid()) @db.Uuid
-  messageId  String       @db.Uuid
+  id         BigInt       @id @default(autoincrement())
+  messageId  BigInt
   reporterId String
   reason     String?      @db.VarChar(255)
   createdAt  DateTime     @default(now()) @db.Timestamp(6)
@@ -379,8 +394,9 @@ model GuildMessageReport {
 }
 
 model GuildInvite {
-  id        String    @id @default(uuid()) @db.Uuid
-  guildId   String    @db.Uuid
+  id        BigInt    @id @default(autoincrement())
+  publicId  String    @unique
+  guildId   BigInt
   token     String    @unique @db.VarChar(64)
   createdBy String
   expiresAt DateTime  @db.Timestamp(6)
@@ -395,8 +411,9 @@ model GuildInvite {
 }
 
 model GuildCampaign {
-  id               String                  @id @default(uuid()) @db.Uuid
-  guildId          String                  @db.Uuid
+  id               BigInt                  @id @default(autoincrement())
+  publicId         String                  @unique
+  guildId          BigInt
   templateId       String                  @db.VarChar(64)
   eventType        String                  @db.VarChar(32)
   target           Int
@@ -416,8 +433,8 @@ model GuildCampaign {
 }
 
 model GuildCampaignProgress {
-  id           String        @id @default(uuid()) @db.Uuid
-  campaignId   String        @db.Uuid
+  id           BigInt        @id @default(autoincrement())
+  campaignId   BigInt
   userId       String
   contribution Int           @default(0)
   claimedAt    DateTime?     @db.Timestamp(6)
@@ -431,9 +448,10 @@ model GuildCampaignProgress {
 }
 
 model TavernMessage {
-  id          String                @id @default(uuid()) @db.Uuid
+  id          BigInt                @id @default(autoincrement())
+  publicId    String                @unique
   userId      String
-  characterId String                @db.Uuid
+  characterId BigInt
   content     String                @db.VarChar(500)
   createdAt   DateTime              @default(now()) @db.Timestamp(6)
   deletedAt   DateTime?             @db.Timestamp(6)
@@ -447,8 +465,8 @@ model TavernMessage {
 }
 
 model TavernMessageReport {
-  id         String        @id @default(uuid()) @db.Uuid
-  messageId  String        @db.Uuid
+  id         BigInt        @id @default(autoincrement())
+  messageId  BigInt
   reporterId String
   reason     String?       @db.VarChar(255)
   createdAt  DateTime      @default(now()) @db.Timestamp(6)

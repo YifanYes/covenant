@@ -1,7 +1,8 @@
 import { CAMPAIGN_EVENT_TYPE } from '@/shared/constants/guild-campaigns.constants'
 import type { CreateHabitType, UpdateHabitType } from '@shared/schemas/habits.schemas'
+import { TRPCError } from '@trpc/server'
 import { analytics as defaultAnalytics, type AnalyticsService } from '../lib/analytics'
-import { resourceNotFound } from '../lib/errors'
+import { RESOURCE_NOT_FOUND_OR_FORBIDDEN, resourceNotFound } from '../lib/errors'
 import { logger } from '../lib/logger'
 import type { CharacterRepository } from '../repositories/character.repository'
 import type { HabitRepository } from '../repositories/habit.repository'
@@ -27,6 +28,12 @@ export class HabitService {
     private analytics: AnalyticsService = defaultAnalytics
   ) {}
 
+  private async resolveHabit(publicId: string, userId: string): Promise<bigint> {
+    const habit = await this.habitRepository.findByPublicId(publicId, userId)
+    if (!habit) throw new TRPCError({ code: 'NOT_FOUND', message: RESOURCE_NOT_FOUND_OR_FORBIDDEN })
+    return habit.id
+  }
+
   async create(userId: string, input: CreateHabitType) {
     const habit = await this.habitRepository.create(userId, input)
     if (this.characterRepository) {
@@ -49,35 +56,31 @@ export class HabitService {
     return { habits: withLastCompleted }
   }
 
-  async getById(userId: string, id: string) {
-    const habit = await this.habitRepository.findByIdWithDetails(id)
-
-    if (!habit) {
-      log.warn({ habitId: id, userId }, 'getById: habit not found')
+  async getById(userId: string, publicId: string) {
+    const lookup = await this.habitRepository.findByPublicId(publicId, userId)
+    if (!lookup) {
+      log.warn({ habitPublicId: publicId, userId }, 'getById: habit not found')
       throw resourceNotFound()
     }
-    if (habit.userId !== userId) {
-      log.warn({ habitId: id, requestingUserId: userId, ownerId: habit.userId }, 'getById: ownership check failed')
-      throw resourceNotFound()
-    }
-
+    const habit = await this.habitRepository.findByIdWithDetails(lookup.id)
+    if (!habit) throw resourceNotFound()
     return { habit }
   }
 
   async update(userId: string, input: UpdateHabitType) {
-    await this.habitRepository.findByIdOrThrow(input.id, userId)
-    const habit = await this.habitRepository.update(input.id, input)
+    const id = await this.resolveHabit(input.publicId, userId)
+    const habit = await this.habitRepository.update(id, input)
     return { habit }
   }
 
-  async delete(userId: string, id: string) {
-    await this.habitRepository.findByIdOrThrow(id, userId)
+  async delete(userId: string, publicId: string) {
+    const id = await this.resolveHabit(publicId, userId)
     await this.habitRepository.softDelete(id)
     return { message: 'Habit deleted successfully' }
   }
 
-  async restore(userId: string, id: string) {
-    await this.habitRepository.findByIdOrThrow(id, userId)
+  async restore(userId: string, publicId: string) {
+    const id = await this.resolveHabit(publicId, userId)
     const restoredHabit = await this.habitRepository.restore(id)
     return { habit: restoredHabit, message: 'Habit restored successfully' }
   }
@@ -87,8 +90,8 @@ export class HabitService {
     return { habits }
   }
 
-  async createCompletion(userId: string, habitId: string) {
-    await this.habitRepository.findByIdOrThrow(habitId, userId)
+  async createCompletion(userId: string, habitPublicId: string) {
+    const habitId = await this.resolveHabit(habitPublicId, userId)
 
     const completion = await this.habitRepository.createCompletion(habitId, userId)
 
@@ -100,7 +103,7 @@ export class HabitService {
     await this.guildService?.recordCampaignEvent(userId, CAMPAIGN_EVENT_TYPE.HABIT_COMPLETION, 1)
 
     this.analytics.track(userId, 'habit_completed', {
-      habit_id: habitId,
+      habit_id: habitId.toString(),
       streak_length: streak,
       streak_tier: streakTier(streak),
       mana_earned: result.manaApplied,
@@ -119,22 +122,13 @@ export class HabitService {
     }
   }
 
-  async deleteCompletion(userId: string, completionId: string) {
-    const completion = await this.habitRepository.findCompletionById(completionId)
-
+  async deleteCompletion(userId: string, completionPublicId: string) {
+    const completion = await this.habitRepository.findCompletionByPublicId(completionPublicId, userId)
     if (!completion) {
-      log.warn({ completionId, userId }, 'deleteCompletion: completion not found')
+      log.warn({ completionPublicId, userId }, 'deleteCompletion: completion not found or unauthorized')
       throw resourceNotFound()
     }
-    if (completion.userId !== userId) {
-      log.warn(
-        { completionId, requestingUserId: userId, ownerId: completion.userId },
-        'deleteCompletion: ownership check failed'
-      )
-      throw resourceNotFound()
-    }
-
-    await this.habitRepository.deleteCompletion(completionId)
+    await this.habitRepository.deleteCompletion(completion.id)
     return { message: 'Habit completion deleted successfully' }
   }
 }

@@ -29,17 +29,23 @@ export class KillRecordService {
     private combatEnemyRepository: CombatEnemyRepository
   ) {}
 
-  async getKillRecord(userId: string, limit = 50, cursor?: string) {
+  async getKillRecord(userId: string, limit = 50, cursorPublicId?: string) {
     const character = await this.characterRepository.findByUserId(userId)
 
     if (!character) {
       return { enemies: [], nextCursor: undefined }
     }
 
-    const enemies = await this.combatEnemyRepository.getDefeatedEnemiesByCharacter(character.id, limit + 1, cursor)
+    let cursorId: bigint | undefined
+    if (cursorPublicId) {
+      const found = await this.combatEnemyRepository.findByPublicId(cursorPublicId)
+      cursorId = found?.id
+    }
+
+    const enemies = await this.combatEnemyRepository.getDefeatedEnemiesByCharacter(character.id, limit + 1, cursorId)
 
     const hasMore = enemies.length > limit
-    const nextCursor = hasMore ? enemies[limit - 1].id : undefined
+    const nextCursor = hasMore ? enemies[limit - 1].publicId : undefined
 
     return {
       enemies: enemies.slice(0, limit),
@@ -79,7 +85,7 @@ export class KillRecordService {
    * Check if the character has earned a tier-up based on total kills and apply it
    * Used internally when we have characterId instead of userId
    */
-  async checkAndApplyTierProgressionByCharacterId(characterId: string): Promise<TierProgressionResult> {
+  async checkAndApplyTierProgressionByCharacterId(characterId: bigint): Promise<TierProgressionResult> {
     const character = await this.characterRepository.findByIdWithClasses(characterId)
     if (!character) {
       log.warn({ characterId }, 'checkAndApplyTierProgressionByCharacterId: character not found')
