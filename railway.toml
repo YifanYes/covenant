@@ -3,7 +3,7 @@ builder = "railpack"
 buildCommand = "pnpm install && pnpm prisma generate && pnpm build"
 
 [deploy]
-preDeployCommand = "pnpm prisma db push --force-reset --accept-data-loss"
+preDeployCommand = "pnpm prisma db push --accept-data-loss"
 startCommand = "pnpm start"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 100

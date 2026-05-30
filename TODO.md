@@ -1,9 +1,5 @@
 # TODOs
 
-## Beta Blockers (closed friends beta, week of 2026-06-01)
-
-- [ ] Audit Objectives → mana → dashboard wiring `[audit]`. Confirm completing an Objective fires the `objective_completed` PostHog event with non-zero `mana_earned` and that the user's mana reserve and dashboard reflect it. Objective is the Goal-tracking pillar named in `MISSION.md`; if it doesn't drive the core loop, the central analytics question in `docs/specs/posthog_integration.md` can't be answered. No code change if everything works.
-
 ## Quick Wins
 
 - [ ] Set up `privacy@covenantrpg.com` email forwarder before going public
@@ -76,7 +72,7 @@
 
 - [ ] Backfill tx-model `any` in grandfathered service tests `[test][debt]`. Five files carry `/* eslint-disable @typescript-eslint/no-explicit-any */` headers with `TODO: replace tx-model any with PrismaClient delegate types`: `auth.service.test.ts`, `guild.service.test.ts`, `guild-campaign.service.test.ts`, `guild-progression.service.test.ts`, `tavern.service.test.ts`. Replace `createRepoMock<any>()` for tx models with `createRepoMock<PrismaClient['guild']>()` etc., then drop the file-level disable.
 
-- [ ] Typed fixtures for Dashboard + Store `[test]`. `dashboard.service.test.ts` has 28 `as any` casts; `store.service.test.ts` has 5. Means fixture shapes drift from real Prisma return types. Extend `src/server/__tests__/fixtures/` to cover dashboard rollups and store inventory shapes, then strip the casts. After this lands, consider promoting `no-explicit-any` to error project-wide.
+- [ ] Typed fixtures for Dashboard + Store `[test]`. Bare `as any` already removed, but the casts were swapped for `as unknown as` (6) + `as never` (22) in `dashboard.service.test.ts` and `as unknown as` (5) in `store.service.test.ts` — these still bypass the type system, so fixture shapes still drift from real Prisma return types. Extend `src/server/__tests__/fixtures/` to cover dashboard rollups and store inventory shapes, then strip the remaining casts. After this lands, consider promoting `no-explicit-any` to error project-wide.
 
 - [ ] tRPC router tests via `createCaller` `[test]`. Currently 1 router test (rate-limit only). All other procedures, input validation, and auth context middleware are untested — bugs here ship. One `createCaller()` test per router with mocked `ServiceFactory`. Start with high-risk routers: auth, character, guild.
 
@@ -85,8 +81,6 @@
 - [ ] Real-DB repo integration tier `[test]`. Repository tests currently mock Prisma — they assert `findUnique` was called with the right `where` clause, which re-states implementation. Real bugs (schema typos, bad joins, N+1) escape. Add testcontainers (or docker-compose Postgres) for a separate `pnpm test:db` tier; keep current mocked unit tier as-is. Defer until a repo bug actually ships.
 
 - [ ] Ratchet vitest coverage thresholds `[test]`. Baselines in `vitest.config.ts` set to current floor minus small buffer (services 75/65/70/75, utils 60/35/75/60). Raise after each coverage-improving PR; target services 85+, utils 80+.
-
-- [ ] Reduce over-assertion in service tests `[test]`. Many tests call `expect(repo.foo).toHaveBeenCalledWith(exactArgs)` on every internal call, locking tests to implementation. Prefer asserting return values + state-changing calls only. Refactor opportunistically when touching a test for other reasons.
 
 ## Low Priority
 
@@ -123,8 +117,6 @@ Deferred until the core loop has been validated with real beta users. Specs for 
 
 - [ ] Heavy-hitter scaling in party combat. When parties ship, prevent high-tier players one-shotting bosses (Habitica's biggest party gripe). Mitigate via per-player damage cap, level-scaled contribution, or share-of-final-blow reward split. Defer until party combat exists.
 
-- [ ] Alternative cosmetic theme/reskin (non-fantasy). Solar-punk / sci-fi / minimalist toggle per user. Habitica feedback: fantasy locks out a chunk of audience. Asset cost is high — ship only if beta surfaces discovery friction from the fantasy framing.
-
 - [ ] Veteran gold/resource sink. Once endgame players accumulate idle gold, add rare expensive sinks: guild buffs, cosmetic upgrades, quest unlocks, prestige tiers. Defer until retention long enough to surface the problem.
 
 - [ ] Interest-tagged guild discovery (study group / ADHD / artists / language-learning / etc.). Tag guilds by theme so users find compatible communities — the gap left by Habitica killing public guilds in 2023. Folds into Guild Phase 4 discovery work — pair tagging with search/filter UI.
@@ -132,10 +124,8 @@ Deferred until the core loop has been validated with real beta users. Specs for 
 - [ ] Google Calendar (and iCal) sync. Two-way sync of scheduled tasks/dailies. Habitica feedback: most-requested integration. Deferrable — internal calendar view (Medium) covers the primary use case first.
 - [ ] AI report of the month — monthly AI-generated summary of productivity, streaks, objective progress
 - [ ] Map page interactivity — clickable regions, faction war state, quest entry points
-- [ ] Account deletion: pre-delete data export prompt (folds into "Account management" data export)
 - [ ] Breadcrumbs on nested routes (`/quests/[questId]`, `/inventory/[tab]`)
 - [ ] Post-combat summary screen — XP/gold/loot between combat end and `/quests` redirect
-- [ ] Theme system: OS-preference option (light/dark already exist)
 
 - [ ] **Evaluate `@posthog/next` once stable.** PostHog ships a unified Next.js package (bundles `PostHogProvider`, `PostHogPageView`, middleware-based reverse proxy at `/ingest`, server-side flag bootstrapping, and synchronized client/server identity). Currently pre-release — PostHog explicitly recommends the manual `posthog-js` + `posthog-node` setup for production. When the package leaves pre-release, revisit and decide whether to migrate. Likely replaces `src/lib/posthog/client.ts`, `src/components/common/posthog-provider.component.tsx`, and the planned manual proxy work. See `docs/specs/posthog_integration.md` "Out of Scope".
 
