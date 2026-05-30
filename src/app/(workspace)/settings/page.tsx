@@ -69,7 +69,7 @@ export default function Settings() {
     control,
     handleSubmit,
     reset,
-    formState: { isDirty }
+    formState: { isDirty, isSubmitting }
   } = useForm<SettingsFormValues>({
     mode: 'onChange',
     defaultValues: {
@@ -160,7 +160,6 @@ export default function Settings() {
     }
   }
 
-  const isSubmitting = updateProfileMutation.isPending
   const isSaveDisabled = !isDirty || isSubmitting
 
   return (
