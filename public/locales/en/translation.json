@@ -86,7 +86,16 @@
       "title": "Complete tasks. Kill demons.",
       "subtitle": "Your daily discipline forges your divine legend.",
       "body": "A productivity app where every completed task, every sustained habit, and every closed objective forges your character and the world's destiny.",
-      "cta": "JOIN THE WAR"
+      "cta": "JOIN THE WAR",
+      "preview": {
+        "hp_label": "HP",
+        "mana_label": "MANA",
+        "ability_name": "Combustion",
+        "task1": "Finish the report",
+        "task2": "Run 5 km",
+        "task3": "Read 20 pages",
+        "caption": "Complete tasks → gather mana → cast spells."
+      }
     },
     "value_proposition": {
       "title": "Another to-do app? (=____=)",

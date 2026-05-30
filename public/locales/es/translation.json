@@ -86,7 +86,16 @@
       "title": "Completa tareas. Mata demonios.",
       "subtitle": "Tu disciplina diaria forja tu leyenda divina.",
       "body": "Una app de productividad donde cada tarea completada, cada hábito sostenido y cada objetivo cerrado forja a tu personaje y el destino del mundo.",
-      "cta": "UNIRSE A LA GUERRA"
+      "cta": "UNIRSE A LA GUERRA",
+      "preview": {
+        "hp_label": "HP",
+        "mana_label": "MANÁ",
+        "ability_name": "Combustión",
+        "task1": "Terminar el informe",
+        "task2": "Correr 5 km",
+        "task3": "Leer 20 páginas",
+        "caption": "Completa tareas → reúne maná → lanza hechizos."
+      }
     },
     "value_proposition": {
       "title": "¿Otra app de to-dos? (=____=)",

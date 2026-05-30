@@ -20,6 +20,7 @@ import {
   Zap
 } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
+import HeroCombatPreview from './hero-combat-preview.component'
 
 function HeroSection() {
   const { t } = useTranslation()
@@ -46,8 +47,9 @@ function HeroSection() {
         </Button>
       </div>
 
-      <div className="relative z-10 hidden lg:block">
+      <div className="relative z-10 hidden items-center justify-center lg:flex">
         <div className="bg-muted/30 border-primary/20 absolute inset-0 border-l-2 border-dashed" />
+        <HeroCombatPreview />
       </div>
     </section>
   )
