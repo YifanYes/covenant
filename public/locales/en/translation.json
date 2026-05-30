@@ -152,25 +152,25 @@
     "coming_soon": {
       "title": "Coming Soon",
       "features": {
-        "journaling": {
-          "title": "Integrated Journaling",
-          "description": "Daily reflection connected with your progress. Document victories, analyze defeats."
-        },
         "pvp": {
           "title": "PvP: Duels",
           "description": "Challenge other players head-to-head. Your real consistency against theirs."
         },
-        "leaderboards": {
-          "title": "Leaderboards",
-          "description": "Rankings for the most disciplined."
+        "classes": {
+          "title": "New Classes",
+          "description": "Expand your options with new classes and playstyles."
         },
-        "coop": {
-          "title": "New Classes and Factions",
-          "description": "Expand your options with new classes and join powerful factions."
+        "factions": {
+          "title": "New Factions",
+          "description": "Join powerful factions and fight for their cause."
         },
-        "scaling": {
-          "title": "Cooking and Crafting",
-          "description": "Create consumables and craft equipment with gathered materials."
+        "warfronts": {
+          "title": "Warfronts",
+          "description": "Time-bound global objectives. Contribute through combat and shape the world's fate."
+        },
+        "calendar_sync": {
+          "title": "Calendar Sync",
+          "description": "Connect your Google Calendar and turn events into quests."
         },
         "seasonal": {
           "title": "Board Game Release",

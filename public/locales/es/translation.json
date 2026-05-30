@@ -152,25 +152,25 @@
     "coming_soon": {
       "title": "Próximamente",
       "features": {
-        "journaling": {
-          "title": "Journaling Integrado",
-          "description": "Reflexión diaria conectada con tu progreso. Documenta victorias, analiza derrotas."
-        },
         "pvp": {
           "title": "PvP: Duelos",
           "description": "Reta a otros jugadores cara a cara. Tu consistencia real contra la de otro."
         },
-        "leaderboards": {
-          "title": "Leaderboards",
-          "description": "Tablas de clasificación para los más disciplinados."
+        "classes": {
+          "title": "Nuevas Clases",
+          "description": "Amplía tus opciones con nuevas clases y estilos de juego."
         },
-        "coop": {
-          "title": "Nuevas Clases y Facciones",
-          "description": "Amplía tus opciones con nuevas clases y únete a facciones poderosas."
+        "factions": {
+          "title": "Nuevas Facciones",
+          "description": "Únete a facciones poderosas y lucha por su causa."
         },
-        "scaling": {
-          "title": "Cocina y Fabricación",
-          "description": "Crea consumibles y fabrica equipamiento con materiales recolectados."
+        "warfronts": {
+          "title": "Frentes de Guerra",
+          "description": "Objetivos globales con tiempo límite. Contribuye en combate y cambia el destino del mundo."
+        },
+        "calendar_sync": {
+          "title": "Sincronización de Calendario",
+          "description": "Conecta tu Google Calendar y convierte tus eventos en misiones."
         },
         "seasonal": {
           "title": "Lanzamiento del Juego de Mesa",

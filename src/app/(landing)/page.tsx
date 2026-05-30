@@ -17,7 +17,6 @@ import {
   Target,
   Trophy,
   User,
-  Users,
   Zap
 } from 'pixelarticons/react'
 import { useTranslation } from 'react-i18next'
@@ -262,34 +261,34 @@ function ComingSoonSection() {
 
   const features = [
     {
-      icon: BookOpen,
-      title: t('landing.coming_soon.features.journaling.title'),
-      description: t('landing.coming_soon.features.journaling.description')
-    },
-    {
       icon: Gamepad,
       title: t('landing.coming_soon.features.pvp.title'),
       description: t('landing.coming_soon.features.pvp.description')
     },
     {
-      icon: Trophy,
-      title: t('landing.coming_soon.features.leaderboards.title'),
-      description: t('landing.coming_soon.features.leaderboards.description')
+      icon: User,
+      title: t('landing.coming_soon.features.classes.title'),
+      description: t('landing.coming_soon.features.classes.description')
     },
     {
-      icon: Users,
-      title: t('landing.coming_soon.features.coop.title'),
-      description: t('landing.coming_soon.features.coop.description')
+      icon: Flag,
+      title: t('landing.coming_soon.features.factions.title'),
+      description: t('landing.coming_soon.features.factions.description')
+    },
+    {
+      icon: Shield,
+      title: t('landing.coming_soon.features.warfronts.title'),
+      description: t('landing.coming_soon.features.warfronts.description')
+    },
+    {
+      icon: Repeat,
+      title: t('landing.coming_soon.features.calendar_sync.title'),
+      description: t('landing.coming_soon.features.calendar_sync.description')
     },
     {
       icon: Calendar,
       title: t('landing.coming_soon.features.seasonal.title'),
       description: t('landing.coming_soon.features.seasonal.description')
-    },
-    {
-      icon: Zap,
-      title: t('landing.coming_soon.features.scaling.title'),
-      description: t('landing.coming_soon.features.scaling.description')
     }
   ]
 
