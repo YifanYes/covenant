@@ -12,7 +12,7 @@ import type { TutorialSlideId } from '@shared/schemas/onboarding.schemas'
 import { queryClient, trpcOptions } from '@/utils/trpc.utils'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useSyncExternalStore } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import ProductivityLayout from './productivity-layout'
@@ -33,7 +33,6 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
   const setSeen = useTutorialStore((s) => s.setSeen)
   const closeCurrent = useTutorialStore((s) => s.closeCurrent)
   const enqueueMany = useTutorialStore((s) => s.enqueueMany)
-  const [tutorialFromParam] = useState(() => searchParams.get('tutorial') === 'true')
   const tutorialParamConsumed = useRef(false)
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -78,7 +77,8 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
   }, [character?.tutorialSlidesSeen, setSeen])
 
   useEffect(() => {
-    if (!tutorialFromParam || tutorialParamConsumed.current) return
+    if (tutorialParamConsumed.current) return
+    if (searchParams.get('tutorial') !== 'true') return
     if (!session?.user) return
     if (character === undefined) return
     if (character === null) {
@@ -90,7 +90,7 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
     }
     tutorialParamConsumed.current = true
     router.replace(pathname)
-  }, [tutorialFromParam, session?.user, character, enqueueMany, router, pathname])
+  }, [searchParams, session?.user, character, enqueueMany, router, pathname])
 
   const markSeenMutation = useMutation(
     trpcOptions.character.markTutorialSlideSeen.mutationOptions({

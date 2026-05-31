@@ -16,7 +16,14 @@ export default function GoogleLoginButton() {
       setIsLoading(true)
       await signIn.social({
         provider: 'google',
-        callbackURL: `${window.location.origin}/login`
+        // New signups land on /objectives?tutorial=true so the onboarding flow fires: no
+        // character → 'character' slide → CTA pushes to /onboarding → back here. Mirrors the
+        // email signup callbackURL. Routing the new-user decision through Better Auth's
+        // server-side `isRegister` check is required because the middleware (proxy.ts)
+        // redirects any authenticated hit on /login to /objectives (no param) before the
+        // login page's client logic can run. Returning users skip the tutorial param.
+        callbackURL: `${window.location.origin}/objectives`,
+        newUserCallbackURL: `${window.location.origin}/objectives?tutorial=true`
       })
     } catch (error) {
       Sentry.captureException(error, { tags: { flow: 'google-login' } })
