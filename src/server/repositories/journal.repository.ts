@@ -31,9 +31,24 @@ export class JournalRepository {
     return tx || this.prisma
   }
 
-  async create(userId: string, content: string, mood?: string | null, color?: string | null, tx?: any): Promise<JournalEntry> {
+  async create(
+    userId: string,
+    content: string,
+    mood?: string | null,
+    color?: string | null,
+    createdAt?: Date,
+    tx?: any
+  ): Promise<JournalEntry> {
     return this.getClient(tx).journalEntry.create({
-      data: { userId, publicId: generatePublicId(), content, mood: mood || null, color: color || null }
+      data: {
+        userId,
+        publicId: generatePublicId(),
+        content,
+        mood: mood || null,
+        color: color || null,
+        // Omit when undefined so Prisma applies @default(now()) for today's entries.
+        ...(createdAt && { createdAt })
+      }
     })
   }
 

@@ -3,6 +3,7 @@
 import { MOODS } from '@shared/constants/journal.constants'
 import LoaderButton from '@/common/loader-button.component'
 import Button from '@/components/ui/button.component'
+import DatePicker from '@/components/forms/date-picker.component'
 import TiptapEditor from '@/components/ui/tiptap-editor.component'
 import Select, {
   SelectContent,
@@ -24,11 +25,27 @@ function getRandomPrompt(t: (key: string) => string) {
 
 const TIMEZONE_OFFSET = new Date().getTimezoneOffset()
 
+// Local calendar date as YYYY-MM-DD (not toISOString, which would shift to UTC).
+function toDateStr(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function isFutureDate(date: Date) {
+  const endOfToday = new Date()
+  endOfToday.setHours(23, 59, 59, 999)
+  return date.getTime() > endOfToday.getTime()
+}
+
 export default function JournalEditor() {
   const { t } = useTranslation()
   const [content, setContent] = useState('')
   const [mood, setMood] = useState<string | undefined>(undefined)
   const [color, setColor] = useState<string | undefined>(undefined)
+  const [date, setDate] = useState<Date>(new Date())
+  const [dateError, setDateError] = useState<string | undefined>(undefined)
 
   const { data: streakData } = useSuspenseQuery(
     trpcOptions.journaling.getStreak.queryOptions({ timezoneOffset: TIMEZONE_OFFSET })
@@ -41,6 +58,8 @@ export default function JournalEditor() {
         setContent('')
         setMood(undefined)
         setColor(undefined)
+        setDate(new Date())
+        setDateError(undefined)
         await queryClient.invalidateQueries({ queryKey: trpcOptions.journaling.getByDate.queryKey() })
         await queryClient.invalidateQueries({ queryKey: trpcOptions.journaling.getStreak.queryKey() })
         await queryClient.invalidateQueries({ queryKey: trpcOptions.journaling.getAll.queryKey() })
@@ -60,8 +79,8 @@ export default function JournalEditor() {
 
   const handleSave = () => {
     const plain = content.replace(/<[^>]*>/g, '').trim()
-    if (!plain) return
-    createMutation.mutate({ content, mood, color, timezoneOffset: TIMEZONE_OFFSET })
+    if (!plain || dateError) return
+    createMutation.mutate({ content, mood, color, date: toDateStr(date), timezoneOffset: TIMEZONE_OFFSET })
   }
 
   const handlePrompt = () => {
@@ -79,6 +98,22 @@ export default function JournalEditor() {
 
   return (
     <div className="flex flex-col gap-5">
+      <DatePicker
+        label={t('journaling.entry_date')}
+        value={date}
+        onChange={(selected) => {
+          if (!selected) return
+          if (isFutureDate(selected)) {
+            setDateError(t('journaling.error.future_date'))
+            return
+          }
+          setDateError(undefined)
+          setDate(selected)
+        }}
+        errorMessage={dateError}
+        disableFuture
+      />
+
       <div className="flex flex-col gap-3">
         <TiptapEditor
           content={content}
@@ -92,7 +127,9 @@ export default function JournalEditor() {
         <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
           {t('journaling.select_mood')}
         </p>
-        <Select value={mood} onValueChange={handleMoodChange}>
+        {/* Empty-string sentinel keeps Radix controlled; passing undefined flips it to */}
+        {/* uncontrolled, so a reset (mood -> undefined) leaves the stale label showing. */}
+        <Select value={mood ?? ''} onValueChange={handleMoodChange}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder={t('journaling.select_mood')}>
               {mood && (
@@ -135,7 +172,7 @@ export default function JournalEditor() {
           <LoaderButton
             onClick={handleSave}
             isLoading={isLoading}
-            disabled={!plainContent}
+            disabled={!plainContent || !!dateError}
             label={t('journaling.save')}
           />
         </div>

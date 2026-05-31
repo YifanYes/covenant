@@ -1665,8 +1665,10 @@
     "streak": "Racha: {{count}} días",
     "edit_entry": "Editar entrada",
     "recent_entries": "Entradas recientes",
+    "loading_more": "Invocando entradas anteriores...",
     "no_entry_for_date": "No hay entrada para esta fecha",
     "select_mood": "¿Cómo te sientes?",
+    "entry_date": "Fecha de la entrada",
     "empty_state": {
       "title": "Sin entradas aún",
       "description": "Tu crónica está vacía. Escribe tu primera entrada y comienza tu leyenda.",
@@ -1690,6 +1692,7 @@
       "delete": "Entrada eliminada exitosamente"
     },
     "error": {
+      "future_date": "No se permiten entradas de diario con fecha futura.",
       "internal": {
         "create": "Ocurrió un error al guardar la entrada",
         "update": "Ocurrió un error al actualizar la entrada",

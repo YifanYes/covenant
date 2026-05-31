@@ -1665,8 +1665,10 @@
     "streak": "Streak: {{count}} days",
     "edit_entry": "Edit entry",
     "recent_entries": "Recent entries",
+    "loading_more": "Summoning older entries...",
     "no_entry_for_date": "No entry for this date",
     "select_mood": "How are you feeling?",
+    "entry_date": "Entry date",
     "empty_state": {
       "title": "No entries yet",
       "description": "Your chronicle is empty. Scribe your first entry and begin your legend.",
@@ -1690,6 +1692,7 @@
       "delete": "Entry deleted successfully"
     },
     "error": {
+      "future_date": "Future journal entries are not allowed.",
       "internal": {
         "create": "An error occurred while saving the entry",
         "update": "An error occurred while updating the entry",

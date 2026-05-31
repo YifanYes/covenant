@@ -26,6 +26,18 @@ export class JournalService {
     return entry.id
   }
 
+  // User's local calendar date (YYYY-MM-DD) for a UTC instant, given their tz offset.
+  private localDateStr(date: Date, timezoneOffset: number): string {
+    const shifted = new Date(date.getTime() - timezoneOffset * 60 * 1000)
+    return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, '0')}-${String(shifted.getUTCDate()).padStart(2, '0')}`
+  }
+
+  // UTC instant for local midnight of the given calendar date, using a fixed tz offset.
+  private localMidnightUtc(dateStr: string, timezoneOffset: number): Date {
+    const localMidnight = new Date(`${dateStr}T00:00:00.000Z`)
+    return new Date(localMidnight.getTime() + timezoneOffset * 60 * 1000)
+  }
+
   async create(userId: string, input: CreateJournalEntryType) {
     let manaEarned = 0
     let reserveGained = 0
@@ -33,21 +45,36 @@ export class JournalService {
     let entry: Awaited<ReturnType<typeof this.journalRepository.create>>
     const sanitizedContent = sanitizeRichText(input.content)
 
+    // Resolve which calendar day this entry belongs to. Backdating is allowed; future-dating is not.
+    const todayStr = this.localDateStr(new Date(), input.timezoneOffset)
+    const targetDate = input.date ?? todayStr
+    if (targetDate > todayStr) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Future journal entries are not allowed' })
+    }
+    const isToday = targetDate === todayStr
+    // Today keeps @default(now()); backdated entries pin to that day's local midnight.
+    const createdAt = isToday ? undefined : this.localMidnightUtc(targetDate, input.timezoneOffset)
+
+    // Mana is granted at most once per local calendar day. Backdated days dedupe via the
+    // @@unique([userId, createdAt]) constraint (createdNew is false on the second insert),
+    // but today's entries use @default(now()) and never collide, so check explicitly.
+    const alreadyLoggedToday = isToday && (await this.journalRepository.hasEntryToday(userId, input.timezoneOffset))
+
     try {
       entry = await this.prisma.$transaction(async (tx) => {
-        return this.journalRepository.create(userId, sanitizedContent, input.mood, input.color, tx)
+        return this.journalRepository.create(userId, sanitizedContent, input.mood, input.color, createdAt, tx)
       })
       createdNew = true
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        const entries = await this.journalRepository.findByDate(userId, new Date(), input.timezoneOffset)
+        const entries = await this.journalRepository.findByDate(userId, targetDate, input.timezoneOffset)
         entry = entries[0]
       } else {
         throw error
       }
     }
 
-    if (createdNew) {
+    if (createdNew && !alreadyLoggedToday) {
       const result = await this.manaService.addManaFromCompletion(userId, 'journal')
       if (result.success) {
         manaEarned = result.manaApplied
@@ -88,23 +115,17 @@ export class JournalService {
   }
 
   async getByDate(userId: string, date: string, timezoneOffset = 0) {
-    const match = date.match(/^(\d{4})-(\d{2})-(\d{2})$/)
-    if (!match) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid date format' })
-    }
+    // Date shape/validity enforced by journalDateSchema (z.iso.date()) at the router boundary.
     const entries = await this.journalRepository.findByDate(userId, date, timezoneOffset)
     return entries
   }
 
-  async getAll(userId: string, input: { page: number; pageSize: number }) {
-    const { entries, totalCount } = await this.journalRepository.findAll(userId, input.page, input.pageSize)
-    return {
-      entries,
-      totalCount,
-      page: input.page,
-      pageSize: input.pageSize,
-      totalPages: Math.ceil(totalCount / input.pageSize)
-    }
+  async getAll(userId: string, input: { cursor?: number; pageSize: number }) {
+    const page = input.cursor ?? 1
+    const { entries, totalCount } = await this.journalRepository.findAll(userId, page, input.pageSize)
+    // Next 1-based page, or undefined once this page reaches the end.
+    const nextCursor = page * input.pageSize < totalCount ? page + 1 : undefined
+    return { entries, totalCount, nextCursor }
   }
 
   async getMoodCalendar(userId: string, month: number, year: number, timezoneOffset = 0) {

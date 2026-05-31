@@ -19,7 +19,8 @@ export default function DatePicker({
   label,
   required,
   errorMessage,
-  id
+  id,
+  disableFuture
 }: {
   value?: Date | null
   onChange: (date: Date | null) => void
@@ -29,6 +30,7 @@ export default function DatePicker({
   required?: boolean
   errorMessage?: string
   id?: string
+  disableFuture?: boolean
 }) {
   const { i18n } = useTranslation()
   const { fieldId, effectivePlaceholder } = useFormField({
@@ -220,6 +222,7 @@ export default function DatePicker({
               month={month}
               onMonthChange={setMonth}
               weekStartsOn={1}
+              disabled={disableFuture ? { after: new Date() } : undefined}
               initialFocus
               formatters={{
                 formatCaption: (date) => {

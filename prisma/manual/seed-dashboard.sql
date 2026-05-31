@@ -9,6 +9,13 @@
 --
 -- Idempotent: re-running emits a NOTICE and skips. Rollback at bottom of file.
 
+-- publicId is app-generated (no DB default), shape `^[a-z][a-z0-9]{11}$`. Session-temp
+-- helper mints conforming ids for seeded rows; auto-dropped at session end.
+CREATE OR REPLACE FUNCTION pg_temp.seed_public_id() RETURNS text AS $fn$
+  SELECT chr(97 + floor(random() * 26)::int)
+       || substr(md5(random()::text || clock_timestamp()::text), 1, 11);
+$fn$ LANGUAGE sql VOLATILE;
+
 DO $$
 DECLARE
   target_email   text := 'PLACEHOLDER_EMAIL@example.com';
@@ -46,11 +53,11 @@ BEGIN
   END IF;
 
   -- Ensure default TODO/DOING/DONE statuses exist for this user, then capture their IDs.
-  INSERT INTO user_task_statuses ("userId", label, "isDefault", "createdAt", "updatedAt")
+  INSERT INTO user_task_statuses ("publicId", "userId", label, "isDefault", "createdAt", "updatedAt")
   VALUES
-    (target_user_id, 'TODO',  true,  now_ts, now_ts),
-    (target_user_id, 'DOING', false, now_ts, now_ts),
-    (target_user_id, 'DONE',  false, now_ts, now_ts)
+    (pg_temp.seed_public_id(), target_user_id, 'TODO',  true,  now_ts, now_ts),
+    (pg_temp.seed_public_id(), target_user_id, 'DOING', false, now_ts, now_ts),
+    (pg_temp.seed_public_id(), target_user_id, 'DONE',  false, now_ts, now_ts)
   ON CONFLICT ("userId", label) DO NOTHING;
 
   SELECT id INTO status_todo_id  FROM user_task_statuses WHERE "userId" = target_user_id AND label = 'TODO';
@@ -62,8 +69,9 @@ BEGIN
   ELSE
     ---------------------------------------------------------------- AREAS
     FOR i IN 1..10 LOOP
-      INSERT INTO areas (name, color, icon, "userId", "createdAt", "updatedAt")
+      INSERT INTO areas ("publicId", name, color, icon, "userId", "createdAt", "updatedAt")
       VALUES (
+        pg_temp.seed_public_id(),
         'SEED Area ' || lpad(i::text, 2, '0'),
         colors[i],
         icons[i],
@@ -77,8 +85,9 @@ BEGIN
 
     ---------------------------------------------------------- OBJECTIVES
     FOR i IN 1..20 LOOP
-      INSERT INTO objectives (name, description, "userId", "createdAt", "updatedAt")
+      INSERT INTO objectives ("publicId", name, description, "userId", "createdAt", "updatedAt")
       VALUES (
+        pg_temp.seed_public_id(),
         'SEED Obj ' || lpad(i::text, 2, '0'),
         'Seeded objective for dashboard validation',
         target_user_id,
@@ -117,8 +126,9 @@ BEGIN
         habit_recurr := 1;
       END IF;
 
-      INSERT INTO habits (name, description, recurrence, timespan, "userId", "createdAt", "updatedAt")
+      INSERT INTO habits ("publicId", name, description, recurrence, timespan, "userId", "createdAt", "updatedAt")
       VALUES (
+        pg_temp.seed_public_id(),
         'SEED Habit ' || lpad(i::text, 2, '0'),
         'Seeded habit for dashboard validation',
         habit_recurr,
@@ -146,8 +156,9 @@ BEGIN
         FOR day_offset IN 0..89 LOOP
           IF random() < 0.80 THEN
             FOR k IN 1..completions_per_day LOOP
-              INSERT INTO habit_completions ("habitId", "userId", "completedAt")
+              INSERT INTO habit_completions ("publicId", "habitId", "userId", "completedAt")
               VALUES (
+                pg_temp.seed_public_id(),
                 habit_ids[i],
                 target_user_id,
                 now_ts - (day_offset || ' days')::interval - (k * 2 || ' hours')::interval
@@ -159,8 +170,9 @@ BEGIN
         -- WEEKLY: one completion every 7 days at ~85% prob
         FOR day_offset IN 0..89 LOOP
           IF day_offset % 7 = 0 AND random() < 0.85 THEN
-            INSERT INTO habit_completions ("habitId", "userId", "completedAt")
+            INSERT INTO habit_completions ("publicId", "habitId", "userId", "completedAt")
             VALUES (
+              pg_temp.seed_public_id(),
               habit_ids[i],
               target_user_id,
               now_ts - (day_offset || ' days')::interval
@@ -170,10 +182,10 @@ BEGIN
       END IF;
     END LOOP;
     -- Stale habits
-    INSERT INTO habit_completions ("habitId", "userId", "completedAt")
-    VALUES (habit_ids[11], target_user_id, now_ts - interval '25 days');
-    INSERT INTO habit_completions ("habitId", "userId", "completedAt")
-    VALUES (habit_ids[12], target_user_id, now_ts - interval '40 days');
+    INSERT INTO habit_completions ("publicId", "habitId", "userId", "completedAt")
+    VALUES (pg_temp.seed_public_id(), habit_ids[11], target_user_id, now_ts - interval '25 days');
+    INSERT INTO habit_completions ("publicId", "habitId", "userId", "completedAt")
+    VALUES (pg_temp.seed_public_id(), habit_ids[12], target_user_id, now_ts - interval '40 days');
 
     ---------------------------------------------------------------- TASKS
     FOR i IN 1..100 LOOP
@@ -257,9 +269,10 @@ BEGIN
         WHEN 'DONE'  THEN status_done_id
       END;
 
-      INSERT INTO tasks (title, description, "statusId", "order", "dueDate", "userId",
+      INSERT INTO tasks ("publicId", title, description, "statusId", "order", "dueDate", "userId",
                          "createdAt", "updatedAt", color, effort, impact, "completedAt")
       VALUES (
+        pg_temp.seed_public_id(),
         'SEED Task ' || lpad(i::text, 3, '0'),
         'Seeded task for dashboard validation',
         task_status_id,

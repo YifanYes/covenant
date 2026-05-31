@@ -5,6 +5,9 @@ export const createJournalEntrySchema = z.object({
   content: z.string().min(1, 'errors.required_field').max(10000),
   mood: z.string().max(20).optional(),
   color: z.string().max(7).optional(),
+  // Local calendar date (YYYY-MM-DD) the entry is for. Omitted = today.
+  // z.iso.date() validates format AND real calendar date (rejects 2020-13-45, 2020-02-30).
+  date: z.iso.date().optional(),
   timezoneOffset: z.number().int().optional().default(0)
 })
 export type CreateJournalEntryType = z.infer<typeof createJournalEntrySchema>
@@ -22,13 +25,14 @@ export const journalEntryIdSchema = z.object({
 })
 
 export const journalDateSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  date: z.iso.date(),
   timezoneOffset: z.number().int().optional().default(0)
 })
 
 export const journalListSchema = z.object({
-  page: z.number().int().min(1).default(1),
-  pageSize: z.number().int().min(1).max(100).default(7)
+  // Cursor = 1-based page number. Optional so the tRPC infinite-query helper can inject it.
+  cursor: z.number().int().min(1).optional(),
+  pageSize: z.number().int().min(1).max(100).default(8)
 })
 
 export const journalMonthSchema = z.object({

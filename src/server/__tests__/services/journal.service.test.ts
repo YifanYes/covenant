@@ -1,3 +1,4 @@
+import { journalDateSchema } from '@shared/schemas/journal.schemas'
 import { Prisma } from '@/generated/prisma'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { JournalRepository } from '../../repositories/journal.repository'
@@ -35,6 +36,7 @@ describe('JournalService', () => {
   describe('create', () => {
     it('should create entry and award mana on first entry of the day', async () => {
       mockJournalRepo.create.mockResolvedValue({ id: BigInt(1), content: 'Hello', mood: 'happy', color: '#FFD700' })
+      mockJournalRepo.hasEntryToday.mockResolvedValue(false)
       mockJournalRepo.findEntryDates.mockResolvedValue([
         new Date(),
         new Date(Date.now() - 86400000),
@@ -70,6 +72,21 @@ describe('JournalService', () => {
 
       expect(result.manaEarned).toBe(0)
       expect(mockManaService.addManaFromCompletion).toHaveBeenCalledWith('user-1', 'journal')
+    })
+
+    it('does not award mana for a second entry on the same day', async () => {
+      // Today's entries use @default(now()) so they never trip the unique constraint;
+      // hasEntryToday is the guard that keeps mana to one grant per local day.
+      mockJournalRepo.create.mockResolvedValue({ id: BigInt(2), publicId: 'jrnpub000002', content: 'Again' })
+      mockJournalRepo.hasEntryToday.mockResolvedValue(true)
+      mockJournalRepo.findEntryDates.mockResolvedValue([new Date()])
+
+      const result = await journalService.create('user-1', { content: 'Again', timezoneOffset: 0 })
+
+      expect(result.manaEarned).toBe(0)
+      expect(mockManaService.addManaFromCompletion).not.toHaveBeenCalled()
+      // The entry is still written — multiple entries per day are allowed, only the reward is capped.
+      expect(mockJournalRepo.create).toHaveBeenCalled()
     })
 
     it('should sanitize HTML content before writing', async () => {
@@ -111,6 +128,31 @@ describe('JournalService', () => {
       expect(result.manaEarned).toBe(0)
       expect(result.entry).toEqual(existingEntry)
       expect(mockManaService.addManaFromCompletion).not.toHaveBeenCalled()
+    })
+
+    it('awards mana for a backdated entry and pins createdAt to local midnight', async () => {
+      mockJournalRepo.create.mockResolvedValue({ id: BigInt(5), publicId: 'jrnpub000005', content: 'Past' })
+      mockJournalRepo.findEntryDates.mockResolvedValue([new Date()])
+
+      const result = await journalService.create('user-1', {
+        content: 'Past',
+        date: '2020-01-01',
+        timezoneOffset: 0
+      })
+
+      expect(result.manaEarned).toBe(1)
+      expect(mockManaService.addManaFromCompletion).toHaveBeenCalledWith('user-1', 'journal')
+      // createdAt (5th positional arg) is pinned to the chosen day's local midnight.
+      const createdAt = mockJournalRepo.create.mock.calls[0][4] as Date
+      expect(createdAt).toBeInstanceOf(Date)
+      expect(createdAt.toISOString()).toBe('2020-01-01T00:00:00.000Z')
+    })
+
+    it('rejects a future-dated entry', async () => {
+      await expect(
+        journalService.create('user-1', { content: 'Tomorrow', date: '2999-12-31', timezoneOffset: 0 })
+      ).rejects.toThrow('Future journal entries are not allowed')
+      expect(mockJournalRepo.create).not.toHaveBeenCalled()
     })
   })
 
@@ -187,8 +229,11 @@ describe('JournalService', () => {
       expect(mockJournalRepo.findByDate).toHaveBeenCalledWith('user-1', dateStr, 0)
     })
 
-    it('should throw BAD_REQUEST for invalid date format', async () => {
-      await expect(journalService.getByDate('user-1', 'not-a-date')).rejects.toThrow('Invalid date format')
+    it('rejects malformed and impossible dates at the schema boundary', () => {
+      expect(journalDateSchema.safeParse({ date: 'not-a-date' }).success).toBe(false)
+      expect(journalDateSchema.safeParse({ date: '2020-13-45' }).success).toBe(false)
+      expect(journalDateSchema.safeParse({ date: '2020-02-30' }).success).toBe(false)
+      expect(journalDateSchema.safeParse({ date: '2024-01-15' }).success).toBe(true)
     })
   })
 
