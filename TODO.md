@@ -19,6 +19,8 @@
     - **Repo metadata** (Settings → General): Description "Gamified productivity platform with RPG-style progression"; Topics `nextjs trpc prisma postgresql gamification productivity rpg`; Website `https://covenantrpg.com`
     - **Repo secrets** (Settings → Secrets and variables → Actions): `SENTRY_AUTH_TOKEN` only. No `RAILWAY_TOKEN` — Railway uses its GitHub app, no Actions deploy workflow today.
 
+- [ ] Add skeleton loading states to this pages: dashboard, habits, inventory, objectives, quests, tavern and shop
+
 ## High Priority
 
 > Post-beta hardening for public launch. None block the closed friends beta — friends-only traffic = no hostile abuse, no GDPR strangers, no press scrutiny.
