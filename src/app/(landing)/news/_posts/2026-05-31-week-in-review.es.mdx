@@ -1,0 +1,38 @@
+# Una semana en Covenant: Diarios retroactivos, una página de perfil real y una vista previa de combate
+
+Esta semana no fue tanto un gran cambio único, sino un puñado de funcionalidades que tenían una arista afilada que llevaba demasiado tiempo ignorando.
+
+## El diario recuerda
+
+Lancé el módulo de diario asumiendo que los usuarios escribirían en él el mismo día en que pasaba algo. Pero luego me di cuenta de que a menudo escribo en mi diario a la mañana siguiente. Así que lo mejoré:
+
+- **Añade entradas en el pasado.** Elige un día pasado y escribe en él
+- **Scroll infinito** en lugar de cargar de golpe un muro con todas las entradas que has escrito
+- **Un límite de maná por día.** Escribir en el diario da maná, y sin límite "escribe 40 entradas de una palabra" se convierte en una impresora infinita de maná. Ahora hay un techo diario
+
+## Una página de perfil renovada
+
+Los ajustes de cuenta antes estaban dispersos y medio incompletos. Ahora hay una **página de perfil dedicada** que hace las cosas aburridas pero esenciales:
+
+- Cambiar tu correo y actualizar tu contraseña
+- Una **zona de peligro** para eliminar tu cuenta — aislada y deliberadamente impactante
+
+## La landing lanza un golpe
+
+La página pública era todo palabras.
+
+- Una **vista previa animada de combate** en el hero banner que muestra el bucle de juego — completar tareas, ganar maná, usar una habilidad y matar demonios
+- Sección de **próximamente** actualizada con facciones, frentes de guerra y sincronización de calendario
+
+## Cosas pequeñas con mordida
+
+- **Puedes rendirte.** Las misiones tienen una acción de abandono con diálogo de confirmación, para cobardes que no tienen los huevos de morir en batalla.
+- **El calendario muestra tu estado de ánimo.** Cada día se tiñe según cómo lo registraste, así que un vistazo al mes ya te dice algo antes de leer una palabra
+
+## Por debajo
+
+- **Analíticas, por fin.** Integré PostHog para eventos y feature flags, incluido un evento de activación para ver de verdad si la gente completa el bucle central en vez de adivinar. Medir primero, decidir qué cortar después
+- **Migré todos los IDs de UUIDs a bigints con IDs públicos separados.** Búsquedas más rápidas, índices más pequeños y URLs que dejan de filtrar conteos internos de filas. Fontanería pura, pero de la que solo puedes rehacer barato mientras el modelo de datos aún es pequeño
+- **Arreglado el flujo de registro con Google** — los usuarios de Google se colaban por la puerta lateral y se saltaban el onboarding. Ahora pasan por onboarding como todos. Sin trato especial
+
+Nos vemos la semana que viene, sed traviesos ( • ᴗ - ) ✧

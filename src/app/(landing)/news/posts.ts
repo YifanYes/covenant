@@ -14,6 +14,20 @@ export interface BlogPost {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: '2026-05-31-week-in-review',
+    title: {
+      en: 'A Week in Covenant: Backdated Journals, a Real Profile Page, and a Combat Preview',
+      es: 'Una semana en Covenant: Diarios retroactivos, una página de perfil real y una vista previa de combate'
+    },
+    date: '2026-05-31',
+    author: 'Yifan',
+    tags: ['release-notes', 'features'],
+    excerpt: {
+      en: 'Journals can be backdated with infinite scroll and a per-day mana cap, profiles get email and password settings plus account deletion, the landing page gains an animated combat preview, quests can be abandoned, calendar days show mood, and PostHog analytics lands under the hood.',
+      es: 'Los diarios se pueden retrofechar con scroll infinito y límite diario de maná, los perfiles estrenan ajustes de correo y contraseña más eliminación de cuenta, la landing gana una vista previa animada de combate, las misiones se pueden abandonar, los días del calendario muestran el estado de ánimo y PostHog llega por debajo.'
+    }
+  },
+  {
     slug: '2026-05-24-week-in-review',
     title: {
       en: 'A Week in Covenant: A Fresh Home Page, Tasks Your Way, and Guild Identity',
@@ -61,6 +75,10 @@ export const POST_IMPORTS: Record<
   string,
   Record<SupportedLocale, () => Promise<{ default: React.ComponentType }>>
 > = {
+  '2026-05-31-week-in-review': {
+    en: () => import('./_posts/2026-05-31-week-in-review.en.mdx'),
+    es: () => import('./_posts/2026-05-31-week-in-review.es.mdx')
+  },
   '2026-05-11-week-in-review': {
     en: () => import('./_posts/2026-05-11-week-in-review.en.mdx'),
     es: () => import('./_posts/2026-05-11-week-in-review.es.mdx')
