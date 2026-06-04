@@ -2,7 +2,6 @@
 import EmptyState from '@/components/empty-state.component'
 import { panelChrome } from '@/components/rpg/rpg-styles'
 import { cn } from '@/lib/cn.lib'
-import { createInventoryItem, TIER_1_ITEMS } from '@/shared/constants/items.constants'
 import Button from '@/ui/button.component'
 import Card, { CardContent, CardHeader, CardTitle } from '@/ui/card.component'
 import {
@@ -54,23 +53,11 @@ export default function InventoryGrid({
 }: InventoryGridProps) {
   const { t } = useTranslation()
 
-  // Combine tier 1 items (always available) with character's inventory
   // Exclude items that are currently equipped in the loadout
   const groupedItems = useMemo(() => {
     const equippedDefinitionIds = new Set(character?.loadout?.map((item) => item.definitionId) || [])
 
-    // Create inventory items from tier 1 definitions (these use definitionId as id for stable keys)
-    const tier1Items = Object.values(TIER_1_ITEMS)
-      .map((def) => ({
-        ...createInventoryItem(def),
-        id: def.id
-      }))
-      .filter((item) => !equippedDefinitionIds.has(item.definitionId))
-
-    // Add purchased items from character inventory (excluding equipped)
-    const purchasedItems = (character?.inventory || []).filter((item) => !equippedDefinitionIds.has(item.definitionId))
-
-    let allItems = [...tier1Items, ...purchasedItems]
+    let allItems = (character?.inventory || []).filter((item) => !equippedDefinitionIds.has(item.definitionId))
 
     // Apply tier filter
     if (tierFilter !== null && tierFilter !== undefined) {

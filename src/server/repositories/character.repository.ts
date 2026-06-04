@@ -1,6 +1,7 @@
 import { Prisma, type Character, type PrismaClient } from '@/generated/prisma'
 import { CharacterClassName, CLASS_INITIAL_STATS } from '@/shared/constants/classes.constants'
 import { Faction } from '@/shared/constants/factions.constants'
+import { createTier1InventoryItems } from '@/shared/constants/items.constants'
 import { defaultAreas } from '@shared/schemas/areas.schemas'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import { defaultUserTaskStatuses } from '@shared/schemas/user-task-statuses.schemas'
@@ -154,7 +155,7 @@ export class CharacterRepository {
           data: {},
           gold: 0,
           manaReserve: 0,
-          inventory: [],
+          inventory: createTier1InventoryItems() as unknown as Prisma.InputJsonValue,
           loadout: [],
           classes: {
             create: {
@@ -184,7 +185,7 @@ export class CharacterRepository {
             data: {},
             gold: 0,
             manaReserve: 0,
-            inventory: [],
+            inventory: createTier1InventoryItems() as unknown as Prisma.InputJsonValue,
             loadout: [],
             classes: {
               create: {

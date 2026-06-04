@@ -1,6 +1,6 @@
 import { getAbilityById, getAvailableAbilities, MAX_EQUIPPED_ABILITIES } from '@/shared/constants/abilities.constants'
 import type { CharacterClassName, MagicNature } from '@/shared/constants/classes.constants'
-import { createInventoryItem, TIER_1_ITEMS } from '@/shared/constants/items.constants'
+import { addMissingTier1InventoryItems } from '@/shared/constants/items.constants'
 import type { CreateCharacterType } from '@shared/schemas/character.schemas'
 import type { CharacterDataType } from '@shared/schemas/inventory.schemas'
 import type {
@@ -69,6 +69,13 @@ export class CharacterService {
     }
 
     const { tier } = getCharacterProgress(character)
+    const loadout = ((character.loadout as unknown as InventoryItem[]) ?? []) as InventoryItem[]
+    const currentInventory = ((character.inventory as unknown as InventoryItem[]) ?? []) as InventoryItem[]
+    const { inventory, addedItems } = addMissingTier1InventoryItems(currentInventory, loadout)
+
+    if (addedItems.length > 0) {
+      await this.characterRepository.updateInventoryAndLoadout(character.id, inventory, loadout)
+    }
 
     return {
       slug: character.slug,
@@ -81,8 +88,8 @@ export class CharacterService {
       gold: character.gold,
       manaReserve: character.manaReserve ?? 0,
       tier,
-      inventory: character.inventory as unknown as InventoryItem[],
-      loadout: character.loadout as unknown as InventoryItem[],
+      inventory,
+      loadout,
       tutorialSlidesSeen: ((character.user?.tutorialSlidesSeen as TutorialSlideId[] | null) ?? []) as TutorialSlideId[],
       onboardingProgress: ((character.onboardingProgress as OnboardingProgress | null) ?? {}) as OnboardingProgress,
       classes: character.classes.map((c) => ({
@@ -164,22 +171,14 @@ export class CharacterService {
   async equipItem(userId: string, itemId: string): Promise<{ success: boolean }> {
     const character = await this.characterRepository.findByUserIdOrThrow(userId)
 
-    const inventory = (character.inventory as unknown as InventoryItem[]) || []
     const loadout = (character.loadout as unknown as InventoryItem[]) || []
+    const { inventory } = addMissingTier1InventoryItems((character.inventory as unknown as InventoryItem[]) || [], loadout)
 
     let itemToEquip: InventoryItem | undefined
     const itemIndex = inventory.findIndex((item) => item.id === itemId)
 
     if (itemIndex !== -1) {
       itemToEquip = inventory[itemIndex]
-    } else {
-      const tier1Definition = TIER_1_ITEMS[itemId]
-      if (tier1Definition) {
-        itemToEquip = {
-          ...createInventoryItem(tier1Definition),
-          id: tier1Definition.id
-        }
-      }
     }
 
     if (!itemToEquip) {
@@ -202,10 +201,7 @@ export class CharacterService {
     const newLoadout = [...loadout]
     if (existingItemIndex !== -1) {
       const existingItem = newLoadout[existingItemIndex]
-      const isTier1 = existingItem.definitionId ? !!TIER_1_ITEMS[existingItem.definitionId] : false
-      if (!isTier1) {
-        newInventory.push(existingItem)
-      }
+      newInventory.push(existingItem)
       newLoadout.splice(existingItemIndex, 1)
     }
 
@@ -242,8 +238,7 @@ export class CharacterService {
     const newLoadout = [...loadout]
     newLoadout.splice(itemIndex, 1)
 
-    const isTier1 = itemToUnequip.definitionId ? !!TIER_1_ITEMS[itemToUnequip.definitionId] : false
-    const newInventory = isTier1 ? [...inventory] : [...inventory, itemToUnequip]
+    const newInventory = [...inventory, itemToUnequip]
 
     await this.characterRepository.updateInventoryAndLoadout(character.id, newInventory, newLoadout)
 

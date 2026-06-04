@@ -1,5 +1,5 @@
 import { CharacterClassName } from '@/shared/constants/classes.constants'
-import { ALL_ITEMS } from '@/shared/constants/items.constants'
+import { ALL_ITEMS, TIER_1_ITEMS } from '@/shared/constants/items.constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CharacterRepository } from '../../repositories/character.repository'
 import type { UserRepository } from '../../repositories/user.repository'
@@ -60,6 +60,29 @@ describe('CharacterService', () => {
 
       expect(result?.tutorialSlidesSeen).toEqual(['mana'])
       expect(result?.onboardingProgress).toEqual({ habitCreated: true })
+    })
+
+    it('getCurrentClass persists missing tier 1 inventory items', async () => {
+      const character = {
+        ...mockCharacter(),
+        factionName: 'HOLY_KNIGHTS',
+        title: null,
+        magicNature: null,
+        user: { tutorialSlidesSeen: [] }
+      }
+      mockCharacterRepo.findWithClasses.mockResolvedValue(character)
+      mockCharacterRepo.updateInventoryAndLoadout.mockResolvedValue(undefined)
+
+      const result = await characterService.getCurrentClass('user-1')
+
+      expect(mockCharacterRepo.updateInventoryAndLoadout).toHaveBeenCalledWith(
+        character.id,
+        expect.arrayContaining(
+          Object.keys(TIER_1_ITEMS).map((definitionId) => expect.objectContaining({ id: definitionId, definitionId }))
+        ),
+        []
+      )
+      expect(result?.inventory).toHaveLength(Object.keys(TIER_1_ITEMS).length)
     })
   })
 

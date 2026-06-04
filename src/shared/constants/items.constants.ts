@@ -7,7 +7,7 @@ export const WeaponDamageType = {
 export type WeaponDamageType = (typeof WeaponDamageType)[keyof typeof WeaponDamageType]
 
 /**
- * Item stat bonuses (post Phase 2A redesign).
+ * Item stat bonuses
  * Weapons grant flat ATK; armor grants flat DEF. `speed` adds to TacticalUnitState.speed
  * for Pokémon-style turn order (higher acts first). `damageType` routes a weapon's
  * `attackBonus` to either strengthAtkBonus or magicAtkBonus at equip time.
@@ -45,7 +45,6 @@ export interface ConsumableDefinition extends ItemDefinition {
   stackable: boolean
 }
 
-// Tier 1 Weapons (×1 scaling vs. old attackDice values; calibrated against HP×5)
 export const TIER_1_WEAPONS: Record<string, ItemDefinition> = {
   infantry_sword: {
     id: 'infantry_sword',
@@ -103,7 +102,6 @@ export const TIER_1_WEAPONS: Record<string, ItemDefinition> = {
   }
 }
 
-// Tier 2 Weapons
 export const TIER_2_WEAPONS: Record<string, ItemDefinition> = {
   official_sabre: {
     id: 'official_sabre',
@@ -171,7 +169,6 @@ export const TIER_2_WEAPONS: Record<string, ItemDefinition> = {
   }
 }
 
-// Tier 3 Weapons
 export const TIER_3_WEAPONS: Record<string, ItemDefinition> = {
   water_drop: {
     id: 'water_drop',
@@ -239,7 +236,6 @@ export const TIER_3_WEAPONS: Record<string, ItemDefinition> = {
   }
 }
 
-// Tier 1 Armor
 export const TIER_1_ARMOR: Record<string, ItemDefinition> = {
   chainmail: {
     id: 'chainmail',
@@ -261,7 +257,6 @@ export const TIER_1_ARMOR: Record<string, ItemDefinition> = {
   }
 }
 
-// Tier 2 Armor
 export const TIER_2_ARMOR: Record<string, ItemDefinition> = {
   full_plate_armor: {
     id: 'full_plate_armor',
@@ -283,7 +278,6 @@ export const TIER_2_ARMOR: Record<string, ItemDefinition> = {
   }
 }
 
-// Tier 3 Armor
 export const TIER_3_ARMOR: Record<string, ItemDefinition> = {
   gothic_armor: {
     id: 'gothic_armor',
@@ -315,9 +309,6 @@ export const TIER_3_ARMOR: Record<string, ItemDefinition> = {
   }
 }
 
-// Consumables
-// NOTE: mana_potion removed in Phase 2A. Per-fight mana budget = maxMana exactly; Reserve tops
-// up only at Encounter start. Existing inventory entries are scrubbed and 25g refunded per row.
 export const CONSUMABLES: Record<string, ConsumableDefinition> = {
   health_potion: {
     id: 'health_potion',
@@ -361,6 +352,41 @@ export function createInventoryItem(definition: ItemDefinition): InventoryItem {
     rarity,
     stats: adjustedStats as Record<string, number | undefined>,
     obtainedAt: new Date()
+  }
+}
+
+function getOwnedDefinitionId(item: InventoryItem): string | undefined {
+  if (item.definitionId) return item.definitionId
+  return TIER_1_ITEMS[item.id] ? item.id : undefined
+}
+
+export function createTier1InventoryItem(definition: ItemDefinition): InventoryItem {
+  return {
+    ...createInventoryItem(definition),
+    id: definition.id
+  }
+}
+
+export function createTier1InventoryItems(): InventoryItem[] {
+  return Object.values(TIER_1_ITEMS).map(createTier1InventoryItem)
+}
+
+export function addMissingTier1InventoryItems(
+  inventory: InventoryItem[],
+  loadout: InventoryItem[] = []
+): { inventory: InventoryItem[]; addedItems: InventoryItem[] } {
+  const ownedDefinitionIds = new Set(
+    [...inventory, ...loadout]
+      .map(getOwnedDefinitionId)
+      .filter((definitionId): definitionId is string => definitionId !== undefined)
+  )
+  const addedItems = Object.values(TIER_1_ITEMS)
+    .filter((definition) => !ownedDefinitionIds.has(definition.id))
+    .map(createTier1InventoryItem)
+
+  return {
+    inventory: addedItems.length === 0 ? inventory : [...inventory, ...addedItems],
+    addedItems
   }
 }
 
@@ -414,7 +440,7 @@ export function applyRarityToStats(stats: ItemStats, rarity: ItemRarity): ItemSt
 }
 
 /**
- * Aggregate loadout stats. Returns flat ATK/DEF/speed bonuses to be merged with class base stats.
+ * Returns flat ATK/DEF/speed bonuses to be merged with class base stats.
  */
 export function aggregateLoadoutStats(loadout: InventoryItem[]): Required<ItemStats> {
   const totals: Required<ItemStats> = {
