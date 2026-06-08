@@ -1,11 +1,19 @@
 import { createServerI18n } from '@/server/lib/i18n-server'
 import Link from 'next/link'
 import { ArrowRight } from 'pixelarticons/react'
+import LandingPagination from '../_components/landing-pagination.component'
 import { getLandingLocale } from '../_lib/locale'
+import { type PageSearchParams, paginateItems } from '../_lib/pagination'
 import { buildPageMetadata } from '../_lib/page-metadata'
 import { POSTS } from './posts'
 
 export const generateMetadata = () => buildPageMetadata({ pageKey: 'news', path: '/news' })
+
+const NEWS_PAGE_SIZE = 10
+
+interface NewsPageProps {
+  searchParams: Promise<PageSearchParams>
+}
 
 const TAG_COLORS: Record<string, string> = {
   'release-notes': 'bg-primary/10 text-primary border-primary/20',
@@ -14,10 +22,12 @@ const TAG_COLORS: Record<string, string> = {
   infra: 'bg-blue-500/10 text-blue-400 border-blue-500/20'
 }
 
-export default async function NewsPage() {
+export default async function NewsPage({ searchParams }: NewsPageProps) {
+  const { page: pageParam } = await searchParams
   const lang = await getLandingLocale()
   const i18n = await createServerI18n(lang)
   const t = i18n.t.bind(i18n)
+  const { items, page, totalPages } = paginateItems(POSTS, pageParam, NEWS_PAGE_SIZE)
 
   return (
     <main className="bg-background min-h-screen pt-16">
@@ -28,7 +38,7 @@ export default async function NewsPage() {
         </div>
 
         <div className="flex flex-col gap-4">
-          {POSTS.map((post) => (
+          {items.map((post) => (
             <Link key={post.slug} href={`/news/${post.slug}`} className="group block">
               <div className="border-border bg-card hover:border-primary/30 rounded-xl border p-6 transition-all duration-200 hover:shadow-md">
                 <div className="flex items-start justify-between gap-4">
@@ -55,6 +65,19 @@ export default async function NewsPage() {
             </Link>
           ))}
         </div>
+
+        <LandingPagination
+          basePath="/news"
+          page={page}
+          totalPages={totalPages}
+          labels={{
+            previous: t('landing.pagination.previous'),
+            next: t('landing.pagination.next'),
+            page: t('landing.pagination.page'),
+            currentPage: t('landing.pagination.current_page'),
+            status: t('landing.pagination.status', { page, totalPages })
+          }}
+        />
       </div>
     </main>
   )

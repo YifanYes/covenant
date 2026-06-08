@@ -33,6 +33,13 @@
       "back": "Back to News",
       "other_posts": "Other posts"
     },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page",
+      "current_page": "Current page",
+      "status": "Page {{page}} of {{totalPages}}"
+    },
     "footer": {
       "copyright": "© {{year}} Covenant. All rights reserved.",
       "tos": "Terms of Service",

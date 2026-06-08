@@ -33,6 +33,13 @@
       "back": "Volver a Noticias",
       "other_posts": "Otras entradas"
     },
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "page": "Página",
+      "current_page": "Página actual",
+      "status": "Página {{page}} de {{totalPages}}"
+    },
     "footer": {
       "copyright": "© {{year}} Covenant. Todos los derechos reservados.",
       "tos": "Términos del Servicio",
