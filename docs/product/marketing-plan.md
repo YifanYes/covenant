@@ -1,450 +1,454 @@
-# Plan de Marketing Covenant - Beta Privada
+# Marketing Plan Covenant - Primeros Usuarios Beta
 
-> **"El arte supremo de la guerra es someter al enemigo sin luchar."** — Sun Tzu
-
-> **Objetivo:** Conseguir 50-100 usuarios beta cualificados para testear las funcionalidades principales para antes de Junio 2026.
-
-> **Presupuesto:** 200€/mes
-
-> **Principio operativo:** No competimos en mercados saturados. Ocupamos el cuadrante vacío con disciplina, comunidad propia, y ejecución concentrada en 2 canales.
+> **Estado:** plan revisado contra el producto actual.
+> **Fecha:** 8 junio 2026.
+> **Objetivo:** conseguir 50-100 usuarios beta cualificados antes del 31 agosto 2026, con foco en usuarios que realmente prueban el loop central, no solo en registros.
+> **Presupuesto:** 200 EUR/mes maximo. Gasto pagado solo despues de validar activacion.
 
 ---
 
-## Posicionamiento: El Cuadrante Vacío
+## Resumen Ejecutivo
 
-> "Los guerreros victoriosos primero ganan y luego van a la guerra."
+El plan anterior tenia una buena intuicion: Covenant no debe competir como "otra app de productividad". El hueco real es mas concreto:
 
-**Covenant no compite con Habitica, Forest o Todoist.** Ocupamos un territorio que ninguno de ellos puede defender: el "gamer disciplinado" que busca épica, no ternura.
+**Covenant convierte trabajo real en poder RPG visible. Completa tareas. Gana mana. Mata demonios.**
 
-### Análisis Competitivo
+La estrategia para los primeros usuarios debe ser menos "campana de marketing" y mas **reclutamiento beta de alta friccion y alto aprendizaje**. No necesitamos miles de visitas. Necesitamos 50-100 personas que entren, cierren el loop, reporten friccion y digan si volverian una semana despues.
 
-| Competidor         | Territorio                | Fortaleza                       | Debilidad Explotable                        |
-| ------------------ | ------------------------- | ------------------------------- | ------------------------------------------- |
-| **Habitica**       | Gamificación casual       | Comunidad establecida, gratuita | Estética "infantil", sin narrativa profunda |
-| **Forest**         | Focus/Pomodoro            | Simple, visual                  | Sin RPG, sin comunidad, solitario           |
-| **Finch**          | Wellness emocional        | Cute, accesible                 | Demasiado "soft", sin desafío               |
-| **Todoist/Notion** | Productividad profesional | Potentes, establecidos          | Aburridos, "trabajo", sin alma              |
+El KPI principal no es waitlist, Discord, Twitter ni upvotes. Es:
 
-### Mapa del Mercado
+**`loop_closed`: el usuario gana mana con una accion real y empieza una quest.**
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    MAPA DEL MERCADO                         │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   CASUAL ←────────────────────────────────────→ HARDCORE    │
-│                                                             │
-│   ↑ CUTE        [Forest]    [Finch]                        │
-│   │                                                         │
-│   │             [Habitica]                                  │
-│   │                                                         │
-│   │                           ★ Covenant ★                  │
-│   │                         (TERRITORIO VACÍO)              │
-│   │                                                         │
-│   ↓ DARK                                                    │
-│                                                             │
-│   [Todoist/Notion están fuera del mapa - no gamifican]     │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Insight:** El cuadrante "Dark Fantasy + Hardcore" está completamente vacío. No hay competidor que lo defienda. Entramos sin fricción.
+El producto ya tiene la instrumentacion para medir ese momento via PostHog server-side. Eso cambia el plan: cada canal se juzga por usuarios que llegan a `loop_closed`, no por seguidores o impresiones.
 
 ---
 
-## Priorización de Canales
+## Diagnostico del Producto Actual
 
-La regla fundamental: **máximo 2 canales primarios en cualquier momento.** Un indie con 200€/mes no puede estar en 4+ canales y hacer cada uno bien. Es mejor dominar 2 que ser mediocre en 5.
+### Lo que ya esta listo para beta
 
-### Ranking por Impacto / Coste
+| Area | Estado | Implicacion para marketing |
+| ---- | ------ | -------------------------- |
+| Landing | CTA directo a `/sign-up`, hero claro "Complete tasks. Kill demons." | Ya se puede enviar trafico a una experiencia real, no solo promesa |
+| Auth | Email/password, Google OAuth, verificacion email, reset password | La friccion de entrada es aceptable para beta cerrada |
+| Onboarding | Checklist "First Quest" + slides contextuales | El primer usuario tiene una ruta guiada hacia activacion |
+| Core productividad | Tasks, habits, objectives, journaling, calendar | Puede absorber distintos perfiles de productividad |
+| RPG loop | Mana, quests, combat, inventory, shop | La promesa diferencial existe dentro del producto |
+| Comunidad in-app | Guilds, tavern, forum/campaign surfaces | Hay material para futuro social, aunque no debe ser el primer gancho |
+| Analytics | PostHog v1 con `user_signed_up`, `character_created`, completions, `combat_started`, `combat_finished`, `loop_closed` | Se puede medir activacion sin depender solo de encuestas |
+| Legal | Privacy/TOS beta | Suficiente para beta pequena, con pendiente operacional abajo |
 
-| Prioridad | Canal                          | Coste    | Por qué                                                      |
-| --------- | ------------------------------ | -------- | ------------------------------------------------------------ |
-| **#1**    | Discord propio + Email capture | 0€       | Comunidad propia, no dependes de algoritmos, retención alta  |
-| **#2**    | Reddit + Twitter (auténtico)   | 0€       | Acceso a audiencia exacta, pero en terreno ajeno             |
-| **#3**    | Contenido (1/semana calidad)   | 0€       | SEO y descubrimiento a medio plazo                           |
-| **#4**    | Micro-influencer (1 bueno)     | 150€/mes | Amplificación puntual cuando hay producto sólido que mostrar |
-| Opcional  | Eventos presenciales           | Tiempo   | Alto coste en tiempo, útil solo si hay eventos relevantes    |
+### Bloqueadores antes de invitar desconocidos
 
-**Canales primarios Fase Beta:** Discord (#1) + Reddit/Twitter (#2).
-Todo lo demás es secundario hasta que estos dos estén funcionando.
+| Bloqueador | Por que importa | Accion minima |
+| ---------- | --------------- | ------------- |
+| `privacy@covenantrpg.com` puede no estar configurado | Legal/credibilidad; la politica ya lo publica | Configurar forwarder antes de captar usuarios externos |
+| Discord no preparado | El plan depende de feedback y comunidad propia | Crear servidor, roles, `#feedback`, `#bug-reports`, `#wins`, `#announcements` |
+| Welcome email no existe | El usuario verifica email pero no recibe una narrativa beta clara | Enviar email simple: que probar, link Discord, como reportar bugs |
+| Press kit/demo no existe | Reddit/X/creadores necesitan assets faciles | 30s GIF/video, 4 screenshots, pitch de 2 lineas |
+| Copy/documentacion con restos de "dice" | El sistema actual es mana/reserve | Revisar assets publicos antes de outreach amplio |
+| No hay cohortes de beta definidas | Sin batches, el feedback se vuelve caotico | Invitar por oleadas semanales de 10-20 usuarios |
 
----
-
-## #1: Discord + Email — Tu Base de Operaciones
-
-### Por qué Discord es el Canal #1
-
-Discord es **el único canal que controlas completamente.** Reddit puede banearte, Twitter puede cambiar el algoritmo, un influencer puede cancelar. Tu Discord y tu lista de email son tuyos.
-
-Para un producto de nicho gaming/dark fantasy, Discord es el habitat natural del público objetivo. No estás forzando a tu audiencia a un canal incómodo — ya viven ahí.
-
-### Estructura del Discord
-
-| Canal            | Propósito                                      |
-| ---------------- | ---------------------------------------------- |
-| `#announcements` | Updates del producto, parches, nuevas features |
-| `#feedback`      | Canal principal de input de beta testers       |
-| `#bug-reports`   | Reporte estructurado de bugs                   |
-| `#general`       | Conversación libre, comunidad                  |
-| `#lore`          | Discusión del mundo, narrativa, teorías        |
-| `#builds`        | Compartir builds de personajes, estrategias    |
-| `#off-topic`     | Mantener la comunidad humana                   |
-
-### Tácticas para Hacer el Discord Vivo
-
-- **Participación del fundador diaria:** Responder en 24h, compartir progreso, pedir opiniones reales
-- **Building in public:** Screenshots de desarrollo, decisiones de diseño abiertas a votación
-- **Roles con significado:** Beta Tester, Early Adopter, Bug Hunter — que se sientan parte del equipo
-- **Weekly update post:** Cada viernes, qué se hizo esta semana, qué viene la próxima. Podría enviarse en una newsletter en el futuro.
-
-### Email Capture y Funnel
-
-El email es el seguro contra la caída de cualquier plataforma. Cada persona que entra al Discord o a la waitlist debe dejar un email.
-
-**Funnel de captura:**
-
-```
-Landing page / Reddit post / Twitter
-         ↓
-   Waitlist signup (email)
-         ↓
-   Email de bienvenida + invitación Discord
-         ↓
-   Onboarding en Discord
-         ↓
-   Beta access cuando esté listo
-```
-
-**Secuencia de emails:**
-
-| Email | Timing            | Contenido                                                |
-| ----- | ----------------- | -------------------------------------------------------- |
-| #1    | Inmediato         | Bienvenida + link Discord + qué esperar                  |
-| #2    | +3 días           | La visión de Covenant: por qué existe, qué lo diferencia |
-| #3    | +7 días           | Preview de gameplay / screenshots                        |
-| #4    | Cuando hay acceso | Invitación a beta con instrucciones                      |
-
-**Herramientas:** Zoho Mail (contratado). Para el funnel de 4 emails de la secuencia de bienvenida, usarías Zoho Campaigns (incluido en varios planes de Zoho):
-
-1. Crear una lista de contactos - Una lista tipo "Waitlist Covenant" donde caen los suscriptores desde tu landing page.
-2. Conectar el formulario de registro - Zoho Campaigns genera un formulario embebible o puedes usar su API para añadir contactos desde tu landing/Discord.
-3. Crear un workflow de automatización (Zoho Campaigns > Automation > Workflows):
-   - Trigger: "Cuando un contacto se une a la lista Waitlist Covenant"
-   - Email #1 (inmediato): Bienvenida + link Discord + qué esperar
-   - Wait 3 días
-   - Email #2: La visión de Covenant
-   - Wait 4 días
-   - Email #3: Preview de gameplay / screenshots
-   - Email #4: Se envía manualmente o con otro trigger cuando abran el acceso a beta
-
-4. Diseñar los emails - Usa el editor drag & drop de Zoho. Mantén un diseño oscuro/dark fantasy consistente con la marca de Covenant.
-5. Métricas - Zoho Campaigns te da open rate, click rate y unsubscribes por defecto, que cubren las métricas del plan.
-
-Si tu plan de Zoho es solo Zoho Mail (correo corporativo) sin Campaigns, necesitarías contratar Zoho Campaigns aparte o usar Zoho ZeptoMail para emails transaccionales vía API.
-
-### Métricas Discord + Email
-
-| Métrica                 | Objetivo Semana 6 | Objetivo Semana 12 |
-| ----------------------- | ----------------- | ------------------ |
-| Miembros Discord        | 30                | 80                 |
-| Miembros activos/semana | 15                | 40                 |
-| Emails en lista         | 50                | 150                |
-| Tasa apertura emails    | >40%              | >40%               |
+**Decision recomendada:** para los primeros 100 usuarios, no construir waitlist nueva salvo que se quiera cerrar el acceso. Usar signup directo + email/Discord de bienvenida. Si el producto debe ser privado, entonces cambiar la landing a "Request beta access" antes de hacer outreach publico.
 
 ---
 
-## #2: Reddit + Twitter — Presencia Auténtica
+## Posicionamiento
 
-> "Sé el primero en ocupar el terreno elevado."
+### ICP inicial
 
-### Principio Fundamental: Autenticidad, No Infiltración
+Persona primaria:
 
-El enfoque correcto en Reddit y Twitter es **ser un miembro genuino de la comunidad que también está construyendo algo.** No "infiltrarse", no tener una fase secreta de espionaje. La gente detecta el marketing disfrazado inmediatamente, y Reddit en particular lo castiga con dureza.
+**Gamers/productivity nerds de 20-40 anos que ya intentaron to-do apps, habit trackers o Habitica, pero abandonaron porque la recompensa se sentia decorativa, infantil o desconectada del esfuerzo real.**
 
-**Qué funciona:**
+No vender a "todo el mundo que quiere ser productivo". El primer nicho debe tener tres rasgos:
 
-- Ser transparente: "Estoy construyendo X, esto es lo que aprendí"
-- Aportar valor sin pedir nada: responder preguntas, compartir conocimiento
-- Building in public: compartir progreso real, incluyendo fracasos
-- Pedir feedback honesto, no validación
+- Ya usa algun sistema de tareas/habitos.
+- Entiende RPGs, builds, mana, quests o progresion.
+- Esta dispuesto a probar una beta y dar feedback directo.
 
-**Qué NO funciona (y hay que evitar):**
+### Mensaje central
 
-- Crear cuentas falsas o "de apoyo"
-- Posts que parecen orgánicos pero son promoción encubierta
-- Postear en r/habitica para "convertir descontentos"
-- Cualquier cosa que te dé vergüenza si alguien descubre que es marketing
+**Covenant is a gamified productivity app where real work becomes RPG power. Complete tasks, earn mana, and spend it in tactical quests.**
 
-### Reddit: Subreddits Objetivo
+Version corta:
 
-| Subreddit      | Audiencia | Enfoque                                           |
-| -------------- | --------- | ------------------------------------------------- |
-| r/gamification | 15k       | Audiencia exacta, compartir learnings de producto |
-| r/productivity | 2M        | Posts de alto valor sobre gamificación + hábitos  |
-| r/IndieGaming  | 500k+     | Devlogs, arte, progreso de desarrollo             |
-| r/ADHD         | 1.5M      | Contenido útil sobre sistemas de productividad    |
+**Complete tasks. Kill demons.**
 
-**Cadencia:** 2-3 participaciones por semana (comentarios valiosos + 1 post propio máximo).
+Version beta:
 
-### Twitter: Building in Public
+**Estoy construyendo una app de productividad para gente que quiere que sus tareas tengan consecuencias visibles: completas trabajo real, ganas mana, y lo gastas en combate RPG. Busco 50 beta testers que prueben el primer loop y me digan donde se rompe.**
 
-Twitter es el mejor canal para "building in public" porque el formato favorece updates cortos y frecuentes.
+### Que NO prometer aun
 
-**Tipos de contenido:**
-
-| Tipo             | Frecuencia   | Ejemplo                                             |
-| ---------------- | ------------ | --------------------------------------------------- |
-| Devlog update    | 2x/semana    | "Esta semana implementé el sistema de facciones..." |
-| Screenshot/GIF   | 1x/semana    | UI, animaciones, gameplay                           |
-| Pregunta genuina | 1x/semana    | "¿Qué prefieren: XP por tareas o por rachas?"       |
-| Hilo de insight  | 1x/2 semanas | Algo que aprendiste construyendo Covenant           |
-
-**Regla 80/20:** 80% valor puro (insights, preguntas, compartir conocimiento), 20% mención directa de Covenant. Pero incluso el 20% debe ser interesante por sí mismo, no un "descarga mi app".
-
-### Métricas Reddit + Twitter
-
-| Métrica                      | Objetivo Semana 6 | Objetivo Semana 12 |
-| ---------------------------- | ----------------- | ------------------ |
-| Seguidores Twitter           | 100               | 300                |
-| Impresiones/semana           | 5k                | 15k                |
-| Clicks a landing/Discord     | 20/semana         | 50/semana          |
-| Posts Reddit con >20 upvotes | 2                 | 5 acumulados       |
+- No prometer una comunidad masiva.
+- No vender PvP, warfronts, board game ni facciones como valor actual.
+- No decir "mejor que Habitica"; decir "mas tactico, mas oscuro, mas centrado en poder ganado por trabajo real".
+- No usar ADHD como canal primario salvo que el contenido sea responsable, personal y no medico.
 
 ---
 
-## #3: Contenido — 1 Pieza de Calidad por Semana
+## Oferta Beta
 
-### Por qué 1 y No 4
+La invitacion no debe ser "prueba mi app". Debe ser una mision concreta:
 
-Con recursos limitados, **1 pieza excelente por semana genera más impacto que 4 mediocres.** Un buen post en Reddit o un hilo en Twitter bien pensado llega más lejos que 4 posts genéricos que nadie comparte.
+**Beta Quest: cierra el loop en 20 minutos.**
 
-### Calendario Semanal
+1. Crea tu personaje.
+2. Crea una tarea o habito real.
+3. Completalo para ganar mana.
+4. Empieza una quest.
+5. Cuantame que parte fue confusa, emocionante o inutil.
 
-| Día           | Actividad                                              |
-| ------------- | ------------------------------------------------------ |
-| Lunes         | Elegir tema de la semana basado en lo que resonó antes |
-| Martes-Jueves | Crear la pieza (post, hilo, video corto, devlog)       |
-| Viernes       | Publicar + compartir en canales relevantes             |
-| Weekend       | Responder comentarios, engagement con la comunidad     |
+Feedback pedido:
 
-### Formatos que Funcionan para Indie Games / Productivity
+- Que momento te hizo pensar "vale, esto es distinto"?
+- Donde casi abandonas?
+- Volverias manana sin que te lo recuerde?
+- Que app/sistema usas hoy para tareas o habitos?
 
-| Formato                | Plataforma       | Ejemplo                                                 |
-| ---------------------- | ---------------- | ------------------------------------------------------- |
-| Devlog con screenshots | Reddit + Twitter | "Cómo diseñé el sistema de combate basado en hábitos"   |
-| GIF/video corto (30s)  | Twitter + TikTok | Demo de una feature en acción                           |
-| Hilo de decisiones     | Twitter          | "5 decisiones de diseño que tomé esta semana y por qué" |
-| Post de valor          | Reddit           | Insight genuino sobre gamificación / productividad      |
+Esto convierte cada usuario en aprendizaje accionable.
 
 ---
 
-## #4: Micro-Influencers — 1 Colaboración de Calidad
+## Canales Prioritarios
 
-### Cambio de Enfoque: Calidad sobre Cantidad
+La regla sigue siendo buena: **maximo 2 canales primarios a la vez.**
 
-En lugar de 3 micro-influencers a 50€ cada uno (que probablemente hagan un post genérico y se olviden), **invertir 150€ en 1 colaboración más profunda** con alguien que realmente conecte con el producto.
+Para primeros usuarios, el orden recomendado cambia:
 
-### Perfil del Influencer Ideal
+| Prioridad | Canal | Coste | Objetivo |
+| --------- | ----- | ----- | -------- |
+| 1 | Warm-start + Discord | 0 EUR | Primeros 20 usuarios reales y feedback cualitativo |
+| 2 | Reddit valor-first | 0 EUR | Usuarios exactos del nicho, captados sin spam |
+| 3 | X / devlog + blog propio | 0 EUR | Prueba social, assets, continuidad |
+| 4 | Micro-creador | 150-200 EUR | Solo si la activacion ya funciona |
+| 5 | Product Hunt / launch directories | 0 EUR | No antes de tener 100+ usuarios activados o una version muy pulida |
 
-| Criterio        | Requisito                                           |
-| --------------- | --------------------------------------------------- |
-| Seguidores      | 5k-50k (engagement real > alcance masivo)           |
-| Nicho           | Gaming + productividad, o dark fantasy + lifestyle  |
-| Engagement rate | >5%                                                 |
-| Formato         | Video (YouTube/TikTok) o hilos Twitter              |
-| Autenticidad    | Que use el producto de verdad, no un read de script |
+### Canal 1: Warm-start + Discord
 
-### Estructura de Colaboración
+Antes de ir a desconocidos, reclutar una primera cohorte manual.
 
-```
-1. Identificar candidato que ya hable de temas afines
-2. Darle acceso beta real (no una demo limitada)
-3. Dejarle usar el producto 1-2 semanas
-4. Colaboración: review honesto, no script forzado
-5. Presupuesto: 150€ por 1 pieza de contenido de calidad
+Fuentes:
+
+- Amigos gamers/productivity nerds.
+- Mutuales de X/Discord.
+- Comunidades pequenas donde ya tengas presencia.
+- Ex-usuarios de Habitica que conozcas personalmente.
+- Dev/build-in-public contactos.
+
+Script corto:
+
+```text
+Estoy probando Covenant, una app de productividad RPG: completas tareas reales, ganas mana y lo gastas en quests tacticas.
+
+No busco "likes"; busco 10 personas que hagan una prueba de 20 minutos y me digan brutalmente donde se rompe o donde engancha.
+
+Te paso acceso? La mision beta es: crea personaje -> completa una tarea/habito -> gana mana -> empieza una quest.
 ```
 
-### Timing
+Meta: 20 usuarios invitados, 10 `loop_closed`, 5 entrevistas/DMs largos.
 
-No gastar en influencers hasta tener **producto mostrable y comunidad base.** Un influencer enviando tráfico a un Discord vacío o un producto con bugs es dinero desperdiciado. Activar en Fase 3 del timeline.
+### Canal 2: Reddit valor-first
 
----
+Reddit puede funcionar, pero no como link-drop. Usarlo para conversaciones utiles y feedback explicito.
 
-## Mecanismo de Referral
+Subreddits candidatos a validar manualmente antes de postear:
 
-### Sistema Integrado en el Producto
+| Subreddit | Uso recomendado |
+| --------- | --------------- |
+| `r/gamification` | Compartir aprendizajes de diseno y pedir critique |
+| `r/productivity` | Post de valor sobre recompensas visibles y sistemas de seguimiento |
+| `r/SideProject` | Build log honesto con demo |
+| `r/IndieDev` / `r/IndieGaming` | Devlog si el post muestra gameplay real |
+| `r/Habitica` | Solo si las reglas lo permiten y el post es comparativo/feedback, no captacion |
 
-El mejor canal de adquisición a largo plazo es que los propios usuarios traigan a otros. Diseñar un sistema de referral que se integre con la narrativa del juego.
+Reglas operativas:
 
-**Mecánica propuesta:**
+- Leer reglas de cada subreddit antes de publicar.
+- Participar 1-2 semanas con comentarios utiles antes del primer post propio.
+- Publicar posts que funcionen sin link.
+- Pedir feedback, no conversion.
+- No repetir el mismo post en varios subreddits.
+- No usar cuentas falsas ni engagement artificial.
 
-| Elemento            | Implementación                                               |
-| ------------------- | ------------------------------------------------------------ |
-| Invitación          | "Recluta un aliado para tu facción" — link único por usuario |
-| Incentivo invitador | XP bonus, item exclusivo, o título cosmético                 |
-| Incentivo invitado  | Bonus de inicio (XP o item de bienvenida)                    |
-| Tracking            | Dashboard para ver cuántos aliados has reclutado             |
+Formatos:
 
-**Importante:** El sistema de referral no sustituye al marketing — lo complementa. Funciona cuando ya tienes usuarios satisfechos. Implementar cuando haya al menos 30 usuarios activos.
+- "I built a productivity RPG where real tasks become mana. Here is the activation loop I am testing."
+- "What makes gamified productivity feel meaningful instead of fake?"
+- "I replaced generic XP with mana you spend in combat. Would this motivate you or annoy you?"
 
----
+Meta: 2 posts buenos/mes, 20-40 comentarios utiles/mes, 20 usuarios beta desde Reddit en 12 semanas.
 
-## Timeline: 12 Semanas Realistas
+### Canal 3: X / Devlog + Blog
 
-### Fase 1: Infraestructura (Semanas 1-3)
+No esperar conversion directa al principio. Sirve para crear historial publico, screenshots, y material que otros puedan compartir.
 
-**Objetivo:** Tener la base lista antes de buscar usuarios.
+Cadencia minima:
 
-| Semana | Acción                                    | Resultado esperado                |
-| ------ | ----------------------------------------- | --------------------------------- |
-| S1     | Crear Discord con estructura de canales   | Servidor listo para recibir gente |
-| S1     | Landing page con waitlist + email capture | Punto de entrada funcional        |
-| S2     | Configurar email (bienvenida automática)  | Funnel básico operativo           |
-| S2     | Crear cuentas Twitter y Reddit            | Presencia mínima establecida      |
-| S3     | Primeros 3 posts "building in public"     | Contenido inicial publicado       |
-| S3     | Identificar 10 subreddits/cuentas afines  | Mapa de dónde participar          |
+| Frecuencia | Pieza |
+| ---------- | ----- |
+| 2x/semana | Screenshot/GIF de una feature real |
+| 1x/semana | Mini devlog: decision, problema, antes/despues |
+| 1x/2 semanas | Post largo en `/news` o hilo sobre diseno |
 
-### Fase 2: Presencia y Comunidad (Semanas 4-7)
+Temas buenos:
 
-**Objetivo:** Construir presencia auténtica y primeros miembros de comunidad.
+- "Why tasks earn mana instead of generic XP."
+- "The first 20-minute beta quest."
+- "What I learned watching someone fail onboarding."
+- "Building a darker alternative to cute habit trackers."
 
-| Semana | Acción                                       | Resultado esperado                |
-| ------ | -------------------------------------------- | --------------------------------- |
-| S4-S5  | Participar activamente en Reddit (3x/semana) | Reputación en comunidades clave   |
-| S4-S5  | Twitter: devlogs 2x/semana                   | Primeros seguidores orgánicos     |
-| S6     | Primer post propio en Reddit con substance   | 20+ upvotes, primeros signups     |
-| S6-S7  | Contenido semanal de calidad (1/semana)      | Pipeline de contenido establecido |
-| S7     | Invitar primeros 10-15 beta testers          | Discord con vida real             |
+Meta: 1 asset reutilizable por semana, no seguidores por seguidores.
 
-### Fase 3: Amplificación (Semanas 8-10)
+### Canal 4: Micro-creadores
 
-**Objetivo:** Escalar lo que funciona con apoyo de presupuesto.
+No gastar antes de cumplir estas condiciones:
 
-| Semana | Acción                                     | Resultado esperado                   |
-| ------ | ------------------------------------------ | ------------------------------------ |
-| S8     | Activar colaboración con micro-influencer  | Amplificación de alcance             |
-| S8-S9  | Push de contenido en canales que funcionan | Duplicar esfuerzo donde hay tracción |
-| S9-S10 | Activar sistema de referral                | Crecimiento orgánico comienza        |
+- Al menos 30 usuarios han llegado a `loop_closed`.
+- D7 retention de usuarios activados >= 25%.
+- Hay demo de 30s y onboarding probado por usuarios externos.
+- Discord tiene actividad semanal real.
 
-### Fase 4: Evaluación y Ajuste (Semanas 11-12)
+Perfil:
 
-**Objetivo:** Medir resultados, cortar lo que no funciona, reforzar lo que sí.
+- 5k-50k seguidores.
+- Gaming/productivity, RPG, self-improvement o indie games.
+- Engagement visible y comentarios reales.
+- Dispuesto a probar el producto, no solo leer un guion.
 
-| Semana | Acción                                      | Resultado esperado          |
-| ------ | ------------------------------------------- | --------------------------- |
-| S11    | Análisis completo de métricas por canal     | Saber qué funciona y qué no |
-| S11    | Encuesta a beta testers (NPS + feedback)    | Datos cualitativos reales   |
-| S12    | Doblar inversión en canales ganadores       | Recursos concentrados       |
-| S12    | Eliminar canales con bajo retorno           | Menos dispersión            |
-| S12    | Documentar aprendizajes para siguiente fase | Base para el plan post-beta |
+Oferta:
 
----
-
-## Presupuesto: 200€/mes
-
-> "No hay instancia de un país que se haya beneficiado de una guerra prolongada."
-
-### Distribución Mensual
-
-| Partida                     | Monto | Notas                                      |
-| --------------------------- | ----- | ------------------------------------------ |
-| Micro-influencer (1 bueno)  | 150€  | Activar en Fase 3, no antes                |
-| Herramientas / contingencia | 50€   | Dominio, email tool si se necesita upgrade |
-
-**Meses 1-2 (Fases 1-2):** Gastar ~0€. Todo el trabajo es orgánico: Discord, Reddit, Twitter, contenido.
-**Mes 3 (Fase 3):** Activar los 200€ cuando haya producto y comunidad base.
-
-### Distribución de Tiempo (10-12h/semana)
-
-| Actividad                            | Horas | Prioridad |
-| ------------------------------------ | ----- | --------- |
-| Discord: participar + moderar        | 3-4h  | #1        |
-| Reddit + Twitter: crear + participar | 3-4h  | #2        |
-| Contenido semanal: crear + publicar  | 2-3h  | #3        |
-| Gestión influencer + admin           | 1-2h  | #4        |
+- 150-200 EUR por una review honesta o "I tried this beta" con acceso real.
+- Pedir critica publica honesta mejor que promo generica.
 
 ---
 
-## Métricas y KPIs
+## Plan de 12 Semanas
 
-### Dashboard Principal
+### Semana 0: Readiness antes de invitar desconocidos
 
-| KPI                  | Objetivo S6 | Objetivo S12 | Cómo medirlo                |
-| -------------------- | ----------- | ------------ | --------------------------- |
-| Emails en waitlist   | 50          | 150          | Email tool dashboard        |
-| Miembros Discord     | 30          | 80           | Discord server stats        |
-| Beta testers activos | 15          | 50           | Analytics del producto      |
-| Retention D7         | 40%         | 50%          | Mixpanel / analytics propio |
-| NPS                  | >30         | >50          | Encuesta in-app o Discord   |
+Checklist:
 
-### Métricas por Canal
+- Configurar `privacy@covenantrpg.com`.
+- Crear Discord con canales minimos: `#announcements`, `#start-here`, `#feedback`, `#bug-reports`, `#wins`, `#general`.
+- Crear email de bienvenida manual o automatizado.
+- Preparar demo de 30s + 4 screenshots.
+- Crear enlaces UTM por canal: `reddit`, `x`, `discord`, `warm`.
+- Ejecutar el happy path completo como usuario nuevo.
+- Revisar copy publica para que todo hable de mana/reserve, no de dice.
 
-| Canal      | Métrica principal          | Objetivo S12  |
-| ---------- | -------------------------- | ------------- |
-| Discord    | Miembros activos/semana    | 40            |
-| Email      | Tasa de apertura           | >40%          |
-| Reddit     | Clicks a landing/Discord   | 50/semana     |
-| Twitter    | Impresiones/semana         | 15k           |
-| Influencer | Signups por colaboración   | 15+           |
-| Referral   | Usuarios traídos por otros | 10% del total |
+### Semanas 1-2: Cohorte manual
 
-### Herramientas de Medición
+Objetivo: 10-20 usuarios invitados manualmente.
 
-| Herramienta          | Uso                              | Coste  |
-| -------------------- | -------------------------------- | ------ |
-| **Google Analytics** | Tráfico web, fuentes, conversión | Gratis |
-| **Mixpanel**         | Comportamiento de usuarios       | Gratis |
-| **UTM parameters**   | Atribución por canal y campaña   | Gratis |
-| **Discord Insights** | Actividad del servidor           | Gratis |
+Acciones:
+
+- Enviar 5-10 DMs/dia, maximo.
+- Dar acceso en batches pequenos.
+- Pedir que hagan la Beta Quest en 20 minutos.
+- Hacer 5 entrevistas cortas o DMs estructurados.
+- Corregir fricciones criticas antes de ampliar.
+
+Exit criteria:
+
+- 10 usuarios llegan a `loop_closed`.
+- Sabes los 3 mayores puntos de confusion.
+- Al menos 3 usuarios vuelven otro dia.
+
+### Semanas 3-6: Comunidad externa pequena
+
+Objetivo: 30-50 usuarios beta totales.
+
+Acciones:
+
+- Primer post en Reddit tras participacion previa.
+- 2 updates/semana en X.
+- 1 post largo/devlog cada 2 semanas.
+- Invitar 10-15 usuarios por semana, no mas.
+- Publicar weekly update en Discord cada viernes.
+
+Exit criteria:
+
+- `loop_closed` >= 30% de nuevos signups.
+- D7 de activados >= 25%.
+- 15 miembros Discord activos/semana.
+- 10 piezas de feedback accionable.
+
+### Semanas 7-10: Escalar solo lo que funciono
+
+Objetivo: 50-100 usuarios beta.
+
+Acciones:
+
+- Doblar el canal con mejor ratio signup -> `loop_closed`.
+- Activar referral narrativo simple si hay 30 usuarios activos: "Recluta un aliado".
+- Contactar 5 micro-creadores; pagar 1 solo si las metricas anteriores se sostienen.
+- Publicar una demo mas pulida con aprendizajes reales.
+
+Exit criteria:
+
+- 50 usuarios beta activos acumulados.
+- 30+ usuarios con `loop_closed`.
+- 10 usuarios han vuelto despues de 7 dias.
+- Discord ya no depende 100% del fundador para cada conversacion.
+
+### Semanas 11-12: Decision
+
+Objetivo: decidir siguiente fase.
+
+Preguntas:
+
+- Que canal genero mas usuarios activados, no mas visitas?
+- Que feature hizo que usuarios volvieran?
+- Donde abandona la mayoria: signup, email verify, onboarding, mana, quest, combat?
+- El posicionamiento "Complete tasks. Kill demons." atrae a los usuarios correctos?
+- Hay suficiente senal para Product Hunt/public launch, o toca otra beta cerrada?
+
+Decision:
+
+- **Go public:** si activacion y D7 son solidos.
+- **Otra beta cerrada:** si el loop engancha pero onboarding/friccion falla.
+- **Product pivot:** si usuarios completan el loop pero no quieren volver.
 
 ---
 
-## Los 6 Caminos a la Derrota (Y Cómo Evitarlos)
+## Metricas
 
-> "Conoce al enemigo y conócete a ti mismo; en cien batallas nunca estarás en peligro."
+### Dashboard principal
 
-| Derrota              | Causa                              | Prevención                                      |
-| -------------------- | ---------------------------------- | ----------------------------------------------- |
-| **Dispersión**       | Estar en 5 canales a la vez        | Máximo 2 canales primarios hasta validar        |
-| **Artificialidad**   | Marketing disfrazado de comunidad  | Autenticidad siempre, building in public real   |
-| **Insubordinación**  | Mensajes inconsistentes            | Una voz, una narrativa, un posicionamiento      |
-| **Ruina financiera** | Gastar antes de validar            | 0€ hasta tener tracción, luego 200€ con cuidado |
-| **Colapso**          | Estrategia sin ejecución constante | Calendario semanal estricto, no "cuando pueda"  |
-| **Impaciencia**      | Esperar resultados en 2 semanas    | 12 semanas mínimo, medir tendencias no picos    |
+| KPI | Target S6 | Target S12 | Fuente |
+| --- | --------- | ---------- | ------ |
+| Signups | 40 | 120 | PostHog / auth |
+| Character created | 30 | 90 | `character_created` |
+| Loop closed | 15 | 50 | `loop_closed` |
+| Signup -> loop_closed | >= 30% | >= 40% | Funnel PostHog |
+| D7 retention activados | >= 25% | >= 35% | PostHog |
+| Feedback cualitativo | 10 piezas | 25 piezas | Discord/DM |
+| Discord activos/semana | 10 | 30 | Discord |
+
+### Funnel de activacion
+
+Medir:
+
+```text
+landing/pageview
+  -> user_signed_up
+  -> character_created
+  -> task_completed OR habit_completed OR objective_completed OR journal_entry_created
+  -> combat_started
+  -> loop_closed
+  -> return D1 / D7
+```
+
+Si el abandono ocurre antes de `character_created`, es problema de signup/onboarding.
+Si ocurre despues de ganar mana pero antes de `combat_started`, es problema de conectar productividad con RPG.
+Si ocurre despues de `loop_closed` pero no hay D7, el loop es interesante pero no recurrente.
+
+### Metricas de canal
+
+| Canal | Metrica buena | Metrica peligrosa |
+| ----- | ------------- | ----------------- |
+| Warm-start | `loop_closed` + feedback detallado | "Me parece guay" sin uso |
+| Reddit | Comentarios profundos + signups activados | Upvotes sin signups |
+| X/devlog | DMs, shares, usuarios que prueban | Impresiones vacias |
+| Discord | Usuarios ayudandose/reportando | Servidor lleno pero silencioso |
+| Influencer | Signups activados | Vistas sin activacion |
 
 ---
 
-## Señales de Victoria
+## Presupuesto
 
-### Fase Beta Exitosa
+Mes 1:
 
-| Métrica              | Target               |
-| -------------------- | -------------------- |
-| 50-100 usuarios beta | Masa crítica         |
-| 50% retention D7     | Producto funciona    |
-| NPS >50              | Usuarios satisfechos |
-| 2 canales validados  | Marketing funciona   |
+- 0 EUR paid acquisition.
+- Usar tiempo en setup, feedback, demo, Discord.
 
-### Señales Cualitativas de que Va Bien
+Mes 2:
 
-- Usuarios refiriendo amigos sin que se lo pidas
-- Contenido compartido orgánicamente por usuarios
-- Solicitudes de acceso beta que llegan sin promoción activa
-- Conversaciones espontáneas en el Discord sin intervención del fundador
-- Alguien escribe sobre Covenant sin que se lo hayas pedido
+- 0-50 EUR para herramientas si falta algo operativo.
+- No pagar creadores todavia salvo oportunidad excepcional.
+
+Mes 3:
+
+- 150-200 EUR en una colaboracion si el producto ya prueba activacion.
+- 0 EUR en ads. Ads optimizan volumen; Covenant aun necesita aprendizaje.
+
+---
+
+## Rutina Semanal del Fundador
+
+Tiempo esperado: 10-12h/semana.
+
+| Actividad | Horas |
+| --------- | ----- |
+| Hablar con beta users / Discord | 3h |
+| Outreach manual | 2h |
+| Reddit/X participacion real | 2h |
+| Crear una pieza de contenido/demo | 2h |
+| Revisar metricas y priorizar fixes | 1-2h |
+| Admin/creadores/UTMs | 1h |
+
+Ritual de viernes:
+
+1. Publicar update corto: que se arreglo, que se aprendio, que se prueba la semana que viene.
+2. Revisar funnel signup -> `loop_closed`.
+3. Elegir un solo problema de activacion para mejorar.
+4. Invitar la siguiente cohorte.
+
+---
+
+## Assets Necesarios
+
+| Asset | Uso |
+| ----- | --- |
+| Demo 30s | Reddit, X, micro-creadores |
+| 4 screenshots | Press kit, posts, Discord |
+| Pitch 1 linea | Bio, posts, DMs |
+| Pitch 2 lineas | Outreach y creador |
+| Beta Quest instructions | Email/Discord onboarding |
+| Feedback form | Recoger friccion sin perseguir a todos |
+| UTM links | Atribucion por canal |
+
+Pitch 1 linea:
+
+**Covenant is a productivity RPG where real tasks become mana for tactical quests.**
+
+Pitch 2 lineas:
+
+**Complete tasks, habits, objectives, or journal entries to earn mana. Spend that mana in tactical RPG quests, win gold and gear, and make your real-world discipline visible.**
+
+---
+
+## Riesgos
+
+| Riesgo | Mitigacion |
+| ------ | ---------- |
+| Marketing antes de producto estable | Cohortes pequenas, no launch publico aun |
+| Discord vacio | Warm-start antes de invitar masa |
+| Reddit te marca como spam | Valor primero, reglas de comunidad, no repetir links |
+| Usuarios se registran pero no entienden que hacer | Beta Quest + checklist + email claro |
+| Mucha promesa futura | Vender solo loop actual: tarea -> mana -> quest |
+| Optimizar seguidores | Cortar cualquier canal que no produzca `loop_closed` |
+
+---
+
+## Fuentes Operativas
+
+- Reddit Help: spam incluye acciones repetidas/no solicitadas y publicacion masiva para exposicion o ganancia; la promocion requiere cuidado con frecuencia y reglas de cada comunidad.
+- Reddit Help para moderacion: algunas comunidades prohiben promocion; otras aplican la regla 10% autopromo / 90% contenido organico.
+- Discord Community: Server Insights ayuda a medir engagement y salud de comunidad cuando el servidor crece.
+- PostHog: las metricas de activacion deben correlacionarse con retencion y conviene capturarlas server-side cuando son criticas.
+- Product Hunt Help: launch publico queda para mas adelante; los makers deben estar listos para interactuar directamente con la comunidad.
 
 ---
 
 ## Principio Final
 
-> "La excelencia suprema consiste en romper la resistencia del enemigo sin luchar."
+No necesitamos demostrar que Covenant puede atraer trafico. Necesitamos demostrar que el loop hace que una persona vuelva.
 
-Covenant no compite. Covenant ocupa el vacío.
+Primero: **20 usuarios que cierren la Beta Quest.**
+Despues: **50 usuarios activados.**
+Solo entonces: **campana publica.**
 
-No luchamos contra Habitica por sus usuarios. Atraemos a los que Habitica nunca pudo satisfacer. No gastamos en ads compitiendo con Forest. Aparecemos donde Forest no existe. No intentamos ser mejores que Todoist. Somos algo completamente diferente.
-
-La estrategia es simple: **construir una comunidad propia (Discord + Email), ser auténticos en comunidades ajenas (Reddit + Twitter), y concentrar recursos en lo que funciona.** Sin dispersión, sin artificialidad, sin prisa.
-
----
-
-_Última actualización: 11 Febrero 2026_
+La guerra no empieza con un ejercito. Empieza con la primera patrulla que vuelve del frente y dice: "esto funciona".
